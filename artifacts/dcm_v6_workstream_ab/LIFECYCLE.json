@@ -1,0 +1,18 @@
+{
+  "software": "6.0.0+WSAB.UNIVERSAL.LR000000",
+  "learning_revision": "LR000000",
+  "predictive_claim": "NONE",
+  "objects": {
+    "v5_source": "ABSENT",
+    "v5_ledger": "ABSENT",
+    "schema_6e78": "DECLARED_UNVERIFIED",
+    "wsab_baseline_46": "AUTHORIZED",
+    "football_plugin": "IMPLEMENTED_STANDALONE",
+    "basketball_plugin": "IMPLEMENTED_STANDALONE",
+    "sport_plugin_sdk": "IMPLEMENTED_STANDALONE",
+    "prizepicks_settlement": "IMPLEMENTED_STANDALONE",
+    "har_spine": "DESIGNED",
+    "operator_ui": "IMPLEMENTED_STANDALONE",
+    "release": "NOT_ACCEPTED"
+  }
+}

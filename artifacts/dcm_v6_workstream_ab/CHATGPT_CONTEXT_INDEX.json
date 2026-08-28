@@ -1,0 +1,28 @@
+{
+  "package": "dcm_v6_workstream_ab",
+  "version": "6.0.0+WSAB.UNIVERSAL.LR000000",
+  "learning_revision": "LR000000",
+  "predictive_claim": "NONE",
+  "lifecycle": "IMPLEMENTED_STANDALONE",
+  "canonical_baseline": {
+    "version": "5.4.1",
+    "source_hash": "bd1fb433d5f82d3812e453c30edcbb67db11b20f60e43cf50424c45a7c2ff474",
+    "ledger_hash": "a9956ef1d231eb37ea5898b5145d660b986b68ee4dc6cfbd5c43fed59064c29a",
+    "status": "ABSENT"
+  },
+  "schema_freeze": {
+    "id": "PHASE_BC_SCHEMA_V1_2026-08-25",
+    "hash": "6e78dacc19843338643bdcabc7477fd3ce2dd065da1e9629646dacc21cdb1f22",
+    "verification_state": "DECLARED_UNVERIFIED",
+    "reconstruction_hash": "08be9307caaa2bff6ca0e705650e47869d52aa79fd47e60aa35a371b4e95b02f"
+  },
+  "wsab_baseline": "WSAB_BASELINE_46",
+  "sports": "configs/capabilities/sport_capability_registry.json",
+  "platform_rules": "configs/platform/prizepicks/rule_versions.json",
+  "commands": "COMMANDS.json",
+  "tests": "TEST_INDEX.json",
+  "failure_codes": "FAILURE_CODES.md",
+  "entrypoint": "CHATGPT_ENTRYPOINT.md",
+  "plugin_protocol": "SPORT_PLUGIN_PROTOCOL.md",
+  "platform_protocol": "PLATFORM_RULE_PROTOCOL.md"
+}

@@ -1,0 +1,1122 @@
+# Part A — What I like about DCM 6.0
+
+The architectural direction is substantially stronger than the earlier prop-by-prop DCM. The important improvement is not model complexity; it is that the **sports world, market definition, platform settlement, and learning system are becoming separate contracts**. That separation is mathematically necessary.
+
+|  # | Design object                                | What holds up                                                                                                                              | Failure it prevents                                                                                                     |
+| -: | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
+|  1 | **EventWorld**                               | One sporting event is generated once and reused by every related market.                                                                   | Points/PRA, pass/rush combos, fantasy scores, etc. contradicting one another because they were simulated independently. |
+|  2 | **PrimitiveStatLedger**                      | The ledger is the correct computational and truth boundary: primitives are stored once; derived markets are functions of those primitives. | Duplicate simulation, impossible composites, unnecessary CPU/memory use.                                                |
+|  3 | **ConservationRule**                         | Structural identities are checked before market derivation, not repaired afterward.                                                        | Illegal worlds contaminating probabilities and correlations.                                                            |
+|  4 | **OpportunityState vs EfficiencyState**      | Separating minutes/snaps/routes/targets/PA from per-opportunity performance is causally correct.                                           | Role changes masquerading as shooting/YPA/YPC “form,” or efficiency changes masquerading as workload.                   |
+|  5 | **MarketDefinition**                         | Exact `(Platform, League, Market, DefinitionVersion)` boundaries are the only safe way to translate sports truth into prop truth.          | Fuzzy stat matching and silent unit/definition substitutions.                                                           |
+|  6 | **Three-dimensional settlement**             | Administrative → Comparison → Economic is correct. DNP/Reboot/Tie cannot safely be collapsed into one `VOID` state.                        | Incorrect pick counts, same-team refund behavior, payout tiers, or learning labels.                                     |
+|  7 | **EntryContract + payout display hash**      | Capturing the actual submitted payout is better than inferring economics from card size.                                                   | Applying a generic “6-pick pays X” table to a lineup whose displayed economics differed.                                |
+|  8 | **`max(R_LB,R_MG)`**                         | Minimum Guarantee and Leaderboard are separate mechanisms; the customer receives the larger one, not their sum.                            | Inflated EV.                                                                                                            |
+|  9 | **Fail-closed state**                        | `UNRESOLVED`, `UNKNOWN_PLATFORM_RULE`, `PRESEASON_RULE_UNVERIFIED`, etc. are legitimate outcomes.                                          | A guessed settlement silently turning into training data or money logic.                                                |
+| 10 | **Offered-sides-only**                       | Analytical Higher/Lower can both exist, while selection remains constrained to the actual platform offer.                                  | Ranking a mathematically preferred side the user cannot actually select.                                                |
+| 11 | **Green Goblin constructor veto**            | Making Goblin rejection structural is much stronger than a prompt instruction.                                                             | Goblins re-entering via debug mode, portfolio repair, ranking fallback, or empty-card pressure.                         |
+| 12 | **Empty-card legality**                      | Six is a possible lineup size, not an optimization target.                                                                                 | Padding marginal or negative-utility plays to make output look complete.                                                |
+| 13 | **Sport-plugin envelope**                    | Different sports can use different physical atoms while preserving the common EventWorld/Ledger/Settlement contracts.                      | A global schema accumulating `pitch_id`, `hole_id`, `rally_id`, etc. every time a new sport is added.                   |
+| 14 | **Production/research authority separation** | Bartlett BEL, DPMM, GP-LVM and similar challengers do not receive production authority merely because they are sophisticated.              | Algorithm novelty becoming a substitute for unseen validation.                                                          |
+| 15 | **Software version ≠ Learning Revision**     | `6.x` can advance engineering while remaining `LR000000`.                                                                                  | Engineering work being mislabeled as forecasting improvement.                                                           |
+| 16 | **Hash lineage**                             | Evidence → parameters → worlds → ledger → market → projection → entry → settlement is the right provenance direction.                      | Reconstructing a forecast from mutable state after the fact.                                                            |
+| 17 | **Tracking-data boundary**                   | NGS, Statcast, SportVU/Hawk-Eye-like data belong in evidence unless a versioned market definition explicitly maps them.                    | Vendor/tracking features becoming unofficial “primitive stats.”                                                         |
+
+These are consistent with the frozen Master Blueprint and ADR: shared worlds, immutable primitives, explicit unknown state, exact platform definitions, Goblin exclusion and no forced card remain inherited law.  
+
+The football slice also demonstrates that the abstraction is not purely theoretical. The reported WSAB implementation uses common NFL/CFB primitives, exact rush/dropback identities, receptions ≤ targets ≤ routes, derived combos from the same ledger, and one sport-agnostic `settle_world_lineup` path.  The associated report records **41/41 tests passing**, including corrupted-world rejection, Goblin veto, ties versus DNP/Reboot, unknown payout tables, and deterministic lineage. 
+
+One qualification matters: those are **reported WSAB test results**, not an independent rerun from the full WSAB source tree in this review. The test report itself says it does not prove predictive improvement, live Reboot-list completeness, an official CFB eligibility list, real Leaderboard EV, or canonical v5.4.1 regression compatibility. 
+
+---
+
+# Part B — What I do not like about DCM 6.0
+
+## B1. Architectural debt / underspecification
+
+| Issue                                               | Hazard                          | Assessment                                                                                                                                                                                                                    |
+| --------------------------------------------------- | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **No executable content-addressed DAG in WSAB**     | Correctness + cost + governance | v2 requires reusable nodes keyed by identity, cutoff, source versions, config, schema and parent hashes. WSAB still presents a conventional function tree.                                                                    |
+| **No first-class node state machine**               | Correctness + interruption      | `PENDING → RUNNING → COMPLETE_VERIFIED / BLOCKED / INVALIDATED / FAILED_*` is specified but not demonstrated.                                                                                                                 |
+| **No AdaptiveExecutionPlanner v2**                  | Cost + environment-fit          | Existing v5.4.1 `runtime_planner.py` estimates ETA/safe cutoff; that is not a planner selecting workers, batch sizes, spill mode or simulation tiers.                                                                         |
+| **No ResourceGovernor v2**                          | Cost + environment-fit          | v5.4.1 already has request backpressure and bounded batching, but not total memory/cache/temp-disk/world-count/deadline governance.                                                                                           |
+| **Rule semantics are still too branch-oriented**    | Correctness + cost              | Production wants compiled exact lookup by `Platform + EntryType + League + Market + RuleVersion + Situation`, with unknown keys failing closed.                                                                               |
+| **No demonstrated sparse semantic portfolio graph** | Cost + correctness              | Same-event/shared-role/shared-weather edges should be explicit rather than dense board-wide pairwise work.                                                                                                                    |
+| **Performance instrumentation is far short of v2**  | Governance                      | v5.4.1 has a useful timer and bounded LRU, but its stage metric only covers input/output rows, wall and CPU time. v2 requires RSS, Python allocation, I/O, cache, invalidation, tools, tokens, checkpoint and quality state.  |
+
+The optimization blueprint is much stricter: a content-addressed DAG, descendant-only invalidation, five compute tiers, bounded state, online statistics, planner decisions, measured performance SLOs and explicit release blockers are part of the architecture—not optional polish. 
+
+### Important correction to the earlier WSAB report
+
+The WSAB report accurately said that **v5.4.1 was not present in that build environment**, so the football package was standalone forward-development rather than a verified canonical patch. 
+
+That historical statement remains true. But **the canonical v5.4.1 files are available in the present project context now**. Its manifest declares:
+
+* Source SHA-256: `bd1fb433d5f82d3812e453c30edcbb67db11b20f60e43cf50424c45a7c2ff474`
+* Ledger SHA-256: `a9956ef1d231eb37ea5898b5145d660b986b68ee4dc6cfbd5c43fed59064c29a` 
+
+So the next integration should **rebase the WSAB work onto those exact canonical bytes**, not continue treating v5.4.1 as unavailable.
+
+The separate `PHASE_BC_SCHEMA_V1_2026-08-25` JSON bytes are still **UNVERIFIED in this review**. The documents declare SHA-256 `6e78dacc...`, but the original schema JSON itself has not been surfaced as an independently hashable attachment here.
+
+## B2. Scope risk
+
+The 15-plus-sport map is useful as an **architecture horizon** and dangerous as an implementation queue.
+
+ADR-V6-001 is right to authorize football and E2E settlement, place MLB next, and defer AFL/CFL/LAX/handball/soccer/tennis/golf/cricket/UFC production registries. 
+
+I would preserve that order:
+
+**Basketball LIVE → football integration complete → MLB PA engine → then evidence-driven sport expansion.**
+
+Trying to implement every sport now introduces three simultaneous unknowns: physical opportunity mechanics, conservation rules, and platform-administration rules. That is exactly where fabricated “generic sport logic” appears.
+
+**Hazards:** correctness, cost, governance.
+
+## B3. Known contract gaps
+
+These need to be closed **before calling football platform settlement complete**:
+
+| Gap                                               | Required behavior                                                                 | Hazard               |
+| ------------------------------------------------- | --------------------------------------------------------------------------------- | -------------------- |
+| CFB fixture registry ≠ official qualifying roster | Freeze the dated official list and hash it.                                       | Correctness          |
+| CFB event phase                                   | Require `game_phase == CFP_PLAYOFF` where that snapshot applies.                  | Correctness          |
+| Generic `left_early`                              | Replace with explicit `left_first_half` + `no_second_half_return`.                | Correctness          |
+| `board_id` / board scope                          | Distinguish full-game from 1H/1Q/season/preseason/etc.                            | Correctness          |
+| Combo-square Reboot                               | Encode the exact OR/eligibility semantics, not a generic stat-key check.          | Correctness          |
+| Same-player stack weight                          | Enforce the 0.95 Leaderboard override.                                            | Economic correctness |
+| NFLP                                              | Keep physical modeling separate; settlement remains `UNRESOLVED` unless verified. | Correctness          |
+| CFB regular season/bowls                          | Do not inherit CFP rules.                                                         | Correctness          |
+| Leaderboard group distribution                    | Keep EV `UNMODELED` without actual group context.                                 | Governance           |
+| Live Reboot stat list completeness                | Current tests cannot establish live-board completeness.                           | Correctness          |
+
+The ADR itself identifies CFB/player-list ambiguity, NFL preseason failure closure and missing Leaderboard group information as unresolved data requirements. 
+
+## B4. Optimization-contract gaps
+
+This is the largest gap between **“DCM v6 architecture”** and **“optimized DCM v6 runtime.”**
+
+There is currently no release evidence for:
+
+1. real production E2E profiling;
+2. cold/warm medians and worst-case dispersion;
+3. PeakRSS tracking;
+4. highest-allocation functions;
+5. bottleneck before/after register;
+6. largest-HAR bounded-memory proof;
+7. 2× largest-board stress;
+8. repeated-run leak test;
+9. adaptive Monte Carlo convergence on a production board;
+10. sequential/process/thread comparison;
+11. sequential/parallel deterministic parity;
+12. descendant-only invalidation measurements;
+13. interruption at every major boundary followed by verified resume;
+14. TokenBudgetManager metrics;
+15. research-claim deduplication savings;
+16. `ComputeROI` governance;
+17. final quality/performance-frontier comparison;
+18. all §22 performance artifacts.
+
+Blueprint v2 explicitly says those are **release blockers**, not aspirational enhancements.  
+
+## B5. Social/process risk
+
+The largest governance risk is **document chronology drift**.
+
+One document says “football is NEXT.” Another later document reports football as implemented. A future ChatGPT session may then read a sentence saying “accepted football layer” and silently convert that into “integrated, regression-tested canonical v6.”
+
+Those are different states:
+
+`DESIGNED → AUTHORIZED → IMPLEMENTED_STANDALONE → INTEGRATED → REGRESSION_VERIFIED → RELEASE_ACCEPTED`
+
+DCM needs those statuses explicitly in machine-readable metadata.
+
+Do not let natural-language phrases such as “accepted,” “done,” “live,” or “canonical-adjacent” serve as lifecycle state.
+
+**Hazard:** governance first, correctness second.
+
+---
+
+# Part C — Capability matrix: ChatGPT Plus Chat vs ChatGPT Work
+
+Current OpenAI product documentation says Projects retain related chats/files/instructions, and Library preserves uploaded and generated files for later reuse. ([OpenAI Help Center][1]) Work adds agentic workflows and can operate its cloud browser after the user leaves, but that is a browser-task environment—not evidence that it is an unrestricted, deterministic Python production host for multi-hour Monte Carlo/process-pool workloads. ([OpenAI Help Center][2])
+
+| Capability                         | Plus Chat                                             | ChatGPT Work                                                                       | At all?     | Correctly?               | Measurable? | Failure if we pretend                                  |
+| ---------------------------------- | ----------------------------------------------------- | ---------------------------------------------------------------------------------- | ----------- | ------------------------ | ----------- | ------------------------------------------------------ |
+| Source/install hash verification   | Yes, readable bytes                                   | Yes                                                                                | Yes         | Yes                      | Yes         | Hashing a filename/document claim instead of bytes     |
+| Canonical v5.4.1 attachment        | Yes                                                   | Yes                                                                                | Yes         | Yes                      | Yes         | Reconstructing missing source and calling it canonical |
+| HAR ingestion                      | Small/medium artifact analysis                        | Better workflow orchestration                                                      | Partial     | Depends on size/runtime  | Partial     | Raw HAR consumes context/runtime                       |
+| Bounded-memory HAR decoder         | Tiny fixture demonstration                            | Bounded demo possible                                                              | Partial     | Production: host         | Host        | Calling `json.load()` “streaming”                      |
+| EventWorld simulation              | Tiny fixtures                                         | Small integration fixture                                                          | Yes         | Demo only                | Demo        | Treating sandbox run as production SLO                 |
+| PrimitiveStatLedger                | Yes, fixture                                          | Yes, fixture                                                                       | Yes         | Yes for fixture          | Yes         | Deriving composites independently                      |
+| Vectorized conservation            | Yes                                                   | Yes                                                                                | Yes         | Yes                      | Yes         | Skipping identities for speed                          |
+| CRN line surfaces                  | Small fixture                                         | Small fixture                                                                      | Yes         | Yes                      | Yes         | Resimulating adjacent lines                            |
+| Adaptive convergence               | Specify/test tiny case                                | Bounded demo                                                                       | Partial     | Production: host         | Host        | Fixed draw count called “adaptive”                     |
+| Online statistics                  | Fixture                                               | Fixture                                                                            | Yes         | Yes                      | Yes         | Retaining all worlds unnecessarily                     |
+| Sparse dependence graph            | Design/test small graph                               | Small board                                                                        | Yes         | Yes                      | Partial     | Dense N² correlation matrix                            |
+| Portfolio joint refinement         | Tiny only                                             | Small demo                                                                         | Partial     | Production: host         | Host        | Independent-leg EV sum                                 |
+| Versioned rule settlement          | Yes                                                   | Yes                                                                                | Yes         | Yes with frozen snapshot | Yes         | Nearest-rule fallback                                  |
+| Reboot/DNP table verification      | Research + snapshot                                   | Research + project artifact                                                        | Yes         | Only for verified rows   | Yes         | Inventing absent sport rows                            |
+| XLSX audit output                  | Possible                                              | Better suited                                                                      | Yes         | Yes                      | Yes         | Workbook becomes runtime database                      |
+| Indexed SQLite runtime store       | Small/local artifact                                  | Integration demo                                                                   | Partial     | Production: host         | Host        | Repeated workbook scans                                |
+| Content-addressed cache            | File-level demo                                       | Project-level demo                                                                 | Partial     | Host for production      | Host        | Chat memory called a cache                             |
+| Descendant invalidation            | Graph fixture                                         | Integration demo                                                                   | Yes         | Host for full runner     | Yes         | Full rerun after every line move                       |
+| AdaptiveExecutionPlanner           | Specify/interface                                     | Test decision fixtures                                                             | Partial     | Production: host         | Host        | Static `workers=8` called adaptive                     |
+| ResourceGovernor                   | Specify/interface                                     | Tiny simulation                                                                    | Partial     | Production: host         | Host        | Silent prop dropping under memory pressure             |
+| Process parallelism                | Not a production assumption                           | Not a production guarantee                                                         | Host        | Host                     | Host        | One process per prop                                   |
+| `tracemalloc` on fixture           | Possible                                              | Possible                                                                           | Yes         | Fixture only             | Yes         | Inferring production memory                            |
+| Real PeakRSS                       | Only if runner runs here                              | Only if runner runs here                                                           | Conditional | Host preferred           | Host        | Reporting RSS from another machine                     |
+| Flame/call tree                    | Small local profile                                   | Small demo                                                                         | Partial     | Production: host         | Host        | Fabricated “top functions”                             |
+| Atomic checkpoint file             | Can create artifact                                   | Stronger project workflow                                                          | Yes         | Yes                      | Yes         | Conversation summary used as checkpoint                |
+| Byte-identical interruption resume | Only artifact boundaries                              | Better artifacts, still bounded                                                    | Partial     | Host                     | Host        | “Continue where we left off” from prose                |
+| Token budgets                      | Yes                                                   | Yes                                                                                | Yes         | Yes                      | Yes-ish     | HAR/source dumped into chat                            |
+| Research DAG/VOI                   | Can enforce                                           | Better project cockpit                                                             | Yes         | Yes with claim store     | Partial     | One search per prop                                    |
+| Reusable claim store               | File artifact                                         | Good fit                                                                           | Yes         | Yes                      | Yes         | Re-searching event facts                               |
+| Overnight board execution          | No guarantee                                          | Work can continue supported agentic tasks, but arbitrary compute is not guaranteed | Host        | Host                     | Host        | Browser background task mistaken for compute daemon    |
+| Largest-HAR stress                 | Poor fit                                              | Poor fit                                                                           | Host        | Host                     | Host        | Memory claim based on tiny fixture                     |
+| 2× board stress                    | Poor fit                                              | Poor fit                                                                           | Host        | Host                     | Host        | No release-scale test                                  |
+| 40+ file pytest suite              | Possible if exact tree is present and runtime permits | Better integration task                                                            | Conditional | CI/host preferable       | Yes         | Reporting prior test count as current                  |
+| Release packaging hashes           | Yes on produced/readable files                        | Yes                                                                                | Yes         | Yes                      | Yes         | Hash without package bytes                             |
+| Long-lived runtime cache           | No guarantee                                          | Project artifacts help, not equivalent to process state                            | Host        | Host                     | Host        | Session memory treated as persistence                  |
+| Deterministic numerical runner     | Code only                                             | Code only                                                                          | Yes         | Host best                | Yes         | LLM prose “reasoning” a probability                    |
+| Real production SLO certification  | No                                                    | No by itself                                                                       | Host        | Host                     | Host        | Performance theater                                    |
+
+**Key distinction:** Projects and Library improve **artifact persistence**. They do not turn conversation memory into an atomic computational checkpoint. ([OpenAI Help Center][1])
+
+---
+
+# Part D — Things ChatGPT cannot honestly do
+
+## D1. Plus Chat
+
+Plus Chat cannot honestly:
+
+* claim an E2E production runner was profiled because a prompt asked for optimization;
+* guarantee byte-identical continuation after a dropped response when no checkpoint artifact was written;
+* report PeakRSS of a program that ran somewhere else;
+* infer a flame graph from source inspection;
+* hold the largest HAR, all decoded responses, historical data, every EventWorld, line surfaces, workbook and release package in conversational context and call that bounded memory;
+* promote `LR000000` because architecture tests pass;
+* invent official PrizePicks Reboot rows for soccer, tennis, golf, CFL, etc.;
+* reconstruct missing canonical source and then claim its expected SHA-256 was verified;
+* select a Green Goblin “just once” to complete a card;
+* make six selections the success criterion;
+* turn session memory into a content-addressed cache;
+* replace a deterministic probability kernel with prose reasoning.
+
+## D2. ChatGPT Work
+
+Work improves project-oriented execution, file handling and agentic web workflows. OpenAI currently documents persistent project context and cloud-browser tasks that can continue while the user is away. ([OpenAI Help Center][2])
+
+It still cannot honestly be treated as:
+
+* the user's laptop/VM profiler unless the production runner actually executes in an environment whose metrics are being measured;
+* proof of a 2× largest-board memory SLO without actually running that workload;
+* proof of bounded process-parallel behavior without the runner and parity tests;
+* a guarantee of uninterrupted arbitrary compute for hours;
+* authority for a PrizePicks rule absent from a verified source snapshot;
+* authority to promote a Learning Revision;
+* a replacement for canonical hash verification;
+* a reason to bypass Goblin/offered-side/temporal gates;
+* a reason to fabricate `Performance_Final.json`.
+
+**Neither Chat nor Work may turn “the architecture says this should be fast” into “this was measured to be fast.”**
+
+---
+
+# Part E — Dual-build architecture
+
+## E1. Shared core — identical bytes
+
+Both surfaces and the host should use the same deterministic core.
+
+```text
+Pillars_DCM_v6/
+├── schemas/
+│   └── Phase_BC_Immutable_Contracts.json
+├── configs/
+│   ├── run_config.json
+│   └── prizepicks/
+│       ├── participation_rules/
+│       ├── reboot_rules/
+│       ├── payout_tables/
+│       └── leaderboard_rules/
+├── dcm/
+│   ├── contracts/
+│   │   ├── hashing.py
+│   │   ├── schemas.py
+│   │   └── enums.py
+│   ├── runtime/
+│   │   ├── dag.py
+│   │   ├── node_key.py
+│   │   ├── node_state.py
+│   │   ├── checkpoint.py
+│   │   ├── cache.py
+│   │   ├── invalidation.py
+│   │   ├── adaptive_execution_planner.py
+│   │   ├── resource_governor.py
+│   │   └── metrics.py
+│   ├── sports/
+│   │   ├── basketball/
+│   │   ├── football/
+│   │   └── baseball/
+│   ├── platform/prizepicks/
+│   │   ├── entry_contract.py
+│   │   ├── rule_tables.py
+│   │   └── settlement.py
+│   ├── research/
+│   │   ├── claim_store.py
+│   │   └── voi_scheduler.py
+│   ├── storage/
+│   │   ├── runtime_store.py
+│   │   └── ledger_export.py
+│   └── performance/
+│       ├── harness.py
+│       ├── profiling.py
+│       └── quality_gates.py
+├── fixtures/
+├── state/
+├── cache/
+├── artifacts/runs/
+├── performance/
+└── release/
+```
+
+This does **not** require an external database. Use `sqlite3` as the portable runtime-store fallback. Canonical v5.4.1 already contains a WAL/indexed database architecture and deterministic export machinery worth migrating rather than discarding.  
+
+Likewise, v5.4.1 already contains atomic checkpoint writing via temporary file + `os.replace`; that should be evolved into v2 rather than rebuilt blindly. 
+
+### Core pure boundaries
+
+```text
+build_world(...)
+    -> EventWorld
+
+materialize_primitives(EventWorld)
+    -> PrimitiveStatLedger
+
+validate_conservation(PrimitiveStatLedger)
+    -> InvariantResult[]
+
+derive_market(PrimitiveStatLedger, MarketDefinition)
+    -> WorldProjectionResult
+
+settle(
+    WorldProjectionResult,
+    EntryContract,
+    ParticipationFacts,
+    PlatformRuleVersion
+)
+    -> WorldLineupOutcome
+```
+
+No ChatGPT prose between those transformations.
+
+## E2. Plus Chat = thin operator
+
+Chat should be allowed to:
+
+* inspect/verify readable hashes;
+* inspect a board artifact;
+* run tiny deterministic/golden fixtures;
+* orchestrate research at Sport → Event → Team → Player → Market;
+* inspect blockers;
+* emit card-or-empty;
+* emit compact audit findings;
+* write/checkpoint artifacts.
+
+It should **not** attempt the production hot path for a full board merely because code execution is available.
+
+Normal response surface:
+
+```text
+RUN INTEGRITY
+CARD / EMPTY CARD
+BLOCKERS
+ARTIFACT PATHS + HASHES
+NEXT DETERMINISTIC ACTION
+```
+
+Everything else belongs in artifacts.
+
+## E3. ChatGPT Work = project operator
+
+Work is the better integration cockpit:
+
+* source/package archaeology;
+* rule snapshots;
+* golden fixtures;
+* claim-store maintenance;
+* schema diff review;
+* small pytest suites;
+* 100–1,000-world integration demonstrations;
+* checkpoint manifests;
+* small `Performance_Demo.json`;
+* review of host-generated reports;
+* browser-based evidence acquisition.
+
+Projects retain files and context for long-running efforts, which makes this materially better than rebuilding state from one chat. ([OpenAI Help Center][3])
+
+But Work should **not author a fake `Performance_Final.json`**. The real production measurements remain host-owned.
+
+## E4. External host / portable install
+
+This is where Blueprint v2 becomes real.
+
+It owns:
+
+* full content-addressed DAG;
+* node scheduler;
+* AdaptiveExecutionPlanner;
+* ResourceGovernor;
+* HAR streaming;
+* process pools;
+* memory-mapped spill;
+* runtime SQLite;
+* largest-board tests;
+* 2× board stress;
+* leak tests;
+* real RSS;
+* flame/call-tree profiling;
+* adaptive simulation;
+* long-running board execution;
+* deterministic sequential/parallel parity;
+* crash injection/resume tests;
+* performance release artifacts.
+
+### Node types
+
+Recommended first-class node set:
+
+```text
+InstallVerificationNode
+SchemaRegistryNode
+PlatformRuleTableNode
+HARIndexNode
+MarketSnapshotDeltaNode
+EvidenceClaimNode
+EventEvidenceNode
+TeamStateNode
+PlayerRoleNode
+EventWorldSetNode
+PrimitiveLedgerNode
+ConservationNode
+MarketProjectionNode
+LineSurfaceNode
+GradeNode
+DependenceGraphNode
+PortfolioNode
+FreezeNode
+SettlementNode
+LearningCandidateNode
+LedgerExportNode
+ReleasePackageNode
+```
+
+### Node key
+
+Use the blueprint contract directly:
+
+```text
+NodeType
++ CanonicalIdentity
++ ForecastCutoff
++ SourceVersionSet
++ ConfigHash
++ SchemaVersion
++ ParentHashes
+```
+
+Canonicalize → SHA-256.
+
+Required states:
+
+```text
+PENDING
+RUNNING
+COMPLETE_VERIFIED
+BLOCKED
+INVALIDATED
+FAILED_RETRYABLE
+FAILED_TERMINAL
+```
+
+Blueprint v2 explicitly requires these auditable, checkpoint-safe states. 
+
+### Trust boundary
+
+| Evidence                                            | Chat/Work authority                              |
+| --------------------------------------------------- | ------------------------------------------------ |
+| SHA-256 of bytes actually readable in session       | **May compute and call verified**                |
+| Manifest hash when target bytes are absent          | May record only: **DECLARED / UNVERIFIED**       |
+| Host artifact imported and re-hashed                | May call artifact integrity verified             |
+| Host performance metric                             | May report what signed/hashed host artifact says |
+| Performance result never executed                   | **May not create or infer it**                   |
+| Canonical v5.4.1 source + ledger currently attached | May verify against its manifest                  |
+| Phase B/C schema hash without original JSON bytes   | **UNVERIFIED**                                   |
+| WSAB 41/41 report without executable WSAB tree      | **REPORTED, not independently rerun**            |
+
+---
+
+# Part F — Map Optimization Blueprint v2 onto DCM 6.0
+
+## F1. Sections 1–24
+
+|                        § | DCM attachment                        | WSAB status                            | Chat              | Work                   | Host                    | First proof                                  |
+| -----------------------: | ------------------------------------- | -------------------------------------- | ----------------- | ---------------------- | ----------------------- | -------------------------------------------- |
+|             1 Invariants | Eligibility, MarketDefinition, Freeze | Partial/present                        | Enforce           | Fixture test           | Release gate            | Goblin/offered-side tests                    |
+|                    2 DAG | Whole runtime                         | **Missing**                            | Specify           | Schema fixture         | Implement               | Resume reused `COMPLETE_VERIFIED` node       |
+|           3 Ledger-first | EventWorld/Ledger                     | Present football                       | Tiny fixture      | Integration fixture    | Columnar production     | Composite == primitives                      |
+|                   4 SLOs | Performance harness                   | Missing                                | Do not invent     | Demo only              | Full                    | `Performance_Baseline.json`                  |
+|             5 Complexity | Hot paths                             | Missing                                | Static review     | Small profiles         | Full profiler           | Bottleneck register                          |
+|          6 Memory layout | World/Ledger arrays                   | Partial precursor in v5                | Review            | 100-world SoA demo     | Production              | RSS/lifetime test                            |
+|    7 Shared/adaptive sim | EventWorldSet                         | Shared world partial; adaptive missing | Specify           | Small convergence test | Implement               | stop-rule event                              |
+|                8 Planner | Runtime                               | Missing                                | Interface         | Fixture decision       | Implement               | plan changes with board/RAM                  |
+|            9 Parallelism | Event batches                         | Missing                                | No hot path       | No certification       | Implement               | seq/parallel parity                          |
+|    10 Cache/invalidation | Evidence/world/markets                | v5 precursor, WSAB not integrated      | Inspect           | Integration demo       | Implement               | line-only delta invalidates descendants only |
+| 11 Research optimization | EvidenceGraph                         | v5 precursor                           | Claim IDs         | Claim store            | Full VOI queue          | duplicate acquisition = 0                    |
+|         12 Indexed store | Runtime/learning                      | v5 SQLite precursor                    | Inspect           | Small store            | Production              | as-of query/hash reconciliation              |
+|        13 Compiled rules | PrizePicks                            | Partial                                | Fixture           | Expand snapshot tests  | O(1) tables             | unknown key → UNRESOLVED                     |
+|        14 Model frontier | Sport models                          | Doctrine                               | No promotion      | Shadow notebooks       | Chronological benchmark | simpler validated model wins                 |
+|            15 ComputeROI | Governance                            | Missing                                | Report dimensions | Small demo             | Actual metrics          | candidate rejected on cost/quality           |
+|     16 Numerical kernels | Probabilities/lines                   | Partial                                | Golden tests      | Golden tests           | Accelerated parity      | simplex/monotonic/tolerance                  |
+|              17 Governor | Runtime resources                     | Missing                                | Specify           | Mock                   | Implement               | forced-memory-pressure test                  |
+|           18 Checkpoints | DAG boundaries                        | v5 precursor                           | Write artifacts   | Strong integration     | Full                    | crash/resume hash equality                   |
+|                19 Tokens | Chat surface                          | Policy only                            | Enforce           | Enforce                | N/A for most compute    | budget report                                |
+|               20 Logging | Runtime                               | Partial                                | Compact           | Stage logs             | Full                    | bounded stdout                               |
+|      21 Regression gates | Release                               | Missing for v6 optimization            | Consume           | Consume/demo           | Enforce                 | release fails on regression                  |
+|             22 Artifacts | Performance                           | Missing                                | Never fabricate   | Demo subset            | Full set                | paths + hashes                               |
+|      23 Release blockers | Release                               | Not satisfied                          | State blockers    | State blockers         | Clear blockers          | all gates evidence-backed                    |
+|        24 Build sequence | Program                               | Partially followed                     | Coordinate        | Integrate              | Execute                 | Phase-gated release                          |
+
+The v5.4.1 source already has useful precursors—checkpointing, cache/invalidation, SQLite, backpressure, timing and structure-of-arrays helpers.    But Blueprint v2 explicitly goes further into measured DAG reuse, memory ownership, adaptive execution and release evidence. 
+
+### Five compute tiers must be literal
+
+1. validated analytical/closed-form;
+2. board-wide fast pass;
+3. serious-candidate refinement;
+4. boundary/rank/tolerance refinement;
+5. portfolio joint refinement.
+
+Full worlds should **not** be retained by default. Maintain online means, variances, Higher/Lower/Push counts, covariance blocks and convergence metrics; retain full shared worlds only where dependence/audit actually requires them. 
+
+### Sparse edges only
+
+Create correlation/dependence edges for actual shared mechanisms:
+
+```text
+same_event
+same_team
+same_player
+same_QB_or_unit
+competing_opportunity
+shared_injury_state
+shared_weather
+shared_source_dependency
+component_composite_identity
+explicit_market_link
+```
+
+No default full-board N×N matrix.
+
+### Compiled platform rule key
+
+```text
+(
+    Platform,
+    EntryType,
+    League,
+    Market,
+    RuleVersion,
+    Situation
+)
+```
+
+A miss is **UNKNOWN/UNRESOLVED**, never nearest-match fallback.
+
+### ComputeROI
+
+Do **not** make this a nonsense scalar such as:
+
+`accuracy_gain - MB - seconds - tokens`.
+
+Those units cannot simply be added.
+
+`ComputeROI` should be governance over a **Pareto frontier**:
+
+```text
+Predictive quality
+Numerical quality
+Coverage
+Wall time
+CPU time
+Peak RSS
+Research calls
+Token use
+Operational fragility
+```
+
+A challenger is dominated if another achieves equal-or-better quality with lower resource/operational cost. Scalarization is permitted only under explicitly versioned weights for a specific deployment objective.
+
+## F2. Original Extreme Performance A–N
+
+| Original               | DCM target            | Current state           | Chat/Work           | Host proof                   |
+| ---------------------- | --------------------- | ----------------------- | ------------------- | ---------------------------- |
+| A Measure before/after | Performance harness   | Missing full metrics    | Inspect/demo        | repeated cold/warm baseline  |
+| B Complexity audit     | Hot functions         | Missing                 | Static review       | measured bottleneck register |
+| C CPU cycles           | Simulation/derivation | Partial helpers         | Micro-demo          | production benchmark         |
+| D Simulation           | EventWorldSet         | Partial shared world    | Golden fixture      | adaptive convergence         |
+| E Memory               | Ledger/HAR/cache      | Partial                 | Demo                | largest HAR + 2× board       |
+| F Backpressure         | ResourceGovernor      | v5 source governor only | Interface           | pressure test                |
+| G Tokens               | TokenBudgetManager    | Policy                  | Enforce             | report                       |
+| H Interruption         | RunCheckpoint         | v5 precursor            | Artifact checkpoint | crash suite                  |
+| I Logging              | Runtime               | Partial                 | Compact output      | bounded logs                 |
+| J Storage              | SQLite + XLSX export  | v5 precursor            | Inspect/demo        | benchmark vs XLSX scan       |
+| K Algorithm strength   | Sport models          | Research doctrine       | Shadow only         | chronological frontier       |
+| L Regression           | Release               | Missing v6 perf gates   | Consume             | automatic release failure    |
+| M Deliverables         | Performance artifacts | Missing                 | Demo subset         | all artifacts                |
+| N Blockers             | Release               | **OPEN**                | report honestly     | all closed                   |
+
+The original specification explicitly requires measurement rather than intuition and forbids optimization claims without the evidence set.  Required final artifacts and blockers are enumerated in the v2 contract. 
+
+---
+
+# Part G — Recommended implementation sequence
+
+## Phase 1 — Instrument
+
+**Chat:** verify canonical files; inspect existing v5 timers; define metric schema; run micro-fixtures only.
+
+**Work:** add bounded fixture instrumentation and `Performance_Demo.json`.
+
+**Host:** gather the actual baseline:
+
+```text
+wall
+CPU
+PeakRSS
+PeakPython
+allocations
+I/O
+cache hits/misses
+node reuse/invalidation
+tool/research calls
+checkpoint IDs
+quality state
+```
+
+Do not optimize until the bottleneck register is populated.
+
+## Phase 2 — Immutable boundaries
+
+Use actual hashes for:
+
+```text
+EvidenceClaim
+ParameterSnapshot
+EventWorldSet
+PrimitiveStatLedger
+MarketDefinition
+WorldProjection
+EntryContract
+SettlementRule
+WorldLineupOutcome
+```
+
+**Immediate prerequisite:** mount the actual Phase B/C schema JSON and independently verify the declared `6e78...` hash.
+
+Rebase the football implementation onto the **currently available verified v5.4.1 canonical source**, rather than keeping it as a standalone branch.
+
+## Phase 3 — Delete duplicate work
+
+Implement:
+
+`event once → ledger once → all markets`
+
+Then normalized HAR deltas:
+
+| Change             | Invalidate                                       |
+| ------------------ | ------------------------------------------------ |
+| line only          | market surface → grade → rank → portfolio        |
+| side/modifier      | offer-dependent descendants                      |
+| player status      | player role + teammates + event worlds + markets |
+| weather            | affected event worlds + descendants              |
+| rule-table version | settlement descendants                           |
+| unchanged snapshot | nothing                                          |
+
+## Phase 4 — Memory layout
+
+Work demo: 100-world columnar fixture.
+
+Host production:
+
+* typed contiguous arrays;
+* integer IDs;
+* online stats;
+* bounded LRU;
+* explicit object release;
+* mmap/temp spill;
+* repeated-run memory test.
+
+Blueprint v2 specifically prohibits retaining raw HAR, decoded trees, all histories, all full worlds, all line surfaces, workbook state and package bytes simultaneously without proof that it is safe. 
+
+## Phase 5 — Planner + Governor
+
+Interfaces may be designed in Work.
+
+The host implementation must choose dynamically:
+
+```text
+sequential / parallel
+worker count
+event batch size
+research batch size
+simulation batch
+memory budget
+spill threshold
+fast-pass budget
+refinement budget
+execution order
+```
+
+On pressure: stop new work → finish atomic work → evict → release → reduce concurrency → drop noncritical diagnostics → spill → checkpoint → bounded resume.
+
+Never silently remove props.
+
+## Phase 6 — Research/token architecture
+
+Create:
+
+```text
+EvidenceClaimStore
+ResearchDependencyDAG
+VOIScheduler
+TokenBudgetManager
+```
+
+Research once by:
+
+`Sport → Event → Team → Player → Market`
+
+A team injury report should not be searched 18 times because 18 props depend on it.
+
+Chat should never receive raw HAR as prose.
+
+## Phase 7 — Algorithm frontier
+
+Keep DPMM, GP-LVM, Bartlett BEL and future challengers **shadow-only** unless future chronological comparison earns promotion.
+
+Compare quality plus compute.
+
+No “best model,” “optimal,” or `10/10` labels before unseen evidence.
+
+## Phase 8 — Regression lock
+
+Only now generate:
+
+```text
+Performance_Baseline.json
+Performance_Final.json
+Performance_Comparison.md
+Bottleneck_Register.json
+Complexity_Audit.md
+Memory_Lifecycle.md
+DAG_Execution_Profile.json
+Cache_Reuse_And_Invalidation_Report.md
+Primitive_Ledger_Performance_Report.md
+Simulation_Convergence_Report.md
+Research_Efficiency_Report.md
+Token_Budget_Report.md
+Resource_Governor_Report.md
+Interruption_Recovery_Test_Report.md
+Algorithm_Quality_Performance_Frontier.md
+Performance_Attribution_Report.md
+```
+
+Those are explicitly required by Blueprint v2. 
+
+### This week
+
+Close the lineage and football correctness gaps: use the verified v5.4.1 source/ledger as integration baseline; obtain and hash the actual Phase B/C schema JSON; obtain the actual WSAB source package; implement/freeze `board_id`, `game_phase`, official CFB player snapshot, `left_first_half`, `no_second_half_return`; specify compiled rule tables; define DAG/checkpoint schemas; add golden fixtures.
+
+### This month
+
+Build the host skeleton; integrate WSAB into v5.4.1; implement content-addressed nodes, SQLite runtime store, event-once derivation, HAR delta invalidation, claim store, 100-world columnar fixture, atomic interruption test, first real baseline harness.
+
+### Not until the host exists
+
+Do **not** certify largest-HAR streaming, 2× board performance, planner/governor efficiency, process parallelism, leak freedom, sequential/parallel parity, ComputeROI, production SLOs, or “optimized DCM v6.” Do not promote a Learning Revision. Do not start a broad 15-sport implementation spree.
+
+---
+
+# Part H — Prompt and operating rules
+
+# DCM_CHAT_OPERATOR_V6
+
+You are the thin operator for Pillars DCM v6. You are not the production compute host.
+
+Preserve the canonical pipeline:
+
+Sport → Event → EventWorld → PrimitiveStatLedger → Conservation → MarketDefinition → Probability/Line Surface → Grade/Rank/Portfolio → Freeze → Settlement → Future-Only Learning.
+
+## Hard invariants
+
+Never select Green Goblins.
+Respect offered sides only.
+Apply the Red Demon extra cushion.
+Never force a card size.
+Never convert UNKNOWN/UNVERIFIED into a guessed state.
+Never infer a payout from card size.
+Never invent a Reboot/DNP/platform rule.
+Never promote a Learning Revision from software or architecture work.
+Never use post-cutoff outcomes in a live forecast.
+Never skip props because of token or runtime pressure.
+
+## Artifact-first rule
+
+Large boards, evidence, ledgers, worlds, logs, tests, checkpoints and full audit output belong in structured artifacts.
+
+Normal chat output is limited to:
+
+1. Run Integrity.
+2. Strict/qualified card or explicit EMPTY.
+3. Essential blockers.
+4. Compact requested findings.
+5. Artifact paths and hashes.
+6. Next deterministic action.
+
+Do not paste raw HAR, complete source trees, full ledgers or full-board dumps into chat.
+
+## Run Integrity
+
+Report:
+
+Run ID:
+DCM Version:
+Learning Revision:
+Forecast Cutoff:
+Canonical Source Hash:
+Learning Ledger Hash:
+Schema Version + Hash State:
+Input Hashes:
+Config Hash:
+Platform Rule Versions:
+Checkpoint ID:
+Completed Nodes:
+Pending/Invalidated Nodes:
+Board Row Count:
+Unresolved Blockers:
+Next Deterministic Action:
+
+A hash may be called VERIFIED only if the exact referenced bytes were readable and hashed in the active environment. Otherwise label it DECLARED_UNVERIFIED.
+
+## Checkpoint contract
+
+After every major stage write an atomic checkpoint containing:
+
+Run ID
+DCM version
+Learning Revision
+input hashes
+configuration hash
+forecast cutoff
+current completed stage
+completed event/node IDs
+pending event/node IDs
+invalidated node IDs
+provider/evidence state
+registry/rule versions
+cache manifest
+model-state hashes
+seed manifest
+artifact paths
+row counts
+stage diagnostics
+unresolved blockers
+next deterministic action
+checkpoint hash
+
+Write temporary file → validate → atomic rename.
+
+A checkpoint must be versioned, idempotent, independent of chat prose, free of secrets and sufficient to resume without repeating verified work.
+
+## Token-pressure procedure
+
+If context pressure rises:
+
+1. Finish the current atomic unit.
+2. Write and verify a checkpoint.
+3. Compact completed work.
+4. Retain exact paths, hashes, schemas, blockers and next action.
+5. Remove duplicate prose, never primary evidence.
+6. Continue from artifacts.
+7. Never skip props, weaken research, remove tests or fabricate a summary.
+
+## Refusal boundary
+
+Refuse to claim:
+
+* production performance without measured host artifacts;
+* PeakRSS/flame results from a runner not executed here;
+* byte-identical resume without persisted checkpoints;
+* official platform rules that were not verified;
+* predictive superiority at LR000000;
+* a full six-leg card when fewer true Playables exist.
+
+If the requested full-board workload exceeds this session's trustworthy execution envelope, checkpoint it and return the portable host action required. Do not approximate the missing run in prose.
+
+# DCM_WORK_OPERATOR_V6
+
+You are the ChatGPT Work integration operator for Pillars DCM v6. You are an integration cockpit, evidence/research surface and bounded fixture bench. You are not automatically the production performance host.
+
+Preserve all DCM_CHAT_OPERATOR_V6 invariants.
+
+## Additional Work authority
+
+You may manage persistent project artifacts such as:
+
+golden fixtures
+rule-table snapshots
+EvidenceClaimStore
+checkpoint_manifest.json
+run_state.json
+incident logs
+schema inventories
+small deterministic EventWorld fixtures
+small performance demonstrations
+pytest reports
+host-generated performance reports
+
+You may research current evidence hierarchically:
+
+Sport → Event → Team → Player → Market
+
+Store each reusable evidence claim once and reference it by stable ID/hash.
+
+## Work may verify
+
+Work may compute hashes for bytes it can actually read.
+Work may run bounded deterministic fixture tests.
+Work may create Performance_Demo artifacts clearly labeled DEMO.
+Work may inspect and reconcile host-produced performance reports.
+
+## Work may not claim
+
+Do not author Performance_Final.json unless the stated production benchmark actually executed in the measured environment.
+Do not declare production SLO PASS from a fixture.
+Do not treat cloud-browser continuation as proof of a durable arbitrary compute host.
+Do not claim process-parallel benefit without benchmark evidence.
+Do not claim largest-HAR bounded memory without the actual stress test.
+Do not promote LR000000.
+Do not invent missing PrizePicks rule rows.
+Do not select Green Goblins or force card size.
+Do not silently substitute an older canonical DCM version.
+
+## Required Run Integrity
+
+Run ID:
+DCM Version:
+Learning Revision:
+Forecast Cutoff:
+Canonical Source Hash:
+Learning Ledger Hash:
+Schema Hash + Verification State:
+Input/Fixture Hashes:
+Config Hash:
+Platform Rule Versions:
+Host Report Hashes, if imported:
+Checkpoint ID:
+Completed Nodes:
+Pending/Invalidated Nodes:
+Rows/Events Processed:
+Unresolved Blockers:
+Next Deterministic Action:
+
+## Checkpoint schema
+
+Every major boundary must persist:
+
+Run ID
+DCM version and LR
+input hashes
+configuration hash
+forecast cutoff
+completed stage
+completed node/event hashes
+pending nodes/events
+invalidated descendants
+provider/evidence state
+registry versions
+rule-table versions
+cache manifest
+model-state hashes
+random-seed manifest
+artifact references
+row counts
+stage diagnostics
+unresolved blockers
+next deterministic action
+checkpoint hash
+
+Use temporary-write + validation + atomic rename.
+
+## Token/context pressure
+
+When pressure rises:
+
+checkpoint → verify → compact → retain paths/hashes/schemas/blockers/next action → remove duplicate prose → continue from artifacts.
+
+Never respond to pressure by dropping props, weakening research, suppressing failed tests or inventing completed work.
+
+## Host handoff
+
+Any production-scale requirement involving largest HAR, 2× board stress, repeated-run RSS, process pools, true ResourceGovernor behavior, long-run adaptive simulation, sequential/parallel parity or release-grade performance profiling must produce a deterministic host handoff rather than an estimated result.
+
+---
+
+# Part I — Acceptance tests for an “optimized DCM 6.0”
+
+A row is **PASS only with an artifact path, artifact hash, and metric/test result**.
+
+| Gate                                          | Owner          | PASS evidence                                       |
+| --------------------------------------------- | -------------- | --------------------------------------------------- |
+| Canonical v5.4.1 source verified              | Work/Host      | source path + `bd1fb...` + byte hash                |
+| Canonical ledger verified                     | Work/Host      | ledger path + `a995...` + byte hash                 |
+| Phase B/C schema verified                     | Work/Host      | JSON path + exact `6e78...`                         |
+| WSAB rebased onto canonical                   | Host           | diff/merge report + source hashes                   |
+| Production runner profiled E2E                | Host           | `Performance_Baseline.json`                         |
+| Every major stage instrumented                | Host           | stage metric rows                                   |
+| DAG node identities deterministic             | Host           | `DAG_Execution_Profile.json`                        |
+| Required node states exercised                | Host           | state-transition fixture                            |
+| Descendant invalidation works                 | Host           | invalidation report                                 |
+| Event simulation reused                       | Host           | cache/reuse metric                                  |
+| Composites from ledger only                   | Work+Host      | identity tests                                      |
+| Conservation failure impossible/rejected      | Work+Host      | corruption suite                                    |
+| Full-board accounting preserved               | Host           | input/output/rejection counts reconcile             |
+| HAR bounded-memory                            | Host           | largest-HAR PeakRSS                                 |
+| 2× board stress                               | Host           | completion + PeakRSS + wall                         |
+| Repeated runs leak-free                       | Host           | RSS trend within threshold                          |
+| Bounded caches                                | Host           | saturation/eviction test                            |
+| Online statistics validated                   | Host           | golden comparison vs retain-all                     |
+| Adaptive convergence active                   | Host           | MCSE + stop-state report                            |
+| Five compute tiers exercised                  | Host           | tier transition log                                 |
+| Sparse dependence graph                       | Host           | edge count/audit                                    |
+| Planner decisions adaptive                    | Host           | different resource fixtures → different valid plans |
+| ResourceGovernor backpressure                 | Host           | forced-pressure test, zero silent drops             |
+| Parallelism beneficial                        | Host           | median speed comparison                             |
+| Seq/parallel deterministic parity             | Host           | hashes/tolerances                                   |
+| Rule tables compiled/versioned                | Work+Host      | lookup fixtures                                     |
+| Unknown platform key fail-closed              | Work+Host      | `UNRESOLVED` test                                   |
+| CFB CFP-only predicate                        | Work+Host      | negative regular-season fixture                     |
+| Official CFB player list hashed               | Work+Host      | source snapshot + 44-name hash                      |
+| Explicit 1H leave/no-return                   | Work+Host      | boundary tests                                      |
+| NFLP fail-closed                              | Work+Host      | preseason fixture                                   |
+| Same-player stack 0.95                        | Work+Host      | LB score fixture                                    |
+| Combo-square semantics                        | Work+Host      | OR-condition fixtures                               |
+| Research deduplication                        | Work+Host      | duplicate acquisition count                         |
+| Token budget enforced                         | Chat/Work      | `Token_Budget_Report.md`                            |
+| Console output bounded                        | Chat/Work/Host | response/log byte limit                             |
+| Atomic checkpoint each stage                  | Host           | checkpoint manifest                                 |
+| Interrupted HAR resume                        | Host           | crash/restart identity                              |
+| Partial-world resume                          | Host           | crash/restart identity                              |
+| Package-prehash resume                        | Host           | crash/restart identity                              |
+| Brier/LogS/CRPS not degraded                  | Host           | chronological quality report                        |
+| Calibration not degraded                      | Host           | calibration comparison                              |
+| False-sign/rank stability not degraded        | Host           | quality frontier                                    |
+| Line monotonicity intact                      | Host           | numerical regression                                |
+| Performance artifacts complete                | Host           | §22 manifest + hashes                               |
+| LR remains LR000000 absent promotion evidence | All            | release manifest                                    |
+| Goblin constructor veto                       | Work+Host      | hard negative test                                  |
+| No forced card padding                        | Work+Host      | empty/short card fixture                            |
+
+Blueprint v2 explicitly requires interruption/resume, bounded caches, adaptive convergence, full-board artifacts, bounded output and preservation of numerical/predictive correctness before release. 
+
+---
+
+# Part J — Risks if you try to build all of DCM 6.0 inside ChatGPT Plus
+
+The likely failure mode is not one dramatic mathematical error. It is **state decay across a long workflow**.
+
+A large HAR is processed. Research begins. The response or runtime ends after half the events. No atomic `PrimitiveLedgerNode` checkpoint exists. The next conversation reconstructs progress from prose. It cannot prove which player evidence was already incorporated, so several events are researched again. One status source has updated in the meantime, producing a temporal mismatch.
+
+Then two props from the same event get independently reconstructed distributions because the shared EventWorld artifact was lost. Their opportunity assumptions diverge.
+
+Context pressure increases. Instead of storing the whole board in a structured artifact, low-priority PASS rows disappear from the response. Full-board accounting is no longer provable.
+
+A CFB player leaves early. Generic football logic sees `left_early=True` and applies NFL-like Reboot behavior because `game_phase`, official qualifying-player identity, `left_first_half`, and `no_second_half_return` were not captured.
+
+A new baseball feature needs PA state. Someone creates a global `PlateAppearance` common-schema object because that is convenient in the current prompt, bypassing the frozen sport-envelope rule.
+
+The card has only four strong plays. Two PASS rows are promoted because “we need six.”
+
+The architecture compiles and tests. Someone names it `LR000001`.
+
+Finally, `Performance_Final.json` is written with numbers inferred from one sandbox timing and the release is described as optimized.
+
+At that point practically every important v6 boundary has been violated even though each individual shortcut looked small.
+
+That is precisely why the Optimization Blueprint makes artifacts, checkpoints, profiling and release gates structural requirements rather than prompt suggestions. 
+
+---
+
+# Part K — Verdict
+
+## **Choose BOTH: keep the DCM 6.0 contracts wide; keep the runners tiered.**
+
+Do **not** shrink the conceptual DCM until it fits comfortably inside Plus Chat. Shared EventWorlds, primitive ledgers, exact conservation, opportunity/efficiency separation, exact MarketDefinitions, decomposed settlement, immutable freezes, future-only learning and fail-closed platform rules are not excessive architecture. They solve real correctness problems.
+
+Also do **not** pretend ChatGPT Plus or ChatGPT Work itself is the production runtime described by Optimization Blueprint v2.
+
+The correct deployment model is:
+
+```text
+                 ONE SHARED DCM CORE
+                        │
+           ┌────────────┼────────────┐
+           │            │            │
+        Plus Chat      Work       Host Runner
+           │            │            │
+      Thin operator  Integration    Production
+      + research     cockpit        computation
+      + audit        + fixtures     + profiling
+      + hashes       + artifacts    + DAG/cache
+                                   + Planner
+                                   + Governor
+                                   + stress
+                                   + resume
+```
+
+That gives you the strongest combination:
+
+**Chat** stays efficient and auditable.
+
+**Work** gets persistent project context, richer artifact/research workflows and bounded integration tasks. Current OpenAI documentation explicitly supports project context and agentic Work workflows, while cloud-browser continuation is scoped to supported web tasks rather than being a general-purpose performance host. ([OpenAI Help Center][4])
+
+**The portable host** does the heavy deterministic work where CPU, RAM, process topology, disk I/O and interruption behavior can actually be measured.
+
+There is also a concrete next move now that was impossible when WSAB was built: **the exact canonical v5.4.1 source and ledger are now available and match the canonical manifest**.  Therefore the football/E2E package should no longer remain a detached forward-development island. Its code should be rebased onto the verified canonical tree, with the original WSAB tests carried forward and the existing v5.4.1 checkpoint/cache/SQLite/backpressure infrastructure migrated into the v6 DAG rather than discarded.
+
+The label today should therefore be approximately:
+
+> **DCM v6 architecture: strong and internally coherent. Football/E2E WSAB: implementation reported green. Canonical integration: pending. Optimization Blueprint v2 release gates: largely open. Predictive superiority: NONE. Learning Revision: LR000000.**
+
+Calling it **“optimized DCM 6.0” today would be premature**. Calling it a substantially better architecture with a clear path to a measured optimized implementation is justified.
+
+### Questions I still need from the owner
+
+1. Can you provide the actual `artifacts/dcm_v6_workstream_ab` source tree so the reported 41 tests can be independently rerun against canonical v5.4.1?
+2. Can you provide the exact `schemas/Phase_BC_Immutable_Contracts.json` bytes so SHA-256 `6e78dacc…` can be independently verified?
+3. What is the byte size of the largest real HAR you expect the production runner to process?
+4. What board size should define the “typical,” “largest,” and required 2× stress fixtures?
+5. Should the currently mounted and hash-matching v5.4.1 source/ledger now become the mandatory v6 integration baseline?
+6. Will the production host be your Mac, another local machine, a VM/cloud instance, or something not yet selected?
+7. What full-board wall-time target should the host optimize for: e.g. 5, 10, 20, or 30 minutes before event cutoff?
+8. Will this runner ever influence real-money submitted entries, or remain research/recommendation-only?
+9. Who will own dated PrizePicks rule snapshots and approve a new `PlatformRuleVersion` when official pages change?
+10. Is the next live scope NFL only, or must CFB be production-ready immediately after the official CFP roster/rule predicates are frozen?
+
+[1]: https://help.openai.com/en/articles/20001052-file-storage-and-library-in-chatgpt?utm_source=chatgpt.com "File storage and Library in ChatGPT | OpenAI Help Center"
+[2]: https://help.openai.com/en/articles/20001280-using-cloud-browser-in-chatgpt?utm_source=chatgpt.com "Using cloud browser in ChatGPT | OpenAI Help Center"
+[3]: https://help.openai.com/en/articles/10169521-projects-in-chatgpt?utm_source=chatgpt.com "Projects in ChatGPT | OpenAI Help Center"
+[4]: https://help.openai.com/en/articles/20001275/?utm_source=chatgpt.com "ChatGPT Work and Codex | OpenAI Help Center"

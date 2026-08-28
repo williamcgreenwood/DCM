@@ -1,0 +1,14 @@
+{
+  "gate": "WSAB_BASELINE_46",
+  "files": {
+    "tests/test_football_registry.py": 16,
+    "tests/test_e2e_world_to_lineup.py": 20,
+    "tests/test_lineage_and_schema.py": 5,
+    "tests/test_official_predicates.py": 5
+  },
+  "total": 46,
+  "extensions": {
+    "tests/test_plugin_contract.py": "universal plugin fail-closed + identity samples"
+  },
+  "note": "46 is a frozen compatibility baseline, not a ceiling."
+}

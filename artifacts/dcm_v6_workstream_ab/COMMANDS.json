@@ -1,0 +1,19 @@
+{
+  "verify_package": {
+    "cmd": "PYTHONPATH=. python3 -c \"from dcm.contracts.schemas import SCHEMA_VERSION; print(SCHEMA_VERSION)\"",
+    "expect": 0
+  },
+  "wsab_baseline_46": {
+    "cmd": "PYTHONPATH=. python3 -m pytest tests/test_football_registry.py tests/test_e2e_world_to_lineup.py tests/test_lineage_and_schema.py tests/test_official_predicates.py -q",
+    "expect": 0,
+    "meaning": "Compatibility gate. Do not delete. Expanding the suite does not retire these 46."
+  },
+  "plugin_contract": {
+    "cmd": "PYTHONPATH=. python3 -m pytest tests/test_plugin_contract.py -q",
+    "expect": 0
+  },
+  "run_from_har": {
+    "cmd": "not in this package — integrated v6 runner. Operator UI runFromHar() is the demo surface.",
+    "expect": "BLOCKED until Sprint 1 HAR engine is hash-verified against v5"
+  }
+}

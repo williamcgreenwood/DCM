@@ -1,0 +1,19 @@
+{
+  "package": "6.0.0+WSAB.LR000000",
+  "learning_revision": "LR000000",
+  "predictive_superiority": "NONE",
+  "lifecycle": "IMPLEMENTED_STANDALONE",
+  "workstreams": [
+    "A",
+    "B"
+  ],
+  "test_command": "PYTHONPATH=. python3 -m pytest tests -q",
+  "historical_slice": "41",
+  "current_files": [
+    "test_football_registry.py",
+    "test_e2e_world_to_lineup.py",
+    "test_lineage_and_schema.py",
+    "test_official_predicates.py"
+  ],
+  "file_count": 50
+}

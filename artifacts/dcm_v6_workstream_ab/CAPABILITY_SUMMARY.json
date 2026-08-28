@@ -1,0 +1,14 @@
+{
+  "learning_revision": "LR000000",
+  "predictive_claim": "NONE",
+  "default_unknown": "UNSUPPORTED_FAIL_CLOSED",
+  "families": {
+    "basketball": { "NBA": "PRODUCTION_SUPPORTED", "WNBA": "PRODUCTION_SUPPORTED" },
+    "gridiron": { "NFL": "PRODUCTION_SUPPORTED", "CFB": "PRODUCTION_SUPPORTED", "NFLP": "RESEARCH_ONLY", "CFL": "UNSUPPORTED_FAIL_CLOSED" },
+    "baseball": { "MLB": "SHADOW_SUPPORTED", "KBO": "RESEARCH_ONLY" },
+    "combat": { "UFC": "RESEARCH_ONLY", "BOXING": "UNSUPPORTED_FAIL_CLOSED" },
+    "soccer": { "*": "UNSUPPORTED_FAIL_CLOSED" },
+    "hockey": { "*": "UNSUPPORTED_FAIL_CLOSED" },
+    "esports": { "*": "UNSUPPORTED_FAIL_CLOSED" }
+  }
+}
