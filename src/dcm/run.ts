@@ -1,3 +1,4 @@
+import { accountRows, freezeBoard } from "./board.ts";
 import { contentHash } from "./hash.ts";
 import { DEMO_HAR } from "./demo-board.ts";
 import { ingestHar } from "./har.ts";
@@ -16,9 +17,10 @@ function count(pop: ModeledProp[], state: string) {
   return pop.filter((p) => p.state === state).length;
 }
 
-export function runFromHar(raw: unknown = DEMO_HAR, cutoff = "2026-08-27T16:00:00Z"): DcmRun {
-  const ingest = ingestHar(raw);
-  const board = ingest.rows;
+export async function runFromHar(raw: unknown = DEMO_HAR, cutoff = "2026-08-28T00:00:00Z"): Promise<DcmRun> {
+  const ingest = await ingestHar(raw);
+  const frozen = freezeBoard(ingest, cutoff);
+  const board = frozen.rows;
   const classified = board.map((row) => {
     const c = classify(row);
     return modelRow(row, c.state, c.blocker);
@@ -65,11 +67,20 @@ export function runFromHar(raw: unknown = DEMO_HAR, cutoff = "2026-08-27T16:00:0
   const events = new Set(board.map((r) => r.eventId));
   const teams = new Set(board.map((r) => r.teamId));
   const players = new Set(board.map((r) => r.playerId));
-  const runId = `RUN_${contentHash({ har: ingest.harHash, cutoff }).slice(0, 16)}`;
+  const runId = `RUN_${contentHash({ har: ingest.harSha256, cutoff }).slice(0, 16)}`;
   const freezeHash = contentHash({
     board: board.map((b) => b.projectionId),
     ranks: ranked.map((p) => [p.row.projectionId, p.rank, p.selectedP]),
     cutoff,
+  });
+
+  const accounting = accountRows(board, {
+    goblin_excluded: count(classified, "GOBLIN_EXCLUDED"),
+    half_line_excluded: count(classified, "HALF_LINE_POLICY_EXCLUDED"),
+    modeled: modeled.length,
+    unsupported: count(classified, "UNSUPPORTED_FAIL_CLOSED"),
+    research_only: classified.filter((p) => p.blocker === "RESEARCH_ONLY_NOT_SELECTABLE").length,
+    final_model_population: modeled.length,
   });
 
   const integrity: RunIntegrity = {
@@ -81,7 +92,10 @@ export function runFromHar(raw: unknown = DEMO_HAR, cutoff = "2026-08-27T16:00:0
     schemaState: "DECLARED_UNVERIFIED",
     v5SourceState: "ABSENT_IN_THIS_WORKSPACE",
     v5LedgerState: "ABSENT_IN_THIS_WORKSPACE",
+    v5Decoder: ingest.v5Decoder,
     harHash: ingest.harHash,
+    harSha256: ingest.harSha256,
+    parserVersion: ingest.parserVersion,
     sourceAdapter: ingest.adapter,
     forecastCutoff: cutoff,
     rawRows: board.length,
@@ -102,12 +116,15 @@ export function runFromHar(raw: unknown = DEMO_HAR, cutoff = "2026-08-27T16:00:0
     playableCount: qualified.length,
     cardSize: card.length,
     freezeHash,
+    boardHash: frozen.contentHash,
     lr: LEARNING_REVISION,
+    optimizedDcm60Claim: false,
   };
 
   return {
     integrity,
     board,
+    boardJson: { ...frozen, accounting },
     population: ranked.concat(excluded),
     excluded,
     top25Ranked,
@@ -122,19 +139,7 @@ export function runFromHar(raw: unknown = DEMO_HAR, cutoff = "2026-08-27T16:00:0
       RANK_COMPLETE: true,
       FREEZE_COMPLETE: true,
     },
-    accounting: {
-      raw_projection_rows: board.length,
-      unique_offer_rows: board.length,
-      standard_rows: board.filter((r) => r.modifier === "STANDARD").length,
-      goblin_rows: board.filter((r) => r.modifier === "GOBLIN").length,
-      demon_rows: board.filter((r) => r.modifier === "DEMON").length,
-      goblin_excluded: integrity.goblinExcluded,
-      half_line_excluded: integrity.halfLineExcluded,
-      modeled: integrity.modeledRows,
-      unsupported: count(classified, "UNSUPPORTED_FAIL_CLOSED"),
-      research_only: classified.filter((p) => p.blocker === "RESEARCH_ONLY_NOT_SELECTABLE").length,
-      final_model_population: modeled.length,
-    },
+    accounting: { ...accounting },
   };
 }
 
@@ -147,8 +152,11 @@ export function verifyInstall() {
     schemaState: "DECLARED_UNVERIFIED",
     v5Source: "ABSENT",
     v5Ledger: "ABSENT",
+    v5Decoder: "NOT_MOUNTED",
     wsabBaseline46: "PYTHON_PACKAGE_PRESENT",
-    lifecycle: "IMPLEMENTED_STANDALONE",
+    harSpine: "IMPLEMENTED_DEVELOPMENT",
+    lifecycle: "INTEGRATED_DEVELOPMENT",
+    optimizedDcm60Claim: false,
     ok: true,
   };
 }

@@ -8,7 +8,9 @@
   },
   "total": 46,
   "extensions": {
-    "tests/test_plugin_contract.py": "universal plugin fail-closed + identity samples"
+    "tests/test_plugin_contract.py": "universal plugin fail-closed + identity samples",
+    "tests/test_har_ingest.py": "HAR → board.json accounting, JSON:API, mount refuse-on-mismatch",
+    "tests/test_v541_mount.py": "workspace v5.4.1 mount stays ABSENT"
   },
-  "note": "46 is a frozen compatibility baseline, not a ceiling."
+  "note": "46 is a frozen compatibility baseline, not a ceiling. HAR tests do not retire it."
 }

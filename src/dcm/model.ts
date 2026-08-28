@@ -117,7 +117,18 @@ export function modelRow(row: BoardRow, state: RowState, blocker?: string): Mode
   const pHigher = pH / sum;
   const pLower = pL / sum;
   const pPush = pP / sum;
-  const side = row.side as Side;
+  let side: Side;
+  if (row.side === "MORE" || row.side === "LESS") {
+    side = row.side;
+  } else if (row.offeredHigher && !row.offeredLower) {
+    side = "MORE";
+  } else if (row.offeredLower && !row.offeredHigher) {
+    side = "LESS";
+  } else if (pHigher >= pLower) {
+    side = row.offeredHigher ? "MORE" : "LESS";
+  } else {
+    side = row.offeredLower ? "LESS" : "MORE";
+  }
   const selectedP = side === "MORE" ? pHigher : pLower;
   const reliability = 0.55 + 0.4 * pr.quality;
   const fragility = row.modifier === "DEMON" ? 0.42 : Math.abs(line % 1 - 0.5) < 0.05 ? 0.38 : 0.18;
@@ -164,7 +175,9 @@ export function modelRow(row: BoardRow, state: RowState, blocker?: string): Mode
 export function classify(row: BoardRow): { state: RowState; blocker?: string } {
   if (row.modifier === "GOBLIN") return { state: "GOBLIN_EXCLUDED", blocker: "GOBLIN_SELECTION_FORBIDDEN" };
   if (row.modifier === "OTHER") return { state: "MODIFIER_UNKNOWN", blocker: "MODIFIER_UNKNOWN" };
-  if (row.side === "UNKNOWN") return { state: "OFFERED_SIDE_UNKNOWN", blocker: "OFFERED_SIDE_UNKNOWN" };
+  if (row.side === "UNKNOWN" && !row.offeredHigher && !row.offeredLower) {
+    return { state: "OFFERED_SIDE_UNKNOWN", blocker: "OFFERED_SIDE_UNKNOWN" };
+  }
   if (row.side === "MORE" && !row.offeredHigher) return { state: "OFFERED_SIDE_UNKNOWN", blocker: "OFFERED_SIDE_UNKNOWN" };
   if (row.side === "LESS" && !row.offeredLower) return { state: "OFFERED_SIDE_UNKNOWN", blocker: "OFFERED_SIDE_UNKNOWN" };
   if (row.sportFamily === "baseball" && row.market === "hits_runs_rbi" && Math.abs(row.line - 0.5) < 1e-9) {

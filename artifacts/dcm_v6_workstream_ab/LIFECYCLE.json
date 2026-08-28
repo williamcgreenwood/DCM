@@ -1,18 +1,24 @@
 {
-  "software": "6.0.0+WSAB.UNIVERSAL.LR000000",
+  "software": "6.0.0+WSAB.HARSPINE.LR000000",
   "learning_revision": "LR000000",
   "predictive_claim": "NONE",
+  "optimized_dcm_60_claim": false,
   "objects": {
     "v5_source": "ABSENT",
     "v5_ledger": "ABSENT",
+    "v5_development_copy": "ABSENT_MOUNT_GATE_READY",
     "schema_6e78": "DECLARED_UNVERIFIED",
     "wsab_baseline_46": "AUTHORIZED",
     "football_plugin": "IMPLEMENTED_STANDALONE",
     "basketball_plugin": "IMPLEMENTED_STANDALONE",
     "sport_plugin_sdk": "IMPLEMENTED_STANDALONE",
     "prizepicks_settlement": "IMPLEMENTED_STANDALONE",
-    "har_spine": "DESIGNED",
-    "operator_ui": "IMPLEMENTED_STANDALONE",
+    "har_spine": "INTEGRATED_DEVELOPMENT",
+    "board_json": "IMPLEMENTED_DEVELOPMENT",
+    "operator_ui": "INTEGRATED_DEVELOPMENT",
+    "mlb_pa": "SHADOW_SUPPORTED",
+    "cfb_name_to_id": "BLOCKED",
+    "research_dag": "DESIGNED",
     "release": "NOT_ACCEPTED"
   }
 }

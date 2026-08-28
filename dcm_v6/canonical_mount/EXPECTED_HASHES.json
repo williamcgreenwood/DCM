@@ -1,0 +1,10 @@
+{
+  "name": "Pillars_DCM_v5.4.1",
+  "expected_source_sha256": "bd1fb433d5f82d3812e453c30edcbb67db11b20f60e43cf50424c45a7c2ff474",
+  "expected_ledger_sha256": "a9956ef1d231eb37ea5898b5145d660b986b68ee4dc6cfbd5c43fed59064c29a",
+  "source_filename": "Pillars_DCM_v5.4.1_COMPLETE_PROJECT_SOURCE.txt",
+  "ledger_filename": "Pillars_DCM_v5.4.1_Learning_Ledger.xlsx",
+  "install_filename": "Pillars_DCM_v5.4.1_INSTALL_SHA256.txt",
+  "copy_forward_rule": "Hash must match before any byte is copied into v5.4.1_copy/. Never invent source. Never overwrite a canonical tree.",
+  "har_decoder_rule": "A hash-verified v5.4.1 HAR decoder is BLOCKED until source bytes verify. The v6 development adapter is a new wrapper, not a verified v5 port."
+}

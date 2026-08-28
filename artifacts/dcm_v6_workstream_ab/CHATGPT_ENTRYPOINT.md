@@ -27,6 +27,8 @@ WHEN USER SAYS "RUN DCM" / "Final Check DCM" / "Audit DCM":
 - Do not copy NFL reboot into CFB/CFL/soccer/etc.
 - Software version ≠ Learning Revision. LR stays LR000000.
 - Predictive superiority: NONE.
+- Do not claim optimized DCM 6.0.
+- v5.4.1 HAR decoder is NOT_MOUNTED until source bytes hash-verify.
 
 ## Chat output only
 

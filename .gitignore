@@ -3,3 +3,15 @@ node_modules/
 .github_repo
 .env
 .env.*
+.vercel/
+.grok/preview.log
+
+**/__pycache__/
+*.pyc
+dcm_v6/INBOX/*.har
+dcm_v6/INBOX/*.json
+!dcm_v6/INBOX/README.md
+dcm_v6/RUNS/**
+!dcm_v6/RUNS/.gitkeep
+dcm_v6/canonical_mount/v5.4.1_copy/**
+!dcm_v6/canonical_mount/v5.4.1_copy/.gitkeep

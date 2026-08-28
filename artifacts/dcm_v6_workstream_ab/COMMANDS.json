@@ -12,8 +12,18 @@
     "cmd": "PYTHONPATH=. python3 -m pytest tests/test_plugin_contract.py -q",
     "expect": 0
   },
+  "mount_v541": {
+    "cmd": "PYTHONPATH=. python3 -m dcm.runtime.mount_v541",
+    "expect": 0,
+    "meaning": "Hash-verify canonical v5.4.1 and copy-forward into dcm_v6/canonical_mount/v5.4.1_copy. ABSENT is an honest success of the gate."
+  },
   "run_from_har": {
-    "cmd": "not in this package — integrated v6 runner. Operator UI runFromHar() is the demo surface.",
-    "expect": "BLOCKED until Sprint 1 HAR engine is hash-verified against v5"
+    "cmd": "PYTHONPATH=. python3 -m dcm.runtime.har_run --synthetic --out /workspace/dcm_v6/RUNS",
+    "expect": 0,
+    "meaning": "Development HAR → board.json. Not a hash-verified v5.4.1 decoder. Live inbox: --inbox dcm_v6/INBOX/current.har"
+  },
+  "har_tests": {
+    "cmd": "PYTHONPATH=. python3 -m pytest tests/test_har_ingest.py tests/test_v541_mount.py -q",
+    "expect": 0
   }
 }

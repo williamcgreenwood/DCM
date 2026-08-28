@@ -1,8 +1,9 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   AlertTriangle,
   Check,
   ChevronRight,
+  Download,
   FileJson,
   Lock,
   Play,
@@ -16,7 +17,7 @@ import type { DcmRun, ModeledProp } from "@/dcm/types.ts";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-type Tab = "qualified" | "ranked" | "population" | "capabilities" | "blockers";
+type Tab = "qualified" | "ranked" | "population" | "accounting" | "capabilities" | "blockers";
 
 function pct(n: number | null | undefined) {
   if (n == null) return "—";
@@ -62,8 +63,8 @@ function PropTable({ rows, showState }: { rows: ModeledProp[]; showState?: boole
     return <p className="px-4 py-10 text-center text-sm text-muted">EMPTY — a legal card. Nothing padded.</p>;
   }
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full min-w-[920px] text-left text-xs">
+    <div className="w-full max-w-full overflow-x-auto">
+      <table className="w-full min-w-[720px] text-left text-xs">
         <thead className="sticky top-0 bg-surface text-[10px] uppercase tracking-wider text-muted">
           <tr>
             <th className="px-3 py-2 font-medium">#</th>
@@ -123,12 +124,13 @@ export function OperatorConsole() {
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState("Drop a HAR or run the synthetic slate. Goblins never enter the card.");
   const fileRef = useRef<HTMLInputElement>(null);
+  const started = useRef(false);
   const install = useMemo(() => verifyInstall(), []);
 
-  function execute(raw: unknown) {
+  async function execute(raw: unknown) {
     setBusy(true);
     try {
-      const next = runFromHar(raw);
+      const next = await runFromHar(raw);
       setRun(next);
       setTab("qualified");
       setNote(
@@ -143,13 +145,19 @@ export function OperatorConsole() {
     }
   }
 
+  useEffect(() => {
+    if (started.current) return;
+    started.current = true;
+    void execute(DEMO_HAR);
+  }, []);
+
   async function onFile(f: File | undefined) {
     if (!f) return;
     const text = await f.text();
     try {
-      execute(JSON.parse(text));
+      void execute(JSON.parse(text));
     } catch {
-      execute(text);
+      void execute(text);
     }
   }
 
@@ -158,27 +166,55 @@ export function OperatorConsole() {
     { id: "qualified", label: "Top 25 qualified" },
     { id: "ranked", label: "Top 25 ranked" },
     { id: "population", label: "Full board" },
+    { id: "accounting", label: "Accounting" },
     { id: "capabilities", label: "Capabilities" },
     { id: "blockers", label: "Blockers" },
   ];
 
   return (
-    <div className="min-h-screen bg-bg">
+    <div className="min-h-screen overflow-x-hidden bg-bg">
       <header className="border-b border-border bg-ink">
         <div className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-3 px-4 py-3">
           <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-brass">Pillars · LR000000 · NONE</p>
+            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-brass">
+              Pillars · LR000000 · NONE · not optimized 6.0
+            </p>
             <h1 className="text-lg font-semibold tracking-tight">DCM v6 operator</h1>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <Button variant="brass" onClick={() => execute(DEMO_HAR)} disabled={busy}>
+            <Button
+              variant="brass"
+              className="whitespace-nowrap"
+              data-testid="run-dcm"
+              aria-label="Run DCM"
+              onClick={() => void execute(DEMO_HAR)}
+              disabled={busy}
+            >
               <Play className="size-4" />
               Run DCM
             </Button>
-            <Button variant="outline" onClick={() => fileRef.current?.click()}>
+            <Button variant="outline" className="whitespace-nowrap" onClick={() => fileRef.current?.click()}>
               <FileJson className="size-4" />
               Upload HAR
             </Button>
+            {run ? (
+              <Button
+                variant="outline"
+                className="whitespace-nowrap"
+                onClick={() => {
+                  const blob = new Blob([JSON.stringify(run.boardJson, null, 2)], { type: "application/json" });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = `${run.integrity.runId}_board.json`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                }}
+              >
+                <Download className="size-4" />
+                board.json
+              </Button>
+            ) : null}
             <input
               ref={fileRef}
               type="file"
@@ -190,14 +226,14 @@ export function OperatorConsole() {
         </div>
       </header>
 
-      <main className="mx-auto grid max-w-[1400px] gap-4 px-4 py-4 lg:grid-cols-[280px_1fr]">
+      <main className="mx-auto grid w-full max-w-[1400px] gap-4 px-4 py-4 lg:grid-cols-[280px_minmax(0,1fr)]">
         <aside className="space-y-3">
           <section className="rounded-lg border border-border bg-surface p-4">
             <h2 className="mb-2 font-mono text-[10px] uppercase tracking-wider text-muted">Install</h2>
             <dl className="space-y-1 font-mono text-[11px]">
               <div className="flex justify-between gap-2">
                 <dt className="text-muted">Version</dt>
-                <dd>6.0.0+WSAB</dd>
+                <dd>6.0.0+WSAB.HARSPINE</dd>
               </div>
               <div className="flex justify-between gap-2">
                 <dt className="text-muted">LR</dt>
@@ -208,12 +244,20 @@ export function OperatorConsole() {
                 <dd className="text-warn">{install.v5Source}</dd>
               </div>
               <div className="flex justify-between gap-2">
+                <dt className="text-muted">v5 decoder</dt>
+                <dd className="text-warn">{install.v5Decoder}</dd>
+              </div>
+              <div className="flex justify-between gap-2">
+                <dt className="text-muted">HAR spine</dt>
+                <dd>{install.harSpine}</dd>
+              </div>
+              <div className="flex justify-between gap-2">
                 <dt className="text-muted">Schema</dt>
                 <dd className="text-warn">UNVERIFIED</dd>
               </div>
               <div className="flex justify-between gap-2">
                 <dt className="text-muted">Lifecycle</dt>
-                <dd>STANDALONE</dd>
+                <dd>INTEGRATED_DEV</dd>
               </div>
             </dl>
           </section>
@@ -241,7 +285,7 @@ export function OperatorConsole() {
           <p className="px-1 font-mono text-[11px] leading-relaxed text-muted">{note}</p>
         </aside>
 
-        <div className="space-y-4">
+        <div className="min-w-0 space-y-4">
           <section className="rounded-lg border border-border bg-surface p-4">
             <h2 className="mb-3 font-mono text-[10px] uppercase tracking-wider text-muted">Run integrity</h2>
             {i ? (
@@ -265,6 +309,13 @@ export function OperatorConsole() {
             ) : (
               <p className="text-sm text-muted">No freeze yet. Run DCM on the synthetic HAR to produce a RUNS directory.</p>
             )}
+            {i ? (
+              <div className="mt-3 space-y-1 font-mono text-[10px] text-muted">
+                <div>adapter {i.sourceAdapter} · parser {i.parserVersion}</div>
+                <div className="break-all">HAR SHA-256 {i.harSha256}</div>
+                <div className="break-all">board {i.boardHash}</div>
+              </div>
+            ) : null}
             {i ? (
               <div className="mt-3 flex flex-wrap gap-2 font-mono text-[10px]">
                 {Object.entries(run!.gates).map(([g, ok]) => (
@@ -305,6 +356,15 @@ export function OperatorConsole() {
               <PropTable rows={run.top25Ranked} />
             ) : tab === "population" ? (
               <PropTable rows={run.population} showState />
+            ) : tab === "accounting" ? (
+              <ul className="divide-y divide-border">
+                {Object.entries(run.accounting).map(([k, v]) => (
+                  <li key={k} className="flex items-center justify-between px-4 py-2.5 text-sm">
+                    <span className="font-mono text-xs text-muted">{k}</span>
+                    <span className="font-mono tabular">{v}</span>
+                  </li>
+                ))}
+              </ul>
             ) : tab === "blockers" ? (
               <ul className="divide-y divide-border">
                 {run.blockers.map((b) => (
@@ -318,8 +378,8 @@ export function OperatorConsole() {
                 ))}
               </ul>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[800px] text-left text-xs">
+              <div className="w-full max-w-full overflow-x-auto">
+                <table className="w-full min-w-[640px] text-left text-xs">
                   <thead className="text-[10px] uppercase tracking-wider text-muted">
                     <tr>
                       <th className="px-3 py-2">League</th>

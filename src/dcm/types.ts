@@ -1,4 +1,4 @@
-export const DCM_VERSION = "6.0.0+WSAB.UNIVERSAL.LR000000";
+export const DCM_VERSION = "6.0.0+WSAB.HARSPINE.LR000000";
 export const LEARNING_REVISION = "LR000000";
 export const PREDICTIVE_CLAIM = "NONE";
 export const SCHEMA_ID = "PHASE_BC_SCHEMA_V1_2026-08-25";
@@ -62,6 +62,10 @@ export interface BoardRow {
   boardId: string;
   productType: ProductType;
   role: string;
+  wsabPlugin?: string | null;
+  wsabMarketBound?: boolean;
+  cfbOfficialNameListed?: boolean;
+  cfbOfficialPlayerId?: string | null;
 }
 
 export interface EvidencePacket {
@@ -115,7 +119,10 @@ export interface RunIntegrity {
   schemaState: string;
   v5SourceState: string;
   v5LedgerState: string;
+  v5Decoder: string;
   harHash: string;
+  harSha256: string;
+  parserVersion: string;
   sourceAdapter: string;
   forecastCutoff: string;
   rawRows: number;
@@ -136,12 +143,15 @@ export interface RunIntegrity {
   playableCount: number;
   cardSize: number;
   freezeHash: string;
+  boardHash: string;
   lr: string;
+  optimizedDcm60Claim: false;
 }
 
 export interface DcmRun {
   integrity: RunIntegrity;
   board: BoardRow[];
+  boardJson: unknown;
   population: ModeledProp[];
   excluded: ModeledProp[];
   top25Ranked: ModeledProp[];
