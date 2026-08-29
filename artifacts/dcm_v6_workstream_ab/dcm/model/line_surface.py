@@ -1,8 +1,12 @@
-"""True unclamped line surface from shared sorted worlds. Do not re-simulate per line."""
+"""Directional empirical line surface from shared worlds.
 
+Tolerance is side-specific and derived from the empirical order statistics;
+there is no arbitrary +/- display clamp.
+"""
 from __future__ import annotations
 
 import bisect
+import math
 
 
 def _probs(xs: list[float], line: float) -> dict[str, float]:
@@ -12,58 +16,56 @@ def _probs(xs: list[float], line: float) -> dict[str, float]:
     lower = bisect.bisect_left(xs, line - 1e-9)
     higher = n - bisect.bisect_right(xs, line + 1e-9)
     push = n - higher - lower
-    pH, pL, pP = higher / n, lower / n, push / n
-    mean = sum(xs) / n
-    return {"pHigher": pH, "pLower": pL, "pPush": pP, "mean": mean, "n": n}
+    return {"pHigher": higher / n, "pLower": lower / n, "pPush": push / n, "mean": sum(xs) / n, "n": n}
 
 
-def surface(values: list[float], offered_line: float, *, playable_p: float = 0.58) -> dict:
+def _side_p(probs: dict[str, float], side: str) -> float:
+    return probs["pHigher"] if side == "MORE" else probs["pLower"]
+
+
+def _order_break(xs: list[float], side: str, required_p: float) -> float:
+    n = len(xs)
+    if not n:
+        return math.nan
+    k = max(1, min(n, int(math.ceil(required_p * n))))
+    if side == "MORE":
+        return xs[n - k]
+    return xs[k - 1]
+
+
+def surface(values: list[float], offered_line: float, *, side: str = "MORE", playable_p: float = 0.58, step: float = 0.5) -> dict:
+    if side not in {"MORE", "LESS"}:
+        raise ValueError("SIDE_REQUIRED_FOR_LINE_SURFACE")
     xs = sorted(float(v) for v in values)
     offered = _probs(xs, offered_line)
-    step = 0.5
-    tol_up = 0.0
-    line = offered_line
-    while line < offered_line + 40:
-        nxt = _probs(xs, line + step)
-        if nxt["pHigher"] < playable_p:
-            break
-        line += step
-        tol_up += step
-    tol_down = 0.0
-    line = offered_line
-    while line > offered_line - 40:
-        nxt = _probs(xs, line - step)
-        if nxt["pLower"] < playable_p:
-            break
-        line -= step
-        tol_down += step
-    lo, hi = offered_line - 20.0, offered_line + 20.0
-    be = offered_line
-    best = abs(offered["pHigher"] - 0.5)
-    for _ in range(24):
-        mid = (lo + hi) / 2
-        p = _probs(xs, mid)["pHigher"]
-        err = abs(p - 0.5)
-        if err < best:
-            best, be = err, mid
-        if p > 0.5:
-            lo = mid
-        else:
-            hi = mid
-    elasticity = abs(_probs(xs, offered_line + 0.5)["pHigher"] - offered["pHigher"]) / 0.5
+    offered_p = _side_p(offered, side)
+    playable_break = _order_break(xs, side, playable_p)
+    break_even = _order_break(xs, side, 0.50)
+    if not xs or math.isnan(playable_break):
+        tolerance = 0.0
+    elif side == "MORE":
+        tolerance = max(0.0, playable_break - offered_line)
+    else:
+        tolerance = max(0.0, offered_line - playable_break)
+    adverse_line = offered_line + step if side == "MORE" else offered_line - step
+    adverse_p = _side_p(_probs(xs, adverse_line), side)
+    elasticity = abs(adverse_p - offered_p) / max(1e-9, step)
     area = 0.0
-    for i in range(-12, 13):
-        if _probs(xs, offered_line + i * 0.5)["pHigher"] >= playable_p:
-            area += 0.5
+    if tolerance > 0:
+        intervals = max(1, int(math.ceil(tolerance / step)))
+        for i in range(intervals):
+            line = offered_line + i * step if side == "MORE" else offered_line - i * step
+            p = _side_p(_probs(xs, line), side)
+            area += max(0.0, p - playable_p) * step
     return {
+        "side": side,
         "offered_line": offered_line,
-        "offered_probability": offered["pHigher"],
-        "break_even_line": be,
-        "true_unclamped_line_tolerance": max(tol_up, tol_down),
+        "offered_probability": offered_p,
+        "break_even_line": break_even,
+        "playable_break_line": playable_break,
+        "true_unclamped_line_tolerance": tolerance,
         "edge_elasticity": elasticity,
         "robustness_area": area,
-        "pHigher": offered["pHigher"],
-        "pLower": offered["pLower"],
-        "pPush": offered["pPush"],
-        "mean": offered["mean"],
+        "pHigher": offered["pHigher"], "pLower": offered["pLower"],
+        "pPush": offered["pPush"], "mean": offered["mean"], "n": offered["n"],
     }
