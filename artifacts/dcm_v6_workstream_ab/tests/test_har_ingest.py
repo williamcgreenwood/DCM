@@ -108,7 +108,8 @@ def test_prizepicks_jsonapi_payload():
     assert rows[0]["league"] == "NBA"
     assert rows[1]["modifier"] == "GOBLIN"
     assert rows[0]["side"] == "UNKNOWN"
-    assert rows[0]["offeredHigher"] is True
+    assert rows[0]["offeredHigher"] is False
+    assert rows[0]["offeredLower"] is False
 
 
 def test_unknown_shape_fail_closed():

@@ -1,0 +1,31 @@
+name: DCM v6 branch CI
+
+on:
+  push:
+    branches:
+      - chatgpt/v6-production-completion-20260828
+  pull_request:
+    paths:
+      - "artifacts/dcm_v6_workstream_ab/**"
+      - ".github/workflows/dcm-v6-ci.yml"
+
+jobs:
+  python-dcm:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: artifacts/dcm_v6_workstream_ab
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip pytest
+      - name: Compile
+        run: python -m compileall -q dcm tests
+      - name: Test
+        env:
+          PYTHONPATH: .
+          DCM_FAST_WORLDS: "64"
+          DCM_SERIOUS_WORLDS: "128"
+        run: pytest -q
