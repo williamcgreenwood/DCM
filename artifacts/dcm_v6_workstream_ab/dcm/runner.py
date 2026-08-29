@@ -198,6 +198,10 @@ def run_dcm(
     bundle = collect(requests, provider)
     (dest / "evidence").mkdir(exist_ok=True)
     (dest / "evidence" / "claims.json").write_text(json.dumps(bundle["claims"], indent=2) + "\n", encoding="utf-8")
+    (dest / "evidence" / "coverage.json").write_text(
+        json.dumps(bundle.get("coverage") or {}, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
     n_res = dag.add("EVIDENCE", "board", parents=[n_id.key])
     if not bundle["complete"]:
         dag.block(n_res.key, "RESEARCH_INCOMPLETE")
@@ -478,6 +482,8 @@ def run_dcm(
         "researchReused": bundle["reused"],
         "researchComplete": bundle["complete"],
         "productionResearchComplete": production_research_ready,
+        "evidenceCoverageComplete": bool((bundle.get("coverage") or {}).get("complete")),
+        "evidenceCoverageMissing": int((bundle.get("coverage") or {}).get("missingRequirementCount") or 0),
         "evidenceMode": bundle.get("evidence_mode"),
         "canonicalBaselineReady": canonical_ready,
         "schemaReady": schema_ready,
