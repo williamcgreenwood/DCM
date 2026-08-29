@@ -9,6 +9,7 @@ from dcm.model.parameters import build_parameter_snapshot
 from dcm.model.uncertainty import evidence_safe_probability
 from dcm.model.worlds import generate_event_contexts, simulate_player_worlds
 from dcm.research.provider import FixtureProvider, collect
+from dcm.runtime.governor import Governor
 from dcm.selection.portfolio import build_card
 
 
@@ -169,3 +170,23 @@ def test_portfolio_rejects_highly_correlated_simulated_selection_outcomes():
         candidate("C", "E2", inverse),
     ])
     assert [x["row"]["projectionId"] for x in card] == ["A", "C"]
+
+
+def test_adaptive_governor_escalates_only_serious_production_candidates():
+    gov = Governor(fast_worlds=256, serious_worlds=2048, ceiling_worlds=8192, mc_se_target=0.008)
+    assert gov.next_world_count(
+        current=256, selected_probability=0.59, decision_threshold=0.58,
+        production_selectable=False,
+    ) == 256
+    assert gov.next_world_count(
+        current=256, selected_probability=0.59, decision_threshold=0.58,
+        production_selectable=True,
+    ) == 2048
+    assert gov.next_world_count(
+        current=2048, selected_probability=0.59, decision_threshold=0.58,
+        production_selectable=True,
+    ) == 4096
+    assert gov.next_world_count(
+        current=4096, selected_probability=0.59, decision_threshold=0.58,
+        production_selectable=True,
+    ) == 4096
