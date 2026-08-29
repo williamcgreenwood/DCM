@@ -21,6 +21,7 @@ from typing import Any
 from dcm.contracts.hashes import content_hash
 from dcm.identity.resolve import freeze_map, resolve_row
 from dcm.ingest.board import freeze_board, write_board
+from dcm.ingest.composite import compose_ingests
 from dcm.ingest.har import ingest_har
 from dcm.model.distributions import from_worlds
 from dcm.model.grade import grade as grade_of
@@ -91,6 +92,7 @@ def run_dcm(
     *,
     input_path: Path | None,
     forecast_cutoff: str,
+    input_paths: list[Path] | None = None,
     output_root: Path,
     synthetic: bool = False,
     research: str = "file",
@@ -122,12 +124,16 @@ def run_dcm(
         if synthetic:
             raw = json.loads(SYNTHETIC.read_text(encoding="utf-8"))
             raw_bytes = SYNTHETIC.read_bytes()
+            ingests = [ingest_har(raw, raw_bytes=raw_bytes)]
         else:
-            if input_path is None or not input_path.is_file():
-                raise FileNotFoundError("HAR missing. Pass --input or --synthetic.")
-            raw_bytes = input_path.read_bytes()
-            raw = raw_bytes
-        ingest = ingest_har(raw, raw_bytes=raw_bytes)
+            sources = list(input_paths or ([] if input_path is None else [input_path]))
+            if not sources or any(not p.is_file() for p in sources):
+                raise FileNotFoundError("HAR missing. Pass one or more --input values or --synthetic.")
+            ingests = []
+            for source in sources:
+                raw_bytes = source.read_bytes()
+                ingests.append(ingest_har(raw_bytes, raw_bytes=raw_bytes))
+        ingest = compose_ingests(ingests) if len(ingests) > 1 else ingests[0]
         har_sha = ingest["harSha256"]
         run_id = _run_id(har_sha, forecast_cutoff)
         dest = output_root / run_id
@@ -138,10 +144,18 @@ def run_dcm(
             json.dumps(
                 {
                     "harSha256": har_sha,
+                    "sourceHarSha256s": ingest.get("contributingHarSha256s") or [har_sha],
+                    "compositeCaptureId": ingest.get("compositeCaptureId"),
                     "adapter": ingest["adapter"],
                     "parserVersion": ingest["parserVersion"],
                     "synthetic": bool(ingest.get("synthetic")),
-                    "sourceMode": "SYNTHETIC" if bool(ingest.get("synthetic")) else "CAPTURED_HAR",
+                    "sourceMode": (
+                        "SYNTHETIC"
+                        if bool(ingest.get("synthetic"))
+                        else "MULTI_HAR_COMPOSITE"
+                        if ingest.get("compositeCaptureId")
+                        else "CAPTURED_HAR"
+                    ),
                 },
                 indent=2,
                 sort_keys=True,
@@ -568,7 +582,7 @@ def run_dcm(
 
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(description="DCM v6 E2E runner (LR000000, not optimized 6.0)")
-    p.add_argument("--input", type=Path, default=None)
+    p.add_argument("--input", type=Path, action="append", default=None, help="HAR input; repeat for complementary captures")
     p.add_argument("--out", type=Path, default=DEFAULT_WORKSPACE / "dcm_v6" / "RUNS")
     p.add_argument("--synthetic", action="store_true")
     p.add_argument("--cutoff", default="2026-08-28T00:00:00Z")
@@ -580,7 +594,8 @@ def main(argv: list[str] | None = None) -> int:
     args = p.parse_args(argv)
     try:
         result = run_dcm(
-            input_path=args.input,
+            input_path=(args.input[0] if args.input and len(args.input) == 1 else None),
+            input_paths=args.input,
             forecast_cutoff=args.cutoff,
             output_root=args.out,
             synthetic=args.synthetic,
