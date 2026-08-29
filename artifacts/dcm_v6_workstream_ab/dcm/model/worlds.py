@@ -30,6 +30,69 @@ def _p(params: dict[str, Any], key: str, default: float) -> float:
         return default
 
 
+def generate_event_contexts(
+    family: str,
+    event_id: str,
+    *,
+    n: int,
+    seed: str,
+) -> list[dict[str, float]]:
+    """Create deterministic latent event states shared by every player.
+
+    The event stream is keyed only by forecast seed + sport family + event ID,
+    never by player identity. This preserves cross-player event dependence while
+    player-specific RNG remains independent conditional on the event state.
+    """
+    rng = _rng(f"{seed}:EVENT:{family}:{event_id}")
+    out = []
+    for _ in range(n):
+        out.append({
+            "tempo": _clip(rng.gauss(1.0, 0.055), 0.84, 1.16),
+            "efficiency": _clip(rng.gauss(1.0, 0.045), 0.86, 1.14),
+            "opportunity": _clip(rng.gauss(1.0, 0.045), 0.86, 1.14),
+            "environment": _clip(rng.gauss(1.0, 0.035), 0.88, 1.12),
+        })
+    return out
+
+
+def _contextualize(
+    params: dict[str, Any],
+    family: str,
+    context: dict[str, float],
+) -> dict[str, Any]:
+    p = dict(params)
+    tempo = float(context["tempo"])
+    eff = float(context["efficiency"])
+    opp = float(context["opportunity"])
+    env = float(context["environment"])
+
+    if family == "basketball":
+        if "minutes_mean" in p:
+            p["minutes_mean"] = _p(p, "minutes_mean", 34.0) * opp
+        for key in ("fga_per_min", "fta_per_min", "reb_per_min", "ast_per_min", "stl_per_min", "blk_per_min", "tov_per_min"):
+            if key in p:
+                p[key] = _p(p, key, 0.0) * tempo
+        for key in ("two_fg_pct", "three_fg_pct"):
+            if key in p:
+                p[key] = _p(p, key, 0.5) * eff
+    elif family == "gridiron":
+        for key in ("pass_att_mean", "rush_att_mean", "routes_mean"):
+            if key in p:
+                p[key] = _p(p, key, 0.0) * opp
+        for key in ("pass_ypa", "rush_ypa", "rec_ypr"):
+            if key in p:
+                p[key] = _p(p, key, 0.0) * eff * env
+    elif family == "baseball":
+        if "pa_mean" in p:
+            p["pa_mean"] = _p(p, "pa_mean", 4.2) * opp
+        for key in ("single_rate", "double_rate", "triple_rate", "hr_rate", "run_per_pa", "rbi_per_pa"):
+            if key in p:
+                p[key] = _p(p, key, 0.0) * eff * env
+        if "so_rate" in p:
+            p["so_rate"] = _p(p, "so_rate", 0.24) / max(0.75, eff)
+    return p
+
+
 def sample_basketball(rng: random.Random, minutes: float, parameters: dict[str, Any] | None = None) -> dict[str, float]:
     p = parameters or {}
     fga = max(0.0, rng.gauss(minutes * max(0.01, _p(p, "fga_per_min", 0.55)), 3.0))
@@ -133,23 +196,50 @@ def value_from_stats(market: str, stats: dict[str, float]) -> float:
     return float(stats[key])
 
 
-def simulate_player_worlds(row: dict[str, Any], *, n: int, seed: str, parameter_snapshot: dict[str, Any] | None = None) -> list[dict[str, float]]:
-    rng = _rng(f"{seed}:{row['playerId']}:{row['eventId']}")
+def simulate_player_worlds(
+    row: dict[str, Any],
+    *,
+    n: int,
+    seed: str,
+    parameter_snapshot: dict[str, Any] | None = None,
+    event_contexts: list[dict[str, float]] | None = None,
+) -> list[dict[str, float]]:
+    family = str(row.get("sportFamily") or "")
+    rng = _rng(f"{seed}:PLAYER:{row['playerId']}:{row['eventId']}")
     params = (parameter_snapshot or {}).get("parameters") if isinstance(parameter_snapshot, dict) else {}
     params = params if isinstance(params, dict) else {}
+    contexts = event_contexts or generate_event_contexts(
+        family, str(row.get("eventId") or ""), n=n, seed=seed
+    )
+    if len(contexts) < n:
+        raise ValueError("EVENT_CONTEXT_WORLD_COUNT_TOO_SMALL")
+
     worlds = []
-    for _ in range(n):
-        if row.get("sportFamily") == "basketball":
-            mean_minutes = _p(params, "minutes_mean", 34.0 if row.get("league") == "NBA" else 31.0)
-            sd_minutes = max(0.5, _p(params, "minutes_sd", 4.5))
+    for idx in range(n):
+        world_params = _contextualize(params, family, contexts[idx])
+        if family == "basketball":
+            mean_minutes = _p(world_params, "minutes_mean", 34.0 if row.get("league") == "NBA" else 31.0)
+            sd_minutes = max(0.5, _p(world_params, "minutes_sd", 4.5))
             regulation = 48.0 if row.get("league") == "NBA" else 40.0
             minutes = _clip(rng.gauss(mean_minutes, sd_minutes), 0.0, regulation + 10.0)
-            worlds.append(sample_basketball(rng, minutes, params))
-        elif row.get("sportFamily") == "gridiron":
-            worlds.append(sample_football(rng, str(params.get("role") or row.get("role") or "QB"), params))
-        elif row.get("sportFamily") == "baseball":
-            pa = max(0.0, rng.gauss(_p(params, "pa_mean", 4.2), max(0.2, _p(params, "pa_sd", 0.8))))
-            worlds.append(sample_baseball_batter(rng, pa, params))
+            worlds.append(sample_basketball(rng, minutes, world_params))
+        elif family == "gridiron":
+            worlds.append(
+                sample_football(
+                    rng,
+                    str(world_params.get("role") or row.get("role") or "QB"),
+                    world_params,
+                )
+            )
+        elif family == "baseball":
+            pa = max(
+                0.0,
+                rng.gauss(
+                    _p(world_params, "pa_mean", 4.2),
+                    max(0.2, _p(world_params, "pa_sd", 0.8)),
+                ),
+            )
+            worlds.append(sample_baseball_batter(rng, pa, world_params))
         else:
-            raise KeyError(row.get("sportFamily"))
+            raise KeyError(family)
     return worlds
