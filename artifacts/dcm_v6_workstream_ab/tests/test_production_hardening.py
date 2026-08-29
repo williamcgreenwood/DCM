@@ -7,7 +7,7 @@ from dcm.ingest.prizepicks import _side
 from dcm.model.line_surface import surface
 from dcm.model.parameters import build_parameter_snapshot
 from dcm.model.uncertainty import evidence_safe_probability
-from dcm.model.worlds import simulate_player_worlds
+from dcm.model.worlds import generate_event_contexts, simulate_player_worlds
 from dcm.research.provider import FixtureProvider, collect
 from dcm.selection.portfolio import build_card
 
@@ -135,3 +135,12 @@ def test_schema_gate_rejects_reconstruction_hash(tmp_path):
             os.environ["DCM_PHASE_BC_SCHEMA"] = old
     assert state["productionEligible"] is False
     assert state["state"] == "HASH_MISMATCH_RECONSTRUCTION_NOT_CANONICAL"
+
+
+def test_event_contexts_are_shared_by_event_not_player():
+    a = generate_event_contexts("basketball", "E1", n=16, seed="HAR")
+    b = generate_event_contexts("basketball", "E1", n=16, seed="HAR")
+    c = generate_event_contexts("basketball", "E2", n=16, seed="HAR")
+    assert a == b
+    assert a != c
+    assert len(a) == 16
