@@ -31,6 +31,7 @@ from dcm.model.ranking import rank_candidates
 from dcm.model.uncertainty import probability_bundle
 from dcm.learning.calibration import apply_calibration, cell_key
 from dcm.model.worlds import MARKET_FROM_STATS, simulate_player_worlds, value_from_stats
+from dcm.research.host_plan import build_host_research_plan
 from dcm.research.provider import FileProvider, FixtureProvider, collect
 from dcm.research.requests import build_requests
 from dcm.runtime.checkpoint import load_checkpoint, write_checkpoint
@@ -206,6 +207,11 @@ def run_dcm(
         json.dumps(bundle.get("conflicts") or [], indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
+    host_plan = build_host_research_plan(requests, coverage=bundle.get("coverage"))
+    (dest / "host_research_plan.json").write_text(
+        json.dumps(host_plan, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
     n_res = dag.add("EVIDENCE", "board", parents=[n_id.key])
     if not bundle["complete"]:
         dag.block(n_res.key, "RESEARCH_INCOMPLETE")
@@ -219,7 +225,7 @@ def run_dcm(
                 "artifactRoot": str(dest),
                 "completedStages": sorted(stages_done),
                 "pending": ["EVIDENCE"],
-                "nextDeterministicAction": "write evidence/ then --resume checkpoint.json",
+                "nextDeterministicAction": "execute host_research_plan.json, write validated evidence files, then --resume checkpoint.json",
                 "rowCounts": {"raw": len(rows)},
                 "blockers": ["RESEARCH_INCOMPLETE"],
             },
