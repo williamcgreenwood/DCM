@@ -20,7 +20,9 @@ LEARNING_REVISION = "LR000000"
 PREDICTIVE_CLAIM = "NONE"
 SOFTWARE = "6.0.0+WSAB.HARSPINE.LR000000"
 
-SYNTHETIC_FIXTURE = Path("/workspace/artifacts/dcm_v6_workstream_ab/fixtures/synthetic_har.json")
+ARTIFACT_ROOT = Path(__file__).resolve().parents[2]
+DEFAULT_WORKSPACE = Path(__file__).resolve().parents[4]
+SYNTHETIC_FIXTURE = ARTIFACT_ROOT / "fixtures" / "synthetic_har.json"
 
 
 def _run_id(har_sha256: str, cutoff: str) -> str:
@@ -70,11 +72,11 @@ def run_har(*, inbox: Path | None, out_root: Path, synthetic: bool, cutoff: str,
 
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(description="DCM v6 HAR → board.json (LR000000, no v5 mutation)")
-    p.add_argument("--inbox", type=Path, default=Path("/workspace/dcm_v6/INBOX/current.har"))
-    p.add_argument("--out", type=Path, default=Path("/workspace/dcm_v6/RUNS"))
+    p.add_argument("--inbox", type=Path, default=DEFAULT_WORKSPACE / "dcm_v6" / "INBOX" / "current.har")
+    p.add_argument("--out", type=Path, default=DEFAULT_WORKSPACE / "dcm_v6" / "RUNS")
     p.add_argument("--synthetic", action="store_true")
     p.add_argument("--cutoff", default="2026-08-28T00:00:00Z")
-    p.add_argument("--workspace", type=Path, default=Path("/workspace"))
+    p.add_argument("--workspace", type=Path, default=DEFAULT_WORKSPACE)
     args = p.parse_args(argv)
     try:
         result = run_har(

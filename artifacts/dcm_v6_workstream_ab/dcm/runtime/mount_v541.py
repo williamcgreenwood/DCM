@@ -162,7 +162,19 @@ def write_mount_state(state: dict, path: Path) -> Path:
     return path
 
 
-def mount_default(workspace: Path = Path("/workspace")) -> dict:
+DEFAULT_WORKSPACE = Path(__file__).resolve().parents[4]
+
+def _usable_workspace(requested: Path) -> Path:
+    if requested.exists():
+        return requested
+    try:
+        requested.mkdir(parents=True, exist_ok=True)
+        return requested
+    except (OSError, PermissionError):
+        return DEFAULT_WORKSPACE
+
+def mount_default(workspace: Path = DEFAULT_WORKSPACE) -> dict:
+    workspace = _usable_workspace(workspace)
     dest = workspace / "dcm_v6" / "canonical_mount" / "v5.4.1_copy"
     env_source = Path(os.environ["DCM_V541_SOURCE"]) if os.environ.get("DCM_V541_SOURCE") else None
     env_ledger = Path(os.environ["DCM_V541_LEDGER"]) if os.environ.get("DCM_V541_LEDGER") else None

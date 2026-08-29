@@ -23,7 +23,7 @@ from dcm.sports.basketball.minimal import basketball_conservation
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "fixtures" / "synthetic_har.json"
-CUTOFF = "2026-08-28T00:00:00Z"
+CUTOFF = "2026-08-29T00:00:00Z"
 
 
 def _synthetic_har(rows: list[dict]) -> dict:

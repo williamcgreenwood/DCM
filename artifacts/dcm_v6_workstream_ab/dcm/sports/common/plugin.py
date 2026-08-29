@@ -52,10 +52,10 @@ def selection_state(family: str, league: str, market: str) -> str:
     return CAPABILITIES.get((family, league, market), UNSUPPORTED)
 
 
-register(SportPluginManifest("gridiron", "1.1.0", ("NFL", "CFB", "NFLP"), "play/snap/route/target/dropback", ("snaps", "routes", "targets", "dropbacks", "carries"), PRODUCTION, test_ids=("WSAB_BASELINE_46",)))
+register(SportPluginManifest("gridiron", "1.1.0", ("NFL", "CFB", "NFLP", "CFL", "UFL"), "play/snap/route/target/dropback", ("snaps", "routes", "targets", "dropbacks", "carries"), PRODUCTION, known_unsupported=("CFL_REBOOT",), test_ids=("WSAB_BASELINE_46",)))
 register(SportPluginManifest("basketball", "1.1.0", ("NBA", "WNBA"), "possession/stint/minute", ("minutes", "possessions"), PRODUCTION, test_ids=("basketball_minimal_e2e",)))
 register(SportPluginManifest("baseball", "0.2.0", ("MLB", "NPB"), "PA/pitch/base-out", ("PA", "BF"), SHADOW))
-register(SportPluginManifest("combat", "0.1.0", ("UFC",), "fight_second/round", ("fight_seconds",), RESEARCH))
+register(SportPluginManifest("combat", "0.1.0", ("UFC", "BOXING"), "fight_second/round", ("fight_seconds",), RESEARCH, known_unsupported=("BOXING_AS_UFC",)))
 for fam, unit, leagues in (
     ("soccer", "minute/action", ("EPL", "MLS", "UEFA")), ("hockey", "shift/TOI", ("NHL",)),
     ("racket", "point/game/set", ("ATP", "WTA")), ("cricket", "ball/over/innings", ("T20", "ODI", "TEST")),

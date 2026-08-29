@@ -144,8 +144,8 @@ def test_har_run_synthetic_does_not_promote_lr(tmp_path: Path):
         inbox=None,
         out_root=tmp_path / "RUNS",
         synthetic=True,
-        cutoff="2026-08-28T00:00:00Z",
-        workspace=Path("/workspace"),
+        cutoff="2026-08-29T00:00:00Z",
+        workspace=tmp_path,
     )
     integ = result["integrity"]
     assert integ["learningRevision"] == "LR000000"

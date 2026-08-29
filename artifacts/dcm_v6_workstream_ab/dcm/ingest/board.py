@@ -77,8 +77,9 @@ def accounting_from_rows(rows: list[dict], *, asof: dict[str, int] | None = None
     return out
 
 
-def freeze_board(ingest: dict[str, Any], *, mount: dict[str, Any], cutoff: str = "2026-08-28T00:00:00Z") -> dict[str, Any]:
-    selected, asof = rows_as_of(ingest, cutoff)
+def freeze_board(ingest: dict[str, Any], *, mount: dict[str, Any], cutoff: str | None = None) -> dict[str, Any]:
+    resolved_cutoff = cutoff or str(ingest.get("captureEnd") or "9999-12-31T23:59:59Z")
+    selected, asof = rows_as_of(ingest, resolved_cutoff)
     rows = annotate_rows(selected)
     payload = {
         "schemaId": PARSER_SCHEMA,
@@ -91,7 +92,7 @@ def freeze_board(ingest: dict[str, Any], *, mount: dict[str, Any], cutoff: str =
         "harSha256": ingest.get("harSha256"),
         "captureStart": ingest.get("captureStart") or "",
         "captureEnd": ingest.get("captureEnd") or "",
-        "forecastCutoff": cutoff,
+        "forecastCutoff": resolved_cutoff,
         "redactedSecrets": ingest.get("redactedSecrets") or 0,
         "indexStats": ingest.get("indexStats") or {},
         "warnings": ingest.get("warnings") or [],
