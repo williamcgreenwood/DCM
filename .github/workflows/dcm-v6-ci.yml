@@ -1,5 +1,9 @@
 name: DCM v6 branch CI
 
+concurrency:
+  group: dcm-v6-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     branches:
@@ -8,6 +12,9 @@ on:
     paths:
       - "artifacts/dcm_v6_workstream_ab/**"
       - ".github/workflows/dcm-v6-ci.yml"
+
+permissions:
+  contents: read
 
 jobs:
   python-dcm:
