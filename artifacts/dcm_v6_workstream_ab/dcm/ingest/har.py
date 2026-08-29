@@ -102,6 +102,7 @@ def _index_har(obj: dict) -> tuple[list[dict], dict[str, int], list[str]]:
         seen_body[body_hash] = started
         indexed.append({
             "url": url.split("?")[0],
+            "scopeHash": sha256_text(f"{method}:{url}"),
             "method": method,
             "startedDateTime": started,
             "status": status,
@@ -184,7 +185,7 @@ def ingest_har(raw: Any, *, raw_bytes: bytes | None = None) -> dict[str, Any]:
         capture_end = max(times) if times else ""
         last_hash_by_scope: dict[tuple[str, str], str] = {}
         for e in indexed:
-            scope_key = (e["method"], e["url"])
+            scope_key = (e["method"], e.get("scopeHash") or e["url"])
             if last_hash_by_scope.get(scope_key) == e["bodyHash"]:
                 continue
             last_hash_by_scope[scope_key] = e["bodyHash"]
@@ -196,7 +197,7 @@ def ingest_har(raw: Any, *, raw_bytes: bytes | None = None) -> dict[str, Any]:
             parsed = _parse_payload(payload)
             if parsed:
                 adapter, batch = parsed
-                add_rows(batch, snapshot=e["startedDateTime"], body_hash=e["bodyHash"], scope=e["url"])
+                add_rows(batch, snapshot=e["startedDateTime"], body_hash=e["bodyHash"], scope=str(e.get("scopeHash") or e["url"]))
     elif obj is not None:
         parsed = _parse_payload(obj)
         if parsed:

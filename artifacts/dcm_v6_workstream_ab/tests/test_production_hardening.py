@@ -90,3 +90,48 @@ def test_directional_line_surface_and_shared_dependency_constraint():
         p("C", "E3", "T2", []),
     ])
     assert [x["row"]["playerId"] for x in card] == ["A", "C"]
+
+
+def test_event_start_is_not_market_updated_at():
+    from dcm.ingest.prizepicks import parse_prizepicks_payload
+    payload = {
+        "data": [{
+            "id": "x1", "type": "projection",
+            "attributes": {
+                "line_score": 10.5, "stat_type": "Points", "odds_type": "standard",
+                "updated_at": "2026-08-28T10:00:00Z", "start_time": "2026-08-29T02:00:00Z",
+                "offered_higher": True, "offered_lower": True,
+            },
+            "relationships": {
+                "new_player": {"data": {"id": "p1", "type": "new_player"}},
+                "league": {"data": {"id": "l1", "type": "league"}},
+                "new_game": {"data": {"id": "g1", "type": "new_game"}},
+            },
+        }],
+        "included": [
+            {"id": "p1", "type": "new_player", "attributes": {"display_name": "P", "team": "AAA"}},
+            {"id": "l1", "type": "league", "attributes": {"name": "NBA", "sport": "Basketball"}},
+            {"id": "g1", "type": "new_game", "attributes": {"home_name": "AAA", "away_name": "BBB"}},
+        ],
+    }
+    _, rows = parse_prizepicks_payload(payload)
+    assert rows[0]["sourceUpdatedAt"] == "2026-08-28T10:00:00Z"
+    assert rows[0]["eventStartTime"] == "2026-08-29T02:00:00Z"
+
+
+def test_schema_gate_rejects_reconstruction_hash(tmp_path):
+    from dcm.runtime.schema_root import verify_schema
+    p = tmp_path / "Phase_BC_Immutable_Contracts.json"
+    p.write_text('{"reconstruction": true}', encoding="utf-8")
+    import os
+    old = os.environ.get("DCM_PHASE_BC_SCHEMA")
+    os.environ["DCM_PHASE_BC_SCHEMA"] = str(p)
+    try:
+        state = verify_schema(tmp_path)
+    finally:
+        if old is None:
+            os.environ.pop("DCM_PHASE_BC_SCHEMA", None)
+        else:
+            os.environ["DCM_PHASE_BC_SCHEMA"] = old
+    assert state["productionEligible"] is False
+    assert state["state"] == "HASH_MISMATCH_RECONSTRUCTION_NOT_CANONICAL"

@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any, Protocol
 
 from dcm.research.claims import claim_record, dedupe
+from dcm.contracts.hashes import content_hash
 from dcm.research.temporal import assert_not_after_cutoff
 
 
@@ -27,9 +28,9 @@ def _is_fixture_claim(claim: dict[str, Any]) -> bool:
 
 def _validate_claim(claim: dict[str, Any], request: dict[str, Any]) -> dict[str, Any]:
     required = {
-        "source_id", "published_at", "observed_at", "forecast_cutoff",
+        "source_id", "url", "published_at", "observed_at", "forecast_cutoff",
         "semantic_scope", "scope_id", "claim_type", "claim_value",
-        "reliability", "freshness",
+        "reliability", "freshness", "source_hash", "claim_hash",
     }
     missing = sorted(required - set(claim))
     if missing:
@@ -46,6 +47,14 @@ def _validate_claim(claim: dict[str, Any], request: dict[str, Any]) -> dict[str,
     freshness = float(claim.get("freshness", 0.0))
     if not (0.0 <= reliability <= 1.0 and 0.0 <= freshness <= 1.0):
         raise ValueError("EVIDENCE_QUALITY_OUT_OF_RANGE")
+    expected_source = content_hash({
+        "source_id": claim["source_id"], "url": claim["url"], "published_at": claim["published_at"]
+    })
+    if str(claim.get("source_hash")) != expected_source:
+        raise ValueError("EVIDENCE_SOURCE_HASH_MISMATCH")
+    expected_claim = content_hash({k: v for k, v in claim.items() if k != "claim_hash"})
+    if str(claim.get("claim_hash")) != expected_claim:
+        raise ValueError("EVIDENCE_CLAIM_HASH_MISMATCH")
     return claim
 
 

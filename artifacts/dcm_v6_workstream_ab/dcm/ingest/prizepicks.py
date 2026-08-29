@@ -155,7 +155,8 @@ def _row_from_jsonapi(item: dict, included: dict) -> dict | None:
         "boardId": _board_id(duration, attrs),
         "productType": "PLAYER_PICKS",
         "role": str(pa.get("position") or pa.get("position_abbreviation") or ""),
-        "sourceUpdatedAt": str(attrs.get("updated_at") or attrs.get("start_time") or ""),
+        "sourceUpdatedAt": str(attrs.get("updated_at") or ""),
+        "eventStartTime": str(attrs.get("start_time") or ga.get("start_time") or ""),
     }
 
 
@@ -190,6 +191,7 @@ def _row_from_normalized(item: dict) -> dict | None:
         "productType": str(item.get("productType") or "PLAYER_PICKS"),
         "role": str(item.get("role") or ""),
         "sourceUpdatedAt": str(item.get("sourceUpdatedAt") or ""),
+        "eventStartTime": str(item.get("eventStartTime") or item.get("startTime") or ""),
     }
 
 

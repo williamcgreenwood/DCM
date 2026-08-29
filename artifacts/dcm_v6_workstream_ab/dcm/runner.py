@@ -48,7 +48,9 @@ SCHEMA = "PHASE_BC_SCHEMA_V1_2026-08-25"
 N_WORLDS = int(__import__("os").environ.get("DCM_FAST_WORLDS", "256"))
 N_SERIOUS = int(__import__("os").environ.get("DCM_SERIOUS_WORLDS", "2048"))
 
-SYNTHETIC = Path("/workspace/artifacts/dcm_v6_workstream_ab/fixtures/synthetic_har.json")
+ARTIFACT_ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_WORKSPACE = Path(__file__).resolve().parents[3]
+SYNTHETIC = ARTIFACT_ROOT / "fixtures" / "synthetic_har.json"
 
 SUPPORTED_FAMILIES = {"basketball", "gridiron", "baseball"}
 
@@ -92,7 +94,7 @@ def run_dcm(
     synthetic: bool = False,
     research: str = "file",
     evidence_dir: Path | None = None,
-    workspace: Path = Path("/workspace"),
+    workspace: Path = DEFAULT_WORKSPACE,
     resume: Path | None = None,
 ) -> dict[str, Any]:
     if resume:
@@ -510,13 +512,13 @@ def run_dcm(
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(description="DCM v6 E2E runner (LR000000, not optimized 6.0)")
     p.add_argument("--input", type=Path, default=None)
-    p.add_argument("--out", type=Path, default=Path("/workspace/dcm_v6/RUNS"))
+    p.add_argument("--out", type=Path, default=DEFAULT_WORKSPACE / "dcm_v6" / "RUNS")
     p.add_argument("--synthetic", action="store_true")
     p.add_argument("--cutoff", default="2026-08-28T00:00:00Z")
     p.add_argument("--research", choices=["fixture", "file"], default="file")
     p.add_argument("--evidence-dir", type=Path, default=None)
     p.add_argument("--resume", type=Path, default=None)
-    p.add_argument("--workspace", type=Path, default=Path("/workspace"))
+    p.add_argument("--workspace", type=Path, default=DEFAULT_WORKSPACE)
     p.add_argument("--version", default=SOFTWARE)
     args = p.parse_args(argv)
     try:
