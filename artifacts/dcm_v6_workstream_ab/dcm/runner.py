@@ -30,7 +30,7 @@ from dcm.model.parameters import build_parameter_snapshot
 from dcm.model.ranking import rank_candidates
 from dcm.model.uncertainty import probability_bundle
 from dcm.learning.calibration import apply_calibration, cell_key
-from dcm.model.worlds import MARKET_FROM_STATS, simulate_player_worlds, value_from_stats
+from dcm.model.worlds import MARKET_FROM_STATS, generate_event_contexts, simulate_player_worlds, value_from_stats
 from dcm.research.host_plan import build_host_research_plan
 from dcm.research.provider import FileProvider, FixtureProvider, collect
 from dcm.research.requests import build_requests
@@ -255,6 +255,7 @@ def run_dcm(
     gov = Governor(max_worlds=N_WORLDS, serious_worlds=N_SERIOUS)
     t = StageTimer("MODEL")
     world_cache: dict[tuple[str, str, str], list[dict[str, float]]] = {}
+    event_context_cache: dict[tuple[str, str, int], list[dict[str, float]]] = {}
     parameter_cache: dict[str, dict[str, Any]] = {}
     modeled: list[dict[str, Any]] = []
     classified: list[dict[str, Any]] = []
@@ -281,8 +282,17 @@ def run_dcm(
         key = (str(row["eventId"]), str(row["playerId"]), str(snapshot["parameter_snapshot_hash"]))
         try:
             if key not in world_cache:
+                ctx_key = (str(row.get("sportFamily") or ""), str(row.get("eventId") or ""), gov.max_worlds)
+                if ctx_key not in event_context_cache:
+                    event_context_cache[ctx_key] = generate_event_contexts(
+                        ctx_key[0], ctx_key[1], n=gov.max_worlds, seed=har_sha
+                    )
                 world_cache[key] = simulate_player_worlds(
-                    row, n=gov.max_worlds, seed=har_sha, parameter_snapshot=snapshot
+                    row,
+                    n=gov.max_worlds,
+                    seed=har_sha,
+                    parameter_snapshot=snapshot,
+                    event_contexts=event_context_cache[ctx_key],
                 )
             values = [value_from_stats(row["market"], w) for w in world_cache[key]]
         except KeyError:
@@ -299,8 +309,21 @@ def run_dcm(
             dist["pLower"] if row.get("offeredLower") else 0.0,
         )
         if production_selectable and preliminary >= 0.52 and gov.serious_worlds > gov.max_worlds:
+            serious_ctx_key = (
+                str(row.get("sportFamily") or ""),
+                str(row.get("eventId") or ""),
+                gov.serious_worlds,
+            )
+            if serious_ctx_key not in event_context_cache:
+                event_context_cache[serious_ctx_key] = generate_event_contexts(
+                    serious_ctx_key[0], serious_ctx_key[1], n=gov.serious_worlds, seed=har_sha
+                )
             world_cache[key] = simulate_player_worlds(
-                row, n=gov.serious_worlds, seed=har_sha, parameter_snapshot=snapshot
+                row,
+                n=gov.serious_worlds,
+                seed=har_sha,
+                parameter_snapshot=snapshot,
+                event_contexts=event_context_cache[serious_ctx_key],
             )
             values = [value_from_stats(row["market"], w) for w in world_cache[key]]
             dist = from_worlds(values, float(row["line"]))
@@ -399,7 +422,12 @@ def run_dcm(
 
     n_worlds = dag.add("EVENT_WORLDS", "board", parents=[n_res.key])
     dag.complete(n_worlds.key, content_hash({"events": len({k[0] for k in world_cache}), "n": N_WORLDS}))
-    model_perf = t.finish(OutputRows=len(modeled), NodeCount=len(world_cache))
+    model_perf = t.finish(
+        OutputRows=len(modeled),
+        NodeCount=len(world_cache),
+        EventContextSets=len(event_context_cache),
+        SimulatedPlayerWorlds=sum(len(v) for v in world_cache.values()),
+    )
     (dest / "performance" / "model.json").write_text(json.dumps(model_perf, indent=2) + "\n", encoding="utf-8")
     stages_done.add("MODEL")
 
