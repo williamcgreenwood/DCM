@@ -6,6 +6,7 @@ challengers. LR never advances automatically from one result.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import math
 from pathlib import Path
@@ -14,6 +15,7 @@ from typing import Any
 from dcm.contracts.hashes import content_hash
 from dcm.learning.calibration import build_challenger_cells, cell_key
 from dcm.learning.sidecar import append_record
+from dcm.runtime.freeze import compute_forecast_hash
 from dcm.runtime.store import IndexedStore
 
 
@@ -29,6 +31,44 @@ def _outcomes(path: Path) -> dict[str, dict[str, Any]]:
     return {str(r["projectionId"]): r for r in rows if isinstance(r, dict) and r.get("projectionId")}
 
 
+def _sha256_file(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as fh:
+        for chunk in iter(lambda: fh.read(1024 * 1024), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def _verify_frozen_run(run_dir: Path) -> tuple[dict[str, Any], dict[str, Any], list[dict[str, Any]]]:
+    freeze = json.loads((run_dir / "frozen_forecast.json").read_text(encoding="utf-8"))
+    integrity = json.loads((run_dir / "run_integrity.json").read_text(encoding="utf-8"))
+    checkpoint = json.loads((run_dir / "checkpoint.json").read_text(encoding="utf-8"))
+    population = _population(run_dir)
+    strict_card = json.loads((run_dir / "strict_card.json").read_text(encoding="utf-8"))
+    top25_ranked = json.loads((run_dir / "top25_ranked.json").read_text(encoding="utf-8"))
+    hash_sidecar = (run_dir / "frozen_forecast.sha256").read_text(encoding="utf-8").strip()
+
+    recomputed = compute_forecast_hash(freeze, population, strict_card, top25_ranked)
+    declared = str(freeze.get("frozenForecastHash") or "")
+    if not declared or recomputed != declared:
+        raise RuntimeError("FROZEN_FORECAST_SEMANTIC_HASH_MISMATCH")
+    if hash_sidecar != declared:
+        raise RuntimeError("FROZEN_FORECAST_SIDECAR_HASH_MISMATCH")
+    if str(integrity.get("frozenForecastHash") or "") != declared:
+        raise RuntimeError("RUN_INTEGRITY_FORECAST_HASH_MISMATCH")
+    if str(checkpoint.get("frozenForecastHash") or "") != declared:
+        raise RuntimeError("CHECKPOINT_FORECAST_HASH_MISMATCH")
+    if str(integrity.get("runId") or "") != str(freeze.get("runId") or ""):
+        raise RuntimeError("RUN_ID_MISMATCH")
+    for field in (
+        "forecastCutoff", "boardHash", "harSha256", "modelConfigHash",
+        "calibrationStateHash", "learningRevision",
+    ):
+        if integrity.get(field) != freeze.get(field):
+            raise RuntimeError(f"RUN_INTEGRITY_{field.upper()}_MISMATCH")
+    return freeze, integrity, population
+
+
 def _result(value: float, line: float, side: str) -> str:
     if abs(value - line) < 1e-9:
         return "PUSH"
@@ -38,14 +78,14 @@ def _result(value: float, line: float, side: str) -> str:
 
 
 def settle_run(run_dir: Path, outcomes_path: Path) -> dict[str, Any]:
-    freeze = json.loads((run_dir / "frozen_forecast.json").read_text(encoding="utf-8"))
-    integrity = json.loads((run_dir / "run_integrity.json").read_text(encoding="utf-8"))
+    freeze, integrity, population = _verify_frozen_run(run_dir)
+    outcomes_sha256 = _sha256_file(outcomes_path)
     outcomes = _outcomes(outcomes_path)
     settlements: list[dict[str, Any]] = []
     audits: list[dict[str, Any]] = []
     proposals: list[dict[str, Any]] = []
 
-    for p in _population(run_dir):
+    for p in population:
         pid = str(p.get("projectionId") or "")
         if not pid or p.get("state") != "MODELED" or p.get("direction") not in {"MORE", "LESS"}:
             continue
@@ -54,8 +94,24 @@ def settle_run(run_dir: Path, outcomes_path: Path) -> dict[str, Any]:
             settlements.append({"projectionId": pid, "settlement": "UNRESOLVED", "reason": "OUTCOME_MISSING"})
             continue
         admin = str(out.get("administrativeState") or "ACTIVE").upper()
-        if admin in {"DNP", "REBOOT", "CANCELLED", "VOID"}:
-            settlements.append({"projectionId": pid, "settlement": admin, "binaryOutcome": None})
+        if admin == "REBOOT":
+            settlements.append({
+                "projectionId": pid,
+                "settlement": "UNRESOLVED",
+                "binaryOutcome": None,
+                "reason": "PLATFORM_REBOOT_REQUIRES_ENTRY_CONTRACT_AND_PARTICIPATION_FACTS",
+                "platformSettlementState": "NOT_COMPUTED",
+                "outcomesSha256": outcomes_sha256,
+            })
+            continue
+        if admin in {"DNP", "CANCELLED", "VOID", "INACTIVE"}:
+            settlements.append({
+                "projectionId": pid,
+                "settlement": admin,
+                "binaryOutcome": None,
+                "platformSettlementState": "NOT_COMPUTED",
+                "outcomesSha256": outcomes_sha256,
+            })
             continue
         try:
             value = float(out["officialStatValue"])
@@ -71,6 +127,9 @@ def settle_run(run_dir: Path, outcomes_path: Path) -> dict[str, Any]:
             "projectionId": pid, "player": p.get("player"), "market": p.get("market"),
             "line": line, "direction": p.get("direction"), "officialStatValue": value,
             "settlement": result, "binaryOutcome": binary, "forecastP": forecast_p,
+            "sportingSettlement": result,
+            "platformSettlementState": "NOT_COMPUTED_WITHOUT_ENTRY_CONTRACT",
+            "outcomesSha256": outcomes_sha256,
             "calibrationKey": cell_key(str(p.get("sportFamily") or ""), str(p.get("league") or ""),
                                        str(p.get("market") or ""), str(p.get("direction") or "")),
         }
@@ -117,6 +176,10 @@ def settle_run(run_dir: Path, outcomes_path: Path) -> dict[str, Any]:
         "learningRevisionBefore": integrity.get("learningRevision", "LR000000"),
         "learningRevisionAfter": integrity.get("learningRevision", "LR000000"),
         "lrPromoted": False, "calibrationPromotion": "NOT_AUTOMATIC", "predictiveClaim": "NONE",
+        "outcomesSha256": outcomes_sha256,
+        "frozenRunVerified": True,
+        "platformSettlementComputed": False,
+        "platformSettlementReason": "ENTRY_CONTRACT_AND_PARTICIPATION_FACTS_REQUIRED",
     }
     for name, data in (
         ("settlement.json", settlements), ("audit.json", audits),
