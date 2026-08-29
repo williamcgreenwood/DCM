@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 from typing import Any, Protocol
+from urllib.parse import parse_qsl, urlsplit
 
 from dcm.research.claims import claim_record, conflict_ledger, dedupe
 from dcm.research.coverage import coverage_report
@@ -27,6 +28,23 @@ def _is_fixture_claim(claim: dict[str, Any]) -> bool:
     return source.startswith("FIXTURE_") or url.startswith("fixture://") or bool(claim.get("synthetic"))
 
 
+def _validate_source_url(url: str) -> None:
+    parsed = urlsplit(url)
+    if parsed.scheme.lower() not in {"http", "https"} or not parsed.hostname:
+        raise ValueError("EVIDENCE_SOURCE_URL_INVALID")
+    if parsed.username or parsed.password:
+        raise ValueError("EVIDENCE_SOURCE_URL_CONTAINS_CREDENTIALS")
+    for key, _ in parse_qsl(parsed.query, keep_blank_values=True):
+        lowered = key.strip().lower()
+        if (
+            lowered in {"token", "access_token", "refresh_token", "session", "session_id", "auth", "authorization", "api_key", "apikey", "key", "sig", "signature"}
+            or "token" in lowered
+            or "session" in lowered
+            or "auth" in lowered
+        ):
+            raise ValueError("EVIDENCE_SOURCE_URL_CONTAINS_SECRET_QUERY")
+
+
 def _validate_claim(claim: dict[str, Any], request: dict[str, Any]) -> dict[str, Any]:
     required = {
         "source_id", "url", "published_at", "observed_at", "forecast_cutoff",
@@ -41,7 +59,12 @@ def _validate_claim(claim: dict[str, Any], request: dict[str, Any]) -> dict[str,
     if str(claim["scope_id"]) != str(request["scope_id"]):
         raise ValueError("EVIDENCE_SCOPE_ID_MISMATCH")
     cutoff = str(request["forecast_cutoff"])
-    assert_not_after_cutoff(str(claim["observed_at"]), cutoff)
+    _validate_source_url(str(claim["url"]))
+    assert_not_after_cutoff(str(claim["observed_at"]), cutoff, field="observed_at")
+    published = str(claim.get("published_at") or "").strip()
+    if not published:
+        raise ValueError("EVIDENCE_PUBLISHED_AT_REQUIRED")
+    assert_not_after_cutoff(published, cutoff, field="published_at")
     if str(claim.get("forecast_cutoff")) != cutoff:
         raise ValueError("EVIDENCE_CUTOFF_MISMATCH")
     reliability = float(claim.get("reliability", 0.0))
