@@ -231,6 +231,9 @@ def test_e_checkpoint_resume_matches_uninterrupted(tmp_path: Path):
         evidence_dir=tmp_path / "empty-evidence",
     )
     assert incomplete["runState"] == "INCOMPLETE_CHECKPOINTED"
+    manifest = json.loads((Path(incomplete["dest"]) / "input_manifest.json").read_text())
+    assert manifest["synthetic"] is True
+    assert manifest["sourceMode"] == "SYNTHETIC"
     ck_path = Path(incomplete["dest"]) / "checkpoint.json"
     ck = load_checkpoint(ck_path)
     assert ck["learningRevision"] == LEARNING_REVISION
