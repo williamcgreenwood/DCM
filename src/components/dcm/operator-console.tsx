@@ -17,7 +17,7 @@ import type { DcmRun, ModeledProp } from "@/dcm/types.ts";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-type Tab = "qualified" | "ranked" | "population" | "accounting" | "capabilities" | "blockers";
+type Tab = "qualified" | "ranked" | "population" | "accounting" | "research" | "dag" | "capabilities" | "blockers";
 
 function pct(n: number | null | undefined) {
   if (n == null) return "—";
@@ -45,7 +45,7 @@ function GradeChip({ g }: { g: string | null }) {
 }
 
 function StateChip({ s }: { s: string }) {
-  const ok = s === "MODELED";
+  const ok = s === "MODELED" || s === "COMPLETE_VERIFIED";
   return (
     <span
       className={cn(
@@ -77,7 +77,7 @@ function PropTable({ rows, showState }: { rows: ModeledProp[]; showState?: boole
             <th className="px-3 py-2 font-medium">P</th>
             <th className="px-3 py-2 font-medium">LCB</th>
             <th className="px-3 py-2 font-medium">μ</th>
-            <th className="px-3 py-2 font-medium">Opp</th>
+            <th className="px-3 py-2 font-medium">Tol</th>
             <th className="px-3 py-2 font-medium">Why / risk</th>
           </tr>
         </thead>
@@ -93,7 +93,7 @@ function PropTable({ rows, showState }: { rows: ModeledProp[]; showState?: boole
               </td>
               <td className="px-3 py-2">{p.row.marketLabel}</td>
               <td className="px-3 py-2 font-mono tabular">{p.row.line}</td>
-              <td className="px-3 py-2 font-mono">{p.row.side}</td>
+              <td className="px-3 py-2 font-mono">{p.selectedSide ?? p.row.side}</td>
               <td className="px-3 py-2">
                 <GradeChip g={p.grade} />
               </td>
@@ -105,7 +105,7 @@ function PropTable({ rows, showState }: { rows: ModeledProp[]; showState?: boole
               <td className="px-3 py-2 font-mono tabular">{pct(p.selectedP)}</td>
               <td className="px-3 py-2 font-mono tabular">{pct(p.lowerBound)}</td>
               <td className="px-3 py-2 font-mono tabular">{num(p.mean)}</td>
-              <td className="px-3 py-2 font-mono tabular">{num(p.opportunityMean)}</td>
+              <td className="px-3 py-2 font-mono tabular">{num(p.trueLineTolerance)}</td>
               <td className="max-w-[280px] px-3 py-2 text-muted">
                 <div className="truncate text-fg/90">{p.primaryReason}</div>
                 <div className="truncate text-[10px]">{p.primaryRisk}</div>
@@ -167,6 +167,8 @@ export function OperatorConsole() {
     { id: "ranked", label: "Top 25 ranked" },
     { id: "population", label: "Full board" },
     { id: "accounting", label: "Accounting" },
+    { id: "research", label: "Research" },
+    { id: "dag", label: "DAG" },
     { id: "capabilities", label: "Capabilities" },
     { id: "blockers", label: "Blockers" },
   ];
@@ -233,7 +235,7 @@ export function OperatorConsole() {
             <dl className="space-y-1 font-mono text-[11px]">
               <div className="flex justify-between gap-2">
                 <dt className="text-muted">Version</dt>
-                <dd>6.0.0+WSAB.HARSPINE</dd>
+                <dd>6.0.0+WSAB.E2E</dd>
               </div>
               <div className="flex justify-between gap-2">
                 <dt className="text-muted">LR</dt>
@@ -248,16 +250,20 @@ export function OperatorConsole() {
                 <dd className="text-warn">{install.v5Decoder}</dd>
               </div>
               <div className="flex justify-between gap-2">
-                <dt className="text-muted">HAR spine</dt>
-                <dd>{install.harSpine}</dd>
+                <dt className="text-muted">E2E runner</dt>
+                <dd>DEV</dd>
+              </div>
+              <div className="flex justify-between gap-2">
+                <dt className="text-muted">Chat operable</dt>
+                <dd>{install.chatgptOperable ? "TRUE" : "FALSE"}</dd>
+              </div>
+              <div className="flex justify-between gap-2">
+                <dt className="text-muted">Host SLO</dt>
+                <dd className="text-warn">PENDING</dd>
               </div>
               <div className="flex justify-between gap-2">
                 <dt className="text-muted">Schema</dt>
                 <dd className="text-warn">UNVERIFIED</dd>
-              </div>
-              <div className="flex justify-between gap-2">
-                <dt className="text-muted">Lifecycle</dt>
-                <dd>INTEGRATED_DEV</dd>
               </div>
             </dl>
           </section>
@@ -270,7 +276,7 @@ export function OperatorConsole() {
               </li>
               <li className="flex gap-2">
                 <Lock className="mt-0.5 size-3.5 shrink-0 text-brass" />
-                Offered sides only. Unknown → fail closed.
+                Event-once worlds. PRA is not an independent draw.
               </li>
               <li className="flex gap-2">
                 <SquareStack className="mt-0.5 size-3.5 shrink-0 text-primary" />
@@ -296,7 +302,7 @@ export function OperatorConsole() {
                   ["Modeled", i.modeledRows],
                   ["Blocked", i.blockedRows],
                   ["Events", i.uniqueEvents],
-                  ["Players", i.uniquePlayers],
+                  ["Worlds", i.eventWorlds],
                   ["PLAYABLE", i.playableCount],
                   ["Card", i.cardSize],
                 ].map(([k, v]) => (
@@ -311,7 +317,8 @@ export function OperatorConsole() {
             )}
             {i ? (
               <div className="mt-3 space-y-1 font-mono text-[10px] text-muted">
-                <div>adapter {i.sourceAdapter} · parser {i.parserVersion}</div>
+                <div>adapter {i.sourceAdapter} · parser {i.parserVersion} · ChatGPT operable {String(i.chatgptOperable)}</div>
+                <div>host certified {String(i.hostPerformanceCertified)} · optimized 6.0 {String(i.optimizedDcm60Claim)}</div>
                 <div className="break-all">HAR SHA-256 {i.harSha256}</div>
                 <div className="break-all">board {i.boardHash}</div>
               </div>
@@ -362,6 +369,39 @@ export function OperatorConsole() {
                   <li key={k} className="flex items-center justify-between px-4 py-2.5 text-sm">
                     <span className="font-mono text-xs text-muted">{k}</span>
                     <span className="font-mono tabular">{v}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : tab === "research" ? (
+              <div className="space-y-2 px-4 py-4 text-sm">
+                <p className="font-mono text-xs text-muted">
+                  FixtureProvider filled structured claims. Live HARs still need operator evidence writes + resume. This is not live box-score research.
+                </p>
+                <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  <div className="rounded-md bg-surface-2 px-3 py-2">
+                    <div className="font-mono text-[10px] uppercase text-muted">Requested</div>
+                    <div className="font-mono text-xl tabular">{run.research.requested}</div>
+                  </div>
+                  <div className="rounded-md bg-surface-2 px-3 py-2">
+                    <div className="font-mono text-[10px] uppercase text-muted">Reused</div>
+                    <div className="font-mono text-xl tabular">{run.research.reused}</div>
+                  </div>
+                  <div className="rounded-md bg-surface-2 px-3 py-2">
+                    <div className="font-mono text-[10px] uppercase text-muted">Claims</div>
+                    <div className="font-mono text-xl tabular">{run.research.claims}</div>
+                  </div>
+                  <div className="rounded-md bg-surface-2 px-3 py-2">
+                    <div className="font-mono text-[10px] uppercase text-muted">Complete</div>
+                    <div className="font-mono text-xl tabular">{run.research.complete ? "YES" : "NO"}</div>
+                  </div>
+                </dl>
+              </div>
+            ) : tab === "dag" ? (
+              <ul className="divide-y divide-border">
+                {run.dag.nodes.map((n) => (
+                  <li key={n.nodeType} className="flex items-center justify-between px-4 py-2.5 text-sm">
+                    <span className="font-mono text-xs">{n.nodeType}</span>
+                    <StateChip s={n.state} />
                   </li>
                 ))}
               </ul>
@@ -421,7 +461,7 @@ export function OperatorConsole() {
                       <ChevronRight className="size-4 text-brass" />
                       <span className="font-medium">{p.row.playerName}</span>
                       <span className="text-muted">
-                        {p.row.side} {p.row.marketLabel} {p.row.line}
+                        {p.selectedSide ?? p.row.side} {p.row.marketLabel} {p.row.line}
                       </span>
                       <GradeChip g={p.grade} />
                       <span className="ml-auto font-mono tabular text-xs">{pct(p.selectedP)}</span>

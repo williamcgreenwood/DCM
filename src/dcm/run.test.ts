@@ -23,7 +23,11 @@ test("full board is processed; Goblins never enter the card", async () => {
 test("empty-or-short card is legal — never pad to six", async () => {
   const run = await runFromHar(DEMO_HAR);
   assert.ok(run.card.length <= 6);
-  assert.equal(run.card.length, Math.min(6, run.top25Qualified.length));
+  assert.ok(run.card.length <= run.top25Qualified.length);
+  const ids = run.card.map((p) => p.row.playerId);
+  assert.equal(ids.length, new Set(ids).size);
+  assert.ok(run.card.every((p) => p.grade === "PLAYABLE"));
+  assert.ok(run.card.every((p) => p.row.modifier !== "GOBLIN"));
 });
 
 test("unsupported sports fail closed after inventory", async () => {
@@ -64,10 +68,13 @@ test("run is deterministic", async () => {
   assert.equal(a.integrity.playableCount, b.integrity.playableCount);
 });
 
-test("verify_install does not bump LR", () => {
+test("verify_install does not bump LR or claim optimized 6.0", () => {
   const v = verifyInstall();
   assert.equal(v.learningRevision, "LR000000");
   assert.equal(v.predictiveClaim, "NONE");
+  assert.equal(v.optimizedDcm60Claim, false);
+  assert.equal(v.hostPerformanceCertified, false);
+  assert.equal(v.chatgptOperable, true);
 });
 
 test("completion gates are all true on demo", async () => {
@@ -77,4 +84,10 @@ test("completion gates are all true on demo", async () => {
   assert.equal(run.gates.MODEL_COMPLETE, true);
   assert.equal(run.gates.RANK_COMPLETE, true);
   assert.equal(run.gates.FREEZE_COMPLETE, true);
+  assert.equal(run.integrity.chatgptOperable, true);
+  assert.equal(run.integrity.hostPerformanceCertified, false);
+  assert.equal(run.integrity.optimizedDcm60Claim, false);
+  assert.ok(run.integrity.eventWorlds >= 1);
+  assert.ok(run.research.requested >= 1);
+  assert.equal(run.dag.completed, 7);
 });

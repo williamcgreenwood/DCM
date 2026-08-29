@@ -1,0 +1,9 @@
+{
+  "QualityGateState": "INSTRUMENTED_NOT_CERTIFIED",
+  "hostPerformanceCertified": false,
+  "PeakRSS": "NOT_CERTIFIED",
+  "twoXBoard": "NOT_CERTIFIED",
+  "leakFree": "NOT_CERTIFIED",
+  "productionSLO": "NOT_CERTIFIED",
+  "note": "Harness exists. Do not treat this file as a host PASS."
+}

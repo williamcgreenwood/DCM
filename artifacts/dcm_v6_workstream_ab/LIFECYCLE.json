@@ -1,5 +1,5 @@
 {
-  "software": "6.0.0+WSAB.HARSPINE.LR000000",
+  "software": "6.0.0+WSAB.E2E.LR000000",
   "learning_revision": "LR000000",
   "predictive_claim": "NONE",
   "optimized_dcm_60_claim": false,
@@ -18,7 +18,15 @@
     "operator_ui": "INTEGRATED_DEVELOPMENT",
     "mlb_pa": "SHADOW_SUPPORTED",
     "cfb_name_to_id": "BLOCKED",
-    "research_dag": "DESIGNED",
-    "release": "NOT_ACCEPTED"
-  }
+    "research_dag": "IMPLEMENTED_DEVELOPMENT",
+    "release": "NOT_ACCEPTED",
+    "e2e_runner": "IMPLEMENTED_DEVELOPMENT",
+    "event_once_worlds": "IMPLEMENTED_DEVELOPMENT",
+    "line_surface": "IMPLEMENTED_DEVELOPMENT",
+    "portfolio": "IMPLEMENTED_DEVELOPMENT",
+    "host_performance": "INSTRUMENTED_NOT_CERTIFIED"
+  },
+  "chatgpt_operable": true,
+  "software_e2e_complete": true,
+  "host_performance_certified": false
 }

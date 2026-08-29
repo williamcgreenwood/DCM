@@ -5,7 +5,7 @@ Executable Workstreams A and B only.
 - A: football primitive registry (NFL + CFB physics; NFLP ledger allowed).
 - B: WorldProjection → EntryContract → WorldLineupOutcome via one sport-independent settler.
 
-This is not the live DCM runner. `runtime/pipeline.py` starts at an already-built world. It does not ingest `current.har`.
+E2E runner: `python -m dcm.runner --synthetic --out /workspace/dcm_v6/RUNS`. `runtime/pipeline.py` remains the WSAB world-to-lineup slice. HAR ingest is `dcm.ingest.har` + `dcm.runner`. Not optimized 6.0. Host performance not certified.
 
 ## What this package is not
 
@@ -27,4 +27,4 @@ Historical slice: 41 tests. This tree adds official-predicate tests (CFB phase, 
 
 ## Lifecycle
 
-`IMPLEMENTED_STANDALONE` · software `6.0.0+WSAB.LR000000` · LR000000 · predictive claim NONE
+`INTEGRATED_DEVELOPMENT` · software `6.0.0+WSAB.E2E.LR000000` · LR000000 · predictive claim NONE · optimized 6.0 false
