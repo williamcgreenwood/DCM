@@ -155,3 +155,34 @@ def test_production_evidence_rejects_secret_bearing_source_url():
     }
     with pytest.raises(ValueError, match="SECRET_QUERY"):
         _validate_claim(claim, request)
+
+
+def test_cross_claim_type_field_conflict_is_blocking():
+    base = dict(
+        source_id="A",
+        published_at="2026-08-28T09:00:00Z",
+        observed_at="2026-08-28T10:00:00Z",
+        forecast_cutoff="2026-08-28T11:00:00Z",
+        semantic_scope="PLAYER",
+        scope_id="P",
+        reliability=0.9,
+        freshness=0.9,
+    )
+    a = claim_record(
+        **base,
+        url="https://example.com/status",
+        claim_type="status_report",
+        claim_value={"status": "ACTIVE"},
+    )
+    b = claim_record(
+        **{**base, "source_id": "B"},
+        url="https://example.com/role",
+        claim_type="role_update",
+        claim_value={"status": "OUT", "role": "starter"},
+    )
+    conflicts = conflict_ledger([a, b])
+    assert any(
+        row.get("state") == "UNRESOLVED_CONTEMPORANEOUS_FIELD_CONFLICT"
+        and row.get("field") == "status"
+        for row in conflicts
+    )
