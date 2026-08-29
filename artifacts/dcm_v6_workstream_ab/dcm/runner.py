@@ -50,6 +50,8 @@ SOFTWARE = "6.0.0+WSAB.E2E.PRODUCTION_PIPELINE.LR000000"
 SCHEMA = "PHASE_BC_SCHEMA_V1_2026-08-25"
 N_WORLDS = int(__import__("os").environ.get("DCM_FAST_WORLDS", "256"))
 N_SERIOUS = int(__import__("os").environ.get("DCM_SERIOUS_WORLDS", "2048"))
+N_MAX = int(__import__("os").environ.get("DCM_MAX_WORLDS", "8192"))
+MC_SE_TARGET = float(__import__("os").environ.get("DCM_MC_SE_TARGET", "0.008"))
 
 ARTIFACT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_WORKSPACE = Path(__file__).resolve().parents[3]
@@ -60,6 +62,26 @@ SUPPORTED_FAMILIES = {"basketball", "gridiron", "baseball"}
 
 def _run_id(har_sha: str, cutoff: str) -> str:
     return "RUN_" + content_hash({"har": har_sha, "cutoff": cutoff, "sw": SOFTWARE})[:16]
+
+
+def _default_model_config() -> dict[str, Any]:
+    return {
+        "software": SOFTWARE,
+        "learningRevision": LEARNING_REVISION,
+        "fastWorlds": N_WORLDS,
+        "seriousWorlds": N_SERIOUS,
+        "ceilingWorlds": max(N_SERIOUS, N_MAX),
+        "mcSeTarget": MC_SE_TARGET,
+    }
+
+
+def _active_calibration(workspace: Path) -> dict[str, Any]:
+    path = workspace / "dcm_v6" / "calibration" / "active_cells.json"
+    try:
+        cells = json.loads(path.read_text(encoding="utf-8")) if path.is_file() else {}
+    except (OSError, json.JSONDecodeError):
+        cells = {}
+    return {"cells": cells, "contentHash": content_hash(cells)}
 
 
 def _classify(row: dict) -> tuple[str, str | None]:
@@ -116,6 +138,15 @@ def run_dcm(
         synthetic = bool(ingest_meta.get("synthetic", board.get("synthetic", False)))
         run_id = ck["runId"]
         dest = output_root
+        model_config_path = dest / "MODEL_CONFIG.json"
+        calibration_state_path = dest / "CALIBRATION_STATE.json"
+        if not model_config_path.is_file():
+            raise RuntimeError("MODEL_CONFIG_MISSING_ON_RESUME")
+        if not calibration_state_path.is_file():
+            raise RuntimeError("CALIBRATION_STATE_MISSING_ON_RESUME")
+        model_config = json.loads(model_config_path.read_text(encoding="utf-8"))
+        calibration_state = json.loads(calibration_state_path.read_text(encoding="utf-8"))
+        calibration_cells = calibration_state.get("cells") or {}
         stages_done = set(ck.get("completedStages") or [])
     else:
         stages_done = set()
@@ -139,6 +170,17 @@ def run_dcm(
         run_id = _run_id(har_sha, forecast_cutoff)
         dest = output_root / run_id
         dest.mkdir(parents=True, exist_ok=True)
+        model_config = _default_model_config()
+        calibration_state = _active_calibration(workspace)
+        (dest / "MODEL_CONFIG.json").write_text(
+            json.dumps(model_config, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        (dest / "CALIBRATION_STATE.json").write_text(
+            json.dumps(calibration_state, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        calibration_cells = calibration_state.get("cells") or {}
         board = freeze_board(ingest, mount=mount, cutoff=forecast_cutoff)
         write_board(board, dest / "board.json")
         (dest / "input_manifest.json").write_text(
@@ -172,7 +214,7 @@ def run_dcm(
         (dest / "performance").mkdir(exist_ok=True)
         (dest / "performance" / "har.json").write_text(json.dumps(har_perf, indent=2) + "\n", encoding="utf-8")
 
-    config_hash = content_hash({"sw": SOFTWARE, "n": N_WORLDS, "lr": LEARNING_REVISION})
+    config_hash = content_hash(model_config)
     dag = Dag(
         cutoff=forecast_cutoff,
         config_hash=config_hash,
@@ -242,17 +284,17 @@ def run_dcm(
     (dest / "performance" / "research.json").write_text(json.dumps(research_perf, indent=2) + "\n", encoding="utf-8")
     stages_done.add("RESEARCH")
 
-    calibration_path = workspace / "dcm_v6" / "calibration" / "active_cells.json"
-    try:
-        calibration_cells = json.loads(calibration_path.read_text(encoding="utf-8")) if calibration_path.is_file() else {}
-    except (OSError, json.JSONDecodeError):
-        calibration_cells = {}
     canonical_ready = mount.get("state") == "HASH_VERIFIED_EXTRACTED"
     schema_ready = bool(schema_root.get("productionEligible")) and schema_root.get("state") == "HASH_VERIFIED"
     production_research_ready = bool(bundle.get("production_ready"))
     global_selection_gate = canonical_ready and schema_ready and production_research_ready and not synthetic
 
-    gov = Governor(max_worlds=N_WORLDS, serious_worlds=N_SERIOUS)
+    gov = Governor(
+        fast_worlds=int(model_config["fastWorlds"]),
+        serious_worlds=int(model_config["seriousWorlds"]),
+        ceiling_worlds=int(model_config["ceilingWorlds"]),
+        mc_se_target=float(model_config["mcSeTarget"]),
+    )
     t = StageTimer("MODEL")
     world_cache: dict[tuple[str, str, str], list[dict[str, float]]] = {}
     event_context_cache: dict[tuple[str, str, int], list[dict[str, float]]] = {}
