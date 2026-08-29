@@ -112,8 +112,9 @@ def test_dedupe_never_mutates_hashed_claim_content_and_conflicts_are_sidecar():
     for x in got:
         assert x["claim_hash"] == original[x["claim_hash"]]
     conflicts = conflict_ledger(got)
-    assert len(conflicts) == 1
-    assert conflicts[0]["state"] == "UNRESOLVED_CONTEMPORANEOUS_CONFLICT"
+    states = {row["state"] for row in conflicts}
+    assert "UNRESOLVED_CONTEMPORANEOUS_CONFLICT" in states
+    assert "UNRESOLVED_CONTEMPORANEOUS_FIELD_CONFLICT" in states
 
 
 def test_published_after_cutoff_is_temporal_leak_even_if_observed_time_is_safe():
