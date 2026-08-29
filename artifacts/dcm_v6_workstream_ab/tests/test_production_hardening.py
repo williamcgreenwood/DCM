@@ -219,3 +219,29 @@ def test_shadow_calibration_cell_cannot_activate_without_lr_promotion():
     got = apply_calibration(0.60, key=key, cells=active)
     assert got["state"] == "ACTIVE_CHRONOLOGICAL_CELL"
     assert got["calibrated"] > 0.60
+
+
+def test_physical_count_primitives_are_discrete_and_conserved():
+    import random as _random
+    from dcm.model.worlds import sample_baseball_batter, sample_basketball, sample_football
+
+    rng = _random.Random(991)
+    for _ in range(32):
+        b = sample_basketball(rng, 34.5)
+        for key in ("fga", "tpa", "twopa", "fgm", "tpm", "twopm", "fta", "ftm", "oreb", "dreb", "reb", "ast", "stl", "blk", "tov", "pts"):
+            assert float(b[key]).is_integer(), key
+        assert b["twopa"] == b["fga"] - b["tpa"]
+        assert b["fgm"] == b["twopm"] + b["tpm"]
+        assert b["reb"] == b["oreb"] + b["dreb"]
+
+        f = sample_football(rng, "WR")
+        for key in ("rush_att", "routes", "targets", "receptions", "rush_yds", "rec_yds"):
+            assert float(f[key]).is_integer(), key
+        assert f["receptions"] <= f["targets"] <= f["routes"]
+
+        bb = sample_baseball_batter(rng, 4)
+        for key in ("PA", "AB", "BB", "HBP", "SF", "SH", "SO", "H", "1B", "2B", "3B", "HR", "TB", "R", "RBI"):
+            assert float(bb[key]).is_integer(), key
+        assert bb["PA"] == bb["AB"] + bb["BB"] + bb["HBP"] + bb["SF"] + bb["SH"]
+        assert bb["H"] == bb["1B"] + bb["2B"] + bb["3B"] + bb["HR"]
+        assert bb["H"] + bb["SO"] <= bb["AB"]
