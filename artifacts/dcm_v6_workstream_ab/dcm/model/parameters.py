@@ -161,10 +161,14 @@ def build_parameter_snapshot(row: dict[str, Any], claims: list[dict[str, Any]]) 
         opp_n = max(opp_n, pan)
         eff_n = max(eff_n, len(logs))
 
-    status = str(player.get("status") or "UNKNOWN").upper()
+    status = str(player.get("status") or "UNKNOWN").strip().upper()
     definition_verified = bool(market.get("definition_verified"))
+    active_statuses = {"ACTIVE", "AVAILABLE", "PROBABLE", "EXPECTED_ACTIVE"}
+    inactive_statuses = {"OUT", "DNP", "INACTIVE", "SUSPENDED", "IR", "PUP"}
+    uncertain_statuses = {"QUESTIONABLE", "GTD", "GAME_TIME_DECISION", "DOUBTFUL", "LIMITED"}
+    status_eligible = status in active_statuses
     production_eligible = (
-        not synthetic and status not in {"OUT", "DNP", "INACTIVE", "SUSPENDED"}
+        not synthetic and status_eligible
         and opp_n >= 3 and eff_n >= 3 and definition_verified
     )
     data_quality = max(0.0, min(1.0, rel * 0.65 + fresh * 0.20 + min(1.0, min(opp_n, eff_n) / 10.0) * 0.15))
@@ -172,7 +176,9 @@ def build_parameter_snapshot(row: dict[str, Any], claims: list[dict[str, Any]]) 
     blocker = None
     if synthetic: blocker = "SYNTHETIC_EVIDENCE_NOT_SELECTABLE"
     elif not definition_verified: blocker = "UNVERIFIED_MARKET_DEFINITION"
-    elif status in {"OUT", "DNP", "INACTIVE", "SUSPENDED"}: blocker = "PLAYER_NOT_ACTIVE"
+    elif status in inactive_statuses: blocker = "PLAYER_NOT_ACTIVE"
+    elif status in uncertain_statuses: blocker = "PLAYER_STATUS_UNCERTAIN"
+    elif status not in active_statuses: blocker = "PLAYER_STATUS_UNKNOWN"
     elif opp_n < 3: blocker = "INSUFFICIENT_OPPORTUNITY_SAMPLE"
     elif eff_n < 3: blocker = "INSUFFICIENT_EFFICIENCY_SAMPLE"
 
