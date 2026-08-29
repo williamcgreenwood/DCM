@@ -356,6 +356,17 @@ def run_dcm(
         forced = row.get("side") if row.get("side") in evaluations else None
         chosen_side = forced or max(evaluations, key=lambda x: (evaluations[x]["evidenceSafeP"], evaluations[x]["lowerBound"]))
         ev = evaluations[chosen_side]
+        selected_line = float(row["line"])
+        if chosen_side == "MORE":
+            selection_outcomes = bytes(
+                2 if value > selected_line else 0 if value < selected_line else 1
+                for value in values
+            )
+        else:
+            selection_outcomes = bytes(
+                2 if value < selected_line else 0 if value > selected_line else 1
+                for value in values
+            )
         if blocker in {"RESEARCH_ONLY_NOT_SELECTABLE", "SHADOW_SUPPORTED_NOT_SELECTABLE"}:
             production_selectable = False
         opp = snapshot.get("opportunity") or {}
@@ -376,6 +387,7 @@ def run_dcm(
             "productionSelectable": production_selectable,
             "researchOnly": blocker in {"RESEARCH_ONLY_NOT_SELECTABLE", "SHADOW_SUPPORTED_NOT_SELECTABLE"},
             "worldCount": len(values),
+            "_selectionOutcomes": selection_outcomes,
         })
         modeled.append(rec)
         classified.append(rec)
