@@ -350,27 +350,44 @@ def run_dcm(
             dist["pHigher"] if row.get("offeredHigher") else 0.0,
             dist["pLower"] if row.get("offeredLower") else 0.0,
         )
-        if production_selectable and preliminary >= 0.52 and gov.serious_worlds > gov.max_worlds:
-            serious_ctx_key = (
+        demon = row.get("modifier") == "DEMON"
+        decision_threshold = 0.63 if demon else 0.58
+
+        while True:
+            target_worlds = gov.next_world_count(
+                current=len(values),
+                selected_probability=preliminary,
+                decision_threshold=decision_threshold,
+                production_selectable=production_selectable,
+            )
+            if target_worlds <= len(values):
+                break
+            adaptive_ctx_key = (
                 str(row.get("sportFamily") or ""),
                 str(row.get("eventId") or ""),
-                gov.serious_worlds,
+                target_worlds,
             )
-            if serious_ctx_key not in event_context_cache:
-                event_context_cache[serious_ctx_key] = generate_event_contexts(
-                    serious_ctx_key[0], serious_ctx_key[1], n=gov.serious_worlds, seed=har_sha
+            if adaptive_ctx_key not in event_context_cache:
+                event_context_cache[adaptive_ctx_key] = generate_event_contexts(
+                    adaptive_ctx_key[0],
+                    adaptive_ctx_key[1],
+                    n=target_worlds,
+                    seed=har_sha,
                 )
             world_cache[key] = simulate_player_worlds(
                 row,
-                n=gov.serious_worlds,
+                n=target_worlds,
                 seed=har_sha,
                 parameter_snapshot=snapshot,
-                event_contexts=event_context_cache[serious_ctx_key],
+                event_contexts=event_context_cache[adaptive_ctx_key],
             )
             values = [value_from_stats(row["market"], w) for w in world_cache[key]]
             dist = from_worlds(values, float(row["line"]))
+            preliminary = max(
+                dist["pHigher"] if row.get("offeredHigher") else 0.0,
+                dist["pLower"] if row.get("offeredLower") else 0.0,
+            )
 
-        demon = row.get("modifier") == "DEMON"
         sd = statistics.pstdev(values) if len(values) >= 2 else 0.0
         volatility = min(1.0, sd / (abs(float(dist["mean"])) + 1.0))
         support_n = min(
