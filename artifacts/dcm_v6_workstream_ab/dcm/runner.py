@@ -41,6 +41,7 @@ from dcm.runtime.governor import Governor
 from dcm.runtime.mount_v541 import mount_default
 from dcm.runtime.schema_root import verify_schema
 from dcm.runtime.perf import StageTimer
+from dcm.runtime.readiness import build_readiness
 from dcm.runtime.store import IndexedStore
 from dcm.selection.portfolio import build_card, exposure_report
 from dcm.sports.common.plugin import selection_state
@@ -627,6 +628,24 @@ def run_dcm(
         "top25QualifiedCount": len(top25_qualified),
         "dag": dag.snapshot(),
     }
+    readiness = build_readiness(
+        mount=mount,
+        schema=schema_root,
+        research=bundle,
+        board=board,
+        conservation_failures=conservation_failures,
+        software_e2e_complete=True,
+        host_performance_certified=False,
+        learning_revision=LEARNING_REVISION,
+        predictive_claim=PREDICTIVE_CLAIM,
+    )
+    (dest / "production_readiness.json").write_text(
+        json.dumps(readiness, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    freeze["productionSelectionReady"] = readiness["productionSelectionReady"]
+    freeze["systemCertified"] = readiness["systemCertified"]
+    freeze["predictiveValidationEarned"] = readiness["predictiveValidationEarned"]
     freeze["frozenForecastHash"] = compute_forecast_hash(
         freeze,
         full_population,
