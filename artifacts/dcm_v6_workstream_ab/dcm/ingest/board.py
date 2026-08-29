@@ -1,43 +1,102 @@
-"""Freeze immutable board.json immediately after successful ingest."""
-
+"""As-of immutable board freeze."""
 from __future__ import annotations
 
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 from dcm.contracts.hashes import content_hash
+from dcm.ingest.composite import reconcile_scope_attempts
 from dcm.ingest.wsab_bind import annotate_rows
 
-PARSER_SCHEMA = "BOARD_JSON_V1_2026-08-28"
+PARSER_SCHEMA = "BOARD_JSON_V2_ASOF_2026-08-28"
 LEARNING_REVISION = "LR000000"
 PREDICTIVE_CLAIM = "NONE"
 
 
-def accounting_from_rows(rows: list[dict]) -> dict[str, int]:
+def _time(value: Any) -> datetime | None:
+    s = str(value or "").strip()
+    if not s:
+        return None
+    try:
+        d = datetime.fromisoformat(s.replace("Z", "+00:00"))
+        return d.replace(tzinfo=timezone.utc) if d.tzinfo is None else d.astimezone(timezone.utc)
+    except ValueError:
+        return None
+
+
+def rows_as_of(ingest: dict[str, Any], cutoff: str) -> tuple[list[dict], dict[str, int]]:
+    cut = _time(cutoff)
+    if cut is None:
+        raise ValueError("FORECAST_CUTOFF_INVALID")
+
+    # New scope-state captures are authoritative because they can represent a
+    # successful empty refresh. Projection-only history cannot express a
+    # deletion and would incorrectly resurrect rows after such a refresh.
+    attempts = ingest.get("scopeAttempts")
+    if isinstance(attempts, list) and attempts:
+        reconciled = reconcile_scope_attempts(attempts, cutoff=cutoff)
+        stats = reconciled["stats"]
+        return list(reconciled["rows"]), {
+            "post_cutoff_snapshots_excluded": int(stats["post_cutoff_attempts_excluded"]),
+            "post_cutoff_updates_excluded": int(stats["post_cutoff_updates_excluded"]),
+            "failed_refreshes_retained": int(stats["failed_refreshes_retained"]),
+            "selected_request_scopes": int(stats["selected_scope_count"]),
+        }
+
+    history = ingest.get("rowHistory") if isinstance(ingest.get("rowHistory"), dict) else {}
+    if not history:
+        return list(ingest.get("rows") or []), {"post_cutoff_snapshots_excluded": 0, "post_cutoff_updates_excluded": 0}
+    selected: list[dict] = []
+    post_snap = post_update = 0
+    for hist in history.values():
+        candidates = []
+        for row in hist if isinstance(hist, list) else []:
+            snap = _time(row.get("sourceSnapshotTime"))
+            updated = _time(row.get("sourceUpdatedAt"))
+            if snap is not None and snap > cut:
+                post_snap += 1
+                continue
+            if updated is not None and updated > cut:
+                post_update += 1
+                continue
+            candidates.append(row)
+        if candidates:
+            candidates.sort(key=lambda r: (
+                _time(r.get("sourceUpdatedAt")) or _time(r.get("sourceSnapshotTime")) or datetime.min.replace(tzinfo=timezone.utc),
+                str(r.get("sourceBodyHash") or ""),
+            ))
+            selected.append(dict(candidates[-1]))
+    selected.sort(key=lambda r: str(r.get("projectionId")))
+    return selected, {"post_cutoff_snapshots_excluded": post_snap, "post_cutoff_updates_excluded": post_update}
+
+
+def accounting_from_rows(rows: list[dict], *, asof: dict[str, int] | None = None) -> dict[str, int]:
     def n(pred) -> int:
         return sum(1 for r in rows if pred(r))
-
-    return {
+    out = {
         "raw_projection_rows": len(rows),
         "unique_offer_rows": len({r["projectionId"] for r in rows}),
         "standard_rows": n(lambda r: r.get("modifier") == "STANDARD"),
         "goblin_rows": n(lambda r: r.get("modifier") == "GOBLIN"),
         "demon_rows": n(lambda r: r.get("modifier") == "DEMON"),
         "unknown_modifier_rows": n(lambda r: r.get("modifier") not in {"STANDARD", "GOBLIN", "DEMON"}),
-        "unknown_side_rows": n(lambda r: r.get("side") == "UNKNOWN"),
+        "unknown_side_rows": n(lambda r: not r.get("offeredHigher") and not r.get("offeredLower")),
         "duplicate_rows": max(0, len(rows) - len({r["projectionId"] for r in rows})),
         "removed_rows": 0,
         "unresolved_rows": n(lambda r: r.get("market") in {"unknown", ""} or r.get("league") == "UNKNOWN"),
         "wsab_bound_rows": n(lambda r: r.get("wsabMarketBound")),
         "final_model_population": n(lambda r: r.get("modifier") != "GOBLIN"),
     }
+    out.update(asof or {})
+    return out
 
 
-def freeze_board(ingest: dict[str, Any], *, mount: dict[str, Any], cutoff: str = "2026-08-28T00:00:00Z") -> dict[str, Any]:
-    rows = annotate_rows(list(ingest.get("rows") or []))
-    acc = accounting_from_rows(rows)
-    unique_events = sorted({r.get("eventId") or "" for r in rows})
+def freeze_board(ingest: dict[str, Any], *, mount: dict[str, Any], cutoff: str | None = None) -> dict[str, Any]:
+    resolved_cutoff = cutoff or str(ingest.get("captureEnd") or "9999-12-31T23:59:59Z")
+    selected, asof = rows_as_of(ingest, resolved_cutoff)
+    rows = annotate_rows(selected)
     payload = {
         "schemaId": PARSER_SCHEMA,
         "parserVersion": ingest.get("parserVersion"),
@@ -49,16 +108,21 @@ def freeze_board(ingest: dict[str, Any], *, mount: dict[str, Any], cutoff: str =
         "harSha256": ingest.get("harSha256"),
         "captureStart": ingest.get("captureStart") or "",
         "captureEnd": ingest.get("captureEnd") or "",
-        "forecastCutoff": cutoff,
+        "forecastCutoff": resolved_cutoff,
         "redactedSecrets": ingest.get("redactedSecrets") or 0,
         "indexStats": ingest.get("indexStats") or {},
         "warnings": ingest.get("warnings") or [],
+        "timeline": ingest.get("timeline") or [],
         "rows": rows,
-        "unresolvedRows": [r["projectionId"] for r in rows if r.get("market") in {"unknown", ""} or r.get("league") == "UNKNOWN"],
-        "eventIds": unique_events,
-        "accounting": acc,
+        "unresolvedRows": [
+            r["projectionId"] for r in rows
+            if r.get("market") in {"unknown", ""} or r.get("league") == "UNKNOWN"
+            or (not r.get("offeredHigher") and not r.get("offeredLower"))
+        ],
+        "eventIds": sorted({r.get("eventId") or "" for r in rows}),
+        "accounting": accounting_from_rows(rows, asof=asof),
     }
-    payload["contentHash"] = content_hash({k: v for k, v in payload.items() if k not in {"contentHash"}})
+    payload["contentHash"] = content_hash(payload)
     return payload
 
 

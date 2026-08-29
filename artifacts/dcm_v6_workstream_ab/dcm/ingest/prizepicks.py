@@ -40,23 +40,57 @@ def _modifier(attrs: dict) -> str:
     return "OTHER"
 
 
+def _normalize_side(value: Any) -> str | None:
+    u = str(value or "").strip().upper()
+    if u in {"MORE", "OVER", "HIGHER"}:
+        return "MORE"
+    if u in {"LESS", "UNDER", "LOWER"}:
+        return "LESS"
+    return None
+
+
+def _side_list(value: Any) -> tuple[bool, bool]:
+    seq = value if isinstance(value, list) else [value] if value is not None else []
+    more = less = False
+    for item in seq:
+        key = str(item or "").strip().lower()
+        if key in {"more", "over", "higher"}:
+            more = True
+        elif key in {"less", "under", "lower"}:
+            less = True
+        elif key in {"both", "over_under", "under_or_over", "higher_lower", "more_less"}:
+            more = less = True
+    return more, less
+
+
 def _side(attrs: dict) -> tuple[str, bool, bool]:
-    raw = str(attrs.get("selected_side") or attrs.get("side") or attrs.get("pick_side") or "").upper()
-    if raw in ("MORE", "OVER", "HIGHER"):
-        ol = attrs.get("offered_lower")
-        return "MORE", True, False if ol is None else bool(ol)
-    if raw in ("LESS", "UNDER", "LOWER"):
-        oh = attrs.get("offered_higher")
-        return "LESS", False if oh is None else bool(oh), True
+    """Verify offered sides. Missing side metadata fails closed."""
+    explicit_more = attrs.get("offered_higher")
+    explicit_less = attrs.get("offered_lower")
+    more = bool(explicit_more) if explicit_more is not None else False
+    less = bool(explicit_less) if explicit_less is not None else False
+    for key in ("allowed_wager_types", "allowed_pick_types", "offered_sides", "wager_types"):
+        if key in attrs:
+            m, l = _side_list(attrs.get(key))
+            more, less = more or m, less or l
+    if attrs.get("over_odds") is not None or attrs.get("over") is not None:
+        more = True
+    if attrs.get("under_odds") is not None or attrs.get("under") is not None:
+        less = True
+    selected = _normalize_side(attrs.get("selected_side") or attrs.get("side") or attrs.get("pick_side"))
+    if selected == "MORE":
+        more = True
+    elif selected == "LESS":
+        less = True
     if _modifier(attrs) == "GOBLIN":
         return "MORE", True, False
-    oh = attrs.get("offered_higher")
-    ol = attrs.get("offered_lower")
-    if oh is None and (attrs.get("over_odds") is not None or attrs.get("over") is not None):
-        oh = True
-    if ol is None and (attrs.get("under_odds") is not None or attrs.get("under") is not None):
-        ol = True
-    return "UNKNOWN", True if oh is None else bool(oh), True if ol is None else bool(ol)
+    if selected is not None:
+        return selected, more, less
+    if more and not less:
+        return "MORE", True, False
+    if less and not more:
+        return "LESS", False, True
+    return "UNKNOWN", more, less
 
 
 def _board_id(duration: dict | None, attrs: dict) -> str:
@@ -121,7 +155,8 @@ def _row_from_jsonapi(item: dict, included: dict) -> dict | None:
         "boardId": _board_id(duration, attrs),
         "productType": "PLAYER_PICKS",
         "role": str(pa.get("position") or pa.get("position_abbreviation") or ""),
-        "sourceUpdatedAt": str(attrs.get("updated_at") or attrs.get("start_time") or ""),
+        "sourceUpdatedAt": str(attrs.get("updated_at") or ""),
+        "eventStartTime": str(attrs.get("start_time") or ga.get("start_time") or ""),
     }
 
 
@@ -156,6 +191,7 @@ def _row_from_normalized(item: dict) -> dict | None:
         "productType": str(item.get("productType") or "PLAYER_PICKS"),
         "role": str(item.get("role") or ""),
         "sourceUpdatedAt": str(item.get("sourceUpdatedAt") or ""),
+        "eventStartTime": str(item.get("eventStartTime") or item.get("startTime") or ""),
     }
 
 
