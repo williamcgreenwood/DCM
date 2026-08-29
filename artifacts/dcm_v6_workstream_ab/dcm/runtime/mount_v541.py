@@ -129,9 +129,11 @@ def attempt_mount(
         return state
 
     if src_ok:
-        shutil.copy2(source, dest / SOURCE_NAMES[0]); state["copied"] = True
+        source_name = SOURCE_NAMES[0] if expected_source == EXPECTED_SOURCE else source.name
+        shutil.copy2(source, dest / source_name); state["copied"] = True
     if led_ok:
-        shutil.copy2(ledger, dest / LEDGER_NAMES[0]); state["copied"] = True
+        ledger_name = LEDGER_NAMES[0] if expected_ledger == EXPECTED_LEDGER else ledger.name
+        shutil.copy2(ledger, dest / ledger_name); state["copied"] = True
     if manifest_ok and manifest is not None:
         shutil.copy2(manifest, dest / INSTALL_NAMES[0]); state["copied"] = True
 

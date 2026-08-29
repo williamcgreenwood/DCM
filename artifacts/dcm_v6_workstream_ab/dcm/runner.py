@@ -36,6 +36,7 @@ from dcm.runtime.checkpoint import load_checkpoint, write_checkpoint
 from dcm.runtime.dag import Dag
 from dcm.runtime.governor import Governor
 from dcm.runtime.mount_v541 import mount_default
+from dcm.runtime.schema_root import verify_schema
 from dcm.runtime.perf import StageTimer
 from dcm.runtime.store import IndexedStore
 from dcm.selection.portfolio import build_card, exposure_report
@@ -104,6 +105,8 @@ def run_dcm(
         board = json.loads((output_root / "board.json").read_text(encoding="utf-8"))
         ingest_meta = json.loads((output_root / "input_manifest.json").read_text(encoding="utf-8"))
         mount = json.loads((output_root / "MOUNT_STATE.json").read_text(encoding="utf-8"))
+        schema_path = output_root / "SCHEMA_STATE.json"
+        schema_root = json.loads(schema_path.read_text(encoding="utf-8")) if schema_path.is_file() else verify_schema(workspace)
         har_sha = ingest_meta["harSha256"]
         run_id = ck["runId"]
         dest = output_root
@@ -111,6 +114,7 @@ def run_dcm(
     else:
         stages_done = set()
         mount = mount_default(workspace)
+        schema_root = verify_schema(workspace)
         t = StageTimer("HAR")
         if synthetic:
             raw = json.loads(SYNTHETIC.read_text(encoding="utf-8"))
@@ -133,6 +137,7 @@ def run_dcm(
             encoding="utf-8",
         )
         (dest / "MOUNT_STATE.json").write_text(json.dumps(mount, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        (dest / "SCHEMA_STATE.json").write_text(json.dumps(schema_root, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         stages_done.add("BOARD_FREEZE")
         har_perf = t.finish(InputRows=len(board["rows"]), OutputRows=len(board["rows"]))
         (dest / "logs").mkdir(exist_ok=True)
@@ -201,9 +206,10 @@ def run_dcm(
         calibration_cells = json.loads(calibration_path.read_text(encoding="utf-8")) if calibration_path.is_file() else {}
     except (OSError, json.JSONDecodeError):
         calibration_cells = {}
-    canonical_ready = mount.get("state") in {"HASH_VERIFIED", "HASH_VERIFIED_EXTRACTED"}
+    canonical_ready = mount.get("state") == "HASH_VERIFIED_EXTRACTED"
+    schema_ready = bool(schema_root.get("productionEligible")) and schema_root.get("state") == "HASH_VERIFIED"
     production_research_ready = bool(bundle.get("production_ready"))
-    global_selection_gate = canonical_ready and production_research_ready and not synthetic
+    global_selection_gate = canonical_ready and schema_ready and production_research_ready and not synthetic
 
     gov = Governor(max_worlds=N_WORLDS, serious_worlds=N_SERIOUS)
     t = StageTimer("MODEL")
@@ -426,6 +432,9 @@ def run_dcm(
         "v5Decoder": mount.get("har_decoder"),
         "v5MountState": mount.get("state"),
         "schemaId": SCHEMA,
+        "schemaState": schema_root.get("state"),
+        "schemaHash": schema_root.get("observedSha256"),
+        "schemaReady": schema_ready,
         "harSha256": har_sha,
         "forecastCutoff": forecast_cutoff,
         "boardHash": board["contentHash"],
@@ -444,15 +453,50 @@ def run_dcm(
         "productionResearchComplete": production_research_ready,
         "evidenceMode": bundle.get("evidence_mode"),
         "canonicalBaselineReady": canonical_ready,
+        "schemaReady": schema_ready,
         "evidenceBlocked": evidence_blocked,
         "portfolioExposure": exposure,
         "top25QualifiedCount": len(top25_qualified),
         "dag": dag.snapshot(),
     }
-    freeze["frozenForecastHash"] = content_hash(
-        {k: v for k, v in freeze.items() if k not in {"frozenForecastHash", "dag"}}
-        | {"card": [p["projectionId"] for p in strict_card], "ranked": [p["projectionId"] for p in top25_ranked]}
-    )
+    forecast_hash_payload = {
+        "runId": run_id,
+        "dcmVersion": SOFTWARE,
+        "learningRevision": LEARNING_REVISION,
+        "schemaId": SCHEMA,
+        "schemaHash": schema_root.get("observedSha256"),
+        "harSha256": har_sha,
+        "forecastCutoff": forecast_cutoff,
+        "boardHash": board["contentHash"],
+        "forecasts": [
+            {
+                "projectionId": p["row"].get("projectionId"),
+                "line": p["row"].get("line"),
+                "modifier": p["row"].get("modifier"),
+                "offeredHigher": p["row"].get("offeredHigher"),
+                "offeredLower": p["row"].get("offeredLower"),
+                "state": p.get("state"),
+                "blocker": p.get("blocker"),
+                "grade": p.get("grade"),
+                "selectedSide": p.get("selectedSide"),
+                "rawP": p.get("rawP"),
+                "calibratedP": p.get("calibratedP"),
+                "evidenceSafeP": p.get("evidenceSafeP"),
+                "pHigher": p.get("pHigher"),
+                "pLower": p.get("pLower"),
+                "pPush": p.get("pPush"),
+                "lowerBound": p.get("lowerBound"),
+                "parameterSnapshotHash": p.get("parameterSnapshotHash"),
+                "rank": p.get("rank"),
+                "selectionScore": p.get("selectionScore"),
+                "productionSelectable": p.get("productionSelectable", False),
+            }
+            for p in sorted(classified, key=lambda x: str(x["row"].get("projectionId")))
+        ],
+        "card": [p["projectionId"] for p in strict_card],
+        "ranked": [p["projectionId"] for p in top25_ranked],
+    }
+    freeze["frozenForecastHash"] = content_hash(forecast_hash_payload)
     n_fz = dag.add("FREEZE", "board", parents=[n_port.key])
     dag.complete(n_fz.key, freeze["frozenForecastHash"])
     freeze["dag"] = dag.snapshot()
