@@ -99,4 +99,38 @@ def conflict_ledger(claims: list[dict]) -> list[dict[str, Any]]:
                 "state": "UNRESOLVED_CONTEMPORANEOUS_CONFLICT",
             }
         )
+    # Also detect conflicting top-level fields across different claim types.
+    # Without this, e.g. a "status" claim and a "role_update" claim observed at
+    # the same instant could both write status with divergent values and merge
+    # order would decide the model input.
+    fields: dict[tuple[str, str, str, str], dict[str, list[str]]] = {}
+    for claim in claims:
+        value = claim.get("claim_value")
+        if not isinstance(value, dict):
+            continue
+        scope = str(claim.get("semantic_scope") or "")
+        scope_id = str(claim.get("scope_id") or "")
+        observed_at = str(claim.get("observed_at") or "")
+        claim_hash = str(claim.get("claim_hash") or "")
+        for field, field_value in value.items():
+            key = (scope, scope_id, observed_at, str(field))
+            value_hash = content_hash(field_value)
+            fields.setdefault(key, {}).setdefault(value_hash, []).append(claim_hash)
+
+    for (scope, scope_id, observed_at, field), by_value in sorted(fields.items()):
+        if len(by_value) <= 1:
+            continue
+        out.append(
+            {
+                "scope": scope,
+                "scopeId": scope_id,
+                "field": field,
+                "observedAt": observed_at,
+                "valueHashes": sorted(by_value),
+                "claimHashes": sorted(
+                    h for hashes in by_value.values() for h in hashes if h
+                ),
+                "state": "UNRESOLVED_CONTEMPORANEOUS_FIELD_CONFLICT",
+            }
+        )
     return out
