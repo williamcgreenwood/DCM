@@ -35,4 +35,21 @@ jobs:
           PYTHONPATH: .
           DCM_FAST_WORLDS: "64"
           DCM_SERIOUS_WORLDS: "128"
+          DCM_MAX_WORLDS: "256"
         run: pytest -q
+      - name: Benchmark smoke
+        env:
+          PYTHONPATH: .
+          DCM_FAST_WORLDS: "32"
+          DCM_SERIOUS_WORLDS: "64"
+          DCM_MAX_WORLDS: "128"
+        run: |
+          python -m dcm.runtime.benchmark --sizes 100 1000 --out /tmp/dcm-benchmark
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report = json.loads(Path("/tmp/dcm-benchmark/benchmark_report.json").read_text())
+          assert report["hostPerformanceCertified"] is False
+          assert [r["boardRows"] for r in report["results"]] == [100, 1000]
+          assert all(r["rowsPerWallSecond"] > 0 for r in report["results"])
+          PY
