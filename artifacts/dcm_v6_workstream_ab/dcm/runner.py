@@ -108,6 +108,9 @@ def run_dcm(
         schema_path = output_root / "SCHEMA_STATE.json"
         schema_root = json.loads(schema_path.read_text(encoding="utf-8")) if schema_path.is_file() else verify_schema(workspace)
         har_sha = ingest_meta["harSha256"]
+        # Frozen source provenance is authoritative on resume. A resume-time CLI
+        # default must never change forecast semantics or production gating.
+        synthetic = bool(ingest_meta.get("synthetic", board.get("synthetic", False)))
         run_id = ck["runId"]
         dest = output_root
         stages_done = set(ck.get("completedStages") or [])
@@ -132,7 +135,17 @@ def run_dcm(
         board = freeze_board(ingest, mount=mount, cutoff=forecast_cutoff)
         write_board(board, dest / "board.json")
         (dest / "input_manifest.json").write_text(
-            json.dumps({"harSha256": har_sha, "adapter": ingest["adapter"], "parserVersion": ingest["parserVersion"]}, indent=2)
+            json.dumps(
+                {
+                    "harSha256": har_sha,
+                    "adapter": ingest["adapter"],
+                    "parserVersion": ingest["parserVersion"],
+                    "synthetic": bool(ingest.get("synthetic")),
+                    "sourceMode": "SYNTHETIC" if bool(ingest.get("synthetic")) else "CAPTURED_HAR",
+                },
+                indent=2,
+                sort_keys=True,
+            )
             + "\n",
             encoding="utf-8",
         )
