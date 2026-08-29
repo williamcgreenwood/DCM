@@ -144,3 +144,28 @@ def test_event_contexts_are_shared_by_event_not_player():
     assert a == b
     assert a != c
     assert len(a) == 16
+
+
+def test_portfolio_rejects_highly_correlated_simulated_selection_outcomes():
+    def candidate(pid, event, outcomes):
+        return {
+            "grade": "PLAYABLE",
+            "_selectionOutcomes": bytes(outcomes),
+            "dependencyTags": [f"EVENT:{event}"],
+            "row": {
+                "projectionId": pid,
+                "playerId": pid,
+                "eventId": event,
+                "teamId": pid,
+                "market": "pts",
+                "modifier": "STANDARD",
+            },
+        }
+    pattern = [2, 2, 0, 2, 0, 0, 2, 2] * 8
+    inverse = [0 if x == 2 else 2 if x == 0 else 1 for x in pattern]
+    card = build_card([
+        candidate("A", "E1", pattern),
+        candidate("B", "E1", pattern),
+        candidate("C", "E2", inverse),
+    ])
+    assert [x["row"]["projectionId"] for x in card] == ["A", "C"]
