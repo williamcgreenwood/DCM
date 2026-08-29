@@ -23,6 +23,54 @@ def _clip(x: float, lo: float, hi: float) -> float:
     return max(lo, min(hi, x))
 
 
+def _nonneg_int_gauss(rng: random.Random, mean: float, sd: float) -> int:
+    return max(0, int(round(rng.gauss(mean, max(0.01, sd)))))
+
+
+def _binomial(rng: random.Random, n: int, p: float) -> int:
+    p = _clip(float(p), 0.0, 1.0)
+    return sum(1 for _ in range(max(0, int(n))) if rng.random() < p)
+
+
+def _poisson(rng: random.Random, lam: float) -> int:
+    lam = max(0.0, float(lam))
+    if lam <= 0.0:
+        return 0
+    # Knuth is efficient for the small per-player lambdas used here.
+    threshold = __import__("math").exp(-lam)
+    k = 0
+    product = 1.0
+    while product > threshold:
+        k += 1
+        product *= rng.random()
+    return k - 1
+
+
+def _categorical_counts(
+    rng: random.Random,
+    n: int,
+    probabilities: dict[str, float],
+) -> dict[str, int]:
+    clean = {key: max(0.0, float(value)) for key, value in probabilities.items()}
+    total = sum(clean.values())
+    # Reserve at least 2% probability for an ordinary out when supplied rates
+    # are overly aggressive rather than allowing impossible >100% mass.
+    if total > 0.98:
+        scale = 0.98 / total
+        clean = {key: value * scale for key, value in clean.items()}
+    keys = list(clean)
+    counts = {key: 0 for key in keys}
+    for _ in range(max(0, int(n))):
+        u = rng.random()
+        cumulative = 0.0
+        for key in keys:
+            cumulative += clean[key]
+            if u < cumulative:
+                counts[key] += 1
+                break
+    return counts
+
+
 def _p(params: dict[str, Any], key: str, default: float) -> float:
     try:
         return float(params.get(key, default))
@@ -95,21 +143,32 @@ def _contextualize(
 
 def sample_basketball(rng: random.Random, minutes: float, parameters: dict[str, Any] | None = None) -> dict[str, float]:
     p = parameters or {}
-    fga = max(0.0, rng.gauss(minutes * max(0.01, _p(p, "fga_per_min", 0.55)), 3.0))
-    tpa = _clip(rng.gauss(fga * _clip(_p(p, "three_pa_share", 0.42), 0.0, 1.0), 1.6), 0.0, fga)
+    fga_mean = minutes * max(0.01, _p(p, "fga_per_min", 0.55))
+    fga = _nonneg_int_gauss(rng, fga_mean, max(1.0, fga_mean ** 0.5))
+    tpa = _binomial(rng, fga, _p(p, "three_pa_share", 0.42))
     twopa = fga - tpa
-    tpm = _clip(rng.gauss(tpa * _clip(_p(p, "three_fg_pct", 0.36), 0.05, 0.8), 1.0), 0.0, tpa)
-    twopm = _clip(rng.gauss(twopa * _clip(_p(p, "two_fg_pct", 0.52), 0.05, 0.95), 1.3), 0.0, twopa)
+    tpm = _binomial(rng, tpa, _p(p, "three_fg_pct", 0.36))
+    twopm = _binomial(rng, twopa, _p(p, "two_fg_pct", 0.52))
     fgm = twopm + tpm
-    fta = max(0.0, rng.gauss(minutes * max(0.0, _p(p, "fta_per_min", 0.18)), 1.3))
-    ftm = _clip(rng.gauss(fta * _clip(_p(p, "ft_pct", 0.78), 0.2, 1.0), 0.8), 0.0, fta)
-    reb = max(0.0, rng.gauss(minutes * max(0.0, _p(p, "reb_per_min", 0.23)), 1.4))
-    oreb = _clip(rng.gauss(reb * _clip(_p(p, "oreb_share", 0.22), 0.0, 1.0), 0.5), 0.0, reb)
+
+    fta_mean = minutes * max(0.0, _p(p, "fta_per_min", 0.18))
+    fta = _nonneg_int_gauss(rng, fta_mean, max(0.75, fta_mean ** 0.5))
+    ftm = _binomial(rng, fta, _p(p, "ft_pct", 0.78))
+
+    reb_mean = minutes * max(0.0, _p(p, "reb_per_min", 0.23))
+    reb = _nonneg_int_gauss(rng, reb_mean, max(0.75, reb_mean ** 0.5))
+    oreb = _binomial(rng, reb, _p(p, "oreb_share", 0.22))
     dreb = reb - oreb
-    ast = max(0.0, rng.gauss(minutes * max(0.0, _p(p, "ast_per_min", 0.14)), 1.2))
-    stl = max(0.0, rng.gauss(minutes * max(0.0, _p(p, "stl_per_min", 0.03)), 0.5))
-    blk = max(0.0, rng.gauss(minutes * max(0.0, _p(p, "blk_per_min", 0.025)), 0.5))
-    tov = max(0.0, rng.gauss(minutes * max(0.0, _p(p, "tov_per_min", 0.08)), 0.8))
+
+    ast_mean = minutes * max(0.0, _p(p, "ast_per_min", 0.14))
+    stl_mean = minutes * max(0.0, _p(p, "stl_per_min", 0.03))
+    blk_mean = minutes * max(0.0, _p(p, "blk_per_min", 0.025))
+    tov_mean = minutes * max(0.0, _p(p, "tov_per_min", 0.08))
+    ast = _nonneg_int_gauss(rng, ast_mean, max(0.65, ast_mean ** 0.5))
+    stl = _poisson(rng, stl_mean)
+    blk = _poisson(rng, blk_mean)
+    tov = _nonneg_int_gauss(rng, tov_mean, max(0.55, tov_mean ** 0.5))
+
     pts = 2 * twopm + 3 * tpm + ftm
     return {
         "minutes": minutes, "fga": fga, "tpa": tpa, "twopa": twopa, "fgm": fgm,
@@ -118,29 +177,36 @@ def sample_basketball(rng: random.Random, minutes: float, parameters: dict[str, 
         "pts": pts, "pra": pts + reb + ast, "pr": pts + reb, "pa": pts + ast, "ra": reb + ast,
     }
 
-
 def sample_football(rng: random.Random, role: str, parameters: dict[str, Any] | None = None) -> dict[str, float]:
     p = parameters or {}
     role = (role or "QB").upper()
     if role == "QB":
-        pass_att = max(0.0, rng.gauss(_p(p, "pass_att_mean", 34.0), max(1.0, _p(p, "pass_att_sd", 6.0))))
-        sacks = max(0.0, rng.gauss(_p(p, "sacks_mean", 2.2), 1.1))
-        rush_att = max(0.0, rng.gauss(_p(p, "rush_att_mean", 5.0), max(0.5, _p(p, "rush_att_sd", 2.0))))
-        scramble = min(rush_att, max(0.0, rng.gauss(rush_att * 0.6, 0.8)))
-        designed = max(0.0, rush_att - scramble)
-        pass_cmp = _clip(rng.gauss(pass_att * _clip(_p(p, "completion_rate", 0.65), 0.2, 0.9), 2.5), 0.0, pass_att)
-        pass_yds = max(0.0, rng.gauss(pass_att * max(1.0, _p(p, "pass_ypa", 7.1)), 42.0))
-        rush_yds = max(0.0, rng.gauss(rush_att * max(0.0, _p(p, "rush_ypa", 4.4)), 16.0))
-        routes = targets = receptions = rec_yds = 0.0
+        pass_att = _nonneg_int_gauss(rng, _p(p, "pass_att_mean", 34.0), max(1.0, _p(p, "pass_att_sd", 6.0)))
+        sacks = _nonneg_int_gauss(rng, _p(p, "sacks_mean", 2.2), 1.1)
+        rush_att = _nonneg_int_gauss(rng, _p(p, "rush_att_mean", 5.0), max(0.5, _p(p, "rush_att_sd", 2.0)))
+        scramble = _binomial(rng, rush_att, 0.60)
+        designed = rush_att - scramble
+        pass_cmp = _binomial(rng, pass_att, _p(p, "completion_rate", 0.65))
+        pass_yds = int(round(rng.gauss(pass_att * max(1.0, _p(p, "pass_ypa", 7.1)), 42.0)))
+        rush_yds = int(round(rng.gauss(rush_att * _p(p, "rush_ypa", 4.4), 16.0)))
+        routes = targets = receptions = rec_yds = 0
         dropbacks = pass_att + sacks + scramble
     else:
-        pass_att = pass_cmp = sacks = scramble = designed = pass_yds = dropbacks = 0.0
-        rush_att = max(0.0, rng.gauss(_p(p, "rush_att_mean", 12.0 if role == "RB" else 1.5), max(0.5, _p(p, "rush_att_sd", 4.0))))
-        rush_yds = max(0.0, rng.gauss(rush_att * max(0.0, _p(p, "rush_ypa", 4.3)), 17.0))
-        routes = max(0.0, rng.gauss(_p(p, "routes_mean", 22.0 if role in {"WR", "TE"} else 8.0), max(1.0, _p(p, "routes_sd", 5.0))))
-        targets = _clip(rng.gauss(routes * _clip(_p(p, "target_rate", 0.28), 0.0, 1.0), 1.8), 0.0, routes)
-        receptions = _clip(rng.gauss(targets * _clip(_p(p, "catch_rate", 0.68), 0.0, 1.0), 1.2), 0.0, targets)
-        rec_yds = max(0.0, rng.gauss(receptions * max(0.0, _p(p, "rec_ypr", 11.5)), 17.0))
+        pass_att = pass_cmp = sacks = scramble = designed = pass_yds = dropbacks = 0
+        rush_att = _nonneg_int_gauss(
+            rng,
+            _p(p, "rush_att_mean", 12.0 if role == "RB" else 1.5),
+            max(0.5, _p(p, "rush_att_sd", 4.0)),
+        )
+        rush_yds = int(round(rng.gauss(rush_att * _p(p, "rush_ypa", 4.3), 17.0)))
+        routes = _nonneg_int_gauss(
+            rng,
+            _p(p, "routes_mean", 22.0 if role in {"WR", "TE"} else 8.0),
+            max(1.0, _p(p, "routes_sd", 5.0)),
+        )
+        targets = _binomial(rng, routes, _p(p, "target_rate", 0.28))
+        receptions = _binomial(rng, targets, _p(p, "catch_rate", 0.68))
+        rec_yds = int(round(rng.gauss(receptions * max(0.0, _p(p, "rec_ypr", 11.5)), 17.0)))
     stats = {
         "pass_att": pass_att, "pass_cmp": pass_cmp, "sacks_taken": sacks, "scramble_att": scramble,
         "designed_rush_att": designed, "rush_att": rush_att, "dropbacks": dropbacks,
@@ -148,36 +214,56 @@ def sample_football(rng: random.Random, role: str, parameters: dict[str, Any] | 
         "receptions": receptions, "targets": targets, "routes": routes,
         "pass_rush_yds": pass_yds + rush_yds, "rush_rec_yds": rush_yds + rec_yds,
     }
-    if stats["pass_cmp"] > stats["pass_att"] + 1e-9 or stats["receptions"] > stats["targets"] + 1e-9:
+    if stats["pass_cmp"] > stats["pass_att"] or stats["receptions"] > stats["targets"] or stats["targets"] > stats["routes"]:
         raise RuntimeError("PRIMITIVE_CONSERVATION_FAILURE")
     return stats
 
-
 def sample_baseball_batter(rng: random.Random, pa: float, parameters: dict[str, Any] | None = None) -> dict[str, float]:
     p = parameters or {}
-    pa = max(0.0, pa)
-    bb = _clip(rng.gauss(pa * _clip(_p(p, "bb_rate", 0.09), 0, 0.6), 0.35), 0, pa)
-    hbp = _clip(rng.gauss(pa * _clip(_p(p, "hbp_rate", 0.01), 0, 0.2), 0.12), 0, pa - bb)
-    sf = _clip(rng.gauss(pa * _clip(_p(p, "sf_rate", 0.02), 0, 0.2), 0.12), 0, pa - bb - hbp)
-    sh = _clip(rng.gauss(pa * _clip(_p(p, "sh_rate", 0.005), 0, 0.1), 0.07), 0, pa - bb - hbp - sf)
-    ab = max(0.0, pa - bb - hbp - sf - sh)
-    so = _clip(rng.gauss(ab * _clip(_p(p, "so_rate", 0.24), 0, 0.8), 0.65), 0, ab)
-    hr = _clip(rng.gauss(ab * _clip(_p(p, "hr_rate", 0.04), 0, 0.3), 0.30), 0, ab)
-    triple = _clip(rng.gauss(ab * _clip(_p(p, "triple_rate", 0.005), 0, 0.1), 0.07), 0, max(0, ab - hr))
-    double = _clip(rng.gauss(ab * _clip(_p(p, "double_rate", 0.05), 0, 0.4), 0.32), 0, max(0, ab - hr - triple))
-    single = _clip(rng.gauss(ab * _clip(_p(p, "single_rate", 0.15), 0, 0.7), 0.50), 0, max(0, ab - hr - triple - double))
+    pa_i = max(0, int(round(pa)))
+
+    # Non-AB plate appearance outcomes are allocated sequentially so the exact
+    # identity PA = AB + BB + HBP + SF + SH holds in every world.
+    bb = _binomial(rng, pa_i, _p(p, "bb_rate", 0.09))
+    remaining = pa_i - bb
+    hbp = _binomial(rng, remaining, _p(p, "hbp_rate", 0.01))
+    remaining -= hbp
+    sf = _binomial(rng, remaining, _p(p, "sf_rate", 0.02))
+    remaining -= sf
+    sh = _binomial(rng, remaining, _p(p, "sh_rate", 0.005))
+    ab = remaining - sh
+
+    outcomes = _categorical_counts(
+        rng,
+        ab,
+        {
+            "SO": _p(p, "so_rate", 0.24),
+            "HR": _p(p, "hr_rate", 0.04),
+            "3B": _p(p, "triple_rate", 0.005),
+            "2B": _p(p, "double_rate", 0.05),
+            "1B": _p(p, "single_rate", 0.15),
+        },
+    )
+    so = outcomes["SO"]
+    hr = outcomes["HR"]
+    triple = outcomes["3B"]
+    double = outcomes["2B"]
+    single = outcomes["1B"]
     h = single + double + triple + hr
     tb = single + 2 * double + 3 * triple + 4 * hr
-    runs = max(0.0, rng.gauss(pa * max(0.0, _p(p, "run_per_pa", 0.14)), 0.45))
-    rbi = max(0.0, rng.gauss(pa * max(0.0, _p(p, "rbi_per_pa", 0.12)), 0.45))
-    stats = {"PA": pa, "AB": ab, "BB": bb, "HBP": hbp, "SF": sf, "SH": sh, "SO": so,
-             "H": h, "1B": single, "2B": double, "3B": triple, "HR": hr, "TB": tb,
-             "R": runs, "RBI": rbi, "hits_runs_rbi": h + runs + rbi, "k": so, "h": h, "tb": tb}
-    failed = [c["rule_id"] for c in mlb_conservation(stats) if not c["passed"]]
+
+    runs = _poisson(rng, pa_i * max(0.0, _p(p, "run_per_pa", 0.14)))
+    rbi = _poisson(rng, pa_i * max(0.0, _p(p, "rbi_per_pa", 0.12)))
+    stats = {
+        "PA": pa_i, "AB": ab, "BB": bb, "HBP": hbp, "SF": sf, "SH": sh,
+        "SO": so, "H": h, "1B": single, "2B": double, "3B": triple, "HR": hr,
+        "TB": tb, "R": runs, "RBI": rbi, "hits_runs_rbi": h + runs + rbi,
+        "k": so, "h": h, "tb": tb,
+    }
+    failed = [check["rule_id"] for check in mlb_conservation(stats) if not check["passed"]]
     if failed:
         raise RuntimeError(f"PRIMITIVE_CONSERVATION_FAILURE:{failed}")
     return stats
-
 
 MARKET_FROM_STATS = {
     "pts": "pts", "reb": "reb", "ast": "ast", "pra": "pra", "pr": "pr", "pa": "pa", "ra": "ra",
@@ -232,12 +318,10 @@ def simulate_player_worlds(
                 )
             )
         elif family == "baseball":
-            pa = max(
-                0.0,
-                rng.gauss(
-                    _p(world_params, "pa_mean", 4.2),
-                    max(0.2, _p(world_params, "pa_sd", 0.8)),
-                ),
+            pa = _nonneg_int_gauss(
+                rng,
+                _p(world_params, "pa_mean", 4.2),
+                max(0.2, _p(world_params, "pa_sd", 0.8)),
             )
             worlds.append(sample_baseball_batter(rng, pa, world_params))
         else:
