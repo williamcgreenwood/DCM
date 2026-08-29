@@ -147,6 +147,22 @@ def run_dcm(
         model_config = json.loads(model_config_path.read_text(encoding="utf-8"))
         calibration_state = json.loads(calibration_state_path.read_text(encoding="utf-8"))
         calibration_cells = calibration_state.get("cells") or {}
+
+        board_payload = {k: v for k, v in board.items() if k != "contentHash"}
+        if str(board.get("contentHash") or "") != content_hash(board_payload):
+            raise RuntimeError("BOARD_HASH_MISMATCH_ON_RESUME")
+        if str(board.get("harSha256") or "") != str(ingest_meta.get("harSha256") or ""):
+            raise RuntimeError("INPUT_MANIFEST_BOARD_SOURCE_MISMATCH")
+        if str(ck.get("modelConfigHash") or "") != content_hash(model_config):
+            raise RuntimeError("MODEL_CONFIG_HASH_MISMATCH_ON_RESUME")
+        if str(calibration_state.get("contentHash") or "") != content_hash(calibration_cells):
+            raise RuntimeError("CALIBRATION_STATE_SELF_HASH_MISMATCH")
+        if str(ck.get("calibrationStateHash") or "") != str(calibration_state.get("contentHash") or ""):
+            raise RuntimeError("CALIBRATION_STATE_HASH_MISMATCH_ON_RESUME")
+        if str(ck.get("mountStateHash") or "") != content_hash(mount):
+            raise RuntimeError("MOUNT_STATE_HASH_MISMATCH_ON_RESUME")
+        if str(ck.get("schemaStateHash") or "") != content_hash(schema_root):
+            raise RuntimeError("SCHEMA_STATE_HASH_MISMATCH_ON_RESUME")
         stages_done = set(ck.get("completedStages") or [])
     else:
         stages_done = set()
@@ -679,6 +695,8 @@ def run_dcm(
             "forecastCutoff": forecast_cutoff,
             "modelConfigHash": config_hash,
             "calibrationStateHash": calibration_state.get("contentHash"),
+            "mountStateHash": content_hash(mount),
+            "schemaStateHash": content_hash(schema_root),
             "artifactRoot": str(dest),
             "completedStages": ["BOARD_FREEZE", "RESEARCH", "MODEL", "RANK", "PORTFOLIO", "FREEZE"],
             "pending": [],
