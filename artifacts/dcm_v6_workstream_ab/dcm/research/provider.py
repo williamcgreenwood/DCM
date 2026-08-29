@@ -108,8 +108,8 @@ class FixtureProvider:
             semantic_scope=scope, scope_id=str(request["scope_id"]), claim_type=str(request["need"]),
             claim_value=value, reliability=0.35, freshness=1.0,
         )
-        claim["synthetic"] = True
-        claim["production_eligible"] = False
+        # FIXTURE_ source identity is itself the immutable synthetic marker.
+        # Do not mutate claim content after claim_hash has been computed.
         return [claim]
 
 
