@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import statistics
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -24,6 +25,10 @@ from dcm.ingest.har import ingest_har
 from dcm.model.distributions import from_worlds
 from dcm.model.grade import grade as grade_of
 from dcm.model.line_surface import surface as line_surface
+from dcm.model.parameters import build_parameter_snapshot
+from dcm.model.ranking import rank_candidates
+from dcm.model.uncertainty import probability_bundle
+from dcm.learning.calibration import apply_calibration, cell_key
 from dcm.model.worlds import MARKET_FROM_STATS, simulate_player_worlds, value_from_stats
 from dcm.research.provider import FileProvider, FixtureProvider, collect
 from dcm.research.requests import build_requests
@@ -33,15 +38,15 @@ from dcm.runtime.governor import Governor
 from dcm.runtime.mount_v541 import mount_default
 from dcm.runtime.perf import StageTimer
 from dcm.runtime.store import IndexedStore
-from dcm.selection.portfolio import build_card
+from dcm.selection.portfolio import build_card, exposure_report
 from dcm.sports.common.plugin import selection_state
 
 LEARNING_REVISION = "LR000000"
 PREDICTIVE_CLAIM = "NONE"
-SOFTWARE = "6.0.0+WSAB.E2E.LR000000"
+SOFTWARE = "6.0.0+WSAB.E2E.PRODUCTION_PIPELINE.LR000000"
 SCHEMA = "PHASE_BC_SCHEMA_V1_2026-08-25"
-N_WORLDS = 64
-N_SERIOUS = 128
+N_WORLDS = int(__import__("os").environ.get("DCM_FAST_WORLDS", "256"))
+N_SERIOUS = int(__import__("os").environ.get("DCM_SERIOUS_WORLDS", "2048"))
 
 SYNTHETIC = Path("/workspace/artifacts/dcm_v6_workstream_ab/fixtures/synthetic_har.json")
 
@@ -85,7 +90,7 @@ def run_dcm(
     forecast_cutoff: str,
     output_root: Path,
     synthetic: bool = False,
-    research: str = "fixture",
+    research: str = "file",
     evidence_dir: Path | None = None,
     workspace: Path = Path("/workspace"),
     resume: Path | None = None,
@@ -189,97 +194,147 @@ def run_dcm(
     (dest / "performance" / "research.json").write_text(json.dumps(research_perf, indent=2) + "\n", encoding="utf-8")
     stages_done.add("RESEARCH")
 
+    calibration_path = workspace / "dcm_v6" / "calibration" / "active_cells.json"
+    try:
+        calibration_cells = json.loads(calibration_path.read_text(encoding="utf-8")) if calibration_path.is_file() else {}
+    except (OSError, json.JSONDecodeError):
+        calibration_cells = {}
+    canonical_ready = mount.get("state") in {"HASH_VERIFIED", "HASH_VERIFIED_EXTRACTED"}
+    production_research_ready = bool(bundle.get("production_ready"))
+    global_selection_gate = canonical_ready and production_research_ready and not synthetic
+
     gov = Governor(max_worlds=N_WORLDS, serious_worlds=N_SERIOUS)
     t = StageTimer("MODEL")
-    world_cache: dict[tuple[str, str], list[dict[str, float]]] = {}
+    world_cache: dict[tuple[str, str, str], list[dict[str, float]]] = {}
+    parameter_cache: dict[str, dict[str, Any]] = {}
     modeled: list[dict[str, Any]] = []
     classified: list[dict[str, Any]] = []
     conservation_failures = 0
-    unsupported = excluded = unresolved = 0
+    unsupported = excluded = unresolved = evidence_blocked = 0
+
     for row in rows:
         state, blocker = _classify(row)
         rec: dict[str, Any] = {"row": row, "state": state, "blocker": blocker}
         if state == "EXCLUDED_GOBLIN":
-            excluded += 1
-            classified.append(rec)
-            continue
+            excluded += 1; classified.append(rec); continue
         if state == "UNSUPPORTED":
-            unsupported += 1
-            classified.append(rec)
-            continue
+            unsupported += 1; classified.append(rec); continue
         if state == "UNRESOLVED":
-            unresolved += 1
-            classified.append(rec)
-            continue
-        key = (row["eventId"], row["playerId"])
+            unresolved += 1; classified.append(rec); continue
+
+        snapshot = build_parameter_snapshot(row, bundle["claims"])
+        parameter_cache[str(row["projectionId"])] = snapshot
+        production_selectable = global_selection_gate and bool(snapshot["production_eligible"]) and blocker is None
+        if not snapshot["production_eligible"] and not synthetic and blocker is None:
+            rec["blocker"] = snapshot.get("blocker") or "EVIDENCE_INSUFFICIENT"
+            evidence_blocked += 1
+
+        key = (str(row["eventId"]), str(row["playerId"]), str(snapshot["parameter_snapshot_hash"]))
         try:
             if key not in world_cache:
-                world_cache[key] = simulate_player_worlds(row, n=gov.max_worlds, seed=har_sha)
+                world_cache[key] = simulate_player_worlds(
+                    row, n=gov.max_worlds, seed=har_sha, parameter_snapshot=snapshot
+                )
             values = [value_from_stats(row["market"], w) for w in world_cache[key]]
         except KeyError:
-            rec["state"] = "UNSUPPORTED"
-            rec["blocker"] = "UNSUPPORTED_FAIL_CLOSED"
-            unsupported += 1
-            classified.append(rec)
-            continue
+            rec["state"] = "UNSUPPORTED"; rec["blocker"] = "UNSUPPORTED_FAIL_CLOSED"
+            unsupported += 1; classified.append(rec); continue
         except RuntimeError:
-            conservation_failures += 1
-            rec["state"] = "UNRESOLVED"
+            conservation_failures += 1; rec["state"] = "UNRESOLVED"
             rec["blocker"] = "PRIMITIVE_CONSERVATION_FAILURE"
-            unresolved += 1
-            classified.append(rec)
-            continue
+            unresolved += 1; classified.append(rec); continue
+
         dist = from_worlds(values, float(row["line"]))
-        if abs(dist["pHigher"] + dist["pLower"] + dist["pPush"] - 1.0) > 1e-6:
-            raise RuntimeError("SIMPLEX_FAILURE")
-        side = row.get("side")
-        if side not in {"MORE", "LESS"}:
-            side = "MORE" if row.get("offeredHigher") and dist["pHigher"] >= dist["pLower"] else "LESS"
-        selected_p = dist["pHigher"] if side == "MORE" else dist["pLower"]
+        preliminary = max(
+            dist["pHigher"] if row.get("offeredHigher") else 0.0,
+            dist["pLower"] if row.get("offeredLower") else 0.0,
+        )
+        if production_selectable and preliminary >= 0.52 and gov.serious_worlds > gov.max_worlds:
+            world_cache[key] = simulate_player_worlds(
+                row, n=gov.serious_worlds, seed=har_sha, parameter_snapshot=snapshot
+            )
+            values = [value_from_stats(row["market"], w) for w in world_cache[key]]
+            dist = from_worlds(values, float(row["line"]))
+
         demon = row.get("modifier") == "DEMON"
-        fragility = 0.42 if demon else 0.18
-        lb = max(0.01, selected_p - 0.07)
-        serious = selected_p >= 0.52 or demon
-        surf = line_surface(values, float(row["line"])) if serious else {
-            "offered_line": float(row["line"]),
-            "offered_probability": dist["pHigher"],
-            "break_even_line": float(row["line"]),
-            "true_unclamped_line_tolerance": 0.0,
-            "edge_elasticity": 0.0,
-            "robustness_area": 0.0,
-            "pHigher": dist["pHigher"],
-            "pLower": dist["pLower"],
-            "pPush": dist["pPush"],
-            "mean": dist["mean"],
-        }
-        g = grade_of(
-            selected_p=selected_p,
-            lower_bound=lb,
-            demon=demon,
-            fragility=fragility,
-            robustness_area=surf["robustness_area"],
-            elasticity=surf["edge_elasticity"],
-            false_sign=max(0.04, 0.5 - abs(selected_p - 0.5)),
+        sd = statistics.pstdev(values) if len(values) >= 2 else 0.0
+        volatility = min(1.0, sd / (abs(float(dist["mean"])) + 1.0))
+        support_n = min(
+            int((snapshot.get("opportunity") or {}).get("support_n", 0)),
+            int((snapshot.get("efficiency") or {}).get("support_n", 0)),
         )
-        score = selected_p * 0.45 + lb * 0.25 - fragility * 0.1
-        rec.update(
-            {
-                "state": "MODELED",
-                "grade": g,
-                "selectedSide": side,
-                "selectedP": selected_p,
-                "pHigher": dist["pHigher"],
-                "pLower": dist["pLower"],
-                "pPush": dist["pPush"],
-                "mean": dist["mean"],
-                "lowerBound": lb,
-                "lineSurface": surf,
-                "selectionScore": score,
-                "researchOnly": blocker in {"RESEARCH_ONLY_NOT_SELECTABLE", "SHADOW_SUPPORTED_NOT_SELECTABLE"},
+        offered_sides = []
+        if row.get("offeredHigher"): offered_sides.append("MORE")
+        if row.get("offeredLower"): offered_sides.append("LESS")
+        if not offered_sides:
+            rec["state"] = "UNRESOLVED"; rec["blocker"] = "OFFERED_SIDE_UNKNOWN"
+            unresolved += 1; classified.append(rec); continue
+
+        evaluations: dict[str, dict[str, Any]] = {}
+        for side in offered_sides:
+            raw_p = dist["pHigher"] if side == "MORE" else dist["pLower"]
+            ckey = cell_key(str(row.get("sportFamily")), str(row.get("league")), str(row.get("market")), side)
+            cal = apply_calibration(raw_p, key=ckey, cells=calibration_cells)
+            unc = probability_bundle(
+                raw_selected_p=float(cal["calibrated"]), n_worlds=len(values),
+                support_n=support_n, data_quality=float(snapshot.get("data_quality") or 0.0),
+                ood_risk=float(snapshot.get("ood_risk") or 1.0), volatility=volatility,
+                synthetic=bool(snapshot.get("synthetic")),
+            )
+            safe_p = float(unc["evidence_safe_probability"])
+            surf = line_surface(values, float(row["line"]), side=side, playable_p=0.63 if demon else 0.58)
+            fragility = min(
+                1.0,
+                0.10 + float(unc["epistemic_uncertainty"]) * 0.70
+                + float(snapshot.get("ood_risk") or 0.0) * 0.20
+                + min(0.20, float(surf["edge_elasticity"]) * 0.20),
+            )
+            side_grade = grade_of(
+                selected_p=safe_p, lower_bound=float(unc["lower_bound"]), demon=demon,
+                fragility=fragility, robustness_area=float(surf["robustness_area"]),
+                elasticity=float(surf["edge_elasticity"]), false_sign=float(unc["false_sign_risk"]),
+            )
+            evaluations[side] = {
+                "side": side, "rawP": raw_p, "calibratedP": float(cal["calibrated"]),
+                "calibrationState": cal["state"], "evidenceSafeP": safe_p,
+                "lowerBound": float(unc["lower_bound"]), "monteCarloSE": float(unc["monte_carlo_se"]),
+                "epistemicUncertainty": float(unc["epistemic_uncertainty"]),
+                "aleatoricUncertainty": float(unc["aleatoric_uncertainty"]),
+                "reliability": float(unc["reliability"]), "falseSignRisk": float(unc["false_sign_risk"]),
+                "volatility": volatility, "fragility": fragility, "lineSurface": surf, "grade": side_grade,
             }
-        )
+
+        forced = row.get("side") if row.get("side") in evaluations else None
+        chosen_side = forced or max(evaluations, key=lambda x: (evaluations[x]["evidenceSafeP"], evaluations[x]["lowerBound"]))
+        ev = evaluations[chosen_side]
+        if blocker in {"RESEARCH_ONLY_NOT_SELECTABLE", "SHADOW_SUPPORTED_NOT_SELECTABLE"}:
+            production_selectable = False
+        opp = snapshot.get("opportunity") or {}
+        opportunity_mean = next((opp[k] for k in ("minutes_mean", "pass_att_mean", "routes_mean", "rush_att_mean", "pa_mean") if k in opp), None)
+        rec.update({
+            "state": "MODELED", "grade": ev["grade"], "selectedSide": chosen_side,
+            "selectedP": ev["rawP"], "rawP": ev["rawP"], "calibratedP": ev["calibratedP"],
+            "evidenceSafeP": ev["evidenceSafeP"], "pHigher": dist["pHigher"], "pLower": dist["pLower"],
+            "pPush": dist["pPush"], "mean": dist["mean"], "lowerBound": ev["lowerBound"],
+            "lineSurface": ev["lineSurface"], "sideEvaluations": evaluations,
+            "opportunityMean": opportunity_mean, "reliability": ev["reliability"],
+            "dataQuality": snapshot["data_quality"], "volatility": ev["volatility"],
+            "fragility": ev["fragility"], "oodRisk": snapshot["ood_risk"],
+            "falseSignRisk": ev["falseSignRisk"], "epistemicUncertainty": ev["epistemicUncertainty"],
+            "aleatoricUncertainty": ev["aleatoricUncertainty"], "monteCarloSE": ev["monteCarloSE"],
+            "calibrationState": ev["calibrationState"], "parameterSnapshotHash": snapshot["parameter_snapshot_hash"],
+            "evidenceHashes": snapshot["evidence_hashes"], "dependencyTags": snapshot["dependency_tags"],
+            "productionSelectable": production_selectable,
+            "researchOnly": blocker in {"RESEARCH_ONLY_NOT_SELECTABLE", "SHADOW_SUPPORTED_NOT_SELECTABLE"},
+            "worldCount": len(values),
+        })
         modeled.append(rec)
         classified.append(rec)
+
+    (dest / "parameters").mkdir(exist_ok=True)
+    (dest / "parameters" / "snapshots.json").write_text(
+        json.dumps(parameter_cache, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
 
     n_worlds = dag.add("EVENT_WORLDS", "board", parents=[n_res.key])
     dag.complete(n_worlds.key, content_hash({"events": len({k[0] for k in world_cache}), "n": N_WORLDS}))
@@ -287,41 +342,42 @@ def run_dcm(
     (dest / "performance" / "model.json").write_text(json.dumps(model_perf, indent=2) + "\n", encoding="utf-8")
     stages_done.add("MODEL")
 
-    ranked = sorted(modeled, key=lambda p: p.get("selectionScore") or 0, reverse=True)
-    for i, p in enumerate(ranked, 1):
-        p["rank"] = i
+    ranked = rank_candidates(modeled, top_k=25, seed=har_sha)
     qualified = [
-        p
-        for p in ranked
-        if p.get("grade") == "PLAYABLE" and not p.get("researchOnly") and p["row"].get("modifier") != "GOBLIN"
+        p for p in ranked
+        if p.get("grade") == "PLAYABLE" and p.get("productionSelectable")
+        and p["row"].get("modifier") != "GOBLIN"
     ]
     card = build_card(qualified)
+    exposure = exposure_report(card)
     n_rank = dag.add("RANK", "board", parents=[n_worlds.key])
     dag.complete(n_rank.key, content_hash([p["row"]["projectionId"] for p in ranked[:25]]))
     n_port = dag.add("PORTFOLIO", "board", parents=[n_rank.key])
-    dag.complete(n_port.key, content_hash([p["row"]["projectionId"] for p in card]))
+    dag.complete(n_port.key, content_hash({"ids": [p["row"]["projectionId"] for p in card], "exposure": exposure}))
 
     def slim(p: dict) -> dict:
         r = p["row"]
         return {
-            "rank": p.get("rank"),
-            "player": r.get("playerName"),
-            "team": r.get("team"),
-            "opponent": r.get("opponent"),
-            "event": r.get("eventLabel"),
-            "market": r.get("market"),
-            "line": r.get("line"),
-            "direction": p.get("selectedSide"),
-            "modifier": r.get("modifier"),
-            "selectedP": p.get("selectedP"),
-            "pHigher": p.get("pHigher"),
-            "pLower": p.get("pLower"),
-            "pPush": p.get("pPush"),
-            "lowerBound": p.get("lowerBound"),
-            "grade": p.get("grade"),
-            "state": p.get("state"),
-            "blocker": p.get("blocker"),
+            "rank": p.get("rank"), "sportFamily": r.get("sportFamily"), "league": r.get("league"),
+            "player": r.get("playerName"), "team": r.get("team"), "opponent": r.get("opponent"),
+            "event": r.get("eventLabel"), "market": r.get("market"), "line": r.get("line"),
+            "direction": p.get("selectedSide"), "offeredHigher": r.get("offeredHigher"),
+            "offeredLower": r.get("offeredLower"), "modifier": r.get("modifier"),
+            "selectedP": p.get("selectedP"), "rawP": p.get("rawP"),
+            "calibratedP": p.get("calibratedP"), "evidenceSafeP": p.get("evidenceSafeP"),
+            "pHigher": p.get("pHigher"), "pLower": p.get("pLower"), "pPush": p.get("pPush"),
+            "lowerBound": p.get("lowerBound"), "reliability": p.get("reliability"),
+            "dataQuality": p.get("dataQuality"), "volatility": p.get("volatility"),
+            "fragility": p.get("fragility"), "oodRisk": p.get("oodRisk"),
+            "falseSignRisk": p.get("falseSignRisk"), "epistemicUncertainty": p.get("epistemicUncertainty"),
+            "monteCarloSE": p.get("monteCarloSE"), "opportunityMean": p.get("opportunityMean"),
+            "grade": p.get("grade"), "state": p.get("state"), "blocker": p.get("blocker"),
+            "productionSelectable": p.get("productionSelectable", False),
+            "calibrationState": p.get("calibrationState"), "selectionScore": p.get("selectionScore"),
+            "topKInclusionP": p.get("topKInclusionP"), "rankStability": p.get("rankStability"),
+            "posteriorRegret": p.get("posteriorRegret"),
             "trueLineTolerance": (p.get("lineSurface") or {}).get("true_unclamped_line_tolerance"),
+            "sideEvaluations": p.get("sideEvaluations"), "dependencyTags": p.get("dependencyTags"),
             "projectionId": r.get("projectionId"),
         }
 
@@ -335,7 +391,7 @@ def run_dcm(
     (dest / "strict_card.json").write_text(json.dumps(strict_card, indent=2) + "\n", encoding="utf-8")
     (dest / "full_population.jsonl").write_text("".join(json.dumps(slim(p)) + "\n" for p in classified), encoding="utf-8")
     (dest / "dependencies.json").write_text(
-        json.dumps({"maxPerEvent": 2, "uniquePlayer": True, "eventOnce": True}, indent=2) + "\n",
+        json.dumps(exposure, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
 
@@ -343,9 +399,14 @@ def run_dcm(
     for p in classified:
         states_count[p["state"]] = states_count.get(p["state"], 0) + 1
 
-    run_state = "EMPTY_CARD_COMPLETE" if not card and board["accounting"]["raw_projection_rows"] > 0 else "COMPLETE_FROZEN"
-    if unsupported:
-        run_state = "COMPLETE_WITH_UNSUPPORTED_ROWS" if card or qualified else run_state
+    if not global_selection_gate:
+        run_state = "EMPTY_CARD_COMPLETE"
+    elif not card and board["accounting"]["raw_projection_rows"] > 0:
+        run_state = "EMPTY_CARD_COMPLETE"
+    elif unsupported:
+        run_state = "COMPLETE_WITH_UNSUPPORTED_ROWS"
+    else:
+        run_state = "COMPLETE_FROZEN"
 
     freeze = {
         "runId": run_id,
@@ -354,7 +415,10 @@ def run_dcm(
         "predictiveClaim": PREDICTIVE_CLAIM,
         "optimizedDcm60Claim": False,
         "hostPerformanceCertified": False,
-        "chatgptOperable": research == "fixture" or bundle["complete"],
+        "chatgptOperable": True,
+        "productionOperable": global_selection_gate,
+        "selectionAllowed": global_selection_gate,
+        "executionMode": "PRODUCTION" if global_selection_gate else "ENGINEERING_OR_BLOCKED",
         "softwareE2eComplete": True,
         "runState": run_state,
         "v5Decoder": mount.get("har_decoder"),
@@ -374,6 +438,12 @@ def run_dcm(
         "conservationFailures": conservation_failures,
         "researchRequested": bundle["requested"],
         "researchReused": bundle["reused"],
+        "researchComplete": bundle["complete"],
+        "productionResearchComplete": production_research_ready,
+        "evidenceMode": bundle.get("evidence_mode"),
+        "canonicalBaselineReady": canonical_ready,
+        "evidenceBlocked": evidence_blocked,
+        "portfolioExposure": exposure,
         "top25QualifiedCount": len(top25_qualified),
         "dag": dag.snapshot(),
     }
@@ -443,7 +513,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--out", type=Path, default=Path("/workspace/dcm_v6/RUNS"))
     p.add_argument("--synthetic", action="store_true")
     p.add_argument("--cutoff", default="2026-08-28T00:00:00Z")
-    p.add_argument("--research", choices=["fixture", "file"], default="fixture")
+    p.add_argument("--research", choices=["fixture", "file"], default="file")
     p.add_argument("--evidence-dir", type=Path, default=None)
     p.add_argument("--resume", type=Path, default=None)
     p.add_argument("--workspace", type=Path, default=Path("/workspace"))

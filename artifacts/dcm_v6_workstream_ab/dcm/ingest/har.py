@@ -108,13 +108,10 @@ def _index_har(obj: dict) -> tuple[list[dict], dict[str, int], list[str]]:
             "bodyHash": body_hash,
             "body": body,
         })
-    indexed.sort(key=lambda e: e["startedDateTime"])
-    latest: dict[tuple[str, str], dict] = {}
-    for e in indexed:
-        latest[(e["method"], e["url"])] = e
-    if not latest and entries:
+    indexed.sort(key=lambda e: (e["startedDateTime"], e["method"], e["url"], e["bodyHash"]))
+    if not indexed and entries:
         warnings.append("NO_ALLOWLISTED_MARKET_ENDPOINT")
-    return list(latest.values()), stats, warnings
+    return indexed, stats, warnings
 
 
 def _parse_payload(obj: Any) -> tuple[str, list[dict]] | None:
@@ -142,6 +139,7 @@ def _merge_rows(batches: list[tuple[str, list[dict]]]) -> tuple[str, list[dict],
 
 
 def ingest_har(raw: Any, *, raw_bytes: bytes | None = None) -> dict[str, Any]:
+    """Parse every allowlisted snapshot and preserve per-projection history."""
     obj, text = _as_object(raw)
     har_sha256 = sha256_bytes(raw_bytes) if raw_bytes is not None else sha256_text(text)
     redacted = count_secrets(obj) if obj is not None else count_secrets(text)
@@ -150,19 +148,33 @@ def ingest_har(raw: Any, *, raw_bytes: bytes | None = None) -> dict[str, Any]:
         warnings.append("Secrets detected in capture; redacted from persistence. Never replay HAR.")
 
     synthetic = isinstance(obj, dict) and isinstance(obj.get("_pillars"), dict) and obj["_pillars"].get("kind") == "SYNTHETIC_HAR"
-    index_stats = {
-        "raw_entries": 0,
-        "denied_endpoints": 0,
-        "allowlisted_endpoints": 0,
-        "decoded_bodies": 0,
-        "duplicate_bodies": 0,
-        "secret_headers": 0,
-    }
-    capture_start = ""
-    capture_end = ""
-    batches: list[tuple[str, list[dict]]] = []
+    index_stats = {"raw_entries": 0, "denied_endpoints": 0, "allowlisted_endpoints": 0, "decoded_bodies": 0, "duplicate_bodies": 0, "secret_headers": 0}
+    capture_start = capture_end = ""
     parser = PARSER_VERSION
     adapter = "UNKNOWN"
+    histories: dict[str, list[dict]] = {}
+    timeline: list[dict] = []
+
+    def add_rows(rows: list[dict], *, snapshot: str, body_hash: str, scope: str) -> None:
+        for row in rows:
+            rec = dict(row)
+            rec["sourceSnapshotTime"] = snapshot
+            rec["sourceBodyHash"] = body_hash
+            rec["requestScope"] = scope
+            pid = str(rec["projectionId"])
+            hist = histories.setdefault(pid, [])
+            prior = hist[-1] if hist else None
+            states = ["ADDED"] if prior is None else []
+            if prior is not None:
+                if prior.get("line") != rec.get("line"): states.append("LINE_CHANGED")
+                if prior.get("modifier") != rec.get("modifier"): states.append("MODIFIER_CHANGED")
+                if (prior.get("offeredHigher"), prior.get("offeredLower")) != (rec.get("offeredHigher"), rec.get("offeredLower")): states.append("SIDE_CHANGED")
+                if prior.get("status") != rec.get("status"): states.append("STATUS_CHANGED")
+                if not states: states = ["UNCHANGED"]
+            timeline.append({"projectionId": pid, "snapshotTime": snapshot, "states": states,
+                             "previousLine": prior.get("line") if prior else None, "currentLine": rec.get("line"),
+                             "bodyHash": body_hash, "requestScope": scope})
+            hist.append(rec)
 
     if isinstance(obj, dict) and isinstance(obj.get("log"), dict):
         indexed, index_stats, w = _index_har(obj)
@@ -170,7 +182,12 @@ def ingest_har(raw: Any, *, raw_bytes: bytes | None = None) -> dict[str, Any]:
         times = [e["startedDateTime"] for e in indexed if e.get("startedDateTime")]
         capture_start = min(times) if times else ""
         capture_end = max(times) if times else ""
+        last_hash_by_scope: dict[tuple[str, str], str] = {}
         for e in indexed:
+            scope_key = (e["method"], e["url"])
+            if last_hash_by_scope.get(scope_key) == e["bodyHash"]:
+                continue
+            last_hash_by_scope[scope_key] = e["bodyHash"]
             try:
                 payload = json.loads(e["body"])
             except json.JSONDecodeError:
@@ -178,38 +195,35 @@ def ingest_har(raw: Any, *, raw_bytes: bytes | None = None) -> dict[str, Any]:
                 continue
             parsed = _parse_payload(payload)
             if parsed:
-                batches.append(parsed)
+                adapter, batch = parsed
+                add_rows(batch, snapshot=e["startedDateTime"], body_hash=e["bodyHash"], scope=e["url"])
     elif obj is not None:
         parsed = _parse_payload(obj)
         if parsed:
-            batches.append(parsed)
+            adapter, batch = parsed
+            add_rows(batch, snapshot="", body_hash=har_sha256, scope="DIRECT")
 
-    if batches:
-        adapter, rows, dup = _merge_rows(batches)
-        index_stats["duplicate_projection_ids"] = dup
-    else:
-        rows = []
+    rows = []
+    for hist in histories.values():
+        hist.sort(key=lambda r: (str(r.get("sourceSnapshotTime") or ""), str(r.get("sourceUpdatedAt") or ""), str(r.get("sourceBodyHash") or "")))
+        rows.append(hist[-1])
+    rows.sort(key=lambda r: str(r.get("projectionId")))
+    index_stats["projection_snapshot_rows"] = sum(len(v) for v in histories.values())
+    index_stats["unique_projection_ids"] = len(histories)
+    index_stats["lineage_transitions"] = len(timeline)
+    if not rows:
         warnings.append("UNKNOWN_HAR_SHAPE")
-
+    missing_sides = sum(not r.get("offeredHigher") and not r.get("offeredLower") for r in rows)
+    if missing_sides:
+        warnings.append(f"{missing_sides} offers have no verified offered side and fail closed")
     if synthetic:
         adapter = "SYNTHETIC"
-        parser = "HAR_SYNTHETIC_V1"
-
+        parser = "HAR_SYNTHETIC_V2"
     if adapter == "UNKNOWN":
         parser = "HAR_UNKNOWN"
-
     redacted += index_stats.get("secret_headers", 0)
-
-    return {
-        "adapter": adapter,
-        "parserVersion": parser,
-        "harSha256": har_sha256,
-        "rows": rows,
-        "redactedSecrets": redacted,
-        "warnings": warnings,
-        "indexStats": index_stats,
-        "captureStart": capture_start,
-        "captureEnd": capture_end,
-        "synthetic": synthetic,
-        "v5Decoder": "NOT_MOUNTED",
-    }
+    return {"adapter": adapter, "parserVersion": parser, "harSha256": har_sha256,
+            "rows": rows, "rowHistory": histories, "timeline": timeline,
+            "redactedSecrets": redacted, "warnings": warnings, "indexStats": index_stats,
+            "captureStart": capture_start, "captureEnd": capture_end,
+            "synthetic": synthetic, "v5Decoder": "NOT_MOUNTED"}
