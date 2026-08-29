@@ -36,6 +36,7 @@ from dcm.research.provider import FileProvider, FixtureProvider, collect
 from dcm.research.requests import build_requests
 from dcm.runtime.checkpoint import load_checkpoint, write_checkpoint
 from dcm.runtime.dag import Dag
+from dcm.runtime.freeze import compute_forecast_hash
 from dcm.runtime.governor import Governor
 from dcm.runtime.mount_v541 import mount_default
 from dcm.runtime.schema_root import verify_schema
@@ -542,6 +543,7 @@ def run_dcm(
             "grade": p.get("grade"), "state": p.get("state"), "blocker": p.get("blocker"),
             "productionSelectable": p.get("productionSelectable", False),
             "calibrationState": p.get("calibrationState"), "selectionScore": p.get("selectionScore"),
+            "parameterSnapshotHash": p.get("parameterSnapshotHash"),
             "topKInclusionP": p.get("topKInclusionP"), "rankStability": p.get("rankStability"),
             "posteriorRegret": p.get("posteriorRegret"),
             "trueLineTolerance": (p.get("lineSurface") or {}).get("true_unclamped_line_tolerance"),
@@ -553,11 +555,12 @@ def run_dcm(
     top25_qualified = [slim(p) for p in qualified[:25]]
     top100 = [slim(p) for p in ranked[:100]]
     strict_card = [slim(p) for p in card]
+    full_population = [slim(p) for p in classified]
     (dest / "top100.json").write_text(json.dumps(top100, indent=2) + "\n", encoding="utf-8")
     (dest / "top25_ranked.json").write_text(json.dumps(top25_ranked, indent=2) + "\n", encoding="utf-8")
     (dest / "top25_qualified.json").write_text(json.dumps(top25_qualified, indent=2) + "\n", encoding="utf-8")
     (dest / "strict_card.json").write_text(json.dumps(strict_card, indent=2) + "\n", encoding="utf-8")
-    (dest / "full_population.jsonl").write_text("".join(json.dumps(slim(p)) + "\n" for p in classified), encoding="utf-8")
+    (dest / "full_population.jsonl").write_text("".join(json.dumps(p) + "\n" for p in full_population), encoding="utf-8")
     (dest / "dependencies.json").write_text(
         json.dumps(exposure, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
@@ -624,46 +627,12 @@ def run_dcm(
         "top25QualifiedCount": len(top25_qualified),
         "dag": dag.snapshot(),
     }
-    forecast_hash_payload = {
-        "runId": run_id,
-        "dcmVersion": SOFTWARE,
-        "learningRevision": LEARNING_REVISION,
-        "schemaId": SCHEMA,
-        "schemaHash": schema_root.get("observedSha256"),
-        "modelConfigHash": config_hash,
-        "calibrationStateHash": calibration_state.get("contentHash"),
-        "harSha256": har_sha,
-        "forecastCutoff": forecast_cutoff,
-        "boardHash": board["contentHash"],
-        "forecasts": [
-            {
-                "projectionId": p["row"].get("projectionId"),
-                "line": p["row"].get("line"),
-                "modifier": p["row"].get("modifier"),
-                "offeredHigher": p["row"].get("offeredHigher"),
-                "offeredLower": p["row"].get("offeredLower"),
-                "state": p.get("state"),
-                "blocker": p.get("blocker"),
-                "grade": p.get("grade"),
-                "selectedSide": p.get("selectedSide"),
-                "rawP": p.get("rawP"),
-                "calibratedP": p.get("calibratedP"),
-                "evidenceSafeP": p.get("evidenceSafeP"),
-                "pHigher": p.get("pHigher"),
-                "pLower": p.get("pLower"),
-                "pPush": p.get("pPush"),
-                "lowerBound": p.get("lowerBound"),
-                "parameterSnapshotHash": p.get("parameterSnapshotHash"),
-                "rank": p.get("rank"),
-                "selectionScore": p.get("selectionScore"),
-                "productionSelectable": p.get("productionSelectable", False),
-            }
-            for p in sorted(classified, key=lambda x: str(x["row"].get("projectionId")))
-        ],
-        "card": [p["projectionId"] for p in strict_card],
-        "ranked": [p["projectionId"] for p in top25_ranked],
-    }
-    freeze["frozenForecastHash"] = content_hash(forecast_hash_payload)
+    freeze["frozenForecastHash"] = compute_forecast_hash(
+        freeze,
+        full_population,
+        strict_card,
+        top25_ranked,
+    )
     n_fz = dag.add("FREEZE", "board", parents=[n_port.key])
     dag.complete(n_fz.key, freeze["frozenForecastHash"])
     freeze["dag"] = dag.snapshot()
