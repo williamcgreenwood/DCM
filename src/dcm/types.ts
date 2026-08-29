@@ -1,4 +1,4 @@
-export const DCM_VERSION = "6.0.0+WSAB.HARSPINE.LR000000";
+export const DCM_VERSION = "6.0.0+WSAB.E2E.LR000000";
 export const LEARNING_REVISION = "LR000000";
 export const PREDICTIVE_CLAIM = "NONE";
 export const SCHEMA_ID = "PHASE_BC_SCHEMA_V1_2026-08-25";
@@ -105,6 +105,7 @@ export interface ModeledProp {
   falseSign: number | null;
   selectionScore: number | null;
   rank: number | null;
+  trueLineTolerance: number | null;
   primaryReason: string;
   primaryRisk: string;
   evidenceIds: string[];
@@ -146,6 +147,12 @@ export interface RunIntegrity {
   boardHash: string;
   lr: string;
   optimizedDcm60Claim: false;
+  chatgptOperable: boolean;
+  hostPerformanceCertified: false;
+  softwareE2eComplete: boolean;
+  eventWorlds: number;
+  researchRequested: number;
+  researchReused: number;
 }
 
 export interface DcmRun {
@@ -167,4 +174,6 @@ export interface DcmRun {
     FREEZE_COMPLETE: boolean;
   };
   accounting: Record<string, number>;
+  research: { requested: number; reused: number; complete: boolean; claims: number };
+  dag: { nodes: { nodeType: string; state: string }[]; completed: number };
 }

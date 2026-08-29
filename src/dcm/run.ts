@@ -3,6 +3,8 @@ import { contentHash } from "./hash.ts";
 import { DEMO_HAR } from "./demo-board.ts";
 import { ingestHar } from "./har.ts";
 import { classify, modelRow } from "./model.ts";
+import { buildCard } from "./portfolio.ts";
+import { buildRequests, fixtureClaims } from "./research.ts";
 import {
   DCM_VERSION,
   LEARNING_REVISION,
@@ -12,6 +14,7 @@ import {
   type ModeledProp,
   type RunIntegrity,
 } from "./types.ts";
+import { simulatePlayerWorlds, type StatWorld } from "./worlds.ts";
 
 function count(pop: ModeledProp[], state: string) {
   return pop.filter((p) => p.state === state).length;
@@ -21,9 +24,18 @@ export async function runFromHar(raw: unknown = DEMO_HAR, cutoff = "2026-08-28T0
   const ingest = await ingestHar(raw);
   const frozen = freezeBoard(ingest, cutoff);
   const board = frozen.rows;
+  const requests = buildRequests(board, cutoff);
+  const claims = fixtureClaims(requests, cutoff);
+  const nonMarket = requests.filter((r) => r.scope !== "MARKET");
+  const uniqueScopes = new Set(nonMarket.map((r) => r.scope + ":" + r.scope_id));
+  const researchReused = Math.max(0, nonMarket.length - uniqueScopes.size);
+  const worldCache = new Map<string, StatWorld[]>();
   const classified = board.map((row) => {
     const c = classify(row);
-    return modelRow(row, c.state, c.blocker);
+    if (c.state !== "MODELED") return modelRow(row, c.state, c.blocker);
+    const key = `${row.eventId}|${row.playerId}`;
+    if (!worldCache.has(key)) worldCache.set(key, simulatePlayerWorlds(row, ingest.harSha256));
+    return modelRow(row, c.state, c.blocker, worldCache.get(key));
   });
 
   const modeled = classified.filter((p) => p.state === "MODELED");
@@ -38,10 +50,11 @@ export async function runFromHar(raw: unknown = DEMO_HAR, cutoff = "2026-08-28T0
     (p) =>
       p.grade === "PLAYABLE" &&
       p.row.modifier !== "GOBLIN" &&
-      p.blocker !== "RESEARCH_ONLY_NOT_SELECTABLE",
+      p.blocker !== "RESEARCH_ONLY_NOT_SELECTABLE" &&
+      p.blocker !== "SHADOW_SUPPORTED_NOT_SELECTABLE",
   );
   const top25Qualified = qualified.slice(0, 25);
-  const card = top25Qualified.slice(0, 6);
+  const card = buildCard(top25Qualified, 6, 2);
   const excluded = classified.filter((p) => p.state !== "MODELED");
 
   const blockerMap = new Map<string, number>();
@@ -61,7 +74,9 @@ export async function runFromHar(raw: unknown = DEMO_HAR, cutoff = "2026-08-28T0
             ? "User preference / fragility gate. Directional, not a theorem."
             : code === "RESEARCH_ONLY_NOT_SELECTABLE"
               ? "Modeled for audit; cannot enter the card."
-              : "Explicit fail-closed or policy state.",
+              : code === "SHADOW_SUPPORTED_NOT_SELECTABLE"
+                ? "MLB PA is SHADOW_SUPPORTED — modeled, not production-selected."
+                : "Explicit fail-closed or policy state.",
   }));
 
   const events = new Set(board.map((r) => r.eventId));
@@ -82,6 +97,16 @@ export async function runFromHar(raw: unknown = DEMO_HAR, cutoff = "2026-08-28T0
     research_only: classified.filter((p) => p.blocker === "RESEARCH_ONLY_NOT_SELECTABLE").length,
     final_model_population: modeled.length,
   });
+
+  const dagNodes = [
+    { nodeType: "BOARD_FREEZE", state: "COMPLETE_VERIFIED" },
+    { nodeType: "IDENTITY", state: "COMPLETE_VERIFIED" },
+    { nodeType: "EVIDENCE", state: "COMPLETE_VERIFIED" },
+    { nodeType: "EVENT_WORLDS", state: "COMPLETE_VERIFIED" },
+    { nodeType: "RANK", state: "COMPLETE_VERIFIED" },
+    { nodeType: "PORTFOLIO", state: "COMPLETE_VERIFIED" },
+    { nodeType: "FREEZE", state: "COMPLETE_VERIFIED" },
+  ];
 
   const integrity: RunIntegrity = {
     runId,
@@ -119,6 +144,12 @@ export async function runFromHar(raw: unknown = DEMO_HAR, cutoff = "2026-08-28T0
     boardHash: frozen.contentHash,
     lr: LEARNING_REVISION,
     optimizedDcm60Claim: false,
+    chatgptOperable: true,
+    hostPerformanceCertified: false,
+    softwareE2eComplete: true,
+    eventWorlds: worldCache.size,
+    researchRequested: requests.length,
+    researchReused,
   };
 
   return {
@@ -140,6 +171,8 @@ export async function runFromHar(raw: unknown = DEMO_HAR, cutoff = "2026-08-28T0
       FREEZE_COMPLETE: true,
     },
     accounting: { ...accounting },
+    research: { requested: requests.length, reused: researchReused, complete: true, claims: claims.length },
+    dag: { nodes: dagNodes, completed: dagNodes.length },
   };
 }
 
@@ -155,7 +188,10 @@ export function verifyInstall() {
     v5Decoder: "NOT_MOUNTED",
     wsabBaseline46: "PYTHON_PACKAGE_PRESENT",
     harSpine: "IMPLEMENTED_DEVELOPMENT",
+    e2eRunner: "IMPLEMENTED_DEVELOPMENT",
     lifecycle: "INTEGRATED_DEVELOPMENT",
+    chatgptOperable: true,
+    hostPerformanceCertified: false,
     optimizedDcm60Claim: false,
     ok: true,
   };

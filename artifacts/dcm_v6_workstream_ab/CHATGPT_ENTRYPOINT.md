@@ -4,7 +4,7 @@ WHEN USER SAYS "RUN DCM" / "Final Check DCM" / "Audit DCM":
 
 1. Read `00_READ_ME_FIRST.md` and `CHATGPT_CONTEXT_INDEX.json`.
 2. Do not recursively dump the repository.
-3. Execute the exact verify command in `COMMANDS.json`.
+3. Execute the exact verify command in `COMMANDS.json`, then `python -m dcm.runner --synthetic --out dcm_v6/RUNS` (or `--input` a HAR). FixtureProvider fills research; FileProvider + `--resume` is the live evidence loop.
 4. Inspect `CAPABILITY_SUMMARY.json` for each sport/league/market on the board.
 5. HAR in `INBOX/current.har` (or attachment). Never paste raw HAR into chat.
 6. Extract COMPLETE board before Goblin elimination. Account every row.

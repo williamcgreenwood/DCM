@@ -20,10 +20,23 @@
   "run_from_har": {
     "cmd": "PYTHONPATH=. python3 -m dcm.runtime.har_run --synthetic --out /workspace/dcm_v6/RUNS",
     "expect": 0,
-    "meaning": "Development HAR → board.json. Not a hash-verified v5.4.1 decoder. Live inbox: --inbox dcm_v6/INBOX/current.har"
+    "meaning": "Development HAR \u2192 board.json. Not a hash-verified v5.4.1 decoder. Live inbox: --inbox dcm_v6/INBOX/current.har"
   },
   "har_tests": {
     "cmd": "PYTHONPATH=. python3 -m pytest tests/test_har_ingest.py tests/test_v541_mount.py -q",
+    "expect": 0
+  },
+  "e2e_runner": {
+    "cmd": "PYTHONPATH=. python3 -m dcm.runner --synthetic --out /workspace/dcm_v6/RUNS",
+    "expect": 0,
+    "meaning": "HAR \u2192 research (FixtureProvider) \u2192 event-once worlds \u2192 grade \u2192 rank \u2192 portfolio \u2192 freeze. Not optimized 6.0. Not host-certified."
+  },
+  "e2e_tests": {
+    "cmd": "PYTHONPATH=. python3 -m pytest tests/test_e2e_runner.py -q",
+    "expect": 0
+  },
+  "resume": {
+    "cmd": "PYTHONPATH=. python3 -m dcm.runner --resume RUNS/<run_id>/checkpoint.json --research fixture",
     "expect": 0
   }
 }
