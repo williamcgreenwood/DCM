@@ -2,7 +2,11 @@ from __future__ import annotations
 
 from dcm.ingest.outlier import parse_outlier_payload
 from dcm.model.parameters import build_parameter_snapshot
+import pytest
+
 from dcm.research.claims import claim_record, conflict_ledger, dedupe
+from dcm.research.provider import _validate_claim
+from dcm.research.temporal import TemporalLeakError
 from dcm.contracts.hashes import content_hash
 
 
@@ -110,3 +114,44 @@ def test_dedupe_never_mutates_hashed_claim_content_and_conflicts_are_sidecar():
     conflicts = conflict_ledger(got)
     assert len(conflicts) == 1
     assert conflicts[0]["state"] == "UNRESOLVED_CONTEMPORANEOUS_CONFLICT"
+
+
+def test_published_after_cutoff_is_temporal_leak_even_if_observed_time_is_safe():
+    with pytest.raises(TemporalLeakError) as exc:
+        claim_record(
+            source_id="A",
+            url="https://example.com/a",
+            published_at="2026-08-28T12:00:00Z",
+            observed_at="2026-08-28T10:00:00Z",
+            forecast_cutoff="2026-08-28T11:00:00Z",
+            semantic_scope="PLAYER",
+            scope_id="P",
+            claim_type="status",
+            claim_value={"status": "ACTIVE"},
+            reliability=0.9,
+            freshness=0.9,
+        )
+    assert exc.value.field == "published_at"
+
+
+def test_production_evidence_rejects_secret_bearing_source_url():
+    claim = claim_record(
+        source_id="A",
+        url="https://example.com/player?token=secret-value",
+        published_at="2026-08-28T09:00:00Z",
+        observed_at="2026-08-28T10:00:00Z",
+        forecast_cutoff="2026-08-28T11:00:00Z",
+        semantic_scope="PLAYER",
+        scope_id="P",
+        claim_type="status",
+        claim_value={"status": "ACTIVE"},
+        reliability=0.9,
+        freshness=0.9,
+    )
+    request = {
+        "scope": "PLAYER",
+        "scope_id": "P",
+        "forecast_cutoff": "2026-08-28T11:00:00Z",
+    }
+    with pytest.raises(ValueError, match="SECRET_QUERY"):
+        _validate_claim(claim, request)
