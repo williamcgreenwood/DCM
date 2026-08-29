@@ -3,6 +3,7 @@ from __future__ import annotations
 import random
 
 from dcm.ingest.board import rows_as_of
+from dcm.learning.calibration import apply_calibration
 from dcm.ingest.prizepicks import _side
 from dcm.model.line_surface import surface
 from dcm.model.parameters import build_parameter_snapshot
@@ -190,3 +191,31 @@ def test_adaptive_governor_escalates_only_serious_production_candidates():
         current=4096, selected_probability=0.59, decision_threshold=0.58,
         production_selectable=True,
     ) == 4096
+
+
+def test_shadow_calibration_cell_cannot_activate_without_lr_promotion():
+    key = "basketball|NBA|pts|MORE"
+    shadow = {
+        key: {
+            "n": 100,
+            "mean_pred": 0.60,
+            "empirical_rate": 0.66,
+            "promotion_state": "SHADOW_ONLY_REQUIRES_FUTURE_WALK_FORWARD",
+        }
+    }
+    got = apply_calibration(0.60, key=key, cells=shadow)
+    assert got["calibrated"] == 0.60
+    assert got["state"] == "SHADOW_NOT_PROMOTED"
+
+    active = {
+        key: {
+            "n": 100,
+            "mean_pred": 0.60,
+            "empirical_rate": 0.66,
+            "promotion_state": "ACTIVE_PROMOTED",
+            "activation_revision": "LR000001",
+        }
+    }
+    got = apply_calibration(0.60, key=key, cells=active)
+    assert got["state"] == "ACTIVE_CHRONOLOGICAL_CELL"
+    assert got["calibrated"] > 0.60
