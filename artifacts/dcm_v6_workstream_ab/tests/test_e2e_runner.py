@@ -396,3 +396,28 @@ def test_software_version_does_not_promote_lr():
     assert PREDICTIVE_CLAIM == "NONE"
     assert "E2E" in SOFTWARE
     assert "OPTIMIZED" not in SOFTWARE
+
+
+def test_resume_rejects_tampered_frozen_model_config(tmp_path: Path):
+    incomplete = run_dcm(
+        input_path=None,
+        forecast_cutoff=CUTOFF,
+        output_root=tmp_path / "tamper",
+        synthetic=True,
+        research="file",
+        evidence_dir=tmp_path / "empty-evidence",
+    )
+    assert incomplete["runState"] == "INCOMPLETE_CHECKPOINTED"
+    dest = Path(incomplete["dest"])
+    config_path = dest / "MODEL_CONFIG.json"
+    config = json.loads(config_path.read_text())
+    config["fastWorlds"] = int(config["fastWorlds"]) + 1
+    config_path.write_text(json.dumps(config), encoding="utf-8")
+    with pytest.raises(RuntimeError, match="MODEL_CONFIG_HASH_MISMATCH_ON_RESUME"):
+        run_dcm(
+            input_path=None,
+            forecast_cutoff=CUTOFF,
+            output_root=tmp_path / "tamper",
+            research="fixture",
+            resume=dest / "checkpoint.json",
+        )
