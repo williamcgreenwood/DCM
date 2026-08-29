@@ -24,7 +24,9 @@ def claim_record(
     reliability: float,
     freshness: float,
 ) -> dict[str, Any]:
-    assert_not_after_cutoff(observed_at, forecast_cutoff)
+    assert_not_after_cutoff(observed_at, forecast_cutoff, field="observed_at")
+    if str(published_at).strip():
+        assert_not_after_cutoff(published_at, forecast_cutoff, field="published_at")
     body = {
         "source_id": source_id,
         "url": url,
