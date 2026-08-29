@@ -11,7 +11,7 @@ import json
 from pathlib import Path
 from typing import Any, Protocol
 
-from dcm.research.claims import claim_record, dedupe
+from dcm.research.claims import claim_record, conflict_ledger, dedupe
 from dcm.research.coverage import coverage_report
 from dcm.contracts.hashes import content_hash
 from dcm.research.temporal import assert_not_after_cutoff
@@ -136,6 +136,7 @@ def collect(requests: list[dict], provider: ResearchProvider) -> dict[str, Any]:
         else:
             claims.extend(got)
     claims = dedupe(claims)
+    conflicts = conflict_ledger(claims)
     fixture_claims = [c for c in claims if _is_fixture_claim(c)]
     production_claims = [c for c in claims if not _is_fixture_claim(c)]
     structural_complete = not missing and not malformed
@@ -146,12 +147,14 @@ def collect(requests: list[dict], provider: ResearchProvider) -> dict[str, Any]:
         and coverage["complete"]
         and provider_capable
         and not fixture_claims
+        and not conflicts
         and bool(production_claims)
     )
     return {
         "claims": claims, "missing": missing, "malformed": malformed, "requested": len(requests),
         "reused": reused, "complete": structural_complete, "production_ready": production_ready,
         "coverage": coverage,
+        "conflicts": conflicts,
         "evidence_mode": "PRODUCTION" if production_ready else "SYNTHETIC_OR_INCOMPLETE",
         "fixture_claims": len(fixture_claims), "production_claims": len(production_claims),
     }
