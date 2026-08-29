@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from dcm.contracts.hashes import content_hash
+from dcm.ingest.composite import reconcile_scope_attempts
 from dcm.ingest.wsab_bind import annotate_rows
 
 PARSER_SCHEMA = "BOARD_JSON_V2_ASOF_2026-08-28"
@@ -29,6 +30,21 @@ def rows_as_of(ingest: dict[str, Any], cutoff: str) -> tuple[list[dict], dict[st
     cut = _time(cutoff)
     if cut is None:
         raise ValueError("FORECAST_CUTOFF_INVALID")
+
+    # New scope-state captures are authoritative because they can represent a
+    # successful empty refresh. Projection-only history cannot express a
+    # deletion and would incorrectly resurrect rows after such a refresh.
+    attempts = ingest.get("scopeAttempts")
+    if isinstance(attempts, list) and attempts:
+        reconciled = reconcile_scope_attempts(attempts, cutoff=cutoff)
+        stats = reconciled["stats"]
+        return list(reconciled["rows"]), {
+            "post_cutoff_snapshots_excluded": int(stats["post_cutoff_attempts_excluded"]),
+            "post_cutoff_updates_excluded": int(stats["post_cutoff_updates_excluded"]),
+            "failed_refreshes_retained": int(stats["failed_refreshes_retained"]),
+            "selected_request_scopes": int(stats["selected_scope_count"]),
+        }
+
     history = ingest.get("rowHistory") if isinstance(ingest.get("rowHistory"), dict) else {}
     if not history:
         return list(ingest.get("rows") or []), {"post_cutoff_snapshots_excluded": 0, "post_cutoff_updates_excluded": 0}
