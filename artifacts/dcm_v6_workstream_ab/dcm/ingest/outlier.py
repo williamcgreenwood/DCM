@@ -15,7 +15,11 @@ def _num(v: Any) -> float | None:
 
 
 def _row(item: dict, idx: int) -> dict | None:
-    line = _num(item.get("line") or item.get("value") or item.get("number") or item.get("points"))
+    line_raw = next(
+        (item.get(key) for key in ("line", "value", "number", "points") if item.get(key) is not None),
+        None,
+    )
+    line = _num(line_raw)
     if line is None:
         return None
     player_name = str(item.get("player") or item.get("playerName") or item.get("athlete") or item.get("name") or "")
@@ -45,8 +49,8 @@ def _row(item: dict, idx: int) -> dict | None:
         "marketLabel": label if label != "UNKNOWN" else market_label(market, stat),
         "line": line,
         "side": side,
-        "offeredHigher": side == "MORE" or side == "UNKNOWN",
-        "offeredLower": side == "LESS" or side == "UNKNOWN",
+        "offeredHigher": side == "MORE",
+        "offeredLower": side == "LESS",
         "modifier": "STANDARD",
         "boardId": "FULL_GAME",
         "productType": "PLAYER_PICKS",
