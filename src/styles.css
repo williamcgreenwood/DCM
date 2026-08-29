@@ -1,38 +1,72 @@
-@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
-  --color-ink: #0b0f0e;
-  --color-bg: #101614;
-  --color-surface: #171d1b;
-  --color-surface-2: #1f2724;
-  --color-fg: #e6ece8;
-  --color-muted: #8b9892;
-  --color-border: #2a342f;
-  --color-primary: #3f8f6b;
-  --color-primary-foreground: #07140f;
-  --color-brass: #c4a35a;
-  --color-danger: #c45c4a;
-  --color-warn: #d4a017;
-  --color-ring: #c4a35a;
-  --radius: 0.5rem;
+  --font-sans: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --color-bg: #090a0c;
+  --color-bg-elevated: #121418;
+  --color-bg-subtle: #1a1d22;
+  --color-fg: #ecece8;
+  --color-muted: #9a9a94;
+  --color-faint: #6b6b66;
+  --color-border: #2a2d33;
+  --color-accent: #c9d0d6;
+  --color-accent-fg: #090a0c;
+  --color-ok: #8fa392;
+  --color-warn: #c4a574;
+  --color-danger: #c47b73;
+  --color-shadow: #7d8aa3;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+
+  --shadow-panel: 0 1px 0 rgba(255, 255, 255, 0.04), 0 18px 40px rgba(0, 0, 0, 0.35);
 }
 
 @layer base {
+  html,
+  body,
+  #app {
+    min-height: 100%;
+    background: var(--color-bg);
+    color: var(--color-fg);
+  }
+
+  body {
+    font-family: var(--font-sans);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
   button:not(:disabled),
   [role="button"]:not(:disabled) {
     cursor: pointer;
   }
-  html,
-  body {
-    background: var(--color-bg);
-    color: var(--color-fg);
-    font-family: var(--font-sans);
+
+  * {
+    border-color: var(--color-border);
   }
 }
 
-.tabular {
-  font-variant-numeric: tabular-nums;
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
