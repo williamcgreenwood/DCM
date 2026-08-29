@@ -64,51 +64,6 @@ test("unknown shape fail closed", async () => {
   assert.ok(ing.warnings.includes("UNKNOWN_HAR_SHAPE"));
 });
 
-test("board HAR with unknown side still models when both sides offered", async () => {
-  const run = await runFromHar({
-    data: [
-      {
-        projectionId: "x1",
-        sportFamily: "basketball",
-        league: "NBA",
-        eventId: "E",
-        eventLabel: "BOS @ NYK",
-        playerId: "TATUM",
-        playerName: "Jayson Tatum",
-        teamId: "BOS",
-        team: "BOS",
-        opponent: "NYK",
-        market: "pts",
-        marketLabel: "Points",
-        line: 27.5,
-        side: "UNKNOWN",
-        offeredHigher: true,
-        offeredLower: true,
-        modifier: "STANDARD",
-        boardId: "FULL_GAME",
-        productType: "PLAYER_PICKS",
-        role: "F",
-      },
-    ],
-  });
-  assert.equal(run.population[0].state, "MODELED");
-  assert.ok(run.population[0].selectedSide === "MORE" || run.population[0].selectedSide === "LESS");
-});
-
-test("CFB official name is flagged without inventing a player id", async () => {
-  const run = await runFromHar(DEMO_HAR);
-  const sayin = run.board.find((r) => r.playerName === "Julian Sayin");
-  assert.ok(sayin);
-  assert.equal(sayin?.cfbOfficialNameListed, true);
-  assert.equal(sayin?.cfbOfficialPlayerId, null);
-});
-
-test("run does not claim optimized 6.0 or promote LR", async () => {
-  const run = await runFromHar(DEMO_HAR);
-  assert.equal(run.integrity.learningRevision, "LR000000");
-  assert.equal(run.integrity.predictiveClaim, "NONE");
-  assert.equal(run.integrity.optimizedDcm60Claim, false);
-  assert.equal(run.integrity.v5Decoder, "NOT_MOUNTED");
-  assert.ok(run.accounting.raw_projection_rows >= 30);
-  assert.ok(run.accounting.goblin_rows >= 1);
+test("TypeScript runFromHar is disabled", async () => {
+  await assert.rejects(() => runFromHar(DEMO_HAR), /CANONICAL_ENGINE_IS_PYTHON/);
 });
