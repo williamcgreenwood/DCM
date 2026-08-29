@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any, Protocol
 
 from dcm.research.claims import claim_record, dedupe
+from dcm.research.coverage import coverage_report
 from dcm.contracts.hashes import content_hash
 from dcm.research.temporal import assert_not_after_cutoff
 
@@ -138,11 +139,19 @@ def collect(requests: list[dict], provider: ResearchProvider) -> dict[str, Any]:
     fixture_claims = [c for c in claims if _is_fixture_claim(c)]
     production_claims = [c for c in claims if not _is_fixture_claim(c)]
     structural_complete = not missing and not malformed
+    coverage = coverage_report(requests, claims)
     provider_capable = bool(getattr(provider, "production_capable", False))
-    production_ready = structural_complete and provider_capable and not fixture_claims and bool(production_claims)
+    production_ready = (
+        structural_complete
+        and coverage["complete"]
+        and provider_capable
+        and not fixture_claims
+        and bool(production_claims)
+    )
     return {
         "claims": claims, "missing": missing, "malformed": malformed, "requested": len(requests),
         "reused": reused, "complete": structural_complete, "production_ready": production_ready,
+        "coverage": coverage,
         "evidence_mode": "PRODUCTION" if production_ready else "SYNTHETIC_OR_INCOMPLETE",
         "fixture_claims": len(fixture_claims), "production_claims": len(production_claims),
     }
