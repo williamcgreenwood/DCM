@@ -26,6 +26,11 @@ BOARD_MAX_BYTES = 2 * 1024 * 1024
 COMPLETE_STATES = frozenset(
     {"COMPLETE_FROZEN", "COMPLETE_WITH_UNSUPPORTED_ROWS", "EMPTY_CARD_COMPLETE"}
 )
+# Three-layer Python freeze states: modeled card/top25 exist while v5/V1 production root stays closed.
+PYTHON_FREEZE_STATES = COMPLETE_STATES | {
+    "RESEARCHED_MODELED_CARD",
+    "RESEARCHED_MODELED_TOP25",
+}
 REQUIRED_PICK_SCOPES = frozenset({"PLAYER", "EVENT", "MARKET_DEFINITION", "MARKET", "OFFER"})
 SKIP_EVIDENCE_JSON = frozenset({"coverage.json", "conflicts.json"})
 SECRET_SUBSTR = ("cookie", "token", "authorization", "password", "passwd", "secret", "apikey", "api_key")
@@ -67,6 +72,7 @@ PACK_FILES = (
     "top25_ranked.json",
     "top25_qualified.json",
     "strict_card.json",
+    "production_certified_card.json",
     "blockers.json",
     "run_integrity.json",
     "production_readiness.json",
@@ -461,7 +467,7 @@ def _hash_certified_python_freeze(audit: dict[str, Any]) -> bool:
         return False
     if run_state in MANUAL_STATES:
         return False
-    if run_state not in COMPLETE_STATES:
+    if run_state not in PYTHON_FREEZE_STATES:
         return False
     if audit.get("softwareFreeze") is False:
         return False
@@ -476,7 +482,7 @@ def _model_run_certified(audit: dict[str, Any]) -> bool:
         return False
     if not _hash_certified_python_freeze(audit):
         return False
-    if run_state not in COMPLETE_STATES:
+    if run_state not in PYTHON_FREEZE_STATES:
         return False
     stages = {str(s) for s in (audit.get("completedStages") or [])}
     software_e2e = bool(audit.get("softwareE2eComplete"))

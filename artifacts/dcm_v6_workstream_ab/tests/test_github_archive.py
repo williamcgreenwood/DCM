@@ -482,3 +482,36 @@ def test_set_cookie_dest_file_is_not_copied(tmp_path: Path):
     names = {p.name for p in pack.iterdir()}
     assert "MODEL_CONFIG.json" not in names
     assert not any("Set-Cookie" in p.read_text(encoding="utf-8", errors="ignore") for p in pack.iterdir() if p.is_file())
+
+
+def test_researched_modeled_card_is_python_freeze_certified(tmp_path: Path):
+    """Three-layer modeled card is a Python freeze even while production root stays closed."""
+    claims = [
+        _player_claim(),
+        _event_claim(),
+        _market_claim(),
+        {
+            "semantic_scope": "OFFER",
+            "scope_id": PROJ_ID,
+            "claim_value": {"offer_recorded": True},
+            "claim_hash": "claim-offer-1",
+            "url": "https://api.prizepicks.com/projections",
+            "observed_at": "2026-08-28T16:00:00Z",
+            "published_at": "2026-08-28T16:00:00Z",
+        },
+    ]
+    dest = _fake_dest(
+        tmp_path / "RUN_MODELED_CARD",
+        claims=claims,
+        run_state="RESEARCHED_MODELED_CARD",
+        evidence_mode="PRODUCTION",
+        synthetic=False,
+        software_e2e=True,
+        frozen_forecast_hash="python-freeze-hash",
+        stages=["RESEARCH", "MODEL", "RANK", "PORTFOLIO", "FREEZE"],
+    )
+    audit = build_run_audit(dest)
+    assert audit["modelRunCertified"] is True
+    assert audit["hashCertifiedPythonFreeze"] is True
+    assert audit["productionRootCertified"] is False
+    assert audit["predictiveValidationEarned"] is False
