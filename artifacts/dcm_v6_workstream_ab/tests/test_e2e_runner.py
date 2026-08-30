@@ -120,11 +120,13 @@ def test_a_synthetic_smoke(tmp_path: Path):
     assert freeze["v5Decoder"] == "NOT_MOUNTED"
 
 
-def test_b_real_har_not_supplied():
-    live = Path("/workspace/dcm_v6/INBOX/current.har")
-    if not live.is_file():
-        pytest.skip("REAL_HAR_NOT_SUPPLIED")
-    # Live path would run ingest → freeze; absence is an honest skip, not a pass.
+def test_b_real_har_sanitized_fixture_is_supplied():
+    live = Path(__file__).resolve().parents[1] / "fixtures" / "sanitized_live_har" / "prizepicks_compact.har"
+    assert live.is_file(), "sanitized live HAR fixture missing"
+    from dcm.ingest.har import ingest_har
+    ing = ingest_har(live.read_bytes(), raw_bytes=live.read_bytes())
+    assert ing["rows"], "compact live HAR must parse projections"
+    assert ing["adapter"] == "PRIZEPICKS_JSONAPI"
 
 
 def test_c_thousand_row_board_accounts_every_row(tmp_path: Path):

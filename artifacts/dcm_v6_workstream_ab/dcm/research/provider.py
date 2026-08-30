@@ -129,6 +129,97 @@ class FileProvider:
         return [_validate_claim(dict(rec), request) for rec in records if isinstance(rec, dict)]
 
 
+class BundleProvider:
+    """One JSONL evidence bundle indexed by (scope, scope_id, request_id).
+
+    Same validation as FileProvider. Streaming append is allowed. Fixture/synthetic
+    claims remain non-production. The bundle manifest hash is content-addressed.
+    """
+    production_capable = True
+
+    def __init__(self, path: Path, *, firewall_cutoff: str | None = None):
+        self.path = Path(path)
+        self.firewall_cutoff = firewall_cutoff
+        self._claims: list[dict[str, Any]] = []
+        self._by_request: dict[str, list[int]] = {}
+        self._by_scope: dict[tuple[str, str], list[int]] = {}
+        if self.path.is_file():
+            self._load()
+
+    def _load(self) -> None:
+        self._claims = []
+        self._by_request = {}
+        self._by_scope = {}
+        with self.path.open("r", encoding="utf-8") as fh:
+            for line in fh:
+                line = line.strip()
+                if not line:
+                    continue
+                rec = json.loads(line)
+                if not isinstance(rec, dict):
+                    continue
+                idx = len(self._claims)
+                self._claims.append(rec)
+                rid = str(rec.get("request_id") or "")
+                if rid:
+                    self._by_request.setdefault(rid, []).append(idx)
+                key = (str(rec.get("semantic_scope") or ""), str(rec.get("scope_id") or ""))
+                self._by_scope.setdefault(key, []).append(idx)
+
+    def append(self, claims: list[dict[str, Any]]) -> None:
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        with self.path.open("a", encoding="utf-8") as fh:
+            for rec in claims:
+                fh.write(json.dumps(rec, ensure_ascii=True, separators=(",", ":")) + "\n")
+        self._load()
+
+    def resolve(self, request: dict[str, Any]) -> list[dict[str, Any]]:
+        if not self._claims and self.path.is_file():
+            self._load()
+        idxs = list(self._by_request.get(str(request.get("request_id") or ""), []))
+        if not idxs:
+            idxs = list(self._by_scope.get((str(request["scope"]), str(request["scope_id"])), []))
+        out: list[dict[str, Any]] = []
+        seen: set[str] = set()
+        for i in idxs:
+            rec = dict(self._claims[i])
+            validated = _validate_claim(rec, request)
+            h = str(validated.get("claim_hash") or "")
+            if h in seen:
+                continue
+            seen.add(h)
+            out.append(validated)
+        return out
+
+    def all_claims(self) -> list[dict[str, Any]]:
+        return list(self._claims)
+
+    def manifest(self, extra: dict[str, Any] | None = None) -> dict[str, Any]:
+        hashes = sorted(str(c.get("claim_hash") or "") for c in self._claims)
+        payload = {
+            "schema": "pillars_dcm.evidence_bundle_manifest.v6",
+            "bundle_path": str(self.path),
+            "claim_count": len(self._claims),
+            "source_count": len({str(c.get("source_id") or "") for c in self._claims}),
+            "claim_hashes": hashes,
+            "bundle_hash": content_hash({"claim_hashes": hashes, "n": len(hashes)}),
+        }
+        if extra:
+            payload.update(extra)
+        payload["contentHash"] = content_hash(payload)
+        return payload
+
+
+def write_bundle(path: Path, claims: list[dict[str, Any]]) -> BundleProvider:
+    path = Path(path)
+    if path.exists():
+        path.unlink()
+    provider = BundleProvider(path)
+    if claims:
+        provider.append(claims)
+    return provider
+
+
 def claims_by_scope(claims: list[dict[str, Any]]) -> dict[tuple[str, str], list[dict[str, Any]]]:
     out: dict[tuple[str, str], list[dict[str, Any]]] = {}
     for claim in claims:
@@ -145,7 +236,7 @@ def collect(requests: list[dict], provider: ResearchProvider) -> dict[str, Any]:
     seen_scope: set[tuple[str, str]] = set()
     for req in requests:
         key = (str(req["scope"]), str(req["scope_id"]))
-        if key in seen_scope and req["scope"] != "MARKET":
+        if key in seen_scope and req["scope"] not in {"MARKET", "OFFER"}:
             reused += 1
             continue
         seen_scope.add(key)

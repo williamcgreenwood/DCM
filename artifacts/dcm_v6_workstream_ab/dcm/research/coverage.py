@@ -47,9 +47,12 @@ def evaluate_request(request: dict[str, Any], claims: list[dict[str, Any]]) -> d
         efficiency = merged.get("efficiency")
         if not isinstance(efficiency, dict):
             missing.append("EFFICIENCY_EVIDENCE")
-    elif scope == "MARKET":
+    elif scope in {"MARKET", "MARKET_DEFINITION"}:
         if merged.get("definition_verified") is not True:
             missing.append("VERIFIED_MARKET_DEFINITION")
+    elif scope == "OFFER":
+        if not merged:
+            missing.append("OFFER_CONTEXT")
     elif scope in {"SPORT", "EVENT", "TEAM"}:
         if not merged:
             missing.append(f"{scope}_CONTEXT")

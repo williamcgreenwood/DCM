@@ -8,6 +8,7 @@ on:
   push:
     branches:
       - chatgpt/v6-production-completion-20260828
+      - grok/v6-live-har-production
   pull_request:
     paths:
       - "artifacts/dcm_v6_workstream_ab/**"

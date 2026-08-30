@@ -30,3 +30,16 @@ dcm_v6/canonical_mount/v5.4.1_copy/**
 # Runtime artifacts are reproducible and may contain derived user data.
 **/RUNS/**
 !**/RUNS/.gitkeep
+
+# Sanitized live HAR fixtures (no cookies/tokens) are allowed for parser certification.
+!fixtures/sanitized_live_har/
+!fixtures/sanitized_live_har/**
+!**/fixtures/sanitized_live_har/
+!**/fixtures/sanitized_live_har/**
+!artifacts/dcm_v6_workstream_ab/fixtures/sanitized_live_har/
+!artifacts/dcm_v6_workstream_ab/fixtures/sanitized_live_har/**
+
+.venv/
+venv/
+*.egg-info/
+artifacts/**/*.egg-info/

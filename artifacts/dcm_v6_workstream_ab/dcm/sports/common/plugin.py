@@ -43,8 +43,10 @@ _cap("basketball", "WNBA", ("pts", "reb", "ast", "pra", "pr", "pa", "ra", "3pm",
 _cap("gridiron", "NFL", ("pass_yds", "rush_yds", "rec_yds", "receptions", "pass_rush_yds", "rush_rec_yds"), PRODUCTION)
 _cap("gridiron", "CFB", ("pass_yds", "rush_yds", "rec_yds", "receptions", "pass_rush_yds", "rush_rec_yds"), PRODUCTION)
 _cap("gridiron", "NFLP", ("pass_yds", "rush_yds", "rec_yds", "receptions"), RESEARCH)
+_cap("gridiron", "CFL", ("pass_yds", "rush_yds", "rec_yds", "receptions", "pass_rush_yds", "rush_rec_yds"), UNSUPPORTED)
 _cap("baseball", "MLB", ("h", "tb", "k", "hits_runs_rbi"), SHADOW)
-_cap("baseball", "NPB", ("h", "tb", "k", "hits_runs_rbi"), RESEARCH)
+_cap("baseball", "NPB", ("h", "tb", "k", "hits_runs_rbi"), UNSUPPORTED)
+_cap("baseball", "KBO", ("h", "tb", "k", "hits_runs_rbi"), UNSUPPORTED)
 _cap("combat", "UFC", ("sig_strikes", "takedowns", "fight_time"), RESEARCH)
 
 

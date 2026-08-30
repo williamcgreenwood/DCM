@@ -64,6 +64,20 @@ _SCOPE_SPEC: dict[str, dict[str, Any]] = {
             "meaningful line movement when reliable prior observations exist",
         ],
     },
+    "MARKET_DEFINITION": {
+        "priority": 5,
+        "requiredFields": ["definition_verified"],
+        "research": [
+            "exact platform/league/board/stat definition, reused across all matching offers",
+        ],
+    },
+    "OFFER": {
+        "priority": 6,
+        "requiredFields": ["offer_recorded"],
+        "research": [
+            "projection-specific line, offered sides, modifier, and line history",
+        ],
+    },
 }
 
 
@@ -106,7 +120,7 @@ def build_host_research_plan(
     tasks.sort(key=lambda t: (int(t["priority"]), str(t["scope"]), str(t["scopeId"]), str(t["requestId"])))
     return {
         "mode": "HOST_WEB_RESEARCH_REQUIRED",
-        "researchHierarchy": ["SPORT", "EVENT", "TEAM", "PLAYER", "MARKET"],
+        "researchHierarchy": ["SPORT", "EVENT", "TEAM", "PLAYER", "MARKET_DEFINITION", "OFFER"],
         "reuseRule": "Research each reusable entity once and reuse evidence for all dependent props.",
         "temporalRule": "Every EvidenceClaim observed_at must be <= forecastCutoff.",
         "evidenceContract": {

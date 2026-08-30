@@ -1,0 +1,147 @@
+{
+  "accounting_states": [
+    "MODELED",
+    "UNSUPPORTED",
+    "UNRESOLVED",
+    "EXCLUDED_GOBLIN",
+    "SHADOW",
+    "FAIL_CLOSED"
+  ],
+  "adr": "docs/ADR-PHASE-BC-V2.md",
+  "governance": {
+    "composites_from_primitives": true,
+    "demon_extra_cushion_demotion_only": true,
+    "empty_short_card_valid": true,
+    "extract_every_visible_prop_first": true,
+    "goblin_accounting_before_exclusion": true,
+    "goblins_never_production_selections": true,
+    "learning_future_only": true,
+    "missing_sides_fail_closed": true,
+    "never_infer_player_id_from_name": true,
+    "no_forced_card_size": true,
+    "offered_sides_only": true,
+    "opportunity_efficiency_separated": true,
+    "playable_only_production_grade": true,
+    "shared_event_world": true,
+    "temporal_firewall": true,
+    "unknown_identity_definition_status_fail_closed": true
+  },
+  "grades": [
+    "PLAYABLE",
+    "LEAN",
+    "PASS",
+    "TRAP"
+  ],
+  "identities": {
+    "basketball": {
+      "2PA": "FGA - 3PA",
+      "FGM": "2PM + 3PM",
+      "NBA_team_minutes": 240,
+      "PTS": "2*2PM + 3*3PM + FTM",
+      "REB": "OREB + DREB",
+      "WNBA_team_minutes": 200,
+      "makes_le_attempts": true
+    },
+    "football": {
+      "dropbacks": "pass_att + sacks_taken + scramble_att",
+      "fg_xp_made_le_att": true,
+      "pass_cmp_le_pass_att": true,
+      "receptions_le_targets": true,
+      "rush_att": "designed_rush_att + scramble_att",
+      "targets_le_routes_when_routes_exist": true,
+      "team_off_plays": "team_pass_att + team_rush_att + team_sacks_taken"
+    },
+    "mlb_shadow": {
+      "AB": "PA - BB - HBP - SF - SH",
+      "H": "1B + 2B + 3B + HR",
+      "TB": "1*1B + 2*2B + 3*3B + 4*HR"
+    }
+  },
+  "learning_revision": "LR000000",
+  "lineage": [
+    "EvidenceGraphHash",
+    "ParameterSnapshotHash",
+    "EventWorldSetHash",
+    "PrimitiveLedgerHash",
+    "MarketDefinitionHash",
+    "OfferHash",
+    "WorldProjectionHash",
+    "EntryContractHash",
+    "SettlementRuleHash",
+    "WorldLineupOutcomeHash"
+  ],
+  "new_common_types_added": [
+    "Offer",
+    "EvidenceBundleManifest",
+    "BoardOffer",
+    "ProductionReadiness"
+  ],
+  "note": "Explicit new Phase B/C schema freeze. Not a reconstruction of V1 bytes. V1 expected hash is unchanged and the V1 production gate remains closed until original V1 bytes are recovered.",
+  "objects": [
+    "BlockPlan",
+    "EventWorldSet",
+    "EventWorld",
+    "EventLatentState",
+    "DiscreteEventRegime",
+    "PlayerWorldState",
+    "OpportunityState",
+    "EfficiencyState",
+    "PrimitiveStatLedger",
+    "PrimitiveStatEntry",
+    "StatDefinition",
+    "ConservationRule",
+    "InvariantResult",
+    "MarketDefinition",
+    "Offer",
+    "WorldProjection",
+    "WorldProjectionResult",
+    "EntryPickContract",
+    "EntryContract",
+    "PickSettlement",
+    "LineupSettlement",
+    "WorldLineupOutcome",
+    "EvidenceClaim",
+    "EvidenceBundleManifest",
+    "BoardOffer",
+    "ProductionReadiness"
+  ],
+  "optimized_dcm_60": false,
+  "predecessor_bytes_available": false,
+  "predecessor_expected_sha256": "6e78dacc19843338643bdcabc7477fd3ce2dd065da1e9629646dacc21cdb1f22",
+  "predecessor_schema_id": "PHASE_BC_SCHEMA_V1_2026-08-25",
+  "predictive_claim": "NONE",
+  "production_promotion": "NOT_ACCEPTED",
+  "research_scopes": [
+    "SPORT",
+    "EVENT",
+    "TEAM",
+    "PLAYER",
+    "MARKET_DEFINITION",
+    "OFFER"
+  ],
+  "run_states": [
+    "COMPLETE_FROZEN",
+    "INCOMPLETE_CHECKPOINTED",
+    "COMPLETE_WITH_UNSUPPORTED_ROWS",
+    "EMPTY_CARD_COMPLETE"
+  ],
+  "schema_freeze_id": "PHASE_BC_SCHEMA_V2_2026-08-29",
+  "sport_production": {
+    "CFB": "PRODUCTION_SUPPORTED",
+    "CFL": "UNSUPPORTED_FAIL_CLOSED",
+    "EPL": "UNSUPPORTED_FAIL_CLOSED",
+    "KBO": "UNSUPPORTED_FAIL_CLOSED",
+    "MLB": "SHADOW_SUPPORTED",
+    "NBA": "PRODUCTION_SUPPORTED",
+    "NFL": "PRODUCTION_SUPPORTED",
+    "NPB": "UNSUPPORTED_FAIL_CLOSED",
+    "OTD": "UNSUPPORTED_FAIL_CLOSED",
+    "SOCCER": "UNSUPPORTED_FAIL_CLOSED",
+    "WNBA": "PRODUCTION_SUPPORTED"
+  },
+  "support_states": [
+    "PRODUCTION_SUPPORTED",
+    "SHADOW_SUPPORTED",
+    "UNSUPPORTED_FAIL_CLOSED"
+  ]
+}

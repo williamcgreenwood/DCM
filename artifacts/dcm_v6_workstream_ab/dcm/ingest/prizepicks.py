@@ -104,6 +104,40 @@ def _board_id(duration: dict | None, attrs: dict) -> str:
     return "FULL_GAME"
 
 
+
+def _game_teams(ga: dict) -> tuple[str, str]:
+    home = str(ga.get("home_team_name") or ga.get("home_name") or ga.get("home") or "")
+    away = str(ga.get("away_team_name") or ga.get("away_name") or ga.get("away") or "")
+    meta = ga.get("metadata")
+    if isinstance(meta, dict):
+        info = meta.get("game_info") if isinstance(meta.get("game_info"), dict) else {}
+        teams = info.get("teams") if isinstance(info.get("teams"), dict) else {}
+        home_n = teams.get("home") if isinstance(teams.get("home"), dict) else {}
+        away_n = teams.get("away") if isinstance(teams.get("away"), dict) else {}
+        home = home or str(home_n.get("abbreviation") or home_n.get("name") or "")
+        away = away or str(away_n.get("abbreviation") or away_n.get("name") or "")
+    return home, away
+
+
+def _event_label(ga: dict, away: str, home: str, team: str, opponent: str) -> str:
+    if away and home:
+        return f"{away} @ {home}"
+    return f"{team} vs {opponent}" if team or opponent else ""
+
+
+def _status(attrs: dict) -> str:
+    raw = str(attrs.get("status") or "").strip().lower()
+    if raw in {"pre_game", "in_progress", "suspended"}:
+        return raw
+    if raw in {"pre-game", "pregame"}:
+        return "pre_game"
+    if raw in {"in-progress", "live"}:
+        return "in_progress"
+    if raw:
+        return "unknown"
+    return "unknown"
+
+
 def _row_from_jsonapi(item: dict, included: dict) -> dict | None:
     attrs = _attrs(item)
     line = attrs.get("line_score", attrs.get("lineScore", attrs.get("line")))
@@ -117,8 +151,11 @@ def _row_from_jsonapi(item: dict, included: dict) -> dict | None:
     duration = _rel(item, included, "duration")
     pa, la, ga = _attrs(player), _attrs(league_n), _attrs(game)
     player_name = str(pa.get("display_name") or pa.get("name") or attrs.get("description") or "UNKNOWN")
-    player_id = str((player or {}).get("id") or pa.get("name") or player_name)
-    league, sport_family = map_league(la.get("name") or la.get("league"), la.get("sport") or la.get("sport_name"))
+    # HAR player/game IDs only. Never infer player_id from name.
+    player_rel_id = (player or {}).get("id")
+    player_id = str(player_rel_id) if player_rel_id not in (None, "") else ""
+    league_name = la.get("name") or la.get("league") or attrs.get("league_ppid")
+    league, sport_family = map_league(league_name, la.get("sport") or la.get("sport_name") or la.get("icon"))
     stat_label = str(
         attrs.get("stat_type")
         or attrs.get("statType")
@@ -126,14 +163,14 @@ def _row_from_jsonapi(item: dict, included: dict) -> dict | None:
         or "unknown"
     )
     market, market_label_s = map_stat(stat_label)
-    home = str(ga.get("home_team_name") or ga.get("home_name") or ga.get("home") or "")
-    away = str(ga.get("away_team_name") or ga.get("away_name") or ga.get("away") or "")
+    home, away = _game_teams(ga)
     team = str(pa.get("team") or pa.get("team_name") or home or "UNK")
-    opponent = away if team == home else home or away or "UNK"
-    event_id = str((game or {}).get("id") or ga.get("id") or f"{league}_{team}_{opponent}")
-    event_label = str(ga.get("metadata") or "") or (f"{away} @ {home}" if away and home else f"{team} vs {opponent}")
+    opponent = away if team and home and str(team).upper() == str(home).upper() else (home if team and away and str(team).upper() == str(away).upper() else (home or away or "UNK"))
+    event_id = str((game or {}).get("id") or ga.get("id") or attrs.get("game_id") or f"{league}_{team}_{opponent}")
+    event_label = _event_label(ga, away, home, team, opponent)
     side, oh, ol = _side(attrs)
     modifier = _modifier(attrs)
+    status = _status(attrs)
     return {
         "projectionId": str(item.get("id") or attrs.get("id") or f"{player_id}_{market}_{line_f}"),
         "sportFamily": sport_family,
@@ -157,6 +194,16 @@ def _row_from_jsonapi(item: dict, included: dict) -> dict | None:
         "role": str(pa.get("position") or pa.get("position_abbreviation") or ""),
         "sourceUpdatedAt": str(attrs.get("updated_at") or ""),
         "eventStartTime": str(attrs.get("start_time") or ga.get("start_time") or ""),
+        "status": status,
+        "isLive": bool(attrs.get("is_live") or attrs.get("isLive")),
+        "isLiveScored": bool(attrs.get("is_live_scored") or attrs.get("isLiveScored")),
+        "inGame": bool(attrs.get("in_game") or attrs.get("inGame")),
+        "eventType": str(attrs.get("event_type") or ""),
+        "combo": bool(pa.get("combo")) or str(attrs.get("event_type") or "").lower() == "combo",
+        "identityResolved": bool(player_id),
+        "allowedWagerTypes": attrs.get("allowed_wager_types"),
+        "statTypeRaw": stat_label,
+        "leagueId": str((league_n or {}).get("id") or ""),
     }
 
 

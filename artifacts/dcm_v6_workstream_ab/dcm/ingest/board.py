@@ -75,6 +75,19 @@ def rows_as_of(ingest: dict[str, Any], cutoff: str) -> tuple[list[dict], dict[st
 def accounting_from_rows(rows: list[dict], *, asof: dict[str, int] | None = None) -> dict[str, int]:
     def n(pred) -> int:
         return sum(1 for r in rows if pred(r))
+    by_league: dict[str, int] = {}
+    by_sport: dict[str, int] = {}
+    by_status: dict[str, int] = {}
+    by_odds: dict[str, int] = {}
+    for r in rows:
+        lg = str(r.get("league") or "UNKNOWN")
+        by_league[lg] = by_league.get(lg, 0) + 1
+        fam = str(r.get("sportFamily") or "unknown")
+        by_sport[fam] = by_sport.get(fam, 0) + 1
+        st = str(r.get("status") or "unknown")
+        by_status[st] = by_status.get(st, 0) + 1
+        md = str(r.get("modifier") or "OTHER")
+        by_odds[md] = by_odds.get(md, 0) + 1
     out = {
         "raw_projection_rows": len(rows),
         "unique_offer_rows": len({r["projectionId"] for r in rows}),
@@ -83,19 +96,71 @@ def accounting_from_rows(rows: list[dict], *, asof: dict[str, int] | None = None
         "demon_rows": n(lambda r: r.get("modifier") == "DEMON"),
         "unknown_modifier_rows": n(lambda r: r.get("modifier") not in {"STANDARD", "GOBLIN", "DEMON"}),
         "unknown_side_rows": n(lambda r: not r.get("offeredHigher") and not r.get("offeredLower")),
+        "offered_higher_only": n(lambda r: r.get("offeredHigher") and not r.get("offeredLower")),
+        "offered_lower_only": n(lambda r: r.get("offeredLower") and not r.get("offeredHigher")),
+        "offered_both_sides": n(lambda r: r.get("offeredHigher") and r.get("offeredLower")),
+        "missing_sides_fail_closed": n(lambda r: not r.get("offeredHigher") and not r.get("offeredLower")),
+        "raw_missing_wager_types": n(lambda r: r.get("allowedWagerTypes") in (None, "", "missing")),
+        "raw_over_wager_types": n(lambda r: str(r.get("allowedWagerTypes") or "").lower() == "over"),
+        "raw_under_or_over_wager_types": n(lambda r: str(r.get("allowedWagerTypes") or "").lower() in {"under_or_over", "over_or_under"}),
+        "pre_game_rows": n(lambda r: r.get("status") == "pre_game"),
+        "in_progress_rows": n(lambda r: r.get("status") == "in_progress"),
+        "suspended_rows": n(lambda r: r.get("status") == "suspended"),
+        "live_rows": n(lambda r: bool(r.get("isLive"))),
+        "combo_rows": n(lambda r: bool(r.get("combo"))),
+        "events": len({r.get("eventId") for r in rows if r.get("eventId")}),
+        "players": len({r.get("playerId") for r in rows if r.get("playerId")}),
         "duplicate_rows": max(0, len(rows) - len({r["projectionId"] for r in rows})),
         "removed_rows": 0,
         "unresolved_rows": n(lambda r: r.get("market") in {"unknown", ""} or r.get("league") == "UNKNOWN"),
         "wsab_bound_rows": n(lambda r: r.get("wsabMarketBound")),
         "final_model_population": n(lambda r: r.get("modifier") != "GOBLIN"),
+        "by_league": by_league,
+        "by_sport": by_sport,
+        "by_status": by_status,
+        "by_modifier": by_odds,
     }
     out.update(asof or {})
     return out
 
 
-def freeze_board(ingest: dict[str, Any], *, mount: dict[str, Any], cutoff: str | None = None) -> dict[str, Any]:
+def freeze_board(
+    ingest: dict[str, Any],
+    *,
+    mount: dict[str, Any],
+    cutoff: str | None = None,
+    asof_policy: str = "strict",
+) -> dict[str, Any]:
+    """Freeze the board.
+
+    asof_policy:
+      - strict: drop snapshots/updates after cutoff (unit tests / replay).
+      - account_capture: account every unique captured projection; cutoff is
+        recorded for evidence and production gating. A live HAR captured after
+        the evidence cutoff still must be fully accounted.
+    """
     resolved_cutoff = cutoff or str(ingest.get("captureEnd") or "9999-12-31T23:59:59Z")
-    selected, asof = rows_as_of(ingest, resolved_cutoff)
+    if asof_policy == "account_capture":
+        attempts = ingest.get("scopeAttempts")
+        if isinstance(attempts, list) and attempts:
+            reconciled = reconcile_scope_attempts(attempts, cutoff=None)
+            selected = list(reconciled["rows"])
+            asof = {
+                "post_cutoff_snapshots_excluded": 0,
+                "post_cutoff_updates_excluded": 0,
+                "failed_refreshes_retained": int((reconciled.get("stats") or {}).get("failed_refreshes_retained") or 0),
+                "selected_request_scopes": int((reconciled.get("stats") or {}).get("selected_scope_count") or 0),
+                "accounted_including_post_cutoff": True,
+            }
+            if cutoff:
+                _, skipped = rows_as_of(ingest, cutoff)
+                asof["would_exclude_under_strict_asof"] = int(skipped.get("post_cutoff_snapshots_excluded") or 0) + int(
+                    skipped.get("post_cutoff_updates_excluded") or 0
+                )
+        else:
+            selected, asof = list(ingest.get("rows") or []), {"accounted_including_post_cutoff": True}
+    else:
+        selected, asof = rows_as_of(ingest, resolved_cutoff)
     rows = annotate_rows(selected)
     payload = {
         "schemaId": PARSER_SCHEMA,

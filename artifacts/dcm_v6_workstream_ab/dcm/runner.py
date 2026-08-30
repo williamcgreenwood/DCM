@@ -32,14 +32,14 @@ from dcm.model.uncertainty import probability_bundle
 from dcm.learning.calibration import apply_calibration, cell_key
 from dcm.model.worlds import MARKET_FROM_STATS, generate_event_contexts, simulate_player_worlds, value_from_stats
 from dcm.research.host_plan import build_host_research_plan
-from dcm.research.provider import FileProvider, FixtureProvider, collect
+from dcm.research.provider import BundleProvider, FileProvider, FixtureProvider, collect, write_bundle
 from dcm.research.requests import build_requests
 from dcm.runtime.checkpoint import load_checkpoint, write_checkpoint
 from dcm.runtime.dag import Dag
 from dcm.runtime.freeze import compute_forecast_hash
 from dcm.runtime.governor import Governor
 from dcm.runtime.mount_v541 import mount_default
-from dcm.runtime.schema_root import verify_schema
+from dcm.runtime.schema_root import SCHEMA_V2_ID, verify_schema, verify_schema_v2
 from dcm.runtime.perf import StageTimer
 from dcm.runtime.readiness import build_readiness
 from dcm.runtime.store import IndexedStore
@@ -93,6 +93,8 @@ def _classify(row: dict) -> tuple[str, str | None]:
         return "UNRESOLVED", "MODIFIER_UNKNOWN"
     if row.get("side") == "UNKNOWN" and not row.get("offeredHigher") and not row.get("offeredLower"):
         return "UNRESOLVED", "OFFERED_SIDE_UNKNOWN"
+    if not row.get("playerId"):
+        return "UNRESOLVED", "PLAYER_ID_UNRESOLVED_NO_NAME_INFERENCE"
     if row.get("sportFamily") == "baseball" and row.get("market") == "hits_runs_rbi" and abs(float(row.get("line", 0)) - 0.5) < 1e-9:
         return "UNRESOLVED", "HALF_LINE_AVOID_BASEBALL_HRRBI_0_5"
     family = row.get("sportFamily") or ""
@@ -103,6 +105,14 @@ def _classify(row: dict) -> tuple[str, str | None]:
         return "MODELED", "RESEARCH_ONLY_NOT_SELECTABLE"
     if cap == "SHADOW_SUPPORTED":
         return "MODELED", "SHADOW_SUPPORTED_NOT_SELECTABLE"
+    status = str(row.get("status") or "unknown")
+    if bool(row.get("isLive")) or status in {"in_progress", "suspended"}:
+        return "MODELED", "LIVE_OR_IN_PROGRESS_NOT_PRODUCTION"
+    if status not in {"pre_game", "unknown"}:
+        return "MODELED", "UNKNOWN_STATUS_FAIL_CLOSED"
+    if status == "unknown":
+        # Synthetic/legacy rows without status remain modelable but not production-selected.
+        pass
     market = row.get("market")
     if family == "basketball" and market not in {"pts", "reb", "ast", "pra", "3pm", "stl", "blk"}:
         return "UNSUPPORTED", "UNSUPPORTED_FAIL_CLOSED"
@@ -124,6 +134,8 @@ def run_dcm(
     evidence_dir: Path | None = None,
     workspace: Path = DEFAULT_WORKSPACE,
     resume: Path | None = None,
+    account_only: bool = False,
+    bundle_path: Path | None = None,
 ) -> dict[str, Any]:
     if resume:
         ck = load_checkpoint(resume)
@@ -199,7 +211,7 @@ def run_dcm(
             encoding="utf-8",
         )
         calibration_cells = calibration_state.get("cells") or {}
-        board = freeze_board(ingest, mount=mount, cutoff=forecast_cutoff)
+        board = freeze_board(ingest, mount=mount, cutoff=forecast_cutoff, asof_policy="account_capture")
         write_board(board, dest / "board.json")
         (dest / "input_manifest.json").write_text(
             json.dumps(
@@ -225,6 +237,8 @@ def run_dcm(
             encoding="utf-8",
         )
         (dest / "MOUNT_STATE.json").write_text(json.dumps(mount, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        schema_v2 = verify_schema_v2(workspace)
+        schema_root = {**schema_root, "v2": schema_v2, "workingSchemaId": SCHEMA_V2_ID}
         (dest / "SCHEMA_STATE.json").write_text(json.dumps(schema_root, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         stages_done.add("BOARD_FREEZE")
         har_perf = t.finish(InputRows=len(board["rows"]), OutputRows=len(board["rows"]))
@@ -249,16 +263,62 @@ def run_dcm(
     n_id = dag.add("IDENTITY", "board", parents=[n_board.key])
     dag.complete(n_id.key, id_map["contentHash"])
 
+    if account_only:
+        classified = []
+        counts = {"EXCLUDED_GOBLIN": 0, "UNSUPPORTED": 0, "UNRESOLVED": 0, "MODELED": 0, "SHADOW": 0}
+        for row in rows:
+            state, blocker = _classify(row)
+            classified.append({"row": row, "state": state, "blocker": blocker, "grade": None})
+            counts[state] = counts.get(state, 0) + 1
+        acc = dict(board.get("accounting") or {})
+        acc["classified"] = counts
+        acc["goblins_excluded_from_selection"] = counts.get("EXCLUDED_GOBLIN", 0)
+        (dest / "accounting.json").write_text(json.dumps(acc, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        (dest / "population_full.jsonl").write_text("".join(json.dumps({"projectionId": p["row"]["projectionId"], "state": p["state"], "blocker": p["blocker"], "league": p["row"].get("league"), "sportFamily": p["row"].get("sportFamily"), "modifier": p["row"].get("modifier"), "status": p["row"].get("status"), "offeredHigher": p["row"].get("offeredHigher"), "offeredLower": p["row"].get("offeredLower")}) + "\n" for p in classified), encoding="utf-8")
+        (dest / "full_population.jsonl").write_text((dest / "population_full.jsonl").read_text(encoding="utf-8"), encoding="utf-8")
+        hashes = {"boardHash": board.get("contentHash"), "harSha256": har_sha, "schemaV1Expected": "6e78dacc19843338643bdcabc7477fd3ce2dd065da1e9629646dacc21cdb1f22"}
+        (dest / "hashes.json").write_text(json.dumps(hashes, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        run_state = "COMPLETE_WITH_UNSUPPORTED_ROWS" if counts.get("UNSUPPORTED") else "EMPTY_CARD_COMPLETE"
+        freeze = {
+            "runId": run_id, "runState": run_state, "learningRevision": LEARNING_REVISION,
+            "predictiveClaim": PREDICTIVE_CLAIM, "rawRows": len(rows), "accountOnly": True,
+            "classified": counts, "boardHash": board.get("contentHash"),
+        }
+        (dest / "freeze.json").write_text(json.dumps(freeze, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        (dest / "research_requests.json").write_text("[]\n", encoding="utf-8")
+        ck = write_checkpoint(dest / "checkpoint.json", {
+            "runId": run_id, "dcmVersion": SOFTWARE, "learningRevision": LEARNING_REVISION,
+            "forecastCutoff": forecast_cutoff, "artifactRoot": str(dest),
+            "completedStages": ["BOARD_FREEZE", "IDENTITY", "ACCOUNT"],
+            "pending": [], "nextDeterministicAction": "none", "rowCounts": counts,
+            "modelConfigHash": content_hash(model_config),
+            "calibrationStateHash": calibration_state.get("contentHash"),
+            "mountStateHash": content_hash(mount),
+            "schemaStateHash": content_hash(schema_root),
+        })
+        return {"run_id": run_id, "dest": str(dest), "runState": run_state, "checkpoint": ck, "integrity": freeze, "board": board}
+
+
     t = StageTimer("RESEARCH")
     requests = build_requests(rows, forecast_cutoff)
     (dest / "research_requests.json").write_text(json.dumps(requests, indent=2) + "\n", encoding="utf-8")
     if research == "file":
         provider: Any = FileProvider(evidence_dir or dest / "evidence")
+    elif research == "bundle":
+        provider = BundleProvider(bundle_path or dest / "evidence_bundle.jsonl")
     else:
         provider = FixtureProvider(forecast_cutoff)
     bundle = collect(requests, provider)
     (dest / "evidence").mkdir(exist_ok=True)
     (dest / "evidence" / "claims.json").write_text(json.dumps(bundle["claims"], indent=2) + "\n", encoding="utf-8")
+    written = write_bundle(dest / "evidence_bundle.jsonl", bundle["claims"])
+    manifest = written.manifest({
+        "harSha256": har_sha,
+        "boardHash": board.get("contentHash"),
+        "forecastCutoff": forecast_cutoff,
+        "dcmVersion": SOFTWARE,
+    })
+    (dest / "bundle_manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     (dest / "evidence" / "coverage.json").write_text(
         json.dumps(bundle.get("coverage") or {}, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
@@ -656,7 +716,11 @@ def run_dcm(
     dag.complete(n_fz.key, freeze["frozenForecastHash"])
     freeze["dag"] = dag.snapshot()
     (dest / "frozen_forecast.json").write_text(json.dumps(freeze, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    (dest / "freeze.json").write_text(json.dumps(freeze, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     (dest / "frozen_forecast.sha256").write_text(freeze["frozenForecastHash"] + "\n", encoding="utf-8")
+    (dest / "population_full.jsonl").write_text("".join(json.dumps(p) + "\n" for p in full_population), encoding="utf-8")
+    (dest / "accounting.json").write_text(json.dumps({**(board.get("accounting") or {}), "states": states_count, "playable": len(qualified), "cardSize": len(card)}, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    (dest / "hashes.json").write_text(json.dumps({"boardHash": board.get("contentHash"), "harSha256": har_sha, "frozenForecastHash": freeze["frozenForecastHash"], "checkpointPending": False, "schemaV1Expected": "6e78dacc19843338643bdcabc7477fd3ce2dd065da1e9629646dacc21cdb1f22", "schemaV2": (schema_root.get("v2") or {})}, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
     blockers = []
     if excluded:
@@ -716,10 +780,13 @@ def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(description="DCM v6 E2E runner (LR000000, not optimized 6.0)")
     p.add_argument("--input", type=Path, action="append", default=None, help="HAR input; repeat for complementary captures")
     p.add_argument("--out", type=Path, default=DEFAULT_WORKSPACE / "dcm_v6" / "RUNS")
+    p.add_argument("--output", type=Path, default=None, help="Alias for --out")
     p.add_argument("--synthetic", action="store_true")
     p.add_argument("--cutoff", default="2026-08-28T00:00:00Z")
-    p.add_argument("--research", choices=["fixture", "file"], default="file")
+    p.add_argument("--research", choices=["fixture", "file", "bundle"], default="file")
     p.add_argument("--evidence-dir", type=Path, default=None)
+    p.add_argument("--bundle", type=Path, default=None, help="evidence_bundle.jsonl for --research bundle")
+    p.add_argument("--account-only", action="store_true", help="Freeze+account every row; skip Monte Carlo")
     p.add_argument("--resume", type=Path, default=None)
     p.add_argument("--workspace", type=Path, default=DEFAULT_WORKSPACE)
     p.add_argument("--version", default=SOFTWARE)
@@ -729,12 +796,14 @@ def main(argv: list[str] | None = None) -> int:
             input_path=(args.input[0] if args.input and len(args.input) == 1 else None),
             input_paths=args.input,
             forecast_cutoff=args.cutoff,
-            output_root=args.out,
+            output_root=args.output or args.out,
             synthetic=args.synthetic,
             research=args.research,
             evidence_dir=args.evidence_dir,
             workspace=args.workspace,
             resume=args.resume,
+            account_only=args.account_only,
+            bundle_path=args.bundle,
         )
     except FileNotFoundError as e:
         print(str(e), file=sys.stderr)
