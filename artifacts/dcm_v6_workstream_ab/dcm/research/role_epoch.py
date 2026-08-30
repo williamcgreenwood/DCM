@@ -14,6 +14,18 @@ def _as_logs(value: Any) -> list[dict[str, Any]]:
     return [row for row in value if isinstance(row, dict)]
 
 
+def _alias_minutes(row: dict[str, Any]) -> dict[str, Any]:
+    """Expose Basketball-Reference MP as minutes without rejecting other sports."""
+    if row.get("minutes") is not None:
+        return row
+    for key in ("mp", "MP", "MIN", "min"):
+        if key in row and row[key] is not None:
+            out = dict(row)
+            out["minutes"] = row[key]
+            return out
+    return row
+
+
 def partition_logs(
     logs: list[dict[str, Any]],
     *,
@@ -51,7 +63,7 @@ def partition_logs(
 
 class RoleEpochBuilder:
     def build(self, player_claim_value: dict[str, Any], claims: list[dict[str, Any]] | None = None) -> dict[str, Any]:
-        logs = _as_logs(player_claim_value.get("role_epoch_logs") or player_claim_value.get("game_logs"))
+        logs = [_alias_minutes(r) for r in _as_logs(player_claim_value.get("role_epoch_logs") or player_claim_value.get("game_logs"))]
         parts = partition_logs(logs, claims=claims)
         return {
             "builder": "RoleEpochBuilder.stub",
