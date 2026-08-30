@@ -46,6 +46,18 @@ from dcm.runtime.schema_root import SCHEMA_V2_ID, verify_schema, verify_schema_v
 from dcm.runtime.perf import StageTimer
 from dcm.runtime.readiness import build_readiness
 from dcm.runtime.store import IndexedStore
+from dcm.selection.card_layers import (
+    EMPTY_ACCOUNT_ONLY,
+    EMPTY_ROOT_NOT_CERTIFIED,
+    NOT_PRODUCTION_ROOT_CERTIFIED,
+    build_directional_passes,
+    is_modeled_playable,
+    layer_run_state,
+    modeled_empty_card_reason,
+    production_certified_rows,
+    production_root_accepted,
+    write_card_layer_files,
+)
 from dcm.selection.portfolio import build_card, exposure_report
 from dcm.version import (
     ExactVersionMismatch,
@@ -336,11 +348,24 @@ def run_dcm(
         (dest / "full_population.jsonl").write_text((dest / "population_full.jsonl").read_text(encoding="utf-8"), encoding="utf-8")
         hashes = {"boardHash": board.get("contentHash"), "harSha256": har_sha, "schemaV1Expected": "6e78dacc19843338643bdcabc7477fd3ce2dd065da1e9629646dacc21cdb1f22"}
         (dest / "hashes.json").write_text(json.dumps(hashes, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        write_card_layer_files(
+            dest,
+            top25_ranked=[],
+            strict_card=[],
+            production_certified=[],
+            directional_passes=[],
+        )
         run_state = "COMPLETE_WITH_UNSUPPORTED_ROWS" if counts.get("UNSUPPORTED") else "EMPTY_CARD_COMPLETE"
         freeze = {
             "runId": run_id, "runState": run_state, "learningRevision": LEARNING_REVISION,
             "predictiveClaim": PREDICTIVE_CLAIM, "rawRows": len(rows), "accountOnly": True,
             "classified": counts, "boardHash": board.get("contentHash"),
+            "cardSize": 0, "modeledCardSize": 0, "playable": 0,
+            "productionCertified": False, "notProductionRootCertified": True,
+            "productionRootCertification": NOT_PRODUCTION_ROOT_CERTIFIED,
+            "executionMode": "RESEARCHED_MODELED",
+            "emptyCardReason": EMPTY_ACCOUNT_ONLY,
+            "productionEmptyCardReason": EMPTY_ROOT_NOT_CERTIFIED,
         }
         (dest / "freeze.json").write_text(json.dumps(freeze, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         planned = plan_research(rows, forecast_cutoff, research_shadow=research_shadow)
@@ -463,6 +488,7 @@ def run_dcm(
     canonical_ready = mount.get("state") == "HASH_VERIFIED_EXTRACTED"
     schema_ready = bool(schema_root.get("productionEligible")) and schema_root.get("state") == "HASH_VERIFIED"
     production_research_ready = bool(bundle.get("production_ready"))
+    # Production root (v5/V1/production research). Must not zero modeled ranking or strict_card.
     global_selection_gate = canonical_ready and schema_ready and production_research_ready and not synthetic
 
     gov = Governor(
@@ -643,6 +669,7 @@ def run_dcm(
             "calibrationState": ev["calibrationState"], "parameterSnapshotHash": snapshot["parameter_snapshot_hash"],
             "evidenceHashes": snapshot["evidence_hashes"], "dependencyTags": snapshot["dependency_tags"],
             "productionSelectable": production_selectable,
+            "modeledPlayable": is_modeled_playable({"row": row, "grade": ev["grade"], "state": "MODELED", "blocker": rec.get("blocker") or blocker}),
             "researchOnly": blocker in {"RESEARCH_ONLY_NOT_SELECTABLE", "SHADOW_SUPPORTED_NOT_SELECTABLE"},
             "worldCount": len(values),
             "_selectionOutcomes": selection_outcomes,
@@ -667,11 +694,8 @@ def run_dcm(
     stages_done.add("MODEL")
 
     ranked = rank_candidates(modeled, top_k=25, seed=har_sha)
-    qualified = [
-        p for p in ranked
-        if p.get("grade") == "PLAYABLE" and p.get("productionSelectable")
-        and p["row"].get("modifier") != "GOBLIN"
-    ]
+    # Strict card is PLAYABLE-grade modeled rows. Production root is a later layer.
+    qualified = [p for p in ranked if is_modeled_playable(p)]
     card = build_card(qualified)
     exposure = exposure_report(card)
     n_rank = dag.add("RANK", "board", parents=[n_worlds.key])
@@ -697,6 +721,7 @@ def run_dcm(
             "monteCarloSE": p.get("monteCarloSE"), "opportunityMean": p.get("opportunityMean"),
             "grade": p.get("grade"), "state": p.get("state"), "blocker": p.get("blocker"),
             "productionSelectable": p.get("productionSelectable", False),
+            "modeledPlayable": p.get("modeledPlayable", False),
             "calibrationState": p.get("calibrationState"), "selectionScore": p.get("selectionScore"),
             "parameterSnapshotHash": p.get("parameterSnapshotHash"),
             "topKInclusionP": p.get("topKInclusionP"), "rankStability": p.get("rankStability"),
@@ -712,9 +737,7 @@ def run_dcm(
     strict_card = [slim(p) for p in card]
     full_population = [slim(p) for p in classified]
     (dest / "top100.json").write_text(json.dumps(top100, indent=2) + "\n", encoding="utf-8")
-    (dest / "top25_ranked.json").write_text(json.dumps(top25_ranked, indent=2) + "\n", encoding="utf-8")
     (dest / "top25_qualified.json").write_text(json.dumps(top25_qualified, indent=2) + "\n", encoding="utf-8")
-    (dest / "strict_card.json").write_text(json.dumps(strict_card, indent=2) + "\n", encoding="utf-8")
     (dest / "full_population.jsonl").write_text("".join(json.dumps(p) + "\n" for p in full_population), encoding="utf-8")
     (dest / "dependencies.json").write_text(
         json.dumps(exposure, indent=2, sort_keys=True) + "\n",
@@ -725,14 +748,13 @@ def run_dcm(
     for p in classified:
         states_count[p["state"]] = states_count.get(p["state"], 0) + 1
 
-    if not global_selection_gate:
-        run_state = "EMPTY_CARD_COMPLETE"
-    elif not card and board["accounting"]["raw_projection_rows"] > 0:
-        run_state = "EMPTY_CARD_COMPLETE"
-    elif unsupported:
-        run_state = "COMPLETE_WITH_UNSUPPORTED_ROWS"
-    else:
-        run_state = "COMPLETE_FROZEN"
+    evidence_coverage_complete = bool((bundle.get("coverage") or {}).get("complete"))
+    empty_card_reason = modeled_empty_card_reason(
+        modeled_card_size=len(card),
+        modeled_playable_count=len(qualified),
+        evidence_coverage_complete=evidence_coverage_complete,
+        research_complete=bool(bundle.get("complete")),
+    )
 
     freeze = {
         "runId": run_id,
@@ -744,9 +766,7 @@ def run_dcm(
         "chatgptOperable": True,
         "productionOperable": global_selection_gate,
         "selectionAllowed": global_selection_gate,
-        "executionMode": "PRODUCTION" if global_selection_gate else "ENGINEERING_OR_BLOCKED",
         "softwareE2eComplete": True,
-        "runState": run_state,
         "v5Decoder": mount.get("har_decoder"),
         "v5MountState": mount.get("state"),
         "schemaId": SCHEMA,
@@ -765,6 +785,7 @@ def run_dcm(
         "modeled": len(modeled),
         "playable": len(qualified),
         "cardSize": len(card),
+        "modeledCardSize": len(card),
         "eventWorlds": len(world_cache),
         "conservationFailures": conservation_failures,
         "researchRequested": bundle["requested"],
@@ -800,6 +821,37 @@ def run_dcm(
     freeze["productionSelectionReady"] = readiness["productionSelectionReady"]
     freeze["systemCertified"] = readiness["systemCertified"]
     freeze["predictiveValidationEarned"] = readiness["predictiveValidationEarned"]
+    root_accepted = production_root_accepted(
+        global_selection_gate=global_selection_gate,
+        production_selection_ready=bool(readiness["productionSelectionReady"]),
+    )
+    production_certified = production_certified_rows(strict_card, root_accepted=root_accepted)
+    directional_passes = build_directional_passes(ranked, strict_card)
+    write_card_layer_files(
+        dest,
+        top25_ranked=top25_ranked,
+        strict_card=strict_card,
+        production_certified=production_certified,
+        directional_passes=directional_passes,
+    )
+    freeze["productionCertified"] = bool(root_accepted and production_certified)
+    freeze["notProductionRootCertified"] = not root_accepted
+    freeze["productionRootCertification"] = (
+        "PRODUCTION_ROOT_CERTIFIED" if root_accepted else NOT_PRODUCTION_ROOT_CERTIFIED
+    )
+    freeze["productionCertifiedCardSize"] = len(production_certified)
+    freeze["executionMode"] = "PRODUCTION" if root_accepted else "RESEARCHED_MODELED"
+    run_state = layer_run_state(
+        root_accepted=root_accepted,
+        modeled_card_size=len(card),
+        ranked_size=len(top25_ranked),
+        unsupported=unsupported,
+    )
+    freeze["runState"] = run_state
+    if empty_card_reason:
+        freeze["emptyCardReason"] = empty_card_reason
+    if not root_accepted:
+        freeze["productionEmptyCardReason"] = EMPTY_ROOT_NOT_CERTIFIED
     freeze["frozenForecastHash"] = compute_forecast_hash(
         freeze,
         full_population,
@@ -972,6 +1024,8 @@ def main(argv: list[str] | None = None) -> int:
                 "modeled": integ.get("modeled"),
                 "playable": integ.get("playable"),
                 "cardSize": integ.get("cardSize"),
+                "modeledCardSize": integ.get("modeledCardSize"),
+                "productionCertified": integ.get("productionCertified"),
                 "chatgptOperable": integ.get("chatgptOperable"),
                 "dest": result["dest"],
                 "archivePath": result.get("archivePath"),
