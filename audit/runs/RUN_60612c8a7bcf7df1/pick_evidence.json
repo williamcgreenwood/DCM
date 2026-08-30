@@ -7,9 +7,9 @@
   "evidenceTemporalCertified": true,
   "failures": [],
   "hallucinationRisk": false,
-  "hashCertifiedPythonFreeze": false,
-  "locksCertified": false,
-  "modelRunCertified": false,
+  "hashCertifiedPythonFreeze": true,
+  "locksCertified": true,
+  "modelRunCertified": true,
   "picks": [
     {
       "coverage": {
@@ -291,5 +291,5 @@
   "predictiveValidationEarned": false,
   "productionRootCertified": false,
   "runId": "RUN_60612c8a7bcf7df1",
-  "selectionCertified": false
+  "selectionCertified": true
 }

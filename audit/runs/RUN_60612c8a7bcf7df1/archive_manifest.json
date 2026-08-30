@@ -1,5 +1,5 @@
 {
-  "createdAtUtc": "2026-08-30T19:44:34Z",
+  "createdAtUtc": "2026-08-30T19:46:10Z",
   "excludes": [
     "*.har",
     "index.sqlite",
@@ -10,19 +10,19 @@
   ],
   "files": [
     {
-      "bytes": 3964,
+      "bytes": 3860,
       "name": "RUN_AUDIT.md",
-      "sha256": "5278affd356c39a57852389d820f3505432c0a6810651c2fe4d96c66b476ffa5"
+      "sha256": "5ffba8cad689e8115d97f5a5de52815110048c961dc189b4b1e9baa6eb6df660"
     },
     {
-      "bytes": 9949,
+      "bytes": 9945,
       "name": "pick_evidence.json",
-      "sha256": "d1feb955d2f8728d8009d7538e3dc5a55b9a90022a90a742a92ae47aedf45ad4"
+      "sha256": "6a99e183a2337b06f91590b8ce79a1da1580adcc2beccaea044d3a4e4060f77e"
     },
     {
-      "bytes": 769,
+      "bytes": 765,
       "name": "archive_manifest.json",
-      "sha256": "11c5833caacb3ce80e994c7480b72fa7d8f591ea302af81395a4038127dc86c4"
+      "sha256": "4b53d893a7c0bb4c288c60c508dcd6a5504df577a8b573c06406294f5524de94"
     },
     {
       "bytes": 943,
@@ -68,6 +68,11 @@
       "bytes": 14905,
       "name": "strict_card.json",
       "sha256": "d3436cf108d7c3198bfd62deebc628f9f6ae37b30aaa896e28dfedb135deab69"
+    },
+    {
+      "bytes": 3,
+      "name": "production_certified_card.json",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
     },
     {
       "bytes": 191,

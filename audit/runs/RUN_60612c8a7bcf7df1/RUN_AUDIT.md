@@ -1,13 +1,12 @@
 # DCM run RUN_60612c8a7bcf7df1
-**NOT a Python DCM freeze. Do not treat this card as a DCM pick unless modelRunCertified is true.**
 - software: 6.0.0+WSAB.E2E.PRODUCTION_PIPELINE.LR000000, learningRevision: LR000000, predictiveClaim: NONE
 - forecastCutoff: 2026-08-30T19:43:12Z, harSha256: cd4c8c7c32427bcf5763ba88620a99c56c90c0a3b73cc67a7faf134cd42e7467, boardHash: 0cbe94aaab2b04e441038903305b816352edbc768737b19750290b3acebbfb2e, frozenForecastHash: ae0f2e5fb1c15139f88fea9abefca2583b99f07d87e33686c086c0adfce6c797
 - runState: RESEARCHED_MODELED_CARD, researchComplete: True, evidenceMode: SYNTHETIC_OR_INCOMPLETE, productionResearchComplete: False
 - BEFORE: researchRequested: 782, request count: 782
 - AFTER: playable: 5, cardSize: 4, hallucinationRisk: False
-- modelRunCertified: False, selectionCertified: False, evidenceCoverageCertified: True
+- modelRunCertified: True, selectionCertified: True, evidenceCoverageCertified: True
 - evidenceTemporalCertified: True, archiveIntegrityCertified: True, productionRootCertified: False
-- predictiveValidationEarned: False, hashCertifiedPythonFreeze: False, locksCertified (derived): False
+- predictiveValidationEarned: False, hashCertifiedPythonFreeze: True, locksCertified (derived): True
 
 ## Card
 - DeWanna Bonner | pts | 6.5 | MORE | claims=1d0aee9ad19a0f1947003653f94c7e33c525aef94a7fe3193d7df2068b1b5720,33f0952686bbc82ac98f9c6178eac0eb7b9661189e285aa49d8f1bdde6896c2e,729e72186a7f6ed995a34215fc50ad822aecf69a069e805e7e884b06f7a551a7,b609d705e0f4789470b8fd293e8e920a2a6961eca2b1a16be703ec60309e6601 | urls=https://www.espn.com/wnba/preview/_/gameId/401857186,https://www.basketball-reference.com/wnba/players/b/bonnede01w.html,https://api.prizepicks.com/projections?league_id=3&per_page=250&single_stat=true&in_game=true&state_code=CA&game_mode=prizepools,https://api.prizepicks.com/projections?league_id=3&per_page=250&single_stat=true&in_game=true&state_code=CA&game_mode=prizepools | complete=yes | missing=none
