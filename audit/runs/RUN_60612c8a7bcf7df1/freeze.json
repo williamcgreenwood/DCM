@@ -1,0 +1,203 @@
+{
+  "boardHash": "0cbe94aaab2b04e441038903305b816352edbc768737b19750290b3acebbfb2e",
+  "calibrationStateHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+  "canonicalBaselineReady": false,
+  "cardSize": 4,
+  "chatgptOperable": true,
+  "conservationFailures": 0,
+  "dag": {
+    "completed": [
+      "bccaf3b096ed1910d61bcc8b9b2456d5bd37822cce5f8dd1139ef7a8daf76948",
+      "65dec62559ac0dcc29ab41b09fff56f485a6305f657dcb27b32ae9135b14b276",
+      "a938a13d11558ff06aa92d554fbf8a6a1f792873df3222f1b160d6944f0178a8",
+      "d5728108636aee847b3902ded596fcbe9963cbf1e5e70a61f1efdbe16e96505e",
+      "03c87cfd117d4ca3068859191b734687990d8dc5c3210714de7eeb51fd90f649",
+      "6a5ac5df9cae43ac1b5697af64b4a92d94cc4a3c681a80e0f45f5b6337216e05",
+      "154448c3f6934c93855a74989602b0ea530dc4f1cad9b2c4c22f150b422d6fdd"
+    ],
+    "configHash": "5c52767a96036e16ed99f8469c48cdd5c092ffe76d76d1669632c02311f8e389",
+    "cutoff": "2026-08-30T19:43:12Z",
+    "invalidated": [],
+    "nodes": [
+      {
+        "artifactHash": "0cbe94aaab2b04e441038903305b816352edbc768737b19750290b3acebbfb2e",
+        "error": null,
+        "identity": "board",
+        "key": "bccaf3b096ed1910d61bcc8b9b2456d5bd37822cce5f8dd1139ef7a8daf76948",
+        "nodeType": "BOARD_FREEZE",
+        "parents": [],
+        "state": "COMPLETE_VERIFIED"
+      },
+      {
+        "artifactHash": "6abfcaa4fe3f9735e3b6ddd0ff92029211634e029ed8c0cda13bd5b673bfc920",
+        "error": null,
+        "identity": "board",
+        "key": "65dec62559ac0dcc29ab41b09fff56f485a6305f657dcb27b32ae9135b14b276",
+        "nodeType": "IDENTITY",
+        "parents": [
+          "bccaf3b096ed1910d61bcc8b9b2456d5bd37822cce5f8dd1139ef7a8daf76948"
+        ],
+        "state": "COMPLETE_VERIFIED"
+      },
+      {
+        "artifactHash": "24c79e5974e743e043c2c410397365e2e2f3d7f2393e129ded9361036091a62c",
+        "error": null,
+        "identity": "board",
+        "key": "a938a13d11558ff06aa92d554fbf8a6a1f792873df3222f1b160d6944f0178a8",
+        "nodeType": "EVIDENCE",
+        "parents": [
+          "65dec62559ac0dcc29ab41b09fff56f485a6305f657dcb27b32ae9135b14b276"
+        ],
+        "state": "COMPLETE_VERIFIED"
+      },
+      {
+        "artifactHash": "d129ab988a6266d199c508e4fab72ac1affd67381d76a3a22e1f177fb7a08c79",
+        "error": null,
+        "identity": "board",
+        "key": "d5728108636aee847b3902ded596fcbe9963cbf1e5e70a61f1efdbe16e96505e",
+        "nodeType": "EVENT_WORLDS",
+        "parents": [
+          "a938a13d11558ff06aa92d554fbf8a6a1f792873df3222f1b160d6944f0178a8"
+        ],
+        "state": "COMPLETE_VERIFIED"
+      },
+      {
+        "artifactHash": "8aceb016680bcba07eb018c50fd5f38dfd58ebb6269f14ccf4ed55c55d811c4a",
+        "error": null,
+        "identity": "board",
+        "key": "03c87cfd117d4ca3068859191b734687990d8dc5c3210714de7eeb51fd90f649",
+        "nodeType": "RANK",
+        "parents": [
+          "d5728108636aee847b3902ded596fcbe9963cbf1e5e70a61f1efdbe16e96505e"
+        ],
+        "state": "COMPLETE_VERIFIED"
+      },
+      {
+        "artifactHash": "6ed446967f35ddacf1b48691c3294e4b3d993626709cd904e0e3e9c7f37c9725",
+        "error": null,
+        "identity": "board",
+        "key": "6a5ac5df9cae43ac1b5697af64b4a92d94cc4a3c681a80e0f45f5b6337216e05",
+        "nodeType": "PORTFOLIO",
+        "parents": [
+          "03c87cfd117d4ca3068859191b734687990d8dc5c3210714de7eeb51fd90f649"
+        ],
+        "state": "COMPLETE_VERIFIED"
+      },
+      {
+        "artifactHash": "ae0f2e5fb1c15139f88fea9abefca2583b99f07d87e33686c086c0adfce6c797",
+        "error": null,
+        "identity": "board",
+        "key": "154448c3f6934c93855a74989602b0ea530dc4f1cad9b2c4c22f150b422d6fdd",
+        "nodeType": "FREEZE",
+        "parents": [
+          "6a5ac5df9cae43ac1b5697af64b4a92d94cc4a3c681a80e0f45f5b6337216e05"
+        ],
+        "state": "COMPLETE_VERIFIED"
+      }
+    ],
+    "pending": [],
+    "schemaVersion": "PHASE_BC_SCHEMA_V1_2026-08-25",
+    "sourceVersions": {
+      "har": "cd4c8c7c32427bcf5763ba88620a99c56c90c0a3b73cc67a7faf134cd42e7467",
+      "parser": "HAR_ADAPTER_V6_SCOPE_STATE_2026-08-29",
+      "software": "6.0.0+WSAB.E2E.PRODUCTION_PIPELINE.LR000000"
+    }
+  },
+  "dcmVersion": "6.0.0+WSAB.E2E.PRODUCTION_PIPELINE.LR000000",
+  "eventWorlds": 1591,
+  "evidenceBlocked": 29,
+  "evidenceConflictCount": 0,
+  "evidenceCoverageComplete": false,
+  "evidenceCoverageMissing": 6,
+  "evidenceMode": "SYNTHETIC_OR_INCOMPLETE",
+  "executionMode": "RESEARCHED_MODELED",
+  "forecastCutoff": "2026-08-30T19:43:12Z",
+  "frozenForecastHash": "ae0f2e5fb1c15139f88fea9abefca2583b99f07d87e33686c086c0adfce6c797",
+  "goblins": 2569,
+  "harSha256": "cd4c8c7c32427bcf5763ba88620a99c56c90c0a3b73cc67a7faf134cd42e7467",
+  "hostPerformanceCertified": false,
+  "learningRevision": "LR000000",
+  "modelConfigHash": "5c52767a96036e16ed99f8469c48cdd5c092ffe76d76d1669632c02311f8e389",
+  "modeled": 2909,
+  "modeledCardSize": 4,
+  "notProductionRootCertified": true,
+  "optimizedDcm60Claim": false,
+  "playable": 5,
+  "portfolioExposure": {
+    "events": {
+      "176427": 2,
+      "176430": 2
+    },
+    "maxPositiveSelectionCorrelation": 0.09747153370603873,
+    "pairwiseSelectionCorrelations": [
+      {
+        "a": "14266059",
+        "b": "14279482",
+        "selectionCorrelation": 0.09747153370603873
+      },
+      {
+        "a": "14287995",
+        "b": "14279482",
+        "selectionCorrelation": -0.07639148763160813
+      },
+      {
+        "a": "14287889",
+        "b": "14279482",
+        "selectionCorrelation": -0.06294058066909786
+      },
+      {
+        "a": "14287889",
+        "b": "14287995",
+        "selectionCorrelation": -0.06038678510126831
+      },
+      {
+        "a": "14287889",
+        "b": "14266059",
+        "selectionCorrelation": -0.05401717779975095
+      },
+      {
+        "a": "14266059",
+        "b": "14287995",
+        "selectionCorrelation": -0.04871755691185346
+      }
+    ],
+    "players": 4,
+    "shared_dependencies": {
+      "EVENT:176427": 2,
+      "EVENT:176430": 2,
+      "TEAM:ATL": 2
+    },
+    "teams": {
+      "ATL": 2,
+      "CON": 1,
+      "DAL": 1
+    }
+  },
+  "predictiveClaim": "NONE",
+  "predictiveValidationEarned": false,
+  "productionCertified": false,
+  "productionCertifiedCardSize": 0,
+  "productionEmptyCardReason": "EMPTY_ROOT_NOT_CERTIFIED",
+  "productionOperable": false,
+  "productionResearchComplete": false,
+  "productionRootCertification": "NOT_PRODUCTION_ROOT_CERTIFIED",
+  "productionSelectionReady": false,
+  "rawRows": 14607,
+  "researchComplete": true,
+  "researchRequested": 782,
+  "researchReused": 0,
+  "runId": "RUN_60612c8a7bcf7df1",
+  "runState": "RESEARCHED_MODELED_CARD",
+  "schemaHash": "08be9307caaa2bff6ca0e705650e47869d52aa79fd47e60aa35a371b4e95b02f",
+  "schemaId": "PHASE_BC_SCHEMA_V1_2026-08-25",
+  "schemaReady": false,
+  "schemaState": "HASH_MISMATCH_RECONSTRUCTION_NOT_CANONICAL",
+  "selectionAllowed": false,
+  "softwareE2eComplete": true,
+  "systemCertified": false,
+  "top25QualifiedCount": 5,
+  "unresolved": 1895,
+  "unsupported": 7234,
+  "v5Decoder": "NOT_MOUNTED",
+  "v5MountState": "ABSENT_IN_THIS_WORKSPACE"
+}

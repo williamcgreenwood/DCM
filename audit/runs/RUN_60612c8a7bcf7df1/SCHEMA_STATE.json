@@ -1,0 +1,22 @@
+{
+  "expectedSha256": "6e78dacc19843338643bdcabc7477fd3ce2dd065da1e9629646dacc21cdb1f22",
+  "note": "Do not reconstruct V1 bytes or change expectedSha256.",
+  "observedSha256": "08be9307caaa2bff6ca0e705650e47869d52aa79fd47e60aa35a371b4e95b02f",
+  "path": "/workspace/DCM-repo/artifacts/dcm_v6_workstream_ab/schemas/Phase_BC_Immutable_Contracts.json",
+  "productionEligible": false,
+  "schemaId": "PHASE_BC_SCHEMA_V1_2026-08-25",
+  "state": "HASH_MISMATCH_RECONSTRUCTION_NOT_CANONICAL",
+  "v1BytesAvailable": false,
+  "v2": {
+    "acceptedForProduction": false,
+    "expectedSha256": "6edbc92e94c734ead8c94edcfa8b112c2fb33ec3fb4610a89199b84993df6521",
+    "frozen": true,
+    "note": "V2 is a new schema. It does not satisfy the V1 production hash gate.",
+    "observedSha256": "6edbc92e94c734ead8c94edcfa8b112c2fb33ec3fb4610a89199b84993df6521",
+    "path": "/workspace/DCM-repo/artifacts/dcm_v6_workstream_ab/schemas/phase_bc_v2/phase_bc_schema_v2.json",
+    "productionEligible": false,
+    "schemaId": "PHASE_BC_SCHEMA_V2_2026-08-29",
+    "state": "HASH_VERIFIED"
+  },
+  "workingSchemaId": "PHASE_BC_SCHEMA_V2_2026-08-29"
+}

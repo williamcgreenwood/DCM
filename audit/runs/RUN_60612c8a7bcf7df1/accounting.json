@@ -1,0 +1,70 @@
+{
+  "accounted_including_post_cutoff": true,
+  "by_league": {
+    "CFB": 1350,
+    "CFL": 10,
+    "EPL": 256,
+    "MLB": 5697,
+    "OTD": 7,
+    "SOCCER": 5320,
+    "WNBA": 1788,
+    "WNBA1H": 152,
+    "WNBA1Q": 27
+  },
+  "by_modifier": {
+    "DEMON": 10547,
+    "GOBLIN": 2569,
+    "STANDARD": 1491
+  },
+  "by_sport": {
+    "baseball": 5697,
+    "basketball": 1967,
+    "gridiron": 1360,
+    "soccer": 5576,
+    "unknown": 7
+  },
+  "by_status": {
+    "in_progress": 599,
+    "pre_game": 13991,
+    "suspended": 17
+  },
+  "cardSize": 4,
+  "combo_rows": 66,
+  "demon_rows": 10547,
+  "duplicate_rows": 0,
+  "events": 69,
+  "failed_refreshes_retained": 0,
+  "final_model_population": 12038,
+  "goblin_rows": 2569,
+  "in_progress_rows": 599,
+  "live_rows": 726,
+  "missing_sides_fail_closed": 1878,
+  "offered_both_sides": 2686,
+  "offered_higher_only": 10043,
+  "offered_lower_only": 0,
+  "playable": 5,
+  "players": 1568,
+  "post_cutoff_snapshots_excluded": 0,
+  "post_cutoff_updates_excluded": 0,
+  "pre_game_rows": 13991,
+  "raw_missing_wager_types": 2376,
+  "raw_over_wager_types": 8871,
+  "raw_projection_rows": 14607,
+  "raw_under_or_over_wager_types": 3360,
+  "removed_rows": 0,
+  "selected_request_scopes": 9,
+  "standard_rows": 1491,
+  "states": {
+    "EXCLUDED_GOBLIN": 2569,
+    "MODELED": 2909,
+    "UNRESOLVED": 1895,
+    "UNSUPPORTED": 7234
+  },
+  "suspended_rows": 17,
+  "unique_offer_rows": 14607,
+  "unknown_modifier_rows": 0,
+  "unknown_side_rows": 1878,
+  "unresolved_rows": 0,
+  "would_exclude_under_strict_asof": 0,
+  "wsab_bound_rows": 1366
+}
