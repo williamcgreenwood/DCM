@@ -24,6 +24,9 @@ dcm = "dcm.runner:main"
 where = ["artifacts/dcm_v6_workstream_ab"]
 include = ["dcm*", "pillars_dcm*"]
 
+[tool.setuptools.package-data]
+dcm = ["VERSION.json", "data/synthetic_har.json"]
+
 [tool.pytest.ini_options]
 testpaths = ["artifacts/dcm_v6_workstream_ab/tests"]
 pythonpath = ["artifacts/dcm_v6_workstream_ab"]

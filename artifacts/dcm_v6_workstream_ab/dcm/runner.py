@@ -30,11 +30,13 @@ from dcm.model.parameters import build_parameter_snapshot
 from dcm.model.ranking import rank_candidates
 from dcm.model.uncertainty import probability_bundle
 from dcm.learning.calibration import apply_calibration, cell_key
-from dcm.model.worlds import MARKET_FROM_STATS, generate_event_contexts, simulate_player_worlds, value_from_stats
+from dcm.model.worlds import generate_event_contexts, simulate_player_worlds, value_from_stats
+from dcm.research.classify import accounting_classify as _classify
 from dcm.research.host_plan import build_host_research_plan
 from dcm.research.provider import BundleProvider, FileProvider, FixtureProvider, collect, write_bundle
-from dcm.research.requests import build_requests
+from dcm.research.requests import plan_research
 from dcm.runtime.checkpoint import load_checkpoint, write_checkpoint
+from dcm.runtime.cutoff import CutoffRequired, POLICY_DOC, resolve_forecast_cutoff
 from dcm.runtime.dag import Dag
 from dcm.runtime.freeze import compute_forecast_hash
 from dcm.runtime.governor import Governor
@@ -44,11 +46,14 @@ from dcm.runtime.perf import StageTimer
 from dcm.runtime.readiness import build_readiness
 from dcm.runtime.store import IndexedStore
 from dcm.selection.portfolio import build_card, exposure_report
-from dcm.sports.common.plugin import selection_state
+from dcm.version import (
+    ExactVersionMismatch,
+    LEARNING_REVISION,
+    PREDICTIVE_CLAIM,
+    SOFTWARE,
+    resolve_requested_version,
+)
 
-LEARNING_REVISION = "LR000000"
-PREDICTIVE_CLAIM = "NONE"
-SOFTWARE = "6.0.0+WSAB.E2E.PRODUCTION_PIPELINE.LR000000"
 SCHEMA = "PHASE_BC_SCHEMA_V1_2026-08-25"
 N_WORLDS = int(__import__("os").environ.get("DCM_FAST_WORLDS", "256"))
 N_SERIOUS = int(__import__("os").environ.get("DCM_SERIOUS_WORLDS", "2048"))
@@ -56,11 +61,21 @@ N_MAX = int(__import__("os").environ.get("DCM_MAX_WORLDS", "8192"))
 MC_SE_TARGET = float(__import__("os").environ.get("DCM_MC_SE_TARGET", "0.008"))
 
 ARTIFACT_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_WORKSPACE = Path(__file__).resolve().parents[3]
-SYNTHETIC = ARTIFACT_ROOT / "fixtures" / "synthetic_har.json"
+_REPO_CANDIDATE = Path(__file__).resolve().parents[3] if len(Path(__file__).resolve().parents) > 3 else Path.cwd()
+DEFAULT_WORKSPACE = _REPO_CANDIDATE if (_REPO_CANDIDATE / "VERSION.json").is_file() else Path.cwd()
 
-SUPPORTED_FAMILIES = {"basketball", "gridiron", "baseball"}
+def _synthetic_path() -> Path:
+    candidates = [
+        Path(__file__).resolve().parent / "data" / "synthetic_har.json",
+        ARTIFACT_ROOT / "fixtures" / "synthetic_har.json",
+        DEFAULT_WORKSPACE / "artifacts" / "dcm_v6_workstream_ab" / "fixtures" / "synthetic_har.json",
+    ]
+    for path in candidates:
+        if path.is_file():
+            return path
+    return candidates[0]
 
+SYNTHETIC = _synthetic_path()
 
 def _run_id(har_sha: str, cutoff: str) -> str:
     return "RUN_" + content_hash({"har": har_sha, "cutoff": cutoff, "sw": SOFTWARE})[:16]
@@ -86,47 +101,10 @@ def _active_calibration(workspace: Path) -> dict[str, Any]:
     return {"cells": cells, "contentHash": content_hash(cells)}
 
 
-def _classify(row: dict) -> tuple[str, str | None]:
-    if row.get("modifier") == "GOBLIN":
-        return "EXCLUDED_GOBLIN", "GOBLIN_SELECTION_FORBIDDEN"
-    if row.get("modifier") == "OTHER":
-        return "UNRESOLVED", "MODIFIER_UNKNOWN"
-    if row.get("side") == "UNKNOWN" and not row.get("offeredHigher") and not row.get("offeredLower"):
-        return "UNRESOLVED", "OFFERED_SIDE_UNKNOWN"
-    if not row.get("playerId"):
-        return "UNRESOLVED", "PLAYER_ID_UNRESOLVED_NO_NAME_INFERENCE"
-    if row.get("sportFamily") == "baseball" and row.get("market") == "hits_runs_rbi" and abs(float(row.get("line", 0)) - 0.5) < 1e-9:
-        return "UNRESOLVED", "HALF_LINE_AVOID_BASEBALL_HRRBI_0_5"
-    family = row.get("sportFamily") or ""
-    cap = selection_state(family, row.get("league") or "", row.get("market") or "")
-    if family not in SUPPORTED_FAMILIES or cap == "UNSUPPORTED_FAIL_CLOSED":
-        return "UNSUPPORTED", "UNSUPPORTED_FAIL_CLOSED"
-    if cap == "RESEARCH_ONLY":
-        return "MODELED", "RESEARCH_ONLY_NOT_SELECTABLE"
-    if cap == "SHADOW_SUPPORTED":
-        return "MODELED", "SHADOW_SUPPORTED_NOT_SELECTABLE"
-    status = str(row.get("status") or "unknown")
-    if bool(row.get("isLive")) or status in {"in_progress", "suspended"}:
-        return "MODELED", "LIVE_OR_IN_PROGRESS_NOT_PRODUCTION"
-    if status not in {"pre_game", "unknown"}:
-        return "MODELED", "UNKNOWN_STATUS_FAIL_CLOSED"
-    if status == "unknown":
-        # Synthetic/legacy rows without status remain modelable but not production-selected.
-        pass
-    market = row.get("market")
-    if family == "basketball" and market not in {"pts", "reb", "ast", "pra", "3pm", "stl", "blk"}:
-        return "UNSUPPORTED", "UNSUPPORTED_FAIL_CLOSED"
-    if family == "gridiron" and market not in MARKET_FROM_STATS and market not in {"pass_yds", "rush_yds", "rec_yds", "receptions", "pass_rush_yds", "rush_rec_yds"}:
-        return "UNSUPPORTED", "UNSUPPORTED_FAIL_CLOSED"
-    if family == "baseball" and market not in {"h", "tb", "k", "hits_runs_rbi"}:
-        return "UNSUPPORTED", "UNSUPPORTED_FAIL_CLOSED"
-    return "MODELED", None
-
-
 def run_dcm(
     *,
     input_path: Path | None,
-    forecast_cutoff: str,
+    forecast_cutoff: str | None,
     input_paths: list[Path] | None = None,
     output_root: Path,
     synthetic: bool = False,
@@ -136,6 +114,8 @@ def run_dcm(
     resume: Path | None = None,
     account_only: bool = False,
     bundle_path: Path | None = None,
+    research_shadow: bool = False,
+    cutoff_from_capture: bool = False,
 ) -> dict[str, Any]:
     if resume:
         ck = load_checkpoint(resume)
@@ -149,6 +129,10 @@ def run_dcm(
         har_sha = ingest_meta["harSha256"]
         # Frozen source provenance is authoritative on resume. A resume-time CLI
         # default must never change forecast semantics or production gating.
+        forecast_cutoff = str(ck.get("forecastCutoff") or board.get("forecastCutoff") or forecast_cutoff or "")
+        if not forecast_cutoff:
+            raise CutoffRequired("FORECAST_CUTOFF_REQUIRED: resume checkpoint is missing forecastCutoff")
+        research_shadow = bool(ck.get("researchShadow", research_shadow))
         synthetic = bool(ingest_meta.get("synthetic", board.get("synthetic", False)))
         run_id = ck["runId"]
         dest = output_root
@@ -196,6 +180,12 @@ def run_dcm(
                 raw_bytes = source.read_bytes()
                 ingests.append(ingest_har(raw_bytes, raw_bytes=raw_bytes))
         ingest = compose_ingests(ingests) if len(ingests) > 1 else ingests[0]
+        cutoff_info = resolve_forecast_cutoff(
+            explicit=forecast_cutoff,
+            from_capture=cutoff_from_capture,
+            ingest=ingest,
+        )
+        forecast_cutoff = str(cutoff_info["cutoff"])
         har_sha = ingest["harSha256"]
         run_id = _run_id(har_sha, forecast_cutoff)
         dest = output_root / run_id
@@ -285,11 +275,26 @@ def run_dcm(
             "classified": counts, "boardHash": board.get("contentHash"),
         }
         (dest / "freeze.json").write_text(json.dumps(freeze, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-        (dest / "research_requests.json").write_text("[]\n", encoding="utf-8")
+        planned = plan_research(rows, forecast_cutoff, research_shadow=research_shadow)
+        (dest / "research_requests.json").write_text(
+            json.dumps(planned["requests"], indent=2) + "\n", encoding="utf-8"
+        )
+        host_plan = build_host_research_plan(
+            planned["requests"],
+            skipped=planned["skipped"],
+            entity_graph=planned["entity_graph"],
+            unique_scopes=planned["unique_scopes"],
+            eligible_prop_count=planned["eligible_prop_count"],
+            research_shadow=research_shadow,
+        )
+        (dest / "host_research_plan.json").write_text(
+            json.dumps(host_plan, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+        )
         ck = write_checkpoint(dest / "checkpoint.json", {
             "runId": run_id, "dcmVersion": SOFTWARE, "learningRevision": LEARNING_REVISION,
             "forecastCutoff": forecast_cutoff, "artifactRoot": str(dest),
-            "completedStages": ["BOARD_FREEZE", "IDENTITY", "ACCOUNT"],
+            "researchShadow": research_shadow,
+            "completedStages": ["BOARD_FREEZE", "IDENTITY", "ACCOUNT", "RESEARCH_PLAN"],
             "pending": [], "nextDeterministicAction": "none", "rowCounts": counts,
             "modelConfigHash": content_hash(model_config),
             "calibrationStateHash": calibration_state.get("contentHash"),
@@ -300,7 +305,8 @@ def run_dcm(
 
 
     t = StageTimer("RESEARCH")
-    requests = build_requests(rows, forecast_cutoff)
+    planned = plan_research(rows, forecast_cutoff, research_shadow=research_shadow)
+    requests = planned["requests"]
     (dest / "research_requests.json").write_text(json.dumps(requests, indent=2) + "\n", encoding="utf-8")
     if research == "file":
         provider: Any = FileProvider(evidence_dir or dest / "evidence")
@@ -327,7 +333,15 @@ def run_dcm(
         json.dumps(bundle.get("conflicts") or [], indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
-    host_plan = build_host_research_plan(requests, coverage=bundle.get("coverage"))
+    host_plan = build_host_research_plan(
+        requests,
+        coverage=bundle.get("coverage"),
+        skipped=planned["skipped"],
+        entity_graph=planned["entity_graph"],
+        unique_scopes=planned["unique_scopes"],
+        eligible_prop_count=planned["eligible_prop_count"],
+        research_shadow=research_shadow,
+    )
     (dest / "host_research_plan.json").write_text(
         json.dumps(host_plan, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
@@ -777,20 +791,52 @@ def run_dcm(
 
 
 def main(argv: list[str] | None = None) -> int:
-    p = argparse.ArgumentParser(description="DCM v6 E2E runner (LR000000, not optimized 6.0)")
+    p = argparse.ArgumentParser(description="DCM v6 E2E runner (LR000000, not optimized 6.0)", epilog=POLICY_DOC, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--input", type=Path, action="append", default=None, help="HAR input; repeat for complementary captures")
     p.add_argument("--out", type=Path, default=DEFAULT_WORKSPACE / "dcm_v6" / "RUNS")
     p.add_argument("--output", type=Path, default=None, help="Alias for --out")
     p.add_argument("--synthetic", action="store_true")
-    p.add_argument("--cutoff", default="2026-08-28T00:00:00Z")
+    p.add_argument(
+        "--cutoff",
+        default=None,
+        help="RFC3339 forecast cutoff. Required unless --cutoff-from-capture or --resume.",
+    )
+    p.add_argument(
+        "--cutoff-from-capture",
+        action="store_true",
+        help="Derive cutoff from HAR startedDateTime / max board_time (CAPTURE_MAX_STARTED_DATETIME).",
+    )
     p.add_argument("--research", choices=["fixture", "file", "bundle"], default="file")
+    p.add_argument(
+        "--research-shadow",
+        action="store_true",
+        help="Include MLB/shadow rows in deep research (default OFF).",
+    )
     p.add_argument("--evidence-dir", type=Path, default=None)
     p.add_argument("--bundle", type=Path, default=None, help="evidence_bundle.jsonl for --research bundle")
     p.add_argument("--account-only", action="store_true", help="Freeze+account every row; skip Monte Carlo")
     p.add_argument("--resume", type=Path, default=None)
     p.add_argument("--workspace", type=Path, default=DEFAULT_WORKSPACE)
-    p.add_argument("--version", default=SOFTWARE)
+    p.add_argument(
+        "--version",
+        default=None,
+        help="Exact software pin against VERSION.json (software or softwareShort). Omitted defaults to current SOFTWARE.",
+    )
     args = p.parse_args(argv)
+    try:
+        resolved = resolve_requested_version(args.version)
+    except ExactVersionMismatch as e:
+        print(str(e), file=sys.stderr)
+        return 2
+    if resolved.get("defaulted"):
+        print(f"DCM_VERSION_DEFAULTED software={SOFTWARE}", file=sys.stderr)
+    if not args.resume and not args.cutoff and not args.cutoff_from_capture:
+        print(
+            "FORECAST_CUTOFF_REQUIRED: pass --cutoff <RFC3339> or --cutoff-from-capture. "
+            "There is no hardcoded default cutoff.",
+            file=sys.stderr,
+        )
+        return 2
     try:
         result = run_dcm(
             input_path=(args.input[0] if args.input and len(args.input) == 1 else None),
@@ -804,8 +850,13 @@ def main(argv: list[str] | None = None) -> int:
             resume=args.resume,
             account_only=args.account_only,
             bundle_path=args.bundle,
+            research_shadow=args.research_shadow,
+            cutoff_from_capture=args.cutoff_from_capture,
         )
     except FileNotFoundError as e:
+        print(str(e), file=sys.stderr)
+        return 2
+    except (CutoffRequired, ExactVersionMismatch) as e:
         print(str(e), file=sys.stderr)
         return 2
     integ = result.get("integrity") or {}

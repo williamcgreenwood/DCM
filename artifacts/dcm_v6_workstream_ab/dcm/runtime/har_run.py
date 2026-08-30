@@ -14,11 +14,9 @@ from pathlib import Path
 from dcm.contracts.hashes import content_hash
 from dcm.ingest.board import freeze_board, write_board
 from dcm.ingest.har import ingest_har
+from dcm.runtime.cutoff import CutoffRequired, derive_cutoff_from_capture
 from dcm.runtime.mount_v541 import mount_default
-
-LEARNING_REVISION = "LR000000"
-PREDICTIVE_CLAIM = "NONE"
-SOFTWARE = "6.0.0+WSAB.HARSPINE.LR000000"
+from dcm.version import LEARNING_REVISION, PREDICTIVE_CLAIM, SOFTWARE
 
 ARTIFACT_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_WORKSPACE = Path(__file__).resolve().parents[4]
@@ -29,7 +27,7 @@ def _run_id(har_sha256: str, cutoff: str) -> str:
     return "RUN_" + content_hash({"har": har_sha256, "cutoff": cutoff})[:16]
 
 
-def run_har(*, inbox: Path | None, out_root: Path, synthetic: bool, cutoff: str, workspace: Path) -> dict:
+def run_har(*, inbox: Path | None, out_root: Path, synthetic: bool, cutoff: str | None, workspace: Path, cutoff_from_capture: bool = False) -> dict:
     mount = mount_default(workspace)
     if synthetic:
         raw = json.loads(SYNTHETIC_FIXTURE.read_text(encoding="utf-8"))
@@ -40,6 +38,10 @@ def run_har(*, inbox: Path | None, out_root: Path, synthetic: bool, cutoff: str,
         raw_bytes = inbox.read_bytes()
         raw = raw_bytes
     ingest = ingest_har(raw, raw_bytes=raw_bytes)
+    if not cutoff:
+        if not cutoff_from_capture:
+            raise CutoffRequired("FORECAST_CUTOFF_REQUIRED: pass --cutoff or --cutoff-from-capture")
+        cutoff = derive_cutoff_from_capture(ingest)
     board = freeze_board(ingest, mount=mount, cutoff=cutoff)
     run_id = _run_id(ingest["harSha256"], cutoff)
     dest = out_root / run_id
@@ -75,7 +77,8 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--inbox", type=Path, default=DEFAULT_WORKSPACE / "dcm_v6" / "INBOX" / "current.har")
     p.add_argument("--out", type=Path, default=DEFAULT_WORKSPACE / "dcm_v6" / "RUNS")
     p.add_argument("--synthetic", action="store_true")
-    p.add_argument("--cutoff", default="2026-08-28T00:00:00Z")
+    p.add_argument("--cutoff", default=None, help="RFC3339 forecast cutoff. Required unless --cutoff-from-capture.")
+    p.add_argument("--cutoff-from-capture", action="store_true")
     p.add_argument("--workspace", type=Path, default=DEFAULT_WORKSPACE)
     args = p.parse_args(argv)
     try:
@@ -85,8 +88,12 @@ def main(argv: list[str] | None = None) -> int:
             synthetic=args.synthetic,
             cutoff=args.cutoff,
             workspace=args.workspace,
+            cutoff_from_capture=args.cutoff_from_capture,
         )
     except FileNotFoundError as e:
+        print(str(e), file=sys.stderr)
+        return 2
+    except CutoffRequired as e:
         print(str(e), file=sys.stderr)
         return 2
     integ = result["integrity"]
