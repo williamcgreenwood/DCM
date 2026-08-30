@@ -100,7 +100,12 @@ class FixtureProvider:
         elif scope == "PLAYER":
             value = {"status": "ACTIVE", "role": "starter_or_feature", "opportunity": {"support_n": 0},
                      "efficiency": {"support_n": 0}, "game_logs": [], "production_eligible": False}
+        elif scope == "MARKET_DEFINITION":
+            value = {"definition_verified": False, "production_eligible": False}
+        elif scope == "OFFER":
+            value = {"offer_recorded": True, "line_history": "fixture", "production_eligible": False}
         else:
+            # Legacy MARKET and unknown scopes.
             value = {"line_history": "fixture", "definition_verified": False, "production_eligible": False}
         claim = claim_record(
             source_id="FIXTURE_SYNTHETIC_V2", url="fixture://pillars/synthetic",
@@ -236,7 +241,7 @@ def collect(requests: list[dict], provider: ResearchProvider) -> dict[str, Any]:
     seen_scope: set[tuple[str, str]] = set()
     for req in requests:
         key = (str(req["scope"]), str(req["scope_id"]))
-        if key in seen_scope and req["scope"] not in {"MARKET", "OFFER"}:
+        if key in seen_scope and req["scope"] not in {"OFFER"}:
             reused += 1
             continue
         seen_scope.add(key)

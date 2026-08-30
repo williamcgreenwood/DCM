@@ -46,13 +46,15 @@ def test_market_definition_split_reuses_across_offers():
             "projectionId": "a", "sportFamily": "basketball", "league": "WNBA",
             "eventId": "E1", "teamId": "T", "playerId": "P1", "playerName": "A",
             "market": "pts", "line": 20.5, "boardId": "FULL_GAME", "modifier": "STANDARD",
-            "eventLabel": "x",
+            "eventLabel": "x", "status": "pre_game", "offeredHigher": True, "offeredLower": True,
+            "side": "MORE",
         },
         {
             "projectionId": "b", "sportFamily": "basketball", "league": "WNBA",
             "eventId": "E1", "teamId": "T", "playerId": "P2", "playerName": "B",
             "market": "pts", "line": 18.5, "boardId": "FULL_GAME", "modifier": "STANDARD",
-            "eventLabel": "x",
+            "eventLabel": "x", "status": "pre_game", "offeredHigher": True, "offeredLower": True,
+            "side": "MORE",
         },
     ]
     reqs = build_requests(rows, "2026-08-28T00:00:00Z")
@@ -60,3 +62,4 @@ def test_market_definition_split_reuses_across_offers():
     offers = [r for r in reqs if r["scope"] == "OFFER"]
     assert len(defs) == 1
     assert len(offers) == 2
+    assert not any(r["scope"] == "MARKET" for r in reqs)

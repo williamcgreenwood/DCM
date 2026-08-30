@@ -11,6 +11,7 @@ from statistics import mean, pstdev
 from typing import Any
 
 from dcm.contracts.hashes import content_hash
+from dcm.research.classify import market_definition_id
 
 
 def _f(v: Any, default: float) -> float:
@@ -68,9 +69,30 @@ def build_parameter_snapshot(row: dict[str, Any], claims: list[dict[str, Any]]) 
     player_pairs = _pairs(claims, "PLAYER", str(row.get("playerId") or ""))
     team_pairs = _pairs(claims, "TEAM", str(row.get("teamId") or ""))
     event_pairs = _pairs(claims, "EVENT", str(row.get("eventId") or ""))
-    market_pairs = _pairs(claims, "MARKET", str(row.get("projectionId") or ""))
-    player, team, event, market = map(_merge, (player_pairs, team_pairs, event_pairs, market_pairs))
-    all_claims = [c for c, _ in player_pairs + team_pairs + event_pairs + market_pairs]
+    sport_id = f"{row.get('sportFamily') or ''}:{row.get('league') or ''}"
+    sport_pairs = _pairs(claims, "SPORT", sport_id)
+    def_id = market_definition_id(row)
+    def_pairs = _pairs(claims, "MARKET_DEFINITION", def_id)
+    offer_pairs = _pairs(claims, "OFFER", str(row.get("projectionId") or ""))
+    legacy_market_pairs = _pairs(claims, "MARKET", str(row.get("projectionId") or ""))
+    # MARKET_DEFINITION + OFFER are canonical. Legacy MARKET is a migration fallback only.
+    if def_pairs:
+        market_pairs = def_pairs
+        market = {**_merge(legacy_market_pairs), **_merge(offer_pairs), **_merge(def_pairs)}
+        used_legacy_market = False
+    elif offer_pairs:
+        market_pairs = offer_pairs
+        market = {**_merge(legacy_market_pairs), **_merge(offer_pairs)}
+        used_legacy_market = bool(legacy_market_pairs) and not def_pairs
+    else:
+        market_pairs = legacy_market_pairs
+        market = _merge(legacy_market_pairs)
+        used_legacy_market = bool(legacy_market_pairs)
+    player, team, event, sport = map(_merge, (player_pairs, team_pairs, event_pairs, sport_pairs))
+    claim_pairs = list(player_pairs + team_pairs + event_pairs + sport_pairs + def_pairs + offer_pairs)
+    if used_legacy_market or not (def_pairs or offer_pairs):
+        claim_pairs.extend(legacy_market_pairs)
+    all_claims = [c for c, _ in claim_pairs]
     synthetic = any(str(c.get("source_id") or "").upper().startswith("FIXTURE_") or bool(c.get("synthetic")) for c in all_claims)
     rel = mean([_f(c.get("reliability"), 0.0) for c in all_claims]) if all_claims else 0.0
     fresh = mean([_f(c.get("freshness"), 0.0) for c in all_claims]) if all_claims else 0.0
@@ -163,6 +185,8 @@ def build_parameter_snapshot(row: dict[str, Any], claims: list[dict[str, Any]]) 
 
     status = str(player.get("status") or "UNKNOWN").strip().upper()
     definition_verified = bool(market.get("definition_verified"))
+    # Sport-level context is consumed for reliability/freshness (via all_claims).
+    _ = sport
     active_statuses = {"ACTIVE", "AVAILABLE", "PROBABLE", "EXPECTED_ACTIVE"}
     inactive_statuses = {"OUT", "DNP", "INACTIVE", "SUSPENDED", "IR", "PUP"}
     uncertain_statuses = {"QUESTIONABLE", "GTD", "GAME_TIME_DECISION", "DOUBTFUL", "LIMITED"}
@@ -194,6 +218,16 @@ def build_parameter_snapshot(row: dict[str, Any], claims: list[dict[str, Any]]) 
         "ood_risk": ood, "synthetic": synthetic, "definition_verified": definition_verified,
         "production_eligible": production_eligible, "blocker": blocker, "dependency_tags": sorted(tags),
         "evidence_hashes": sorted(str(c.get("claim_hash") or "") for c in all_claims if c.get("claim_hash")),
+        "scopes_used": sorted({
+            *(["SPORT"] if sport_pairs else []),
+            *(["EVENT"] if event_pairs else []),
+            *(["TEAM"] if team_pairs else []),
+            *(["PLAYER"] if player_pairs else []),
+            *(["MARKET_DEFINITION"] if def_pairs else []),
+            *(["OFFER"] if offer_pairs else []),
+            *(["MARKET"] if used_legacy_market else []),
+        }),
+        "legacy_market_fallback": used_legacy_market,
     }
     for key in ("minutes_mean", "minutes_sd", "pass_att_mean", "pass_att_sd", "rush_att_mean", "rush_att_sd", "routes_mean", "routes_sd", "pa_mean", "pa_sd"):
         if key in params:
