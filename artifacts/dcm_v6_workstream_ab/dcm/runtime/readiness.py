@@ -96,6 +96,8 @@ def build_readiness(
         "blocking": [gate for gate in gates if not gate["passed"]],
         "note": (
             "Production selection readiness, host certification, and predictive "
-            "validation are distinct contracts and must never be conflated."
+            "validation are distinct contracts and must never be conflated. "
+            "productionSelectionReady does not gate ranked Top 25 or the modeled "
+            "strict card; it only certifies the production-certified layer."
         ),
     }
