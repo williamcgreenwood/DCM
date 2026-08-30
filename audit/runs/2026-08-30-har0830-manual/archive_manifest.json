@@ -1,0 +1,15 @@
+{
+  "schema": "pillars_dcm.run_archive_manifest.v6",
+  "runId": "2026-08-30-har0830-manual",
+  "createdAtUtc": "2026-08-30T18:01:00Z",
+  "locksCertified": true,
+  "hallucinationRisk": false,
+  "hashCertifiedPythonFreeze": false,
+  "evidenceMode": "manual_research",
+  "claimCount": 27,
+  "cardSize": 6,
+  "runState": "MANUAL_RESEARCH_CARD",
+  "predictiveClaim": "NONE",
+  "harSha256": "cd4c8c7c32427bcf5763ba88620a99c56c90c0a3b73cc67a7faf134cd42e7467",
+  "forecastCutoff": "2026-08-30T17:48:00Z"
+}

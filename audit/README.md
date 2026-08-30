@@ -54,3 +54,7 @@ Omit `--push` to copy+commit locally only.
 
 Every run still writes `dest/audit/RUN_AUDIT.md` locally even without
 `--archive-github`.
+
+## Example pack
+
+`audit/runs/2026-08-30-har0830-manual/` is the 08/30 WNBA researched card (6 STANDARD locks) with Basketball-Reference and ESPN claim hashes. It is **not** a Python `COMPLETE_FROZEN` freeze. Read `pick_evidence.json` and `evidence_bundle.jsonl` before trusting those locks.
