@@ -9,10 +9,8 @@ on:
     branches:
       - chatgpt/v6-production-completion-20260828
       - grok/v6-live-har-production
+      - integration/v6-chatgpt-runtime-20260829
   pull_request:
-    paths:
-      - "artifacts/dcm_v6_workstream_ab/**"
-      - ".github/workflows/dcm-v6-ci.yml"
 
 permissions:
   contents: read
@@ -20,27 +18,33 @@ permissions:
 jobs:
   python-dcm:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: artifacts/dcm_v6_workstream_ab
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: python -m pip install --upgrade pip pytest
-      - name: Compile
-        run: python -m compileall -q dcm tests
+      - name: Install package from repo root
+        run: python -m pip install --upgrade pip && python -m pip install ".[dev]"
+      - name: CLI smoke from clean cwd
+        working-directory: /tmp
+        run: pillars-dcm --help
+      - name: CLI module help
+        working-directory: /tmp
+        run: python -m dcm --help
+      - name: CLI pillars_dcm help
+        working-directory: /tmp
+        run: python -m pillars_dcm --help
+      - name: Synthetic smoke
+        working-directory: /tmp
+        run: python -m dcm --synthetic --research fixture --cutoff-from-capture --out /tmp/dcm-smoke
       - name: Test
         env:
-          PYTHONPATH: .
           DCM_FAST_WORLDS: "64"
           DCM_SERIOUS_WORLDS: "128"
           DCM_MAX_WORLDS: "256"
         run: pytest -q
       - name: Benchmark smoke
         env:
-          PYTHONPATH: .
           DCM_FAST_WORLDS: "32"
           DCM_SERIOUS_WORLDS: "64"
           DCM_MAX_WORLDS: "128"

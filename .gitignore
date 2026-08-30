@@ -43,3 +43,6 @@ dcm_v6/canonical_mount/v5.4.1_copy/**
 venv/
 *.egg-info/
 artifacts/**/*.egg-info/
+
+# Stale portable blobs are not a release channel.
+artifacts/dcm_v6_workstream_ab.zip
