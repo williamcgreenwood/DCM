@@ -8,26 +8,17 @@ import type { ModeledProp } from "./types.ts";
 import { DEMO_BOARD } from "./demo-board.ts";
 import { classify } from "./model.ts";
 
-test("PRA equals PTS+REB+AST in every basketball world", () => {
-  const rng = mulberry32(7);
-  for (let i = 0; i < 40; i++) {
-    const w = sampleBasketball(rng, 34);
-    assert.ok(Math.abs(w.pra - (w.pts + w.reb + w.ast)) < 1e-9);
-    assert.ok(Math.abs(valueFromStats("pra", w) - (w.pts + w.reb + w.ast)) < 1e-9);
-    assert.ok(w.fgm <= w.fga + 1e-9);
-    assert.ok(Math.abs(w.twopa - (w.fga - w.tpa)) < 1e-9);
-  }
+test("TypeScript world sampling is disabled", () => {
+  assert.throws(() => sampleBasketball(), /CANONICAL_ENGINE_IS_PYTHON/);
+  assert.throws(() => fromWorlds(), /CANONICAL_ENGINE_IS_PYTHON/);
+  assert.throws(() => valueFromStats(), /CANONICAL_ENGINE_IS_PYTHON/);
 });
 
-test("simplex is push-aware", () => {
-  const d = fromWorlds([1, 2, 2, 3], 2);
-  assert.equal(d.pHigher, 0.25);
-  assert.equal(d.pLower, 0.25);
-  assert.equal(d.pPush, 0.5);
-  assert.ok(Math.abs(d.pHigher + d.pLower + d.pPush - 1) < 1e-12);
+test("classify does not model in TypeScript", () => {
+  assert.throws(() => classify(), /CANONICAL_ENGINE_IS_PYTHON/);
 });
 
-test("portfolio unique player and goblin veto", () => {
+test("portfolio unique player and goblin veto still applies to Python-shaped rows", () => {
   const mk = (id: string, player: string, event: string, market: string, goblin = false): ModeledProp =>
     ({
       row: {
@@ -62,7 +53,13 @@ test("portfolio unique player and goblin veto", () => {
       primaryRisk: "t",
       evidenceIds: [],
     }) as ModeledProp;
-  const card = buildCard([mk("a", "TATUM", "E1", "pts"), mk("b", "TATUM", "E1", "pra"), mk("c", "GOB", "E2", "pts", true), mk("d", "JOKIC", "E1", "pra"), mk("e", "BRUNSON", "E1", "pts")]);
+  const card = buildCard([
+    mk("a", "TATUM", "E1", "pts"),
+    mk("b", "TATUM", "E1", "pra"),
+    mk("c", "GOB", "E2", "pts", true),
+    mk("d", "JOKIC", "E1", "pra"),
+    mk("e", "BRUNSON", "E1", "pts"),
+  ]);
   assert.ok(card.every((p) => p.row.modifier !== "GOBLIN"));
   const players = card.map((p) => p.row.playerId);
   assert.equal(players.length, new Set(players).size);
@@ -71,10 +68,4 @@ test("portfolio unique player and goblin veto", () => {
 
 test("temporal leak fails closed", () => {
   assert.throws(() => assertNotAfterCutoff("2026-08-29T00:00:01Z", "2026-08-28T00:00:00Z"));
-});
-
-test("soccer remains fail-closed after inventory", () => {
-  const soccer = DEMO_BOARD.filter((r) => r.league === "EPL");
-  assert.ok(soccer.length >= 1);
-  assert.ok(soccer.every((r) => classify(r).state === "UNSUPPORTED_FAIL_CLOSED"));
 });

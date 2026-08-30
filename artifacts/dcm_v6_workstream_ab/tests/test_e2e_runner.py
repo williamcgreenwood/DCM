@@ -23,7 +23,7 @@ from dcm.sports.basketball.minimal import basketball_conservation
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "fixtures" / "synthetic_har.json"
-CUTOFF = "2026-08-28T00:00:00Z"
+CUTOFF = "2026-08-29T00:00:00Z"
 
 
 def _synthetic_har(rows: list[dict]) -> dict:
@@ -120,11 +120,13 @@ def test_a_synthetic_smoke(tmp_path: Path):
     assert freeze["v5Decoder"] == "NOT_MOUNTED"
 
 
-def test_b_real_har_not_supplied():
-    live = Path("/workspace/dcm_v6/INBOX/current.har")
-    if not live.is_file():
-        pytest.skip("REAL_HAR_NOT_SUPPLIED")
-    # Live path would run ingest → freeze; absence is an honest skip, not a pass.
+def test_b_real_har_sanitized_fixture_is_supplied():
+    live = Path(__file__).resolve().parents[1] / "fixtures" / "sanitized_live_har" / "prizepicks_compact.har"
+    assert live.is_file(), "sanitized live HAR fixture missing"
+    from dcm.ingest.har import ingest_har
+    ing = ingest_har(live.read_bytes(), raw_bytes=live.read_bytes())
+    assert ing["rows"], "compact live HAR must parse projections"
+    assert ing["adapter"] == "PRIZEPICKS_JSONAPI"
 
 
 def test_c_thousand_row_board_accounts_every_row(tmp_path: Path):
@@ -231,6 +233,9 @@ def test_e_checkpoint_resume_matches_uninterrupted(tmp_path: Path):
         evidence_dir=tmp_path / "empty-evidence",
     )
     assert incomplete["runState"] == "INCOMPLETE_CHECKPOINTED"
+    manifest = json.loads((Path(incomplete["dest"]) / "input_manifest.json").read_text())
+    assert manifest["synthetic"] is True
+    assert manifest["sourceMode"] == "SYNTHETIC"
     ck_path = Path(incomplete["dest"]) / "checkpoint.json"
     ck = load_checkpoint(ck_path)
     assert ck["learningRevision"] == LEARNING_REVISION
@@ -393,3 +398,28 @@ def test_software_version_does_not_promote_lr():
     assert PREDICTIVE_CLAIM == "NONE"
     assert "E2E" in SOFTWARE
     assert "OPTIMIZED" not in SOFTWARE
+
+
+def test_resume_rejects_tampered_frozen_model_config(tmp_path: Path):
+    incomplete = run_dcm(
+        input_path=None,
+        forecast_cutoff=CUTOFF,
+        output_root=tmp_path / "tamper",
+        synthetic=True,
+        research="file",
+        evidence_dir=tmp_path / "empty-evidence",
+    )
+    assert incomplete["runState"] == "INCOMPLETE_CHECKPOINTED"
+    dest = Path(incomplete["dest"])
+    config_path = dest / "MODEL_CONFIG.json"
+    config = json.loads(config_path.read_text())
+    config["fastWorlds"] = int(config["fastWorlds"]) + 1
+    config_path.write_text(json.dumps(config), encoding="utf-8")
+    with pytest.raises(RuntimeError, match="MODEL_CONFIG_HASH_MISMATCH_ON_RESUME"):
+        run_dcm(
+            input_path=None,
+            forecast_cutoff=CUTOFF,
+            output_root=tmp_path / "tamper",
+            research="fixture",
+            resume=dest / "checkpoint.json",
+        )

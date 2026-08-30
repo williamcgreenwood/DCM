@@ -1,0 +1,1237 @@
+{
+  "$defs": {
+    "EfficiencyState": {
+      "additionalProperties": true,
+      "description": "Conditional rates given opportunity. Never mixed into volume.",
+      "properties": {
+        "rates": {
+          "description": "Sport-specific rate map",
+          "type": "object"
+        },
+        "support_n": {
+          "description": "Role-comparable sample size",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "units": {
+          "description": "per-minute, per-attempt, per-PA",
+          "type": "object"
+        }
+      },
+      "required": [
+        "support_n"
+      ],
+      "type": "object"
+    },
+    "EntryContract": {
+      "additionalProperties": true,
+      "description": "Platform entry: ordered picks + payout table. Empty card is legal.",
+      "properties": {
+        "contentHash": {
+          "description": "SHA-256 hex digest",
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "entryId": {
+          "description": "Entry id",
+          "type": "string"
+        },
+        "payoutTable": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "picks": {
+          "description": "Picks",
+          "items": {
+            "$ref": "#/$defs/EntryPickContract"
+          },
+          "minItems": 0,
+          "type": "array"
+        },
+        "platformRules": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "predecessorHashes": {
+          "description": "Offer / definition hashes",
+          "items": {
+            "description": "SHA-256 hex digest",
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "entryId",
+        "picks"
+      ],
+      "type": "object",
+      "x-invariants": [
+        "empty_short_card_valid",
+        "no_forced_card_size"
+      ]
+    },
+    "EntryPickContract": {
+      "additionalProperties": true,
+      "description": "One pick inside an entry. Offered sides only. Goblins forbidden in production.",
+      "properties": {
+        "line": {
+          "description": "Contracted line",
+          "type": "number"
+        },
+        "market": {
+          "description": "Market key",
+          "type": "string"
+        },
+        "modifier": {
+          "enum": [
+            "STANDARD",
+            "DEMON",
+            "GOBLIN",
+            "OTHER"
+          ],
+          "type": "string"
+        },
+        "pickId": {
+          "description": "Pick id",
+          "type": "string"
+        },
+        "playerId": {
+          "description": "Player id",
+          "type": "string"
+        },
+        "projectionId": {
+          "description": "Offer id",
+          "type": "string"
+        },
+        "side": {
+          "enum": [
+            "MORE",
+            "LESS"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "pickId",
+        "projectionId",
+        "side",
+        "line",
+        "modifier"
+      ],
+      "type": "object",
+      "x-invariants": [
+        "goblins_never_production_selections",
+        "offered_sides_only"
+      ]
+    },
+    "EventLatentState": {
+      "additionalProperties": true,
+      "description": "Latent environment of one event world.",
+      "properties": {
+        "environment": {
+          "description": "Venue / roof / indoor-outdoor class",
+          "type": "string"
+        },
+        "eventId": {
+          "description": "Event identity",
+          "type": "string"
+        },
+        "matchupMultiplier": {
+          "description": "Matchup efficiency multiplier",
+          "minimum": 0,
+          "type": "number"
+        },
+        "pace": {
+          "description": "Pace / possession multiplier",
+          "minimum": 0,
+          "type": "number"
+        },
+        "paceUnit": {
+          "description": "Unit of pace",
+          "examples": [
+            "possessions_per_48",
+            "plays_per_game"
+          ],
+          "type": "string"
+        },
+        "regime": {
+          "description": "Discrete regime label",
+          "type": "string"
+        },
+        "units": {
+          "description": "Declared units for numeric fields",
+          "type": "object"
+        },
+        "weather": {
+          "description": "Weather block when material",
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "worldIndex": {
+          "description": "World index",
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "eventId",
+        "worldIndex"
+      ],
+      "type": "object"
+    },
+    "EventWorld": {
+      "additionalProperties": true,
+      "description": "Single shared-event draw.",
+      "properties": {
+        "contentHash": {
+          "description": "SHA-256 hex digest",
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "eventId": {
+          "description": "Event identity",
+          "type": "string"
+        },
+        "latent": {
+          "$ref": "#/$defs/EventLatentState"
+        },
+        "predecessorHash": {
+          "description": "Hash of generating EventWorldSet inputs",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "seed": {
+          "description": "World seed",
+          "nullable": true,
+          "type": "string"
+        },
+        "worldIndex": {
+          "description": "0-based world index",
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "worldIndex",
+        "eventId",
+        "latent",
+        "contentHash"
+      ],
+      "type": "object"
+    },
+    "EventWorldSet": {
+      "additionalProperties": true,
+      "description": "Shared event-world collection. One set per event; all players in the event draw from these worlds.",
+      "properties": {
+        "contentHash": {
+          "description": "SHA-256 hex digest",
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "createdAt": {
+          "description": "RFC3339 / ISO-8601 UTC timestamp",
+          "type": "string"
+        },
+        "eventId": {
+          "description": "Event identity",
+          "type": "string"
+        },
+        "learningRevision": {
+          "const": "LR000000",
+          "description": "Must remain LR000000 until promoted",
+          "type": "string"
+        },
+        "nWorlds": {
+          "description": "Cardinality of worlds",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "predecessorHashes": {
+          "description": "Hashes of evidence/parameter inputs",
+          "items": {
+            "description": "SHA-256 hex digest",
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "schemaVersion": {
+          "const": "PHASE_BC_SCHEMA_V2_2026-08-29",
+          "description": "Schema freeze id",
+          "type": "string"
+        },
+        "seed": {
+          "description": "Optional RNG seed",
+          "type": "string"
+        },
+        "softwareVersion": {
+          "description": "VERSION.json software string",
+          "type": "string"
+        },
+        "worldSetId": {
+          "description": "Stable id for this EventWorldSet",
+          "type": "string"
+        },
+        "worlds": {
+          "description": "EventWorld members",
+          "items": {
+            "$ref": "#/$defs/EventWorld"
+          },
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "worldSetId",
+        "eventId",
+        "schemaVersion",
+        "softwareVersion",
+        "learningRevision",
+        "nWorlds",
+        "worlds",
+        "predecessorHashes",
+        "contentHash",
+        "createdAt"
+      ],
+      "type": "object",
+      "x-cardinality": "1 per eventId",
+      "x-invariants": [
+        "nWorlds == len(worlds)",
+        "shared_event_world"
+      ]
+    },
+    "EvidenceBundleManifest": {
+      "additionalProperties": true,
+      "description": "Content-addressed bundle of EvidenceClaims (JSONL).",
+      "properties": {
+        "bundle_hash": {
+          "description": "SHA-256 hex digest",
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "bundle_path": {
+          "description": "Path to evidence_bundle.jsonl",
+          "type": "string"
+        },
+        "claim_count": {
+          "description": "Number of claims",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "claim_hashes": {
+          "description": "Sorted claim hashes",
+          "items": {
+            "description": "SHA-256 hex digest",
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "contentHash": {
+          "description": "SHA-256 hex digest",
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "dcmVersion": {
+          "description": "Software version",
+          "type": "string"
+        },
+        "forecastCutoff": {
+          "description": "RFC3339 / ISO-8601 UTC timestamp",
+          "type": "string"
+        },
+        "schema": {
+          "description": "Manifest schema id",
+          "type": "string"
+        },
+        "source_count": {
+          "description": "Distinct source_id count",
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "schema",
+        "claim_count",
+        "claim_hashes",
+        "bundle_hash",
+        "contentHash"
+      ],
+      "type": "object"
+    },
+    "EvidenceClaim": {
+      "additionalProperties": true,
+      "description": "Timestamped, hashed, cutoff-firewalled fact. Host supplies source/url/timestamps/facts.",
+      "properties": {
+        "claim_hash": {
+          "description": "SHA-256 hex digest",
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "claim_type": {
+          "description": "Need / claim type",
+          "type": "string"
+        },
+        "claim_value": {
+          "description": "Structured claim payload"
+        },
+        "conflicts": {
+          "description": "Conflicting claim hashes",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "forecast_cutoff": {
+          "description": "RFC3339 / ISO-8601 UTC timestamp",
+          "type": "string"
+        },
+        "freshness": {
+          "description": "0..1 derived or host-supplied",
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "observed_at": {
+          "description": "RFC3339 / ISO-8601 UTC timestamp",
+          "type": "string"
+        },
+        "published_at": {
+          "description": "RFC3339 / ISO-8601 UTC timestamp",
+          "type": "string"
+        },
+        "reliability": {
+          "description": "0..1 derived or host-supplied",
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "scope_id": {
+          "description": "Scope key",
+          "type": "string"
+        },
+        "semantic_scope": {
+          "enum": [
+            "SPORT",
+            "EVENT",
+            "TEAM",
+            "PLAYER",
+            "MARKET_DEFINITION",
+            "OFFER",
+            "MARKET"
+          ],
+          "type": "string"
+        },
+        "source_hash": {
+          "description": "SHA-256 hex digest",
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "source_id": {
+          "description": "Source identity",
+          "type": "string"
+        },
+        "supports": {
+          "description": "Supporting claim hashes",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "synthetic": {
+          "description": "Fixture/synthetic marker",
+          "type": "boolean"
+        },
+        "url": {
+          "description": "http(s) source URL; no credentials",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_id",
+        "url",
+        "published_at",
+        "observed_at",
+        "forecast_cutoff",
+        "semantic_scope",
+        "scope_id",
+        "claim_type",
+        "claim_value",
+        "reliability",
+        "freshness",
+        "source_hash",
+        "claim_hash"
+      ],
+      "type": "object",
+      "x-invariants": [
+        "observed_at <= forecast_cutoff",
+        "published_at <= forecast_cutoff",
+        "temporal_firewall"
+      ]
+    },
+    "LineupSettlement": {
+      "additionalProperties": true,
+      "description": "Entry-level settlement after all picks resolve.",
+      "properties": {
+        "contentHash": {
+          "description": "SHA-256 hex digest",
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "entryId": {
+          "description": "Entry id",
+          "type": "string"
+        },
+        "payout": {
+          "description": "numeric or null",
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "pickResults": {
+          "description": "Per-pick results",
+          "items": {
+            "$ref": "#/$defs/PickSettlement"
+          },
+          "type": "array"
+        },
+        "settledAt": {
+          "description": "RFC3339 / ISO-8601 UTC timestamp",
+          "type": "string"
+        }
+      },
+      "required": [
+        "entryId",
+        "pickResults"
+      ],
+      "type": "object"
+    },
+    "MarketDefinition": {
+      "additionalProperties": true,
+      "description": "Reusable platform+league+market+board definition. Not an offer.",
+      "properties": {
+        "boardId": {
+          "description": "FULL_GAME or alt board",
+          "type": "string"
+        },
+        "contentHash": {
+          "description": "SHA-256 hex digest",
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "definitionId": {
+          "description": "prizepicks|league|market|boardId",
+          "type": "string"
+        },
+        "definitionVerified": {
+          "description": "Exact stat definition confirmed",
+          "type": "boolean"
+        },
+        "league": {
+          "description": "League code",
+          "type": "string"
+        },
+        "market": {
+          "description": "Canonical market key",
+          "type": "string"
+        },
+        "platform": {
+          "description": "Offer platform",
+          "examples": [
+            "prizepicks"
+          ],
+          "type": "string"
+        },
+        "schemaVersion": {
+          "description": "Schema freeze id",
+          "type": "string"
+        },
+        "statMapping": {
+          "description": "Mapping onto primitives",
+          "type": [
+            "object",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "definitionId",
+        "platform",
+        "league",
+        "market",
+        "boardId",
+        "definitionVerified",
+        "contentHash"
+      ],
+      "type": "object"
+    },
+    "Offer": {
+      "additionalProperties": true,
+      "description": "Projection-specific line, sides, modifier. References a MarketDefinition.",
+      "properties": {
+        "contentHash": {
+          "description": "SHA-256 hex digest",
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "definitionId": {
+          "description": "MarketDefinition.definitionId",
+          "type": "string"
+        },
+        "line": {
+          "description": "Posted line",
+          "type": "number"
+        },
+        "lineHistory": {
+          "items": {
+            "type": "object"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "modifier": {
+          "enum": [
+            "STANDARD",
+            "GOBLIN",
+            "DEMON",
+            "OTHER"
+          ],
+          "type": "string"
+        },
+        "offerId": {
+          "description": "Offer id (usually projectionId)",
+          "type": "string"
+        },
+        "offeredHigher": {
+          "description": "MORE/over offered",
+          "type": "boolean"
+        },
+        "offeredLower": {
+          "description": "LESS/under offered",
+          "type": "boolean"
+        },
+        "projectionId": {
+          "description": "Board projection id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "offerId",
+        "projectionId",
+        "definitionId",
+        "line",
+        "offeredHigher",
+        "offeredLower",
+        "modifier",
+        "contentHash"
+      ],
+      "type": "object",
+      "x-invariants": [
+        "offered_sides_only",
+        "missing_sides_fail_closed"
+      ]
+    },
+    "OpportunityState": {
+      "additionalProperties": true,
+      "description": "Usage / volume parameters. Never mixed into efficiency rates.",
+      "properties": {
+        "minutes_mean": {
+          "description": "numeric or null",
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "minutes_sd": {
+          "description": "numeric or null",
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "pa_mean": {
+          "description": "numeric or null",
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "pa_sd": {
+          "description": "numeric or null",
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "pass_att_mean": {
+          "description": "numeric or null",
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "pass_att_sd": {
+          "description": "numeric or null",
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "routes_mean": {
+          "description": "numeric or null",
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "routes_sd": {
+          "description": "numeric or null",
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "rush_att_mean": {
+          "description": "numeric or null",
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "rush_att_sd": {
+          "description": "numeric or null",
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "support_n": {
+          "description": "Role-comparable sample size",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "units": {
+          "description": "minutes | plays | routes | PA",
+          "type": "object"
+        }
+      },
+      "required": [
+        "support_n"
+      ],
+      "type": "object"
+    },
+    "PickSettlement": {
+      "additionalProperties": true,
+      "description": "Official settlement of one pick.",
+      "properties": {
+        "officialValue": {
+          "description": "numeric or null",
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "pickId": {
+          "description": "Pick id",
+          "type": "string"
+        },
+        "result": {
+          "enum": [
+            "HIT",
+            "MISS",
+            "PUSH",
+            "VOID",
+            "UNSETTLED"
+          ],
+          "type": "string"
+        },
+        "settledAt": {
+          "description": "RFC3339 / ISO-8601 UTC timestamp",
+          "type": "string"
+        },
+        "sourceHash": {
+          "description": "SHA-256 hex digest",
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "pickId",
+        "result"
+      ],
+      "type": "object"
+    },
+    "PlayerWorldState": {
+      "additionalProperties": true,
+      "description": "Player state inside one shared event world.",
+      "properties": {
+        "appearance": {
+          "description": "Starter/bench/snap appearance",
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "contentHash": {
+          "description": "SHA-256 hex digest",
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "efficiency": {
+          "$ref": "#/$defs/EfficiencyState"
+        },
+        "eventId": {
+          "description": "Event identity",
+          "type": "string"
+        },
+        "opportunity": {
+          "$ref": "#/$defs/OpportunityState"
+        },
+        "playerId": {
+          "description": "Official/source player id; never inferred from name",
+          "type": "string"
+        },
+        "primitives": {
+          "$ref": "#/$defs/PrimitiveStatLedger"
+        },
+        "worldIndex": {
+          "description": "World index",
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "playerId",
+        "eventId",
+        "worldIndex",
+        "opportunity",
+        "efficiency"
+      ],
+      "type": "object",
+      "x-invariants": [
+        "opportunity_efficiency_separated"
+      ]
+    },
+    "PrimitiveStatEntry": {
+      "additionalProperties": true,
+      "description": "One primitive stat in one world.",
+      "properties": {
+        "nullable": {
+          "description": "Whether missing is allowed",
+          "type": "boolean"
+        },
+        "playerId": {
+          "description": "Player identity",
+          "type": "string"
+        },
+        "statId": {
+          "description": "Primitive stat identifier",
+          "type": "string"
+        },
+        "unit": {
+          "description": "Unit label",
+          "type": "string"
+        },
+        "value": {
+          "description": "Realized value",
+          "type": "number"
+        }
+      },
+      "required": [
+        "statId",
+        "value",
+        "playerId"
+      ],
+      "type": "object"
+    },
+    "PrimitiveStatLedger": {
+      "additionalProperties": true,
+      "description": "World-level primitive stat table. Composites must be derived, not independently sampled.",
+      "properties": {
+        "conservationResults": {
+          "description": "Invariant evaluation records",
+          "items": {
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "contentHash": {
+          "description": "SHA-256 hex digest",
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "entries": {
+          "description": "Primitive rows",
+          "items": {
+            "$ref": "#/$defs/PrimitiveStatEntry"
+          },
+          "minItems": 0,
+          "type": "array"
+        },
+        "eventId": {
+          "description": "Event identity",
+          "type": "string"
+        },
+        "ledgerId": {
+          "description": "Ledger id",
+          "type": "string"
+        },
+        "predecessorHashes": {
+          "description": "PlayerWorld / EventWorld hashes",
+          "items": {
+            "description": "SHA-256 hex digest",
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "worldIndex": {
+          "description": "World index",
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "ledgerId",
+        "eventId",
+        "worldIndex",
+        "entries",
+        "contentHash"
+      ],
+      "type": "object",
+      "x-invariants": [
+        "composites_from_primitives",
+        "conservation identities in identities"
+      ]
+    },
+    "ProductionReadiness": {
+      "additionalProperties": true,
+      "description": "Gate matrix. Never auto-promoted.",
+      "properties": {
+        "acceptedForProduction": {
+          "const": false,
+          "description": "Explicit later decision required",
+          "type": "boolean"
+        },
+        "gates": {
+          "description": "Named gate records",
+          "items": {
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "hostPerformanceCertified": {
+          "const": false,
+          "type": "boolean"
+        },
+        "learningRevision": {
+          "const": "LR000000",
+          "description": "LR000000 until promoted",
+          "type": "string"
+        },
+        "optimizedDcm60Claim": {
+          "const": false,
+          "type": "boolean"
+        },
+        "predictiveClaim": {
+          "const": "NONE",
+          "description": "NONE until earned",
+          "type": "string"
+        },
+        "predictiveValidationEarned": {
+          "description": "Chronological predictive claim earned",
+          "type": "boolean"
+        },
+        "productionEligible": {
+          "const": false,
+          "description": "V2 freeze is not production-eligible",
+          "type": "boolean"
+        },
+        "productionSelectionReady": {
+          "description": "All production gates green",
+          "type": "boolean"
+        },
+        "systemCertified": {
+          "description": "Host+software certified",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "productionSelectionReady",
+        "systemCertified",
+        "predictiveValidationEarned",
+        "productionEligible",
+        "acceptedForProduction",
+        "learningRevision",
+        "predictiveClaim"
+      ],
+      "type": "object",
+      "x-invariants": [
+        "do_not_auto_promote"
+      ]
+    },
+    "WorldLineupOutcome": {
+      "additionalProperties": true,
+      "description": "Simulated lineup outcome in one event-world draw.",
+      "properties": {
+        "contentHash": {
+          "description": "SHA-256 hex digest",
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "entryId": {
+          "description": "Entry id",
+          "type": "string"
+        },
+        "hits": {
+          "description": "Hit count",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "payout": {
+          "description": "numeric or null",
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "predecessorHashes": {
+          "description": "WorldProjection / EntryContract hashes",
+          "items": {
+            "description": "SHA-256 hex digest",
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "worldIndex": {
+          "description": "World index",
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "entryId",
+        "worldIndex",
+        "hits"
+      ],
+      "type": "object"
+    },
+    "WorldProjection": {
+      "additionalProperties": true,
+      "description": "Projected market value in one world against an offer.",
+      "properties": {
+        "contentHash": {
+          "description": "SHA-256 hex digest",
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "line": {
+          "description": "Offer line",
+          "type": "number"
+        },
+        "predecessorHashes": {
+          "description": "Ledger / definition / offer hashes",
+          "items": {
+            "description": "SHA-256 hex digest",
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "projectionId": {
+          "description": "Offer / projection id",
+          "type": "string"
+        },
+        "sideOutcomes": {
+          "description": "MORE/LESS/PUSH encoding",
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "value": {
+          "description": "Realized market value in this world",
+          "type": "number"
+        },
+        "worldIndex": {
+          "description": "World index",
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "projectionId",
+        "worldIndex",
+        "value",
+        "line"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "https://pillars.local/schemas/phase_bc_schema_v2.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "acceptedForProduction": false,
+  "accounting_states": [
+    "MODELED",
+    "UNSUPPORTED",
+    "UNRESOLVED",
+    "EXCLUDED_GOBLIN",
+    "SHADOW",
+    "FAIL_CLOSED"
+  ],
+  "adr": "docs/ADR-PHASE-BC-V2.md",
+  "description": "Phase B/C V2 working contract. Field schemas live under $defs.",
+  "governance": {
+    "composites_from_primitives": true,
+    "demon_extra_cushion_demotion_only": true,
+    "empty_short_card_valid": true,
+    "extract_every_visible_prop_first": true,
+    "goblin_accounting_before_exclusion": true,
+    "goblins_never_production_selections": true,
+    "learning_future_only": true,
+    "missing_sides_fail_closed": true,
+    "never_infer_player_id_from_name": true,
+    "no_forced_card_size": true,
+    "offered_sides_only": true,
+    "opportunity_efficiency_separated": true,
+    "playable_only_production_grade": true,
+    "shared_event_world": true,
+    "temporal_firewall": true,
+    "unknown_identity_definition_status_fail_closed": true
+  },
+  "grades": [
+    "PLAYABLE",
+    "LEAN",
+    "PASS",
+    "TRAP"
+  ],
+  "identities": {
+    "basketball": {
+      "2PA": "FGA - 3PA",
+      "FGM": "2PM + 3PM",
+      "NBA_team_minutes": 240,
+      "PTS": "2*2PM + 3*3PM + FTM",
+      "REB": "OREB + DREB",
+      "WNBA_team_minutes": 200,
+      "makes_le_attempts": true
+    },
+    "football": {
+      "dropbacks": "pass_att + sacks_taken + scramble_att",
+      "fg_xp_made_le_att": true,
+      "pass_cmp_le_pass_att": true,
+      "receptions_le_targets": true,
+      "rush_att": "designed_rush_att + scramble_att",
+      "targets_le_routes_when_routes_exist": true,
+      "team_off_plays": "team_pass_att + team_rush_att + team_sacks_taken"
+    },
+    "mlb_shadow": {
+      "AB": "PA - BB - HBP - SF - SH",
+      "H": "1B + 2B + 3B + HR",
+      "TB": "1*1B + 2*2B + 3*3B + 4*HR"
+    }
+  },
+  "learning_revision": "LR000000",
+  "lineage": [
+    "EvidenceGraphHash",
+    "ParameterSnapshotHash",
+    "EventWorldSetHash",
+    "PrimitiveLedgerHash",
+    "MarketDefinitionHash",
+    "OfferHash",
+    "WorldProjectionHash",
+    "EntryContractHash",
+    "SettlementRuleHash",
+    "WorldLineupOutcomeHash"
+  ],
+  "new_common_types_added": [
+    "Offer",
+    "EvidenceBundleManifest",
+    "BoardOffer",
+    "ProductionReadiness"
+  ],
+  "note": "Field-level working freeze. Not a reconstruction of V1 bytes. V1 expected hash is unchanged and the V1 production gate remains closed. productionEligible and acceptedForProduction stay false until an explicit later decision.",
+  "objects": [
+    "BlockPlan",
+    "EventWorldSet",
+    "EventWorld",
+    "EventLatentState",
+    "DiscreteEventRegime",
+    "PlayerWorldState",
+    "OpportunityState",
+    "EfficiencyState",
+    "PrimitiveStatLedger",
+    "PrimitiveStatEntry",
+    "StatDefinition",
+    "ConservationRule",
+    "InvariantResult",
+    "MarketDefinition",
+    "Offer",
+    "WorldProjection",
+    "WorldProjectionResult",
+    "EntryPickContract",
+    "EntryContract",
+    "PickSettlement",
+    "LineupSettlement",
+    "WorldLineupOutcome",
+    "EvidenceClaim",
+    "EvidenceBundleManifest",
+    "BoardOffer",
+    "ProductionReadiness"
+  ],
+  "optimized_dcm_60": false,
+  "predecessor_bytes_available": false,
+  "predecessor_expected_sha256": "6e78dacc19843338643bdcabc7477fd3ce2dd065da1e9629646dacc21cdb1f22",
+  "predecessor_schema_id": "PHASE_BC_SCHEMA_V1_2026-08-25",
+  "predictive_claim": "NONE",
+  "productionEligible": false,
+  "production_promotion": "NOT_ACCEPTED",
+  "research_scopes": [
+    "SPORT",
+    "EVENT",
+    "TEAM",
+    "PLAYER",
+    "MARKET_DEFINITION",
+    "OFFER"
+  ],
+  "run_states": [
+    "COMPLETE_FROZEN",
+    "INCOMPLETE_CHECKPOINTED",
+    "COMPLETE_WITH_UNSUPPORTED_ROWS",
+    "EMPTY_CARD_COMPLETE"
+  ],
+  "schema_freeze_id": "PHASE_BC_SCHEMA_V2_2026-08-29",
+  "sport_production": {
+    "CFB": "PRODUCTION_SUPPORTED",
+    "CFL": "UNSUPPORTED_FAIL_CLOSED",
+    "EPL": "UNSUPPORTED_FAIL_CLOSED",
+    "KBO": "UNSUPPORTED_FAIL_CLOSED",
+    "MLB": "SHADOW_SUPPORTED",
+    "NBA": "PRODUCTION_SUPPORTED",
+    "NFL": "PRODUCTION_SUPPORTED",
+    "NPB": "UNSUPPORTED_FAIL_CLOSED",
+    "OTD": "UNSUPPORTED_FAIL_CLOSED",
+    "SOCCER": "UNSUPPORTED_FAIL_CLOSED",
+    "WNBA": "PRODUCTION_SUPPORTED"
+  },
+  "support_states": [
+    "PRODUCTION_SUPPORTED",
+    "SHADOW_SUPPORTED",
+    "UNSUPPORTED_FAIL_CLOSED"
+  ],
+  "title": "PHASE_BC_SCHEMA_V2_2026-08-29",
+  "type": "object"
+}
