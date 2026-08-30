@@ -3,6 +3,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from dcm.research.gamelog import assert_compatible_basketball_logs
+
 
 def _values_for(request: dict[str, Any], claims: list[dict[str, Any]]) -> list[dict[str, Any]]:
     out = []
@@ -34,6 +36,32 @@ def _league_family(request: dict[str, Any]) -> tuple[str, str]:
         elif league in {"NFL", "CFB"}:
             family = "gridiron"
     return family, league
+
+
+_BBALL_LOG_KEYS = {"minutes", "mp", "min", "fga", "tpa", "fta", "fg3a", "3pa", "trb", "reb"}
+
+
+def _is_basketball_player_request(family: str, logs: list[dict[str, Any]]) -> bool:
+    if family == "basketball":
+        return True
+    if family in {"gridiron", "football", "baseball"}:
+        return False
+    keys = {str(k).strip().lower() for row in logs for k in row}
+    return bool(keys & _BBALL_LOG_KEYS)
+
+
+def _market_token(request: dict[str, Any]) -> str:
+    market = str(request.get("market") or request.get("stat") or "").strip().lower()
+    if market:
+        return market
+    need = str(request.get("need") or "").strip().lower()
+    for token in (
+        "pra", "3pm", "threes", "points", "pts", "rebounds", "rebound", "reb",
+        "assists", "assist", "ast", "steals", "stl", "blocks", "blk", "turnovers", "tov",
+    ):
+        if need == token or need.startswith(token + "_") or need.endswith("_" + token) or f"_{token}_" in need:
+            return token
+    return ""
 
 
 def _event_missing(request: dict[str, Any], merged: dict[str, Any], values: list[dict[str, Any]]) -> list[str]:
@@ -93,7 +121,8 @@ def evaluate_request(request: dict[str, Any], claims: list[dict[str, Any]]) -> d
         if not role:
             missing.append("PLAYER_ROLE")
         logs = merged.get("role_epoch_logs") or merged.get("game_logs")
-        if not isinstance(logs, list) or len([x for x in logs if isinstance(x, dict)]) < 3:
+        log_dicts = [x for x in logs if isinstance(x, dict)] if isinstance(logs, list) else []
+        if not isinstance(logs, list) or len(log_dicts) < 3:
             missing.append("ROLE_COMPARABLE_GAME_LOGS_MIN_3")
         opportunity = merged.get("opportunity")
         if not isinstance(opportunity, dict):
@@ -101,6 +130,13 @@ def evaluate_request(request: dict[str, Any], claims: list[dict[str, Any]]) -> d
         efficiency = merged.get("efficiency")
         if not isinstance(efficiency, dict):
             missing.append("EFFICIENCY_EVIDENCE")
+        family, _league = _league_family(request)
+        if _is_basketball_player_request(family, log_dicts) and log_dicts:
+            market = _market_token(request)
+            compat = assert_compatible_basketball_logs(log_dicts, market=market)
+            for code in compat.get("missing") or []:
+                if code not in missing:
+                    missing.append(code)
     elif scope == "MARKET_DEFINITION":
         if merged.get("definition_verified") is not True:
             missing.append("VERIFIED_MARKET_DEFINITION")

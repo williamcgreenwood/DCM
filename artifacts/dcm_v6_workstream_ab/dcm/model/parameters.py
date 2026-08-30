@@ -12,6 +12,7 @@ from typing import Any
 
 from dcm.contracts.hashes import content_hash
 from dcm.research.classify import market_definition_id
+from dcm.research.gamelog import normalize_basketball_logs
 
 
 def _f(v: Any, default: float) -> float:
@@ -105,7 +106,17 @@ def build_parameter_snapshot(row: dict[str, Any], claims: list[dict[str, Any]]) 
     opp_n = int(_f(opp.get("support_n"), len(logs)))
     eff_n = int(_f(eff.get("support_n"), len(logs)))
 
+    logs_normalized = 0
+    logs_rejected = 0
+    evidence_used = False
+    opportunity_support_from_logs = 0
+    minutes_source = "PRIOR"
+
     if family == "basketball":
+        norm = normalize_basketball_logs(logs, league=str(row.get("league") or "") or None)
+        logs = norm["logs"]
+        logs_normalized = len(logs)
+        logs_rejected = len(norm["rejected"])
         minutes, mn = _avg(logs, "minutes")
         fga, fn = _avg(logs, "fga")
         tpa, tn = _avg(logs, "tpa")
@@ -113,7 +124,20 @@ def build_parameter_snapshot(row: dict[str, Any], claims: list[dict[str, Any]]) 
         reb, rn = _avg(logs, "reb")
         ast, an = _avg(logs, "ast")
         prior_minutes = 34.0 if row.get("league") == "NBA" else 31.0
-        mm = _f(opp.get("minutes_mean"), _shrink(minutes, mn, prior_minutes))
+        opportunity_support_from_logs = mn
+        if mn > 0 and minutes is not None:
+            evidence_used = True
+            minutes_source = "LOGS"
+            observed_minutes = minutes if mn >= 3 else _shrink(minutes, mn, prior_minutes)
+            mm = _f(opp.get("minutes_mean"), observed_minutes)
+            opp_n = max(opp_n, mn)
+        else:
+            # Labeled PRIOR for engineering only. Do not treat generic minutes as
+            # player research, and do not let claimed support_n paper over mn==0.
+            evidence_used = False
+            minutes_source = "PRIOR"
+            mm = prior_minutes
+            opp_n = 0
         pace = _f(team.get("pace_multiplier"), 1.0) * _f(event.get("pace_multiplier"), 1.0)
         matchup = _f(team.get("matchup_efficiency_multiplier"), 1.0) * _f(event.get("matchup_efficiency_multiplier"), 1.0)
         params.update({
@@ -130,8 +154,14 @@ def build_parameter_snapshot(row: dict[str, Any], claims: list[dict[str, Any]]) 
             "stl_per_min": max(0.0, _f(eff.get("stl_per_min"), 0.03) * pace),
             "blk_per_min": max(0.0, _f(eff.get("blk_per_min"), 0.025) * pace),
             "tov_per_min": max(0.0, _f(eff.get("tov_per_min"), 0.08) * pace),
+            "_log_support": {
+                "logsNormalized": logs_normalized,
+                "logsRejected": logs_rejected,
+                "evidenceUsed": evidence_used,
+                "opportunitySupportFromLogs": opportunity_support_from_logs,
+                "minutesSource": minutes_source,
+            },
         })
-        opp_n = max(opp_n, mn)
         eff_n = max(eff_n, fn, rn, an)
     elif family == "gridiron":
         role = str(player.get("role") or row.get("role") or "QB").upper()
