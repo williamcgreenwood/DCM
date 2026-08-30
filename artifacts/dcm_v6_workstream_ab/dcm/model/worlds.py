@@ -1,5 +1,9 @@
-"""Event-once primitive worlds. Composites derive from the same draw. Never independent PRA."""
+"""Evidence-parameterized shared primitive worlds.
 
+Opportunity is sampled before conditional efficiency. Composite markets derive
+from the same world. Generic priors remain development fallbacks only; runner
+selection gates prevent them from becoming production PLAYABLEs.
+"""
 from __future__ import annotations
 
 import hashlib
@@ -19,157 +23,253 @@ def _clip(x: float, lo: float, hi: float) -> float:
     return max(lo, min(hi, x))
 
 
-def sample_basketball(rng: random.Random, minutes: float) -> dict[str, float]:
-    fga = max(0.0, rng.gauss(minutes * 0.55, 3.2))
-    tpa = _clip(rng.gauss(fga * 0.42, 1.8), 0.0, fga)
+def _nonneg_int_gauss(rng: random.Random, mean: float, sd: float) -> int:
+    return max(0, int(round(rng.gauss(mean, max(0.01, sd)))))
+
+
+def _binomial(rng: random.Random, n: int, p: float) -> int:
+    p = _clip(float(p), 0.0, 1.0)
+    return sum(1 for _ in range(max(0, int(n))) if rng.random() < p)
+
+
+def _poisson(rng: random.Random, lam: float) -> int:
+    lam = max(0.0, float(lam))
+    if lam <= 0.0:
+        return 0
+    # Knuth is efficient for the small per-player lambdas used here.
+    threshold = __import__("math").exp(-lam)
+    k = 0
+    product = 1.0
+    while product > threshold:
+        k += 1
+        product *= rng.random()
+    return k - 1
+
+
+def _categorical_counts(
+    rng: random.Random,
+    n: int,
+    probabilities: dict[str, float],
+) -> dict[str, int]:
+    clean = {key: max(0.0, float(value)) for key, value in probabilities.items()}
+    total = sum(clean.values())
+    # Reserve at least 2% probability for an ordinary out when supplied rates
+    # are overly aggressive rather than allowing impossible >100% mass.
+    if total > 0.98:
+        scale = 0.98 / total
+        clean = {key: value * scale for key, value in clean.items()}
+    keys = list(clean)
+    counts = {key: 0 for key in keys}
+    for _ in range(max(0, int(n))):
+        u = rng.random()
+        cumulative = 0.0
+        for key in keys:
+            cumulative += clean[key]
+            if u < cumulative:
+                counts[key] += 1
+                break
+    return counts
+
+
+def _p(params: dict[str, Any], key: str, default: float) -> float:
+    try:
+        return float(params.get(key, default))
+    except (TypeError, ValueError):
+        return default
+
+
+def generate_event_contexts(
+    family: str,
+    event_id: str,
+    *,
+    n: int,
+    seed: str,
+) -> list[dict[str, float]]:
+    """Create deterministic latent event states shared by every player.
+
+    The event stream is keyed only by forecast seed + sport family + event ID,
+    never by player identity. This preserves cross-player event dependence while
+    player-specific RNG remains independent conditional on the event state.
+    """
+    rng = _rng(f"{seed}:EVENT:{family}:{event_id}")
+    out = []
+    for _ in range(n):
+        out.append({
+            "tempo": _clip(rng.gauss(1.0, 0.055), 0.84, 1.16),
+            "efficiency": _clip(rng.gauss(1.0, 0.045), 0.86, 1.14),
+            "opportunity": _clip(rng.gauss(1.0, 0.045), 0.86, 1.14),
+            "environment": _clip(rng.gauss(1.0, 0.035), 0.88, 1.12),
+        })
+    return out
+
+
+def _contextualize(
+    params: dict[str, Any],
+    family: str,
+    context: dict[str, float],
+) -> dict[str, Any]:
+    p = dict(params)
+    tempo = float(context["tempo"])
+    eff = float(context["efficiency"])
+    opp = float(context["opportunity"])
+    env = float(context["environment"])
+
+    if family == "basketball":
+        if "minutes_mean" in p:
+            p["minutes_mean"] = _p(p, "minutes_mean", 34.0) * opp
+        for key in ("fga_per_min", "fta_per_min", "reb_per_min", "ast_per_min", "stl_per_min", "blk_per_min", "tov_per_min"):
+            if key in p:
+                p[key] = _p(p, key, 0.0) * tempo
+        for key in ("two_fg_pct", "three_fg_pct"):
+            if key in p:
+                p[key] = _p(p, key, 0.5) * eff
+    elif family == "gridiron":
+        for key in ("pass_att_mean", "rush_att_mean", "routes_mean"):
+            if key in p:
+                p[key] = _p(p, key, 0.0) * opp
+        for key in ("pass_ypa", "rush_ypa", "rec_ypr"):
+            if key in p:
+                p[key] = _p(p, key, 0.0) * eff * env
+    elif family == "baseball":
+        if "pa_mean" in p:
+            p["pa_mean"] = _p(p, "pa_mean", 4.2) * opp
+        for key in ("single_rate", "double_rate", "triple_rate", "hr_rate", "run_per_pa", "rbi_per_pa"):
+            if key in p:
+                p[key] = _p(p, key, 0.0) * eff * env
+        if "so_rate" in p:
+            p["so_rate"] = _p(p, "so_rate", 0.24) / max(0.75, eff)
+    return p
+
+
+def sample_basketball(rng: random.Random, minutes: float, parameters: dict[str, Any] | None = None) -> dict[str, float]:
+    p = parameters or {}
+    fga_mean = minutes * max(0.01, _p(p, "fga_per_min", 0.55))
+    fga = _nonneg_int_gauss(rng, fga_mean, max(1.0, fga_mean ** 0.5))
+    tpa = _binomial(rng, fga, _p(p, "three_pa_share", 0.42))
     twopa = fga - tpa
-    tpm = _clip(rng.gauss(tpa * 0.36, 1.1), 0.0, tpa)
-    twopm = _clip(rng.gauss(twopa * 0.52, 1.4), 0.0, twopa)
+    tpm = _binomial(rng, tpa, _p(p, "three_fg_pct", 0.36))
+    twopm = _binomial(rng, twopa, _p(p, "two_fg_pct", 0.52))
     fgm = twopm + tpm
-    fta = max(0.0, rng.gauss(minutes * 0.18, 1.4))
-    ftm = _clip(rng.gauss(fta * 0.78, 0.9), 0.0, fta)
-    oreb = max(0.0, rng.gauss(minutes * 0.05, 0.7))
-    dreb = max(0.0, rng.gauss(minutes * 0.18, 1.2))
-    reb = oreb + dreb
-    ast = max(0.0, rng.gauss(minutes * 0.14, 1.3))
-    stl = max(0.0, rng.gauss(minutes * 0.03, 0.5))
-    blk = max(0.0, rng.gauss(minutes * 0.025, 0.5))
-    tov = max(0.0, rng.gauss(minutes * 0.08, 0.8))
+
+    fta_mean = minutes * max(0.0, _p(p, "fta_per_min", 0.18))
+    fta = _nonneg_int_gauss(rng, fta_mean, max(0.75, fta_mean ** 0.5))
+    ftm = _binomial(rng, fta, _p(p, "ft_pct", 0.78))
+
+    reb_mean = minutes * max(0.0, _p(p, "reb_per_min", 0.23))
+    reb = _nonneg_int_gauss(rng, reb_mean, max(0.75, reb_mean ** 0.5))
+    oreb = _binomial(rng, reb, _p(p, "oreb_share", 0.22))
+    dreb = reb - oreb
+
+    ast_mean = minutes * max(0.0, _p(p, "ast_per_min", 0.14))
+    stl_mean = minutes * max(0.0, _p(p, "stl_per_min", 0.03))
+    blk_mean = minutes * max(0.0, _p(p, "blk_per_min", 0.025))
+    tov_mean = minutes * max(0.0, _p(p, "tov_per_min", 0.08))
+    ast = _nonneg_int_gauss(rng, ast_mean, max(0.65, ast_mean ** 0.5))
+    stl = _poisson(rng, stl_mean)
+    blk = _poisson(rng, blk_mean)
+    tov = _nonneg_int_gauss(rng, tov_mean, max(0.55, tov_mean ** 0.5))
+
     pts = 2 * twopm + 3 * tpm + ftm
     return {
-        "minutes": minutes,
-        "fga": fga,
-        "tpa": tpa,
-        "twopa": twopa,
-        "fgm": fgm,
-        "tpm": tpm,
-        "twopm": twopm,
-        "fta": fta,
-        "ftm": ftm,
-        "oreb": oreb,
-        "dreb": dreb,
-        "reb": reb,
-        "ast": ast,
-        "stl": stl,
-        "blk": blk,
-        "tov": tov,
-        "pts": pts,
-        "pra": pts + reb + ast,
-        "pr": pts + reb,
-        "pa": pts + ast,
-        "ra": reb + ast,
+        "minutes": minutes, "fga": fga, "tpa": tpa, "twopa": twopa, "fgm": fgm,
+        "tpm": tpm, "twopm": twopm, "fta": fta, "ftm": ftm, "oreb": oreb,
+        "dreb": dreb, "reb": reb, "ast": ast, "stl": stl, "blk": blk, "tov": tov,
+        "pts": pts, "pra": pts + reb + ast, "pr": pts + reb, "pa": pts + ast, "ra": reb + ast,
     }
 
-
-def sample_football(rng: random.Random, role: str) -> dict[str, float]:
-    if role in {"QB", ""}:
-        pass_att = max(0.0, rng.gauss(34, 6))
-        sacks = max(0.0, rng.gauss(2.2, 1.1))
-        scramble = max(0.0, rng.gauss(3.0, 1.5))
-        designed = max(0.0, rng.gauss(2.0, 1.2))
-        rush_att = designed + scramble
+def sample_football(rng: random.Random, role: str, parameters: dict[str, Any] | None = None) -> dict[str, float]:
+    p = parameters or {}
+    role = (role or "QB").upper()
+    if role == "QB":
+        pass_att = _nonneg_int_gauss(rng, _p(p, "pass_att_mean", 34.0), max(1.0, _p(p, "pass_att_sd", 6.0)))
+        sacks = _nonneg_int_gauss(rng, _p(p, "sacks_mean", 2.2), 1.1)
+        rush_att = _nonneg_int_gauss(rng, _p(p, "rush_att_mean", 5.0), max(0.5, _p(p, "rush_att_sd", 2.0)))
+        scramble = _binomial(rng, rush_att, 0.60)
+        designed = rush_att - scramble
+        pass_cmp = _binomial(rng, pass_att, _p(p, "completion_rate", 0.65))
+        pass_yds = int(round(rng.gauss(pass_att * max(1.0, _p(p, "pass_ypa", 7.1)), 42.0)))
+        rush_yds = int(round(rng.gauss(rush_att * _p(p, "rush_ypa", 4.4), 16.0)))
+        routes = targets = receptions = rec_yds = 0
         dropbacks = pass_att + sacks + scramble
-        pass_cmp = _clip(rng.gauss(pass_att * 0.65, 3), 0.0, pass_att)
-        pass_yds = max(0.0, rng.gauss(pass_att * 7.1, 45))
-        rush_yds = max(0.0, rng.gauss(rush_att * 4.4, 18))
-        rec_yds = 0.0
-        targets = 0.0
-        receptions = 0.0
-        routes = 0.0
     else:
-        pass_att = sacks = scramble = designed = dropbacks = pass_cmp = pass_yds = 0.0
-        rush_att = max(0.0, rng.gauss(12 if role == "RB" else 1.5, 4))
-        rush_yds = max(0.0, rng.gauss(rush_att * 4.3, 18))
-        routes = max(0.0, rng.gauss(22 if role in {"WR", "TE"} else 8, 5))
-        targets = _clip(rng.gauss(routes * 0.28, 2), 0.0, routes)
-        receptions = _clip(rng.gauss(targets * 0.68, 1.4), 0.0, targets)
-        rec_yds = max(0.0, rng.gauss(receptions * 11.5, 18))
+        pass_att = pass_cmp = sacks = scramble = designed = pass_yds = dropbacks = 0
+        rush_att = _nonneg_int_gauss(
+            rng,
+            _p(p, "rush_att_mean", 12.0 if role == "RB" else 1.5),
+            max(0.5, _p(p, "rush_att_sd", 4.0)),
+        )
+        rush_yds = int(round(rng.gauss(rush_att * _p(p, "rush_ypa", 4.3), 17.0)))
+        routes = _nonneg_int_gauss(
+            rng,
+            _p(p, "routes_mean", 22.0 if role in {"WR", "TE"} else 8.0),
+            max(1.0, _p(p, "routes_sd", 5.0)),
+        )
+        targets = _binomial(rng, routes, _p(p, "target_rate", 0.28))
+        receptions = _binomial(rng, targets, _p(p, "catch_rate", 0.68))
+        rec_yds = int(round(rng.gauss(receptions * max(0.0, _p(p, "rec_ypr", 11.5)), 17.0)))
     stats = {
-        "pass_att": pass_att,
-        "pass_cmp": pass_cmp,
-        "sacks_taken": sacks,
-        "scramble_att": scramble,
-        "designed_rush_att": designed,
-        "rush_att": rush_att,
-        "dropbacks": dropbacks if role in {"QB", ""} else 0.0,
-        "pass_yds": pass_yds,
-        "rush_yds": rush_yds,
-        "rec_yds": rec_yds,
-        "receptions": receptions,
-        "targets": targets,
-        "routes": routes,
-        "pass_rush_yds": pass_yds + rush_yds,
-        "rush_rec_yds": rush_yds + rec_yds,
+        "pass_att": pass_att, "pass_cmp": pass_cmp, "sacks_taken": sacks, "scramble_att": scramble,
+        "designed_rush_att": designed, "rush_att": rush_att, "dropbacks": dropbacks,
+        "pass_yds": pass_yds, "rush_yds": rush_yds, "rec_yds": rec_yds,
+        "receptions": receptions, "targets": targets, "routes": routes,
+        "pass_rush_yds": pass_yds + rush_yds, "rush_rec_yds": rush_yds + rec_yds,
     }
-    if stats["pass_cmp"] > stats["pass_att"] + 1e-9:
-        raise RuntimeError("PRIMITIVE_CONSERVATION_FAILURE: cmp>att")
-    if stats["receptions"] > stats["targets"] + 1e-9:
-        raise RuntimeError("PRIMITIVE_CONSERVATION_FAILURE: rec>tgt")
-    if stats["targets"] > stats["routes"] + 1e-9 and stats["routes"] > 0:
-        raise RuntimeError("PRIMITIVE_CONSERVATION_FAILURE: tgt>routes")
+    if stats["pass_cmp"] > stats["pass_att"] or stats["receptions"] > stats["targets"] or stats["targets"] > stats["routes"]:
+        raise RuntimeError("PRIMITIVE_CONSERVATION_FAILURE")
     return stats
 
+def sample_baseball_batter(rng: random.Random, pa: float, parameters: dict[str, Any] | None = None) -> dict[str, float]:
+    p = parameters or {}
+    pa_i = max(0, int(round(pa)))
 
-def sample_baseball_batter(rng: random.Random, pa: float) -> dict[str, float]:
-    pa = max(0.0, pa)
-    bb = _clip(rng.gauss(pa * 0.09, 0.4), 0.0, pa)
-    hbp = _clip(rng.gauss(pa * 0.01, 0.15), 0.0, pa - bb)
-    sf = _clip(rng.gauss(pa * 0.02, 0.15), 0.0, pa - bb - hbp)
-    sh = _clip(rng.gauss(pa * 0.005, 0.08), 0.0, pa - bb - hbp - sf)
-    ab = pa - bb - hbp - sf - sh
-    so = _clip(rng.gauss(ab * 0.24, 0.7), 0.0, ab)
-    hr = _clip(rng.gauss(ab * 0.04, 0.35), 0.0, ab)
-    triple = _clip(rng.gauss(ab * 0.005, 0.08), 0.0, max(0.0, ab - hr))
-    double = _clip(rng.gauss(ab * 0.05, 0.35), 0.0, max(0.0, ab - hr - triple))
-    single = _clip(rng.gauss(ab * 0.15, 0.55), 0.0, max(0.0, ab - hr - triple - double))
+    # Non-AB plate appearance outcomes are allocated sequentially so the exact
+    # identity PA = AB + BB + HBP + SF + SH holds in every world.
+    bb = _binomial(rng, pa_i, _p(p, "bb_rate", 0.09))
+    remaining = pa_i - bb
+    hbp = _binomial(rng, remaining, _p(p, "hbp_rate", 0.01))
+    remaining -= hbp
+    sf = _binomial(rng, remaining, _p(p, "sf_rate", 0.02))
+    remaining -= sf
+    sh = _binomial(rng, remaining, _p(p, "sh_rate", 0.005))
+    ab = remaining - sh
+
+    outcomes = _categorical_counts(
+        rng,
+        ab,
+        {
+            "SO": _p(p, "so_rate", 0.24),
+            "HR": _p(p, "hr_rate", 0.04),
+            "3B": _p(p, "triple_rate", 0.005),
+            "2B": _p(p, "double_rate", 0.05),
+            "1B": _p(p, "single_rate", 0.15),
+        },
+    )
+    so = outcomes["SO"]
+    hr = outcomes["HR"]
+    triple = outcomes["3B"]
+    double = outcomes["2B"]
+    single = outcomes["1B"]
     h = single + double + triple + hr
-    tb = 1 * single + 2 * double + 3 * triple + 4 * hr
-    stats = {
-        "PA": pa,
-        "AB": ab,
-        "BB": bb,
-        "HBP": hbp,
-        "SF": sf,
-        "SH": sh,
-        "SO": so,
-        "H": h,
-        "1B": single,
-        "2B": double,
-        "3B": triple,
-        "HR": hr,
-        "TB": tb,
-        "hits_runs_rbi": h + rng.gauss(0.6, 0.5) + rng.gauss(0.5, 0.5),
-        "k": so,
-        "h": h,
-        "tb": tb,
-    }
-    failed = [c["rule_id"] for c in mlb_conservation(stats) if not c["passed"]]
-    if failed:
-        raise RuntimeError(f"PRIMITIVE_CONSERVATION_FAILURE: {failed}")
-    return stats
+    tb = single + 2 * double + 3 * triple + 4 * hr
 
+    runs = _poisson(rng, pa_i * max(0.0, _p(p, "run_per_pa", 0.14)))
+    rbi = _poisson(rng, pa_i * max(0.0, _p(p, "rbi_per_pa", 0.12)))
+    stats = {
+        "PA": pa_i, "AB": ab, "BB": bb, "HBP": hbp, "SF": sf, "SH": sh,
+        "SO": so, "H": h, "1B": single, "2B": double, "3B": triple, "HR": hr,
+        "TB": tb, "R": runs, "RBI": rbi, "hits_runs_rbi": h + runs + rbi,
+        "k": so, "h": h, "tb": tb,
+    }
+    failed = [check["rule_id"] for check in mlb_conservation(stats) if not check["passed"]]
+    if failed:
+        raise RuntimeError(f"PRIMITIVE_CONSERVATION_FAILURE:{failed}")
+    return stats
 
 MARKET_FROM_STATS = {
-    "pts": "pts",
-    "reb": "reb",
-    "ast": "ast",
-    "pra": "pra",
-    "pr": "pr",
-    "pa": "pa",
-    "ra": "ra",
-    "3pm": "tpm",
-    "stl": "stl",
-    "blk": "blk",
-    "pass_yds": "pass_yds",
-    "rush_yds": "rush_yds",
-    "rec_yds": "rec_yds",
-    "receptions": "receptions",
-    "pass_rush_yds": "pass_rush_yds",
-    "rush_rec_yds": "rush_rec_yds",
-    "h": "H",
-    "tb": "TB",
-    "k": "SO",
-    "hits_runs_rbi": "hits_runs_rbi",
+    "pts": "pts", "reb": "reb", "ast": "ast", "pra": "pra", "pr": "pr", "pa": "pa", "ra": "ra",
+    "3pm": "tpm", "stl": "stl", "blk": "blk", "pass_yds": "pass_yds", "rush_yds": "rush_yds",
+    "rec_yds": "rec_yds", "receptions": "receptions", "pass_rush_yds": "pass_rush_yds",
+    "rush_rec_yds": "rush_rec_yds", "h": "H", "tb": "TB", "k": "SO", "hits_runs_rbi": "hits_runs_rbi",
 }
 
 
@@ -187,18 +287,43 @@ def simulate_player_worlds(
     *,
     n: int,
     seed: str,
+    parameter_snapshot: dict[str, Any] | None = None,
+    event_contexts: list[dict[str, float]] | None = None,
 ) -> list[dict[str, float]]:
-    rng = _rng(f"{seed}:{row['playerId']}:{row['eventId']}")
-    family = row.get("sportFamily")
+    family = str(row.get("sportFamily") or "")
+    rng = _rng(f"{seed}:PLAYER:{row['playerId']}:{row['eventId']}")
+    params = (parameter_snapshot or {}).get("parameters") if isinstance(parameter_snapshot, dict) else {}
+    params = params if isinstance(params, dict) else {}
+    contexts = event_contexts or generate_event_contexts(
+        family, str(row.get("eventId") or ""), n=n, seed=seed
+    )
+    if len(contexts) < n:
+        raise ValueError("EVENT_CONTEXT_WORLD_COUNT_TOO_SMALL")
+
     worlds = []
-    for _ in range(n):
+    for idx in range(n):
+        world_params = _contextualize(params, family, contexts[idx])
         if family == "basketball":
-            minutes = 34.0 if row.get("league") == "NBA" else 31.0
-            worlds.append(sample_basketball(rng, minutes))
+            mean_minutes = _p(world_params, "minutes_mean", 34.0 if row.get("league") == "NBA" else 31.0)
+            sd_minutes = max(0.5, _p(world_params, "minutes_sd", 4.5))
+            regulation = 48.0 if row.get("league") == "NBA" else 40.0
+            minutes = _clip(rng.gauss(mean_minutes, sd_minutes), 0.0, regulation + 10.0)
+            worlds.append(sample_basketball(rng, minutes, world_params))
         elif family == "gridiron":
-            worlds.append(sample_football(rng, row.get("role") or "QB"))
+            worlds.append(
+                sample_football(
+                    rng,
+                    str(world_params.get("role") or row.get("role") or "QB"),
+                    world_params,
+                )
+            )
         elif family == "baseball":
-            worlds.append(sample_baseball_batter(rng, 4.2))
+            pa = _nonneg_int_gauss(
+                rng,
+                _p(world_params, "pa_mean", 4.2),
+                max(0.2, _p(world_params, "pa_sd", 0.8)),
+            )
+            worlds.append(sample_baseball_batter(rng, pa, world_params))
         else:
             raise KeyError(family)
     return worlds

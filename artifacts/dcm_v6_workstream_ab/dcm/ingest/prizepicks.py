@@ -40,23 +40,57 @@ def _modifier(attrs: dict) -> str:
     return "OTHER"
 
 
+def _normalize_side(value: Any) -> str | None:
+    u = str(value or "").strip().upper()
+    if u in {"MORE", "OVER", "HIGHER"}:
+        return "MORE"
+    if u in {"LESS", "UNDER", "LOWER"}:
+        return "LESS"
+    return None
+
+
+def _side_list(value: Any) -> tuple[bool, bool]:
+    seq = value if isinstance(value, list) else [value] if value is not None else []
+    more = less = False
+    for item in seq:
+        key = str(item or "").strip().lower()
+        if key in {"more", "over", "higher"}:
+            more = True
+        elif key in {"less", "under", "lower"}:
+            less = True
+        elif key in {"both", "over_under", "under_or_over", "higher_lower", "more_less"}:
+            more = less = True
+    return more, less
+
+
 def _side(attrs: dict) -> tuple[str, bool, bool]:
-    raw = str(attrs.get("selected_side") or attrs.get("side") or attrs.get("pick_side") or "").upper()
-    if raw in ("MORE", "OVER", "HIGHER"):
-        ol = attrs.get("offered_lower")
-        return "MORE", True, False if ol is None else bool(ol)
-    if raw in ("LESS", "UNDER", "LOWER"):
-        oh = attrs.get("offered_higher")
-        return "LESS", False if oh is None else bool(oh), True
+    """Verify offered sides. Missing side metadata fails closed."""
+    explicit_more = attrs.get("offered_higher")
+    explicit_less = attrs.get("offered_lower")
+    more = bool(explicit_more) if explicit_more is not None else False
+    less = bool(explicit_less) if explicit_less is not None else False
+    for key in ("allowed_wager_types", "allowed_pick_types", "offered_sides", "wager_types"):
+        if key in attrs:
+            m, l = _side_list(attrs.get(key))
+            more, less = more or m, less or l
+    if attrs.get("over_odds") is not None or attrs.get("over") is not None:
+        more = True
+    if attrs.get("under_odds") is not None or attrs.get("under") is not None:
+        less = True
+    selected = _normalize_side(attrs.get("selected_side") or attrs.get("side") or attrs.get("pick_side"))
+    if selected == "MORE":
+        more = True
+    elif selected == "LESS":
+        less = True
     if _modifier(attrs) == "GOBLIN":
         return "MORE", True, False
-    oh = attrs.get("offered_higher")
-    ol = attrs.get("offered_lower")
-    if oh is None and (attrs.get("over_odds") is not None or attrs.get("over") is not None):
-        oh = True
-    if ol is None and (attrs.get("under_odds") is not None or attrs.get("under") is not None):
-        ol = True
-    return "UNKNOWN", True if oh is None else bool(oh), True if ol is None else bool(ol)
+    if selected is not None:
+        return selected, more, less
+    if more and not less:
+        return "MORE", True, False
+    if less and not more:
+        return "LESS", False, True
+    return "UNKNOWN", more, less
 
 
 def _board_id(duration: dict | None, attrs: dict) -> str:
@@ -68,6 +102,40 @@ def _board_id(duration: dict | None, attrs: dict) -> str:
     if "2H" in u or "SECOND HALF" in u:
         return "2H"
     return "FULL_GAME"
+
+
+
+def _game_teams(ga: dict) -> tuple[str, str]:
+    home = str(ga.get("home_team_name") or ga.get("home_name") or ga.get("home") or "")
+    away = str(ga.get("away_team_name") or ga.get("away_name") or ga.get("away") or "")
+    meta = ga.get("metadata")
+    if isinstance(meta, dict):
+        info = meta.get("game_info") if isinstance(meta.get("game_info"), dict) else {}
+        teams = info.get("teams") if isinstance(info.get("teams"), dict) else {}
+        home_n = teams.get("home") if isinstance(teams.get("home"), dict) else {}
+        away_n = teams.get("away") if isinstance(teams.get("away"), dict) else {}
+        home = home or str(home_n.get("abbreviation") or home_n.get("name") or "")
+        away = away or str(away_n.get("abbreviation") or away_n.get("name") or "")
+    return home, away
+
+
+def _event_label(ga: dict, away: str, home: str, team: str, opponent: str) -> str:
+    if away and home:
+        return f"{away} @ {home}"
+    return f"{team} vs {opponent}" if team or opponent else ""
+
+
+def _status(attrs: dict) -> str:
+    raw = str(attrs.get("status") or "").strip().lower()
+    if raw in {"pre_game", "in_progress", "suspended"}:
+        return raw
+    if raw in {"pre-game", "pregame"}:
+        return "pre_game"
+    if raw in {"in-progress", "live"}:
+        return "in_progress"
+    if raw:
+        return "unknown"
+    return "unknown"
 
 
 def _row_from_jsonapi(item: dict, included: dict) -> dict | None:
@@ -83,8 +151,11 @@ def _row_from_jsonapi(item: dict, included: dict) -> dict | None:
     duration = _rel(item, included, "duration")
     pa, la, ga = _attrs(player), _attrs(league_n), _attrs(game)
     player_name = str(pa.get("display_name") or pa.get("name") or attrs.get("description") or "UNKNOWN")
-    player_id = str((player or {}).get("id") or pa.get("name") or player_name)
-    league, sport_family = map_league(la.get("name") or la.get("league"), la.get("sport") or la.get("sport_name"))
+    # HAR player/game IDs only. Never infer player_id from name.
+    player_rel_id = (player or {}).get("id")
+    player_id = str(player_rel_id) if player_rel_id not in (None, "") else ""
+    league_name = la.get("name") or la.get("league") or attrs.get("league_ppid")
+    league, sport_family = map_league(league_name, la.get("sport") or la.get("sport_name") or la.get("icon"))
     stat_label = str(
         attrs.get("stat_type")
         or attrs.get("statType")
@@ -92,14 +163,14 @@ def _row_from_jsonapi(item: dict, included: dict) -> dict | None:
         or "unknown"
     )
     market, market_label_s = map_stat(stat_label)
-    home = str(ga.get("home_team_name") or ga.get("home_name") or ga.get("home") or "")
-    away = str(ga.get("away_team_name") or ga.get("away_name") or ga.get("away") or "")
+    home, away = _game_teams(ga)
     team = str(pa.get("team") or pa.get("team_name") or home or "UNK")
-    opponent = away if team == home else home or away or "UNK"
-    event_id = str((game or {}).get("id") or ga.get("id") or f"{league}_{team}_{opponent}")
-    event_label = str(ga.get("metadata") or "") or (f"{away} @ {home}" if away and home else f"{team} vs {opponent}")
+    opponent = away if team and home and str(team).upper() == str(home).upper() else (home if team and away and str(team).upper() == str(away).upper() else (home or away or "UNK"))
+    event_id = str((game or {}).get("id") or ga.get("id") or attrs.get("game_id") or f"{league}_{team}_{opponent}")
+    event_label = _event_label(ga, away, home, team, opponent)
     side, oh, ol = _side(attrs)
     modifier = _modifier(attrs)
+    status = _status(attrs)
     return {
         "projectionId": str(item.get("id") or attrs.get("id") or f"{player_id}_{market}_{line_f}"),
         "sportFamily": sport_family,
@@ -121,7 +192,18 @@ def _row_from_jsonapi(item: dict, included: dict) -> dict | None:
         "boardId": _board_id(duration, attrs),
         "productType": "PLAYER_PICKS",
         "role": str(pa.get("position") or pa.get("position_abbreviation") or ""),
-        "sourceUpdatedAt": str(attrs.get("updated_at") or attrs.get("start_time") or ""),
+        "sourceUpdatedAt": str(attrs.get("updated_at") or ""),
+        "eventStartTime": str(attrs.get("start_time") or ga.get("start_time") or ""),
+        "status": status,
+        "isLive": bool(attrs.get("is_live") or attrs.get("isLive")),
+        "isLiveScored": bool(attrs.get("is_live_scored") or attrs.get("isLiveScored")),
+        "inGame": bool(attrs.get("in_game") or attrs.get("inGame")),
+        "eventType": str(attrs.get("event_type") or ""),
+        "combo": bool(pa.get("combo")) or str(attrs.get("event_type") or "").lower() == "combo",
+        "identityResolved": bool(player_id),
+        "allowedWagerTypes": attrs.get("allowed_wager_types"),
+        "statTypeRaw": stat_label,
+        "leagueId": str((league_n or {}).get("id") or ""),
     }
 
 
@@ -156,6 +238,7 @@ def _row_from_normalized(item: dict) -> dict | None:
         "productType": str(item.get("productType") or "PLAYER_PICKS"),
         "role": str(item.get("role") or ""),
         "sourceUpdatedAt": str(item.get("sourceUpdatedAt") or ""),
+        "eventStartTime": str(item.get("eventStartTime") or item.get("startTime") or ""),
     }
 
 

@@ -1,4 +1,9 @@
-"""Hierarchical research requests: SPORT → EVENT → TEAM → PLAYER → MARKET. Compute once."""
+"""Hierarchical research requests: SPORT → EVENT → TEAM → PLAYER → MARKET_DEFINITION / OFFER.
+
+MARKET_DEFINITION is reusable across projections that share platform+league+market+board.
+OFFER is projection-specific (line, sides, modifier). MARKET remains as a
+compatibility alias keyed by projection for older evidence files.
+"""
 
 from __future__ import annotations
 
@@ -47,9 +52,39 @@ def build_requests(rows: list[dict], cutoff: str) -> list[dict]:
             {"name": sample.get("playerName"), "league": sample.get("league")},
         )
 
+    seen_defs: set[str] = set()
     for r in rows:
         if r.get("modifier") == "GOBLIN":
             continue
+        def_id = "|".join(
+            [
+                "prizepicks",
+                str(r.get("league") or ""),
+                str(r.get("market") or ""),
+                str(r.get("boardId") or "FULL_GAME"),
+            ]
+        )
+        if def_id not in seen_defs:
+            seen_defs.add(def_id)
+            add(
+                "MARKET_DEFINITION",
+                def_id,
+                "exact_stat_definition",
+                {"market": r.get("market"), "league": r.get("league"), "boardId": r.get("boardId")},
+            )
+        add(
+            "OFFER",
+            r["projectionId"],
+            "line_sides_modifier",
+            {
+                "market": r.get("market"),
+                "line": r.get("line"),
+                "playerId": r.get("playerId"),
+                "definition_id": def_id,
+            },
+        )
+        # Compatibility MARKET request (same id as pre-split) so existing FileProvider
+        # evidence keyed by projection still attaches.
         add(
             "MARKET",
             r["projectionId"],
