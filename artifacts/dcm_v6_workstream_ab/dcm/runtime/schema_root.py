@@ -17,7 +17,7 @@ EXPECTED_SHA256 = "6e78dacc19843338643bdcabc7477fd3ce2dd065da1e9629646dacc21cdb1
 
 SCHEMA_V2_ID = "PHASE_BC_SCHEMA_V2_2026-08-29"
 # Filled from frozen bytes at import via HASH.txt if present; also hardcoded after freeze.
-SCHEMA_V2_EXPECTED_SHA256 = "12b25060820b106b0c7dc439f13c36cea83588233f60b6fccba7cfff1451784f"
+SCHEMA_V2_EXPECTED_SHA256 = "6edbc92e94c734ead8c94edcfa8b112c2fb33ec3fb4610a89199b84993df6521"
 
 
 def sha256_file(path: Path) -> str:
