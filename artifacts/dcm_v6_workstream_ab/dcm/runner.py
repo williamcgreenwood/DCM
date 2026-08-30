@@ -39,6 +39,7 @@ from dcm.runtime.checkpoint import load_checkpoint, write_checkpoint
 from dcm.runtime.cutoff import CutoffRequired, POLICY_DOC, resolve_forecast_cutoff
 from dcm.runtime.dag import Dag
 from dcm.runtime.freeze import compute_forecast_hash
+from dcm.runtime.github_archive import append_index, build_run_audit, materialize_github_pack, push_to_github
 from dcm.runtime.governor import Governor
 from dcm.runtime.mount_v541 import mount_default
 from dcm.runtime.schema_root import SCHEMA_V2_ID, verify_schema, verify_schema_v2
@@ -63,6 +64,60 @@ MC_SE_TARGET = float(__import__("os").environ.get("DCM_MC_SE_TARGET", "0.008"))
 ARTIFACT_ROOT = Path(__file__).resolve().parents[1]
 _REPO_CANDIDATE = Path(__file__).resolve().parents[3] if len(Path(__file__).resolve().parents) > 3 else Path.cwd()
 DEFAULT_WORKSPACE = _REPO_CANDIDATE if (_REPO_CANDIDATE / "VERSION.json").is_file() else Path.cwd()
+
+
+def _finalize_archive(
+    dest: Path,
+    result: dict[str, Any],
+    *,
+    archive_github: bool = False,
+    archive_push: bool = False,
+    repo_root: Path | None = None,
+) -> dict[str, Any]:
+    """Always write dest/audit/. Optionally copy+commit+push a GitHub pack."""
+    try:
+        audit = build_run_audit(dest)
+    except Exception as exc:  # noqa: BLE001 — never lose a finished run to archive I/O
+        result["auditError"] = type(exc).__name__
+        result.setdefault("locksCertified", False)
+        result.setdefault("hallucinationRisk", True)
+        return result
+    result["locksCertified"] = bool(audit.get("locksCertified"))
+    result["hallucinationRisk"] = bool(audit.get("hallucinationRisk"))
+    result["archivePath"] = str(Path(dest) / "audit")
+    result["githubCommit"] = None
+    if not archive_github:
+        return result
+    root = Path(repo_root) if repo_root is not None else DEFAULT_WORKSPACE
+    try:
+        pack = materialize_github_pack(Path(dest), root)
+        run_id = str(result.get("run_id") or audit.get("runId") or Path(dest).name)
+        append_index(
+            root,
+            {
+                "runId": run_id,
+                "path": f"audit/runs/{run_id}",
+                "locksCertified": audit.get("locksCertified"),
+                "hallucinationRisk": audit.get("hallucinationRisk"),
+                "runState": audit.get("runState") or result.get("runState"),
+                "frozenForecastHash": audit.get("frozenForecastHash"),
+                "createdAtUtc": audit.get("createdAtUtc"),
+                "software": audit.get("software") or SOFTWARE,
+                "learningRevision": audit.get("learningRevision") or LEARNING_REVISION,
+                "predictiveClaim": audit.get("predictiveClaim") or PREDICTIVE_CLAIM,
+            },
+        )
+        gh = push_to_github(root, run_id, push=bool(archive_push))
+        result["archivePath"] = str(pack)
+        result["githubCommit"] = gh.get("commit")
+        result["githubPushed"] = gh.get("pushed")
+        if gh.get("error"):
+            result["archiveError"] = gh.get("error")
+    except Exception as exc:  # noqa: BLE001
+        result["archiveError"] = type(exc).__name__
+    return result
+
+
 
 def _synthetic_path() -> Path:
     candidates = [
@@ -116,6 +171,9 @@ def run_dcm(
     bundle_path: Path | None = None,
     research_shadow: bool = False,
     cutoff_from_capture: bool = False,
+    archive_github: bool = False,
+    archive_push: bool = False,
+    repo_root: Path | None = None,
 ) -> dict[str, Any]:
     if resume:
         ck = load_checkpoint(resume)
@@ -301,7 +359,13 @@ def run_dcm(
             "mountStateHash": content_hash(mount),
             "schemaStateHash": content_hash(schema_root),
         })
-        return {"run_id": run_id, "dest": str(dest), "runState": run_state, "checkpoint": ck, "integrity": freeze, "board": board}
+        return _finalize_archive(
+            dest,
+            {"run_id": run_id, "dest": str(dest), "runState": run_state, "checkpoint": ck, "integrity": freeze, "board": board},
+            archive_github=archive_github,
+            archive_push=archive_push,
+            repo_root=repo_root,
+        )
 
 
     t = StageTimer("RESEARCH")
@@ -368,13 +432,19 @@ def run_dcm(
                 "blockers": ["RESEARCH_INCOMPLETE"],
             },
         )
-        return {
-            "run_id": run_id,
-            "dest": str(dest),
-            "runState": "INCOMPLETE_CHECKPOINTED",
-            "checkpoint": ck,
-            "research": bundle,
-        }
+        return _finalize_archive(
+            dest,
+            {
+                "run_id": run_id,
+                "dest": str(dest),
+                "runState": "INCOMPLETE_CHECKPOINTED",
+                "checkpoint": ck,
+                "research": bundle,
+            },
+            archive_github=archive_github,
+            archive_push=archive_push,
+            repo_root=repo_root,
+        )
     dag.complete(n_res.key, content_hash([c["claim_hash"] for c in bundle["claims"]]))
     research_perf = t.finish(NodeCount=len(requests), CacheHits=bundle["reused"])
     (dest / "performance" / "research.json").write_text(json.dumps(research_perf, indent=2) + "\n", encoding="utf-8")
@@ -776,18 +846,24 @@ def run_dcm(
             "frozenForecastHash": freeze["frozenForecastHash"],
         },
     )
-    return {
-        "run_id": run_id,
-        "dest": str(dest),
-        "runState": run_state,
-        "integrity": integrity,
-        "card": strict_card,
-        "top25_qualified": top25_qualified,
-        "board": board,
-        "classified": classified,
-        "world_cache": world_cache,
-        "dag": dag.snapshot(),
-    }
+    return _finalize_archive(
+        dest,
+        {
+            "run_id": run_id,
+            "dest": str(dest),
+            "runState": run_state,
+            "integrity": integrity,
+            "card": strict_card,
+            "top25_qualified": top25_qualified,
+            "board": board,
+            "classified": classified,
+            "world_cache": world_cache,
+            "dag": dag.snapshot(),
+        },
+        archive_github=archive_github,
+        archive_push=archive_push,
+        repo_root=repo_root,
+    )
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -817,6 +893,16 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--account-only", action="store_true", help="Freeze+account every row; skip Monte Carlo")
     p.add_argument("--resume", type=Path, default=None)
     p.add_argument("--workspace", type=Path, default=DEFAULT_WORKSPACE)
+    p.add_argument(
+        "--archive-github",
+        action="store_true",
+        help="Copy a safe audit pack into audit/runs/<runId>/, append INDEX.jsonl, commit, and push.",
+    )
+    p.add_argument(
+        "--no-archive-push",
+        action="store_true",
+        help="With --archive-github, write+commit the pack but do not git push.",
+    )
     p.add_argument(
         "--version",
         default=None,
@@ -852,6 +938,9 @@ def main(argv: list[str] | None = None) -> int:
             bundle_path=args.bundle,
             research_shadow=args.research_shadow,
             cutoff_from_capture=args.cutoff_from_capture,
+            archive_github=bool(args.archive_github),
+            archive_push=bool(args.archive_github) and not bool(args.no_archive_push),
+            repo_root=args.workspace,
         )
     except FileNotFoundError as e:
         print(str(e), file=sys.stderr)
@@ -875,6 +964,10 @@ def main(argv: list[str] | None = None) -> int:
                 "cardSize": integ.get("cardSize"),
                 "chatgptOperable": integ.get("chatgptOperable"),
                 "dest": result["dest"],
+                "archivePath": result.get("archivePath"),
+                "locksCertified": result.get("locksCertified"),
+                "hallucinationRisk": result.get("hallucinationRisk"),
+                "githubCommit": result.get("githubCommit"),
             },
             indent=2,
         )
