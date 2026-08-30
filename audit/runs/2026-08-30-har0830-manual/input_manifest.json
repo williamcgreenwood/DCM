@@ -1,0 +1,30 @@
+{
+  "runId": "2026-08-30-har0830-manual",
+  "har_copied_into_audit": false,
+  "har_sha256": "cd4c8c7c32427bcf5763ba88620a99c56c90c0a3b73cc67a7faf134cd42e7467",
+  "har_filename_is_sha256": true,
+  "captureStart": "2026-08-30T17:48:00.398Z",
+  "captureEnd": "2026-08-30T17:48:25.790Z",
+  "forecast_cutoff_pack": "2026-08-30T17:48:00Z",
+  "eligible_dump": "dcm_v6/INBOX/eligible_0830.json",
+  "eligible_dump_cutoff": "2026-08-30T17:48:25.790Z",
+  "claim_record_module": "dcm.research.claims.claim_record",
+  "hashes_computed": true,
+  "url_verification": {
+    "https://www.basketball-reference.com/wnba/players/c/canadjo01w.html": "200 (WebFetch 2026-08-30 pack compile)",
+    "https://www.basketball-reference.com/wnba/players/m/mcbrika01w.html": "200 (WebFetch 2026-08-30 pack compile)",
+    "https://www.basketball-reference.com/wnba/players/g/grayal01w.html": "200 (WebFetch 2026-08-30 pack compile)",
+    "https://www.basketball-reference.com/wnba/players/o/ogwumnn01w.html": "200 (WebFetch 2026-08-30 pack compile)",
+    "https://www.basketball-reference.com/wnba/players/s/shepaje01w.html": "200 (WebFetch 2026-08-30 pack compile)",
+    "https://www.basketball-reference.com/wnba/players/m/milesol01w.html": "200 (WebFetch 2026-08-30 pack compile)",
+    "https://www.basketball-reference.com/wnba/years/2026_leaders.html": "200 (WebFetch 2026-08-30 pack compile)",
+    "https://www.espn.com/wnba/injuries": "200 (WebFetch 2026-08-30 pack compile)",
+    "https://www.espn.com/wnba/preview/_/gameId/401857186": "200 (WebFetch 2026-08-30 pack compile)",
+    "https://www.espn.com/wnba/preview/_/gameId/401857189": "200 (WebFetch 2026-08-30 pack compile)",
+    "https://www.espn.com/wnba/game/_/gameId/401857187/sparks-storm": "200 (WebFetch 2026-08-30 pack compile)",
+    "https://www.wnba.com/game/min-vs-atl-1022600297": "200 in original research transcript (WebSearch/WebFetch L334)",
+    "https://www.wnba.com/game/las-vs-sea-1022600298": "200 in original research transcript (WebSearch/WebFetch L334)",
+    "https://api.prizepicks.com/projections?league_id=3&per_page=250&single_stat=true&in_game=true&state_code=CA&game_mode=prizepools": "present in 08/30 HAR capture (not re-fetched; cookies not used)"
+  },
+  "failed_urls": []
+}
