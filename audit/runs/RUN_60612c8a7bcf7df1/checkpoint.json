@@ -1,0 +1,34 @@
+{
+  "artifactRoot": "/workspace/DCM-repo/dcm_v6/RUNS/RUN_60612c8a7bcf7df1",
+  "blockers": [
+    "GOBLIN_SELECTION_FORBIDDEN",
+    "UNSUPPORTED_FAIL_CLOSED",
+    "UNRESOLVED"
+  ],
+  "calibrationStateHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+  "checkpointHash": "86ce1268d6394231581b297dbd7ddf0c9bc41c8f948dbadd2e8c166fd5ee8232",
+  "completedStages": [
+    "BOARD_FREEZE",
+    "RESEARCH",
+    "MODEL",
+    "RANK",
+    "PORTFOLIO",
+    "FREEZE"
+  ],
+  "dcmVersion": "6.0.0+WSAB.E2E.PRODUCTION_PIPELINE.LR000000",
+  "forecastCutoff": "2026-08-30T19:43:12Z",
+  "frozenForecastHash": "ae0f2e5fb1c15139f88fea9abefca2583b99f07d87e33686c086c0adfce6c797",
+  "learningRevision": "LR000000",
+  "modelConfigHash": "5c52767a96036e16ed99f8469c48cdd5c092ffe76d76d1669632c02311f8e389",
+  "mountStateHash": "75cfcf2dfa04af79a380e31bf259cb9620308d293afd5d691fa559c6d0b6b941",
+  "nextDeterministicAction": "none",
+  "pending": [],
+  "rowCounts": {
+    "EXCLUDED_GOBLIN": 2569,
+    "MODELED": 2909,
+    "UNRESOLVED": 1895,
+    "UNSUPPORTED": 7234
+  },
+  "runId": "RUN_60612c8a7bcf7df1",
+  "schemaStateHash": "d07b1238a609c1910bf41c9846b0c16fc556b6fa2c85458217fa037b26f1bd18"
+}

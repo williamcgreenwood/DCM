@@ -39,12 +39,25 @@ from dcm.runtime.checkpoint import load_checkpoint, write_checkpoint
 from dcm.runtime.cutoff import CutoffRequired, POLICY_DOC, resolve_forecast_cutoff
 from dcm.runtime.dag import Dag
 from dcm.runtime.freeze import compute_forecast_hash
+from dcm.runtime.github_archive import append_index, build_run_audit, certification_fields, materialize_github_pack, push_to_github
 from dcm.runtime.governor import Governor
 from dcm.runtime.mount_v541 import mount_default
 from dcm.runtime.schema_root import SCHEMA_V2_ID, verify_schema, verify_schema_v2
 from dcm.runtime.perf import StageTimer
 from dcm.runtime.readiness import build_readiness
 from dcm.runtime.store import IndexedStore
+from dcm.selection.card_layers import (
+    EMPTY_ACCOUNT_ONLY,
+    EMPTY_ROOT_NOT_CERTIFIED,
+    NOT_PRODUCTION_ROOT_CERTIFIED,
+    build_directional_passes,
+    is_modeled_playable,
+    layer_run_state,
+    modeled_empty_card_reason,
+    production_certified_rows,
+    production_root_accepted,
+    write_card_layer_files,
+)
 from dcm.selection.portfolio import build_card, exposure_report
 from dcm.version import (
     ExactVersionMismatch,
@@ -63,6 +76,70 @@ MC_SE_TARGET = float(__import__("os").environ.get("DCM_MC_SE_TARGET", "0.008"))
 ARTIFACT_ROOT = Path(__file__).resolve().parents[1]
 _REPO_CANDIDATE = Path(__file__).resolve().parents[3] if len(Path(__file__).resolve().parents) > 3 else Path.cwd()
 DEFAULT_WORKSPACE = _REPO_CANDIDATE if (_REPO_CANDIDATE / "VERSION.json").is_file() else Path.cwd()
+
+
+def _finalize_archive(
+    dest: Path,
+    result: dict[str, Any],
+    *,
+    archive_github: bool = False,
+    archive_push: bool = False,
+    repo_root: Path | None = None,
+) -> dict[str, Any]:
+    """Always write dest/audit/. Optionally copy+commit+push a GitHub pack."""
+    try:
+        audit = build_run_audit(dest)
+    except Exception as exc:  # noqa: BLE001 — never lose a finished run to archive I/O
+        result["auditError"] = type(exc).__name__
+        result.setdefault("locksCertified", False)
+        result.setdefault("modelRunCertified", False)
+        result.setdefault("selectionCertified", False)
+        result.setdefault("evidenceCoverageCertified", False)
+        result.setdefault("evidenceTemporalCertified", False)
+        result.setdefault("archiveIntegrityCertified", False)
+        result.setdefault("productionRootCertified", False)
+        result.setdefault("predictiveValidationEarned", False)
+        result.setdefault("hashCertifiedPythonFreeze", False)
+        result.setdefault("hallucinationRisk", True)
+        return result
+    result.update(certification_fields(audit))
+    result["locksCertified"] = bool(audit.get("locksCertified"))
+    result["hallucinationRisk"] = bool(audit.get("hallucinationRisk"))
+    result["archivePath"] = str(Path(dest) / "audit")
+    result["githubCommit"] = None
+    if not archive_github:
+        return result
+    root = Path(repo_root) if repo_root is not None else DEFAULT_WORKSPACE
+    try:
+        pack = materialize_github_pack(Path(dest), root)
+        run_id = str(result.get("run_id") or audit.get("runId") or Path(dest).name)
+        append_index(
+            root,
+            {
+                "runId": run_id,
+                "path": f"audit/runs/{run_id}",
+                "locksCertified": audit.get("locksCertified"),
+                "hallucinationRisk": audit.get("hallucinationRisk"),
+                "runState": audit.get("runState") or result.get("runState"),
+                "frozenForecastHash": audit.get("frozenForecastHash"),
+                "createdAtUtc": audit.get("createdAtUtc"),
+                "software": audit.get("software") or SOFTWARE,
+                "learningRevision": audit.get("learningRevision") or LEARNING_REVISION,
+                "predictiveClaim": audit.get("predictiveClaim") or PREDICTIVE_CLAIM,
+                **certification_fields(audit),
+            },
+        )
+        gh = push_to_github(root, run_id, push=bool(archive_push))
+        result["archivePath"] = str(pack)
+        result["githubCommit"] = gh.get("commit")
+        result["githubPushed"] = gh.get("pushed")
+        if gh.get("error"):
+            result["archiveError"] = gh.get("error")
+    except Exception as exc:  # noqa: BLE001
+        result["archiveError"] = type(exc).__name__
+    return result
+
+
 
 def _synthetic_path() -> Path:
     candidates = [
@@ -116,6 +193,9 @@ def run_dcm(
     bundle_path: Path | None = None,
     research_shadow: bool = False,
     cutoff_from_capture: bool = False,
+    archive_github: bool = False,
+    archive_push: bool = False,
+    repo_root: Path | None = None,
 ) -> dict[str, Any]:
     if resume:
         ck = load_checkpoint(resume)
@@ -268,11 +348,24 @@ def run_dcm(
         (dest / "full_population.jsonl").write_text((dest / "population_full.jsonl").read_text(encoding="utf-8"), encoding="utf-8")
         hashes = {"boardHash": board.get("contentHash"), "harSha256": har_sha, "schemaV1Expected": "6e78dacc19843338643bdcabc7477fd3ce2dd065da1e9629646dacc21cdb1f22"}
         (dest / "hashes.json").write_text(json.dumps(hashes, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        write_card_layer_files(
+            dest,
+            top25_ranked=[],
+            strict_card=[],
+            production_certified=[],
+            directional_passes=[],
+        )
         run_state = "COMPLETE_WITH_UNSUPPORTED_ROWS" if counts.get("UNSUPPORTED") else "EMPTY_CARD_COMPLETE"
         freeze = {
             "runId": run_id, "runState": run_state, "learningRevision": LEARNING_REVISION,
             "predictiveClaim": PREDICTIVE_CLAIM, "rawRows": len(rows), "accountOnly": True,
             "classified": counts, "boardHash": board.get("contentHash"),
+            "cardSize": 0, "modeledCardSize": 0, "playable": 0,
+            "productionCertified": False, "notProductionRootCertified": True,
+            "productionRootCertification": NOT_PRODUCTION_ROOT_CERTIFIED,
+            "executionMode": "RESEARCHED_MODELED",
+            "emptyCardReason": EMPTY_ACCOUNT_ONLY,
+            "productionEmptyCardReason": EMPTY_ROOT_NOT_CERTIFIED,
         }
         (dest / "freeze.json").write_text(json.dumps(freeze, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         planned = plan_research(rows, forecast_cutoff, research_shadow=research_shadow)
@@ -301,7 +394,13 @@ def run_dcm(
             "mountStateHash": content_hash(mount),
             "schemaStateHash": content_hash(schema_root),
         })
-        return {"run_id": run_id, "dest": str(dest), "runState": run_state, "checkpoint": ck, "integrity": freeze, "board": board}
+        return _finalize_archive(
+            dest,
+            {"run_id": run_id, "dest": str(dest), "runState": run_state, "checkpoint": ck, "integrity": freeze, "board": board},
+            archive_github=archive_github,
+            archive_push=archive_push,
+            repo_root=repo_root,
+        )
 
 
     t = StageTimer("RESEARCH")
@@ -368,13 +467,19 @@ def run_dcm(
                 "blockers": ["RESEARCH_INCOMPLETE"],
             },
         )
-        return {
-            "run_id": run_id,
-            "dest": str(dest),
-            "runState": "INCOMPLETE_CHECKPOINTED",
-            "checkpoint": ck,
-            "research": bundle,
-        }
+        return _finalize_archive(
+            dest,
+            {
+                "run_id": run_id,
+                "dest": str(dest),
+                "runState": "INCOMPLETE_CHECKPOINTED",
+                "checkpoint": ck,
+                "research": bundle,
+            },
+            archive_github=archive_github,
+            archive_push=archive_push,
+            repo_root=repo_root,
+        )
     dag.complete(n_res.key, content_hash([c["claim_hash"] for c in bundle["claims"]]))
     research_perf = t.finish(NodeCount=len(requests), CacheHits=bundle["reused"])
     (dest / "performance" / "research.json").write_text(json.dumps(research_perf, indent=2) + "\n", encoding="utf-8")
@@ -383,6 +488,7 @@ def run_dcm(
     canonical_ready = mount.get("state") == "HASH_VERIFIED_EXTRACTED"
     schema_ready = bool(schema_root.get("productionEligible")) and schema_root.get("state") == "HASH_VERIFIED"
     production_research_ready = bool(bundle.get("production_ready"))
+    # Production root (v5/V1/production research). Must not zero modeled ranking or strict_card.
     global_selection_gate = canonical_ready and schema_ready and production_research_ready and not synthetic
 
     gov = Governor(
@@ -563,6 +669,7 @@ def run_dcm(
             "calibrationState": ev["calibrationState"], "parameterSnapshotHash": snapshot["parameter_snapshot_hash"],
             "evidenceHashes": snapshot["evidence_hashes"], "dependencyTags": snapshot["dependency_tags"],
             "productionSelectable": production_selectable,
+            "modeledPlayable": is_modeled_playable({"row": row, "grade": ev["grade"], "state": "MODELED", "blocker": rec.get("blocker") or blocker}),
             "researchOnly": blocker in {"RESEARCH_ONLY_NOT_SELECTABLE", "SHADOW_SUPPORTED_NOT_SELECTABLE"},
             "worldCount": len(values),
             "_selectionOutcomes": selection_outcomes,
@@ -587,11 +694,8 @@ def run_dcm(
     stages_done.add("MODEL")
 
     ranked = rank_candidates(modeled, top_k=25, seed=har_sha)
-    qualified = [
-        p for p in ranked
-        if p.get("grade") == "PLAYABLE" and p.get("productionSelectable")
-        and p["row"].get("modifier") != "GOBLIN"
-    ]
+    # Strict card is PLAYABLE-grade modeled rows. Production root is a later layer.
+    qualified = [p for p in ranked if is_modeled_playable(p)]
     card = build_card(qualified)
     exposure = exposure_report(card)
     n_rank = dag.add("RANK", "board", parents=[n_worlds.key])
@@ -617,6 +721,7 @@ def run_dcm(
             "monteCarloSE": p.get("monteCarloSE"), "opportunityMean": p.get("opportunityMean"),
             "grade": p.get("grade"), "state": p.get("state"), "blocker": p.get("blocker"),
             "productionSelectable": p.get("productionSelectable", False),
+            "modeledPlayable": p.get("modeledPlayable", False),
             "calibrationState": p.get("calibrationState"), "selectionScore": p.get("selectionScore"),
             "parameterSnapshotHash": p.get("parameterSnapshotHash"),
             "topKInclusionP": p.get("topKInclusionP"), "rankStability": p.get("rankStability"),
@@ -632,9 +737,7 @@ def run_dcm(
     strict_card = [slim(p) for p in card]
     full_population = [slim(p) for p in classified]
     (dest / "top100.json").write_text(json.dumps(top100, indent=2) + "\n", encoding="utf-8")
-    (dest / "top25_ranked.json").write_text(json.dumps(top25_ranked, indent=2) + "\n", encoding="utf-8")
     (dest / "top25_qualified.json").write_text(json.dumps(top25_qualified, indent=2) + "\n", encoding="utf-8")
-    (dest / "strict_card.json").write_text(json.dumps(strict_card, indent=2) + "\n", encoding="utf-8")
     (dest / "full_population.jsonl").write_text("".join(json.dumps(p) + "\n" for p in full_population), encoding="utf-8")
     (dest / "dependencies.json").write_text(
         json.dumps(exposure, indent=2, sort_keys=True) + "\n",
@@ -645,14 +748,13 @@ def run_dcm(
     for p in classified:
         states_count[p["state"]] = states_count.get(p["state"], 0) + 1
 
-    if not global_selection_gate:
-        run_state = "EMPTY_CARD_COMPLETE"
-    elif not card and board["accounting"]["raw_projection_rows"] > 0:
-        run_state = "EMPTY_CARD_COMPLETE"
-    elif unsupported:
-        run_state = "COMPLETE_WITH_UNSUPPORTED_ROWS"
-    else:
-        run_state = "COMPLETE_FROZEN"
+    evidence_coverage_complete = bool((bundle.get("coverage") or {}).get("complete"))
+    empty_card_reason = modeled_empty_card_reason(
+        modeled_card_size=len(card),
+        modeled_playable_count=len(qualified),
+        evidence_coverage_complete=evidence_coverage_complete,
+        research_complete=bool(bundle.get("complete")),
+    )
 
     freeze = {
         "runId": run_id,
@@ -664,9 +766,7 @@ def run_dcm(
         "chatgptOperable": True,
         "productionOperable": global_selection_gate,
         "selectionAllowed": global_selection_gate,
-        "executionMode": "PRODUCTION" if global_selection_gate else "ENGINEERING_OR_BLOCKED",
         "softwareE2eComplete": True,
-        "runState": run_state,
         "v5Decoder": mount.get("har_decoder"),
         "v5MountState": mount.get("state"),
         "schemaId": SCHEMA,
@@ -685,6 +785,7 @@ def run_dcm(
         "modeled": len(modeled),
         "playable": len(qualified),
         "cardSize": len(card),
+        "modeledCardSize": len(card),
         "eventWorlds": len(world_cache),
         "conservationFailures": conservation_failures,
         "researchRequested": bundle["requested"],
@@ -720,6 +821,37 @@ def run_dcm(
     freeze["productionSelectionReady"] = readiness["productionSelectionReady"]
     freeze["systemCertified"] = readiness["systemCertified"]
     freeze["predictiveValidationEarned"] = readiness["predictiveValidationEarned"]
+    root_accepted = production_root_accepted(
+        global_selection_gate=global_selection_gate,
+        production_selection_ready=bool(readiness["productionSelectionReady"]),
+    )
+    production_certified = production_certified_rows(strict_card, root_accepted=root_accepted)
+    directional_passes = build_directional_passes(ranked, strict_card)
+    write_card_layer_files(
+        dest,
+        top25_ranked=top25_ranked,
+        strict_card=strict_card,
+        production_certified=production_certified,
+        directional_passes=directional_passes,
+    )
+    freeze["productionCertified"] = bool(root_accepted and production_certified)
+    freeze["notProductionRootCertified"] = not root_accepted
+    freeze["productionRootCertification"] = (
+        "PRODUCTION_ROOT_CERTIFIED" if root_accepted else NOT_PRODUCTION_ROOT_CERTIFIED
+    )
+    freeze["productionCertifiedCardSize"] = len(production_certified)
+    freeze["executionMode"] = "PRODUCTION" if root_accepted else "RESEARCHED_MODELED"
+    run_state = layer_run_state(
+        root_accepted=root_accepted,
+        modeled_card_size=len(card),
+        ranked_size=len(top25_ranked),
+        unsupported=unsupported,
+    )
+    freeze["runState"] = run_state
+    if empty_card_reason:
+        freeze["emptyCardReason"] = empty_card_reason
+    if not root_accepted:
+        freeze["productionEmptyCardReason"] = EMPTY_ROOT_NOT_CERTIFIED
     freeze["frozenForecastHash"] = compute_forecast_hash(
         freeze,
         full_population,
@@ -776,18 +908,24 @@ def run_dcm(
             "frozenForecastHash": freeze["frozenForecastHash"],
         },
     )
-    return {
-        "run_id": run_id,
-        "dest": str(dest),
-        "runState": run_state,
-        "integrity": integrity,
-        "card": strict_card,
-        "top25_qualified": top25_qualified,
-        "board": board,
-        "classified": classified,
-        "world_cache": world_cache,
-        "dag": dag.snapshot(),
-    }
+    return _finalize_archive(
+        dest,
+        {
+            "run_id": run_id,
+            "dest": str(dest),
+            "runState": run_state,
+            "integrity": integrity,
+            "card": strict_card,
+            "top25_qualified": top25_qualified,
+            "board": board,
+            "classified": classified,
+            "world_cache": world_cache,
+            "dag": dag.snapshot(),
+        },
+        archive_github=archive_github,
+        archive_push=archive_push,
+        repo_root=repo_root,
+    )
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -817,6 +955,16 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--account-only", action="store_true", help="Freeze+account every row; skip Monte Carlo")
     p.add_argument("--resume", type=Path, default=None)
     p.add_argument("--workspace", type=Path, default=DEFAULT_WORKSPACE)
+    p.add_argument(
+        "--archive-github",
+        action="store_true",
+        help="Copy a safe audit pack into audit/runs/<runId>/ and append INDEX.jsonl. Commits if git identity/repo are available; a git commit failure does not fail the DCM run. Pushes unless --no-archive-push.",
+    )
+    p.add_argument(
+        "--no-archive-push",
+        action="store_true",
+        help="With --archive-github, write+commit the pack but do not git push.",
+    )
     p.add_argument(
         "--version",
         default=None,
@@ -852,6 +1000,9 @@ def main(argv: list[str] | None = None) -> int:
             bundle_path=args.bundle,
             research_shadow=args.research_shadow,
             cutoff_from_capture=args.cutoff_from_capture,
+            archive_github=bool(args.archive_github),
+            archive_push=bool(args.archive_github) and not bool(args.no_archive_push),
+            repo_root=args.workspace,
         )
     except FileNotFoundError as e:
         print(str(e), file=sys.stderr)
@@ -873,8 +1024,22 @@ def main(argv: list[str] | None = None) -> int:
                 "modeled": integ.get("modeled"),
                 "playable": integ.get("playable"),
                 "cardSize": integ.get("cardSize"),
+                "modeledCardSize": integ.get("modeledCardSize"),
+                "productionCertified": integ.get("productionCertified"),
                 "chatgptOperable": integ.get("chatgptOperable"),
                 "dest": result["dest"],
+                "archivePath": result.get("archivePath"),
+                "locksCertified": result.get("locksCertified"),
+                "archiveIntegrityCertified": result.get("archiveIntegrityCertified"),
+                "evidenceCoverageCertified": result.get("evidenceCoverageCertified"),
+                "evidenceTemporalCertified": result.get("evidenceTemporalCertified"),
+                "modelRunCertified": result.get("modelRunCertified"),
+                "selectionCertified": result.get("selectionCertified"),
+                "productionRootCertified": result.get("productionRootCertified"),
+                "predictiveValidationEarned": result.get("predictiveValidationEarned"),
+                "hashCertifiedPythonFreeze": result.get("hashCertifiedPythonFreeze"),
+                "hallucinationRisk": result.get("hallucinationRisk"),
+                "githubCommit": result.get("githubCommit"),
             },
             indent=2,
         )

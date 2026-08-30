@@ -62,10 +62,13 @@ def test_compact_cli_fixture_run_writes_artifacts(tmp_path: Path):
         "INCOMPLETE_CHECKPOINTED",
         "COMPLETE_WITH_UNSUPPORTED_ROWS",
         "EMPTY_CARD_COMPLETE",
+        "RESEARCHED_MODELED_CARD",
+        "RESEARCHED_MODELED_TOP25",
     }
     for name in (
         "board.json", "population_full.jsonl", "top100.json", "top25_ranked.json",
-        "top25_qualified.json", "strict_card.json", "production_readiness.json",
+        "top25_qualified.json", "strict_card.json", "production_certified_card.json",
+        "directional_passes.json", "production_readiness.json",
         "evidence_bundle.jsonl", "bundle_manifest.json", "hashes.json", "freeze.json",
         "research_requests.json", "checkpoint.json", "accounting.json",
     ):
@@ -76,6 +79,8 @@ def test_compact_cli_fixture_run_writes_artifacts(tmp_path: Path):
     freeze = json.loads((dest / "freeze.json").read_text())
     assert freeze["learningRevision"] == "LR000000"
     assert freeze["predictiveClaim"] == "NONE"
+    assert freeze["productionCertified"] is False
+    assert freeze.get("notProductionRootCertified") is True
 
 
 def test_full_sanitized_har_accounts_11113(tmp_path: Path):

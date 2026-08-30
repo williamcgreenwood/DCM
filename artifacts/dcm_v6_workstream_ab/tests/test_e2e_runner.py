@@ -89,7 +89,7 @@ def test_a_synthetic_smoke(tmp_path: Path):
         synthetic=True,
         research="fixture",
     )
-    assert result["runState"] in {"COMPLETE_FROZEN", "COMPLETE_WITH_UNSUPPORTED_ROWS", "EMPTY_CARD_COMPLETE"}
+    assert result["runState"] in {"COMPLETE_FROZEN", "COMPLETE_WITH_UNSUPPORTED_ROWS", "EMPTY_CARD_COMPLETE", "RESEARCHED_MODELED_CARD", "RESEARCHED_MODELED_TOP25"}
     dest = Path(result["dest"])
     for name in (
         "board.json",
@@ -98,6 +98,8 @@ def test_a_synthetic_smoke(tmp_path: Path):
         "top25_ranked.json",
         "top25_qualified.json",
         "strict_card.json",
+        "production_certified_card.json",
+        "directional_passes.json",
         "frozen_forecast.json",
         "run_integrity.json",
         "checkpoint.json",
@@ -118,6 +120,13 @@ def test_a_synthetic_smoke(tmp_path: Path):
     assert all(p["modifier"] != "GOBLIN" for p in card)
     freeze = json.loads((dest / "frozen_forecast.json").read_text())
     assert freeze["v5Decoder"] == "NOT_MOUNTED"
+    assert freeze["productionCertified"] is False
+    assert freeze["notProductionRootCertified"] is True
+    assert freeze["executionMode"] == "RESEARCHED_MODELED"
+    certified = json.loads((dest / "production_certified_card.json").read_text())
+    assert certified == []
+    if freeze["cardSize"] == 0:
+        assert freeze.get("emptyCardReason") in {"EMPTY_NO_PLAYABLES", "EMPTY_RESEARCH_INCOMPLETE", "EMPTY_PORTFOLIO_CONSTRAINT"}
 
 
 def test_b_real_har_sanitized_fixture_is_supplied():
@@ -246,7 +255,7 @@ def test_e_checkpoint_resume_matches_uninterrupted(tmp_path: Path):
         research="fixture",
         resume=ck_path,
     )
-    assert resumed["runState"] in {"COMPLETE_FROZEN", "COMPLETE_WITH_UNSUPPORTED_ROWS", "EMPTY_CARD_COMPLETE"}
+    assert resumed["runState"] in {"COMPLETE_FROZEN", "COMPLETE_WITH_UNSUPPORTED_ROWS", "EMPTY_CARD_COMPLETE", "RESEARCHED_MODELED_CARD", "RESEARCHED_MODELED_TOP25"}
     assert resumed["integrity"]["frozenForecastHash"] == a["integrity"]["frozenForecastHash"]
     assert resumed["integrity"]["predictiveClaim"] == PREDICTIVE_CLAIM
 
@@ -266,10 +275,12 @@ def test_f_zero_playable_returns_empty_card(tmp_path: Path):
     path = tmp_path / "empty.har.json"
     path.write_text(json.dumps(_synthetic_har(rows)), encoding="utf-8")
     result = run_dcm(input_path=path, forecast_cutoff=CUTOFF, output_root=tmp_path / "out", research="fixture")
-    assert result["runState"] in {"EMPTY_CARD_COMPLETE", "COMPLETE_WITH_UNSUPPORTED_ROWS"}
+    assert result["runState"] in {"EMPTY_CARD_COMPLETE", "COMPLETE_WITH_UNSUPPORTED_ROWS", "RESEARCHED_MODELED_CARD", "RESEARCHED_MODELED_TOP25"}
     assert result["integrity"]["cardSize"] == 0
     assert result["card"] == []
     assert result["integrity"]["playable"] == 0
+    assert result["integrity"]["productionCertified"] is False
+    assert result["integrity"].get("emptyCardReason") in {"EMPTY_NO_PLAYABLES", "EMPTY_RESEARCH_INCOMPLETE"}
 
 
 def test_g_demon_is_demotion_only():

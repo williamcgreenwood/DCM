@@ -94,6 +94,8 @@ def test_checkpoint_bundle_resume_validate_snapshot_model_freeze(tmp_path: Path)
         "COMPLETE_FROZEN",
         "COMPLETE_WITH_UNSUPPORTED_ROWS",
         "EMPTY_CARD_COMPLETE",
+        "RESEARCHED_MODELED_CARD",
+        "RESEARCHED_MODELED_TOP25",
     }
     assert (dest / "parameters" / "snapshots.json").is_file()
     snaps = json.loads((dest / "parameters" / "snapshots.json").read_text())
@@ -102,4 +104,8 @@ def test_checkpoint_bundle_resume_validate_snapshot_model_freeze(tmp_path: Path)
     assert freeze["learningRevision"] == "LR000000"
     assert freeze["predictiveClaim"] == "NONE"
     assert freeze["researchComplete"] is True
+    assert freeze["productionCertified"] is False
+    assert freeze["executionMode"] == "RESEARCHED_MODELED"
     assert (dest / "frozen_forecast.json").is_file()
+    assert json.loads((dest / "production_certified_card.json").read_text()) == []
+    assert (dest / "top25_ranked.json").is_file()
