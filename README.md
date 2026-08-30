@@ -18,7 +18,7 @@ source .venv/bin/activate
 pip install -e '.[dev]'
 ```
 
-After install, `python -m dcm.runner` and `python -m pillars_dcm.runner` work without `PYTHONPATH` hacks.
+After install, `pillars-dcm`, `python -m dcm`, and `python -m pillars_dcm` work without `PYTHONPATH`. Identity is `VERSION.json`.
 
 Without install (legacy):
 
@@ -41,7 +41,7 @@ CI uses `DCM_FAST_WORLDS=64` (and related caps) so Monte Carlo stays bounded.
 Synthetic smoke:
 
 ```bash
-python -m dcm.runner --synthetic --research fixture --out dcm_v6/RUNS
+python -m dcm --synthetic --research fixture --cutoff-from-capture --out dcm_v6/RUNS
 ```
 
 Compact sanitized live HAR (full model path; fixture research is synthetic/test-only):
@@ -50,7 +50,7 @@ Compact sanitized live HAR (full model path; fixture research is synthetic/test-
 python -m dcm.runner \
   --input artifacts/dcm_v6_workstream_ab/fixtures/sanitized_live_har/prizepicks_compact.har \
   --version 6.0.0 \
-  --cutoff 2026-08-29T16:00:00Z \
+  --cutoff 2026-08-29T16:00:00Z \  # required; or --cutoff-from-capture
   --research fixture \
   --output dcm_v6/RUNS
 ```
@@ -61,7 +61,7 @@ Full sanitized live HAR (account every row; do not fabricate logs; skip MC):
 python -m dcm.runner \
   --input artifacts/dcm_v6_workstream_ab/fixtures/sanitized_live_har/prizepicks_20260829.sanitized.har \
   --version 6.0.0 \
-  --cutoff 2026-08-29T16:00:00Z \
+  --cutoff 2026-08-29T16:00:00Z \  # required; or --cutoff-from-capture
   --account-only \
   --output dcm_v6/RUNS
 ```
@@ -86,6 +86,14 @@ status: pre_game 10836, in_progress 259, suspended 18
 84 games, 1358 players  
 
 Goblins are extracted/accounted then excluded from selection. Demons get extra cushion. MLB is SHADOW (no production PLAYABLE). Soccer/EPL/KBO/NPB/CFL/OTD fail closed after accounting. Live/in_progress/suspended are not production-selected. Player IDs come from HAR `new_player` ids only.
+
+## Cutoff and version
+
+`--cutoff` is required unless `--cutoff-from-capture` or `--resume`. There is no hardcoded default (the old 2026-08-28T00:00:00Z default is gone). `--version` must match VERSION.json software or softwareShort. `--research-shadow` (default OFF) is required to deep-research MLB. Host research plans are bundle-oriented.
+
+## Releases
+
+Do not load a committed artifacts ZIP. Build with `python -m pillars_dcm.release` or `scripts/build_portable.py`.
 
 ## Honest blockers
 

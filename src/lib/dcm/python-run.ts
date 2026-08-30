@@ -31,6 +31,9 @@ export const runPythonDcm = createServerFn({ method: "POST" })
       source: z.enum(["synthetic", "paste"]),
       paste: z.string().optional(),
       cutoff: z.string().optional(),
+      cutoffFromCapture: z.boolean().optional(),
+      version: z.string().optional(),
+      research: z.enum(["fixture", "file", "bundle"]).optional(),
     }),
   )
   .handler(async ({ data }): Promise<DcmView> => {
@@ -51,14 +54,26 @@ export const runPythonDcm = createServerFn({ method: "POST" })
       "-m",
       "dcm.runner",
       "--research",
-      "fixture",
+      data.research || (data.source === "synthetic" ? "fixture" : "file"),
       "--cutoff",
-      data.cutoff || "2026-08-28T23:59:59Z",
+      data.cutoff || "",
       "--out",
       outRoot,
       "--workspace",
       workspace,
     ];
+    if (data.version && data.version.trim()) {
+      args.push("--version", data.version.trim());
+    }
+    if (!data.cutoff || !data.cutoff.trim()) {
+      if (data.cutoffFromCapture || data.source === "synthetic") {
+        const idx = args.indexOf("--cutoff");
+        if (idx >= 0) args.splice(idx, 2);
+        args.push("--cutoff-from-capture");
+      } else {
+        return pythonUnavailable("Forecast cutoff is required. Pass cutoff or enable cutoffFromCapture.");
+      }
+    }
     if (data.source === "synthetic") {
       args.push("--synthetic");
     } else {
@@ -76,9 +91,9 @@ export const runPythonDcm = createServerFn({ method: "POST" })
         ...process.env,
         PYTHONPATH: pkg,
         PYTHONDONTWRITEBYTECODE: "1",
-        DCM_FAST_WORLDS: "48",
-        DCM_SERIOUS_WORLDS: "48",
-        DCM_MAX_WORLDS: "48",
+        DCM_FAST_WORLDS: process.env.DCM_FAST_WORLDS || (data.source === "synthetic" ? "64" : "256"),
+        DCM_SERIOUS_WORLDS: process.env.DCM_SERIOUS_WORLDS || (data.source === "synthetic" ? "64" : "2048"),
+        DCM_MAX_WORLDS: process.env.DCM_MAX_WORLDS || (data.source === "synthetic" ? "64" : "8192"),
       },
       encoding: "utf8",
       timeout: 90000,

@@ -57,7 +57,7 @@ Account-only classification (CLI): EXCLUDED_GOBLIN 1849, MODELED 2414 (MLB shado
 - V1 expected SHA-256 (immutable): `6e78dacc19843338643bdcabc7477fd3ce2dd065da1e9629646dacc21cdb1f22`
 - V1 bytes: **ABSENT**. Reconstruction inventory is not canonical.
 - V2 freeze id: `PHASE_BC_SCHEMA_V2_2026-08-29`
-- V2 SHA-256: `12b25060820b106b0c7dc439f13c36cea83588233f60b6fccba7cfff1451784f`
+- V2 SHA-256: `6edbc92e94c734ead8c94edcfa8b112c2fb33ec3fb4610a89199b84993df6521` (field-level expansion; productionEligible false)
 - V2 `productionEligible`: **false**. ADR: `docs/ADR-PHASE-BC-V2.md`
 
 ## Remaining blockers (do not paper over)

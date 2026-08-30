@@ -10,7 +10,10 @@ type Tab = (typeof TABS)[number];
 export function OperatorConsole() {
   const [tab, setTab] = useState<Tab>("Integrity");
   const [paste, setPaste] = useState("");
-  const [cutoff, setCutoff] = useState("2026-08-28T23:59:59Z");
+  const [cutoffFromCapture, setCutoffFromCapture] = useState(true);
+  const [version, setVersion] = useState("");
+  const [research, setResearch] = useState<"fixture" | "file" | "bundle">("fixture");
+  const [cutoff, setCutoff] = useState("");
   const [run, setRun] = useState<DcmView | null>(null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -19,7 +22,7 @@ export function OperatorConsole() {
     setBusy(true);
     setErr(null);
     try {
-      const result = await runPythonDcm({ data: { source, paste, cutoff } });
+      const result = await runPythonDcm({ data: { source, paste, cutoff, cutoffFromCapture, version, research } });
       setRun(result);
       setTab(result.pythonAvailable ? "Ranked" : "Integrity");
     } catch (e) {
@@ -49,6 +52,7 @@ export function OperatorConsole() {
             Forecast cutoff
             <input value={cutoff} onChange={(e) => setCutoff(e.target.value)} className="mt-1.5 h-11 w-full rounded-md border border-border bg-bg px-3 font-mono text-xs" />
           </label>
+          <label className="mt-3 flex items-center gap-2 text-xs text-muted"><input type="checkbox" checked={cutoffFromCapture} onChange={(e) => setCutoffFromCapture(e.target.checked)} /> Derive cutoff from capture</label>
           <button type="button" disabled={busy} data-dcm-action="synthetic" onClick={() => void execute("synthetic")} className="mt-4 flex h-11 w-full items-center justify-center gap-2 rounded-md bg-accent text-sm font-medium text-accent-fg disabled:opacity-50">
             <Play className="size-4" />
             {busy ? "Running Python…" : "Run synthetic board"}
