@@ -13,6 +13,7 @@ from typing import Any
 from dcm.runtime.github_archive import (
     append_index,
     build_run_audit,
+    certification_fields,
     materialize_github_pack,
     push_to_github,
 )
@@ -60,6 +61,7 @@ def main(argv: list[str] | None = None) -> int:
             "software": audit.get("software") or SOFTWARE,
             "learningRevision": audit.get("learningRevision") or LEARNING_REVISION,
             "predictiveClaim": audit.get("predictiveClaim") or PREDICTIVE_CLAIM,
+            **certification_fields(audit),
         },
     )
     gh: dict[str, Any] = push_to_github(repo, run_id, push=bool(args.push))
@@ -70,6 +72,14 @@ def main(argv: list[str] | None = None) -> int:
                 "dest": str(dest),
                 "archivePath": str(pack),
                 "locksCertified": audit.get("locksCertified"),
+                "archiveIntegrityCertified": audit.get("archiveIntegrityCertified"),
+                "evidenceCoverageCertified": audit.get("evidenceCoverageCertified"),
+                "evidenceTemporalCertified": audit.get("evidenceTemporalCertified"),
+                "modelRunCertified": audit.get("modelRunCertified"),
+                "selectionCertified": audit.get("selectionCertified"),
+                "productionRootCertified": audit.get("productionRootCertified"),
+                "predictiveValidationEarned": audit.get("predictiveValidationEarned"),
+                "hashCertifiedPythonFreeze": audit.get("hashCertifiedPythonFreeze"),
                 "hallucinationRisk": audit.get("hallucinationRisk"),
                 "githubCommit": gh.get("commit"),
                 "pushed": gh.get("pushed"),

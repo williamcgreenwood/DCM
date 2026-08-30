@@ -14,6 +14,7 @@ from dcm.runtime.github_archive import (
     pick_to_requests,
     push_to_github,
     append_index,
+    scan_for_secrets,
 )
 
 
@@ -149,6 +150,7 @@ def _fake_dest(
     card_size: int | None = None,
     software_e2e: bool = True,
     stages: list[str] | None = None,
+    frozen_forecast_hash: str | None = "freezehash",
 ) -> Path:
     dest.mkdir(parents=True, exist_ok=True)
     pick = _slim_pick()
@@ -164,7 +166,7 @@ def _fake_dest(
         "forecastCutoff": "2026-08-29T00:00:00Z",
         "harSha256": "abc123",
         "boardHash": "boardhash",
-        "frozenForecastHash": "freezehash",
+        "frozenForecastHash": frozen_forecast_hash,
         "researchComplete": True,
         "productionResearchComplete": evidence_mode == "PRODUCTION",
         "evidenceMode": evidence_mode,
@@ -187,7 +189,10 @@ def _fake_dest(
     _write_json(dest / "strict_card.json", card)
     _write_json(dest / "research_requests.json", _requests())
     _write_jsonl(dest / "evidence_bundle.jsonl", claims)
-    _write_json(dest / "hashes.json", {"boardHash": "boardhash", "harSha256": "abc123", "frozenForecastHash": "freezehash"})
+    hashes_payload = {"boardHash": "boardhash", "harSha256": "abc123"}
+    if frozen_forecast_hash:
+        hashes_payload["frozenForecastHash"] = frozen_forecast_hash
+    _write_json(dest / "hashes.json", hashes_payload)
     _write_json(dest / "input_manifest.json", {"harSha256": "abc123", "synthetic": synthetic})
     _write_json(dest / "accounting.json", {"playable": card_size, "cardSize": card_size})
     _write_json(dest / "board.json", {"contentHash": "boardhash", "rows": [{"projectionId": PROJ_ID}], "forecastCutoff": "2026-08-29T00:00:00Z", "accounting": {"raw_projection_rows": 1}})
@@ -234,6 +239,8 @@ def test_complete_player_event_market_definition_is_certified(tmp_path: Path):
             "claim_value": {"offer_recorded": True},
             "claim_hash": "claim-offer-1",
             "url": "https://api.prizepicks.com/projections",
+            "observed_at": "2026-08-28T16:00:00Z",
+            "published_at": "2026-08-28T16:00:00Z",
         }
     )
     dest = _fake_dest(tmp_path / "RUN_COMPLETE", claims=claims, synthetic=False, evidence_mode="PRODUCTION")
@@ -244,15 +251,21 @@ def test_complete_player_event_market_definition_is_certified(tmp_path: Path):
     assert ev["urls"]
 
     audit = build_run_audit(dest)
+    assert audit["modelRunCertified"] is True
+    assert audit["selectionCertified"] is True
+    assert audit["evidenceCoverageCertified"] is True
     assert audit["locksCertified"] is True
     assert audit["hallucinationRisk"] is False
+    assert audit["predictiveValidationEarned"] is False
+    assert audit["productionRootCertified"] is False
+    assert audit["hashCertifiedPythonFreeze"] is True
     assert locks_certified(audit) is True
 
 
 def test_fixture_evidence_mode_on_live_har_fails_gate():
     audit = {
         "runState": "COMPLETE_FROZEN",
-        "completedStages": ["RESEARCH", "FREEZE"],
+        "completedStages": ["RESEARCH", "MODEL", "RANK", "FREEZE"],
         "softwareE2eComplete": True,
         "synthetic": False,
         "evidenceMode": "fixture",
@@ -260,8 +273,15 @@ def test_fixture_evidence_mode_on_live_har_fails_gate():
         "claimCount": 3,
         "picks": [],
         "hallucinationRisk": False,
+        "frozenForecastHash": "freezehash",
+        "learningRevision": "LR000000",
+        "predictiveClaim": "NONE",
     }
     assert locks_certified(audit) is False
+    from dcm.runtime.github_archive import compute_certification
+    flags = compute_certification(audit, research_ran=True)
+    assert flags["modelRunCertified"] is False
+    assert flags["locksCertified"] is False
 
 
 def test_empty_card_can_certify_when_research_ran(tmp_path: Path):
@@ -337,13 +357,14 @@ def test_build_run_audit_writes_run_audit_md(tmp_path: Path):
     assert "learningRevision" in text
     assert "LR000000" in text
     assert "NONE" in text
-    assert "## Locks" in text
+    assert "## Card" in text
     assert "## Failures" in text
+    assert "modelRunCertified" in text
     assert (dest / "audit" / "pick_evidence.json").is_file()
     assert (dest / "audit" / "archive_manifest.json").is_file()
 
 
-def test_push_to_github_commits_without_network(tmp_path: Path):
+def test_push_to_github_commits_without_network(tmp_path: Path, monkeypatch):
     dest = _fake_dest(
         tmp_path / "RUN_GIT",
         claims=[_player_claim(), _event_claim(), _market_claim()],
@@ -352,20 +373,35 @@ def test_push_to_github_commits_without_network(tmp_path: Path):
     build_run_audit(dest)
     repo = tmp_path / "gitrepo"
     repo.mkdir()
+    home = tmp_path / "home"
+    home.mkdir()
+    monkeypatch.setenv("HOME", str(home))
+    monkeypatch.setenv("XDG_CONFIG_HOME", str(home / "xdg"))
+    monkeypatch.setenv("GIT_CONFIG_NOSYSTEM", "1")
+    monkeypatch.setenv("GIT_CONFIG_GLOBAL", str(home / "noconfig"))
+    monkeypatch.setenv("GIT_CONFIG_SYSTEM", str(home / "nosystem"))
+    for key in (
+        "GIT_AUTHOR_NAME",
+        "GIT_AUTHOR_EMAIL",
+        "GIT_COMMITTER_NAME",
+        "GIT_COMMITTER_EMAIL",
+        "GIT_AUTHOR_DATE",
+        "GIT_COMMITTER_DATE",
+    ):
+        monkeypatch.delenv(key, raising=False)
     env = os.environ.copy()
-    env.update(
-        {
-            "GIT_AUTHOR_NAME": "williamcgreenwood",
-            "GIT_AUTHOR_EMAIL": "311696354+williamcgreenwood@users.noreply.github.com",
-            "GIT_COMMITTER_NAME": "williamcgreenwood",
-            "GIT_COMMITTER_EMAIL": "311696354+williamcgreenwood@users.noreply.github.com",
-        }
-    )
     subprocess.run(["git", "init"], cwd=repo, check=True, capture_output=True, env=env)
     (repo / "audit").mkdir()
     (repo / "audit" / "README.md").write_text("# audit\n", encoding="utf-8")
     subprocess.run(["git", "add", "audit/README.md"], cwd=repo, check=True, capture_output=True, env=env)
-    subprocess.run(["git", "commit", "-m", "init"], cwd=repo, check=True, capture_output=True, env=env)
+    init_commit = subprocess.run(
+        ["git", "-c", "user.name=init", "-c", "user.email=init@example.com", "commit", "-m", "init"],
+        cwd=repo,
+        capture_output=True,
+        env=env,
+        text=True,
+    )
+    assert init_commit.returncode == 0, init_commit.stderr
     pack = materialize_github_pack(dest, repo)
     append_index(repo, {"runId": dest.name, "path": f"audit/runs/{dest.name}"})
     result = push_to_github(repo, dest.name, push=False)
@@ -374,7 +410,7 @@ def test_push_to_github_commits_without_network(tmp_path: Path):
     assert result["commit"]
     assert result["path"] == f"audit/runs/{dest.name}"
     assert pack.is_dir()
-    log = subprocess.run(["git", "log", "-1", "--pretty=%s"], cwd=repo, capture_output=True, text=True, check=True)
+    log = subprocess.run(["git", "log", "-1", "--pretty=%s"], cwd=repo, capture_output=True, text=True, check=True, env=env)
     assert dest.name in log.stdout
 
 
@@ -396,3 +432,53 @@ def test_gitignore_still_ignores_har_under_audit_runs():
     )
     assert check.returncode == 0, check.stdout + check.stderr
     assert "*.har" in check.stdout
+
+def test_manual_research_card_is_not_model_run_certified(tmp_path: Path):
+    claims = [
+        _player_claim(),
+        _event_claim(),
+        _market_claim(),
+        {
+            "semantic_scope": "OFFER",
+            "scope_id": PROJ_ID,
+            "claim_value": {"offer_recorded": True},
+            "claim_hash": "claim-offer-1",
+            "url": "https://api.prizepicks.com/projections",
+            "observed_at": "2026-08-28T16:00:00Z",
+            "published_at": "2026-08-28T16:00:00Z",
+        },
+    ]
+    dest = _fake_dest(
+        tmp_path / "RUN_MANUAL",
+        claims=claims,
+        run_state="MANUAL_RESEARCH_CARD",
+        evidence_mode="manual_research",
+        software_e2e=False,
+        frozen_forecast_hash=None,
+        stages=["RESEARCH"],
+    )
+    audit = build_run_audit(dest)
+    assert audit["evidenceCoverageCertified"] is True
+    assert audit["modelRunCertified"] is False
+    assert audit["selectionCertified"] is False
+    assert audit["hashCertifiedPythonFreeze"] is False
+    assert audit["locksCertified"] is False
+    assert locks_certified(audit) is False
+
+
+def test_set_cookie_dest_file_is_not_copied(tmp_path: Path):
+    dest = _fake_dest(
+        tmp_path / "RUN_SECRET",
+        claims=[_player_claim(), _event_claim(), _market_claim()],
+        evidence_mode="PRODUCTION",
+    )
+    leak = dest / "MODEL_CONFIG.json"
+    leak.write_text('{"headers": "Set-Cookie: session=abc123"}\n', encoding="utf-8")
+    assert scan_for_secrets(leak)
+    build_run_audit(dest)
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    pack = materialize_github_pack(dest, repo)
+    names = {p.name for p in pack.iterdir()}
+    assert "MODEL_CONFIG.json" not in names
+    assert not any("Set-Cookie" in p.read_text(encoding="utf-8", errors="ignore") for p in pack.iterdir() if p.is_file())

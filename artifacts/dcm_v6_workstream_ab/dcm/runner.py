@@ -39,7 +39,7 @@ from dcm.runtime.checkpoint import load_checkpoint, write_checkpoint
 from dcm.runtime.cutoff import CutoffRequired, POLICY_DOC, resolve_forecast_cutoff
 from dcm.runtime.dag import Dag
 from dcm.runtime.freeze import compute_forecast_hash
-from dcm.runtime.github_archive import append_index, build_run_audit, materialize_github_pack, push_to_github
+from dcm.runtime.github_archive import append_index, build_run_audit, certification_fields, materialize_github_pack, push_to_github
 from dcm.runtime.governor import Governor
 from dcm.runtime.mount_v541 import mount_default
 from dcm.runtime.schema_root import SCHEMA_V2_ID, verify_schema, verify_schema_v2
@@ -80,8 +80,17 @@ def _finalize_archive(
     except Exception as exc:  # noqa: BLE001 — never lose a finished run to archive I/O
         result["auditError"] = type(exc).__name__
         result.setdefault("locksCertified", False)
+        result.setdefault("modelRunCertified", False)
+        result.setdefault("selectionCertified", False)
+        result.setdefault("evidenceCoverageCertified", False)
+        result.setdefault("evidenceTemporalCertified", False)
+        result.setdefault("archiveIntegrityCertified", False)
+        result.setdefault("productionRootCertified", False)
+        result.setdefault("predictiveValidationEarned", False)
+        result.setdefault("hashCertifiedPythonFreeze", False)
         result.setdefault("hallucinationRisk", True)
         return result
+    result.update(certification_fields(audit))
     result["locksCertified"] = bool(audit.get("locksCertified"))
     result["hallucinationRisk"] = bool(audit.get("hallucinationRisk"))
     result["archivePath"] = str(Path(dest) / "audit")
@@ -105,6 +114,7 @@ def _finalize_archive(
                 "software": audit.get("software") or SOFTWARE,
                 "learningRevision": audit.get("learningRevision") or LEARNING_REVISION,
                 "predictiveClaim": audit.get("predictiveClaim") or PREDICTIVE_CLAIM,
+                **certification_fields(audit),
             },
         )
         gh = push_to_github(root, run_id, push=bool(archive_push))
@@ -896,7 +906,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument(
         "--archive-github",
         action="store_true",
-        help="Copy a safe audit pack into audit/runs/<runId>/, append INDEX.jsonl, commit, and push.",
+        help="Copy a safe audit pack into audit/runs/<runId>/ and append INDEX.jsonl. Commits if git identity/repo are available; a git commit failure does not fail the DCM run. Pushes unless --no-archive-push.",
     )
     p.add_argument(
         "--no-archive-push",
@@ -966,6 +976,14 @@ def main(argv: list[str] | None = None) -> int:
                 "dest": result["dest"],
                 "archivePath": result.get("archivePath"),
                 "locksCertified": result.get("locksCertified"),
+                "archiveIntegrityCertified": result.get("archiveIntegrityCertified"),
+                "evidenceCoverageCertified": result.get("evidenceCoverageCertified"),
+                "evidenceTemporalCertified": result.get("evidenceTemporalCertified"),
+                "modelRunCertified": result.get("modelRunCertified"),
+                "selectionCertified": result.get("selectionCertified"),
+                "productionRootCertified": result.get("productionRootCertified"),
+                "predictiveValidationEarned": result.get("predictiveValidationEarned"),
+                "hashCertifiedPythonFreeze": result.get("hashCertifiedPythonFreeze"),
                 "hallucinationRisk": result.get("hallucinationRisk"),
                 "githubCommit": result.get("githubCommit"),
             },

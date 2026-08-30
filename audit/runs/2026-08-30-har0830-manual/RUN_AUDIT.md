@@ -1,6 +1,12 @@
 # DCM run 2026-08-30-har0830-manual
 
-**locksCertified: true**
+**NOT a Python DCM freeze.** These six are researched candidates, not PLAYABLE outputs of EventWorlds/grading/ranking/portfolio. Never trust this card as a DCM pick unless modelRunCertified is true.
+
+**modelRunCertified: false | selectionCertified: false | locksCertified (derived): false | hashCertifiedPythonFreeze: false | productionRootCertified: false | predictiveValidationEarned: false**
+
+**evidenceCoverageCertified: true** (card_only_not_population — the 6 researched picks only)
+**evidenceTemporalCertified: false** — observed_at 2026-08-30T17:47:00Z is before HAR capture 2026-08-30T17:48:00Z while research happened after capture
+**archiveIntegrityCertified: true** (no HAR committed)
 
 This pack documents the **MANUAL researched card** delivered from the 08/30 PrizePicks HAR. It is **not** a hash-certified Python freeze (`COMPLETE_FROZEN`). Predictive claim: **NONE**.
 
@@ -15,8 +21,8 @@ This pack documents the **MANUAL researched card** delivered from the 08/30 Priz
 - Claim count: 27
 - observed_at for all claims: 2026-08-30T17:47:00Z (<= cutoff)
 
-## Why locksCertified is true
-Coverage uses `dcm.research.coverage.evaluate_request`. Each of the 6 locks has:
+## Why evidenceCoverageCertified is true (and locksCertified is false)
+Coverage uses `dcm.research.coverage.evaluate_request` for the 6 researched candidates only (`evidenceCoverageScope: card_only_not_population`). Each of the 6 card picks has:
 - PLAYER status + role
 - >=3 dict game_logs from basketball-reference **Last 5 Games** (all `GS=*`, i.e. starters)
 - opportunity dict (teammate/opponent outs)
@@ -35,7 +41,7 @@ This still is **not** a production Python freeze. `hashCertifiedPythonFreeze: fa
 - skipped: goblin 2569, unsupported_sport 4992, live 601, side_unknown 1806, unsupported_market 2004, shadow 1936
 
 ## AFTER
-6 STANDARD MORE locks (documented, not silently changed):
+6 STANDARD MORE researched candidates (documented, not silently changed):
 
 1. Jordin Canada ATL MORE ast 6.5
 2. Kayla McBride MIN MORE pts 16.5
@@ -44,7 +50,7 @@ This still is **not** a production Python freeze. `hashCertifiedPythonFreeze: fa
 5. Jessica Shepard DAL MORE reb 10.5
 6. Olivia Miles MIN MORE PRA 29.5
 
-## Locks
+## Card
 
 ### Jordin Canada ATL MORE ast 6.5 STANDARD
 - event: MIN @ ATL (PrizePicks eventId 176427) vs MIN
@@ -137,10 +143,10 @@ This still is **not** a production Python freeze. `hashCertifiedPythonFreeze: fa
 - CON @ DAL 17:30 (8:30 PM ET) event 176430
 
 ## Page-snapshot vs manual-card numbers
-Do not silently change the 6 locks. Some live pages drifted vs the 10:48 PT citation:
+Do not silently change the 6 researched candidates. Some live pages drifted vs the 10:48 PT citation:
 - Canada APG: card **7.4 / 37 G**; B-R + ESPN preview snapshot **7.3 / 38 GP (38 GS)**
 - Ogwumike PRA: card **16.8/8.9/2.9 = 28.6**; B-R snapshot **17.0/8.8/3.0 = 28.8**; ESPN LAS@SEA leaders **17.0/8.8**
-Both numbers are stored on the PLAYER claims. Locks unchanged.
+Both numbers are stored on the PLAYER claims. Card picks unchanged.
 
 ## URL verification
 No primary URL 404'd.
@@ -150,4 +156,4 @@ No primary URL 404'd.
 - PrizePicks projections URL: present in HAR; not re-fetched (session)
 
 ## Failures
-None of the 6 locks missing ROLE_COMPARABLE_GAME_LOGS_MIN_3. Incomplete Python freeze / no Monte Carlo / no frozenForecastHash by design.
+None of the 6 card picks missing ROLE_COMPARABLE_GAME_LOGS_MIN_3. Incomplete Python freeze / no Monte Carlo / no frozenForecastHash by design.

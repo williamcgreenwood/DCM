@@ -10,6 +10,8 @@ that looks like cookies/tokens/authorization. Never prints secrets.
 from __future__ import annotations
 
 import json
+import os
+import re
 import shutil
 import subprocess
 from datetime import datetime, timezone
@@ -27,6 +29,25 @@ COMPLETE_STATES = frozenset(
 REQUIRED_PICK_SCOPES = frozenset({"PLAYER", "EVENT", "MARKET_DEFINITION", "MARKET", "OFFER"})
 SKIP_EVIDENCE_JSON = frozenset({"coverage.json", "conflicts.json"})
 SECRET_SUBSTR = ("cookie", "token", "authorization", "password", "passwd", "secret", "apikey", "api_key")
+SECRET_CONTENT_RE = re.compile(
+    r"(?i)(set-cookie|\bcookie\b|\bauthorization\b|\bbearer\b|\bcsrf\b|session[-_]?token)"
+)
+DEFAULT_GIT_NAME = "dcm-archive"
+DEFAULT_GIT_EMAIL = "dcm-archive@users.noreply.github.com"
+MANUAL_STATES = frozenset({"MANUAL_RESEARCH_CARD"})
+MANUAL_EVIDENCE_MODES = frozenset({"manual_research", "manual"})
+REQUIRED_MODEL_STAGES = frozenset({"RESEARCH", "MODEL", "RANK", "FREEZE"})
+CERT_FLAG_KEYS = (
+    "archiveIntegrityCertified",
+    "evidenceCoverageCertified",
+    "evidenceTemporalCertified",
+    "modelRunCertified",
+    "selectionCertified",
+    "productionRootCertified",
+    "predictiveValidationEarned",
+    "hashCertifiedPythonFreeze",
+    "locksCertified",
+)
 FORBIDDEN_NAMES = frozenset(
     {
         "index.sqlite",
@@ -65,6 +86,65 @@ PACK_FILES = (
     "pick_evidence.json",
     "archive_manifest.json",
 )
+
+
+def scan_for_secrets(path: Path) -> list[str]:
+    """Return secret-like tokens found in file text. Empty list means clean.
+
+    Matches Cookie, Set-Cookie, Authorization, Bearer, CSRF, and session
+    token-like keys. Binary files are skipped.
+    """
+    try:
+        raw = Path(path).read_bytes()
+    except OSError:
+        return []
+    if b"\x00" in raw[:8192]:
+        return []
+    try:
+        text_body = raw.decode("utf-8")
+    except UnicodeDecodeError:
+        try:
+            text_body = raw.decode("latin-1")
+        except UnicodeDecodeError:
+            return []
+    hits: list[str] = []
+    seen: set[str] = set()
+    for match in SECRET_CONTENT_RE.finditer(text_body):
+        token = match.group(0)
+        key = token.lower()
+        if key not in seen:
+            seen.add(key)
+            hits.append(token)
+    return hits
+
+
+def git_identity() -> tuple[str, str]:
+    """Author/committer identity for archive commits. Never requires git config."""
+    name = (os.environ.get("GIT_AUTHOR_NAME") or os.environ.get("GIT_COMMITTER_NAME") or DEFAULT_GIT_NAME).strip()
+    email = (os.environ.get("GIT_AUTHOR_EMAIL") or os.environ.get("GIT_COMMITTER_EMAIL") or DEFAULT_GIT_EMAIL).strip()
+    return name or DEFAULT_GIT_NAME, email or DEFAULT_GIT_EMAIL
+
+
+def _git_env() -> dict[str, str]:
+    env = os.environ.copy()
+    name, email = git_identity()
+    env["GIT_AUTHOR_NAME"] = (os.environ.get("GIT_AUTHOR_NAME") or name).strip() or DEFAULT_GIT_NAME
+    env["GIT_AUTHOR_EMAIL"] = (os.environ.get("GIT_AUTHOR_EMAIL") or email).strip() or DEFAULT_GIT_EMAIL
+    env["GIT_COMMITTER_NAME"] = (os.environ.get("GIT_COMMITTER_NAME") or name).strip() or DEFAULT_GIT_NAME
+    env["GIT_COMMITTER_EMAIL"] = (os.environ.get("GIT_COMMITTER_EMAIL") or email).strip() or DEFAULT_GIT_EMAIL
+    return env
+
+
+def certification_fields(audit: dict[str, Any]) -> dict[str, Any]:
+    """Subset of audit flags for runner stdout, INDEX.jsonl, and manifests."""
+    out: dict[str, Any] = {}
+    for key in CERT_FLAG_KEYS:
+        if key in audit:
+            out[key] = audit[key]
+    for extra in ("evidenceCoverageScope", "evidenceTemporalNote", "emptyCardReason"):
+        if extra in audit and audit[extra] is not None:
+            out[extra] = audit[extra]
+    return out
 
 
 def _now_utc() -> str:
@@ -336,53 +416,216 @@ def _is_fixture_mode(evidence_mode: Any) -> bool:
     return False
 
 
-def locks_certified(audit: dict[str, Any]) -> bool:
-    """TRUE only when the run finished, research was real, and every lock is covered."""
-    run_state = _s(audit.get("runState"))
-    if run_state not in COMPLETE_STATES:
-        return False
-    stages = {str(s) for s in (audit.get("completedStages") or [])}
-    software_e2e = bool(audit.get("softwareE2eComplete"))
-    if not (("RESEARCH" in stages and "FREEZE" in stages) or software_e2e):
-        return False
-    synthetic = bool(audit.get("synthetic"))
-    if not synthetic and _is_fixture_mode(audit.get("evidenceMode")):
-        return False
+def _is_manual_evidence(evidence_mode: Any) -> bool:
+    return _s(evidence_mode).lower() in MANUAL_EVIDENCE_MODES
+
+
+def _parse_iso(value: Any) -> datetime | None:
+    s = _s(value)
+    if not s:
+        return None
+    if s.endswith("Z"):
+        s = s[:-1] + "+00:00"
+    try:
+        return datetime.fromisoformat(s)
+    except ValueError:
+        return None
+
+
+def _picks_coverage_complete(audit: dict[str, Any]) -> bool:
     card_size = int(audit.get("cardSize") or 0)
     picks = audit.get("picks") or audit.get("pickEvidence") or []
     if not isinstance(picks, list):
         picks = []
-    if card_size > 0:
-        claim_count = int(audit.get("claimCount") or 0)
-        if claim_count <= 0:
+    if card_size <= 0:
+        return False
+    if int(audit.get("claimCount") or 0) <= 0:
+        return False
+    if not picks:
+        return False
+    for pick in picks:
+        if not isinstance(pick, dict):
             return False
-        if not picks:
+        coverage = pick.get("coverage") or {}
+        if not coverage.get("complete"):
             return False
-        for pick in picks:
-            if not isinstance(pick, dict):
-                return False
-            coverage = pick.get("coverage") or {}
-            if not coverage.get("complete"):
-                return False
-            if pick.get("hallucinationRisk"):
-                return False
-        return True
-    # Empty card: engineering-complete is allowed. Reviewers still see hallucinationRisk.
+        if pick.get("hallucinationRisk"):
+            return False
     return True
+
+
+def _hash_certified_python_freeze(audit: dict[str, Any]) -> bool:
+    run_state = _s(audit.get("runState"))
+    frozen = _s(audit.get("frozenForecastHash"))
+    if not frozen:
+        return False
+    if run_state in MANUAL_STATES:
+        return False
+    if run_state not in COMPLETE_STATES:
+        return False
+    if audit.get("softwareFreeze") is False:
+        return False
+    return True
+
+
+def _model_run_certified(audit: dict[str, Any]) -> bool:
+    run_state = _s(audit.get("runState"))
+    if run_state in MANUAL_STATES:
+        return False
+    if audit.get("softwareFreeze") is False:
+        return False
+    if not _hash_certified_python_freeze(audit):
+        return False
+    if run_state not in COMPLETE_STATES:
+        return False
+    stages = {str(s) for s in (audit.get("completedStages") or [])}
+    software_e2e = bool(audit.get("softwareE2eComplete"))
+    frozen = _s(audit.get("frozenForecastHash"))
+    stages_ok = REQUIRED_MODEL_STAGES.issubset(stages) or (software_e2e and bool(frozen))
+    if not stages_ok:
+        return False
+    if _is_manual_evidence(audit.get("evidenceMode")):
+        return False
+    if not bool(audit.get("synthetic")) and _is_fixture_mode(audit.get("evidenceMode")):
+        return False
+    return True
+
+
+def _evidence_coverage_certified(audit: dict[str, Any], *, research_ran: bool) -> bool:
+    card_size = int(audit.get("cardSize") or 0)
+    if card_size == 0:
+        return bool(research_ran)
+    return _picks_coverage_complete(audit)
+
+
+def _evidence_temporal(audit: dict[str, Any], claims: list[dict[str, Any]]) -> tuple[bool, str | None]:
+    cutoff = _parse_iso(audit.get("forecastDecisionCutoff") or audit.get("forecastCutoff"))
+    capture = _parse_iso(audit.get("boardCaptureTime"))
+    created = _parse_iso(audit.get("createdAtUtc"))
+    if not claims:
+        return True, None
+    for claim in claims:
+        if not isinstance(claim, dict):
+            return False, "non-dict claim"
+        observed = _parse_iso(claim.get("observed_at") or claim.get("observedAt"))
+        published = _parse_iso(claim.get("published_at") or claim.get("publishedAt"))
+        if observed is None or published is None:
+            return False, "claim missing observed_at or published_at"
+        if cutoff is not None:
+            if observed > cutoff or published > cutoff:
+                return False, "claim observed_at/published_at after forecastDecisionCutoff"
+        if capture is not None and observed < capture:
+            post_capture = False
+            if created is not None and created > capture:
+                post_capture = True
+            if _is_manual_evidence(audit.get("evidenceMode")):
+                post_capture = True
+            if bool(audit.get("postCaptureResearch")):
+                post_capture = True
+            if post_capture:
+                return (
+                    False,
+                    "observed_at backdated before HAR capture while research happened after capture",
+                )
+    return True, None
+
+
+def _empty_card_reason(audit: dict[str, Any], *, research_ran: bool) -> str | None:
+    if int(audit.get("cardSize") or 0) != 0:
+        return None
+    if not research_ran:
+        return "EMPTY_RESEARCH_INCOMPLETE"
+    if not bool(audit.get("productionRootCertified")):
+        return "EMPTY_ROOT_NOT_CERTIFIED"
+    playable = audit.get("playable")
+    try:
+        playable_n = int(playable) if playable is not None else 0
+    except (TypeError, ValueError):
+        playable_n = 0
+    if playable_n <= 0:
+        return "EMPTY_NO_PLAYABLES"
+    return "EMPTY_PORTFOLIO_CONSTRAINT"
+
+
+def compute_certification(
+    audit: dict[str, Any],
+    *,
+    claims: list[dict[str, Any]] | None = None,
+    research_ran: bool | None = None,
+    secrets_blocked: bool = False,
+    hashes_present: bool | None = None,
+) -> dict[str, Any]:
+    """Split certification flags. locksCertified is a derived alias only."""
+    claims = list(claims or [])
+    if research_ran is None:
+        stages = {str(s) for s in (audit.get("completedStages") or [])}
+        research_ran = (
+            "RESEARCH" in stages
+            or bool(audit.get("researchComplete"))
+            or bool(audit.get("softwareE2eComplete"))
+            or int(audit.get("claimCount") or 0) > 0
+            or int(audit.get("requestCount") or 0) > 0
+            or bool(claims)
+        )
+    if hashes_present is None:
+        hashes_present = bool(_s(audit.get("frozenForecastHash")) or audit.get("boardHash") or audit.get("harSha256"))
+
+    hash_certified = _hash_certified_python_freeze(audit)
+    model_run = _model_run_certified(audit)
+    coverage = _evidence_coverage_certified(audit, research_ran=research_ran)
+    temporal_ok, temporal_note = _evidence_temporal(audit, claims)
+    production_root = bool(audit.get("productionSelectionReady")) and bool(audit.get("systemCertified"))
+    lr = _s(audit.get("learningRevision") or LEARNING_REVISION)
+    pc = _s(audit.get("predictiveClaim") or PREDICTIVE_CLAIM)
+    predictive = False if lr == "LR000000" or pc == "NONE" else bool(audit.get("predictiveValidationEarned"))
+    selection = bool(model_run) and bool(hash_certified) and _s(audit.get("runState")) not in MANUAL_STATES
+    archive_integrity = bool(hashes_present) and not secrets_blocked
+    locks = bool(model_run) and bool(selection) and bool(coverage)
+    flags: dict[str, Any] = {
+        "archiveIntegrityCertified": archive_integrity,
+        "evidenceCoverageCertified": coverage,
+        "evidenceCoverageScope": "card_only_not_population",
+        "evidenceTemporalCertified": temporal_ok,
+        "modelRunCertified": model_run,
+        "selectionCertified": selection,
+        "productionRootCertified": production_root,
+        "predictiveValidationEarned": predictive,
+        "hashCertifiedPythonFreeze": hash_certified,
+        "locksCertified": locks,
+    }
+    if temporal_note:
+        flags["evidenceTemporalNote"] = temporal_note
+    empty_reason = _empty_card_reason({**audit, **flags}, research_ran=research_ran)
+    if empty_reason:
+        flags["emptyCardReason"] = empty_reason
+    return flags
+
+
+def locks_certified(audit: dict[str, Any]) -> bool:
+    """Derived alias: modelRunCertified AND selectionCertified AND evidenceCoverageCertified."""
+    flags = compute_certification(audit, claims=[], research_ran=True)
+    return bool(flags["locksCertified"])
 
 
 def _render_run_audit_md(audit: dict[str, Any], picks: list[dict[str, Any]]) -> str:
     run_id = audit.get("runId") or "UNKNOWN"
     lines = [
         f"# DCM run {run_id}",
+    ]
+    if not audit.get("modelRunCertified"):
+        lines.append("**NOT a Python DCM freeze. Do not treat this card as a DCM pick unless modelRunCertified is true.**")
+    lines.extend([
         f"- software: {audit.get('software')}, learningRevision: {audit.get('learningRevision')}, predictiveClaim: {audit.get('predictiveClaim')}",
         f"- forecastCutoff: {audit.get('forecastCutoff')}, harSha256: {audit.get('harSha256')}, boardHash: {audit.get('boardHash')}, frozenForecastHash: {audit.get('frozenForecastHash')}",
         f"- runState: {audit.get('runState')}, researchComplete: {audit.get('researchComplete')}, evidenceMode: {audit.get('evidenceMode')}, productionResearchComplete: {audit.get('productionResearchComplete')}",
         f"- BEFORE: researchRequested: {audit.get('researchRequested')}, request count: {audit.get('requestCount')}",
-        f"- AFTER: playable: {audit.get('playable')}, cardSize: {audit.get('cardSize')}, locksCertified: {audit.get('locksCertified')}, hallucinationRisk: {audit.get('hallucinationRisk')}",
+        f"- AFTER: playable: {audit.get('playable')}, cardSize: {audit.get('cardSize')}, hallucinationRisk: {audit.get('hallucinationRisk')}",
+        f"- modelRunCertified: {audit.get('modelRunCertified')}, selectionCertified: {audit.get('selectionCertified')}, evidenceCoverageCertified: {audit.get('evidenceCoverageCertified')}",
+        f"- evidenceTemporalCertified: {audit.get('evidenceTemporalCertified')}, archiveIntegrityCertified: {audit.get('archiveIntegrityCertified')}, productionRootCertified: {audit.get('productionRootCertified')}",
+        f"- predictiveValidationEarned: {audit.get('predictiveValidationEarned')}, hashCertifiedPythonFreeze: {audit.get('hashCertifiedPythonFreeze')}, locksCertified (derived): {audit.get('locksCertified')}",
         "",
-        "## Locks",
-    ]
+        "## Card",
+    ])
     if not picks:
         lines.append("- (empty card)")
     for pick in picks:
@@ -439,6 +682,9 @@ def build_run_audit(dest: Path) -> dict[str, Any]:
     integrity = _load_json(dest / "run_integrity.json") or {}
     if not isinstance(integrity, dict):
         integrity = {}
+    readiness = _load_json(dest / "production_readiness.json") or {}
+    if not isinstance(readiness, dict):
+        readiness = {}
     claims = _read_claims(dest)
     requests = _read_requests(dest)
     card = _read_card(dest)
@@ -497,30 +743,70 @@ def build_run_audit(dest: Path) -> dict[str, Any]:
         "claimCount": len(claims),
         "synthetic": synthetic,
         "softwareE2eComplete": bool(freeze.get("softwareE2eComplete")),
+        "softwareFreeze": freeze.get("softwareFreeze"),
         "completedStages": stages,
         "picks": pick_rows,
         "pickEvidence": pick_rows,
         "createdAtUtc": _now_utc(),
         "hallucinationRisk": bool(hallucination),
+        "forecastDecisionCutoff": freeze.get("forecastDecisionCutoff")
+        or freeze.get("forecastCutoff")
+        or checkpoint.get("forecastCutoff"),
+        "boardCaptureTime": (
+            freeze.get("boardCaptureTime")
+            or ingest.get("captureStart")
+            or ingest.get("startedDateTime")
+            or ingest.get("harStartedDateTime")
+        ),
+        "productionSelectionReady": bool(
+            freeze.get("productionSelectionReady")
+            if freeze.get("productionSelectionReady") is not None
+            else readiness.get("productionSelectionReady")
+        ),
+        "systemCertified": bool(
+            freeze.get("systemCertified")
+            if freeze.get("systemCertified") is not None
+            else readiness.get("systemCertified")
+        ),
+        "postCaptureResearch": bool(freeze.get("postCaptureResearch")),
     }
-    audit["locksCertified"] = locks_certified(audit)
+    secrets_blocked = False
+    for name in PACK_FILES:
+        src = dest / name
+        if src.is_file() and scan_for_secrets(src):
+            secrets_blocked = True
+            break
+    hashes_present = bool(
+        (dest / "hashes.json").is_file()
+        or _s(audit.get("frozenForecastHash"))
+        or _s(audit.get("boardHash"))
+    )
+    audit.update(
+        compute_certification(
+            audit,
+            claims=claims,
+            research_ran=research_ran,
+            secrets_blocked=secrets_blocked,
+            hashes_present=hashes_present,
+        )
+    )
 
     audit_dir = dest / "audit"
     audit_dir.mkdir(parents=True, exist_ok=True)
+    cert = certification_fields(audit)
     pick_payload = {
         "runId": run_id,
-        "locksCertified": audit["locksCertified"],
         "hallucinationRisk": audit["hallucinationRisk"],
         "cardSize": card_size,
         "claimCount": len(claims),
         "picks": pick_rows,
         "failures": [p for p in pick_rows if not ((p.get("coverage") or {}).get("complete"))],
+        **cert,
     }
     manifest = {
         "schema": "pillars_dcm.run_archive_manifest.v6",
         "runId": run_id,
         "createdAtUtc": audit["createdAtUtc"],
-        "locksCertified": audit["locksCertified"],
         "hallucinationRisk": audit["hallucinationRisk"],
         "sourceDest": str(dest),
         "claimCount": len(claims),
@@ -529,6 +815,7 @@ def build_run_audit(dest: Path) -> dict[str, Any]:
         "runState": audit.get("runState"),
         "evidenceMode": audit.get("evidenceMode"),
         "synthetic": synthetic,
+        **cert,
     }
     (audit_dir / "RUN_AUDIT.md").write_text(_render_run_audit_md(audit, pick_rows), encoding="utf-8")
     _write_json(audit_dir / "pick_evidence.json", pick_payload)
@@ -554,6 +841,8 @@ def _is_forbidden(path: Path) -> bool:
 
 def _copy_file(src: Path, dest: Path) -> bool:
     if not src.is_file() or _is_forbidden(src):
+        return False
+    if scan_for_secrets(src):
         return False
     dest.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(src, dest)
@@ -670,6 +959,7 @@ def _git(repo_root: Path, args: list[str], *, check: bool = False) -> subprocess
         capture_output=True,
         text=True,
         check=check,
+        env=_git_env(),
     )
 
 
@@ -722,9 +1012,18 @@ def push_to_github(repo_root: Path, run_id: str, *, push: bool) -> dict[str, Any
             result["error"] = _sanitize_git_error(porcelain.stderr or porcelain.stdout)
             return result
         if porcelain.stdout.strip():
+            name, email = git_identity()
             commit = _git(
                 repo_root,
-                ["commit", "-m", f"Archive DCM run {run_id}"],
+                [
+                    "-c",
+                    f"user.name={name}",
+                    "-c",
+                    f"user.email={email}",
+                    "commit",
+                    "-m",
+                    f"Archive DCM run {run_id}",
+                ],
             )
             if commit.returncode != 0:
                 result["error"] = _sanitize_git_error(commit.stderr or commit.stdout)
