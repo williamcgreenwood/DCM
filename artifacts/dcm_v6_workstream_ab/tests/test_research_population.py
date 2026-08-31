@@ -109,7 +109,8 @@ def test_account_only_emits_canonical_and_legacy_research_artifacts(tmp_path: Pa
     subject_sets_path = dest / "subject_offer_sets.json"
     player_sets_path = dest / "player_offer_sets.json"
     dependency_path = dest / "research_dependency_graph.json"
-    for path in (man_path, legacy_path, subject_sets_path, player_sets_path, dependency_path):
+    universal_plan_path = dest / "universal_host_research_plan.json"
+    for path in (man_path, legacy_path, subject_sets_path, player_sets_path, dependency_path, universal_plan_path):
         assert path.is_file()
 
     man = json.loads(man_path.read_text())
@@ -130,3 +131,9 @@ def test_account_only_emits_canonical_and_legacy_research_artifacts(tmp_path: Pa
 
     graph = json.loads(dependency_path.read_text())
     assert graph["schema"] == "pillars_dcm.research_dependency_graph.v1"
+
+    universal_plan = json.loads(universal_plan_path.read_text())
+    assert universal_plan["schema"] == "pillars_dcm.universal_host_research_plan.v1"
+    assert universal_plan["researchHierarchy"][4] == "SUBJECT"
+    assert "PLAYER" not in universal_plan["researchHierarchy"]
+    assert "TEAM" not in universal_plan["researchHierarchy"]
