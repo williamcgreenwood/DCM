@@ -92,6 +92,7 @@ PACK_FILES = (
     "research_population_manifest.json",
     "research_dependency_graph.json",
     "universal_host_research_plan.json",
+    "sport_plugin_contract_registry.json",
     "research_population_manifest_legacy.json",
     "player_offer_sets.json",
     "player_research_packets.json",
