@@ -250,7 +250,7 @@ register_contract(
             _b(
                 "ValidationSuite",
                 PARTIAL,
-                "dcm.runtime.readiness:compute_readiness",
+                "dcm.runtime.readiness:build_readiness",
                 "Runtime readiness is executable, but the full sport-specific validation suite is not represented as one plugin component.",
             ),
         ),
@@ -314,7 +314,7 @@ register_contract(
             _b(
                 "ValidationSuite",
                 PARTIAL,
-                "dcm.runtime.readiness:compute_readiness",
+                "dcm.runtime.readiness:build_readiness",
                 "Sport tests exist, but the validation suite is not yet a single plugin-owned contract.",
             ),
         ),
