@@ -6,6 +6,7 @@ from dcm.selection.card_layers import (
     EVENT_ALREADY_STARTED,
     PLAYER_NOT_ACTIVE,
     PLAYER_STATUS_UNCERTAIN,
+    apply_pre_freeze_status_start_gates,
     is_modeled_playable,
     started_event_blocker,
     status_start_hard_blocker,
@@ -250,3 +251,28 @@ def test_healthy_playable_still_makes_card():
     assert is_modeled_playable(p, cutoff=BONNER_CUTOFF) is True
     card = build_card([p])
     assert len(card) == 1
+
+
+def test_pre_freeze_strip_uncertain_and_started():
+    nested = _cand(
+        blocker=PLAYER_STATUS_UNCERTAIN,
+        snapshot={"status": "QUESTIONABLE", "blocker": PLAYER_STATUS_UNCERTAIN},
+    )
+    started = _cand(
+        blocker=None,
+        row=_row(eventStartTime=BONNER_EVENT_START, role="starter"),
+        snapshot={"status": "ACTIVE", "blocker": None},
+        tags=["EVENT:176427", "ROLE:ATL:starter", "TEAM:ATL"],
+    )
+    healthy = _cand(
+        blocker=None,
+        row=_row(eventStartTime="2026-08-30T23:00:00Z", role="starter", projectionId="ok-healthy"),
+        snapshot={"status": "ACTIVE", "blocker": None},
+        tags=["EVENT:176427", "ROLE:ATL:starter", "TEAM:ATL"],
+    )
+    qualified = apply_pre_freeze_status_start_gates(
+        [nested, started, healthy], cutoff=BONNER_CUTOFF
+    )
+    assert [p["row"]["projectionId"] for p in qualified] == ["ok-healthy"]
+    assert nested["modeledPlayable"] is False
+    assert started["modeledPlayable"] is False

@@ -196,6 +196,31 @@ def is_modeled_playable(
     return True
 
 
+def apply_pre_freeze_status_start_gates(
+    ranked: list[dict[str, Any]],
+    *,
+    cutoff: str | None,
+) -> list[dict[str, Any]]:
+    """Final status/start strip immediately before portfolio freeze.
+
+    Late OUT / UNCERTAIN / started-event rows are forced off modeledPlayable
+    and cannot enter the PLAYABLE card. Must run after ranking, before build_card.
+    """
+    qualified: list[dict[str, Any]] = []
+    for p in ranked:
+        snap = p.get("parameterSnapshot") if isinstance(p.get("parameterSnapshot"), dict) else None
+        gate = status_start_hard_blocker(p, cutoff=cutoff, snapshot=snap)
+        if gate:
+            p["blocker"] = p.get("blocker") or gate
+            p["modeledPlayable"] = False
+            continue
+        playable = is_modeled_playable(p, cutoff=cutoff, snapshot=snap)
+        p["modeledPlayable"] = playable
+        if playable:
+            qualified.append(p)
+    return qualified
+
+
 def production_root_accepted(*, global_selection_gate: bool, production_selection_ready: bool) -> bool:
     return bool(
         V6_ROOT_OF_TRUST_MIGRATION_ACCEPTED

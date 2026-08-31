@@ -29,12 +29,14 @@ Audit pack `audit/runs/RUN_60612c8a7bcf7df1` is a **regression fixture, not a go
 | market derivation | PARTIAL/COMPLETE | `dcm/model/market_derive.py` versioned basketball registry (Points/Rebounds/Assists/PRA/Pts+Rebs/Pts+Asts/Rebs+Asts/3PTM/3PTA/FGM/FGA/2PM/2PA/FTM/FTA/Turnovers/OREB/Steals/Blks+Stls). `derive_market(ledger, key)` identities only; unknown → fail closed; Fantasy Score fail-closed (no PrizePicks scoring version registered). Runner `value_from_stats` wired to the registry for basketball. |
 | distributions | COMPLETE | `dcm/model/distributions.py` `from_worlds`: P(Higher)+P(Lower)+P(Push)=1. |
 | More / Less / Push | COMPLETE | Runner evaluates both offered sides independently; missing sides fail closed (`OFFERED_SIDE_UNKNOWN`). |
-| uncertainty | PARTIAL | `dcm/model/uncertainty.py` probability_bundle (epistemic/aleatoric/reliability/false-sign). Not fully separated from ranking score. |
+| uncertainty | PARTIAL | `dcm/model/uncertainty.py` probability_bundle (epistemic/aleatoric/reliability/false-sign). Freeze `probabilityContract` documents Reliability ≠ probability; slim rows keep separate keys (`selectedP`, `evidenceSafeP`, `lowerBound`, `reliability`, `dataQuality`, `volatility`, `fragility`, `oodRisk`, `falseSignRisk`, `monteCarloSE`, `epistemicUncertainty`). Ranking still composes a selectionScore from those fields. |
 | calibration | PARTIAL | `apply_calibration` is INACTIVE without chronological settlements; `build_challenger_cells` is shadow-only. |
 | grading | COMPLETE | `dcm/model/grade.py` PLAYABLE/LEAN/PASS/TRAP; Demon demotion-only. |
+| line surfaces | COMPLETE | `dcm/model/line_surface.py` unclamped offered/break-even/playable-break/tolerance/elasticity/robustness_area. P4 emits those fields on slim() PLAYABLE/LEAN top25 and card rows. |
 | ranking | COMPLETE | `rank_candidates` always writes `top25_ranked.json` (PR #8). |
 | portfolio | COMPLETE | `dcm/selection/portfolio.py` `build_card` 0–6, unique player, event/team caps, composite overlap. |
-| freeze | PARTIAL | Hash-verified `freeze.json` / `frozen_forecast.json`. PR #9 freeze is proof of pathway but **INCORRECT on Bonner** (see below). |
+| PropExplanation | COMPLETE | `dcm/model/explanation.py` `build_prop_explanation`; drivers from encoded snapshot vs league-prior diffs (empty-list-ok). Runner writes `prop_explanations.jsonl` for top25 + strict_card. Human text optional from the object only. |
+| freeze | PARTIAL | Hash-verified `freeze.json` / `frozen_forecast.json`. P4 binds software, git commit (if available), schema hash, featureStoreHash, HAR sha, board hash, evidence graph hash, parameter snapshot hashes, model config, calibration, decision cutoff, top25, card, explanations hash (`freezeBinds`). Final status/start strip runs immediately before portfolio freeze. PR #9 freeze remains a regression fixture, **INCORRECT on Bonner**. |
 | Top25 | COMPLETE | `top25_ranked.json` always; `top25_qualified.json` unpadded (PR #8). |
 | 0–6 PLAYABLE | PARTIAL | PR #8 `modeledPlayable` / `strict_card.json` exist; **status/start hard gates were incomplete** (this P0). Production-certified layer stays empty (`V6_ROOT_OF_TRUST_MIGRATION_ACCEPTED=false`). |
 | audit | PARTIAL | PR #6 `dcm/runtime/github_archive.py` split cert flags. `locksCertified` may still appear as a **derived alias**; retire misleading primary use. |
@@ -63,3 +65,5 @@ P1 (this line): PlayerOfferSets COMPLETE, EvidenceGraph COMPLETE (minimal first-
 P2 (this line): RoleEpochBuilder COMPLETE (production constructor, not stub); FeatureStore COMPLETE (observations, no trained models); ParameterSnapshots PARTIAL (role-comparable minutes + hierarchical shrink wired on basketball).
 
 P3 (this line): Joint EventWorld PARTIAL/COMPLETE (basketball team minutes + FGA residual); PrimitiveStatLedger PARTIAL/COMPLETE on the MC path; market derivation PARTIAL/COMPLETE (versioned registry, fail-closed unknown/fantasy); quarter worlds PARTIAL (pts/minutes Dirichlet split + threshold counts). LR000000 / predictive NONE unchanged. V1 hash unchanged.
+
+P4 (this line): line surfaces COMPLETE on PLAYABLE/LEAN slim rows; PropExplanation COMPLETE (machine-readable, freeze jsonl); freeze binds + probability-contract documentation COMPLETE; joint EventWorld + derive_market already wired in P3 remain engaged. LR000000 / predictive NONE unchanged. V1 hash unchanged.

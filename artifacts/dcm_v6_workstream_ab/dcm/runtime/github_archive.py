@@ -96,6 +96,8 @@ PACK_FILES = (
     "evidence_graph.json",
     "feature_store.jsonl",
     "feature_store_manifest.json",
+    "event_worlds_meta.json",
+    "prop_explanations.jsonl",
     "MOUNT_STATE.json",
     "RUN_AUDIT.md",
     "pick_evidence.json",

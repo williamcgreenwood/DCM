@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import json
 import statistics
+import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -24,11 +25,16 @@ from dcm.ingest.board import freeze_board, write_board
 from dcm.ingest.composite import compose_ingests
 from dcm.ingest.har import ingest_har
 from dcm.model.distributions import from_worlds
+from dcm.model.explanation import (
+    build_prop_explanation,
+    load_feature_hash_index,
+    persist_prop_explanations,
+)
 from dcm.model.grade import grade as grade_of
 from dcm.model.line_surface import surface as line_surface
 from dcm.model.parameters import build_parameter_snapshot
 from dcm.model.ranking import rank_candidates
-from dcm.model.uncertainty import probability_bundle
+from dcm.model.uncertainty import PROBABILITY_CONTRACT_KEYS, RELIABILITY_IS_NOT_PROBABILITY, probability_bundle
 from dcm.learning.calibration import apply_calibration, cell_key
 from dcm.model.event_world_joint import (
     basketball_teammate_groups,
@@ -59,6 +65,7 @@ from dcm.selection.card_layers import (
     EMPTY_ROOT_NOT_CERTIFIED,
     NOT_PRODUCTION_ROOT_CERTIFIED,
     STATUS_START_HARD_BLOCKERS,
+    apply_pre_freeze_status_start_gates,
     build_directional_passes,
     is_modeled_playable,
     layer_run_state,
@@ -169,6 +176,26 @@ SYNTHETIC = _synthetic_path()
 
 def _run_id(har_sha: str, cutoff: str) -> str:
     return "RUN_" + content_hash({"har": har_sha, "cutoff": cutoff, "sw": SOFTWARE})[:16]
+
+
+def _git_commit_sha(workspace: Path) -> str | None:
+    """Best-effort git HEAD. Never writes git config. Missing git is None, not a crash."""
+    try:
+        proc = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=str(workspace),
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except OSError:
+        return None
+    sha = (proc.stdout or "").strip()
+    if proc.returncode != 0 or not sha:
+        return None
+    if any(c not in "0123456789abcdefABCDEF" for c in sha):
+        return None
+    return sha
 
 
 def _default_model_config() -> dict[str, Any]:
@@ -744,7 +771,9 @@ def run_dcm(
             "state": "MODELED", "grade": ev["grade"], "selectedSide": chosen_side,
             "selectedP": ev["rawP"], "rawP": ev["rawP"], "calibratedP": ev["calibratedP"],
             "evidenceSafeP": ev["evidenceSafeP"], "pHigher": dist["pHigher"], "pLower": dist["pLower"],
-            "pPush": dist["pPush"], "mean": dist["mean"], "lowerBound": ev["lowerBound"],
+            "pPush": dist["pPush"], "mean": dist["mean"],
+            "median": statistics.median(values) if values else dist["mean"],
+            "lowerBound": ev["lowerBound"],
             "lineSurface": ev["lineSurface"], "sideEvaluations": evaluations,
             "opportunityMean": opportunity_mean, "reliability": ev["reliability"],
             "dataQuality": snapshot["data_quality"], "volatility": ev["volatility"],
@@ -807,9 +836,9 @@ def run_dcm(
 
     ranked = rank_candidates(modeled, top_k=25, seed=har_sha)
     # Strict card is PLAYABLE-grade modeled rows. Production root is a later layer.
-    # Re-apply status/start hard gates here so a PLAYER_STATUS_UNCERTAIN row
-    # cannot land on qualified / strict_card even if grade is PLAYABLE.
-    qualified = [p for p in ranked if is_modeled_playable(p, cutoff=forecast_cutoff, snapshot=p.get("parameterSnapshot"))]
+    # Final pre-freeze status/start strip: late OUT / UNCERTAIN / started cannot
+    # land on qualified / strict_card even if grade is PLAYABLE.
+    qualified = apply_pre_freeze_status_start_gates(ranked, cutoff=forecast_cutoff)
     card = build_card(qualified)
     exposure = exposure_report(card)
     n_rank = dag.add("RANK", "board", parents=[n_worlds.key])
@@ -819,7 +848,8 @@ def run_dcm(
 
     def slim(p: dict) -> dict:
         r = p["row"]
-        return {
+        surf = p.get("lineSurface") if isinstance(p.get("lineSurface"), dict) else {}
+        out = {
             "rank": p.get("rank"), "sportFamily": r.get("sportFamily"), "league": r.get("league"),
             "player": r.get("playerName"), "team": r.get("team"), "opponent": r.get("opponent"),
             "event": r.get("eventLabel"), "market": r.get("market"), "line": r.get("line"),
@@ -840,10 +870,21 @@ def run_dcm(
             "parameterSnapshotHash": p.get("parameterSnapshotHash"),
             "topKInclusionP": p.get("topKInclusionP"), "rankStability": p.get("rankStability"),
             "posteriorRegret": p.get("posteriorRegret"),
-            "trueLineTolerance": (p.get("lineSurface") or {}).get("true_unclamped_line_tolerance"),
+            "trueLineTolerance": surf.get("true_unclamped_line_tolerance"),
             "sideEvaluations": p.get("sideEvaluations"), "dependencyTags": p.get("dependencyTags"),
             "projectionId": r.get("projectionId"),
+            "median": p.get("median"),
         }
+        # Line surface on PLAYABLE/LEAN slim rows (true unclamped; never a display clamp).
+        if p.get("grade") in {"PLAYABLE", "LEAN"}:
+            out["lineSurface"] = surf
+            out["offered_line"] = surf.get("offered_line")
+            out["break_even_line"] = surf.get("break_even_line")
+            out["playable_break_line"] = surf.get("playable_break_line")
+            out["true_unclamped_line_tolerance"] = surf.get("true_unclamped_line_tolerance")
+            out["edge_elasticity"] = surf.get("edge_elasticity")
+            out["robustness_area"] = surf.get("robustness_area")
+        return out
 
     top25_ranked = [slim(p) for p in ranked[:25]]
     top25_qualified = [slim(p) for p in qualified[:25]]
@@ -857,6 +898,63 @@ def run_dcm(
         json.dumps(exposure, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
+
+    evidence_graph: dict[str, Any] = {}
+    graph_path = dest / "evidence_graph.json"
+    if graph_path.is_file():
+        try:
+            evidence_graph = json.loads(graph_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            evidence_graph = {}
+    feature_store_hash = None
+    feature_manifest_path = dest / "feature_store_manifest.json"
+    if feature_manifest_path.is_file():
+        try:
+            feature_store_hash = json.loads(feature_manifest_path.read_text(encoding="utf-8")).get("contentHash")
+        except (OSError, json.JSONDecodeError):
+            feature_store_hash = None
+    feature_hash_index = load_feature_hash_index(dest)
+    explain_src: list[dict[str, Any]] = []
+    seen_explain: set[str] = set()
+    for p in list(ranked[:25]) + list(card):
+        pid = str((p.get("row") or {}).get("projectionId") or "")
+        if not pid or pid in seen_explain:
+            continue
+        seen_explain.add(pid)
+        explain_src.append(p)
+    explanations: list[dict[str, Any]] = []
+    for p in explain_src:
+        row = p.get("row") or {}
+        snap = p.get("parameterSnapshot") if isinstance(p.get("parameterSnapshot"), dict) else {}
+        side_key = str(p.get("selectedSide") or "")
+        side_eval = (p.get("sideEvaluations") or {}).get(side_key) if isinstance(p.get("sideEvaluations"), dict) else {}
+        if not isinstance(side_eval, dict):
+            side_eval = {}
+        feat_key = (str(row.get("playerId") or ""), str(row.get("eventId") or ""))
+        explanations.append(
+            build_prop_explanation(
+                row,
+                snap,
+                {
+                    "mean": p.get("mean"),
+                    "median": p.get("median"),
+                    "pMore": p.get("pHigher"),
+                    "pLess": p.get("pLower"),
+                    "pPush": p.get("pPush"),
+                    "n": p.get("worldCount"),
+                },
+                side_eval,
+                feature_hash_index.get(feat_key) or [],
+                p.get("evidenceHashes") or snap.get("evidence_hashes") or [],
+            )
+        )
+    explanations_hash = persist_prop_explanations(dest, explanations)
+    git_commit = _git_commit_sha(workspace)
+    parameter_snapshot_hashes = sorted({
+        str(p.get("parameterSnapshotHash") or "")
+        for p in modeled
+        if p.get("parameterSnapshotHash")
+    })
 
     states_count = {}
     for p in classified:
@@ -917,7 +1015,38 @@ def run_dcm(
         "evidenceBlocked": evidence_blocked,
         "portfolioExposure": exposure,
         "top25QualifiedCount": len(top25_qualified),
+        "software": SOFTWARE,
+        "gitCommit": git_commit,
+        "featureStoreHash": feature_store_hash,
+        "evidenceGraphHash": evidence_graph.get("contentHash"),
+        "parameterSnapshotHashes": parameter_snapshot_hashes,
+        "forecastDecisionCutoff": forecast_cutoff,
+        "top25Hash": content_hash(top25_ranked),
+        "cardHash": content_hash(strict_card),
+        "explanationsHash": explanations_hash,
+        "explanationCount": len(explanations),
+        "probabilityContract": {
+            "reliabilityIsNotProbability": RELIABILITY_IS_NOT_PROBABILITY,
+            "separateKeys": list(PROBABILITY_CONTRACT_KEYS),
+            "note": "Reliability is not a probability. selectedP, evidenceSafeP, and lowerBound are probabilities; reliability, dataQuality, volatility, fragility, oodRisk, falseSignRisk, monteCarloSE, and epistemicUncertainty are separate uncertainty quantities and must not be treated as P.",
+        },
         "dag": dag.snapshot(),
+    }
+    freeze["freezeBinds"] = {
+        "software": SOFTWARE,
+        "gitCommit": git_commit,
+        "schemaHash": freeze["schemaHash"],
+        "featureStoreHash": feature_store_hash,
+        "harSha256": har_sha,
+        "boardHash": board["contentHash"],
+        "evidenceGraphHash": evidence_graph.get("contentHash"),
+        "parameterSnapshotHashes": parameter_snapshot_hashes,
+        "modelConfigHash": config_hash,
+        "calibrationStateHash": calibration_state.get("contentHash"),
+        "forecastDecisionCutoff": forecast_cutoff,
+        "top25Hash": freeze["top25Hash"],
+        "cardHash": freeze["cardHash"],
+        "explanationsHash": explanations_hash,
     }
     readiness = build_readiness(
         mount=mount,
@@ -982,21 +1111,7 @@ def run_dcm(
     (dest / "frozen_forecast.sha256").write_text(freeze["frozenForecastHash"] + "\n", encoding="utf-8")
     (dest / "population_full.jsonl").write_text("".join(json.dumps(p) + "\n" for p in full_population), encoding="utf-8")
     (dest / "accounting.json").write_text(json.dumps({**(board.get("accounting") or {}), "states": states_count, "playable": len(qualified), "cardSize": len(card)}, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    evidence_graph = {}
-    graph_path = dest / "evidence_graph.json"
-    if graph_path.is_file():
-        try:
-            evidence_graph = json.loads(graph_path.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError):
-            evidence_graph = {}
-    feature_store_hash = None
-    feature_manifest_path = dest / "feature_store_manifest.json"
-    if feature_manifest_path.is_file():
-        try:
-            feature_store_hash = json.loads(feature_manifest_path.read_text(encoding="utf-8")).get("contentHash")
-        except (OSError, json.JSONDecodeError):
-            feature_store_hash = None
-    (dest / "hashes.json").write_text(json.dumps({"boardHash": board.get("contentHash"), "harSha256": har_sha, "frozenForecastHash": freeze["frozenForecastHash"], "evidenceGraphHash": evidence_graph.get("contentHash"), "featureStoreHash": feature_store_hash, "checkpointPending": False, "schemaV1Expected": "6e78dacc19843338643bdcabc7477fd3ce2dd065da1e9629646dacc21cdb1f22", "schemaV2": (schema_root.get("v2") or {})}, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    (dest / "hashes.json").write_text(json.dumps({"boardHash": board.get("contentHash"), "harSha256": har_sha, "frozenForecastHash": freeze["frozenForecastHash"], "evidenceGraphHash": evidence_graph.get("contentHash"), "featureStoreHash": feature_store_hash, "explanationsHash": explanations_hash, "gitCommit": git_commit, "checkpointPending": False, "schemaV1Expected": "6e78dacc19843338643bdcabc7477fd3ce2dd065da1e9629646dacc21cdb1f22", "schemaV2": (schema_root.get("v2") or {})}, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
     blockers = []
     if excluded:

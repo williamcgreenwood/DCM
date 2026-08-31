@@ -79,3 +79,21 @@ def test_ledger_contains_required_primitive_keys():
             "ftm": 2, "fta": 2, "reb": 7, "ast": 3, "stl": 1, "blk": 0, "tov": 2, "pts": 13}
     filled = as_primitive_ledger(slim)
     assert filled["reb"] == filled["oreb"] + filled["dreb"]
+
+
+def test_value_from_stats_pra_ignores_corrupted_precomputed_field(monkeypatch):
+    calls = []
+    orig = derive_market
+
+    def spy(ledger, market_key, board_id="FULL_GAME"):
+        calls.append(market_key)
+        return orig(ledger, market_key, board_id=board_id)
+
+    monkeypatch.setattr("dcm.model.market_derive.derive_market", spy)
+    rng = __import__("random").Random(21)
+    w = sample_basketball(rng, 30.0)
+    w["pra"] = -1.0
+    got = value_from_stats("pra", w)
+    assert got == w["pts"] + w["reb"] + w["ast"]
+    assert got != -1.0
+    assert calls
