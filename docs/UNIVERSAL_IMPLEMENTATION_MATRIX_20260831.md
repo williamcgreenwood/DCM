@@ -25,7 +25,7 @@ Status meanings:
 | Red Demon stronger cushion | COMPLETE for current selection path | Existing grading/selection gates retain stricter modifier handling. |
 | Offered-sides-only | COMPLETE | Unknown/unoffered side fails closed. |
 | Temporal cutoff / event-start firewall | COMPLETE | Explicit decision cutoff and final start/status hard blockers. |
-| Split certification semantics | COMPLETE | Archive/evidence/temporal/model/selection/root/predictive flags are separate; legacy `locksCertified` is derived compatibility only. |
+| Split certification semantics | COMPLETE | Archive/evidence/temporal/model/selection/root/predictive flags are separate; `locksCertified` is absent from canonical state and exists only as a compatibility helper function. |
 | One canonical integration line | PARTIAL → converging | PR #10 is the current architecture integration line; PR #11 is stacked only to review this universal migration before folding back into #10. |
 | Portable clean-environment install | COMPLETE for engineering runtime | CI installs package from repo root, runs CLI from clean cwd and synthetic E2E. Production data/root certification remains closed. |
 
