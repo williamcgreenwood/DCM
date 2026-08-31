@@ -10,7 +10,8 @@ from collections import defaultdict
 from typing import Any
 
 from dcm.research.requests import FRESHNESS_NEED, INFO_IMPORTANCE
-from dcm.research.research_store import classify_requests, ResearchStore
+from dcm.research.classify_runtime import classify_requests
+from dcm.research.research_store import ResearchStore
 from dcm.research.scopes import CANONICAL_SCOPES, SCOPE_RANK, canonical_scope
 from dcm.research.source_catalog import estimated_cost
 
@@ -124,7 +125,6 @@ def build_next_research_batch(
         remaining = max_entities - len(selected)
         if remaining <= 0:
             break
-        # Shared event/environment/affiliation first, then subjects.
         group_sorted = sorted(
             group,
             key=lambda r: (
