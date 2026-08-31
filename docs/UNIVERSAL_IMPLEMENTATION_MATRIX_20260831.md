@@ -1,6 +1,6 @@
 # DCM universal implementation matrix — 2026-08-31
 
-Baseline audited: PR #10 head `47f41c2617bec6eea62a5eecd90e3ffa1c1b0982`.
+Baseline audited and governance-refreshed: PR #10 head `c9e75c7259d176d3014af8fc9163706e5589d139` after the SportPlugin-contract tranche merged.
 This matrix is code-path status, not predictive validation. LR remains
 `LR000000`; predictive superiority remains `NONE`.
 
@@ -26,7 +26,7 @@ Status meanings:
 | Offered-sides-only | COMPLETE | Unknown/unoffered side fails closed. |
 | Temporal cutoff / event-start firewall | COMPLETE | Explicit decision cutoff and final start/status hard blockers. |
 | Split certification semantics | COMPLETE | Archive/evidence/temporal/model/selection/root/predictive flags are separate; `locksCertified` is absent from canonical state and exists only as a compatibility helper function. |
-| One canonical integration line | PARTIAL → converging | PR #10 is the current architecture integration line; PR #11 is stacked only to review this universal migration before folding back into #10. |
+| One canonical integration line | PARTIAL → converging | PR #10 is the single current architecture integration line. The prior universal-core and SportPlugin child PRs have been folded back into it. |
 | Portable clean-environment install | COMPLETE for engineering runtime | CI installs package from repo root, runs CLI from clean cwd and synthetic E2E. Production data/root certification remains closed. |
 
 ## P1 — universal entity and research layer
@@ -51,7 +51,7 @@ Status meanings:
 | EvidenceGraph | COMPLETE (universal topology), PARTIAL (full lineage population) | V2 graph uses Subject/Affiliation/Counterparty; legacy claim scopes translate at boundary. Feature/Parameter/Simulation/Selection/Settlement nodes still need full runtime population. |
 | Semantic evidence coverage | PARTIAL | Real field-level gates exist for basketball/gridiron; must move under SportResearchSchema instead of legacy PLAYER/TEAM branching. |
 | Research cache / temporal evidence | COMPLETE for current provider path | As-of cache and pre-cutoff claim validation are executable. |
-| Automatic host web acquisition | PARTIAL | Runtime emits host research plans/bundle contracts; actual web acquisition is host-agent work, not an in-engine HTTP scraper. Current adapter/provider translation is incomplete. |
+| Automatic host web acquisition | PARTIAL | Runtime emits research plans/bundle contracts and the ChatGPT-native host contract is now specified. Actual host API/CLI implementation, optimized iterative research batches, and universal adapter/provider translation remain incomplete. |
 
 ## P2 — ML data / state layer
 
@@ -109,7 +109,7 @@ Status meanings:
 | GitHub archive integration | COMPLETE engineering path | Host/CLI archive path exists without making model depend on Git auth. |
 | Evidence trace from selection to source | COMPLETE in EvidenceGraph V2 for current packet path | Canonical trace is Offer→Subject→Claim→SourceDocument. |
 | Feature→Parameter→Simulation→Selection full graph trace | PARTIAL | Required node types/edges are not yet fully populated end-to-end. |
-| Wheel/runtime ZIP/release manifest/SHA manifest | PARTIAL to strong | Release tooling exists, but universal migration must be included and clean-environment release certification rerun. |
+| Wheel/runtime ZIP/release manifest/SHA manifest | PARTIAL to strong | Release tooling exists and clean install is exercised in CI. Fresh-host execution still requires a canonical release artifact that is actually mounted/retrievable in the ChatGPT execution environment; GitHub read access alone is not sufficient. |
 | No secret/raw private HAR archive | COMPLETE as security invariant | Current HAR/evidence sanitization and URL credential checks remain. |
 
 ## P6 — settlement / learning
@@ -144,3 +144,20 @@ Status meanings:
    using only canonical runtime + HAR.
 8. Accumulate chronological settlements before any predictive or Learning
    Revision promotion.
+
+## P7–P14 completion program
+
+The detailed P0–P6 matrix remains the modeling/system audit. The following workstreams make the entire system operable and maintainable as a long-lived ChatGPT-first platform:
+
+| Workstream | State | Required finish |
+|---|---|---|
+| P7 Host-native execution | EARLY | Implement stable `dcm-host` / `python -m dcm.chat` API/CLI: doctor, prepare, next-research, evidence-import, coverage, forecast, report, resume, audit, settle. |
+| P8 Universal source acquisition | PARTIAL | Versioned source catalog, SportResearchSchema-driven field plans, authority/fallback policy, batching, conflicts, authenticated-provider adapters without secrets in repo. |
+| P9 Universal-core migration | STRONG PARTIAL | Legacy Player/Team semantics terminate completely at sport/source compatibility adapters. |
+| P10 Full sport coverage | EARLY | Every promoted sport independently satisfies all 24 SportPlugin components and plugin validation; unsupported sports fail closed. |
+| P11 Release/fresh-host acceptance | PARTIAL | Exact wheel+manifest+hash retrieval and a fresh ChatGPT HAR-only acceptance test with no source checkout/prior memory. |
+| P12 Research archive/index/reuse | EARLY | Content-addressed normalized evidence/provenance, source/entity/event/time indexes, invalidation/retention, licensing-aware storage. |
+| P13 Performance/search/token optimization | PARTIAL | Fan-out research scheduling, cache/incremental DAG, batched writes, adaptive simulation, measured CPU/RSS/wall/token benchmarks. |
+| P14 Production operations/observability | PARTIAL | Run health/readiness, structured failure taxonomy, deterministic recovery, release gates, operator-visible status and immutable engineering-pass ledger. |
+
+See `docs/PROGRAM_STATUS.md`, `docs/PROGRAM_STATUS.json`, `docs/CHATGPT_NATIVE_EXECUTION_SPEC.md`, and `docs/engineering_passes/`.
