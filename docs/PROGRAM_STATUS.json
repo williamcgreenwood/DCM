@@ -1,0 +1,222 @@
+{
+  "schema": "pillars_dcm.program_status.v1",
+  "updatedAtUtc": "2026-08-31T15:40:00Z",
+  "canonicalIntegrationBranch": "integration/v6-ml-architecture-20260830",
+  "canonicalIntegrationPr": 10,
+  "scoreScale": {
+    "0": "MISSING",
+    "10": "COMPLETE_EXECUTABLE_INTEGRATED_TESTED_AUDITABLE_PORTABLE",
+    "8-9": "STRONG_PARTIAL",
+    "5-7": "PARTIAL",
+    "1-4": "STUB_OR_EARLY",
+    "BLOCKED-EXTERNAL": "SOFTWARE_BOUNDARY_COMPLETE_EXTERNAL_EVIDENCE_REQUIRED"
+  },
+  "completionLaw": [
+    "runtime_integrated",
+    "fail_closed",
+    "no_fixture_production",
+    "schema_and_semantic_hash",
+    "deterministic_tests",
+    "end_to_end_lineage",
+    "portable_release",
+    "host_native_operation",
+    "status_and_pass_log_updated",
+    "no_unearned_predictive_claim"
+  ],
+  "workstreams": [
+    {
+      "id": "P0",
+      "name": "Canonical spine / HAR / integrity",
+      "target": 10,
+      "current": 9,
+      "state": "STRONG_PARTIAL",
+      "next": [
+        "refresh matrix at current head",
+        "preserve independent production-root gates"
+      ]
+    },
+    {
+      "id": "P1",
+      "name": "Universal research / evidence",
+      "target": 10,
+      "current": 7,
+      "state": "PARTIAL",
+      "next": [
+        "canonical SUBJECT/AFFILIATION/COUNTERPARTY/ENVIRONMENT provider semantics",
+        "universal packets",
+        "host-native acquisition loop",
+        "source catalog"
+      ]
+    },
+    {
+      "id": "P2",
+      "name": "Feature / state / parameter layer",
+      "target": 10,
+      "current": 7,
+      "state": "PARTIAL",
+      "next": [
+        "universal feature families",
+        "separate ParticipationModel",
+        "universal ParameterSnapshot layers"
+      ]
+    },
+    {
+      "id": "P3",
+      "name": "SportPlugin physics",
+      "target": 10,
+      "current": 6,
+      "state": "PARTIAL",
+      "next": [
+        "close all 24 required bindings per sport",
+        "plugin-owned validation suites"
+      ]
+    },
+    {
+      "id": "P4",
+      "name": "Probability / uncertainty / grading / portfolio",
+      "target": 10,
+      "current": 8,
+      "state": "STRONG_PARTIAL",
+      "next": [
+        "universal correlation/shared-world coverage",
+        "final refresh integration"
+      ]
+    },
+    {
+      "id": "P5",
+      "name": "Audit / portability / ChatGPT-native execution",
+      "target": 10,
+      "current": 7,
+      "state": "PARTIAL",
+      "next": [
+        "dcm.chat API/CLI",
+        "immutable release retrieval",
+        "fresh-chat HAR acceptance"
+      ]
+    },
+    {
+      "id": "P6",
+      "name": "Settlement / calibration / learning",
+      "target": 10,
+      "current": 6,
+      "state": "PARTIAL_EXTERNAL_VALIDATION",
+      "next": [
+        "exact platform coverage",
+        "CRPS/subgroups",
+        "chronological unseen settlement evidence"
+      ]
+    },
+    {
+      "id": "P7",
+      "name": "Host-native execution contract",
+      "target": 10,
+      "current": 2,
+      "state": "EARLY",
+      "next": [
+        "prepare",
+        "research-plan",
+        "evidence-import",
+        "coverage",
+        "forecast",
+        "report",
+        "settle"
+      ]
+    },
+    {
+      "id": "P8",
+      "name": "Universal source acquisition",
+      "target": 10,
+      "current": 4,
+      "state": "PARTIAL",
+      "next": [
+        "schema-driven source priority",
+        "batched reusable entity research",
+        "fallback and conflict policy"
+      ]
+    },
+    {
+      "id": "P9",
+      "name": "Universal core migration",
+      "target": 10,
+      "current": 8,
+      "state": "STRONG_PARTIAL",
+      "next": [
+        "terminate all legacy player/team semantics at adapters"
+      ]
+    },
+    {
+      "id": "P10",
+      "name": "Full sport coverage",
+      "target": 10,
+      "current": 3,
+      "state": "EARLY",
+      "next": [
+        "24/24 SportPlugin components and validation for each promoted sport"
+      ]
+    },
+    {
+      "id": "P11",
+      "name": "Release + fresh-environment acceptance",
+      "target": 10,
+      "current": 7,
+      "state": "PARTIAL",
+      "next": [
+        "wheel/release exact-hash install",
+        "HAR-only fresh ChatGPT acceptance"
+      ]
+    },
+    {
+      "id": "P12",
+      "name": "Research archive / index / reuse",
+      "target": 10,
+      "current": 3,
+      "state": "EARLY",
+      "next": [
+        "content-addressed research store",
+        "entity/source/time indexes",
+        "invalidation/retention"
+      ]
+    },
+    {
+      "id": "P13",
+      "name": "Performance / search / token optimization",
+      "target": 10,
+      "current": 5,
+      "state": "PARTIAL",
+      "next": [
+        "fan-out scheduler benchmarks",
+        "batch research",
+        "cache targets",
+        "CPU/RSS/token measurements"
+      ]
+    },
+    {
+      "id": "P14",
+      "name": "Production operations / observability",
+      "target": 10,
+      "current": 4,
+      "state": "PARTIAL",
+      "next": [
+        "run health/readiness",
+        "failure taxonomy",
+        "deterministic recovery",
+        "release gates"
+      ]
+    }
+  ],
+  "predictiveState": {
+    "learningRevision": "LR000000",
+    "predictiveClaim": "NONE",
+    "productionRootCertified": false
+  },
+  "updatePolicy": {
+    "everyCodingPass": [
+      "update PROGRAM_STATUS.md",
+      "update PROGRAM_STATUS.json",
+      "update universal implementation matrix when affected",
+      "add immutable docs/engineering_passes record"
+    ],
+    "noSilentDowngrades": true,
+    "noSilentCompletionClaims": true
+  }
+}

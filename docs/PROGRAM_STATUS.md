@@ -1,0 +1,61 @@
+# DCM Program Status
+
+Canonical integration line: `integration/v6-ml-architecture-20260830` (PR #10).
+
+This file is the human dashboard. It must be updated on every coding pass together with a new immutable pass record under `docs/engineering_passes/`.
+
+## Status scale
+
+- 10/10 COMPLETE: executable, integrated, tested, auditable, portable for declared scope; no hidden stub/fallback.
+- 8–9/10 STRONG PARTIAL: substantive path exists; bounded gaps remain.
+- 5–7/10 PARTIAL: useful implementation exists but production contract is materially incomplete.
+- 1–4/10 STUB/EARLY: scaffold/prototype or narrow fixture path.
+- 0/10 MISSING: required subsystem absent.
+- BLOCKED-EXTERNAL: correct software boundary exists but completion requires future settlements, licensed/private data, or unavailable canonical bytes.
+
+## Program dashboard
+
+| Workstream | Target | Current | State | Next acceptance gate |
+|---|---:|---:|---|---|
+| P0 Canonical spine / HAR / integrity | 10 | 9 | STRONG PARTIAL | refresh canonical matrix against current head; production root remains independently gated |
+| P1 Universal research / evidence | 10 | 7 | PARTIAL | remove canonical PLAYER/TEAM request semantics; universal packets; host-native acquisition loop; source catalog |
+| P2 Feature / state / parameter layer | 10 | 7 | PARTIAL | universal feature families; separate participation API; universal ParameterSnapshot layers |
+| P3 SportPlugin physics | 10 | 6 | PARTIAL | close all 24-component plugin bindings sport by sport; no generic production fallback |
+| P4 Probability / uncertainty / grading / portfolio | 10 | 8 | STRONG PARTIAL | universal shared-world/correlation coverage; final-refresh integration |
+| P5 Audit / portability / ChatGPT-native execution | 10 | 7 | PARTIAL | dedicated `dcm.chat` API/CLI; immutable release retrieval; fresh-chat HAR acceptance |
+| P6 Settlement / calibration / learning | 10 | 6 | PARTIAL + EXTERNAL VALIDATION | exact platform coverage; CRPS/subgroups; chronological unseen settlements before promotion |
+| P7 Host-native execution contract | 10 | 2 | EARLY | one command family: prepare/research-import/coverage/forecast/report/settle |
+| P8 Universal source acquisition | 10 | 4 | PARTIAL | SportResearchSchema-driven source plan; provider priority/fallback; batched reusable research |
+| P9 Universal core migration | 10 | 8 | STRONG PARTIAL | legacy semantics terminate entirely at adapters |
+| P10 Full sport coverage | 10 | 3 | EARLY | each supported sport reaches 24/24 plugin components + validation suite |
+| P11 Release + fresh-environment acceptance | 10 | 7 | PARTIAL | wheel/release + exact hash + HAR-only fresh ChatGPT acceptance |
+| P12 Research archive / index / reuse | 10 | 3 | EARLY | content-addressed research store, source/entity/time indexes, retention and invalidation |
+| P13 Performance / search / token optimization | 10 | 5 | PARTIAL | measured fan-out scheduling, batch research, cache hit targets, CPU/RSS/token benchmarks |
+| P14 Production operations / observability | 10 | 4 | PARTIAL | run manifests, health/readiness, failure taxonomy, deterministic recovery, release gates |
+
+## Definition of “finished”
+
+The DCM is not “finished” because modules exist. A subsystem reaches 10/10 only when:
+
+1. the runtime calls it on the canonical path;
+2. unsupported inputs fail closed;
+3. no fixture/stub can create production output;
+4. inputs/outputs have explicit schemas and semantic hashes;
+5. deterministic tests cover positive, negative, temporal and resume cases;
+6. the audit graph can trace outputs to evidence and code/release identity;
+7. the portable wheel works outside the repository;
+8. ChatGPT can drive it through the host-native contract without knowing internal module topology;
+9. the subsystem’s status is reflected in `PROGRAM_STATUS.md`, the universal matrix, and a pass log;
+10. any unearned predictive/learning claim remains closed.
+
+## Required repository control files
+
+- `AGENTS.md` — coding-agent law.
+- `docs/PROGRAM_STATUS.md` — human dashboard.
+- `docs/PROGRAM_STATUS.json` — machine-readable workstream registry.
+- `docs/UNIVERSAL_IMPLEMENTATION_MATRIX_20260831.md` — detailed P0–P6 subsystem audit.
+- `docs/engineering_passes/` — append-only pass records.
+- `docs/CHATGPT_NATIVE_EXECUTION_SPEC.md` — host/runtime contract.
+- `scripts/build_code_inventory.py` — generated module/class/function inventory.
+
+No agent may claim “complete” without updating these records and proving the corresponding tests.
