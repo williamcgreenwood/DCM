@@ -1,4 +1,8 @@
 from dcm.research.claims import claim_record, dedupe
+from dcm.research.evidence_graph import build_evidence_graph, trace_selection
+from dcm.research.player_offer_set import build_player_offer_sets
+from dcm.research.player_packet import build_player_research_packet
+from dcm.research.population import build_research_population_manifest
 from dcm.research.provider import BundleProvider, FileProvider, FixtureProvider, collect, write_bundle
 from dcm.research.requests import build_requests
 from dcm.research.temporal import TemporalLeakError, assert_not_after_cutoff, filter_claims
@@ -6,6 +10,11 @@ from dcm.research.temporal import TemporalLeakError, assert_not_after_cutoff, fi
 __all__ = [
     "claim_record",
     "dedupe",
+    "build_evidence_graph",
+    "trace_selection",
+    "build_player_offer_sets",
+    "build_player_research_packet",
+    "build_research_population_manifest",
     "BundleProvider",
     "FileProvider",
     "FixtureProvider",

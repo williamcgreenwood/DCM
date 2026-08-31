@@ -64,6 +64,23 @@ def _market_token(request: dict[str, Any]) -> str:
     return ""
 
 
+def _markets_for_request(request: dict[str, Any]) -> list[str]:
+    """Collect market tokens. A PLAYER object existing is never coverage by itself."""
+    out: list[str] = []
+    token = _market_token(request)
+    if token:
+        out.append(token)
+    extra = request.get("markets") or request.get("dependentMarkets") or []
+    if isinstance(extra, str):
+        extra = [extra]
+    if isinstance(extra, list):
+        for item in extra:
+            m = str(item or "").strip().lower()
+            if m and m not in out:
+                out.append(m)
+    return out
+
+
 def _event_missing(request: dict[str, Any], merged: dict[str, Any], values: list[dict[str, Any]]) -> list[str]:
     if not values:
         return ["EVENT_CONTEXT"]
@@ -114,6 +131,8 @@ def evaluate_request(request: dict[str, Any], claims: list[dict[str, Any]]) -> d
     if not values:
         missing.append("EVIDENCE_CLAIM")
     elif scope == "PLAYER":
+        # PLAYER object existence is not coverage. Status, role, comparable
+        # logs, opportunity, efficiency, and market counting-stats are required.
         status = str(merged.get("status") or "").strip().upper()
         if not status:
             missing.append("PLAYER_STATUS")
@@ -132,11 +151,18 @@ def evaluate_request(request: dict[str, Any], claims: list[dict[str, Any]]) -> d
             missing.append("EFFICIENCY_EVIDENCE")
         family, _league = _league_family(request)
         if _is_basketball_player_request(family, log_dicts) and log_dicts:
-            market = _market_token(request)
-            compat = assert_compatible_basketball_logs(log_dicts, market=market)
-            for code in compat.get("missing") or []:
-                if code not in missing:
-                    missing.append(code)
+            markets = _markets_for_request(request)
+            if markets:
+                for market in markets:
+                    compat = assert_compatible_basketball_logs(log_dicts, market=market)
+                    for code in compat.get("missing") or []:
+                        if code not in missing:
+                            missing.append(code)
+            else:
+                compat = assert_compatible_basketball_logs(log_dicts, market="")
+                for code in compat.get("missing") or []:
+                    if code not in missing:
+                        missing.append(code)
     elif scope == "MARKET_DEFINITION":
         if merged.get("definition_verified") is not True:
             missing.append("VERIFIED_MARKET_DEFINITION")

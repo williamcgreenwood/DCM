@@ -158,13 +158,19 @@ def plan_research(
         if not player_id:
             continue
         sample = group[0]
+        markets = sorted({str(r.get("market") or "") for r in group if r.get("market")})
         _add(
             reqs,
             scope="PLAYER",
             scope_id=player_id,
             need="status_role_logs_opportunity_efficiency",
             cutoff=cutoff,
-            extra={"name": sample.get("playerName"), "league": sample.get("league")},
+            extra={
+                "name": sample.get("playerName"),
+                "league": sample.get("league"),
+                "sportFamily": sample.get("sportFamily"),
+                "markets": markets,
+            },
             dependents=group,
         )
 

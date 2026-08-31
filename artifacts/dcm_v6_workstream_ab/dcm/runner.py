@@ -32,6 +32,7 @@ from dcm.model.uncertainty import probability_bundle
 from dcm.learning.calibration import apply_calibration, cell_key
 from dcm.model.worlds import generate_event_contexts, simulate_player_worlds, value_from_stats
 from dcm.research.classify import accounting_classify as _classify
+from dcm.research.emit import emit_offer_sets_and_manifest, emit_packets_and_graph
 from dcm.research.host_plan import build_host_research_plan
 from dcm.research.provider import BundleProvider, FileProvider, FixtureProvider, collect, write_bundle
 from dcm.research.requests import plan_research
@@ -388,6 +389,10 @@ def run_dcm(
         (dest / "host_research_plan.json").write_text(
             json.dumps(host_plan, indent=2, sort_keys=True) + "\n", encoding="utf-8"
         )
+        pop = emit_offer_sets_and_manifest(
+            dest, rows, planned=planned, cutoff=forecast_cutoff, research_shadow=research_shadow
+        )
+        emit_packets_and_graph(dest, offer_sets=pop["offerSets"], claims=[], cutoff=forecast_cutoff)
         ck = write_checkpoint(dest / "checkpoint.json", {
             "runId": run_id, "dcmVersion": SOFTWARE, "learningRevision": LEARNING_REVISION,
             "forecastCutoff": forecast_cutoff, "artifactRoot": str(dest),
@@ -449,6 +454,12 @@ def run_dcm(
     (dest / "host_research_plan.json").write_text(
         json.dumps(host_plan, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
+    )
+    pop = emit_offer_sets_and_manifest(
+        dest, rows, planned=planned, cutoff=forecast_cutoff, research_shadow=research_shadow
+    )
+    emit_packets_and_graph(
+        dest, offer_sets=pop["offerSets"], claims=bundle.get("claims") or [], cutoff=forecast_cutoff
     )
     n_res = dag.add("EVIDENCE", "board", parents=[n_id.key])
     if not bundle["complete"]:
@@ -903,7 +914,14 @@ def run_dcm(
     (dest / "frozen_forecast.sha256").write_text(freeze["frozenForecastHash"] + "\n", encoding="utf-8")
     (dest / "population_full.jsonl").write_text("".join(json.dumps(p) + "\n" for p in full_population), encoding="utf-8")
     (dest / "accounting.json").write_text(json.dumps({**(board.get("accounting") or {}), "states": states_count, "playable": len(qualified), "cardSize": len(card)}, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    (dest / "hashes.json").write_text(json.dumps({"boardHash": board.get("contentHash"), "harSha256": har_sha, "frozenForecastHash": freeze["frozenForecastHash"], "checkpointPending": False, "schemaV1Expected": "6e78dacc19843338643bdcabc7477fd3ce2dd065da1e9629646dacc21cdb1f22", "schemaV2": (schema_root.get("v2") or {})}, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    evidence_graph = {}
+    graph_path = dest / "evidence_graph.json"
+    if graph_path.is_file():
+        try:
+            evidence_graph = json.loads(graph_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            evidence_graph = {}
+    (dest / "hashes.json").write_text(json.dumps({"boardHash": board.get("contentHash"), "harSha256": har_sha, "frozenForecastHash": freeze["frozenForecastHash"], "evidenceGraphHash": evidence_graph.get("contentHash"), "checkpointPending": False, "schemaV1Expected": "6e78dacc19843338643bdcabc7477fd3ce2dd065da1e9629646dacc21cdb1f22", "schemaV2": (schema_root.get("v2") or {})}, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
     blockers = []
     if excluded:

@@ -1,6 +1,6 @@
 # DCM ML-architecture stage inventory — 2026-08-30
 
-Canonical line: `origin/feat/e2e-0830-python` @ `04742d5` (PR #9), stacked on PR #5 `263c6f4` + #6 `63f5f5a` + #7 `8bd9526` + #8 `505d38e`.
+Canonical line: `integration/v6-ml-architecture-20260830` (PR #10), stacked on PR #5 `263c6f4` + #6 `63f5f5a` + #7 `8bd9526` + #8 `505d38e` + #9 `04742d5`.
 Do **not** use `main` (`d68fa772`, stale). V1 hash remains `6e78dacc19843338643bdcabc7477fd3ce2dd065da1e9629646dacc21cdb1f22`. LR000000 / predictive NONE.
 
 Statuses: COMPLETE | PARTIAL | STUB | MISSING | INCORRECT | OBSOLETE.
@@ -15,12 +15,12 @@ Audit pack `audit/runs/RUN_60612c8a7bcf7df1` is a **regression fixture, not a go
 | board extraction | COMPLETE | `dcm/ingest/board.py` `freeze_board` / `BOARD_JSON_V2_ASOF_2026-08-28`; `eventStartTime` from PrizePicks `start_time`. |
 | accounting | COMPLETE | `accounting_from_rows` + `dcm/research/classify.py` `accounting_classify`; test_e2e_runner accounts every row. |
 | identity | PARTIAL | `dcm/identity/resolve.py` freezes HAR `new_player` ids; `identities/map.json`; no full player-index packet. |
-| PlayerOfferSets | MISSING | Props exist as board rows / OFFER claims; no named `PlayerOfferSet` abstraction grouping a player's markets. |
-| research population | PARTIAL | `classify_rows` + `plan_research` + `host_research_plan.json` (PR #5 classify-before-research). Not a reusable full-season packet. |
+| PlayerOfferSets | COMPLETE | `dcm/research/player_offer_set.py` groups by playerId+eventId; runner writes `player_offer_sets.json`; Paige-style N markets → 1 set. |
+| research population | COMPLETE | `dcm/research/population.py` `ResearchPopulationManifest` (eligible events/teams/players/market_definitions/offers, dependentOfferCount, fan-out priority). Account/classify path always emits `research_population_manifest.json`. |
 | EntityGraph | PARTIAL | `host_plan.py` emits `entityGraph` dict (`test_research_efficiency.py`); not a first-class graph type. |
-| source research | PARTIAL | File/Bundle/Fixture providers + `authority.py` SourceAuthorityRegistry; live fetch is host-driven, not automatic. |
+| source research | PARTIAL | File/Bundle/Fixture providers + `authority.py`; basketball SourceAdapters (`BasketballReferenceGameLogAdapter`, `BasketballReferencePlayerAdapter`, `PrizePicksOfferAdapter`). Live fetch opt-in (`DCM_LIVE_FETCH`); CI uses HTML fixtures. Other sports adapters still missing. |
 | normalized stats | PARTIAL | PR #7 `dcm/research/gamelog.py` basketball aliases (MP/TRB→minutes/reb) COMPLETE for basketball; other sports alias coverage incomplete. |
-| EvidenceGraph | PARTIAL | `claims` + conflict ledger + `coverage.py` + jsonl transport (`evidence_bundle.jsonl`); `evidence_graph_hash` in lineage schema; **no first-class graph object / `evidence_graph.json`**. |
+| EvidenceGraph | COMPLETE | First-class `dcm/research/evidence_graph.py` (`evidence_graph.json` + content hash). Nodes: SourceDocument/EvidenceClaim/Player/Team/Event/MarketDefinition/Offer/NormalizedStat. Edges: supports/derived_from/applies_to/conflicts_with. `trace_selection` resolves Selection→SourceDocument. jsonl remains the transport. |
 | FeatureStore | MISSING | `IndexedStore` sqlite is append-only run records, not a cutoff-safe feature store. |
 | Role / availability | STUB | `dcm/research/role_epoch.py` `RoleEpochBuilder.stub` ("Partitions only when starter/bench/teammate-out claims exist"). Availability is a status string on the snapshot. |
 | ParameterSnapshots | PARTIAL | `dcm/model/parameters.py` five scopes + `parameters/snapshots.json`; opportunity vs efficiency split (PR #7); role-epoch constructor is stub. |
@@ -44,7 +44,7 @@ Audit pack `audit/runs/RUN_60612c8a7bcf7df1` is a **regression fixture, not a go
 | champion / challenger | PARTIAL | Postgame `REGISTER_SHADOW_CHALLENGER_ONLY`; no promotion path; LR never auto-advances. |
 | LR | COMPLETE (locked) | `VERSION.json` + `dcm/version.py` LR000000 / predictive NONE. Not promoted. |
 | portable wheel release | PARTIAL | `dcm/release.py` + `scripts/build_portable.py` + `test_release_freshness.py`. Not a published wheel of the full production stack. |
-| full-season packets | MISSING | No multi-slate / season-scale research packet reuse. |
+| full-season packets | PARTIAL | `dcm/research/player_packet.py` basketball full current-season packet (L3/L5/L10/L15/L20 derived from full log, support_n from usable logs, PRA identity). One packet reused across a PlayerOfferSet. Not a training FeatureStore / multi-slate ledger. |
 | joint team minute conservation | MISSING | WNBA≈200 / NBA≈240 team-minute conservation not enforced across players in an EventWorld. |
 | quarter worlds | MISSING | Board ids 1H/2H exist on ingest; no quarter-level EventWorld. |
 
@@ -56,4 +56,6 @@ Audit pack `audit/runs/RUN_60612c8a7bcf7df1` is a **regression fixture, not a go
 
 ## Out of scope for this P0
 
-FeatureStore, first-class EvidenceGraph, PlayerOfferSets, RoleEpochBuilder production constructor, joint minute conservation, quarter worlds, champion promotion, LR advance, V1 hash rewrite, merge to main.
+FeatureStore, RoleEpochBuilder production constructor, joint minute conservation, quarter worlds, champion promotion, LR advance, V1 hash rewrite, merge to main.
+
+P1 (this line): PlayerOfferSets COMPLETE, EvidenceGraph COMPLETE (minimal first-class), full-season packets PARTIAL (basketball), SourceAdapters basketball-first.

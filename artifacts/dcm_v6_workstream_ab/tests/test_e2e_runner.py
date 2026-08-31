@@ -94,6 +94,10 @@ def test_a_synthetic_smoke(tmp_path: Path):
     for name in (
         "board.json",
         "research_requests.json",
+        "player_offer_sets.json",
+        "research_population_manifest.json",
+        "player_research_packets.json",
+        "evidence_graph.json",
         "evidence/claims.json",
         "top25_ranked.json",
         "top25_qualified.json",

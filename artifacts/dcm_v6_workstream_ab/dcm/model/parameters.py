@@ -3,6 +3,10 @@
 Opportunity and efficiency are deliberately separate. Production selection
 requires non-synthetic evidence, a verified market definition, and support for
 both opportunity and efficiency. Small samples shrink toward declared priors.
+
+Website/HTML parsing lives in dcm.research.adapters. This module consumes
+already-normalized logs (aliases via gamelog.normalize_basketball_logs) and
+never parses host pages inline.
 """
 from __future__ import annotations
 
