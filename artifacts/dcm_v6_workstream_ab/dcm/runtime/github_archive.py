@@ -31,7 +31,7 @@ PYTHON_FREEZE_STATES = COMPLETE_STATES | {
     "RESEARCHED_MODELED_CARD",
     "RESEARCHED_MODELED_TOP25",
 }
-REQUIRED_PICK_SCOPES = frozenset({"PLAYER", "EVENT", "MARKET_DEFINITION", "MARKET", "OFFER"})
+REQUIRED_PICK_SCOPES = frozenset({"PLAYER", "SUBJECT", "EVENT", "MARKET_DEFINITION", "MARKET", "OFFER"})
 SKIP_EVIDENCE_JSON = frozenset({"coverage.json", "conflicts.json"})
 SECRET_SUBSTR = ("cookie", "token", "authorization", "password", "passwd", "secret", "apikey", "api_key")
 SECRET_CONTENT_RE = re.compile(
@@ -313,7 +313,7 @@ def pick_to_requests(pick: dict[str, Any], all_requests: list[dict[str, Any]]) -
         sid = _s(req.get("scope_id") or req.get("scopeId"))
         rid = _s(req.get("request_id") or req.get("requestId") or f"{scope}:{sid}")
         hit = False
-        if scope == "PLAYER":
+        if scope in {"PLAYER", "SUBJECT"}:
             name = _s(req.get("name"))
             if player_id and sid == player_id:
                 hit = True
@@ -338,7 +338,7 @@ def pick_to_requests(pick: dict[str, Any], all_requests: list[dict[str, Any]]) -
                 hit = True
             elif offer_id and sid == offer_id:
                 hit = True
-        elif scope == "TEAM":
+        elif scope in {"TEAM", "AFFILIATION", "COUNTERPARTY"}:
             if team_id and sid == team_id:
                 hit = True
         if hit and rid not in seen:
@@ -395,11 +395,15 @@ def evaluate_pick_evidence(
     matched = pick_to_requests(pick, requests)
     report = coverage_report(matched, claims)
     matched_scopes = {_s(r.get("scope")) for r in matched}
-    has_player = "PLAYER" in matched_scopes
+    has_player = bool(matched_scopes & {"PLAYER", "SUBJECT"})
     has_event = "EVENT" in matched_scopes
     has_market = bool(matched_scopes & {"MARKET_DEFINITION", "MARKET", "OFFER"})
     structural = has_player and has_event and has_market and bool(matched)
-    player_rows = [row for row in report.get("requests") or [] if _s(row.get("scope")) == "PLAYER"]
+    player_rows = [
+        row
+        for row in report.get("requests") or []
+        if _s(row.get("scope")) in {"PLAYER", "SUBJECT"}
+    ]
     missing: list[str] = []
     for row in report.get("requests") or []:
         missing.extend(str(m) for m in (row.get("missing") or []))

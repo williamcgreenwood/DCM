@@ -19,6 +19,7 @@ from dcm.research.population import (
 from dcm.research.staged import stage_research
 from dcm.research.subject_offer_set import build_subject_offer_sets, subject_offer_sets_document
 from dcm.research.universal_plan import build_universal_host_research_plan
+from dcm.research.universal_packets import build_universal_packets
 from dcm.sports.common.contract import contract_registry_document
 
 
@@ -129,6 +130,51 @@ def emit_packets_and_graph(
         },
     )
     _write(Path(dest) / "entity_research_packets.json", entities)
+    universal = build_universal_packets(
+        offer_sets,
+        claims=claims or [],
+        as_of=cutoff,
+        population=population,
+        player_packets=packets,
+        entity_packets=entities,
+    )
+    _write(Path(dest) / "universal_research_packets.json", universal)
+    _write(
+        Path(dest) / "subject_research_packets.json",
+        {
+            "schema": "pillars_dcm.subject_research_packets.v1",
+            "subjectPacketCount": universal["subjectPacketCount"],
+            "subjects": universal["subjects"],
+            "contentHash": universal["contentHash"],
+        },
+    )
+    _write(
+        Path(dest) / "affiliation_research_packets.json",
+        {
+            "schema": "pillars_dcm.affiliation_research_packets.v1",
+            "affiliationPacketCount": universal["affiliationPacketCount"],
+            "affiliations": universal["affiliations"],
+            "contentHash": universal["contentHash"],
+        },
+    )
+    _write(
+        Path(dest) / "counterparty_research_packets.json",
+        {
+            "schema": "pillars_dcm.counterparty_research_packets.v1",
+            "counterpartyPacketCount": universal["counterpartyPacketCount"],
+            "counterparties": universal["counterparties"],
+            "contentHash": universal["contentHash"],
+        },
+    )
+    _write(
+        Path(dest) / "environment_research_packets.json",
+        {
+            "schema": "pillars_dcm.environment_research_packets.v1",
+            "environmentPacketCount": universal["environmentPacketCount"],
+            "environments": universal["environments"],
+            "contentHash": universal["contentHash"],
+        },
+    )
     entity_graph = build_entity_graph(
         offer_sets,
         team_packets=entities.get("teams") or [],
@@ -159,6 +205,7 @@ def emit_packets_and_graph(
         "teamPackets": entities.get("teams") or [],
         "eventPackets": entities.get("events") or [],
         "opponentPackets": entities.get("opponents") or [],
+        "universalPackets": universal,
     }
 
 

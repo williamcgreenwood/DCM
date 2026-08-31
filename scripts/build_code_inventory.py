@@ -23,6 +23,7 @@ PATH_WORKSTREAMS = {
     "/identity/": "P0",
     "/contracts/": "P0",
     "/research/": "P1",
+    "/chat/": "P7",
     "/ml/": "P2",
     "/model/": "P2-P4",
     "/sports/": "P3",

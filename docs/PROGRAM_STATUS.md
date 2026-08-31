@@ -18,20 +18,20 @@ This file is the human dashboard. It must be updated on every coding pass togeth
 | Workstream | Target | Current | State | Next acceptance gate |
 |---|---:|---:|---|---|
 | P0 Canonical spine / HAR / integrity | 10 | 9 | STRONG PARTIAL | refresh canonical matrix against current head; production root remains independently gated |
-| P1 Universal research / evidence | 10 | 7 | PARTIAL | remove canonical PLAYER/TEAM request semantics; universal packets; host-native acquisition loop; source catalog |
-| P2 Feature / state / parameter layer | 10 | 7 | PARTIAL | universal feature families; separate participation API; universal ParameterSnapshot layers |
-| P3 SportPlugin physics | 10 | 6 | PARTIAL | close all 24-component plugin bindings sport by sport; no generic production fallback |
+| P1 Universal research / evidence | 10 | 8 | STRONG PARTIAL | live host observation loop closing SportResearchSchema coverage; remaining adapter PLAYER/TEAM lookups |
+| P2 Feature / state / parameter layer | 10 | 9 | STRONG PARTIAL | remaining sport-neutral feature dispatch; packet-shaped FeatureStore observations |
+| P3 SportPlugin physics | 10 | 6 | PARTIAL | close remaining 24-component plugin bindings sport by sport; no generic production fallback |
 | P4 Probability / uncertainty / grading / portfolio | 10 | 8 | STRONG PARTIAL | universal shared-world/correlation coverage; final-refresh integration |
-| P5 Audit / portability / ChatGPT-native execution | 10 | 7 | PARTIAL | dedicated `dcm.chat` API/CLI; immutable release retrieval; fresh-chat HAR acceptance |
+| P5 Audit / portability / ChatGPT-native execution | 10 | 8 | STRONG PARTIAL | exact-wheel fresh ChatGPT HAR acceptance; immutable release retrieval |
 | P6 Settlement / calibration / learning | 10 | 6 | PARTIAL + EXTERNAL VALIDATION | exact platform coverage; CRPS/subgroups; chronological unseen settlements before promotion |
-| P7 Host-native execution contract | 10 | 2 | EARLY | one command family: prepare/research-import/coverage/forecast/report/settle |
-| P8 Universal source acquisition | 10 | 4 | PARTIAL | SportResearchSchema-driven source plan; provider priority/fallback; batched reusable research |
-| P9 Universal core migration | 10 | 8 | STRONG PARTIAL | legacy semantics terminate entirely at adapters |
+| P7 Host-native execution contract | 10 | 7 | PARTIAL | forecast/settle through host CLI on a fresh wheel+HAR; no second engine |
+| P8 Universal source acquisition | 10 | 6 | PARTIAL | live adapter fetch beyond fixtures; conflict policy + licensed providers |
+| P9 Universal core migration | 10 | 9 | STRONG PARTIAL | retire remaining PLAYER/TEAM claim lookups at packet/parameter adapters |
 | P10 Full sport coverage | 10 | 3 | EARLY | each supported sport reaches 24/24 plugin components + validation suite |
 | P11 Release + fresh-environment acceptance | 10 | 7 | PARTIAL | wheel/release + exact hash + HAR-only fresh ChatGPT acceptance |
-| P12 Research archive / index / reuse | 10 | 3 | EARLY | content-addressed research store, source/entity/time indexes, retention and invalidation |
-| P13 Performance / search / token optimization | 10 | 5 | PARTIAL | measured fan-out scheduling, batch research, cache hit targets, CPU/RSS/token benchmarks |
-| P14 Production operations / observability | 10 | 4 | PARTIAL | run manifests, health/readiness, failure taxonomy, deterministic recovery, release gates |
+| P12 Research archive / index / reuse | 10 | 7 | PARTIAL | high-volume queryable store; retention/licensing enforcement beyond local blobs |
+| P13 Performance / search / token optimization | 10 | 6 | PARTIAL | measured CPU/RSS/token certification; host-performance remains uncertified |
+| P14 Production operations / observability | 10 | 5 | PARTIAL | run health/readiness, failure taxonomy, deterministic recovery, release gates |
 
 ## Definition of “finished”
 

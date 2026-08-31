@@ -48,6 +48,7 @@ from dcm.model.worlds import generate_event_contexts, simulate_player_worlds, va
 from dcm.research.cache import ResearchCache
 from dcm.research.classify import accounting_classify as _classify
 from dcm.research.emit import emit_offer_sets_and_manifest, emit_packets_and_graph
+from dcm.research.evidence_graph import attach_runtime_lineage
 from dcm.research.host_plan import build_host_research_plan
 from dcm.research.provider import BundleProvider, FileProvider, FixtureProvider, collect, write_bundle
 from dcm.research.requests import plan_research
@@ -931,6 +932,29 @@ def run_dcm(
         except (OSError, json.JSONDecodeError):
             feature_store_hash = None
     feature_hash_index = load_feature_hash_index(dest)
+    features_for_graph: list[dict[str, Any]] = []
+    feat_jsonl = dest / "feature_store.jsonl"
+    if feat_jsonl.is_file():
+        for line in feat_jsonl.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                rec = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if isinstance(rec, dict):
+                features_for_graph.append(rec)
+    evidence_graph = attach_runtime_lineage(
+        evidence_graph,
+        features=features_for_graph,
+        snapshots=list(parameter_cache.values()),
+        evaluations=classified,
+        selections=strict_card,
+        run_id=str(run_id),
+        forecast_cutoff=str(forecast_cutoff),
+    )
+    graph_path.write_text(json.dumps(evidence_graph, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     explain_src: list[dict[str, Any]] = []
     seen_explain: set[str] = set()
     for p in list(ranked[:25]) + list(card):

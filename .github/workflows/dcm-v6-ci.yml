@@ -35,6 +35,12 @@ jobs:
       - name: CLI pillars_dcm help
         working-directory: /tmp
         run: python -m pillars_dcm --help
+      - name: Host CLI help
+        working-directory: /tmp
+        run: |
+          dcm-host --help
+          python -m dcm.chat --help
+          dcm-host doctor
       - name: Synthetic smoke
         working-directory: /tmp
         run: python -m dcm --synthetic --research fixture --cutoff-from-capture --out /tmp/dcm-smoke
@@ -44,6 +50,8 @@ jobs:
           DCM_SERIOUS_WORLDS: "128"
           DCM_MAX_WORLDS: "256"
         run: pytest -q
+      - name: Code inventory stale-check
+        run: python scripts/build_code_inventory.py --check
       - name: Benchmark smoke
         env:
           DCM_FAST_WORLDS: "32"

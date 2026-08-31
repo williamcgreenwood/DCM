@@ -1,11 +1,12 @@
 """Hierarchical research requests after pre-research classification.
 
 HAR → account → identity → classify → then only model-eligible (and opt-in
-shadow) rows receive deep research. Shared SPORT/EVENT/TEAM/MARKET_DEFINITION
-entities are emitted once and fan-out prioritized.
+shadow) rows receive deep research. Shared SPORT/COMPETITION/EVENT/
+AFFILIATION/COUNTERPARTY/ENVIRONMENT/MARKET_DEFINITION entities are emitted
+once and fan-out prioritized.
 
-Legacy MARKET is not emitted. MARKET_DEFINITION + OFFER are the production
-scopes. Priority is never alphabetical.
+Canonical scopes are universal. PLAYER/TEAM are adapter aliases only and are
+not emitted by this planner. Legacy MARKET is not emitted.
 """
 from __future__ import annotations
 
@@ -14,27 +15,36 @@ from typing import Any
 
 from dcm.contracts.hashes import content_hash
 from dcm.research.classify import classify_rows, market_definition_id
+from dcm.research.scopes import CANONICAL_SCOPES, SCOPE_ORDER, SCOPE_RANK
 from dcm.sports.common.plugin import selection_state
 
-SCOPE_ORDER = ("SPORT", "EVENT", "TEAM", "PLAYER", "MARKET_DEFINITION", "OFFER")
-SCOPE_RANK = {name: i for i, name in enumerate(SCOPE_ORDER)}
-
-# information_importance × freshness_need by scope (doctrine hierarchy, not alpha)
+# information_importance × freshness_need by canonical scope (doctrine hierarchy, not alpha)
 INFO_IMPORTANCE = {
     "SPORT": 1.00,
+    "COMPETITION": 0.98,
     "EVENT": 0.95,
-    "TEAM": 0.85,
-    "PLAYER": 0.75,
+    "ENVIRONMENT": 0.90,
+    "AFFILIATION": 0.85,
+    "COUNTERPARTY": 0.85,
+    "SUBJECT": 0.75,
     "MARKET_DEFINITION": 0.70,
     "OFFER": 0.40,
+    # Adapter aliases (not emitted here; used by scoring/lookups)
+    "TEAM": 0.85,
+    "PLAYER": 0.75,
 }
 FRESHNESS_NEED = {
     "SPORT": 0.40,
+    "COMPETITION": 0.45,
     "EVENT": 1.00,
-    "TEAM": 0.85,
-    "PLAYER": 1.00,
+    "ENVIRONMENT": 0.95,
+    "AFFILIATION": 0.85,
+    "COUNTERPARTY": 0.90,
+    "SUBJECT": 1.00,
     "MARKET_DEFINITION": 0.30,
     "OFFER": 0.90,
+    "TEAM": 0.85,
+    "PLAYER": 1.00,
 }
 CAP_WEIGHT = {
     "PRODUCTION_SUPPORTED": 1.00,
@@ -93,6 +103,19 @@ def _add(
     return rec
 
 
+def _graph_rows(requests: list[dict[str, Any]], scope: str) -> list[dict[str, Any]]:
+    return [
+        {
+            "scopeId": r["scope_id"],
+            "requestId": r["request_id"],
+            "dependentPropCount": r["dependent_prop_count"],
+            "priorityScore": r["priority_score"],
+        }
+        for r in requests
+        if r["scope"] == scope
+    ]
+
+
 def plan_research(
     rows: list[dict[str, Any]],
     cutoff: str,
@@ -104,19 +127,29 @@ def plan_research(
     reqs: dict[str, dict] = {}
 
     by_sport: dict[tuple[str, str], list[dict]] = defaultdict(list)
+    by_competition: dict[tuple[str, str], list[dict]] = defaultdict(list)
     by_event: dict[str, list[dict]] = defaultdict(list)
-    by_team: dict[str, list[dict]] = defaultdict(list)
-    by_player: dict[str, list[dict]] = defaultdict(list)
+    by_affiliation: dict[str, list[dict]] = defaultdict(list)
+    by_counterparty: dict[str, list[dict]] = defaultdict(list)
+    by_subject: dict[str, list[dict]] = defaultdict(list)
+    by_environment: dict[str, list[dict]] = defaultdict(list)
     by_def: dict[str, list[dict]] = defaultdict(list)
     for row in eligible:
-        by_sport[(str(row.get("sportFamily") or ""), str(row.get("league") or ""))].append(row)
-        by_event[str(row.get("eventId") or "")].append(row)
-        team_key = str(row.get("teamId") or row.get("team") or "")
-        by_team[team_key].append(row)
-        opp_key = str(row.get("opponentId") or row.get("opponent") or "")
-        if opp_key and opp_key != team_key:
-            by_team[opp_key].append(row)
-        by_player[str(row.get("playerId") or "")].append(row)
+        family = str(row.get("sportFamily") or "")
+        league = str(row.get("league") or "")
+        by_sport[(family, league)].append(row)
+        by_competition[(family, league)].append(row)
+        event_id = str(row.get("eventId") or "")
+        by_event[event_id].append(row)
+        if event_id:
+            by_environment[f"env:{event_id}"].append(row)
+        aff_key = str(row.get("teamId") or row.get("team") or row.get("affiliationId") or "")
+        if aff_key:
+            by_affiliation[aff_key].append(row)
+        opp_key = str(row.get("opponentId") or row.get("opponent") or row.get("counterpartyId") or "")
+        if opp_key and opp_key != aff_key:
+            by_counterparty[opp_key].append(row)
+        by_subject[str(row.get("playerId") or row.get("subjectId") or "")].append(row)
         by_def[market_definition_id(row)].append(row)
 
     for (family, league), group in by_sport.items():
@@ -126,7 +159,20 @@ def plan_research(
             scope_id=f"{family}:{league}",
             need="rules_calendar_distribution",
             cutoff=cutoff,
-            extra={"league": league, "sportFamily": family},
+            extra={"league": league, "sportFamily": family, "sportId": family, "competitionId": league},
+            dependents=group,
+        )
+
+    for (family, league), group in by_competition.items():
+        if not family and not league:
+            continue
+        _add(
+            reqs,
+            scope="COMPETITION",
+            scope_id=f"{family}:{league}",
+            need="competition_context",
+            cutoff=cutoff,
+            extra={"league": league, "sportFamily": family, "sportId": family, "competitionId": league},
             dependents=group,
         )
 
@@ -140,40 +186,92 @@ def plan_research(
             scope_id=event_id,
             need="start_venue_starters_environment",
             cutoff=cutoff,
-            extra={"league": sample.get("league"), "label": sample.get("eventLabel")},
+            extra={
+                "league": sample.get("league"),
+                "label": sample.get("eventLabel"),
+                "eventId": event_id,
+                "sportFamily": sample.get("sportFamily"),
+            },
             dependents=group,
         )
 
-    for team_id, group in by_team.items():
-        if not team_id:
+    for env_id, group in by_environment.items():
+        if not env_id:
             continue
         sample = group[0]
         _add(
             reqs,
-            scope="TEAM",
-            scope_id=team_id,
-            need="role_pace_matchup",
+            scope="ENVIRONMENT",
+            scope_id=env_id,
+            need="weather_surface_venue_effects",
             cutoff=cutoff,
-            extra={"league": sample.get("league")},
+            extra={
+                "league": sample.get("league"),
+                "eventId": sample.get("eventId"),
+                "sportFamily": sample.get("sportFamily"),
+            },
             dependents=group,
         )
 
-    for player_id, group in by_player.items():
-        if not player_id:
+    for aff_id, group in by_affiliation.items():
+        if not aff_id:
+            continue
+        sample = group[0]
+        _add(
+            reqs,
+            scope="AFFILIATION",
+            scope_id=aff_id,
+            need="role_pace_matchup",
+            cutoff=cutoff,
+            extra={
+                "league": sample.get("league"),
+                "sportFamily": sample.get("sportFamily"),
+                "eventId": sample.get("eventId"),
+                "affiliationId": aff_id,
+            },
+            dependents=group,
+        )
+
+    for opp_id, group in by_counterparty.items():
+        if not opp_id:
+            continue
+        sample = group[0]
+        _add(
+            reqs,
+            scope="COUNTERPARTY",
+            scope_id=opp_id,
+            need="suppression_allowance_matchup",
+            cutoff=cutoff,
+            extra={
+                "league": sample.get("league"),
+                "sportFamily": sample.get("sportFamily"),
+                "eventId": sample.get("eventId"),
+                "counterpartyId": opp_id,
+                "affiliationId": sample.get("teamId") or sample.get("team"),
+            },
+            dependents=group,
+        )
+
+    for subject_id, group in by_subject.items():
+        if not subject_id:
             continue
         sample = group[0]
         markets = sorted({str(r.get("market") or "") for r in group if r.get("market")})
         _add(
             reqs,
-            scope="PLAYER",
-            scope_id=player_id,
+            scope="SUBJECT",
+            scope_id=subject_id,
             need="status_role_logs_opportunity_efficiency",
             cutoff=cutoff,
             extra={
-                "name": sample.get("playerName"),
+                "name": sample.get("playerName") or sample.get("subjectName"),
                 "league": sample.get("league"),
                 "sportFamily": sample.get("sportFamily"),
                 "markets": markets,
+                "eventId": sample.get("eventId"),
+                "affiliationId": sample.get("teamId") or sample.get("team"),
+                "opponentId": sample.get("opponentId") or sample.get("opponent"),
+                "subjectType": sample.get("subjectType") or "PLAYER",
             },
             dependents=group,
         )
@@ -206,6 +304,8 @@ def plan_research(
                 "market": row.get("market"),
                 "line": row.get("line"),
                 "playerId": row.get("playerId"),
+                "subjectId": row.get("playerId") or row.get("subjectId"),
+                "eventId": row.get("eventId"),
                 "definition_id": def_id,
             },
             dependents=[row],
@@ -225,57 +325,18 @@ def plan_research(
     for rec in requests:
         unique_scopes[str(rec["scope"])] = unique_scopes.get(str(rec["scope"]), 0) + 1
 
+    affiliations = _graph_rows(requests, "AFFILIATION")
+    counterparties = _graph_rows(requests, "COUNTERPARTY")
+    subjects = _graph_rows(requests, "SUBJECT")
     entity_graph = {
-        "sports": [
-            {
-                "scopeId": r["scope_id"],
-                "requestId": r["request_id"],
-                "dependentPropCount": r["dependent_prop_count"],
-                "priorityScore": r["priority_score"],
-            }
-            for r in requests
-            if r["scope"] == "SPORT"
-        ],
-        "events": [
-            {
-                "scopeId": r["scope_id"],
-                "requestId": r["request_id"],
-                "dependentPropCount": r["dependent_prop_count"],
-                "priorityScore": r["priority_score"],
-            }
-            for r in requests
-            if r["scope"] == "EVENT"
-        ],
-        "teams": [
-            {
-                "scopeId": r["scope_id"],
-                "requestId": r["request_id"],
-                "dependentPropCount": r["dependent_prop_count"],
-                "priorityScore": r["priority_score"],
-            }
-            for r in requests
-            if r["scope"] == "TEAM"
-        ],
-        "players": [
-            {
-                "scopeId": r["scope_id"],
-                "requestId": r["request_id"],
-                "dependentPropCount": r["dependent_prop_count"],
-                "priorityScore": r["priority_score"],
-            }
-            for r in requests
-            if r["scope"] == "PLAYER"
-        ],
-        "marketDefinitions": [
-            {
-                "scopeId": r["scope_id"],
-                "requestId": r["request_id"],
-                "dependentPropCount": r["dependent_prop_count"],
-                "priorityScore": r["priority_score"],
-            }
-            for r in requests
-            if r["scope"] == "MARKET_DEFINITION"
-        ],
+        "sports": _graph_rows(requests, "SPORT"),
+        "competitions": _graph_rows(requests, "COMPETITION"),
+        "events": _graph_rows(requests, "EVENT"),
+        "environments": _graph_rows(requests, "ENVIRONMENT"),
+        "affiliations": affiliations,
+        "subjects": subjects,
+        "counterparties": counterparties,
+        "marketDefinitions": _graph_rows(requests, "MARKET_DEFINITION"),
         "offers": [
             {
                 "scopeId": r["scope_id"],
@@ -287,6 +348,9 @@ def plan_research(
             for r in requests
             if r["scope"] == "OFFER"
         ],
+        # Compatibility projections for leftover PLAYER/TEAM consumers.
+        "teams": affiliations + counterparties,
+        "players": subjects,
     }
 
     return {
@@ -298,6 +362,8 @@ def plan_research(
         "entity_graph": entity_graph,
         "research_shadow": research_shadow,
         "legacy_market_emitted": False,
+        "canonicalScopes": list(CANONICAL_SCOPES),
+        "adapterScopesEmitted": False,
     }
 
 
@@ -307,5 +373,5 @@ def build_requests(
     *,
     research_shadow: bool = False,
 ) -> list[dict]:
-    """Backward-compatible wrapper. Does not emit legacy MARKET."""
+    """Backward-compatible wrapper. Does not emit legacy MARKET or PLAYER/TEAM."""
     return plan_research(rows, cutoff, research_shadow=research_shadow)["requests"]

@@ -22,6 +22,7 @@ from dcm.research.adapters.espn_status import ESPNStatusAdapter
 from dcm.research.adapters.official_league import OfficialNBAAdapter, OfficialWNBAAdapter
 from dcm.research.lineup import build_lineup_effects
 from dcm.research.player_packet import WINDOW_SIZES, window_means
+from dcm.research.scopes import claims_for as _claims_for_alias
 
 
 LEAGUE_PACE_PRIOR = {"WNBA": 80.0, "NBA": 100.0, "NCAAB": 68.0}
@@ -96,11 +97,7 @@ def normalize_team_log(row: dict[str, Any]) -> dict[str, Any] | None:
 
 
 def _claims_for(claims: list[dict[str, Any]], scope: str, scope_id: str) -> list[dict[str, Any]]:
-    out = []
-    for claim in claims or []:
-        if str(claim.get("semantic_scope") or "") == scope and str(claim.get("scope_id") or "") == str(scope_id):
-            out.append(claim)
-    return out
+    return _claims_for_alias(claims, scope, scope_id)
 
 
 def _merged_value(claims: list[dict[str, Any]]) -> dict[str, Any]:

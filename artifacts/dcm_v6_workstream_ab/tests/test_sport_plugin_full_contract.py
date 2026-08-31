@@ -31,8 +31,10 @@ def test_registered_sport_plugin_bindings_resolve_but_partial_contracts_do_not_p
                 assert component["importResolved"] is True, component
                 assert component["importError"] is None
 
-    assert any("ParticipationModel:PARTIAL" == b for b in reports["basketball"]["blockers"])
+    assert any("FeatureSchema:PARTIAL" == b for b in reports["basketball"]["blockers"])
     assert any("FeatureSchema:PARTIAL" == b for b in reports["gridiron"]["blockers"])
+    assert not any("ParticipationModel:PARTIAL" == b for b in reports["basketball"]["blockers"])
+    assert not any("ParticipationModel:PARTIAL" == b for b in reports["gridiron"]["blockers"])
 
 
 def test_sport_plugin_contract_requires_every_named_component():

@@ -370,7 +370,7 @@ def build_packets_for_offer_sets(
     claims = [c for c in (claims or []) if isinstance(c, dict)]
     by_player: dict[str, list[dict[str, Any]]] = {}
     for claim in claims:
-        if str(claim.get("semantic_scope") or "") != "PLAYER":
+        if str(claim.get("semantic_scope") or "") not in {"PLAYER", "SUBJECT"}:
             continue
         by_player.setdefault(str(claim.get("scope_id") or ""), []).append(claim)
 

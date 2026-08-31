@@ -1,6 +1,6 @@
 {
   "schema": "pillars_dcm.program_status.v1",
-  "updatedAtUtc": "2026-08-31T15:40:00Z",
+  "updatedAtUtc": "2026-08-31T16:40:00Z",
   "canonicalIntegrationBranch": "integration/v6-ml-architecture-20260830",
   "canonicalIntegrationPr": 10,
   "scoreScale": {
@@ -39,25 +39,22 @@
       "id": "P1",
       "name": "Universal research / evidence",
       "target": 10,
-      "current": 7,
-      "state": "PARTIAL",
+      "current": 8,
+      "state": "STRONG_PARTIAL",
       "next": [
-        "canonical SUBJECT/AFFILIATION/COUNTERPARTY/ENVIRONMENT provider semantics",
-        "universal packets",
-        "host-native acquisition loop",
-        "source catalog"
+        "live host observations closing SportResearchSchema coverage",
+        "retire remaining PLAYER/TEAM lookup aliases at adapters"
       ]
     },
     {
       "id": "P2",
       "name": "Feature / state / parameter layer",
       "target": 10,
-      "current": 7,
-      "state": "PARTIAL",
+      "current": 9,
+      "state": "STRONG_PARTIAL",
       "next": [
-        "universal feature families",
-        "separate ParticipationModel",
-        "universal ParameterSnapshot layers"
+        "remaining sport-neutral feature dispatch",
+        "FeatureStore observations still packet-shaped"
       ]
     },
     {
@@ -86,10 +83,9 @@
       "id": "P5",
       "name": "Audit / portability / ChatGPT-native execution",
       "target": 10,
-      "current": 7,
-      "state": "PARTIAL",
+      "current": 8,
+      "state": "STRONG_PARTIAL",
       "next": [
-        "dcm.chat API/CLI",
         "immutable release retrieval",
         "fresh-chat HAR acceptance"
       ]
@@ -110,38 +106,32 @@
       "id": "P7",
       "name": "Host-native execution contract",
       "target": 10,
-      "current": 2,
-      "state": "EARLY",
+      "current": 7,
+      "state": "PARTIAL",
       "next": [
-        "prepare",
-        "research-plan",
-        "evidence-import",
-        "coverage",
-        "forecast",
-        "report",
-        "settle"
+        "forecast/settle on a fresh wheel+HAR",
+        "no second probability engine"
       ]
     },
     {
       "id": "P8",
       "name": "Universal source acquisition",
       "target": 10,
-      "current": 4,
+      "current": 6,
       "state": "PARTIAL",
       "next": [
-        "schema-driven source priority",
-        "batched reusable entity research",
-        "fallback and conflict policy"
+        "live adapter fetch beyond fixtures",
+        "licensed/authenticated providers as optional capabilities"
       ]
     },
     {
       "id": "P9",
       "name": "Universal core migration",
       "target": 10,
-      "current": 8,
+      "current": 9,
       "state": "STRONG_PARTIAL",
       "next": [
-        "terminate all legacy player/team semantics at adapters"
+        "retire remaining PLAYER/TEAM claim lookups at packet/parameter adapters"
       ]
     },
     {
@@ -169,32 +159,29 @@
       "id": "P12",
       "name": "Research archive / index / reuse",
       "target": 10,
-      "current": 3,
-      "state": "EARLY",
+      "current": 7,
+      "state": "PARTIAL",
       "next": [
-        "content-addressed research store",
-        "entity/source/time indexes",
-        "invalidation/retention"
+        "high-volume queryable artifact store",
+        "retention and licensing enforcement"
       ]
     },
     {
       "id": "P13",
       "name": "Performance / search / token optimization",
       "target": 10,
-      "current": 5,
+      "current": 6,
       "state": "PARTIAL",
       "next": [
-        "fan-out scheduler benchmarks",
-        "batch research",
-        "cache targets",
-        "CPU/RSS/token measurements"
+        "measured CPU/RSS/token certification",
+        "host-performance remains uncertified"
       ]
     },
     {
       "id": "P14",
       "name": "Production operations / observability",
       "target": 10,
-      "current": 4,
+      "current": 5,
       "state": "PARTIAL",
       "next": [
         "run health/readiness",

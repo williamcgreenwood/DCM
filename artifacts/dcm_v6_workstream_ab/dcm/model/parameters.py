@@ -23,10 +23,12 @@ from dcm.model.gridiron_models import (
     TeamEventModel,
 )
 from dcm.model.availability import availability_mixture
+from dcm.model.participation import ParticipationModel
 from dcm.research.classify import market_definition_id
 from dcm.research.gamelog import normalize_basketball_logs
 from dcm.research.gridiron_gamelog import normalize_gridiron_logs
 from dcm.research.role_epoch import RoleEpochBuilder
+from dcm.research.scopes import claims_for
 
 
 def _f(v: Any, default: float) -> float:
@@ -39,8 +41,8 @@ def _f(v: Any, default: float) -> float:
 
 def _pairs(claims: list[dict], scope: str, scope_id: str) -> list[tuple[dict, dict]]:
     out = []
-    for c in claims:
-        if str(c.get("semantic_scope")) == scope and str(c.get("scope_id")) == str(scope_id) and isinstance(c.get("claim_value"), dict):
+    for c in claims_for(claims, scope, scope_id):
+        if isinstance(c.get("claim_value"), dict):
             out.append((c, c["claim_value"]))
     return sorted(out, key=lambda x: str(x[0].get("observed_at") or ""))
 
@@ -88,11 +90,14 @@ def build_parameter_snapshot(
     event_packets: dict[str, dict[str, Any]] | None = None,
     opponent_packets: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
-    player_pairs = _pairs(claims, "PLAYER", str(row.get("playerId") or ""))
-    team_pairs = _pairs(claims, "TEAM", str(row.get("teamId") or ""))
+    player_pairs = _pairs(claims, "SUBJECT", str(row.get("playerId") or row.get("subjectId") or ""))
+    team_pairs = _pairs(claims, "AFFILIATION", str(row.get("teamId") or row.get("affiliationId") or ""))
+    opp_pairs = _pairs(claims, "COUNTERPARTY", str(row.get("opponentId") or row.get("opponent") or ""))
     event_pairs = _pairs(claims, "EVENT", str(row.get("eventId") or ""))
+    env_pairs = _pairs(claims, "ENVIRONMENT", f"env:{row.get('eventId') or ''}")
     sport_id = f"{row.get('sportFamily') or ''}:{row.get('league') or ''}"
     sport_pairs = _pairs(claims, "SPORT", sport_id)
+    competition_pairs = _pairs(claims, "COMPETITION", sport_id)
     def_id = market_definition_id(row)
     def_pairs = _pairs(claims, "MARKET_DEFINITION", def_id)
     offer_pairs = _pairs(claims, "OFFER", str(row.get("projectionId") or ""))
@@ -111,6 +116,15 @@ def build_parameter_snapshot(
         market = _merge(legacy_market_pairs)
         used_legacy_market = bool(legacy_market_pairs)
     player, team, event, sport = map(_merge, (player_pairs, team_pairs, event_pairs, sport_pairs))
+    counterparty = _merge(opp_pairs)
+    environment = _merge(env_pairs)
+    competition = _merge(competition_pairs)
+    if environment:
+        event = {**event, **{k: v for k, v in environment.items() if v is not None}}
+    if competition:
+        sport = {**sport, **{k: v for k, v in competition.items() if k not in sport}}
+    if counterparty:
+        team = {**team, **{k: v for k, v in counterparty.items() if k not in team or team.get(k) in (None, "", 1.0)}}
     team_evidence_used = False
     opp_id = str(row.get("opponentId") or row.get("opponent") or "")
     team_id = str(row.get("teamId") or row.get("team") or "")
@@ -143,7 +157,9 @@ def build_parameter_snapshot(
             event = {**event, **dict(ep.get("parameterFields") or {})}
             event["eventPacketHash"] = ep.get("contentHash")
 
-    claim_pairs = list(player_pairs + team_pairs + event_pairs + sport_pairs + def_pairs + offer_pairs)
+    claim_pairs = list(
+        player_pairs + team_pairs + opp_pairs + event_pairs + env_pairs + sport_pairs + competition_pairs + def_pairs + offer_pairs
+    )
     if used_legacy_market or not (def_pairs or offer_pairs):
         claim_pairs.extend(legacy_market_pairs)
     all_claims = [c for c, _ in claim_pairs]
@@ -167,6 +183,7 @@ def build_parameter_snapshot(
 
     role_epoch_summary: dict[str, Any] | None = None
     shrinkage_out = {"roleWeight": 0.0, "seasonWeight": 0.0, "priorWeight": 1.0}
+    participation_state: dict[str, Any] | None = None
 
     if family == "basketball":
         league = str(row.get("league") or "") or None
@@ -227,6 +244,16 @@ def build_parameter_snapshot(
         params["paceFromTeamPacket"] = bool(team_evidence_used and team.get("pace_multiplier") is not None)
 
         role_multiplier = _f(opp.get("role_multiplier"), 1.0)
+        part_fit = ParticipationModel().fit(
+            comparable,
+            family="basketball",
+            league=league,
+            shrinkage=shrinkage_out,
+            role_multiplier=role_multiplier,
+            support_n=role_support,
+            season_logs=full_logs,
+        )
+        participation_state = part_fit
         opp_fit = OpportunityModel().fit(
             comparable,
             season_logs=full_logs,
@@ -235,6 +262,7 @@ def build_parameter_snapshot(
             league=league,
             role_multiplier=role_multiplier,
             support_n=role_support,
+            participation=part_fit,
         )
         eff_fit = EfficiencyModel().fit(
             comparable,
@@ -271,6 +299,7 @@ def build_parameter_snapshot(
             "roleWeight": shrinkage_out.get("roleWeight"),
             "opportunityInputHash": opp_fit.get("inputHash"),
             "efficiencyInputHash": eff_fit.get("inputHash"),
+            "participationInputHash": part_fit.get("inputHash"),
             "_log_support": {
                 "logsNormalized": logs_normalized,
                 "logsRejected": logs_rejected,
@@ -325,6 +354,16 @@ def build_parameter_snapshot(
         )
         pace = _f(team_event.get("pace"), 1.0)
         matchup = _f(team.get("matchup_efficiency_multiplier"), 1.0) * _f(event.get("matchup_efficiency_multiplier"), 1.0)
+        part_fit = ParticipationModel().fit(
+            comparable,
+            family="gridiron",
+            league=league,
+            shrinkage=shrinkage_out,
+            support_n=role_support,
+            season_logs=full_logs,
+            role=role,
+        )
+        participation_state = part_fit
         opp_fit = GridironOpportunityModel().fit(
             comparable,
             season_logs=full_logs,
@@ -335,6 +374,7 @@ def build_parameter_snapshot(
             support_n=role_support,
             team_plays=team_event.get("plays"),
             pass_rate=team_event.get("pass_rate"),
+            participation=part_fit,
         )
         eff_fit = GridironEfficiencyModel().fit(
             comparable,
@@ -372,6 +412,7 @@ def build_parameter_snapshot(
         params["roleWeight"] = shrinkage_out.get("roleWeight")
         params["opportunityInputHash"] = opp_fit.get("inputHash")
         params["efficiencyInputHash"] = eff_fit.get("inputHash")
+        params["participationInputHash"] = part_fit.get("inputHash")
         params["_log_support"] = {
             "logsNormalized": logs_normalized,
             "logsRejected": logs_rejected,
@@ -452,7 +493,12 @@ def build_parameter_snapshot(
         "evidence_hashes": sorted(str(c.get("claim_hash") or "") for c in all_claims if c.get("claim_hash")),
         "scopes_used": sorted({
             *(["SPORT"] if sport_pairs else []),
+            *(["COMPETITION"] if competition_pairs else []),
             *(["EVENT"] if event_pairs else []),
+            *(["ENVIRONMENT"] if env_pairs else []),
+            *(["AFFILIATION"] if team_pairs else []),
+            *(["COUNTERPARTY"] if opp_pairs else []),
+            *(["SUBJECT"] if player_pairs else []),
             *(["TEAM"] if team_pairs else []),
             *(["PLAYER"] if player_pairs else []),
             *(["MARKET_DEFINITION"] if def_pairs else []),
@@ -466,9 +512,54 @@ def build_parameter_snapshot(
         "teamEvidenceUsed": bool(team_evidence_used),
         "teamPriorUsedAsResearch": False,
         "availabilityMixture": availability_mixture(status),
+        "layers": {
+            "subject": {
+                "subjectId": row.get("playerId") or row.get("subjectId"),
+                "status": status,
+                "role": role,
+            },
+            "affiliation": {
+                "affiliationId": row.get("teamId") or row.get("affiliationId"),
+                "evidenceUsed": bool(team_evidence_used),
+            },
+            "counterparty": {
+                "counterpartyId": row.get("opponentId") or row.get("opponent"),
+            },
+            "event": {"eventId": row.get("eventId")},
+            "environment": {k: environment.get(k) for k in ("weather", "surface", "venue", "environment") if k in environment} if environment else {},
+            "market": {
+                "definition_verified": definition_verified,
+                "legacy_market_fallback": used_legacy_market,
+            },
+            "availability": availability_mixture(status),
+            "participation": {
+                "unit": (participation_state or {}).get("unit"),
+                "mean": (participation_state or {}).get("mean"),
+                "source": (participation_state or {}).get("source"),
+                "inputHash": (participation_state or {}).get("inputHash"),
+            } if participation_state else {},
+            "opportunity": {"support_n": opp_n, "inputHash": params.get("opportunityInputHash")},
+            "efficiency": {"support_n": eff_n, "inputHash": params.get("efficiencyInputHash")},
+            "lineage": {
+                "evidenceHashes": sorted(str(c.get("claim_hash") or "") for c in all_claims if c.get("claim_hash")),
+                "participationInputHash": params.get("participationInputHash"),
+                "opportunityInputHash": params.get("opportunityInputHash"),
+                "efficiencyInputHash": params.get("efficiencyInputHash"),
+            },
+        },
     }
     if role_epoch_summary is not None:
         snapshot["role_epoch"] = role_epoch_summary
+    if participation_state is not None:
+        snapshot["participation"] = {
+            "unit": participation_state.get("unit"),
+            "mean": participation_state.get("mean"),
+            "sd": participation_state.get("sd"),
+            "source": participation_state.get("source"),
+            "support_n": participation_state.get("support_n"),
+            "inputHash": participation_state.get("inputHash"),
+            "definition_version": participation_state.get("definition_version"),
+        }
     for key in ("minutes_mean", "minutes_sd", "pass_att_mean", "pass_att_sd", "rush_att_mean", "rush_att_sd", "routes_mean", "routes_sd", "pa_mean", "pa_sd"):
         if key in params:
             snapshot["opportunity"][key] = params[key]

@@ -102,7 +102,11 @@ def league_priors(league: str | None) -> dict[str, float]:
 
 
 class OpportunityModel:
-    """Minutes + per-minute opportunity from role-comparable logs and pace."""
+    """Per-minute opportunity from role-comparable logs and pace.
+
+    Minutes/participation are produced by ParticipationModel and consumed here
+    when supplied. Efficiency stays out of this module.
+    """
 
     definition_version = OPP_VERSION
 
@@ -116,6 +120,7 @@ class OpportunityModel:
         league: str | None = None,
         role_multiplier: float = 1.0,
         support_n: int | None = None,
+        participation: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         role_logs = [r for r in (comparable_logs or []) if isinstance(r, dict)]
         season = [r for r in (season_logs or role_logs) if isinstance(r, dict)]
@@ -140,7 +145,9 @@ class OpportunityModel:
         s_ast, _ = _avg(season, "ast")
 
         prior_minutes = priors["minutes_mean"]
-        if mn >= 3 and minutes is not None:
+        if isinstance(participation, dict) and participation.get("mean") is not None:
+            observed_minutes = _f(participation.get("mean"), prior_minutes)
+        elif mn >= 3 and minutes is not None:
             observed_minutes = minutes
         elif mn > 0 and minutes is not None:
             observed_minutes = _blend(minutes, season_minutes, prior_minutes, weights)
@@ -171,8 +178,12 @@ class OpportunityModel:
         ast_pm = _blend(role_ast_pm, season_ast_pm, priors["ast_per_min"], weights) if role_ast_pm is not None or season_ast_pm is not None else priors["ast_per_min"]
 
         pace_m = _f(pace, 1.0)
+        if isinstance(participation, dict) and participation.get("mean") is not None:
+            minutes_mean = observed_minutes
+        else:
+            minutes_mean = observed_minutes * _f(role_multiplier, 1.0)
         body = {
-            "minutes_mean": observed_minutes * _f(role_multiplier, 1.0),
+            "minutes_mean": minutes_mean,
             "minutes_sd": max(0.75, _sd(role_logs if role_logs else season, "minutes", priors["minutes_sd"])),
             "fga_per_min": max(0.01, fga_pm * pace_m),
             "three_pa_share": max(0.0, min(1.0, tpa_share)),

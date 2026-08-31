@@ -5,14 +5,23 @@ from typing import Any
 
 from dcm.research.gamelog import assert_compatible_basketball_logs
 from dcm.research.gridiron_gamelog import assert_compatible_gridiron_logs
+from dcm.research.scopes import (
+    AFFILIATION_SCOPES,
+    COUNTERPARTY_SCOPES,
+    SUBJECT_SCOPES,
+    scopes_match,
+)
+from dcm.sports.common.research_schema import lookup_research_schema
 
 
 def _values_for(request: dict[str, Any], claims: list[dict[str, Any]]) -> list[dict[str, Any]]:
     out = []
+    req_scope = str(request.get("scope") or "")
+    req_id = str(request.get("scope_id") or "")
     for claim in claims:
         if (
-            str(claim.get("semantic_scope")) == str(request.get("scope"))
-            and str(claim.get("scope_id")) == str(request.get("scope_id"))
+            scopes_match(req_scope, str(claim.get("semantic_scope") or ""))
+            and str(claim.get("scope_id")) == req_id
             and isinstance(claim.get("claim_value"), dict)
         ):
             out.append(dict(claim["claim_value"]))
@@ -139,6 +148,67 @@ def _team_missing(request: dict[str, Any], merged: dict[str, Any], values: list[
     return missing
 
 
+def _schema_missing(
+    request: dict[str, Any],
+    merged: dict[str, Any],
+    values: list[dict[str, Any]],
+    scope: str,
+) -> list[str]:
+    """SportResearchSchema-driven extras. Does not replace existing field gates."""
+    if not values:
+        return []
+    family, _league = _league_family(request)
+    schema = lookup_research_schema(family) if family else None
+    if schema is None:
+        return []
+    missing: list[str] = []
+    if scope in SUBJECT_SCOPES:
+        reqs = schema.subject_requirements()
+        if not merged.get("status") and "status" in (reqs.get("availability") or reqs.get("participation") or []):
+            # already covered by PLAYER_STATUS; skip duplicate
+            pass
+        min_n = int((reqs.get("minimumSupport") or {}).get("role_comparable_history") or 0)
+        logs = merged.get("role_epoch_logs") or merged.get("game_logs") or []
+        log_n = len([x for x in logs if isinstance(x, dict)]) if isinstance(logs, list) else 0
+        if min_n and log_n < min_n and "ROLE_COMPARABLE_GAME_LOGS_MIN_3" not in missing:
+            # existing PLAYER path already emits ROLE_COMPARABLE_GAME_LOGS_MIN_3
+            pass
+    elif scope in AFFILIATION_SCOPES | COUNTERPARTY_SCOPES:
+        ctx = schema.context_requirements()
+        needed = ctx["affiliation"] if scope in AFFILIATION_SCOPES else ctx["counterparty"]
+        if family == "basketball" and "pace_or_possessions" in needed:
+            has_pace = any(
+                merged.get(k) not in (None, "", [], {})
+                for k in ("pace", "possessions", "ortg", "drtg", "team_logs", "game_logs")
+            )
+            if not has_pace and "BASKETBALL_TEAM_PACE" not in missing:
+                # team_missing already emits this for TEAM/AFFILIATION
+                pass
+        if family in {"gridiron", "football"} and scope in COUNTERPARTY_SCOPES:
+            if merged.get("pass_defense") is None and merged.get("opp_pass_def") is None:
+                if "OPPONENT_PASS_DEFENSE" not in missing:
+                    missing.append("SPORT_SCHEMA_COUNTERPARTY_PASS_DEFENSE")
+            if merged.get("rush_defense") is None and merged.get("opp_rush_def") is None:
+                if "OPPONENT_RUSH_DEFENSE" not in missing:
+                    missing.append("SPORT_SCHEMA_COUNTERPARTY_RUSH_DEFENSE")
+    elif scope == "EVENT":
+        ctx = schema.context_requirements().get("event") or []
+        if family == "basketball" and "scheduled_start" in ctx:
+            if not (merged.get("scheduled_start") or merged.get("start") or merged.get("starters_known")):
+                if "BASKETBALL_EVENT_START_OR_VENUE" not in missing:
+                    pass
+    elif scope == "ENVIRONMENT":
+        if not (
+            merged.get("environment_context")
+            or merged.get("environment")
+            or merged.get("weather")
+            or merged.get("surface")
+            or merged.get("venue")
+        ):
+            missing.append("ENVIRONMENT_CONTEXT")
+    return missing
+
+
 def evaluate_request(request: dict[str, Any], claims: list[dict[str, Any]]) -> dict[str, Any]:
     scope = str(request.get("scope") or "")
     values = _values_for(request, claims)
@@ -147,8 +217,8 @@ def evaluate_request(request: dict[str, Any], claims: list[dict[str, Any]]) -> d
 
     if not values:
         missing.append("EVIDENCE_CLAIM")
-    elif scope == "PLAYER":
-        # PLAYER object existence is not coverage. Status, role, comparable
+    elif scope in SUBJECT_SCOPES:
+        # SUBJECT/PLAYER object existence is not coverage. Status, role, comparable
         # logs, opportunity, efficiency, and market counting-stats are required.
         status = str(merged.get("status") or "").strip().upper()
         if not status:
@@ -193,6 +263,7 @@ def evaluate_request(request: dict[str, Any], claims: list[dict[str, Any]]) -> d
                 for code in compat.get("missing") or []:
                     if code not in missing:
                         missing.append(code)
+        missing.extend(_schema_missing(request, merged, values, scope))
     elif scope == "MARKET_DEFINITION":
         if merged.get("definition_verified") is not True:
             missing.append("VERIFIED_MARKET_DEFINITION")
@@ -208,10 +279,21 @@ def evaluate_request(request: dict[str, Any], claims: list[dict[str, Any]]) -> d
     elif scope == "SPORT":
         if not merged:
             missing.append("SPORT_CONTEXT")
+    elif scope == "COMPETITION":
+        if not merged or not (merged.get("competition_context") or merged.get("league") or merged.get("rules")):
+            if not merged:
+                missing.append("COMPETITION_CONTEXT")
     elif scope == "EVENT":
         missing.extend(_event_missing(request, merged, values))
-    elif scope == "TEAM":
+        missing.extend(_schema_missing(request, merged, values, scope))
+    elif scope in AFFILIATION_SCOPES | {"TEAM"}:
         missing.extend(_team_missing(request, merged, values))
+        missing.extend(_schema_missing(request, merged, values, scope))
+    elif scope in COUNTERPARTY_SCOPES:
+        missing.extend(_team_missing(request, merged, values))
+        missing.extend(_schema_missing(request, merged, values, scope))
+    elif scope == "ENVIRONMENT":
+        missing.extend(_schema_missing(request, merged, values, scope))
 
     return {
         "requestId": request.get("request_id"),
