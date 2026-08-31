@@ -11,7 +11,7 @@ simpler forecasting app. The production path is:
 HAR capture(s)
 → deterministic request-scope reconciliation
 → immutable board freeze
-→ Sport → Event → Team → Player → Market research
+→ Sport → Competition → Event → Affiliation / Subject / Counterparty / Environment → MarketDefinition / Offer research
 → frozen EvidenceGraph
 → opportunity model
 → conditional efficiency model
