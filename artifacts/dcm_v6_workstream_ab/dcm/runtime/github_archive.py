@@ -2,7 +2,7 @@
 
 Copies a SAFE subset of a finished run into audit/runs/<runId>/ so a reviewer
 can prove: the run finished, research ran WITH evidence (URLs, timestamps,
-claim hashes) BEFORE ranking, and every lock cites that evidence.
+claim hashes) BEFORE ranking, and every selection cites that evidence.
 
 Never copies HARs, sqlite indexes, full populations, worlds, or anything
 that looks like cookies/tokens/authorization. Never prints secrets.
@@ -42,9 +42,8 @@ DEFAULT_GIT_EMAIL = "dcm-archive@users.noreply.github.com"
 MANUAL_STATES = frozenset({"MANUAL_RESEARCH_CARD"})
 MANUAL_EVIDENCE_MODES = frozenset({"manual_research", "manual"})
 REQUIRED_MODEL_STAGES = frozenset({"RESEARCH", "MODEL", "RANK", "FREEZE"})
-# Primary flags are the split *Certified set. locksCertified is a retired
-# derived alias kept for old readers: true only if modelRunCertified AND
-# selectionCertified AND evidenceCoverageCertified.
+# Canonical certification flags. The former locksCertified field is retired
+# from runtime/audit state; compatibility callers may use locks_certified().
 CERT_FLAG_KEYS = (
     "archiveIntegrityCertified",
     "evidenceCoverageCertified",
@@ -54,7 +53,6 @@ CERT_FLAG_KEYS = (
     "productionRootCertified",
     "predictiveValidationEarned",
     "hashCertifiedPythonFreeze",
-    "locksCertified",  # derived alias only; do not treat as a primary flag
 )
 FORBIDDEN_NAMES = frozenset(
     {
@@ -90,8 +88,12 @@ PACK_FILES = (
     "evidence_bundle.jsonl",
     "evidence_manifest.json",
     "bundle_manifest.json",
-    "player_offer_sets.json",
+    "subject_offer_sets.json",
     "research_population_manifest.json",
+    "research_dependency_graph.json",
+    "universal_host_research_plan.json",
+    "research_population_manifest_legacy.json",
+    "player_offer_sets.json",
     "player_research_packets.json",
     "team_research_packets.json",
     "event_research_packets.json",
@@ -580,7 +582,7 @@ def compute_certification(
     secrets_blocked: bool = False,
     hashes_present: bool | None = None,
 ) -> dict[str, Any]:
-    """Split certification flags. locksCertified is a derived alias only."""
+    """Compute split canonical certification flags; no combined lock state."""
     claims = list(claims or [])
     if research_ran is None:
         stages = {str(s) for s in (audit.get("completedStages") or [])}
@@ -605,7 +607,6 @@ def compute_certification(
     predictive = False if lr == "LR000000" or pc == "NONE" else bool(audit.get("predictiveValidationEarned"))
     selection = bool(model_run) and bool(hash_certified) and _s(audit.get("runState")) not in MANUAL_STATES
     archive_integrity = bool(hashes_present) and not secrets_blocked
-    locks = bool(model_run) and bool(selection) and bool(coverage)
     flags: dict[str, Any] = {
         "archiveIntegrityCertified": archive_integrity,
         "evidenceCoverageCertified": coverage,
@@ -616,7 +617,6 @@ def compute_certification(
         "productionRootCertified": production_root,
         "predictiveValidationEarned": predictive,
         "hashCertifiedPythonFreeze": hash_certified,
-        "locksCertified": locks,
     }
     if temporal_note:
         flags["evidenceTemporalNote"] = temporal_note
@@ -627,9 +627,13 @@ def compute_certification(
 
 
 def locks_certified(audit: dict[str, Any]) -> bool:
-    """Derived alias: modelRunCertified AND selectionCertified AND evidenceCoverageCertified."""
+    """Compatibility helper only; the combined value is not stored canonically."""
     flags = compute_certification(audit, claims=[], research_ran=True)
-    return bool(flags["locksCertified"])
+    return (
+        bool(flags.get("modelRunCertified"))
+        and bool(flags.get("selectionCertified"))
+        and bool(flags.get("evidenceCoverageCertified"))
+    )
 
 
 def _render_run_audit_md(audit: dict[str, Any], picks: list[dict[str, Any]]) -> str:
@@ -647,7 +651,7 @@ def _render_run_audit_md(audit: dict[str, Any], picks: list[dict[str, Any]]) -> 
         f"- AFTER: playable: {audit.get('playable')}, cardSize: {audit.get('cardSize')}, hallucinationRisk: {audit.get('hallucinationRisk')}",
         f"- modelRunCertified: {audit.get('modelRunCertified')}, selectionCertified: {audit.get('selectionCertified')}, evidenceCoverageCertified: {audit.get('evidenceCoverageCertified')}",
         f"- evidenceTemporalCertified: {audit.get('evidenceTemporalCertified')}, archiveIntegrityCertified: {audit.get('archiveIntegrityCertified')}, productionRootCertified: {audit.get('productionRootCertified')}",
-        f"- predictiveValidationEarned: {audit.get('predictiveValidationEarned')}, hashCertifiedPythonFreeze: {audit.get('hashCertifiedPythonFreeze')}, locksCertified (derived): {audit.get('locksCertified')}",
+        f"- predictiveValidationEarned: {audit.get('predictiveValidationEarned')}, hashCertifiedPythonFreeze: {audit.get('hashCertifiedPythonFreeze')}",
         "",
         "## Card",
     ])

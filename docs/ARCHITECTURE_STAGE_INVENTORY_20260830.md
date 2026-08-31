@@ -7,7 +7,7 @@ Statuses: COMPLETE | PARTIAL | STUB | MISSING | INCORRECT | OBSOLETE.
 
 Audit pack `audit/runs/RUN_60612c8a7bcf7df1` is a **regression fixture, not a gold standard**. It proves the Python freeze pathway and split cert flags, but the Bonner PLAYABLE card is INCORRECT (PLAYER_STATUS_UNCERTAIN + event already started). Do not delete the pack.
 
-`locksCertified` is a **retired derived alias only**. Primary flags are the split set (`modelRunCertified`, `selectionCertified`, `evidenceCoverageCertified`, plus archive/temporal/root/predictive). Alias is true only if modelRunCertified AND selectionCertified AND evidenceCoverageCertified.
+`locksCertified` is **retired from canonical runtime/audit state**. Primary flags are the split set (`modelRunCertified`, `selectionCertified`, `evidenceCoverageCertified`, plus archive/temporal/root/predictive). The compatibility helper `locks_certified()` may derive the historical combined condition for old callers, but the field is not serialized.
 
 | Stage | Status | Evidence |
 | --- | --- | --- |
@@ -39,7 +39,7 @@ Audit pack `audit/runs/RUN_60612c8a7bcf7df1` is a **regression fixture, not a go
 | freeze | PARTIAL | Hash-verified `freeze.json` / `frozen_forecast.json`. P4 binds software, git commit (if available), schema hash, featureStoreHash, HAR sha, board hash, evidence graph hash, parameter snapshot hashes, model config, calibration, decision cutoff, top25, card, explanations hash (`freezeBinds`). Final status/start strip runs immediately before portfolio freeze. PR #9 freeze remains a regression fixture, **INCORRECT on Bonner**. |
 | Top25 | COMPLETE | `top25_ranked.json` always; `top25_qualified.json` unpadded (PR #8). |
 | 0–6 PLAYABLE | COMPLETE/PARTIAL | PR #8 `modeledPlayable` / `strict_card.json`; P0 status/start hard gates (Bonner `PLAYER_STATUS_UNCERTAIN` + started event cannot be PLAYABLE). Empty card is legal. Production-certified layer stays empty (`V6_ROOT_OF_TRUST_MIGRATION_ACCEPTED=false`). |
-| audit | PARTIAL | PR #6 `dcm/runtime/github_archive.py` split cert flags. `locksCertified` is derived-only (documented in `audit/README.md`). Pack copies `prop_explanations.jsonl` / `evidence_graph.json` / feature-store manifest when present; never copies raw HAR or Cookie/Set-Cookie files. Git push remains optional (`--no-archive-push`). |
+| audit | PARTIAL | `dcm/runtime/github_archive.py` uses split cert flags; `locksCertified` is retired from canonical state. Pack includes universal research artifacts, explanations, EvidenceGraph and feature-store manifest when present; never raw HAR or Cookie/Set-Cookie files. Git push remains optional (`--no-archive-push`). |
 | settlement | COMPLETE/PARTIAL | `dcm/learning/postgame.py` `settle_run` + `python -m dcm.settle --dest --outcomes` settle the full modeled population (`full_population.jsonl` / `population_full`) to `settlements.jsonl` + `settlement_summary.json` (counts by result/grade/market). PrizePicks results: WIN/LOSS/PUSH/VOID/DNP/REBOOT/UNKNOWN_PLATFORM_RULE. Card-only subset via `--card-only`. Does not invent outcomes. Lineup economics remain PARTIAL (entry contract required). |
 | LearningLedger | PARTIAL | `dcm/learning/sidecar.py` append-only sqlite + `learning_ledger.jsonl`. Freeze writes FrozenForecast; settle appends one Settlement per modeled prop and never rewrites the frozen forecast. P6 dataset builder joins settlements into `training_dataset.jsonl` + manifest (supervised WIN/LOSS/PUSH vs audit VOID/DNP/UNKNOWN/REBOOT). No full-season multi-slate production trainer. |
 | training | PARTIAL | `dcm/learning/dataset.py` builds `training_dataset.jsonl` + manifest from settled dests (never invents labels). `walkforward.py` evaluates frozen calibratedP/selectedP on chronological folds (Brier/logloss/hitRate/ECE). Optional tiny shadow logistic is SHADOW, no sklearn, no .pkl. No trained production weights. |
@@ -84,3 +84,18 @@ P8 (this line): Team/Opponent/Event research packets + first-class EntityGraph +
 - MLB remains SHADOW.
 - Live ESPN/official/B-R fetches remain opt-in (`DCM_LIVE_FETCH`); default path is fixture/file/bundle.
 - V1 hash gate closed; production root closed.
+
+
+## P9 universal-core migration — PR #11 child tranche (2026-08-31)
+
+This branch adds the first canonical sport-neutral research layer required by the universal DCM directive.
+
+- **SubjectOfferSet — COMPLETE (core contract):** `subject_offer_sets.json` groups `Subject + Event`; PLAYER is one SubjectType, not the core identity.
+- **Universal entity contracts — COMPLETE (container layer):** Sport, Competition, Event, Affiliation, Subject, Counterparty, Environment, MarketDefinition and Offer are first-class. Sport-specific concepts remain adapter/plugin vocabulary.
+- **ResearchPopulationManifest V2 — COMPLETE (population construction):** canonical `research_population_manifest.json` contains sports, competitions, events, affiliations, subjects, counterparties, environments, marketDefinitions and offers. Legacy TEAM/PLAYER planner output is isolated in `research_population_manifest_legacy.json`.
+- **ResearchDependencyGraph — COMPLETE (first version):** `research_dependency_graph.json` contains only universal entity types and fan-out dependencies. It deliberately contains no Team or Player nodes.
+- **Legacy PlayerOfferSet — COMPATIBILITY ONLY:** generated from canonical SubjectOfferSet for existing basketball/gridiron consumers. Non-player subjects are never fabricated as players.
+- **Existing EntityGraph / player/team research packets — PARTIAL migration:** still used by current basketball/gridiron adapters and model consumers. They are sport-specific compatibility projections, not the universal core.
+- **Universal SourceAdapter/ResearchSchema consumption — PARTIAL:** providers still request legacy TEAM/PLAYER scopes. Next migration should make the planner/provider interface consume AFFILIATION/SUBJECT/COUNTERPARTY/ENVIRONMENT directly, with sport plugins translating to source-specific adapters.
+- **Model physics unchanged:** no second engine; probability, EventWorld, primitive ledger, grading, ranking, portfolio and freeze paths are unchanged in this tranche.
+- **Governance unchanged:** LR000000, predictive NONE, V1 expected hash unchanged, production root closed.

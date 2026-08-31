@@ -111,7 +111,6 @@ def _finalize_archive(
         audit = build_run_audit(dest)
     except Exception as exc:  # noqa: BLE001 — never lose a finished run to archive I/O
         result["auditError"] = type(exc).__name__
-        result.setdefault("locksCertified", False)
         result.setdefault("modelRunCertified", False)
         result.setdefault("selectionCertified", False)
         result.setdefault("evidenceCoverageCertified", False)
@@ -123,9 +122,6 @@ def _finalize_archive(
         result.setdefault("hallucinationRisk", True)
         return result
     result.update(certification_fields(audit))
-    # locksCertified is a retired derived alias only (modelRunCertified AND
-    # selectionCertified AND evidenceCoverageCertified). Primary flags are the split set.
-    result["locksCertified"] = bool(audit.get("locksCertified"))
     result["hallucinationRisk"] = bool(audit.get("hallucinationRisk"))
     result["archivePath"] = str(Path(dest) / "audit")
     result["githubCommit"] = None
@@ -140,7 +136,6 @@ def _finalize_archive(
             {
                 "runId": run_id,
                 "path": f"audit/runs/{run_id}",
-                "locksCertified": audit.get("locksCertified"),
                 "hallucinationRisk": audit.get("hallucinationRisk"),
                 "runState": audit.get("runState") or result.get("runState"),
                 "frozenForecastHash": audit.get("frozenForecastHash"),
@@ -1318,7 +1313,6 @@ def main(argv: list[str] | None = None) -> int:
                 "chatgptOperable": integ.get("chatgptOperable"),
                 "dest": result["dest"],
                 "archivePath": result.get("archivePath"),
-                "locksCertified": result.get("locksCertified"),
                 "archiveIntegrityCertified": result.get("archiveIntegrityCertified"),
                 "evidenceCoverageCertified": result.get("evidenceCoverageCertified"),
                 "evidenceTemporalCertified": result.get("evidenceTemporalCertified"),

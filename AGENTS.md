@@ -11,7 +11,7 @@ simpler forecasting app. The production path is:
 HAR capture(s)
 → deterministic request-scope reconciliation
 → immutable board freeze
-→ Sport → Event → Team → Player → Market research
+→ Sport → Competition → Event → Affiliation / Subject / Counterparty / Environment → MarketDefinition / Offer research
 → frozen EvidenceGraph
 → opportunity model
 → conditional efficiency model
@@ -88,9 +88,9 @@ those fields separate throughout the pipeline and reporting.
 
 Research is hierarchical and reusable:
 
-Sport → Event → Team → Player → Market
+Sport → Competition → Event → Affiliation / Subject / Counterparty / Environment → MarketDefinition / Offer
 
-Do not independently research every prop when evidence can be reused.
+Team/player/opponent terminology belongs inside sport/platform adapters and compatibility views, not the universal core. The canonical research unit is SubjectOfferSet = Subject + Event. Do not independently research every prop when evidence can be reused.
 
 Production evidence must be structured, timestamped, source/content hashed,
 claim hashed, cutoff-safe, and traceable. Fixture/synthetic evidence is
@@ -155,7 +155,7 @@ Correctness precedes optimization. Measure before certifying.
 Benchmark representative boards and record wall time, CPU time, peak RSS,
 world count, research count/reuse, cache hits, and artifact/database sizes.
 
-Prefer event/team/player evidence reuse, DAG invalidation, content-addressed
+Prefer event/affiliation/subject/counterparty evidence reuse, DAG invalidation, content-addressed
 caching, adaptive simulation, bounded parallelism, deterministic RNG streams,
 streaming ingest, indexed storage, and batched writes when tests prove semantic
 equivalence.

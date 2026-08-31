@@ -1,6 +1,8 @@
-"""PlayerOfferSet: one research subject per player+event, not per market.
+"""Legacy PlayerOfferSet compatibility projection.
 
-Paige-style invariant: N offers for one player in one event → 1 PlayerOfferSet.
+Canonical research grouping is SubjectOfferSet.  This module exists so older
+basketball/gridiron consumers can migrate without creating a second research
+engine.
 """
 from __future__ import annotations
 
@@ -8,29 +10,26 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from dcm.contracts.hashes import content_hash
-from dcm.research.adapters.prizepicks import PrizePicksOfferAdapter
+from dcm.research.subject_offer_set import build_subject_offer_sets
 
 
 def _s(value: Any) -> str:
     return "" if value is None else str(value)
 
 
-def offer_dict_from_fields(fields: dict[str, Any]) -> dict[str, Any]:
+def _legacy_offer(offer: dict[str, Any]) -> dict[str, Any]:
     return {
-        "projectionId": _s(fields.get("projectionId")),
-        "market": fields.get("market"),
-        "line": fields.get("line"),
-        "modifier": fields.get("modifier"),
-        "offeredHigher": bool(fields.get("offeredHigher")),
-        "offeredLower": bool(fields.get("offeredLower")),
-        "boardId": fields.get("boardId") or "FULL_GAME",
+        "projectionId": _s(offer.get("projectionId")),
+        "market": offer.get("marketCanonicalName"),
+        "line": offer.get("line"),
+        "modifier": offer.get("modifier"),
+        "offeredHigher": bool(offer.get("offeredMore")),
+        "offeredLower": bool(offer.get("offeredLess")),
+        "boardId": offer.get("period") or "FULL_GAME",
         "raw": {
-            "side": fields.get("side"),
-            "status": fields.get("status"),
-            "isLive": fields.get("isLive"),
-            "marketRaw": fields.get("marketRaw"),
-            "productType": fields.get("productType"),
-            "teamId": fields.get("teamId"),
+            "status": offer.get("status"),
+            "isLive": offer.get("isLive"),
+            "marketRaw": offer.get("marketRawName"),
         },
     }
 
@@ -68,40 +67,34 @@ class PlayerOfferSet:
             "offerCount": len(offers),
             "markets": sorted({_s(o.get("market")) for o in offers if o.get("market")}),
             "offers": offers,
+            "canonicalType": "SubjectOfferSetCompatibilityView",
         }
         body["contentHash"] = content_hash({k: v for k, v in body.items() if k != "contentHash"})
         return body
 
 
 def build_player_offer_sets(board_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Group board rows by (playerId, eventId). Same player, different games stay separate."""
-    adapter = PrizePicksOfferAdapter()
-    records = adapter.normalize_rows([r for r in board_rows if isinstance(r, dict)])
-    groups: dict[tuple[str, str], PlayerOfferSet] = {}
-    for rec in records:
-        fields = rec.get("fields") or {}
-        player_id = _s(fields.get("playerId"))
-        if not player_id:
+    """Project canonical PLAYER SubjectOfferSets into the legacy shape."""
+    out: list[dict[str, Any]] = []
+    for subject_set in build_subject_offer_sets(board_rows):
+        if str(subject_set.get("subjectType") or "") != "PLAYER":
             continue
-        event_id = _s(fields.get("eventId"))
-        key = (player_id, event_id)
-        if key not in groups:
-            groups[key] = PlayerOfferSet(
-                playerId=player_id,
-                playerName=_s(fields.get("playerName")),
-                sportFamily=_s(fields.get("sportFamily")),
-                league=_s(fields.get("league")),
-                team=_s(fields.get("team")),
-                opponent=_s(fields.get("opponent")),
-                eventId=event_id,
-                eventLabel=_s(fields.get("eventLabel")),
-                eventStartTime=_s(fields.get("eventStartTime")),
-                offers=[],
-            )
-        groups[key].offers.append(offer_dict_from_fields(fields))
-    sets = [g.to_dict() for g in groups.values()]
-    sets.sort(key=lambda s: (s["playerId"], s["eventId"], s["setId"]))
-    return sets
+        counterparties = list(subject_set.get("counterpartyIds") or [])
+        player_set = PlayerOfferSet(
+            playerId=_s(subject_set.get("subjectId")),
+            playerName=_s(subject_set.get("subjectName")),
+            sportFamily=_s(subject_set.get("sportId")),
+            league=_s(subject_set.get("competitionId")),
+            team=_s(subject_set.get("affiliationId")),
+            opponent=_s(counterparties[0] if counterparties else ""),
+            eventId=_s(subject_set.get("eventId")),
+            eventLabel=_s(subject_set.get("eventLabel")),
+            eventStartTime=_s(subject_set.get("eventStart")),
+            offers=[_legacy_offer(o) for o in subject_set.get("offers") or []],
+        )
+        out.append(player_set.to_dict())
+    out.sort(key=lambda s: (s["playerId"], s["eventId"], s["setId"]))
+    return out
 
 
 def player_offer_sets_document(sets: list[dict[str, Any]]) -> dict[str, Any]:
@@ -110,6 +103,8 @@ def player_offer_sets_document(sets: list[dict[str, Any]]) -> dict[str, Any]:
         "setCount": len(sets),
         "offerCount": sum(int(s.get("offerCount") or len(s.get("offers") or [])) for s in sets),
         "sets": sets,
+        "compatibilityOnly": True,
+        "canonicalArtifact": "subject_offer_sets.json",
     }
     body["contentHash"] = content_hash({k: v for k, v in body.items() if k != "contentHash"})
     return body

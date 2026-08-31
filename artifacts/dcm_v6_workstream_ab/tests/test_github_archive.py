@@ -225,7 +225,7 @@ def test_lock_without_player_claims_is_not_certified(tmp_path: Path):
 
     audit = build_run_audit(dest)
     assert audit["hallucinationRisk"] is True
-    assert audit["locksCertified"] is False
+    assert "locksCertified" not in audit
     assert locks_certified(audit) is False
 
 
@@ -254,7 +254,7 @@ def test_complete_player_event_market_definition_is_certified(tmp_path: Path):
     assert audit["modelRunCertified"] is True
     assert audit["selectionCertified"] is True
     assert audit["evidenceCoverageCertified"] is True
-    assert audit["locksCertified"] is True
+    assert "locksCertified" not in audit
     assert audit["hallucinationRisk"] is False
     assert audit["predictiveValidationEarned"] is False
     assert audit["productionRootCertified"] is False
@@ -281,7 +281,7 @@ def test_fixture_evidence_mode_on_live_har_fails_gate():
     from dcm.runtime.github_archive import compute_certification
     flags = compute_certification(audit, research_ran=True)
     assert flags["modelRunCertified"] is False
-    assert flags["locksCertified"] is False
+    assert "locksCertified" not in flags
 
 
 def test_empty_card_can_certify_when_research_ran(tmp_path: Path):
@@ -297,7 +297,8 @@ def test_empty_card_can_certify_when_research_ran(tmp_path: Path):
     audit = build_run_audit(dest)
     assert audit["cardSize"] == 0
     assert audit["hallucinationRisk"] is False
-    assert audit["locksCertified"] is True
+    assert "locksCertified" not in audit
+    assert locks_certified(audit) is True
 
 
 def test_card_with_incomplete_evidence_is_not_certified(tmp_path: Path):
@@ -309,7 +310,8 @@ def test_card_with_incomplete_evidence_is_not_certified(tmp_path: Path):
     )
     audit = build_run_audit(dest)
     assert audit["cardSize"] > 0
-    assert audit["locksCertified"] is False
+    assert "locksCertified" not in audit
+    assert locks_certified(audit) is False
     assert audit["hallucinationRisk"] is True
 
 
@@ -462,7 +464,7 @@ def test_manual_research_card_is_not_model_run_certified(tmp_path: Path):
     assert audit["modelRunCertified"] is False
     assert audit["selectionCertified"] is False
     assert audit["hashCertifiedPythonFreeze"] is False
-    assert audit["locksCertified"] is False
+    assert "locksCertified" not in audit
     assert locks_certified(audit) is False
 
 
@@ -517,50 +519,44 @@ def test_researched_modeled_card_is_python_freeze_certified(tmp_path: Path):
     assert audit["predictiveValidationEarned"] is False
 
 
-def test_locks_certified_is_derived_alias_not_primary():
-    """locksCertified is a retired derived alias, never a primary cert flag."""
+def test_locks_certified_is_compatibility_helper_not_canonical_state():
+    """Combined lock state is retired from canonical output."""
     from dcm.runtime.github_archive import compute_certification
 
-    flags = compute_certification(
-        {
-            "runState": "COMPLETE_FROZEN",
-            "completedStages": ["RESEARCH", "MODEL", "RANK", "FREEZE"],
-            "softwareE2eComplete": True,
-            "synthetic": False,
-            "evidenceMode": "PRODUCTION",
-            "cardSize": 0,
-            "claimCount": 3,
-            "frozenForecastHash": "abc",
-            "learningRevision": "LR000000",
-            "predictiveClaim": "NONE",
-            "picks": [],
-        },
-        research_ran=True,
-    )
-    assert flags["locksCertified"] == (
-        bool(flags["modelRunCertified"])
-        and bool(flags["selectionCertified"])
-        and bool(flags["evidenceCoverageCertified"])
-    )
-    # Alias stays false unless all three primary flags are true.
-    incomplete = compute_certification(
-        {
-            "runState": "COMPLETE_FROZEN",
-            "completedStages": ["RESEARCH", "MODEL", "RANK", "FREEZE"],
-            "softwareE2eComplete": True,
-            "synthetic": False,
-            "evidenceMode": "fixture",
-            "cardSize": 1,
-            "claimCount": 3,
-            "frozenForecastHash": "abc",
-            "learningRevision": "LR000000",
-            "predictiveClaim": "NONE",
-            "picks": [{"coverage": {"complete": False}}],
-        },
-        research_ran=True,
-    )
+    audit = {
+        "runState": "COMPLETE_FROZEN",
+        "completedStages": ["RESEARCH", "MODEL", "RANK", "FREEZE"],
+        "softwareE2eComplete": True,
+        "synthetic": False,
+        "evidenceMode": "PRODUCTION",
+        "cardSize": 0,
+        "claimCount": 3,
+        "frozenForecastHash": "abc",
+        "learningRevision": "LR000000",
+        "predictiveClaim": "NONE",
+        "picks": [],
+    }
+    flags = compute_certification(audit, research_ran=True)
+    assert "locksCertified" not in flags
+    assert locks_certified(audit) is True
+
+    incomplete_audit = {
+        "runState": "COMPLETE_FROZEN",
+        "completedStages": ["RESEARCH", "MODEL", "RANK", "FREEZE"],
+        "softwareE2eComplete": True,
+        "synthetic": False,
+        "evidenceMode": "fixture",
+        "cardSize": 1,
+        "claimCount": 3,
+        "frozenForecastHash": "abc",
+        "learningRevision": "LR000000",
+        "predictiveClaim": "NONE",
+        "picks": [{"coverage": {"complete": False}}],
+    }
+    incomplete = compute_certification(incomplete_audit, research_ran=True)
     assert incomplete["modelRunCertified"] is False
-    assert incomplete["locksCertified"] is False
+    assert "locksCertified" not in incomplete
+    assert locks_certified(incomplete_audit) is False
 
 
 def test_archive_copies_explanations_graph_and_feature_store_when_present(tmp_path: Path):

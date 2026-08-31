@@ -52,12 +52,13 @@ def test_graph_trace_from_fake_selection_to_claim_url():
     sets = build_player_offer_sets(rows)
     packets = build_packets_for_offer_sets(sets, claims=[claim], as_of=CUTOFF)
     graph = build_evidence_graph([claim], sets, packets)
-    assert graph["schema"] == "pillars_dcm.evidence_graph.v1"
+    assert graph["schema"] == "pillars_dcm.evidence_graph.v2"
     assert graph["contentHash"]
     types = {n["type"] for n in graph["nodes"]}
-    for needed in NODE_TYPES:
-        # NormalizedStat present because packet has logs
+    for needed in ("SourceDocument", "EvidenceClaim", "Subject", "Affiliation", "Counterparty", "Event", "MarketDefinition", "Offer", "NormalizedStat"):
         assert needed in types, needed
+    assert "Player" not in types
+    assert "Team" not in types
     edge_types = {e["type"] for e in graph["edges"]}
     assert "supports" in edge_types
     assert "derived_from" in edge_types
@@ -66,6 +67,8 @@ def test_graph_trace_from_fake_selection_to_claim_url():
     assert traced["resolved"] is True
     assert traced["sourceUrl"] == PAIGE_URL
     assert "Offer" in traced["nodeTypes"]
+    assert "Subject" in traced["nodeTypes"]
+    assert "Player" not in traced["nodeTypes"]
     assert "SourceDocument" in traced["nodeTypes"]
 
 
