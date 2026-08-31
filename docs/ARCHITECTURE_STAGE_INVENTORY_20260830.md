@@ -84,3 +84,18 @@ P8 (this line): Team/Opponent/Event research packets + first-class EntityGraph +
 - MLB remains SHADOW.
 - Live ESPN/official/B-R fetches remain opt-in (`DCM_LIVE_FETCH`); default path is fixture/file/bundle.
 - V1 hash gate closed; production root closed.
+
+
+## P9 universal-core migration — PR #11 child tranche (2026-08-31)
+
+This branch adds the first canonical sport-neutral research layer required by the universal DCM directive.
+
+- **SubjectOfferSet — COMPLETE (core contract):** `subject_offer_sets.json` groups `Subject + Event`; PLAYER is one SubjectType, not the core identity.
+- **Universal entity contracts — COMPLETE (container layer):** Sport, Competition, Event, Affiliation, Subject, Counterparty, Environment, MarketDefinition and Offer are first-class. Sport-specific concepts remain adapter/plugin vocabulary.
+- **ResearchPopulationManifest V2 — COMPLETE (population construction):** canonical `research_population_manifest.json` contains sports, competitions, events, affiliations, subjects, counterparties, environments, marketDefinitions and offers. Legacy TEAM/PLAYER planner output is isolated in `research_population_manifest_legacy.json`.
+- **ResearchDependencyGraph — COMPLETE (first version):** `research_dependency_graph.json` contains only universal entity types and fan-out dependencies. It deliberately contains no Team or Player nodes.
+- **Legacy PlayerOfferSet — COMPATIBILITY ONLY:** generated from canonical SubjectOfferSet for existing basketball/gridiron consumers. Non-player subjects are never fabricated as players.
+- **Existing EntityGraph / player/team research packets — PARTIAL migration:** still used by current basketball/gridiron adapters and model consumers. They are sport-specific compatibility projections, not the universal core.
+- **Universal SourceAdapter/ResearchSchema consumption — PARTIAL:** providers still request legacy TEAM/PLAYER scopes. Next migration should make the planner/provider interface consume AFFILIATION/SUBJECT/COUNTERPARTY/ENVIRONMENT directly, with sport plugins translating to source-specific adapters.
+- **Model physics unchanged:** no second engine; probability, EventWorld, primitive ledger, grading, ranking, portfolio and freeze paths are unchanged in this tranche.
+- **Governance unchanged:** LR000000, predictive NONE, V1 expected hash unchanged, production root closed.
