@@ -296,11 +296,13 @@ def sample_football(rng: random.Random, role: str, parameters: dict[str, Any] | 
         targets = _binomial(rng, routes, _p(p, "target_rate", 0.28))
         receptions = _binomial(rng, targets, _p(p, "catch_rate", 0.68))
         rec_yds = int(round(rng.gauss(receptions * max(0.0, _p(p, "rec_ypr", 11.5)), 17.0)))
+    snaps = max(dropbacks if role == "QB" else (routes or rush_att), pass_att, rush_att, routes)
     stats = {
         "pass_att": pass_att, "pass_cmp": pass_cmp, "sacks_taken": sacks, "scramble_att": scramble,
         "designed_rush_att": designed, "rush_att": rush_att, "dropbacks": dropbacks,
         "pass_yds": pass_yds, "rush_yds": rush_yds, "rec_yds": rec_yds,
         "receptions": receptions, "targets": targets, "routes": routes,
+        "snaps": snaps, "off_snaps": snaps,
         "pass_rush_yds": pass_yds + rush_yds, "rush_rec_yds": rush_yds + rec_yds,
     }
     if stats["pass_cmp"] > stats["pass_att"] or stats["receptions"] > stats["targets"] or stats["targets"] > stats["routes"]:
@@ -363,10 +365,20 @@ MARKET_FROM_STATS = {
 
 
 def value_from_stats(market: str, stats: dict[str, float], board_id: str = "FULL_GAME") -> float:
-    from dcm.model.market_derive import derive_market, looks_like_basketball_ledger
+    from dcm.model.market_derive import (
+        UnknownMarketError,
+        derive_market,
+        looks_like_basketball_ledger,
+        looks_like_gridiron_ledger,
+    )
 
     if looks_like_basketball_ledger(stats):
         return derive_market(stats, market, board_id=board_id)
+    if looks_like_gridiron_ledger(stats):
+        try:
+            return derive_market(stats, market, board_id=board_id)
+        except UnknownMarketError:
+            raise KeyError(market)
     if market == "pra" and "pts" in stats and "reb" in stats and "ast" in stats:
         return float(stats["pts"]) + float(stats["reb"]) + float(stats["ast"])
     key = MARKET_FROM_STATS.get(market, market)

@@ -1,7 +1,8 @@
 """RoleEpochBuilder: production constructor for role-comparable game samples.
 
-Detects role epochs from GS/starter flags, minutes change-points, and optional
-teammate-out flags. Never invents logs. Thin support raises priorWeight.
+Basketball: GS/starter flags, minutes change-points, teammate-out flags.
+Gridiron: starter/depth, QB identity, snap/route/target/carry share change-points.
+Never invents logs. Thin support raises priorWeight.
 """
 from __future__ import annotations
 
@@ -9,6 +10,7 @@ from statistics import mean
 from typing import Any
 
 from dcm.research.gamelog import parse_gs, parse_numeric
+from dcm.research.gridiron_gamelog import looks_like_gridiron_log, parse_numeric as _grid_num, normalize_gridiron_log
 
 BUILDER_ID = "RoleEpochBuilder.v2-20260830"
 PRIOR_N = 8.0
@@ -16,6 +18,12 @@ SEASON_DISCOUNT = 0.35
 CHANGEPOINT_THRESHOLD = 8.0
 MIN_SEGMENT = 3
 STARTER_MINUTES = {"NBA": 24.0, "WNBA": 20.0, "NCAAB": 22.0, "NCAAW": 22.0}
+GRIDIRON_LEAGUES = frozenset({"NFL", "CFB", "NFLP", "CFL", "UFL"})
+STARTER_SNAPS = {"NFL": 40.0, "CFB": 35.0, "NFLP": 30.0}
+STARTER_PASS_ATT = 18.0
+GRIDIRON_CHANGEPOINT = 10.0
+QB_ROLES = frozenset({"qb", "quarterback", "starter_qb", "backup_qb"})
+DEPTH_ROLES = frozenset({"depth", "backup", "reserve", "second_unit", "second-unit", "bench"})
 
 STARTER_ROLES = frozenset({"starter", "starting", "start", "started", "gs"})
 BENCH_ROLES = frozenset({"bench", "reserve", "second_unit", "second-unit", "secondunit"})
@@ -258,6 +266,94 @@ def _strip_internal(row: dict[str, Any]) -> dict[str, Any]:
     return {k: v for k, v in row.items() if not str(k).startswith("_")}
 
 
+
+def _is_gridiron(ctx: dict[str, Any], value: dict[str, Any], logs: list[dict[str, Any]] | None = None) -> bool:
+    family = str(ctx.get("sportFamily") or ctx.get("sport_family") or value.get("sportFamily") or value.get("family") or "").lower()
+    if family in {"gridiron", "football"}:
+        return True
+    league = str(ctx.get("league") or value.get("league") or "").strip().upper()
+    if league in GRIDIRON_LEAGUES:
+        return True
+    sample = logs if logs is not None else _as_logs(value.get("role_epoch_logs") or value.get("game_logs") or value.get("gameLogs"))
+    football_hits = sum(1 for row in sample if looks_like_gridiron_log(row))
+    return football_hits >= 2 and football_hits >= (len(sample) // 2 if sample else 0)
+
+
+def _share_value(row: dict[str, Any]) -> float | None:
+    """Primary share series: snaps, else routes, else targets, else pass_att, else rush_att."""
+    for key in ("snaps", "routes", "targets", "pass_att", "rush_att"):
+        parsed = parse_numeric(row.get(key))
+        if parsed is not None:
+            return float(parsed)
+    pct = parse_numeric(row.get("snap_pct"))
+    if pct is not None:
+        return float(pct) * 100.0 if pct <= 1.0 else float(pct)
+    return None
+
+
+def _qb_id_of(row: dict[str, Any]) -> str | None:
+    for src in (row, _raw(row)):
+        for key in ("qb_id", "qb", "quarterback_id"):
+            val = src.get(key)
+            if val is not None and str(val).strip():
+                return str(val).strip()
+    return None
+
+
+def _gridiron_appearance(row: dict[str, Any], *, is_qb: bool, starter_snap: float) -> str | None:
+    explicit = _explicit_appearance(row)
+    if is_qb:
+        if explicit == "starter":
+            return "starter_qb"
+        if explicit == "bench":
+            return "backup_qb"
+        role = str(row.get("role") or _raw(row).get("role") or "").strip().lower()
+        if role in {"starter_qb", "starting_qb"}:
+            return "starter_qb"
+        if role in {"backup_qb", "backup"}:
+            return "backup_qb"
+        pass_att = parse_numeric(row.get("pass_att"))
+        if pass_att is not None:
+            return "starter_qb" if pass_att >= STARTER_PASS_ATT else "backup_qb"
+        share = _share_value(row)
+        if share is not None:
+            return "starter_qb" if share >= starter_snap else "backup_qb"
+        return None
+    if explicit:
+        return "starter" if explicit == "starter" else "depth"
+    role = str(row.get("role") or _raw(row).get("role") or "").strip().lower()
+    if role in STARTER_ROLES:
+        return "starter"
+    if role in DEPTH_ROLES or role in BENCH_ROLES:
+        return "depth"
+    return None
+
+
+def _gridiron_label_from_share(share: float, threshold: float, *, is_qb: bool) -> str:
+    if is_qb:
+        return "starter_qb" if share >= threshold else "backup_qb"
+    if share >= threshold:
+        return "starter"
+    if share >= 8.0:
+        return "depth"
+    return "other"
+
+
+def _projected_gridiron_label(role: Any, *, is_qb: bool) -> str | None:
+    text = str(role or "").strip().lower()
+    if is_qb:
+        if text in {"backup", "backup_qb", "bench", "depth"}:
+            return "backup_qb"
+        if text in QB_ROLES or text in STARTER_ROLES or not text:
+            return "starter_qb"
+        return "starter_qb"
+    if text in DEPTH_ROLES or text in BENCH_ROLES:
+        return "depth"
+    if text in STARTER_ROLES:
+        return "starter"
+    return "starter"
+
+
 class RoleEpochBuilder:
     """Production role-epoch constructor. Builder id never contains 'stub'."""
 
@@ -271,6 +367,8 @@ class RoleEpochBuilder:
     ) -> dict[str, Any]:
         ctx = dict(today_context or {})
         value = player_claim_value if isinstance(player_claim_value, dict) else {}
+        if _is_gridiron(ctx, value):
+            return self._build_gridiron(value, claims=claims, today_context=ctx)
         league = ctx.get("league") or value.get("league")
         raw_logs = _as_logs(value.get("role_epoch_logs") or value.get("game_logs") or value.get("gameLogs"))
         prepared: list[dict[str, Any]] = []
@@ -374,3 +472,137 @@ class RoleEpochBuilder:
             "invented": False,
             "projectedRole": projected,
         }
+
+    def _build_gridiron(
+        self,
+        value: dict[str, Any],
+        claims: list[dict[str, Any]] | None = None,
+        today_context: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        ctx = dict(today_context or {})
+        league = str(ctx.get("league") or value.get("league") or "").upper() or None
+        role_hint = str(ctx.get("projected_role") or ctx.get("role") or value.get("projected_role") or value.get("role") or "")
+        is_qb = role_hint.strip().upper() in {"QB", "QUARTERBACK", "STARTER_QB", "BACKUP_QB"} or role_hint.strip().lower() in QB_ROLES
+        raw_logs = _as_logs(value.get("role_epoch_logs") or value.get("game_logs") or value.get("gameLogs"))
+        prepared: list[dict[str, Any]] = []
+        for i, row in enumerate(raw_logs):
+            normalized = normalize_gridiron_log(row, league=league) if isinstance(row, dict) else None
+            item = dict(normalized or row)
+            share = _share_value(item)
+            if share is None:
+                continue
+            if not is_qb:
+                # Infer QB identity from the log itself when role is unlabeled.
+                pa = parse_numeric(item.get("pass_att"))
+                if pa is not None and pa >= STARTER_PASS_ATT and parse_numeric(item.get("targets")) is None:
+                    is_qb = True
+            item["_share"] = share
+            item["_src"] = i
+            item["_qb_id"] = _qb_id_of(item)
+            prepared.append(item)
+        # Second pass: if majority of kept logs are QB-shaped, treat as QB.
+        if not is_qb and prepared:
+            qb_shaped = sum(1 for r in prepared if parse_numeric(r.get("pass_att")) is not None and (parse_numeric(r.get("pass_att")) or 0) >= 8)
+            is_qb = qb_shaped >= max(2, len(prepared) // 2)
+        prepared.sort(key=lambda r: _date_key(r, int(r.get("_src") or 0)))
+        for i, row in enumerate(prepared):
+            row["_idx"] = i
+
+        threshold = STARTER_SNAPS.get(str(league or "").upper(), 35.0)
+        share_series = [float(row["_share"]) for row in prepared]
+        cuts = detect_change_points(share_series, threshold=GRIDIRON_CHANGEPOINT)
+
+        # QB-identity cuts: new qb_id starts a segment.
+        qb_cut = set(cuts)
+        last_qb = None
+        for i, row in enumerate(prepared):
+            qid = row.get("_qb_id")
+            if qid and last_qb is not None and qid != last_qb:
+                qb_cut.add(i)
+            if qid:
+                last_qb = qid
+        cuts = sorted(qb_cut) or [0]
+
+        per_game: list[str] = []
+        for row in prepared:
+            label = _gridiron_appearance(row, is_qb=is_qb, starter_snap=threshold)
+            per_game.append(label or "")
+
+        n = len(prepared)
+        cut_ends = list(cuts) + [n]
+        for c, d in zip(cut_ends, cut_ends[1:]):
+            unlabeled = [i for i in range(c, d) if not per_game[i]]
+            if not unlabeled:
+                continue
+            seg = [share_series[i] for i in range(c, d)]
+            seg_label = _gridiron_label_from_share(mean(seg) if seg else 0.0, threshold, is_qb=is_qb)
+            for i in unlabeled:
+                per_game[i] = seg_label
+        for i, label in enumerate(per_game):
+            if not label:
+                per_game[i] = _gridiron_label_from_share(share_series[i], threshold, is_qb=is_qb)
+
+        epochs: list[dict[str, Any]] = []
+        if n:
+            start = 0
+            current = per_game[0]
+            for i in range(1, n):
+                if per_game[i] != current:
+                    rec = _epoch_record(current, start, i, prepared)
+                    rec["share_mean"] = mean(share_series[start:i]) if i > start else None
+                    rec["qb_id"] = prepared[start].get("_qb_id")
+                    epochs.append(rec)
+                    start = i
+                    current = per_game[i]
+            rec = _epoch_record(current, start, n, prepared)
+            rec["share_mean"] = mean(share_series[start:n]) if n > start else None
+            rec["qb_id"] = prepared[start].get("_qb_id")
+            epochs.append(rec)
+
+        projected = _projected_gridiron_label(role_hint, is_qb=is_qb)
+        selected = None
+        if projected:
+            matches = [e for e in epochs if e["label"] == projected]
+            if not matches and projected == "starter_qb":
+                matches = [e for e in epochs if e["label"] == "starter"]
+            if matches:
+                selected = matches[-1]
+        if selected is None and epochs:
+            selected = epochs[-1]
+
+        selected_label = selected["label"] if selected else None
+        comparable: list[dict[str, Any]] = []
+        if selected_label:
+            for epoch in epochs:
+                if epoch["label"] == selected_label:
+                    comparable.extend(prepared[epoch["start"]:epoch["end"]])
+        elif selected:
+            comparable = prepared[selected["start"]:selected["end"]]
+
+        support_n = len(comparable)
+        weights = shrinkage_weights(support_n, n)
+        public_logs = [_strip_internal(r) for r in comparable]
+        return {
+            "builder": BUILDER_ID,
+            "mode": "gridiron",
+            "log_count": n,
+            "epochs": epochs,
+            "selected_epoch": selected,
+            "comparable_logs": public_logs,
+            "support_n": support_n,
+            "shrinkage": {
+                "roleWeight": weights["roleWeight"],
+                "seasonWeight": weights["seasonWeight"],
+                "priorWeight": weights["priorWeight"],
+            },
+            "partitions": {
+                "starter": [_strip_internal(r) for r, lab in zip(prepared, per_game) if lab in {"starter", "starter_qb"}],
+                "depth": [_strip_internal(r) for r, lab in zip(prepared, per_game) if lab in {"depth", "backup_qb"}],
+                "other": [_strip_internal(r) for r, lab in zip(prepared, per_game) if lab not in {"starter", "starter_qb", "depth", "backup_qb"}],
+            },
+            "invented": False,
+            "projectedRole": projected,
+            "qbIdentity": is_qb,
+        }
+
+

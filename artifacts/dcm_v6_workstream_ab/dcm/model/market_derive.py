@@ -1,8 +1,9 @@
-"""Versioned basketball market derivation from a PrimitiveStatLedger.
+"""Versioned market derivation from a PrimitiveStatLedger.
 
-Composites are identities on one ledger. Unknown keys fail closed — no fuzzy match.
-Fantasy Score is listed as a key but has no PrizePicks scoring version, so it
-fails closed until an exact definition hash is registered.
+Basketball and gridiron composites are identities on one ledger. Unknown keys
+fail closed — no fuzzy match. Fantasy Score is listed as a key but has no
+PrizePicks scoring version, so it fails closed until an exact definition hash
+is registered.
 """
 from __future__ import annotations
 
@@ -72,6 +73,29 @@ _ALIASES: dict[str, str] = {
     "fantasy": "fantasy",
 }
 
+GRIDIRON_MARKET_REGISTRY_VERSION = "PP_FOOTBALL_MARKET_V1_2026-08-30"
+
+_GRIDIRON_ALIASES: dict[str, str] = {
+    "pass_yds": "pass_yds",
+    "passing_yards": "pass_yds",
+    "pass_yards": "pass_yds",
+    "passyds": "pass_yds",
+    "rush_yds": "rush_yds",
+    "rushing_yards": "rush_yds",
+    "rush_yards": "rush_yds",
+    "rec_yds": "rec_yds",
+    "receiving_yards": "rec_yds",
+    "rec_yards": "rec_yds",
+    "receptions": "receptions",
+    "rec": "receptions",
+    "pass_rush_yds": "pass_rush_yds",
+    "pass_rush_yards": "pass_rush_yds",
+    "passing_rushing_yards": "pass_rush_yds",
+    "rush_rec_yds": "rush_rec_yds",
+    "rush_rec_yards": "rush_rec_yds",
+    "rushing_receiving_yards": "rush_rec_yds",
+}
+
 MARKET_DISPLAY = {
     "pts": "Points",
     "reb": "Rebounds",
@@ -118,7 +142,7 @@ def canonicalize_market(market_key: str) -> str | None:
         return None
     key = raw.lower().replace("+", "_").replace("-", "_").replace(" ", "_")
     key = "_".join(p for p in key.split("_") if p)
-    return _ALIASES.get(key) or _ALIASES.get(raw)
+    return _ALIASES.get(key) or _ALIASES.get(raw) or _GRIDIRON_ALIASES.get(key) or _GRIDIRON_ALIASES.get(raw)
 
 
 def is_registered(market_key: str) -> bool:
@@ -131,6 +155,13 @@ def looks_like_basketball_ledger(stats: dict[str, Any]) -> bool:
     if "fga" in stats or "twopm" in stats or "tpm" in stats:
         return True
     return "pts" in stats and "reb" in stats and "ast" in stats
+
+
+def looks_like_gridiron_ledger(stats: dict[str, Any]) -> bool:
+    if not isinstance(stats, dict):
+        return False
+    football = {"pass_yds", "pass_att", "rush_yds", "rush_att", "rec_yds", "receptions", "targets", "dropbacks"}
+    return bool(football & set(stats))
 
 
 def _num(ledger: dict[str, Any], *keys: str) -> float:
@@ -162,12 +193,21 @@ def _formulas() -> dict[str, Callable[[dict[str, Any]], float]]:
         "stl": lambda L: _num(L, "stl"),
         "blk": lambda L: _num(L, "blk"),
         "blk_stl": lambda L: _num(L, "blk") + _num(L, "stl"),
+        "pass_yds": lambda L: _num(L, "pass_yds"),
+        "rush_yds": lambda L: _num(L, "rush_yds"),
+        "rec_yds": lambda L: _num(L, "rec_yds"),
+        "receptions": lambda L: _num(L, "receptions"),
+        "pass_rush_yds": lambda L: _num(L, "pass_yds") + _num(L, "rush_yds"),
+        "rush_rec_yds": lambda L: _num(L, "rush_yds") + _num(L, "rec_yds"),
     }
 
 
 FORMULAS = _formulas()
 
-BASKETBALL_MARKET_KEYS = frozenset(k for k in FORMULAS) | frozenset({"qtrs_w_3plus_pts"})
+GRIDIRON_MARKET_KEYS = frozenset({
+    "pass_yds", "rush_yds", "rec_yds", "receptions", "pass_rush_yds", "rush_rec_yds",
+})
+BASKETBALL_MARKET_KEYS = (frozenset(k for k in FORMULAS) | frozenset({"qtrs_w_3plus_pts"})) - GRIDIRON_MARKET_KEYS
 
 
 def derive_market(ledger: dict[str, Any], market_key: str, board_id: str = "FULL_GAME") -> float:

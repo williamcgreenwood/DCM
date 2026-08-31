@@ -5,6 +5,10 @@ from dcm.research.adapters.basketball_reference import (
     BasketballReferencePlayerAdapter,
 )
 from dcm.research.adapters.prizepicks import PrizePicksOfferAdapter
+from dcm.research.adapters.pro_football_reference import (
+    FootballReferenceGameLogAdapter,
+    ProFootballReferenceAdapter,
+)
 
 __all__ = [
     "SourceAdapter",
@@ -14,4 +18,6 @@ __all__ = [
     "BasketballReferenceGameLogAdapter",
     "BasketballReferencePlayerAdapter",
     "PrizePicksOfferAdapter",
+    "FootballReferenceGameLogAdapter",
+    "ProFootballReferenceAdapter",
 ]

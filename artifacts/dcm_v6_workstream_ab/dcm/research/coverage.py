@@ -4,6 +4,7 @@ from __future__ import annotations
 from typing import Any
 
 from dcm.research.gamelog import assert_compatible_basketball_logs
+from dcm.research.gridiron_gamelog import assert_compatible_gridiron_logs
 
 
 def _values_for(request: dict[str, Any], claims: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -58,6 +59,7 @@ def _market_token(request: dict[str, Any]) -> str:
     for token in (
         "pra", "3pm", "threes", "points", "pts", "rebounds", "rebound", "reb",
         "assists", "assist", "ast", "steals", "stl", "blocks", "blk", "turnovers", "tov",
+        "pass_yds", "rush_yds", "rec_yds", "receptions", "pass_rush_yds", "rush_rec_yds",
     ):
         if need == token or need.startswith(token + "_") or need.endswith("_" + token) or f"_{token}_" in need:
             return token
@@ -119,6 +121,10 @@ def _team_missing(request: dict[str, Any], merged: dict[str, Any], values: list[
             missing.append("FOOTBALL_TEAM_INJURY_OR_DEPTH")
         if not (merged.get("plays") or merged.get("pace") or merged.get("pace_multiplier") or merged.get("matchup_efficiency_multiplier")):
             missing.append("FOOTBALL_TEAM_PLAYS_OR_PACE")
+        if merged.get("pass_defense") is None and merged.get("opp_pass_def") is None and merged.get("pass_defense_multiplier") is None:
+            missing.append("OPPONENT_PASS_DEFENSE")
+        if merged.get("rush_defense") is None and merged.get("opp_rush_def") is None and merged.get("rush_defense_multiplier") is None:
+            missing.append("OPPONENT_RUSH_DEFENSE")
     return missing
 
 
@@ -160,6 +166,19 @@ def evaluate_request(request: dict[str, Any], claims: list[dict[str, Any]]) -> d
                             missing.append(code)
             else:
                 compat = assert_compatible_basketball_logs(log_dicts, market="")
+                for code in compat.get("missing") or []:
+                    if code not in missing:
+                        missing.append(code)
+        elif family in {"gridiron", "football"} and log_dicts:
+            markets = _markets_for_request(request)
+            if markets:
+                for market in markets:
+                    compat = assert_compatible_gridiron_logs(log_dicts, market=market)
+                    for code in compat.get("missing") or []:
+                        if code not in missing:
+                            missing.append(code)
+            else:
+                compat = assert_compatible_gridiron_logs(log_dicts, market="")
                 for code in compat.get("missing") or []:
                     if code not in missing:
                         missing.append(code)

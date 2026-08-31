@@ -5,8 +5,8 @@ requires non-synthetic evidence, a verified market definition, and support for
 both opportunity and efficiency. Small samples shrink toward declared priors.
 
 Website/HTML parsing lives in dcm.research.adapters. This module consumes
-already-normalized logs (aliases via gamelog.normalize_basketball_logs) and
-never parses host pages inline.
+already-normalized logs (aliases via gamelog.normalize_basketball_logs /
+gridiron_gamelog.normalize_gridiron_logs) and never parses host pages inline.
 """
 from __future__ import annotations
 
@@ -17,8 +17,14 @@ from typing import Any
 from dcm.contracts.hashes import content_hash
 from dcm.model.basketball_efficiency import EfficiencyModel
 from dcm.model.basketball_opportunity import OpportunityModel
+from dcm.model.gridiron_models import (
+    GridironEfficiencyModel,
+    GridironOpportunityModel,
+    TeamEventModel,
+)
 from dcm.research.classify import market_definition_id
 from dcm.research.gamelog import normalize_basketball_logs
+from dcm.research.gridiron_gamelog import normalize_gridiron_logs
 from dcm.research.role_epoch import RoleEpochBuilder
 
 
@@ -235,40 +241,109 @@ def build_parameter_snapshot(row: dict[str, Any], claims: list[dict[str, Any]]) 
         logs = comparable
         eff_n = max(eff_n, fn, rn, an, int(eff_fit.get("support_n") or 0))
     elif family == "gridiron":
+        league = str(row.get("league") or "") or None
         role = str(player.get("role") or row.get("role") or "QB").upper()
         params["role"] = role
-        if role == "QB":
-            att, attn = _avg(logs, "pass_att")
-            rush, rushn = _avg(logs, "rush_att")
-            params.update({
-                "pass_att_mean": _f(opp.get("pass_att_mean"), _shrink(att, attn, 34.0)),
-                "pass_att_sd": max(1.0, _f(opp.get("pass_att_sd"), _sd(logs, "pass_att", 6.0))),
-                "rush_att_mean": _f(opp.get("rush_att_mean"), _shrink(rush, rushn, 5.0)),
-                "rush_att_sd": max(0.5, _f(opp.get("rush_att_sd"), _sd(logs, "rush_att", 2.0))),
-                "completion_rate": max(0.2, min(0.9, _f(eff.get("completion_rate"), 0.65))),
-                "pass_ypa": max(1.0, _f(eff.get("pass_ypa"), 7.1) * _f(team.get("matchup_efficiency_multiplier"), 1.0)),
-                "rush_ypa": max(0.0, _f(eff.get("rush_ypa"), 4.4)),
-                "sacks_mean": max(0.0, _f(opp.get("sacks_mean"), 2.2)),
-            })
-            opp_n = max(opp_n, attn, rushn)
-            eff_n = max(eff_n, attn)
+        norm = normalize_gridiron_logs(logs, league=league)
+        full_logs = norm["logs"]
+        logs_normalized = len(full_logs)
+        logs_rejected = len(norm["rejected"])
+        today_context = {
+            "role": player.get("role") or role,
+            "projected_role": player.get("projected_role") or player.get("role") or role,
+            "status": player.get("status"),
+            "league": league,
+            "sportFamily": "gridiron",
+            "qb_id": player.get("qb_id"),
+        }
+        role_epoch = RoleEpochBuilder().build(player, claims=all_claims, today_context=today_context)
+        comparable_raw = role_epoch.get("comparable_logs") or []
+        if comparable_raw:
+            comp_norm = normalize_gridiron_logs(comparable_raw, league=league)
+            comparable = comp_norm["logs"] or full_logs
         else:
-            rush, rn = _avg(logs, "rush_att")
-            routes, routen = _avg(logs, "routes")
-            targets, tn = _avg(logs, "targets")
-            rec, recn = _avg(logs, "receptions")
-            params.update({
-                "rush_att_mean": _f(opp.get("rush_att_mean"), _shrink(rush, rn, 12.0 if role == "RB" else 1.5)),
-                "rush_att_sd": max(0.5, _f(opp.get("rush_att_sd"), _sd(logs, "rush_att", 4.0))),
-                "routes_mean": _f(opp.get("routes_mean"), _shrink(routes, routen, 22.0 if role in {"WR", "TE"} else 8.0)),
-                "routes_sd": max(1.0, _f(opp.get("routes_sd"), _sd(logs, "routes", 5.0))),
-                "target_rate": max(0.0, min(1.0, _f(eff.get("target_rate"), targets / routes if targets is not None and routes else 0.28))),
-                "catch_rate": max(0.0, min(1.0, _f(eff.get("catch_rate"), rec / targets if rec is not None and targets else 0.68))),
-                "rush_ypa": max(0.0, _f(eff.get("rush_ypa"), 4.3)),
-                "rec_ypr": max(0.0, _f(eff.get("rec_ypr"), 11.5) * _f(team.get("matchup_efficiency_multiplier"), 1.0)),
-            })
-            opp_n = max(opp_n, rn, routen)
-            eff_n = max(eff_n, tn, recn)
+            comparable = full_logs
+        shrinkage_out = dict(role_epoch.get("shrinkage") or shrinkage_out)
+        role_support = int(role_epoch.get("support_n") or 0)
+        opponent = event.get("opponent") if isinstance(event.get("opponent"), dict) else {}
+        if not opponent and isinstance(team.get("opponent"), dict):
+            opponent = team["opponent"]
+        team_event = TeamEventModel().fit(
+            team, event, opponent, league=league, market=str(row.get("market") or ""),
+        )
+        pace = _f(team_event.get("pace"), 1.0)
+        matchup = _f(team.get("matchup_efficiency_multiplier"), 1.0) * _f(event.get("matchup_efficiency_multiplier"), 1.0)
+        opp_fit = GridironOpportunityModel().fit(
+            comparable,
+            season_logs=full_logs,
+            pace=pace,
+            shrinkage=shrinkage_out,
+            league=league,
+            role=role,
+            support_n=role_support,
+            team_plays=team_event.get("plays"),
+            pass_rate=team_event.get("pass_rate"),
+        )
+        eff_fit = GridironEfficiencyModel().fit(
+            comparable,
+            matchup=matchup,
+            shrinkage=shrinkage_out,
+            league=league,
+            role=role,
+            pass_defense=team_event.get("pass_defense"),
+            rush_defense=team_event.get("rush_defense"),
+        )
+        opportunity_support_from_logs = int(opp_fit.get("support_n") or 0)
+        if opportunity_support_from_logs >= 3:
+            evidence_used = True
+            minutes_source = "LOGS"
+            opp_n = max(opp_n, opportunity_support_from_logs)
+        elif opportunity_support_from_logs > 0:
+            evidence_used = False
+            minutes_source = "LOGS"
+            opp_n = opportunity_support_from_logs
+        else:
+            evidence_used = False
+            minutes_source = "PRIOR"
+            opp_n = 0
+        params.update({k: v for k, v in opp_fit.items() if k not in {"shrinkage", "inputHash", "logSupport", "definition_version"}})
+        params.update({k: v for k, v in eff_fit.items() if k not in {"shrinkage", "inputHash", "makesAttemptedSupport", "definition_version", "role"}})
+        params["role"] = role
+        params["team_plays"] = team_event.get("plays")
+        params["pass_rate"] = team_event.get("pass_rate")
+        params["rush_rate"] = team_event.get("rush_rate")
+        params["pace"] = team_event.get("pace")
+        params["pass_defense"] = team_event.get("pass_defense")
+        params["rush_defense"] = team_event.get("rush_defense")
+        params["priorWeight"] = shrinkage_out.get("priorWeight")
+        params["playerWeight"] = shrinkage_out.get("seasonWeight")
+        params["roleWeight"] = shrinkage_out.get("roleWeight")
+        params["opportunityInputHash"] = opp_fit.get("inputHash")
+        params["efficiencyInputHash"] = eff_fit.get("inputHash")
+        params["_log_support"] = {
+            "logsNormalized": logs_normalized,
+            "logsRejected": logs_rejected,
+            "evidenceUsed": evidence_used,
+            "opportunitySupportFromLogs": opportunity_support_from_logs,
+            "minutesSource": minutes_source,
+            "roleSupportN": role_support,
+            "selectedEpoch": (role_epoch.get("selected_epoch") or {}).get("label"),
+            "teamEventMissing": list(team_event.get("missing") or []),
+        }
+        role_epoch_summary = {
+            "builder": role_epoch.get("builder"),
+            "selected_epoch": role_epoch.get("selected_epoch"),
+            "support_n": role_support,
+            "shrinkage": shrinkage_out,
+            "invented": False,
+            "epochCount": len(role_epoch.get("epochs") or []),
+            "projectedRole": role_epoch.get("projectedRole"),
+            "mode": "gridiron",
+            "qbIdentity": role_epoch.get("qbIdentity"),
+        }
+        logs = comparable
+        eff_n = max(eff_n, int(eff_fit.get("support_n") or 0), opportunity_support_from_logs)
+        params["_team_event_blocker"] = team_event.get("playableBlocker")
     elif family == "baseball":
         pa, pan = _avg(logs, "PA")
         params.update({
@@ -292,9 +367,11 @@ def build_parameter_snapshot(row: dict[str, Any], claims: list[dict[str, Any]]) 
     inactive_statuses = {"OUT", "DNP", "INACTIVE", "SUSPENDED", "IR", "PUP"}
     uncertain_statuses = {"QUESTIONABLE", "GTD", "GAME_TIME_DECISION", "DOUBTFUL", "LIMITED"}
     status_eligible = status in active_statuses
+    gridiron_defense_ok = family != "gridiron" or not params.get("_team_event_blocker")
     production_eligible = (
         not synthetic and status_eligible
         and opp_n >= 3 and eff_n >= 3 and definition_verified
+        and gridiron_defense_ok
     )
     data_quality = max(0.0, min(1.0, rel * 0.65 + fresh * 0.20 + min(1.0, min(opp_n, eff_n) / 10.0) * 0.15))
     ood = max(0.0, min(1.0, _f(player.get("ood_risk"), 0.15 if min(opp_n, eff_n) >= 5 else 0.45)))
@@ -306,6 +383,8 @@ def build_parameter_snapshot(row: dict[str, Any], claims: list[dict[str, Any]]) 
     elif status not in active_statuses: blocker = "PLAYER_STATUS_UNKNOWN"
     elif opp_n < 3: blocker = "INSUFFICIENT_OPPORTUNITY_SAMPLE"
     elif eff_n < 3: blocker = "INSUFFICIENT_EFFICIENCY_SAMPLE"
+    elif family == "gridiron" and params.get("_team_event_blocker"):
+        blocker = str(params.get("_team_event_blocker"))
 
     role = str(player.get("role") or row.get("role") or "UNKNOWN")
     tags = {f"EVENT:{row.get('eventId')}", f"TEAM:{row.get('teamId')}", f"ROLE:{row.get('teamId')}:{role}"}
