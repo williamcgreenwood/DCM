@@ -1,7 +1,9 @@
-"""First-class EvidenceGraph: typed nodes + edges over the jsonl transport.
+"""Canonical universal EvidenceGraph.
 
-Transport remains evidence_bundle.jsonl. This graph is the logical structure
-so a selection can be traced Selection → Offer → Player/Claim → SourceDocument.
+Evidence transport may still contain legacy PLAYER/TEAM semantic scopes while
+sport adapters migrate.  This graph translates those scopes at the boundary;
+the canonical graph itself contains Subject/Affiliation/Counterparty, never
+Player/Team nodes.
 """
 from __future__ import annotations
 
@@ -15,14 +17,18 @@ from dcm.research.classify import market_definition_id
 NODE_TYPES = (
     "SourceDocument",
     "EvidenceClaim",
-    "Player",
-    "Team",
+    "Sport",
+    "Competition",
     "Event",
+    "Affiliation",
+    "Subject",
+    "Counterparty",
+    "Environment",
     "MarketDefinition",
     "Offer",
     "NormalizedStat",
 )
-EDGE_TYPES = ("supports", "derived_from", "applies_to", "conflicts_with")
+EDGE_TYPES = ("supports", "derived_from", "applies_to", "conflicts_with", "member_of", "interacts_with")
 
 
 def _nid(kind: str, *parts: Any) -> str:
@@ -31,8 +37,7 @@ def _nid(kind: str, *parts: Any) -> str:
 
 
 def _node(node_id: str, node_type: str, **attrs: Any) -> dict[str, Any]:
-    body = {"id": node_id, "type": node_type, **attrs}
-    return body
+    return {"id": node_id, "type": node_type, **attrs}
 
 
 def _edge(edge_type: str, src: str, dst: str, **attrs: Any) -> dict[str, Any]:
@@ -41,13 +46,56 @@ def _edge(edge_type: str, src: str, dst: str, **attrs: Any) -> dict[str, Any]:
     return {"type": edge_type, "from": src, "to": dst, **attrs}
 
 
+def _canonical_set(offer_set: dict[str, Any]) -> dict[str, Any]:
+    """Accept canonical SubjectOfferSet or legacy PlayerOfferSet."""
+    if offer_set.get("subjectId"):
+        return {
+            "subjectId": offer_set.get("subjectId"),
+            "subjectType": offer_set.get("subjectType") or "OTHER",
+            "subjectName": offer_set.get("subjectName"),
+            "sportId": offer_set.get("sportId"),
+            "competitionId": offer_set.get("competitionId"),
+            "affiliationId": offer_set.get("affiliationId"),
+            "counterpartyIds": list(offer_set.get("counterpartyIds") or []),
+            "environmentId": offer_set.get("environmentId"),
+            "eventId": offer_set.get("eventId"),
+            "eventLabel": offer_set.get("eventLabel"),
+            "eventStart": offer_set.get("eventStart"),
+            "offers": list(offer_set.get("offers") or []),
+        }
+    opponent = offer_set.get("opponent")
+    return {
+        "subjectId": offer_set.get("playerId"),
+        "subjectType": "PLAYER",
+        "subjectName": offer_set.get("playerName"),
+        "sportId": offer_set.get("sportFamily"),
+        "competitionId": offer_set.get("league"),
+        "affiliationId": offer_set.get("team"),
+        "counterpartyIds": [opponent] if opponent else [],
+        "environmentId": offer_set.get("environmentId"),
+        "eventId": offer_set.get("eventId"),
+        "eventLabel": offer_set.get("eventLabel"),
+        "eventStart": offer_set.get("eventStartTime"),
+        "offers": list(offer_set.get("offers") or []),
+    }
+
+
+def _offer_market(offer: dict[str, Any]) -> Any:
+    return offer.get("marketCanonicalName") or offer.get("market")
+
+
+def _offer_period(offer: dict[str, Any]) -> Any:
+    return offer.get("period") or offer.get("boardId") or "FULL_GAME"
+
+
 def build_evidence_graph(
     claims: list[dict[str, Any]],
-    player_offer_sets: list[dict[str, Any]] | None = None,
+    offer_sets: list[dict[str, Any]] | None = None,
     packets: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     nodes: dict[str, dict[str, Any]] = {}
     edges: list[dict[str, Any]] = []
+    canonical_sets = [_canonical_set(s) for s in (offer_sets or []) if isinstance(s, dict)]
 
     def add_node(node: dict[str, Any]) -> str:
         nid = str(node["id"])
@@ -57,167 +105,215 @@ def build_evidence_graph(
             for k, v in node.items():
                 if k == "id":
                     continue
-                if v is not None and (nodes[nid].get(k) in (None, "", [], {})):
+                if v is not None and nodes[nid].get(k) in (None, "", [], {}):
                     nodes[nid][k] = v
         return nid
 
+    # Create canonical entity context before attaching claims.
+    for offer_set in canonical_sets:
+        subject_id = str(offer_set.get("subjectId") or "")
+        event_id = str(offer_set.get("eventId") or "")
+        sport_id = str(offer_set.get("sportId") or "")
+        competition_id = str(offer_set.get("competitionId") or "")
+        if not subject_id:
+            continue
+
+        subject_nid = add_node(_node(
+            _nid("Subject", subject_id),
+            "Subject",
+            subjectId=subject_id,
+            subjectType=offer_set.get("subjectType"),
+            subjectName=offer_set.get("subjectName"),
+        ))
+        sport_nid = None
+        competition_nid = None
+        if sport_id:
+            sport_nid = add_node(_node(_nid("Sport", sport_id), "Sport", sportId=sport_id))
+        if competition_id:
+            competition_nid = add_node(_node(
+                _nid("Competition", sport_id, competition_id),
+                "Competition",
+                competitionId=competition_id,
+                sportId=sport_id,
+            ))
+            if sport_nid:
+                edges.append(_edge("member_of", competition_nid, sport_nid))
+        event_nid = None
+        if event_id:
+            event_nid = add_node(_node(
+                _nid("Event", event_id),
+                "Event",
+                eventId=event_id,
+                eventLabel=offer_set.get("eventLabel"),
+                eventStart=offer_set.get("eventStart"),
+            ))
+            edges.append(_edge("applies_to", subject_nid, event_nid))
+            if competition_nid:
+                edges.append(_edge("member_of", event_nid, competition_nid))
+
+        affiliation = str(offer_set.get("affiliationId") or "")
+        if affiliation:
+            aff_nid = add_node(_node(
+                _nid("Affiliation", affiliation),
+                "Affiliation",
+                affiliationId=affiliation,
+                competitionId=competition_id,
+            ))
+            edges.append(_edge("applies_to", subject_nid, aff_nid))
+            if event_nid:
+                edges.append(_edge("applies_to", aff_nid, event_nid))
+
+        for cp in offer_set.get("counterpartyIds") or []:
+            cp_id = str(cp or "")
+            if not cp_id:
+                continue
+            cp_nid = add_node(_node(_nid("Counterparty", cp_id), "Counterparty", counterpartyId=cp_id))
+            edges.append(_edge("interacts_with", subject_nid, cp_nid))
+            if event_nid:
+                edges.append(_edge("applies_to", cp_nid, event_nid))
+
+        environment = str(offer_set.get("environmentId") or "")
+        if environment:
+            env_nid = add_node(_node(_nid("Environment", environment), "Environment", environmentId=environment))
+            if event_nid:
+                edges.append(_edge("applies_to", event_nid, env_nid))
+
+        for offer in offer_set.get("offers") or []:
+            pid = str(offer.get("projectionId") or "")
+            if not pid:
+                continue
+            market = _offer_market(offer)
+            offer_nid = add_node(_node(
+                _nid("Offer", pid),
+                "Offer",
+                projectionId=pid,
+                market=market,
+                line=offer.get("line"),
+                modifier=offer.get("modifier"),
+                subjectId=subject_id,
+                eventId=event_id,
+            ))
+            def_id = market_definition_id({
+                "sportFamily": sport_id,
+                "league": competition_id,
+                "market": market,
+                "boardId": _offer_period(offer),
+            })
+            def_nid = add_node(_node(
+                _nid("MarketDefinition", def_id),
+                "MarketDefinition",
+                definitionId=def_id,
+                market=market,
+                competitionId=competition_id,
+                period=_offer_period(offer),
+            ))
+            edges.append(_edge("applies_to", subject_nid, offer_nid))
+            edges.append(_edge("applies_to", offer_nid, def_nid))
+            if event_nid:
+                edges.append(_edge("applies_to", offer_nid, event_nid))
+
+    # Evidence claims and source documents.
     for claim in claims or []:
         if not isinstance(claim, dict):
             continue
         url = str(claim.get("url") or "")
         source_id = str(claim.get("source_id") or "")
         src_nid = _nid("SourceDocument", claim.get("source_hash") or source_id or url)
-        add_node(
-            _node(
-                src_nid,
-                "SourceDocument",
-                sourceId=source_id,
-                url=url,
-                hostname=urlsplit(url).hostname or "",
-                publishedAt=claim.get("published_at"),
-                observedAt=claim.get("observed_at"),
-                sourceHash=claim.get("source_hash"),
-            )
-        )
+        add_node(_node(
+            src_nid,
+            "SourceDocument",
+            sourceId=source_id,
+            url=url,
+            hostname=urlsplit(url).hostname or "",
+            publishedAt=claim.get("published_at"),
+            observedAt=claim.get("observed_at"),
+            sourceHash=claim.get("source_hash"),
+        ))
         claim_nid = _nid("EvidenceClaim", claim.get("claim_hash") or claim.get("claim_type"))
-        add_node(
-            _node(
-                claim_nid,
-                "EvidenceClaim",
-                claimHash=claim.get("claim_hash"),
-                claimType=claim.get("claim_type"),
-                semanticScope=claim.get("semantic_scope"),
-                scopeId=claim.get("scope_id"),
-                url=url,
-            )
-        )
+        add_node(_node(
+            claim_nid,
+            "EvidenceClaim",
+            claimHash=claim.get("claim_hash"),
+            claimType=claim.get("claim_type"),
+            semanticScope=claim.get("semantic_scope"),
+            scopeId=claim.get("scope_id"),
+            url=url,
+        ))
         edges.append(_edge("derived_from", claim_nid, src_nid))
         edges.append(_edge("supports", src_nid, claim_nid, via="source_document"))
 
-        scope = str(claim.get("semantic_scope") or "")
+        scope = str(claim.get("semantic_scope") or "").upper()
         scope_id = str(claim.get("scope_id") or "")
-        target_type = {
-            "PLAYER": "Player",
-            "TEAM": "Team",
-            "EVENT": "Event",
-            "MARKET_DEFINITION": "MarketDefinition",
-            "OFFER": "Offer",
-        }.get(scope)
-        if target_type and scope_id:
-            target_nid = _nid(target_type, scope_id)
-            add_node(_node(target_nid, target_type, scopeId=scope_id))
-            edges.append(_edge("supports", claim_nid, target_nid))
+        targets: list[str] = []
+        if scope in {"SUBJECT", "PLAYER"} and scope_id:
+            targets.append(add_node(_node(_nid("Subject", scope_id), "Subject", subjectId=scope_id)))
+        elif scope in {"AFFILIATION", "TEAM"} and scope_id:
+            # TEAM is a compatibility scope. Attach the same evidence to each
+            # universal role in which this entity appears.
+            if any(str(s.get("affiliationId") or "") == scope_id for s in canonical_sets):
+                targets.append(add_node(_node(_nid("Affiliation", scope_id), "Affiliation", affiliationId=scope_id)))
+            if any(scope_id in [str(x) for x in (s.get("counterpartyIds") or [])] for s in canonical_sets):
+                targets.append(add_node(_node(_nid("Counterparty", scope_id), "Counterparty", counterpartyId=scope_id)))
+            if not targets:
+                targets.append(add_node(_node(_nid("Affiliation", scope_id), "Affiliation", affiliationId=scope_id)))
+        elif scope == "COUNTERPARTY" and scope_id:
+            targets.append(add_node(_node(_nid("Counterparty", scope_id), "Counterparty", counterpartyId=scope_id)))
+        elif scope == "ENVIRONMENT" and scope_id:
+            targets.append(add_node(_node(_nid("Environment", scope_id), "Environment", environmentId=scope_id)))
+        elif scope == "EVENT" and scope_id:
+            targets.append(add_node(_node(_nid("Event", scope_id), "Event", eventId=scope_id)))
+        elif scope == "MARKET_DEFINITION" and scope_id:
+            targets.append(add_node(_node(_nid("MarketDefinition", scope_id), "MarketDefinition", definitionId=scope_id)))
+        elif scope == "OFFER" and scope_id:
+            targets.append(add_node(_node(_nid("Offer", scope_id), "Offer", projectionId=scope_id)))
+        elif scope in {"SPORT", "COMPETITION"} and scope_id:
+            kind = "Sport" if scope == "SPORT" else "Competition"
+            targets.append(add_node(_node(_nid(kind, scope_id), kind, scopeId=scope_id)))
+        for target in targets:
+            edges.append(_edge("supports", claim_nid, target))
+
         for other in claim.get("conflicts") or []:
             other_nid = _nid("EvidenceClaim", other)
             add_node(_node(other_nid, "EvidenceClaim", claimHash=str(other)))
             edges.append(_edge("conflicts_with", claim_nid, other_nid))
 
-    for offer_set in player_offer_sets or []:
-        player_nid = _nid("Player", offer_set.get("playerId"))
-        add_node(
-            _node(
-                player_nid,
-                "Player",
-                playerId=offer_set.get("playerId"),
-                playerName=offer_set.get("playerName"),
-                league=offer_set.get("league"),
-                team=offer_set.get("team"),
-                eventId=offer_set.get("eventId"),
-            )
-        )
-        event_nid = _nid("Event", offer_set.get("eventId"))
-        add_node(
-            _node(
-                event_nid,
-                "Event",
-                eventId=offer_set.get("eventId"),
-                eventLabel=offer_set.get("eventLabel"),
-                eventStartTime=offer_set.get("eventStartTime"),
-            )
-        )
-        team_nid = _nid("Team", offer_set.get("team") or offer_set.get("playerId"))
-        add_node(_node(team_nid, "Team", team=offer_set.get("team"), league=offer_set.get("league")))
-        edges.append(_edge("applies_to", player_nid, event_nid))
-        for offer in offer_set.get("offers") or []:
-            pid = str(offer.get("projectionId") or "")
-            if not pid:
-                continue
-            offer_nid = _nid("Offer", pid)
-            def_id = market_definition_id(
-                {
-                    "league": offer_set.get("league"),
-                    "market": offer.get("market"),
-                    "boardId": offer.get("boardId"),
-                }
-            )
-            def_nid = _nid("MarketDefinition", def_id)
-            add_node(
-                _node(
-                    offer_nid,
-                    "Offer",
-                    projectionId=pid,
-                    market=offer.get("market"),
-                    line=offer.get("line"),
-                    modifier=offer.get("modifier"),
-                    playerId=offer_set.get("playerId"),
-                    eventId=offer_set.get("eventId"),
-                )
-            )
-            add_node(
-                _node(
-                    def_nid,
-                    "MarketDefinition",
-                    definitionId=def_id,
-                    market=offer.get("market"),
-                    league=offer_set.get("league"),
-                    boardId=offer.get("boardId"),
-                )
-            )
-            edges.append(_edge("applies_to", player_nid, offer_nid))
-            edges.append(_edge("applies_to", offer_nid, def_nid))
-            edges.append(_edge("applies_to", offer_nid, event_nid))
-
+    # Existing sport-specific packets may still be player-shaped. Translate to
+    # Subject and keep normalized stat lineage canonical.
     for packet in packets or []:
-        ident = packet.get("identity") or {}
-        player_nid = _nid("Player", ident.get("playerId"))
-        add_node(
-            _node(
-                player_nid,
-                "Player",
-                playerId=ident.get("playerId"),
-                packetId=packet.get("packetId"),
-                status=packet.get("status"),
-            )
-        )
+        ident = packet.get("identity") if isinstance(packet.get("identity"), dict) else {}
+        subject_id = str(ident.get("subjectId") or ident.get("playerId") or "")
+        if not subject_id:
+            continue
+        subject_nid = add_node(_node(
+            _nid("Subject", subject_id),
+            "Subject",
+            subjectId=subject_id,
+            subjectType=ident.get("subjectType") or "PLAYER",
+            packetId=packet.get("packetId"),
+            status=packet.get("status"),
+        ))
         for i, log in enumerate(packet.get("gameLogs") or []):
             if not isinstance(log, dict):
                 continue
-            stat_nid = _nid("NormalizedStat", ident.get("playerId"), "game", i, log.get("minutes"))
-            add_node(
-                _node(
-                    stat_nid,
-                    "NormalizedStat",
-                    playerId=ident.get("playerId"),
-                    minutes=log.get("minutes"),
-                    pts=log.get("pts"),
-                    reb=log.get("reb"),
-                    ast=log.get("ast"),
-                    fga=log.get("fga"),
-                    index=i,
-                )
-            )
-            edges.append(_edge("derived_from", stat_nid, player_nid))
-            edges.append(_edge("supports", stat_nid, player_nid, via="normalized_log"))
+            stat_nid = _nid("NormalizedStat", subject_id, "performance", i)
+            add_node(_node(
+                stat_nid,
+                "NormalizedStat",
+                subjectId=subject_id,
+                values={k: v for k, v in log.items() if k != "raw"},
+                index=i,
+            ))
+            edges.append(_edge("derived_from", stat_nid, subject_nid))
+            edges.append(_edge("supports", stat_nid, subject_nid, via="normalized_history"))
         for h in packet.get("sourceHashes") or []:
             src_nid = _nid("SourceDocument", h)
             add_node(_node(src_nid, "SourceDocument", contentHash=h))
-            edges.append(_edge("derived_from", player_nid, src_nid, via="packet"))
+            edges.append(_edge("derived_from", subject_nid, src_nid, via="packet"))
         for pid in packet.get("appliesToProjectionIds") or []:
             offer_nid = _nid("Offer", pid)
             add_node(_node(offer_nid, "Offer", projectionId=pid))
-            edges.append(_edge("applies_to", player_nid, offer_nid, via="packet"))
+            edges.append(_edge("applies_to", subject_nid, offer_nid, via="packet"))
 
-    # Deduplicate edges.
     seen: set[tuple[str, str, str]] = set()
     unique_edges: list[dict[str, Any]] = []
     for edge in edges:
@@ -229,7 +325,9 @@ def build_evidence_graph(
     unique_edges.sort(key=lambda e: (e["type"], e["from"], e["to"]))
     node_list = [nodes[k] for k in sorted(nodes)]
     body = {
-        "schema": "pillars_dcm.evidence_graph.v1",
+        "schema": "pillars_dcm.evidence_graph.v2",
+        "canonical": True,
+        "legacyScopeCompatibility": ["PLAYER->SUBJECT", "TEAM->AFFILIATION/COUNTERPARTY"],
         "nodeTypes": list(NODE_TYPES),
         "edgeTypes": list(EDGE_TYPES),
         "nodeCount": len(node_list),
@@ -242,7 +340,7 @@ def build_evidence_graph(
 
 
 def trace_selection(graph: dict[str, Any], selection: dict[str, Any]) -> dict[str, Any]:
-    """Resolve Selection → Offer → Player/Claim → SourceDocument for card picks."""
+    """Resolve Selection/Offer → Subject → EvidenceClaim → SourceDocument."""
     projection_id = str(
         selection.get("projectionId")
         or selection.get("offerId")
@@ -261,26 +359,26 @@ def trace_selection(graph: dict[str, Any], selection: dict[str, Any]) -> dict[st
         for edge in edges:
             if edge_type and edge.get("type") != edge_type:
                 continue
-            if reverse:
-                if edge.get("to") == nid:
-                    out.append(str(edge.get("from")))
-            else:
-                if edge.get("from") == nid:
-                    out.append(str(edge.get("to")))
+            if reverse and edge.get("to") == nid:
+                out.append(str(edge.get("from")))
+            elif not reverse and edge.get("from") == nid:
+                out.append(str(edge.get("to")))
         return out
 
     offer = nodes.get(offer_nid)
     if offer:
         path.append(offer)
-        # Player --applies_to--> Offer
-        players = neighbors(offer_nid, "applies_to", reverse=True)
-        player_nodes = [nodes[i] for i in players if i in nodes and nodes[i].get("type") == "Player"]
-        if player_nodes:
-            path.append(player_nodes[0])
-            player_id = player_nodes[0]["id"]
+        subjects = [
+            nodes[i]
+            for i in neighbors(offer_nid, "applies_to", reverse=True)
+            if i in nodes and nodes[i].get("type") == "Subject"
+        ]
+        if subjects:
+            subject = subjects[0]
+            path.append(subject)
             claims = [
                 nodes[i]
-                for i in neighbors(player_id, "supports", reverse=True)
+                for i in neighbors(subject["id"], "supports", reverse=True)
                 if i in nodes and nodes[i].get("type") == "EvidenceClaim"
             ]
             if claims:
@@ -301,16 +399,15 @@ def trace_selection(graph: dict[str, Any], selection: dict[str, Any]) -> dict[st
                     source_url = sources[0].get("url")
                     resolved = True
             if not resolved:
-                # packet-derived source hashes on the player
-                srcs = [
+                sources = [
                     nodes[i]
-                    for i in neighbors(player_id, "derived_from")
+                    for i in neighbors(subject["id"], "derived_from")
                     if i in nodes and nodes[i].get("type") == "SourceDocument"
                 ]
-                if srcs:
-                    path.append(srcs[0])
-                    source_url = srcs[0].get("url")
-                    resolved = bool(source_url) or True
+                if sources:
+                    path.append(sources[0])
+                    source_url = sources[0].get("url")
+                    resolved = True
 
     return {
         "projectionId": projection_id,
