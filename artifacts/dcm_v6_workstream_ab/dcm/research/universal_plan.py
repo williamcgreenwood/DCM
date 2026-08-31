@@ -7,6 +7,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from dcm.sports.common.research_schema import lookup_research_schema
+
 
 ENTITY_ORDER = (
     "SPORT",
@@ -107,22 +109,40 @@ def build_universal_host_research_plan(
         if entity_type not in RESEARCH_SCHEMA:
             continue
         spec = RESEARCH_SCHEMA[entity_type]
-        tasks.append(
-            {
-                "entityType": entity_type,
-                "entityId": row.get("entityId"),
-                "dependentOfferCount": int(row.get("dependentOfferCount") or 0),
-                "priorityScore": row.get("fanOutPriority"),
-                "requiredEvidence": list(spec["required"]),
-                "researchQuestions": list(spec["questions"]),
-                "sportId": row.get("sportId"),
-                "competitionId": row.get("competitionId"),
-                "eventId": row.get("eventId"),
-                "subjectId": row.get("subjectId"),
-                "subjectType": row.get("subjectType"),
-                "affiliationId": row.get("affiliationId"),
-            }
-        )
+        sport_id = str(row.get("sportId") or "").strip().lower()
+        sport_schema = lookup_research_schema(sport_id) if sport_id else None
+        task = {
+            "entityType": entity_type,
+            "entityId": row.get("entityId"),
+            "dependentOfferCount": int(row.get("dependentOfferCount") or 0),
+            "priorityScore": row.get("fanOutPriority"),
+            "requiredEvidence": list(spec["required"]),
+            "researchQuestions": list(spec["questions"]),
+            "sportId": row.get("sportId"),
+            "competitionId": row.get("competitionId"),
+            "eventId": row.get("eventId"),
+            "subjectId": row.get("subjectId"),
+            "subjectType": row.get("subjectType"),
+            "affiliationId": row.get("affiliationId"),
+            "sportResearchSchemaState": (
+                sport_schema.capability_state if sport_schema is not None else "UNSUPPORTED_FAIL_CLOSED"
+            ),
+            "sportResearchSchemaVersion": (
+                sport_schema.schema_version if sport_schema is not None else None
+            ),
+        }
+        if sport_schema is not None:
+            if entity_type == "SUBJECT":
+                task["sportSpecificRequirements"] = sport_schema.subject_requirements()
+            elif entity_type in {"AFFILIATION", "COUNTERPARTY", "EVENT"}:
+                contexts = sport_schema.context_requirements()
+                key = {
+                    "AFFILIATION": "affiliation",
+                    "COUNTERPARTY": "counterparty",
+                    "EVENT": "event",
+                }[entity_type]
+                task["sportSpecificRequirements"] = contexts[key]
+        tasks.append(task)
     tasks.sort(
         key=lambda t: (
             ENTITY_RANK.get(str(t.get("entityType") or ""), 99),
