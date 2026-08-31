@@ -20,7 +20,7 @@ from pathlib import Path
 from typing import Any
 
 from dcm.contracts.hashes import content_hash
-from dcm.identity.resolve import freeze_map, resolve_row
+from dcm.identity.resolve import build_player_index, freeze_map, resolve_row
 from dcm.ingest.board import freeze_board, write_board
 from dcm.ingest.composite import compose_ingests
 from dcm.ingest.har import ingest_har
@@ -45,6 +45,7 @@ from dcm.model.event_world_joint import (
 from dcm.model.market_derive import UnknownMarketError
 from dcm.model.quarter_worlds import QuarterPluginIncomplete
 from dcm.model.worlds import generate_event_contexts, simulate_player_worlds, value_from_stats
+from dcm.research.cache import ResearchCache
 from dcm.research.classify import accounting_classify as _classify
 from dcm.research.emit import emit_offer_sets_and_manifest, emit_packets_and_graph
 from dcm.research.host_plan import build_host_research_plan
@@ -371,6 +372,8 @@ def run_dcm(
     id_map = freeze_map(rows)
     (dest / "identities").mkdir(exist_ok=True)
     (dest / "identities" / "map.json").write_text(json.dumps(id_map, indent=2) + "\n", encoding="utf-8")
+    player_index = build_player_index(rows)
+    (dest / "identities" / "player_index.json").write_text(json.dumps(player_index, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     n_id = dag.add("IDENTITY", "board", parents=[n_board.key])
     dag.complete(n_id.key, id_map["contentHash"])
 
@@ -427,7 +430,9 @@ def run_dcm(
         pop = emit_offer_sets_and_manifest(
             dest, rows, planned=planned, cutoff=forecast_cutoff, research_shadow=research_shadow
         )
-        emit_packets_and_graph(dest, offer_sets=pop["offerSets"], claims=[], cutoff=forecast_cutoff)
+        emit_packets_and_graph(
+            dest, offer_sets=pop["offerSets"], claims=[], cutoff=forecast_cutoff, population=pop.get("manifest")
+        )
         ck = write_checkpoint(dest / "checkpoint.json", {
             "runId": run_id, "dcmVersion": SOFTWARE, "learningRevision": LEARNING_REVISION,
             "forecastCutoff": forecast_cutoff, "artifactRoot": str(dest),
@@ -458,7 +463,8 @@ def run_dcm(
         provider = BundleProvider(bundle_path or dest / "evidence_bundle.jsonl")
     else:
         provider = FixtureProvider(forecast_cutoff)
-    bundle = collect(requests, provider)
+    research_cache = ResearchCache()
+    bundle = collect(requests, provider, cache=research_cache)
     (dest / "evidence").mkdir(exist_ok=True)
     (dest / "evidence" / "claims.json").write_text(json.dumps(bundle["claims"], indent=2) + "\n", encoding="utf-8")
     written = write_bundle(dest / "evidence_bundle.jsonl", bundle["claims"])
@@ -493,9 +499,15 @@ def run_dcm(
     pop = emit_offer_sets_and_manifest(
         dest, rows, planned=planned, cutoff=forecast_cutoff, research_shadow=research_shadow
     )
-    emit_packets_and_graph(
-        dest, offer_sets=pop["offerSets"], claims=bundle.get("claims") or [], cutoff=forecast_cutoff
+    emitted = emit_packets_and_graph(
+        dest, offer_sets=pop["offerSets"], claims=bundle.get("claims") or [], cutoff=forecast_cutoff,
+        population=pop.get("manifest"),
     )
+    team_packet_map = {str(p.get("teamId")): p for p in (emitted.get("teamPackets") or []) if p.get("teamId")}
+    event_packet_map = {str(p.get("eventId")): p for p in (emitted.get("eventPackets") or []) if p.get("eventId")}
+    opponent_packet_map = {
+        f"{p.get('eventId')}|{p.get('teamId')}": p for p in (emitted.get("opponentPackets") or [])
+    }
     n_res = dag.add("EVIDENCE", "board", parents=[n_id.key])
     if not bundle["complete"]:
         dag.block(n_res.key, "RESEARCH_INCOMPLETE")
@@ -532,7 +544,7 @@ def run_dcm(
             repo_root=repo_root,
         )
     dag.complete(n_res.key, content_hash([c["claim_hash"] for c in bundle["claims"]]))
-    research_perf = t.finish(NodeCount=len(requests), CacheHits=bundle["reused"])
+    research_perf = t.finish(NodeCount=len(requests), CacheHits=bundle["reused"], ResearchCacheHits=bundle.get("cacheHits") or 0)
     (dest / "performance" / "research.json").write_text(json.dumps(research_perf, indent=2) + "\n", encoding="utf-8")
     stages_done.add("RESEARCH")
 
@@ -560,6 +572,15 @@ def run_dcm(
     joint_world_cache: dict[tuple[str, str, int], dict[str, list[dict[str, float]]]] = {}
     joint_meta_acc: list[dict[str, Any]] = []
 
+    def _snapshot_for(prow: dict[str, Any]) -> dict[str, Any]:
+        return build_parameter_snapshot(
+            prow,
+            bundle["claims"],
+            team_packets=team_packet_map,
+            event_packets=event_packet_map,
+            opponent_packets=opponent_packet_map,
+        )
+
     for row in rows:
         state, blocker = _classify(row)
         rec: dict[str, Any] = {"row": row, "state": state, "blocker": blocker}
@@ -570,7 +591,7 @@ def run_dcm(
         if state == "UNRESOLVED":
             unresolved += 1; classified.append(rec); continue
 
-        snapshot = build_parameter_snapshot(row, bundle["claims"])
+        snapshot = _snapshot_for(row)
         parameter_cache[str(row["projectionId"])] = snapshot
         rec["forecastCutoff"] = forecast_cutoff
         rec["playerStatus"] = snapshot.get("status")
@@ -605,7 +626,7 @@ def run_dcm(
                     if jkey not in joint_world_cache:
                         specs = []
                         for _pid, prow in group.items():
-                            psnap = build_parameter_snapshot(prow, bundle["claims"])
+                            psnap = _snapshot_for(prow)
                             specs.append({"row": prow, "snapshot": psnap})
                         joint = simulate_joint_team_worlds(
                             specs,
@@ -677,7 +698,7 @@ def run_dcm(
                 if jkey not in joint_world_cache:
                     specs = []
                     for _pid, prow in group.items():
-                        psnap = build_parameter_snapshot(prow, bundle["claims"])
+                        psnap = _snapshot_for(prow)
                         specs.append({"row": prow, "snapshot": psnap})
                     joint = simulate_joint_team_worlds(
                         specs,

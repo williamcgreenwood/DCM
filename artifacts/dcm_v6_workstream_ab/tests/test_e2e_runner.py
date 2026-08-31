@@ -97,6 +97,11 @@ def test_a_synthetic_smoke(tmp_path: Path):
         "player_offer_sets.json",
         "research_population_manifest.json",
         "player_research_packets.json",
+        "team_research_packets.json",
+        "event_research_packets.json",
+        "opponent_research_packets.json",
+        "entity_graph.json",
+        "staged_research.json",
         "evidence_graph.json",
         "feature_store.jsonl",
         "feature_store_manifest.json",
@@ -112,6 +117,7 @@ def test_a_synthetic_smoke(tmp_path: Path):
         "run_integrity.json",
         "checkpoint.json",
         "full_population.jsonl",
+        "identities/player_index.json",
     ):
         assert (dest / name).is_file(), name
     integ = result["integrity"]

@@ -22,6 +22,7 @@ from dcm.model.gridiron_models import (
     GridironOpportunityModel,
     TeamEventModel,
 )
+from dcm.model.availability import availability_mixture
 from dcm.research.classify import market_definition_id
 from dcm.research.gamelog import normalize_basketball_logs
 from dcm.research.gridiron_gamelog import normalize_gridiron_logs
@@ -79,7 +80,14 @@ def _shrink(sample: float | None, n: int, prior: float, prior_n: float = 5.0) ->
     return (sample * n + prior * prior_n) / (n + prior_n)
 
 
-def build_parameter_snapshot(row: dict[str, Any], claims: list[dict[str, Any]]) -> dict[str, Any]:
+def build_parameter_snapshot(
+    row: dict[str, Any],
+    claims: list[dict[str, Any]],
+    *,
+    team_packets: dict[str, dict[str, Any]] | None = None,
+    event_packets: dict[str, dict[str, Any]] | None = None,
+    opponent_packets: dict[str, dict[str, Any]] | None = None,
+) -> dict[str, Any]:
     player_pairs = _pairs(claims, "PLAYER", str(row.get("playerId") or ""))
     team_pairs = _pairs(claims, "TEAM", str(row.get("teamId") or ""))
     event_pairs = _pairs(claims, "EVENT", str(row.get("eventId") or ""))
@@ -103,6 +111,38 @@ def build_parameter_snapshot(row: dict[str, Any], claims: list[dict[str, Any]]) 
         market = _merge(legacy_market_pairs)
         used_legacy_market = bool(legacy_market_pairs)
     player, team, event, sport = map(_merge, (player_pairs, team_pairs, event_pairs, sport_pairs))
+    team_evidence_used = False
+    opp_id = str(row.get("opponentId") or row.get("opponent") or "")
+    team_id = str(row.get("teamId") or row.get("team") or "")
+    event_id = str(row.get("eventId") or "")
+    if team_packets:
+        tp = team_packets.get(team_id) or team_packets.get(str(row.get("team") or ""))
+        if tp and tp.get("evidenceUsed"):
+            team = {**team, **dict(tp.get("parameterFields") or {})}
+            team_evidence_used = True
+            team["teamPacketHash"] = tp.get("contentHash")
+            team["priorUsedAsResearch"] = False
+        elif tp:
+            team["teamPacketHash"] = tp.get("contentHash")
+            team["priorUsedAsResearch"] = False
+            team["teamEvidenceUsed"] = False
+        if opp_id:
+            op_team = team_packets.get(opp_id)
+            if op_team and op_team.get("evidenceUsed"):
+                team["opponent"] = dict(op_team.get("parameterFields") or {})
+                event["opponent"] = dict(op_team.get("parameterFields") or {})
+    if opponent_packets:
+        for op in opponent_packets.values() if isinstance(opponent_packets, dict) else []:
+            if str(op.get("teamId") or "") == opp_id and str(op.get("eventId") or "") in {event_id, str(op.get("eventId") or "")}:
+                if op.get("evidenceUsed"):
+                    event["opponent"] = {**(event.get("opponent") if isinstance(event.get("opponent"), dict) else {}), **dict(op.get("parameterFields") or {})}
+                    break
+    if event_packets:
+        ep = event_packets.get(event_id)
+        if ep and ep.get("evidenceUsed"):
+            event = {**event, **dict(ep.get("parameterFields") or {})}
+            event["eventPacketHash"] = ep.get("contentHash")
+
     claim_pairs = list(player_pairs + team_pairs + event_pairs + sport_pairs + def_pairs + offer_pairs)
     if used_legacy_market or not (def_pairs or offer_pairs):
         claim_pairs.extend(legacy_market_pairs)
@@ -174,6 +214,18 @@ def build_parameter_snapshot(row: dict[str, Any], claims: list[dict[str, Any]]) 
             opp_n = 0
         pace = _f(team.get("pace_multiplier"), 1.0) * _f(event.get("pace_multiplier"), 1.0)
         matchup = _f(team.get("matchup_efficiency_multiplier"), 1.0) * _f(event.get("matchup_efficiency_multiplier"), 1.0)
+        if team.get("ortg") is not None:
+            params["ortg"] = _f(team.get("ortg"), 0.0)
+        if team.get("drtg") is not None:
+            params["drtg"] = _f(team.get("drtg"), 0.0)
+        opp_ctx = event.get("opponent") if isinstance(event.get("opponent"), dict) else {}
+        if opp_ctx.get("ortg") is not None:
+            params["opponent_ortg"] = _f(opp_ctx.get("ortg"), 0.0)
+        if opp_ctx.get("drtg") is not None:
+            params["opponent_drtg"] = _f(opp_ctx.get("drtg"), 0.0)
+        params["teamEvidenceUsed"] = bool(team_evidence_used)
+        params["paceFromTeamPacket"] = bool(team_evidence_used and team.get("pace_multiplier") is not None)
+
         role_multiplier = _f(opp.get("role_multiplier"), 1.0)
         opp_fit = OpportunityModel().fit(
             comparable,
@@ -411,6 +463,9 @@ def build_parameter_snapshot(row: dict[str, Any], claims: list[dict[str, Any]]) 
         "priorWeight": shrinkage_out.get("priorWeight"),
         "playerWeight": shrinkage_out.get("seasonWeight"),
         "roleWeight": shrinkage_out.get("roleWeight"),
+        "teamEvidenceUsed": bool(team_evidence_used),
+        "teamPriorUsedAsResearch": False,
+        "availabilityMixture": availability_mixture(status),
     }
     if role_epoch_summary is not None:
         snapshot["role_epoch"] = role_epoch_summary

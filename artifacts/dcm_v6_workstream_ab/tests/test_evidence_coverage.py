@@ -94,7 +94,7 @@ def test_points_market_incomplete_without_fga_or_pts():
     assert report["complete"] is False
     assert "MARKET_STAT_PTS" in report["requests"][0]["missing"]
 
-    good_logs = [{"minutes": 30, "pts": 18, "fga": 14, "reb": 4, "ast": 6} for _ in range(3)]
+    good_logs = [{"minutes": 30, "pts": 18, "fga": 14, "tpa": 5, "fta": 4, "reb": 4, "ast": 6} for _ in range(3)]
     good = coverage_report(requests, [_claim("PLAYER", "P1", {
         "status": "ACTIVE",
         "role": "starter",
@@ -157,4 +157,51 @@ def test_football_player_path_not_subject_to_basketball_market_codes():
     missing = report["requests"][0]["missing"]
     assert "MARKET_STAT_PTS" not in missing
     assert "GAMELOG_MINUTES" not in missing
+
+
+def test_points_requires_shot_attempts_not_just_pts_totals():
+    requests = [{
+        "request_id": "REQ_P",
+        "scope": "PLAYER",
+        "scope_id": "P1",
+        "need": "status_role_logs_opportunity_efficiency",
+        "sportFamily": "basketball",
+        "league": "WNBA",
+        "market": "pts",
+    }]
+    totals_only = [{"minutes": 30, "pts": 18, "fga": 14, "reb": 4, "ast": 6} for _ in range(3)]
+    report = coverage_report(requests, [_claim("PLAYER", "P1", {
+        "status": "ACTIVE",
+        "role": "starter",
+        "game_logs": totals_only,
+        "opportunity": {"support_n": 3},
+        "efficiency": {"support_n": 3},
+    })])
+    assert report["complete"] is False
+    assert "MARKET_STAT_PTS" in report["requests"][0]["missing"]
+
+
+def test_fixture_team_pace_one_is_not_coverage():
+    requests = [{
+        "request_id": "REQ_T",
+        "scope": "TEAM",
+        "scope_id": "DAL",
+        "need": "pace_matchup",
+        "sportFamily": "basketball",
+        "league": "WNBA",
+    }]
+    prior = coverage_report(requests, [_claim("TEAM", "DAL", {
+        "pace_multiplier": 1.0,
+        "matchup_efficiency_multiplier": 1.0,
+        "injury_cluster": False,
+    })])
+    assert prior["complete"] is False
+    assert "BASKETBALL_TEAM_PACE" in prior["requests"][0]["missing"]
+    real = coverage_report(requests, [_claim("TEAM", "DAL", {
+        "pace": 82.4,
+        "ortg": 105.4,
+        "drtg": 102.1,
+        "team_context": True,
+    })])
+    assert real["complete"] is True
 

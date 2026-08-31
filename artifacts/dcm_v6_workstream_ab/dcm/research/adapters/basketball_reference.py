@@ -18,6 +18,11 @@ from dcm.research.gamelog import normalize_basketball_log, normalize_basketball_
 ADAPTER_VERSION = "br-html-1"
 GAMELOG_ADAPTER_ID = "BasketballReferenceGameLogAdapter"
 PLAYER_ADAPTER_ID = "BasketballReferencePlayerAdapter"
+TEAM_ADAPTER_ID = "BasketballReferenceTeamAdapter"
+TEAM_GAMELOG_ADAPTER_ID = "BasketballReferenceTeamGameLogAdapter"
+SPLIT_ADAPTER_ID = "BasketballReferenceSplitAdapter"
+LINEUP_ADAPTER_ID = "BasketballReferenceLineupAdapter"
+ONOFF_ADAPTER_ID = "BasketballReferenceOnOffAdapter"
 SOURCE_CLASS = "BOX_SCORE_VENDOR"
 
 # B-R data-stat / header aliases already handled by gamelog normalizer
@@ -236,3 +241,304 @@ class BasketballReferencePlayerAdapter:
             extra={"kind": "SEASON_SUMMARY", "tableId": (table or {}).get("id")},
         )
         return [rec]
+
+
+def _fixture_or_live(self, spec: dict[str, Any], *, default_url: str, disabled_code: str, url_code: str) -> dict[str, Any]:
+    html = spec.get("html") or spec.get("text") or spec.get("body")
+    url = str(spec.get("url") or spec.get("source_url") or "")
+    if html is not None:
+        text = html.decode("utf-8", errors="replace") if isinstance(html, bytes) else str(html)
+        return {
+            "url": url or default_url,
+            "html": text,
+            "retrievedAt": spec.get("retrieved_at") or spec.get("retrievedAt") or self.retrieved_at,
+            "publishedAt": spec.get("published_at") or spec.get("publishedAt"),
+            "fixture": True,
+            "league": spec.get("league"),
+        }
+    if not live_fetch_enabled(self.live):
+        raise RuntimeError(disabled_code)
+    if not url:
+        raise ValueError(url_code)
+    return {
+        "url": url,
+        "html": _fetch_http(url),
+        "retrievedAt": self.retrieved_at,
+        "publishedAt": spec.get("published_at") or spec.get("publishedAt"),
+        "fixture": False,
+        "league": spec.get("league"),
+    }
+
+
+class BasketballReferenceTeamAdapter:
+    adapter_id = TEAM_ADAPTER_ID
+    adapter_version = ADAPTER_VERSION
+    source_class = SOURCE_CLASS
+
+    def __init__(self, *, live: bool | None = None, retrieved_at: str | None = None):
+        self.live = live
+        self.retrieved_at = retrieved_at
+
+    def fetch(self, spec: dict[str, Any]) -> dict[str, Any]:
+        return _fixture_or_live(
+            self, spec,
+            default_url="fixture://basketball-reference/team",
+            disabled_code="BR_TEAM_LIVE_FETCH_DISABLED",
+            url_code="BR_TEAM_URL_REQUIRED",
+        )
+
+    def normalize(self, document: dict[str, Any]) -> list[dict[str, Any]]:
+        url = str(document.get("url") or "")
+        html = _as_text(document)
+        retrieved = document.get("retrievedAt") or document.get("retrieved_at") or self.retrieved_at
+        published = document.get("publishedAt") or document.get("published_at") or retrieved
+        tables = extract_tables(html)
+        table = _pick_table(tables, "team_and_opponent", "team-stats-per_game", "team_misc", "misc_stats", "team_ratings")
+        rows = table_rows_as_dicts(table) if table else []
+        chosen = None
+        for row in rows:
+            label = str(row.get("stat") or row.get("") or row.get("player") or "").lower()
+            if "team" in label or "pace" in row or "off_rtg" in row or "ortg" in row or "pts" in row:
+                chosen = row
+                if "team" in label:
+                    break
+        if chosen is None and rows:
+            chosen = rows[0]
+        if chosen is None:
+            return []
+        fields = {
+            "pace": chosen.get("pace") or chosen.get("Pace"),
+            "ortg": chosen.get("off_rtg") or chosen.get("ortg") or chosen.get("ORtg"),
+            "drtg": chosen.get("def_rtg") or chosen.get("drtg") or chosen.get("DRtg"),
+            "net_rtg": chosen.get("net_rtg") or chosen.get("nrtg"),
+            "pts": chosen.get("pts") or chosen.get("pts_per_g"),
+            "opp_pts": chosen.get("opp_pts") or chosen.get("opp_pts_per_g"),
+            "possessions": chosen.get("poss") or chosen.get("pace"),
+            "fg_pct": chosen.get("fg_pct"),
+            "fg3_pct": chosen.get("fg3_pct"),
+            "ft_pct": chosen.get("ft_pct"),
+        }
+        rec = adapter_record(
+            url=url,
+            raw=chosen,
+            fields={k: v for k, v in fields.items() if v is not None},
+            retrieved_at=retrieved,
+            published_at=published,
+            source_class=self.source_class,
+            adapter_id=self.adapter_id,
+            adapter_version=self.adapter_version,
+            extra={"kind": "TEAM_CONTEXT", "tableId": (table or {}).get("id")},
+        )
+        return [rec]
+
+
+class BasketballReferenceTeamGameLogAdapter:
+    adapter_id = TEAM_GAMELOG_ADAPTER_ID
+    adapter_version = ADAPTER_VERSION
+    source_class = SOURCE_CLASS
+
+    def __init__(self, *, live: bool | None = None, retrieved_at: str | None = None):
+        self.live = live
+        self.retrieved_at = retrieved_at
+
+    def fetch(self, spec: dict[str, Any]) -> dict[str, Any]:
+        return _fixture_or_live(
+            self, spec,
+            default_url="fixture://basketball-reference/team-gamelog",
+            disabled_code="BR_TEAM_GAMELOG_LIVE_FETCH_DISABLED",
+            url_code="BR_TEAM_GAMELOG_URL_REQUIRED",
+        )
+
+    def normalize(self, document: dict[str, Any]) -> list[dict[str, Any]]:
+        url = str(document.get("url") or "")
+        html = _as_text(document)
+        retrieved = document.get("retrievedAt") or document.get("retrieved_at") or self.retrieved_at
+        published = document.get("publishedAt") or document.get("published_at") or retrieved
+        tables = extract_tables(html)
+        table = _pick_table(tables, "tgl_basic", "team_game_log", "gamelog")
+        raw_rows = table_rows_as_dicts(table) if table else []
+        records: list[dict[str, Any]] = []
+        for raw in raw_rows:
+            fields = {
+                "date": raw.get("date_game") or raw.get("date"),
+                "opp": raw.get("opp_id") or raw.get("opp"),
+                "home": str(raw.get("game_location") or raw.get("location") or "").lower() not in {"@", "away"},
+                "pts": raw.get("pts") or raw.get("Tm"),
+                "opp_pts": raw.get("opp_pts") or raw.get("Opp"),
+                "fga": raw.get("fga"),
+                "fta": raw.get("fta"),
+                "tov": raw.get("tov"),
+                "oreb": raw.get("orb") or raw.get("oreb"),
+                "fg": raw.get("fg"),
+                "fg3": raw.get("fg3"),
+                "fg3a": raw.get("fg3a"),
+            }
+            records.append(
+                adapter_record(
+                    url=url,
+                    raw=raw,
+                    fields={k: v for k, v in fields.items() if v is not None},
+                    retrieved_at=retrieved,
+                    published_at=published,
+                    source_class=self.source_class,
+                    adapter_id=self.adapter_id,
+                    adapter_version=self.adapter_version,
+                    extra={"kind": "TEAM_GAME_LOG", "tableId": (table or {}).get("id")},
+                )
+            )
+        return records
+
+
+class BasketballReferenceSplitAdapter:
+    adapter_id = SPLIT_ADAPTER_ID
+    adapter_version = ADAPTER_VERSION
+    source_class = SOURCE_CLASS
+
+    def __init__(self, *, live: bool | None = None, retrieved_at: str | None = None):
+        self.live = live
+        self.retrieved_at = retrieved_at
+
+    def fetch(self, spec: dict[str, Any]) -> dict[str, Any]:
+        return _fixture_or_live(
+            self, spec,
+            default_url="fixture://basketball-reference/splits",
+            disabled_code="BR_SPLIT_LIVE_FETCH_DISABLED",
+            url_code="BR_SPLIT_URL_REQUIRED",
+        )
+
+    def normalize(self, document: dict[str, Any]) -> list[dict[str, Any]]:
+        url = str(document.get("url") or "")
+        html = _as_text(document)
+        retrieved = document.get("retrievedAt") or document.get("retrieved_at") or self.retrieved_at
+        published = document.get("publishedAt") or document.get("published_at") or retrieved
+        tables = extract_tables(html)
+        table = _pick_table(tables, "splits", "player-splits", "team-splits")
+        raw_rows = table_rows_as_dicts(table) if table else []
+        records: list[dict[str, Any]] = []
+        for raw in raw_rows:
+            label = str(raw.get("value") or raw.get("split") or raw.get("desc") or raw.get("") or "")
+            fields = {
+                "split": label,
+                "g": raw.get("g") or raw.get("games"),
+                "mp": raw.get("mp") or raw.get("mp_per_g"),
+                "pts": raw.get("pts") or raw.get("pts_per_g"),
+                "reb": raw.get("trb") or raw.get("reb"),
+                "ast": raw.get("ast"),
+                "fga": raw.get("fga"),
+            }
+            records.append(
+                adapter_record(
+                    url=url,
+                    raw=raw,
+                    fields={k: v for k, v in fields.items() if v is not None and v != ""},
+                    retrieved_at=retrieved,
+                    published_at=published,
+                    source_class=self.source_class,
+                    adapter_id=self.adapter_id,
+                    adapter_version=self.adapter_version,
+                    extra={"kind": "SPLIT", "tableId": (table or {}).get("id")},
+                )
+            )
+        return records
+
+
+class BasketballReferenceLineupAdapter:
+    adapter_id = LINEUP_ADAPTER_ID
+    adapter_version = ADAPTER_VERSION
+    source_class = SOURCE_CLASS
+
+    def __init__(self, *, live: bool | None = None, retrieved_at: str | None = None):
+        self.live = live
+        self.retrieved_at = retrieved_at
+
+    def fetch(self, spec: dict[str, Any]) -> dict[str, Any]:
+        return _fixture_or_live(
+            self, spec,
+            default_url="fixture://basketball-reference/lineup",
+            disabled_code="BR_LINEUP_LIVE_FETCH_DISABLED",
+            url_code="BR_LINEUP_URL_REQUIRED",
+        )
+
+    def normalize(self, document: dict[str, Any]) -> list[dict[str, Any]]:
+        url = str(document.get("url") or "")
+        html = _as_text(document)
+        retrieved = document.get("retrievedAt") or document.get("retrieved_at") or self.retrieved_at
+        published = document.get("publishedAt") or document.get("published_at") or retrieved
+        tables = extract_tables(html)
+        table = _pick_table(tables, "lineup", "lineups", "5man")
+        raw_rows = table_rows_as_dicts(table) if table else []
+        records: list[dict[str, Any]] = []
+        for raw in raw_rows:
+            fields = {
+                "lineup": raw.get("lineup") or raw.get("players") or raw.get("lineup_id"),
+                "minutes": raw.get("mp") or raw.get("minutes"),
+                "pts": raw.get("pts"),
+                "opp_pts": raw.get("opp_pts"),
+                "plus": raw.get("plus_minus") or raw.get("diff"),
+            }
+            records.append(
+                adapter_record(
+                    url=url,
+                    raw=raw,
+                    fields={k: v for k, v in fields.items() if v is not None},
+                    retrieved_at=retrieved,
+                    published_at=published,
+                    source_class=self.source_class,
+                    adapter_id=self.adapter_id,
+                    adapter_version=self.adapter_version,
+                    extra={"kind": "LINEUP", "tableId": (table or {}).get("id")},
+                )
+            )
+        return records
+
+
+class BasketballReferenceOnOffAdapter:
+    adapter_id = ONOFF_ADAPTER_ID
+    adapter_version = ADAPTER_VERSION
+    source_class = SOURCE_CLASS
+
+    def __init__(self, *, live: bool | None = None, retrieved_at: str | None = None):
+        self.live = live
+        self.retrieved_at = retrieved_at
+
+    def fetch(self, spec: dict[str, Any]) -> dict[str, Any]:
+        return _fixture_or_live(
+            self, spec,
+            default_url="fixture://basketball-reference/on-off",
+            disabled_code="BR_ONOFF_LIVE_FETCH_DISABLED",
+            url_code="BR_ONOFF_URL_REQUIRED",
+        )
+
+    def normalize(self, document: dict[str, Any]) -> list[dict[str, Any]]:
+        url = str(document.get("url") or "")
+        html = _as_text(document)
+        retrieved = document.get("retrievedAt") or document.get("retrieved_at") or self.retrieved_at
+        published = document.get("publishedAt") or document.get("published_at") or retrieved
+        tables = extract_tables(html)
+        table = _pick_table(tables, "on_off", "on-off", "onoff")
+        raw_rows = table_rows_as_dicts(table) if table else []
+        records: list[dict[str, Any]] = []
+        for raw in raw_rows:
+            fields = {
+                "player": raw.get("player") or raw.get("player_name"),
+                "on_minutes": raw.get("on_mp") or raw.get("mp_on") or raw.get("minutes"),
+                "on_ortg": raw.get("on_ortg") or raw.get("off_rtg_on"),
+                "off_ortg": raw.get("off_ortg") or raw.get("off_rtg_off"),
+                "on_drtg": raw.get("on_drtg"),
+                "off_drtg": raw.get("off_drtg"),
+                "rawEffect": raw.get("net") or raw.get("diff"),
+            }
+            records.append(
+                adapter_record(
+                    url=url,
+                    raw=raw,
+                    fields={k: v for k, v in fields.items() if v is not None},
+                    retrieved_at=retrieved,
+                    published_at=published,
+                    source_class=self.source_class,
+                    adapter_id=self.adapter_id,
+                    adapter_version=self.adapter_version,
+                    extra={"kind": "ON_OFF", "tableId": (table or {}).get("id")},
+                )
+            )
+        return records

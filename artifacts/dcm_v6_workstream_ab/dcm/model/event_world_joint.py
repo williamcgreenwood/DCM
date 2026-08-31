@@ -195,7 +195,13 @@ def simulate_joint_team_worlds(
             mean_m = _p(wp, "minutes_mean", 34.0 if league == "NBA" else 31.0)
             sd_m = max(0.5, _p(wp, "minutes_sd", 4.5))
             cap = regulation_minutes(league) + 10.0
-            minutes = _clip(prng.gauss(mean_m, sd_m), 0.0, cap)
+            mix = snap.get("availabilityMixture") if isinstance(snap, dict) else None
+            try:
+                p_play = float((mix or {}).get("pPlay")) if isinstance(mix, dict) and mix.get("pPlay") is not None else 1.0
+            except (TypeError, ValueError):
+                p_play = 1.0
+            sit = p_play < 0.97 and prng.random() > p_play
+            minutes = 0.0 if sit else _clip(prng.gauss(mean_m, sd_m), 0.0, cap)
             raw_minutes.append(minutes)
             world_params.append(wp)
             player_rngs.append(prng)

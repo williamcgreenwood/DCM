@@ -111,7 +111,11 @@ def plan_research(
     for row in eligible:
         by_sport[(str(row.get("sportFamily") or ""), str(row.get("league") or ""))].append(row)
         by_event[str(row.get("eventId") or "")].append(row)
-        by_team[str(row.get("teamId") or "")].append(row)
+        team_key = str(row.get("teamId") or row.get("team") or "")
+        by_team[team_key].append(row)
+        opp_key = str(row.get("opponentId") or row.get("opponent") or "")
+        if opp_key and opp_key != team_key:
+            by_team[opp_key].append(row)
         by_player[str(row.get("playerId") or "")].append(row)
         by_def[market_definition_id(row)].append(row)
 

@@ -406,17 +406,27 @@ def simulate_player_worlds(
         raise ValueError("EVENT_CONTEXT_WORLD_COUNT_TOO_SMALL")
 
     worlds = []
+    mix = (parameter_snapshot or {}).get("availabilityMixture") if isinstance(parameter_snapshot, dict) else None
+    try:
+        p_play = float((mix or {}).get("pPlay")) if isinstance(mix, dict) and mix.get("pPlay") is not None else 1.0
+    except (TypeError, ValueError):
+        p_play = 1.0
+    # ACTIVE (~0.99) is not mixed. PROBABLE/QUESTIONABLE draw PLAY vs SIT per world.
+    mix_worlds = p_play < 0.97
     for idx in range(n):
         world_params = _contextualize(params, family, contexts[idx])
         if family == "basketball":
+            sit = mix_worlds and rng.random() > p_play
             mean_minutes = _p(world_params, "minutes_mean", 34.0 if row.get("league") == "NBA" else 31.0)
             sd_minutes = max(0.5, _p(world_params, "minutes_sd", 4.5))
             regulation = 48.0 if row.get("league") == "NBA" else 40.0
-            minutes = _clip(rng.gauss(mean_minutes, sd_minutes), 0.0, regulation + 10.0)
+            minutes = 0.0 if sit else _clip(rng.gauss(mean_minutes, sd_minutes), 0.0, regulation + 10.0)
             world = sample_basketball(rng, minutes, world_params)
             from dcm.model.quarter_worlds import attach_quarter_state
             q_rng = _rng(f"{seed}:QUARTER:{row['playerId']}:{row['eventId']}:{idx}")
             attach_quarter_state(world, q_rng)
+            if sit:
+                world["_availabilityState"] = "SIT"
             worlds.append(world)
         elif family == "gridiron":
             worlds.append(

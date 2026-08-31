@@ -129,6 +129,19 @@ def test_mp_trb_normalize_via_adapter_html():
     })
     assert summary
     assert str(summary[0]["fields"].get("games")) == "37"
+    page = build_player_research_packet(
+        identity={"playerId": "PAIGE", "league": "WNBA"},
+        gamelog_html=html,
+        player_html=player_html,
+        as_of=ASOF,
+        league="WNBA",
+        source_url="https://www.basketball-reference.com/wnba/players/b/bueckpa01w.html",
+        retrieved_at=ASOF,
+    )
+    assert page["seasonPageSnapshot"]
+    assert page["seasonPageSnapshot"].get("fromAdapter") is True
+    assert page["opportunity"]["support_n"] == page["gameLogCount"]
+    assert page["opportunity"]["from"] == "FULL_USABLE_LOGS"
 
 
 def test_one_packet_reused_for_every_offer_in_set():

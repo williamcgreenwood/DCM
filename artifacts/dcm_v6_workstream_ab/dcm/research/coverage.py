@@ -114,7 +114,18 @@ def _team_missing(request: dict[str, Any], merged: dict[str, Any], values: list[
         missing.append("TEAM_CONTEXT")
         return missing
     if family == "basketball":
-        if not (merged.get("team_context") or merged.get("pace_multiplier") or merged.get("pace") or merged.get("possessions")):
+        has_real_pace = any(
+            merged.get(k) not in (None, "", [], {})
+            for k in ("pace", "possessions", "ortg", "drtg", "team_logs", "game_logs", "team_html", "team_gamelog_html")
+        )
+        pace_m = merged.get("pace_multiplier")
+        fixture_one = False
+        try:
+            fixture_one = pace_m is not None and abs(float(pace_m) - 1.0) < 1e-12
+        except (TypeError, ValueError):
+            fixture_one = False
+        # Generic 1.0 pace_multiplier is a labeled prior, not team research.
+        if not has_real_pace and not merged.get("team_context") and (pace_m is None or fixture_one):
             missing.append("BASKETBALL_TEAM_PACE")
     elif family in {"gridiron", "football"}:
         if not (merged.get("team_context") or merged.get("injury_cluster") is not None or merged.get("depth") or merged.get("matchup_efficiency_multiplier")):

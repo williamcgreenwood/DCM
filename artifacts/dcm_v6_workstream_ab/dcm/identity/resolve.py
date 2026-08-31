@@ -64,3 +64,60 @@ def freeze_map(rows: list[dict]) -> dict[str, Any]:
     payload = {"pairs": pairs, "count": len(pairs)}
     payload["contentHash"] = content_hash(payload)
     return payload
+
+
+def build_player_index(rows: list[dict[str, Any]]) -> dict[str, Any]:
+    """Group every HAR player by playerId. Name ≠ platform id."""
+    by_player: dict[str, dict[str, Any]] = {}
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        pid = str(row.get("playerId") or "")
+        if not pid:
+            continue
+        rec = by_player.get(pid)
+        if rec is None:
+            rec = {
+                "playerId": pid,
+                "playerName": row.get("playerName"),
+                "sportFamily": row.get("sportFamily"),
+                "league": row.get("league"),
+                "identityResolved": bool(row.get("identityResolved")),
+                "identityBlocker": row.get("identityBlocker"),
+                "cfbOfficialPlayerId": row.get("cfbOfficialPlayerId"),
+                "events": [],
+                "teams": [],
+                "offers": [],
+            }
+            by_player[pid] = rec
+        event_id = str(row.get("eventId") or "")
+        if event_id and event_id not in rec["events"]:
+            rec["events"].append(event_id)
+        team = str(row.get("team") or row.get("teamId") or "")
+        if team and team not in rec["teams"]:
+            rec["teams"].append(team)
+        rec["offers"].append(
+            {
+                "projectionId": row.get("projectionId"),
+                "market": row.get("market"),
+                "line": row.get("line"),
+                "eventId": event_id,
+                "team": team,
+                "opponent": row.get("opponent"),
+                "modifier": row.get("modifier"),
+            }
+        )
+    players = [by_player[k] for k in sorted(by_player)]
+    for rec in players:
+        rec["offerCount"] = len(rec["offers"])
+        rec["eventCount"] = len(rec["events"])
+    body = {
+        "schema": "pillars_dcm.player_index.v1",
+        "playerCount": len(players),
+        "offerCount": sum(p["offerCount"] for p in players),
+        "nameIsNotId": True,
+        "players": players,
+    }
+    body["contentHash"] = content_hash({k: v for k, v in body.items() if k != "contentHash"})
+    return body
+

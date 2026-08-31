@@ -10,6 +10,7 @@ on:
       - chatgpt/v6-production-completion-20260828
       - grok/v6-live-har-production
       - integration/v6-chatgpt-runtime-20260829
+      - integration/v6-ml-architecture-20260830
   pull_request:
 
 permissions:

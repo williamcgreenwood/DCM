@@ -127,7 +127,9 @@ def _present(row: dict[str, Any], *keys: str) -> bool:
 def _market_stat_ok(row: dict[str, Any], market: str) -> bool:
     m = str(market or "").strip().lower()
     if m in {"pts", "points"}:
-        return _present(row, "pts", "fga")
+        # Points coverage: minutes (already required to be a valid log) + FGA + 3PA + FTA.
+        # pts totals alone are not an efficiency model.
+        return _present(row, "pts") and _present(row, "fga") and _present(row, "tpa") and _present(row, "fta")
     if m in {"reb", "rebounds", "rebound"}:
         return _present(row, "reb")
     if m in {"ast", "assists", "assist"}:

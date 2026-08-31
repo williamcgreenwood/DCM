@@ -257,9 +257,11 @@ def build_player_research_packet(
     }
 
     season_summary: dict[str, Any] = {}
+    claimed_g = 0
     if summary_records:
         season_summary = dict(summary_records[-1].get("fields") or {})
         season_summary["fromAdapter"] = True
+        claimed_g = int(_f(season_summary.get("g") or season_summary.get("games") or season_summary.get("G")) or 0)
     else:
         minutes, mn = _avg(full_logs, "minutes")
         pts, pn = _avg(full_logs, "pts")
@@ -274,6 +276,11 @@ def build_player_research_packet(
             "ast_mean": ast,
             "derivedFromFullLog": True,
         }
+    if claimed_g and usable_n and claimed_g != usable_n:
+        flags.append("SEASON_PAGE_GAMES_MISMATCH")
+    # support_n is the usable log count. Season-page G cannot paper over empty logs.
+    # When both exist, residual is max(claimed, usable) only as a diagnostic — never a substitute.
+    season_page_snapshot = dict(season_summary) if season_summary.get("fromAdapter") else {}
 
     applies = []
     if offer.get("offers"):
@@ -331,6 +338,8 @@ def build_player_research_packet(
         "fullSeasonRetained": True,
         "windows": windows,
         "seasonSummary": season_summary,
+        "seasonPageSnapshot": season_page_snapshot,
+        "seasonPageGames": claimed_g or None,
         "praIdentity": pra,
         "opportunity": opportunity,
         "efficiency": efficiency,

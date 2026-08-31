@@ -173,6 +173,8 @@ def persist_feature_store(
     packets: list[dict[str, Any]],
     offer_sets: list[dict[str, Any]] | None = None,
     cutoff: str = "",
+    team_packets: list[dict[str, Any]] | None = None,
+    pass_b_packets: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Write feature_store.jsonl + feature_store_manifest.json. Observations only."""
     dest = Path(dest)
@@ -194,6 +196,68 @@ def persist_feature_store(
             (str(ident.get("playerId") or ""), str(ident.get("eventId") or ""))
         ) or {}
         features.extend(FeatureStore.build_from_packet(packet, offer, cutoff))
+
+    for team in team_packets or []:
+        if not isinstance(team, dict):
+            continue
+        entity = str(team.get("teamId") or "")
+        hashes = [str(h) for h in (team.get("sourceHashes") or [])]
+        as_of = cutoff or str(team.get("asOf") or "")
+        if not entity:
+            continue
+        for name, value, family in (
+            ("team_pace", team.get("pace"), "MATCHUP"),
+            ("team_ortg", team.get("ortg"), "MATCHUP"),
+            ("team_drtg", team.get("drtg"), "MATCHUP"),
+            ("team_pts_mean", team.get("ptsMean"), "OPPORTUNITY"),
+            ("team_evidence_used", bool(team.get("evidenceUsed")), "CONTEXT"),
+            ("team_prior_used_as_research", False, "CONTEXT"),
+        ):
+            features.append(
+                feature_record(
+                    entity=f"TEAM:{entity}",
+                    event_id="",
+                    feature_name=name,
+                    value=value,
+                    as_of=as_of,
+                    source_hashes=hashes,
+                    family=family,
+                )
+            )
+
+    for packet in pass_b_packets or []:
+        if not isinstance(packet, dict):
+            continue
+        ident = packet.get("identity") if isinstance(packet.get("identity"), dict) else {}
+        entity = str(ident.get("playerId") or "")
+        if not entity:
+            continue
+        overlay = packet.get("passB") if isinstance(packet.get("passB"), dict) else {}
+        same = overlay.get("sameOpponent") if isinstance(overlay.get("sameOpponent"), dict) else {}
+        hashes = [str(h) for h in (packet.get("sourceHashes") or [])]
+        as_of = cutoff or str(packet.get("asOf") or "")
+        features.append(
+            feature_record(
+                entity=entity,
+                event_id=str(ident.get("eventId") or ""),
+                feature_name="pass_b_same_opponent_n",
+                value=same.get("nAvailable"),
+                as_of=as_of,
+                source_hashes=hashes,
+                family="MATCHUP",
+            )
+        )
+        features.append(
+            feature_record(
+                entity=entity,
+                event_id=str(ident.get("eventId") or ""),
+                feature_name="pass_b_full_log_retained",
+                value=bool(overlay.get("fullSeasonRetained")),
+                as_of=as_of,
+                source_hashes=hashes,
+                family="CONTEXT",
+            )
+        )
 
     jsonl_path = dest / "feature_store.jsonl"
     with jsonl_path.open("w", encoding="utf-8") as handle:
