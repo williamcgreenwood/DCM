@@ -1,0 +1,45 @@
+{
+  "schema": "pillars_dcm.dcm6_ros_requirement_trace.v1",
+  "specId": "DCM6-ROS-EG-001",
+  "updatedAtUtc": "2026-08-31T21:27:00Z",
+  "predictiveClaim": "NONE",
+  "learningRevision": "LR000000",
+  "requirements": [
+    {
+      "requirement": "Authenticate canonical v5.4.1 source and learning ledger hashes before normative migration",
+      "specSection": "Phase 0",
+      "code": "dcm_v6/canonical_mount/MOUNT_STATE.json",
+      "schema": "MOUNT_STATE",
+      "test": null,
+      "runtimeProducer": null,
+      "runtimeConsumer": "dcm.runtime.mount_v541",
+      "auditArtifact": "docs/PHASE0_CANONICAL_AUTHENTICATION.md",
+      "status": "BLOCKED",
+      "evidence": "MOUNT_STATE.state=ABSENT_IN_THIS_WORKSPACE; canonical files not in this workspace"
+    },
+    {
+      "requirement": "StatePack snapshot authenticates actual packaged file bytes",
+      "specSection": "§7 §33 §34 §41 §44",
+      "code": "artifacts/dcm_v6_workstream_ab/dcm/research/statepack.py:StatePack.integrity_ok",
+      "schema": "pillars_dcm.statepack_integrity.v1",
+      "test": "artifacts/dcm_v6_workstream_ab/tests/test_statepack.py::test_corrupt_export_fails_closed",
+      "runtimeProducer": "StatePack.snapshot",
+      "runtimeConsumer": "StatePack.integrity_ok",
+      "auditArtifact": "integrity_manifest.sha256",
+      "status": "IMPLEMENTED_NOT_INTEGRATED",
+      "evidence": "integrity_ok hashes export/schema/state/sqlite files from disk; host CLI snapshot not wired"
+    },
+    {
+      "requirement": "Complete §36 Research OS table set",
+      "specSection": "§36",
+      "code": null,
+      "schema": null,
+      "test": null,
+      "runtimeProducer": null,
+      "runtimeConsumer": null,
+      "auditArtifact": null,
+      "status": "NOT_STARTED",
+      "evidence": "Phase 1 index pack only"
+    }
+  ]
+}
