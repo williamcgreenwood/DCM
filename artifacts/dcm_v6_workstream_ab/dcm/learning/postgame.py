@@ -19,6 +19,7 @@ from typing import Any
 
 from dcm.contracts.hashes import content_hash
 from dcm.learning.calibration import build_challenger_cells, cell_key
+from dcm.learning.failure_class import classify_failure
 from dcm.learning.sidecar import append_ledger_jsonl, append_record, mutate_forecast
 from dcm.runtime.freeze import compute_forecast_hash
 from dcm.runtime.store import IndexedStore
@@ -354,13 +355,22 @@ def settle_run(run_dir: Path, outcomes_path: Path, *, card_only: bool = False) -
     proposals: list[dict[str, Any]] = []
 
     for prop in modeled:
-        rec = _settle_row(prop, outcomes.get(str(prop.get("projectionId") or "")), outcomes_sha256=outcomes_sha256)
+        out = outcomes.get(str(prop.get("projectionId") or ""))
+        rec = _settle_row(prop, out, outcomes_sha256=outcomes_sha256)
+        classified = classify_failure(
+            predicted_side=str(rec.get("direction") or prop.get("direction") or ""),
+            outcome=str(rec.get("result") or rec.get("settlement") or ""),
+            snapshot_fields={**prop, **rec, **(out or {})},
+        )
+        rec["failureClass"] = classified["failureClass"]
+        rec["failureClassPermanentPatch"] = False
+        rec["failureClassReasons"] = classified.get("reasons") or []
         settlements.append(rec)
         if rec.get("settlement") == "LOSS":
             lower = float(prop.get("lowerBound") or 0.0)
             mechanism = "NORMAL_VARIANCE_OR_UNRESOLVED_MECHANISM"
             model_error = lower >= 0.55
-            out = outcomes.get(str(prop.get("projectionId") or "")) or {}
+            out = out or {}
             actual_opp = out.get("actualOpportunity")
             expected_opp = prop.get("opportunityMean")
             if actual_opp is not None and expected_opp not in {None, 0}:

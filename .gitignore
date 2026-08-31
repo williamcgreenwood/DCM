@@ -58,3 +58,7 @@ dist/
 artifacts/release/
 build/
 *.whl
+
+# Never commit trained-weight blobs. P6 learning is JSONL/JSON only.
+*.pkl
+*.joblib

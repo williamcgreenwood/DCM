@@ -38,5 +38,20 @@
   "resume": {
     "cmd": "PYTHONPATH=. python3 -m dcm.runner --resume RUNS/<run_id>/checkpoint.json --research fixture",
     "expect": 0
+  },
+  "training_dataset": {
+    "cmd": "PYTHONPATH=. python3 -m dcm.learning.dataset --dest /workspace/dcm_v6/RUNS/<id>",
+    "expect": 0,
+    "meaning": "Build training_dataset.jsonl + manifest from settled run dests. Never invents settlements. Alias: python -m dcm.dataset"
+  },
+  "walkforward": {
+    "cmd": "PYTHONPATH=. python3 -m dcm.learning.walkforward --dataset /workspace/dcm_v6/RUNS/<id>/training_dataset.jsonl",
+    "expect": 0,
+    "meaning": "Chronological walk-forward of frozen calibratedP/selectedP. Train cutoff strictly < test. Shadow logistic is SHADOW only; no .pkl."
+  },
+  "registry_shadow": {
+    "cmd": "PYTHONPATH=. python3 -m dcm.learning.registry --registry /workspace/dcm_v6/RUNS/<id>/model_registry.json --register-shadow shadow.logistic.v1",
+    "expect": 0,
+    "meaning": "Register a SHADOW challenger. propose/promote hard-refuse LR000000 and predictive NONE change."
   }
 }

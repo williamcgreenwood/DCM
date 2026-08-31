@@ -119,6 +119,19 @@ python -m dcm.settle --dest dcm_v6/RUNS/<id> --outcomes outcomes.json
 python -m dcm.settle --dest dcm_v6/RUNS/<id> --outcomes outcomes.json --card-only
 ```
 
+## Learning (P6, shadow only)
+
+Settlements must already exist. The engine never invents WIN/LOSS labels. Challengers stay SHADOW; `promote()` cannot advance LR000000 or predictive NONE.
+
+```bash
+python -m dcm.learning.dataset --dest dcm_v6/RUNS/<id>
+python -m dcm.dataset --dest dcm_v6/RUNS/<id> --out dcm_v6/RUNS/<id>
+python -m dcm.learning.walkforward --dataset dcm_v6/RUNS/<id>/training_dataset.jsonl
+python -m dcm.learning.registry --registry dcm_v6/RUNS/<id>/model_registry.json --register-shadow shadow.logistic.v1
+python -m dcm.learning.registry --registry dcm_v6/RUNS/<id>/model_registry.json --propose shadow.logistic.v1
+python -m dcm.learning.registry --registry dcm_v6/RUNS/<id>/model_registry.json --promote shadow.logistic.v1
+```
+
 ## Honest blockers
 
 - Hash-verified v5.4.1 canonical source bytes ABSENT (`bd1fb433…`)
