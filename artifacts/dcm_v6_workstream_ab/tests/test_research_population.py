@@ -110,7 +110,8 @@ def test_account_only_emits_canonical_and_legacy_research_artifacts(tmp_path: Pa
     player_sets_path = dest / "player_offer_sets.json"
     dependency_path = dest / "research_dependency_graph.json"
     universal_plan_path = dest / "universal_host_research_plan.json"
-    for path in (man_path, legacy_path, subject_sets_path, player_sets_path, dependency_path, universal_plan_path):
+    sport_contract_path = dest / "sport_plugin_contract_registry.json"
+    for path in (man_path, legacy_path, subject_sets_path, player_sets_path, dependency_path, universal_plan_path, sport_contract_path):
         assert path.is_file()
 
     man = json.loads(man_path.read_text())
@@ -137,3 +138,8 @@ def test_account_only_emits_canonical_and_legacy_research_artifacts(tmp_path: Pa
     assert universal_plan["researchHierarchy"][4] == "SUBJECT"
     assert "PLAYER" not in universal_plan["researchHierarchy"]
     assert "TEAM" not in universal_plan["researchHierarchy"]
+
+    sport_contracts = json.loads(sport_contract_path.read_text())
+    assert sport_contracts["schema"] == "pillars_dcm.sport_plugin_contract_registry.v1"
+    assert sport_contracts["genericFallbackAllowed"] is False
+    assert sport_contracts["productionCompleteSports"] == []
