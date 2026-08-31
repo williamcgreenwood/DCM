@@ -56,12 +56,12 @@ def test_snapshot_round_trip_preserves_semantic_hash(tmp_path: Path):
     assert (tmp_path / "DCM_StatePack" / "deterministic_export.json.gz").is_file()
     assert pack.integrity_ok()["ok"] is True
     snap2 = pack.snapshot()
-    assert snap1["exportHash"] == snap2["exportHash"]
-    assert snap1["stateManifestHash"] == snap2["stateManifestHash"]
+    assert snap1["semanticExportHash"] == snap2["semanticExportHash"]
+    assert snap1["exportBytesSha256"] == snap2["exportBytesSha256"]
     other = StatePack(tmp_path / "DCM_StatePack_restore")
     restored = other.restore_from_export(tmp_path / "DCM_StatePack" / "deterministic_export.json.gz")
     assert restored["restored"] == 2
-    assert other.snapshot()["exportHash"] == snap1["exportHash"]
+    assert other.snapshot()["semanticExportHash"] == snap1["semanticExportHash"]
 
 
 def test_corrupt_export_fails_closed(tmp_path: Path):
