@@ -1,11 +1,15 @@
-"""ResearchPopulationManifest: unique entities + fan-out after classify/plan."""
+"""ResearchPopulationManifest: canonical universal entities + legacy compatibility."""
 from __future__ import annotations
 
 import json
 from pathlib import Path
 
-from dcm.research.population import build_research_population_manifest
-from dcm.research.requests import INFO_IMPORTANCE, plan_research
+from dcm.research.population import (
+    UNIVERSAL_IMPORTANCE,
+    UNIVERSAL_FRESHNESS,
+    build_research_population_manifest,
+)
+from dcm.research.requests import plan_research
 from dcm.runner import run_dcm
 
 
@@ -36,12 +40,11 @@ def _row(**kwargs):
     return rec
 
 
-def test_manifest_counts_entities_and_fanout_priority():
+def test_manifest_counts_universal_entities_and_fanout_priority():
     rows = [
         _row(projectionId=f"pp{i}", market=m)
         for i, m in enumerate(["pts", "reb", "ast", "pra", "pr", "pa", "ra", "3pm"])
     ]
-    # football row must not break basketball entities
     rows.append(
         _row(
             projectionId="nfl1",
@@ -61,25 +64,37 @@ def test_manifest_counts_entities_and_fanout_priority():
     cutoff = "2026-08-30T12:00:00Z"
     planned = plan_research(rows, cutoff)
     man = build_research_population_manifest(rows, planned=planned, cutoff=cutoff)
-    assert man["schema"] == "pillars_dcm.research_population_manifest.v1"
-    assert man["eligiblePropCount"] == 9
-    players = man["entities"]["players"]
-    paige = next(p for p in players if p["scopeId"] == "PAIGE")
+    assert man["schema"] == "pillars_dcm.research_population_manifest.v2"
+    assert man["canonical"] is True
+    assert man["eligibleOfferCount"] == 9
+    assert man["subjectOfferSetCount"] == 2
+
+    subjects = man["entities"]["subjects"]
+    paige = next(p for p in subjects if p["entityId"] == "PAIGE")
     assert paige["dependentOfferCount"] == 8
-    assert paige["importance"] == INFO_IMPORTANCE["PLAYER"]
-    assert abs(paige["fanOutPriority"] - 8 * INFO_IMPORTANCE["PLAYER"]) < 1e-9
-    assert man["uniqueCounts"]["PLAYER"] >= 2
+    expected = (
+        8
+        * UNIVERSAL_IMPORTANCE["SUBJECT"]
+        * UNIVERSAL_FRESHNESS["SUBJECT"]
+    )
+    assert abs(paige["fanOutPriority"] - expected) < 1e-9
+
+    assert man["uniqueCounts"]["subjects"] >= 2
     assert man["entities"]["offers"]
     assert man["entities"]["events"]
-    assert man["entities"]["teams"]
+    assert man["entities"]["affiliations"]
+    assert man["entities"]["counterparties"]
+    assert man["entities"]["competitions"]
     assert man["entities"]["marketDefinitions"]
+    assert "players" not in man["entities"]
+    assert "teams" not in man["entities"]
     assert "contentHash" in man
-    # football entity present, basketball still first-class
-    nfl_player = next(p for p in players if p["scopeId"] == "QB1")
-    assert nfl_player["dependentOfferCount"] == 1
+
+    nfl_subject = next(p for p in subjects if p["entityId"] == "QB1")
+    assert nfl_subject["dependentOfferCount"] == 1
 
 
-def test_account_only_emits_manifest(tmp_path: Path):
+def test_account_only_emits_canonical_and_legacy_research_artifacts(tmp_path: Path):
     result = run_dcm(
         input_path=None,
         forecast_cutoff="2026-08-29T00:00:00Z",
@@ -90,11 +105,28 @@ def test_account_only_emits_manifest(tmp_path: Path):
     )
     dest = Path(result["dest"])
     man_path = dest / "research_population_manifest.json"
-    sets_path = dest / "player_offer_sets.json"
-    assert man_path.is_file()
-    assert sets_path.is_file()
+    legacy_path = dest / "research_population_manifest_legacy.json"
+    subject_sets_path = dest / "subject_offer_sets.json"
+    player_sets_path = dest / "player_offer_sets.json"
+    dependency_path = dest / "research_dependency_graph.json"
+    for path in (man_path, legacy_path, subject_sets_path, player_sets_path, dependency_path):
+        assert path.is_file()
+
     man = json.loads(man_path.read_text())
-    assert man["eligiblePropCount"] >= 1
-    assert "entities" in man
-    sets = json.loads(sets_path.read_text())
-    assert sets["setCount"] >= 1
+    assert man["schema"] == "pillars_dcm.research_population_manifest.v2"
+    assert man["eligibleOfferCount"] >= 1
+    assert "subjects" in man["entities"]
+
+    subject_sets = json.loads(subject_sets_path.read_text())
+    assert subject_sets["setCount"] >= 1
+    assert subject_sets["schema"] == "pillars_dcm.subject_offer_sets.v1"
+
+    player_sets = json.loads(player_sets_path.read_text())
+    assert player_sets["compatibilityOnly"] is True
+
+    legacy = json.loads(legacy_path.read_text())
+    assert legacy["schema"] == "pillars_dcm.research_population_manifest.v1"
+    assert legacy["compatibilityOnly"] is True
+
+    graph = json.loads(dependency_path.read_text())
+    assert graph["schema"] == "pillars_dcm.research_dependency_graph.v1"
