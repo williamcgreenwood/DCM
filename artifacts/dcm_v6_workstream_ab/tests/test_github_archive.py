@@ -561,3 +561,55 @@ def test_locks_certified_is_derived_alias_not_primary():
     )
     assert incomplete["modelRunCertified"] is False
     assert incomplete["locksCertified"] is False
+
+
+def test_archive_copies_explanations_graph_and_feature_store_when_present(tmp_path: Path):
+    dest = _fake_dest(
+        tmp_path / "RUN_EXPLAIN",
+        claims=[_player_claim(), _event_claim(), _market_claim()],
+        evidence_mode="PRODUCTION",
+    )
+    (dest / "prop_explanations.jsonl").write_text(
+        json.dumps({"projectionId": PROJ_ID, "drivers": []}) + "\n", encoding="utf-8"
+    )
+    (dest / "evidence_graph.json").write_text(json.dumps({"nodes": [], "edges": [], "contentHash": "g"}) + "\n", encoding="utf-8")
+    (dest / "feature_store_manifest.json").write_text(json.dumps({"contentHash": "f", "n": 1}) + "\n", encoding="utf-8")
+    (dest / "feature_store.jsonl").write_text("{}\n", encoding="utf-8")
+    build_run_audit(dest)
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    pack = materialize_github_pack(dest, repo)
+    names = {p.name for p in pack.iterdir()}
+    assert "prop_explanations.jsonl" in names
+    assert "evidence_graph.json" in names
+    assert "feature_store_manifest.json" in names
+    assert "feature_store.jsonl" in names
+    assert not list(pack.rglob("*.har"))
+
+
+def test_cookie_header_dest_file_is_not_copied(tmp_path: Path):
+    dest = _fake_dest(
+        tmp_path / "RUN_COOKIE",
+        claims=[_player_claim(), _event_claim(), _market_claim()],
+        evidence_mode="PRODUCTION",
+    )
+    leak = dest / "hashes.json"
+    original = leak.read_text(encoding="utf-8")
+    leak.write_text('{"Cookie": "session=abc123; Path=/"}\n', encoding="utf-8")
+    assert scan_for_secrets(leak)
+    # Restore a clean hashes.json so the pack still has hashes, and leak via another pack file.
+    leak.write_text(original, encoding="utf-8")
+    cookie_file = dest / "MODEL_CONFIG.json"
+    cookie_file.write_text('{"Cookie": "session=abc123"}\n', encoding="utf-8")
+    assert scan_for_secrets(cookie_file)
+    build_run_audit(dest)
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    pack = materialize_github_pack(dest, repo)
+    names = {p.name for p in pack.iterdir()}
+    assert "MODEL_CONFIG.json" not in names
+    for path in pack.iterdir():
+        if path.is_file():
+            body = path.read_text(encoding="utf-8", errors="ignore")
+            assert "Cookie" not in body
+            assert "Set-Cookie" not in body

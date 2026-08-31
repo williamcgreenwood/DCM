@@ -14,5 +14,5 @@ V2 freeze id: PHASE_BC_SCHEMA_V2_2026-08-29
 V2 is field-level JSON Schema, productionEligible=false, not auto-promoted.
 
 TESTS
-136 pytest functions (not 41).
+233 pytest functions (not 41).
 Command: pip install . && pytest -q

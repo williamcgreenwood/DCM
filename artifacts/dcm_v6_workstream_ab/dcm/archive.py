@@ -1,6 +1,6 @@
 """CLI: build a GitHub-verifiable audit pack for an existing DCM run dest.
 
-python -m dcm.archive --dest dcm_v6/RUNS/<id> [--repo PATH] [--push]
+python -m dcm.archive --dest dcm_v6/RUNS/<id> [--repo PATH] [--push] [--no-archive-push]
 """
 from __future__ import annotations
 
@@ -36,7 +36,12 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument("--dest", type=Path, required=True, help="Existing run directory")
     parser.add_argument("--repo", type=Path, default=None, help="Git repo root to write audit/runs/<id>")
-    parser.add_argument("--push", action="store_true", help="git push origin HEAD after commit")
+    parser.add_argument("--push", action="store_true", help="git push origin HEAD after commit (optional)")
+    parser.add_argument(
+        "--no-archive-push",
+        action="store_true",
+        help="Write the local pack (and commit if possible) but do not git push. Default is local-only.",
+    )
     args = parser.parse_args(argv)
 
     dest = args.dest.expanduser().resolve()
@@ -64,7 +69,7 @@ def main(argv: list[str] | None = None) -> int:
             **certification_fields(audit),
         },
     )
-    gh: dict[str, Any] = push_to_github(repo, run_id, push=bool(args.push))
+    gh: dict[str, Any] = push_to_github(repo, run_id, push=bool(args.push) and not bool(args.no_archive_push))
     print(
         json.dumps(
             {

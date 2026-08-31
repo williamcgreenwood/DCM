@@ -36,6 +36,7 @@ from dcm.model.parameters import build_parameter_snapshot
 from dcm.model.ranking import rank_candidates
 from dcm.model.uncertainty import PROBABILITY_CONTRACT_KEYS, RELIABILITY_IS_NOT_PROBABILITY, probability_bundle
 from dcm.learning.calibration import apply_calibration, cell_key
+from dcm.learning.sidecar import append_ledger_jsonl, append_record
 from dcm.model.event_world_joint import (
     basketball_teammate_groups,
     simulate_joint_team_worlds,
@@ -1128,8 +1129,25 @@ def run_dcm(
     (dest / "blockers.json").write_text(json.dumps(blockers, indent=2) + "\n", encoding="utf-8")
 
     store = IndexedStore(dest / "index.sqlite")
-    store.append(kind="freeze", cutoff=forecast_cutoff, run_id=run_id, lr=LEARNING_REVISION, payload={"hash": freeze["frozenForecastHash"]}, source_hash=har_sha)
+    append_record(
+        store,
+        "FrozenForecast",
+        forecast_cutoff,
+        run_id,
+        LEARNING_REVISION,
+        {"hash": freeze["frozenForecastHash"]},
+        source_hash=har_sha,
+    )
     store.close()
+    append_ledger_jsonl(
+        dest,
+        "FrozenForecast",
+        {"hash": freeze["frozenForecastHash"]},
+        cutoff=forecast_cutoff,
+        run_id=run_id,
+        lr=LEARNING_REVISION,
+        source_hash=har_sha,
+    )
 
     integrity = {
         **freeze,

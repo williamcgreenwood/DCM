@@ -93,7 +93,31 @@ Goblins are extracted/accounted then excluded from selection. Demons get extra c
 
 ## Releases
 
-Do not load a committed artifacts ZIP. Build with `python -m pillars_dcm.release` or `scripts/build_portable.py`.
+Do not load a committed artifacts ZIP. Build a portable runtime (wheel + hashes):
+
+```bash
+python -m dcm.release --out artifacts/release
+# or: python scripts/build_portable.py --out artifacts/release
+```
+
+Clean-env install test (no repo on PYTHONPATH):
+
+```bash
+python -m venv /tmp/dcm-rel && /tmp/dcm-rel/bin/pip install artifacts/release/*.whl
+cd /tmp && /tmp/dcm-rel/bin/python -m dcm --help
+/tmp/dcm-rel/bin/python -m dcm --synthetic --research fixture --cutoff-from-capture --account-only --out /tmp/dcm-rel-run
+```
+
+If `python -m build` is unavailable, the builder pip-installs `build` into the current venv. `--no-wheel` still writes COMPLETE_PROJECT_SOURCE.txt / RELEASE_MANIFEST.json (gitCommit required) / INSTALL_SHA256.txt / CAPABILITY.json.
+
+## Settlement
+
+Outcomes are supplied. The engine does not invent results.
+
+```bash
+python -m dcm.settle --dest dcm_v6/RUNS/<id> --outcomes outcomes.json
+python -m dcm.settle --dest dcm_v6/RUNS/<id> --outcomes outcomes.json --card-only
+```
 
 ## Honest blockers
 

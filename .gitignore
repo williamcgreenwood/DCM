@@ -52,3 +52,9 @@ artifacts/**/*.egg-info/
 
 # Stale portable blobs are not a release channel.
 artifacts/dcm_v6_workstream_ab.zip
+
+# Portable release outputs (rebuild with python -m dcm.release)
+dist/
+artifacts/release/
+build/
+*.whl

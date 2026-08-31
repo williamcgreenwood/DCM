@@ -42,6 +42,9 @@ New machine-state field names do not use the word "lock".
 | `strict_card.json` | The card. Each pick must point at covering hashes in the bundle |
 | `frozen_forecast.json` / `hashes.json` | Run identity: runState, cutoff, board/forecast hashes |
 | `checkpoint.json` | completedStages must include RESEARCH, MODEL, RANK, and FREEZE for `modelRunCertified` |
+| `prop_explanations.jsonl` | Machine-readable PropExplanations for top25 + card (copied when present) |
+| `evidence_graph.json` | EvidenceGraph snapshot (copied when present) |
+| `feature_store_manifest.json` / `feature_store.jsonl` | Cutoff-immutable features (copied when present) |
 
 Fixture research on a live HAR fails `modelRunCertified`. An empty card
 (`cardSize: 0`) may still have `evidenceCoverageCertified` if research ran,

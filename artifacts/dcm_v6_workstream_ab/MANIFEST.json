@@ -6,7 +6,7 @@
   "lifecycle": "INTEGRATED_DEVELOPMENT",
   "workstreams": ["A", "B", "HAR_SPINE", "P0_AUDIT"],
   "test_command": "pip install . && pytest -q",
-  "reported_test_count": 136,
+  "reported_test_count": 233,
   "historical_slice": "46_frozen_baseline_not_a_ceiling",
   "stale_zip": "forbidden; build with python -m pillars_dcm.release"
 }
