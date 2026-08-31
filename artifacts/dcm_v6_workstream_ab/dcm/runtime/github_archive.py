@@ -42,6 +42,9 @@ DEFAULT_GIT_EMAIL = "dcm-archive@users.noreply.github.com"
 MANUAL_STATES = frozenset({"MANUAL_RESEARCH_CARD"})
 MANUAL_EVIDENCE_MODES = frozenset({"manual_research", "manual"})
 REQUIRED_MODEL_STAGES = frozenset({"RESEARCH", "MODEL", "RANK", "FREEZE"})
+# Primary flags are the split *Certified set. locksCertified is a retired
+# derived alias kept for old readers: true only if modelRunCertified AND
+# selectionCertified AND evidenceCoverageCertified.
 CERT_FLAG_KEYS = (
     "archiveIntegrityCertified",
     "evidenceCoverageCertified",
@@ -51,7 +54,7 @@ CERT_FLAG_KEYS = (
     "productionRootCertified",
     "predictiveValidationEarned",
     "hashCertifiedPythonFreeze",
-    "locksCertified",
+    "locksCertified",  # derived alias only; do not treat as a primary flag
 )
 FORBIDDEN_NAMES = frozenset(
     {

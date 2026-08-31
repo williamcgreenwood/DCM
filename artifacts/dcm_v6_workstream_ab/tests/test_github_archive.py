@@ -515,3 +515,49 @@ def test_researched_modeled_card_is_python_freeze_certified(tmp_path: Path):
     assert audit["hashCertifiedPythonFreeze"] is True
     assert audit["productionRootCertified"] is False
     assert audit["predictiveValidationEarned"] is False
+
+
+def test_locks_certified_is_derived_alias_not_primary():
+    """locksCertified is a retired derived alias, never a primary cert flag."""
+    from dcm.runtime.github_archive import compute_certification
+
+    flags = compute_certification(
+        {
+            "runState": "COMPLETE_FROZEN",
+            "completedStages": ["RESEARCH", "MODEL", "RANK", "FREEZE"],
+            "softwareE2eComplete": True,
+            "synthetic": False,
+            "evidenceMode": "PRODUCTION",
+            "cardSize": 0,
+            "claimCount": 3,
+            "frozenForecastHash": "abc",
+            "learningRevision": "LR000000",
+            "predictiveClaim": "NONE",
+            "picks": [],
+        },
+        research_ran=True,
+    )
+    assert flags["locksCertified"] == (
+        bool(flags["modelRunCertified"])
+        and bool(flags["selectionCertified"])
+        and bool(flags["evidenceCoverageCertified"])
+    )
+    # Alias stays false unless all three primary flags are true.
+    incomplete = compute_certification(
+        {
+            "runState": "COMPLETE_FROZEN",
+            "completedStages": ["RESEARCH", "MODEL", "RANK", "FREEZE"],
+            "softwareE2eComplete": True,
+            "synthetic": False,
+            "evidenceMode": "fixture",
+            "cardSize": 1,
+            "claimCount": 3,
+            "frozenForecastHash": "abc",
+            "learningRevision": "LR000000",
+            "predictiveClaim": "NONE",
+            "picks": [{"coverage": {"complete": False}}],
+        },
+        research_ran=True,
+    )
+    assert incomplete["modelRunCertified"] is False
+    assert incomplete["locksCertified"] is False

@@ -50,12 +50,15 @@ from dcm.selection.card_layers import (
     EMPTY_ACCOUNT_ONLY,
     EMPTY_ROOT_NOT_CERTIFIED,
     NOT_PRODUCTION_ROOT_CERTIFIED,
+    STATUS_START_HARD_BLOCKERS,
     build_directional_passes,
     is_modeled_playable,
     layer_run_state,
     modeled_empty_card_reason,
     production_certified_rows,
     production_root_accepted,
+    started_event_blocker,
+    status_start_hard_blocker,
     write_card_layer_files,
 )
 from dcm.selection.portfolio import build_card, exposure_report
@@ -103,6 +106,8 @@ def _finalize_archive(
         result.setdefault("hallucinationRisk", True)
         return result
     result.update(certification_fields(audit))
+    # locksCertified is a retired derived alias only (modelRunCertified AND
+    # selectionCertified AND evidenceCoverageCertified). Primary flags are the split set.
     result["locksCertified"] = bool(audit.get("locksCertified"))
     result["hallucinationRisk"] = bool(audit.get("hallucinationRisk"))
     result["archivePath"] = str(Path(dest) / "audit")
@@ -518,8 +523,19 @@ def run_dcm(
 
         snapshot = build_parameter_snapshot(row, bundle["claims"])
         parameter_cache[str(row["projectionId"])] = snapshot
-        production_selectable = global_selection_gate and bool(snapshot["production_eligible"]) and blocker is None
-        if not snapshot["production_eligible"] and not synthetic and blocker is None:
+        rec["forecastCutoff"] = forecast_cutoff
+        rec["playerStatus"] = snapshot.get("status")
+        rec["parameterSnapshot"] = snapshot
+        rec["dependencyTags"] = snapshot.get("dependency_tags") or []
+        # Status/start hard gates apply even on synthetic/fixture runs.
+        snap_blocker = snapshot.get("blocker")
+        if snap_blocker in STATUS_START_HARD_BLOCKERS:
+            rec["blocker"] = rec.get("blocker") or snap_blocker
+        start_blk = started_event_blocker(row, forecast_cutoff)
+        if start_blk:
+            rec["blocker"] = rec.get("blocker") or start_blk
+        production_selectable = global_selection_gate and bool(snapshot["production_eligible"]) and rec.get("blocker") is None
+        if not snapshot["production_eligible"] and not synthetic and rec.get("blocker") is None:
             rec["blocker"] = snapshot.get("blocker") or "EVIDENCE_INSUFFICIENT"
             evidence_blocked += 1
 
@@ -669,11 +685,30 @@ def run_dcm(
             "calibrationState": ev["calibrationState"], "parameterSnapshotHash": snapshot["parameter_snapshot_hash"],
             "evidenceHashes": snapshot["evidence_hashes"], "dependencyTags": snapshot["dependency_tags"],
             "productionSelectable": production_selectable,
-            "modeledPlayable": is_modeled_playable({"row": row, "grade": ev["grade"], "state": "MODELED", "blocker": rec.get("blocker") or blocker}),
+            "modeledPlayable": is_modeled_playable(
+                {
+                    "row": row,
+                    "grade": ev["grade"],
+                    "state": "MODELED",
+                    "blocker": rec.get("blocker") or blocker,
+                    "parameterSnapshot": snapshot,
+                    "forecastCutoff": forecast_cutoff,
+                    "dependencyTags": snapshot.get("dependency_tags") or rec.get("dependencyTags") or [],
+                    "playerStatus": snapshot.get("status"),
+                },
+                cutoff=forecast_cutoff,
+                snapshot=snapshot,
+            ),
             "researchOnly": blocker in {"RESEARCH_ONLY_NOT_SELECTABLE", "SHADOW_SUPPORTED_NOT_SELECTABLE"},
             "worldCount": len(values),
             "_selectionOutcomes": selection_outcomes,
         })
+        gate = status_start_hard_blocker(
+            rec, cutoff=forecast_cutoff, snapshot=snapshot,
+        )
+        if gate:
+            rec["blocker"] = rec.get("blocker") or gate
+            rec["modeledPlayable"] = False
         modeled.append(rec)
         classified.append(rec)
 
@@ -695,7 +730,9 @@ def run_dcm(
 
     ranked = rank_candidates(modeled, top_k=25, seed=har_sha)
     # Strict card is PLAYABLE-grade modeled rows. Production root is a later layer.
-    qualified = [p for p in ranked if is_modeled_playable(p)]
+    # Re-apply status/start hard gates here so a PLAYER_STATUS_UNCERTAIN row
+    # cannot land on qualified / strict_card even if grade is PLAYABLE.
+    qualified = [p for p in ranked if is_modeled_playable(p, cutoff=forecast_cutoff, snapshot=p.get("parameterSnapshot"))]
     card = build_card(qualified)
     exposure = exposure_report(card)
     n_rank = dag.add("RANK", "board", parents=[n_worlds.key])

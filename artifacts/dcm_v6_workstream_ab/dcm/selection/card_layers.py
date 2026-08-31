@@ -7,6 +7,7 @@ empty/false. Do not fill the strict card with LEAN. Goblins never selected.
 from __future__ import annotations
 
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -22,6 +23,11 @@ EMPTY_ROOT_NOT_CERTIFIED = "EMPTY_ROOT_NOT_CERTIFIED"
 EMPTY_PORTFOLIO_CONSTRAINT = "EMPTY_PORTFOLIO_CONSTRAINT"
 EMPTY_ACCOUNT_ONLY = "EMPTY_ACCOUNT_ONLY"
 
+EVENT_ALREADY_STARTED = "EVENT_ALREADY_STARTED"
+PLAYER_STATUS_UNCERTAIN = "PLAYER_STATUS_UNCERTAIN"
+PLAYER_NOT_ACTIVE = "PLAYER_NOT_ACTIVE"
+PLAYER_STATUS_UNKNOWN = "PLAYER_STATUS_UNKNOWN"
+
 # Row blockers that are not the production root. These still keep a row off
 # the modeled strict card even when grade is PLAYABLE.
 MODELED_CARD_EXCLUDED_BLOCKERS = frozenset({
@@ -36,11 +42,147 @@ MODELED_CARD_EXCLUDED_BLOCKERS = frozenset({
     "MODIFIER_UNKNOWN",
     "PLAYER_ID_UNRESOLVED_NO_NAME_INFERENCE",
     "HALF_LINE_AVOID_BASEBALL_HRRBI_0_5",
+    PLAYER_STATUS_UNCERTAIN,
+    PLAYER_NOT_ACTIVE,
+    PLAYER_STATUS_UNKNOWN,
+    EVENT_ALREADY_STARTED,
 })
 
+# Status/start hard gates. Always applied to modeled PLAYABLE, including synthetic.
+# ParameterSnapshot PLAYER_STATUS_UNCERTAIN forces modeledPlayable=false.
+STATUS_START_HARD_BLOCKERS = frozenset({
+    PLAYER_STATUS_UNCERTAIN,
+    PLAYER_NOT_ACTIVE,
+    PLAYER_STATUS_UNKNOWN,
+    EVENT_ALREADY_STARTED,
+    "LIVE_OR_IN_PROGRESS_NOT_PRODUCTION",
+    "UNKNOWN_STATUS_FAIL_CLOSED",
+})
 
-def is_modeled_playable(p: dict[str, Any]) -> bool:
-    """PLAYABLE-grade modeled row eligible for the strict card, ignoring production root."""
+# HAR/player status OUT/INACTIVE/SUSPENDED cannot be modeled PLAYABLE.
+HARD_EXCLUDE_PLAYER_STATUSES = frozenset({
+    "OUT", "INACTIVE", "SUSPENDED", "DNP", "IR", "PUP",
+})
+# P2: availability mixture with no PLAYABLE promotion when uncertainty is
+# excessive. P0: hard-exclude QUESTIONABLE/DOUBTFUL from PLAYABLE.
+UNCERTAIN_PLAYER_STATUSES = frozenset({
+    "QUESTIONABLE", "GTD", "GAME_TIME_DECISION", "DOUBTFUL", "LIMITED",
+})
+LIVE_EVENT_STATUSES = frozenset({"in_progress", "suspended"})
+
+
+def _parse_utc(value: Any) -> datetime | None:
+    s = str(value or "").strip()
+    if not s:
+        return None
+    try:
+        d = datetime.fromisoformat(s.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if d.tzinfo is None:
+        d = d.replace(tzinfo=timezone.utc)
+    return d.astimezone(timezone.utc)
+
+
+def _snapshot_of(p: dict[str, Any], snapshot: dict[str, Any] | None) -> dict[str, Any]:
+    if isinstance(snapshot, dict):
+        return snapshot
+    for key in ("parameterSnapshot", "snapshot"):
+        value = p.get(key)
+        if isinstance(value, dict):
+            return value
+    return {}
+
+
+def _player_status(p: dict[str, Any], row: dict[str, Any], snap: dict[str, Any]) -> str:
+    for value in (snap.get("status"), p.get("playerStatus"), row.get("playerStatus")):
+        s = str(value or "").strip().upper()
+        if s:
+            return s
+    return ""
+
+
+def _tags(p: dict[str, Any], row: dict[str, Any]) -> list[Any]:
+    tags = p.get("dependencyTags") or row.get("dependencyTags") or []
+    return list(tags) if isinstance(tags, (list, tuple, set)) else []
+
+
+def _role_tag_excludes_playable(tag: Any) -> bool:
+    s = str(tag or "")
+    if not s.upper().startswith("ROLE:"):
+        return False
+    role = s.split(":")[-1].strip().lower().replace(" ", "_")
+    return role in {
+        "questionable", "doubtful", "gtd", "game_time_decision", "limited",
+        "out", "inactive", "suspended", "dnp",
+    }
+
+
+def event_started_before_cutoff(row: dict[str, Any] | None, cutoff: str | None) -> bool:
+    """True when the event is live/suspended or start <= forecastDecisionCutoff."""
+    row = row or {}
+    status = str(row.get("status") or "").strip().lower()
+    if row.get("isLive") or status in LIVE_EVENT_STATUSES:
+        return True
+    start = _parse_utc(
+        row.get("eventStartTime") or row.get("startTime") or row.get("scheduledStart")
+    )
+    cut = _parse_utc(cutoff)
+    if start is None or cut is None:
+        return False
+    return start <= cut
+
+
+def started_event_blocker(row: dict[str, Any] | None, cutoff: str | None) -> str | None:
+    row = row or {}
+    if not event_started_before_cutoff(row, cutoff):
+        return None
+    status = str(row.get("status") or "").strip().lower()
+    if row.get("isLive") or status in LIVE_EVENT_STATUSES:
+        return "LIVE_OR_IN_PROGRESS_NOT_PRODUCTION"
+    return EVENT_ALREADY_STARTED
+
+
+def status_start_hard_blocker(
+    p: dict[str, Any],
+    *,
+    cutoff: str | None = None,
+    snapshot: dict[str, Any] | None = None,
+) -> str | None:
+    """Return the status/start blocker that keeps a row off modeled PLAYABLE."""
+    row = p.get("row") if isinstance(p.get("row"), dict) else p
+    row = row if isinstance(row, dict) else {}
+    snap = _snapshot_of(p, snapshot)
+    blocker = p.get("blocker") or snap.get("blocker")
+    if blocker in MODELED_CARD_EXCLUDED_BLOCKERS:
+        return str(blocker)
+    status = _player_status(p, row, snap)
+    if status in HARD_EXCLUDE_PLAYER_STATUSES:
+        return PLAYER_NOT_ACTIVE
+    if status in UNCERTAIN_PLAYER_STATUSES:
+        return PLAYER_STATUS_UNCERTAIN
+    if status == "UNKNOWN":
+        return PLAYER_STATUS_UNKNOWN
+    if any(_role_tag_excludes_playable(tag) for tag in _tags(p, row)):
+        return PLAYER_STATUS_UNCERTAIN
+    cut = cutoff or p.get("forecastCutoff") or p.get("forecastDecisionCutoff")
+    return started_event_blocker(row, cut)
+
+
+def is_modeled_playable(
+    p: dict[str, Any],
+    *,
+    cutoff: str | None = None,
+    snapshot: dict[str, Any] | None = None,
+) -> bool:
+    """PLAYABLE-grade modeled row eligible for the strict card, ignoring production root.
+
+    P0 status/start hard gates (cannot be modeledPlayable / cannot be on strict_card):
+    1. player status in {OUT, INACTIVE, SUSPENDED} — hard exclude
+    2. ParameterSnapshot / row blocker PLAYER_STATUS_UNCERTAIN
+    3. event already started / in_progress / suspended vs forecastDecisionCutoff
+    4. QUESTIONABLE/DOUBTFUL — hard exclude from PLAYABLE (availability mixture is P2)
+    """
     row = p.get("row") if isinstance(p.get("row"), dict) else p
     if (row or {}).get("modifier") == "GOBLIN":
         return False
@@ -49,7 +191,7 @@ def is_modeled_playable(p: dict[str, Any]) -> bool:
     state = p.get("state")
     if state not in {None, "MODELED"}:
         return False
-    if p.get("blocker") in MODELED_CARD_EXCLUDED_BLOCKERS:
+    if status_start_hard_blocker(p, cutoff=cutoff, snapshot=snapshot):
         return False
     return True
 
