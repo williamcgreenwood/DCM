@@ -94,13 +94,17 @@ class FixtureProvider:
         scope = request["scope"]
         if scope == "SPORT":
             value = {"distribution_family": "development_fixture", "overtime": "INCLUDE_FULL_GAME"}
+        elif scope == "COMPETITION":
+            value = {"competition_context": True, "production_eligible": False}
         elif scope == "EVENT":
             value = {"starters_known": True, "environment": "neutral_fixture"}
-        elif scope == "TEAM":
+        elif scope in {"TEAM", "AFFILIATION", "COUNTERPARTY"}:
             value = {"pace_multiplier": 1.0, "matchup_efficiency_multiplier": 1.0, "injury_cluster": False}
-        elif scope == "PLAYER":
+        elif scope in {"PLAYER", "SUBJECT"}:
             value = {"status": "ACTIVE", "role": "starter_or_feature", "opportunity": {"support_n": 0},
                      "efficiency": {"support_n": 0}, "game_logs": [], "production_eligible": False}
+        elif scope == "ENVIRONMENT":
+            value = {"environment_context": "neutral_fixture", "weather": None, "surface": None, "production_eligible": False}
         elif scope == "MARKET_DEFINITION":
             value = {"definition_verified": False, "production_eligible": False}
         elif scope == "OFFER":
@@ -243,9 +247,14 @@ def collect(requests: list[dict], provider: ResearchProvider, cache: ResearchCac
     seen_scope: set[tuple[str, str]] = set()
     kind_map = {
         "PLAYER": "PLAYER_GAME_LOG",
+        "SUBJECT": "PLAYER_GAME_LOG",
         "TEAM": "TEAM_GAME_LOG",
+        "AFFILIATION": "TEAM_GAME_LOG",
+        "COUNTERPARTY": "TEAM_GAME_LOG",
         "EVENT": "EVENT_STATUS",
+        "ENVIRONMENT": "EVENT_STATUS",
         "SPORT": "MARKET_DEFINITION",
+        "COMPETITION": "MARKET_DEFINITION",
         "MARKET_DEFINITION": "MARKET_DEFINITION",
         "OFFER": "LINE",
     }

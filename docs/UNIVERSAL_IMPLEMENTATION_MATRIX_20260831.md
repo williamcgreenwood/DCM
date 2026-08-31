@@ -39,32 +39,32 @@ Status meanings:
 | Complete Research Population | COMPLETE (canonical population construction) | V2 manifest contains universal entities and fan-out counts. |
 | ResearchDependencyGraph | COMPLETE (first executable graph) | Universal node types only; no Player/Team nodes. |
 | Universal host research plan | COMPLETE (planning artifact) | Emits reusable entity tasks and universal research questions. |
-| Legacy TEAM/PLAYER request planner | OBSOLETE as canonical / ACTIVE compatibility | Still feeds current source-provider and sport-packet code; must be migrated behind adapter translation. |
-| SourceAdapterRegistry | PARTIAL | Real basketball/official/platform adapters exist; provider coverage is not universal across every declared sport. |
-| SportResearchSchema | PARTIAL | Semantic coverage exists for current basketball/gridiron paths, but no full generic SportResearchSchema registry with every required contract field. |
-| SubjectResearchPacket | PARTIAL | Current PlayerResearchPacket is substantive and reused; universal SubjectResearchPacket container/adapter migration remains. |
-| AffiliationResearchPacket | PARTIAL | Team packet is substantive for current team sports but remains sport-specific compatibility vocabulary. |
-| CounterpartyResearchPacket | PARTIAL | Opponent packet reuses team evidence; universal counterparty kinds beyond team opponents are not yet implemented. |
-| EventResearchPacket | PARTIAL | Current team-sport event packet exists; broader formats/course/map/fight/race semantics depend on future sport plugins. |
-| EnvironmentResearchPacket | PARTIAL | Some event/weather/surface context exists; first-class universal environment acquisition is incomplete. |
+| Legacy TEAM/PLAYER request planner | OBSOLETE as canonical / adapter-only | `plan_research` now emits SPORT/COMPETITION/EVENT/AFFILIATION/SUBJECT/COUNTERPARTY/ENVIRONMENT/MARKET_DEFINITION/OFFER. PLAYER/TEAM remain lookup aliases inside adapters/coverage/packets. |
+| SourceAdapterRegistry | PARTIAL | Versioned `source_catalog.json` plus basketball/official/platform adapters. Live fetch remains opt-in; no licensed provider is a hard dependency. |
+| SportResearchSchema | PARTIAL | Semantic coverage exists for basketball/gridiron and is consulted for SUBJECT/AFFILIATION/COUNTERPARTY/EVENT/ENVIRONMENT; remaining sports fail closed. |
+| SubjectResearchPacket | PARTIAL | Universal wrapper + compatibility PlayerResearchPacket. |
+| AffiliationResearchPacket | PARTIAL | Universal wrapper over team packets. |
+| CounterpartyResearchPacket | PARTIAL | Canonical COUNTERPARTY requests; opponent packet still reuses affiliation evidence. |
+| EventResearchPacket | PARTIAL | Current team-sport event packet plus universal wrapper. |
+| EnvironmentResearchPacket | PARTIAL | First-class ENVIRONMENT requests and packet wrapper; sport-specific weather/surface still plugin-owned. |
 | Canonical normalization | PARTIAL | Basketball/gridiron normalized histories exist; every production sport does not yet own a complete CanonicalStatSchema/HistoricalPerformanceSchema. |
-| EvidenceGraph | COMPLETE (universal topology), PARTIAL (full lineage population) | V2 graph uses Subject/Affiliation/Counterparty; legacy claim scopes translate at boundary. Feature/Parameter/Simulation/Selection/Settlement nodes still need full runtime population. |
+| EvidenceGraph | COMPLETE (universal topology), PARTIAL (settlement-time freeze join) | V2 graph uses Subject/Affiliation/Counterparty. Freeze now attaches Feature, RoleState, ParticipationState, OpportunityState, EfficiencyState, ParameterSnapshot, Simulation, PropEvaluation, Selection, Forecast. Settlement/LearningObservation live in `settlement_lineage.json` so freeze bytes stay append-only. |
 | Semantic evidence coverage | PARTIAL | Real field-level gates exist for basketball/gridiron; must move under SportResearchSchema instead of legacy PLAYER/TEAM branching. |
 | Research cache / temporal evidence | COMPLETE for current provider path | As-of cache and pre-cutoff claim validation are executable. |
-| Automatic host web acquisition | PARTIAL | Runtime emits research plans/bundle contracts and the ChatGPT-native host contract is now specified. Actual host API/CLI implementation, optimized iterative research batches, and universal adapter/provider translation remain incomplete. |
+| Automatic host web acquisition | PARTIAL | `dcm-host next-research` + evidence-import is executable. The host still performs the actual web fetch; Python never fabricates research. Fresh-wheel ChatGPT HAR acceptance remains open. |
 
 ## P2 — ML data / state layer
 
 | Subsystem | Status | Evidence / action |
 |---|---|---|
-| Immutable-as-of FeatureStore | PARTIAL | Real feature-store artifacts exist; schema is still shaped by current basketball/gridiron packet paths rather than fully universal feature families. |
+| Immutable-as-of FeatureStore | PARTIAL | Feature families now include IDENTITY/PARTICIPATION/ROLE/OPPORTUNITY/EFFICIENCY/AFFILIATION/COUNTERPARTY/MATCHUP/EVENT/ENVIRONMENT/RECENCY/WORKLOAD/AVAILABILITY/MARKET/PLATFORM. Packet-shaped basketball/gridiron observations remain. |
 | RoleStateModel | PARTIAL | Role epochs/state logic exists for current subjects; universal SportPlugin-defined RoleStateSchema is incomplete. |
-| ParticipationModel | PARTIAL | Basketball minutes/gridiron opportunity state paths exist; universal ParticipationState plugin contract is incomplete. |
+| ParticipationModel | COMPLETE for basketball/gridiron current path / PARTIAL universal | `dcm.model.participation.ParticipationModel` fits minutes (basketball) and snaps (gridiron) independently; OpportunityModel consumes that output. Other sports fail closed. |
 | OpportunityModel | PARTIAL | Explicit opportunity modeling exists in current engines. General sport-neutral dispatch is incomplete. |
 | EfficiencyModel | PARTIAL | Explicit efficiency separation exists in current engines. General sport-neutral dispatch is incomplete. |
 | Hierarchical shrinkage / role-comparable history | PARTIAL | Current packet/state logic has support/shrinkage concepts; not all sports have validated implementations. |
 | Availability state / mixture | COMPLETE for current team-sport path | Active/out/questionable logic is executable and selection-blocking where required. |
-| ParameterSnapshot | PARTIAL | Real snapshots feed current simulations; universal layered SUBJECT/AFFILIATION/COUNTERPARTY/EVENT/ENVIRONMENT container coverage is incomplete. |
+| ParameterSnapshot | PARTIAL | Snapshots expose layered SUBJECT/AFFILIATION/COUNTERPARTY/EVENT/ENVIRONMENT/MARKET/AVAILABILITY/PARTICIPATION/OPPORTUNITY/EFFICIENCY containers plus evidence-hash lineage. PLAYER/TEAM remain compatibility scopes_used. |
 | ML model registry with training metadata | PARTIAL | Governance pieces exist; not every active parameter model is an earned trained ML champion. |
 | No-fake-ML gate | COMPLETE as doctrine/gate | Predictive superiority remains NONE and LR000000; engineering simulations are not mislabeled trained superiority. |
 
@@ -108,7 +108,7 @@ Status meanings:
 | Deterministic audit pack | COMPLETE for current runtime | Run archive/hashes/integrity artifacts exist. |
 | GitHub archive integration | COMPLETE engineering path | Host/CLI archive path exists without making model depend on Git auth. |
 | Evidence trace from selection to source | COMPLETE in EvidenceGraph V2 for current packet path | Canonical trace is Offer→Subject→Claim→SourceDocument. |
-| Feature→Parameter→Simulation→Selection full graph trace | PARTIAL | Required node types/edges are not yet fully populated end-to-end. |
+| Feature→Parameter→Simulation→Selection full graph trace | PARTIAL to strong | Runtime graph is populated at freeze. Settlement/LearningObservation is a sidecar (`settlement_lineage.json`) so frozen forecast bytes are not rewritten. |
 | Wheel/runtime ZIP/release manifest/SHA manifest | PARTIAL to strong | Release tooling exists and clean install is exercised in CI. Fresh-host execution still requires a canonical release artifact that is actually mounted/retrievable in the ChatGPT execution environment; GitHub read access alone is not sufficient. |
 | No secret/raw private HAR archive | COMPLETE as security invariant | Current HAR/evidence sanitization and URL credential checks remain. |
 
@@ -127,23 +127,12 @@ Status meanings:
 
 ## Highest-priority next code migrations
 
-1. Replace host/provider canonical semantics with universal
-   `SUBJECT/AFFILIATION/COUNTERPARTY/ENVIRONMENT` requests and keep
-   `PLAYER/TEAM` only inside sport/source adapters.
-2. Move field-level evidence requirements into a real per-sport
-   `SportResearchSchema` registry.
-3. Replace player/team packet APIs with universal Subject/Affiliation/
-   Counterparty packet contracts while preserving sport-specific payloads.
-4. Expand EvidenceGraph runtime population through
-   Feature → Role/Participation → ParameterSnapshot → Simulation →
-   PropEvaluation → Selection → Settlement → LearningObservation.
-5. Close the explicit PARTIAL bindings reported by `sport_plugin_contract_registry.json`; do not promote universal sport capability until its 24-component contract is fully IMPLEMENTED and import-resolved.
-6. Finish one reference sport end to end under that interface, then promote no
-   additional sport beyond SHADOW/RESEARCH until its deep plugin is complete.
-7. Complete portable release regeneration and fresh-conversation acceptance
-   using only canonical runtime + HAR.
-8. Accumulate chronological settlements before any predictive or Learning
-   Revision promotion.
+1. Drive a fresh-host wheel+HAR acceptance test through `dcm-host` without a source checkout.
+2. Close remaining PLAYER/TEAM claim lookups so they exist only inside source/sport adapters.
+3. Close remaining PARTIAL SportPlugin bindings (FeatureSchema, EnvironmentModel, MarketDefinitionRegistry/minimal, ValidationSuite).
+4. Finish one reference sport end to end under the 24-component interface.
+5. High-volume queryable research artifact store referenced by hashes.
+6. Accumulate chronological settlements before any predictive or Learning Revision promotion.
 
 ## P7–P14 completion program
 
@@ -151,13 +140,13 @@ The detailed P0–P6 matrix remains the modeling/system audit. The following wor
 
 | Workstream | State | Required finish |
 |---|---|---|
-| P7 Host-native execution | EARLY | Implement stable `dcm-host` / `python -m dcm.chat` API/CLI: doctor, prepare, next-research, evidence-import, coverage, forecast, report, resume, audit, settle. |
-| P8 Universal source acquisition | PARTIAL | Versioned source catalog, SportResearchSchema-driven field plans, authority/fallback policy, batching, conflicts, authenticated-provider adapters without secrets in repo. |
-| P9 Universal-core migration | STRONG PARTIAL | Legacy Player/Team semantics terminate completely at sport/source compatibility adapters. |
+| P7 Host-native execution | PARTIAL | `dcm-host` / `python -m dcm.chat` / `HostSession` implemented over the existing runner: doctor, prepare, next-research, evidence-import, coverage, forecast, report, resume, audit, settle, archive. Not 10/10: fresh-wheel HAR acceptance remains. |
+| P8 Universal source acquisition | PARTIAL | Versioned source catalog, event-first batching, schema-driven coverage extras, host-observation import. Live fetch remains opt-in. |
+| P9 Universal-core migration | STRONG PARTIAL | Planner/provider canonical scopes are universal. PLAYER/TEAM survive as adapter aliases and compatibility projections. |
 | P10 Full sport coverage | EARLY | Every promoted sport independently satisfies all 24 SportPlugin components and plugin validation; unsupported sports fail closed. |
 | P11 Release/fresh-host acceptance | PARTIAL | Exact wheel+manifest+hash retrieval and a fresh ChatGPT HAR-only acceptance test with no source checkout/prior memory. |
-| P12 Research archive/index/reuse | EARLY | Content-addressed normalized evidence/provenance, source/entity/event/time indexes, invalidation/retention, licensing-aware storage. |
-| P13 Performance/search/token optimization | PARTIAL | Fan-out research scheduling, cache/incremental DAG, batched writes, adaptive simulation, measured CPU/RSS/wall/token benchmarks. |
-| P14 Production operations/observability | PARTIAL | Run health/readiness, structured failure taxonomy, deterministic recovery, release gates, operator-visible status and immutable engineering-pass ledger. |
+| P12 Research archive/index/reuse | PARTIAL | Content-addressed `ResearchStore` hydrates blobs (not pointers) for delta classification, entity/source/as-of indexes, append-only game-log merge, outcome memory that cannot decide reuse, and DAG invalidation by delta class. High-volume DB/object store still future. |
+| P13 Performance/search/token optimization | PARTIAL | Fan-out × importance × freshness × uncertainty / cost scheduler and event batching exist. Host performance is not certified. |
+| P14 Production operations/observability | PARTIAL | Host doctor, run_manifest, host_state, engineering-pass ledger. Full ops health/recovery remains. |
 
 See `docs/PROGRAM_STATUS.md`, `docs/PROGRAM_STATUS.json`, `docs/CHATGPT_NATIVE_EXECUTION_SPEC.md`, and `docs/engineering_passes/`.

@@ -315,14 +315,17 @@ def test_staged_pass_a_everyone_pass_b_deepens_without_replacing_log():
     assert packet.get("researchPass") in {None, PASS_A}
 
 
-def test_plan_research_fans_out_opponent_as_team():
+def test_plan_research_fans_out_opponent_as_counterparty():
     rows = _paige_rows(3)
     planned = plan_research(rows, CUTOFF)
-    team_ids = {r["scope_id"] for r in planned["requests"] if r["scope"] == "TEAM"}
-    assert "DAL" in team_ids
-    assert "CON" in team_ids
-    dal = next(r for r in planned["requests"] if r["scope"] == "TEAM" and r["scope_id"] == "DAL")
+    aff_ids = {r["scope_id"] for r in planned["requests"] if r["scope"] == "AFFILIATION"}
+    opp_ids = {r["scope_id"] for r in planned["requests"] if r["scope"] == "COUNTERPARTY"}
+    assert "DAL" in aff_ids
+    assert "CON" in opp_ids
+    dal = next(r for r in planned["requests"] if r["scope"] == "AFFILIATION" and r["scope_id"] == "DAL")
     assert dal["dependent_prop_count"] >= 3
+    assert not any(r["scope"] == "TEAM" for r in planned["requests"])
+    assert not any(r["scope"] == "PLAYER" for r in planned["requests"])
 
 
 def test_player_index_groups_offers_name_is_not_id():

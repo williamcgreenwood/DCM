@@ -130,6 +130,7 @@ class GridironOpportunityModel:
         support_n: int | None = None,
         team_plays: float | None = None,
         pass_rate: float | None = None,
+        participation: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         role_logs = [r for r in (comparable_logs or []) if isinstance(r, dict)]
         season = [r for r in (season_logs or role_logs) if isinstance(r, dict)]
@@ -156,9 +157,13 @@ class GridironOpportunityModel:
         s_tgt, _ = _avg(season, "targets")
 
         snap_prior = priors["snaps_mean_qb"] if bucket == "QB" else priors["snaps_mean_wr"]
+        if isinstance(participation, dict) and participation.get("mean") is not None:
+            snaps_mean = float(participation["mean"]) * pace_m
+        else:
+            snaps_mean = _blend(snaps, s_snaps, snap_prior, weights) * pace_m
         body: dict[str, Any] = {
             "role": bucket,
-            "snaps_mean": _blend(snaps, s_snaps, snap_prior, weights) * pace_m,
+            "snaps_mean": snaps_mean,
             "snaps_sd": max(2.0, _sd(role_logs if role_logs else season, "snaps", priors["snaps_sd"])),
             "support_n": max(sn, pan, rn, routen, tn, len(role_logs)),
             "shrinkage": {

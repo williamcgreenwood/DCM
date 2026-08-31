@@ -83,8 +83,10 @@ def build_legacy_research_population_manifest(
     requests = list(planned.get("requests") or [])
     entities = {
         "events": _entity_rows(requests, "EVENT"),
-        "teams": _entity_rows(requests, "TEAM"),
-        "players": _entity_rows(requests, "PLAYER"),
+        "teams": _entity_rows(requests, "TEAM") or (
+            _entity_rows(requests, "AFFILIATION") + _entity_rows(requests, "COUNTERPARTY")
+        ),
+        "players": _entity_rows(requests, "PLAYER") or _entity_rows(requests, "SUBJECT"),
         "marketDefinitions": _entity_rows(requests, "MARKET_DEFINITION"),
         "offers": _entity_rows(requests, "OFFER"),
         "sports": _entity_rows(requests, "SPORT"),

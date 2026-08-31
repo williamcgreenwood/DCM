@@ -365,6 +365,11 @@ def settle_run(run_dir: Path, outcomes_path: Path, *, card_only: bool = False) -
         rec["failureClass"] = classified["failureClass"]
         rec["failureClassPermanentPatch"] = False
         rec["failureClassReasons"] = classified.get("reasons") or []
+        rec["frozenForecastHash"] = freeze["frozenForecastHash"]
+        rec["evidenceGraphHash"] = freeze.get("evidenceGraphHash") or integrity.get("evidenceGraphHash")
+        rec["parameterSnapshotHash"] = prop.get("parameterSnapshotHash")
+        rec["researchReuseNotDecidedByResult"] = True
+        rec["futureOnlyLearning"] = True
         settlements.append(rec)
         if rec.get("settlement") == "LOSS":
             lower = float(prop.get("lowerBound") or 0.0)
@@ -456,6 +461,31 @@ def settle_run(run_dir: Path, outcomes_path: Path, *, card_only: bool = False) -
     for proposal in proposals:
         append_record(store, "PatchProposal", cutoff, run_id, lr, proposal, source_hash=freeze_hash)
     store.close()
+
+    graph_path = run_dir / "evidence_graph.json"
+    if graph_path.is_file():
+        try:
+            from dcm.research.evidence_graph import attach_runtime_lineage
+            from dcm.research.research_store import ResearchStore
+            graph = json.loads(graph_path.read_text(encoding="utf-8"))
+            settlement_graph = attach_runtime_lineage(
+                graph,
+                selections=json.loads((run_dir / "strict_card.json").read_text(encoding="utf-8"))
+                if (run_dir / "strict_card.json").is_file() else [],
+                run_id=run_id,
+                forecast_cutoff=cutoff,
+                frozen_forecast_hash=freeze_hash,
+                settlements=settlements,
+            )
+            (run_dir / "settlement_lineage.json").write_text(
+                json.dumps(settlement_graph, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+            persist = ResearchStore(run_dir / "research_store")
+            for rec in settlements:
+                persist.put_outcome(rec)
+        except (OSError, json.JSONDecodeError, TypeError, ValueError):
+            pass
 
     after = (run_dir / "frozen_forecast.json").read_bytes()
     if after != freeze_bytes:

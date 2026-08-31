@@ -13,9 +13,26 @@ from dcm.contracts.hashes import content_hash
 from dcm.research.player_packet import WINDOW_SIZES, window_means
 from dcm.research.role_epoch import RoleEpochBuilder
 
-FEATURE_SCHEMA_VERSION = "dcm.feature_store.v1-20260830"
+FEATURE_SCHEMA_VERSION = "dcm.feature_store.v2-20260831"
 TRANSFORMATION_VERSION = "dcm.features.windows.v1-20260830"
-FEATURE_FAMILIES = frozenset({"ROLE", "OPPORTUNITY", "EFFICIENCY", "MATCHUP", "CONTEXT"})
+FEATURE_FAMILIES = frozenset({
+    "IDENTITY",
+    "PARTICIPATION",
+    "ROLE",
+    "OPPORTUNITY",
+    "EFFICIENCY",
+    "AFFILIATION",
+    "COUNTERPARTY",
+    "MATCHUP",
+    "EVENT",
+    "ENVIRONMENT",
+    "RECENCY",
+    "WORKLOAD",
+    "AVAILABILITY",
+    "MARKET",
+    "PLATFORM",
+    "CONTEXT",
+})
 WINDOW_STATS = ("minutes", "pts", "reb", "ast", "fga", "tpa", "fta")
 
 
@@ -86,21 +103,23 @@ class FeatureStore:
         if packet.get("contentHash"):
             source_hashes.append(str(packet["contentHash"]))
         source_hashes = sorted(set(source_hashes))
+        claim_hashes = [str(h) for h in (packet.get("claimHashes") or packet.get("evidenceHashes") or []) if h]
         logs = _logs_from_packet(packet)
         features: list[dict[str, Any]] = []
 
         def add(name: str, value: Any, family: str) -> None:
-            features.append(
-                feature_record(
-                    entity=entity,
-                    event_id=event_id,
-                    feature_name=name,
-                    value=value,
-                    as_of=as_of,
-                    source_hashes=source_hashes,
-                    family=family,
-                )
+            rec = feature_record(
+                entity=entity,
+                event_id=event_id,
+                feature_name=name,
+                value=value,
+                as_of=as_of,
+                source_hashes=source_hashes,
+                family=family,
             )
+            if claim_hashes:
+                rec["claimHashes"] = list(claim_hashes)
+            features.append(rec)
 
         packet_windows = packet.get("windows") if isinstance(packet.get("windows"), dict) else {}
         for n in WINDOW_SIZES:
@@ -161,10 +180,13 @@ class FeatureStore:
 
         add("opponent", offer.get("opponent") or (packet.get("identity") or {}).get("opponent"), "MATCHUP")
         add("team", offer.get("team") or (packet.get("identity") or {}).get("team"), "MATCHUP")
-        add("league", offer.get("league") or (packet.get("identity") or {}).get("league"), "CONTEXT")
-        add("eventStartTime", offer.get("eventStartTime") or (packet.get("identity") or {}).get("eventStartTime"), "CONTEXT")
-        add("status", packet.get("status"), "CONTEXT")
-        add("offerCount", offer.get("offerCount") or len(offer.get("offers") or []), "CONTEXT")
+        add("counterpartyId", offer.get("opponentId") or offer.get("opponent"), "COUNTERPARTY")
+        add("affiliationId", offer.get("teamId") or offer.get("team") or (packet.get("identity") or {}).get("team"), "AFFILIATION")
+        add("league", offer.get("league") or (packet.get("identity") or {}).get("league"), "IDENTITY")
+        add("eventStartTime", offer.get("eventStartTime") or (packet.get("identity") or {}).get("eventStartTime"), "EVENT")
+        add("status", packet.get("status"), "AVAILABILITY")
+        add("offerCount", offer.get("offerCount") or len(offer.get("offers") or []), "MARKET")
+        add("subjectId", entity, "IDENTITY")
         return features
 
 
@@ -206,16 +228,16 @@ def persist_feature_store(
         if not entity:
             continue
         for name, value, family in (
-            ("team_pace", team.get("pace"), "MATCHUP"),
-            ("team_ortg", team.get("ortg"), "MATCHUP"),
-            ("team_drtg", team.get("drtg"), "MATCHUP"),
+            ("team_pace", team.get("pace"), "AFFILIATION"),
+            ("team_ortg", team.get("ortg"), "AFFILIATION"),
+            ("team_drtg", team.get("drtg"), "AFFILIATION"),
             ("team_pts_mean", team.get("ptsMean"), "OPPORTUNITY"),
-            ("team_evidence_used", bool(team.get("evidenceUsed")), "CONTEXT"),
-            ("team_prior_used_as_research", False, "CONTEXT"),
+            ("team_evidence_used", bool(team.get("evidenceUsed")), "AFFILIATION"),
+            ("team_prior_used_as_research", False, "AFFILIATION"),
         ):
             features.append(
                 feature_record(
-                    entity=f"TEAM:{entity}",
+                    entity=f"AFFILIATION:{entity}",
                     event_id="",
                     feature_name=name,
                     value=value,

@@ -27,8 +27,31 @@ NODE_TYPES = (
     "MarketDefinition",
     "Offer",
     "NormalizedStat",
+    "Feature",
+    "RoleState",
+    "ParticipationState",
+    "OpportunityState",
+    "EfficiencyState",
+    "ParameterSnapshot",
+    "Simulation",
+    "PropEvaluation",
+    "Selection",
+    "Forecast",
+    "Settlement",
+    "LearningObservation",
 )
-EDGE_TYPES = ("supports", "derived_from", "applies_to", "conflicts_with", "member_of", "interacts_with")
+EDGE_TYPES = (
+    "supports",
+    "derived_from",
+    "applies_to",
+    "conflicts_with",
+    "member_of",
+    "interacts_with",
+    "feeds",
+    "produces",
+    "selects",
+    "settles",
+)
 
 
 def _nid(kind: str, *parts: Any) -> str:
@@ -416,3 +439,308 @@ def trace_selection(graph: dict[str, Any], selection: dict[str, Any]) -> dict[st
         "path": path,
         "nodeTypes": [n.get("type") for n in path],
     }
+
+
+def _unique_edges(edges: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    seen: set[tuple[str, str, str]] = set()
+    unique: list[dict[str, Any]] = []
+    for edge in edges:
+        key = (str(edge.get("type")), str(edge.get("from")), str(edge.get("to")))
+        if key in seen:
+            continue
+        seen.add(key)
+        unique.append(edge)
+    unique.sort(key=lambda e: (str(e.get("type")), str(e.get("from")), str(e.get("to"))))
+    return unique
+
+
+def attach_runtime_lineage(
+    graph: dict[str, Any] | None,
+    *,
+    features: list[dict[str, Any]] | None = None,
+    snapshots: list[dict[str, Any]] | None = None,
+    evaluations: list[dict[str, Any]] | None = None,
+    selections: list[dict[str, Any]] | None = None,
+    run_id: str = "",
+    forecast_cutoff: str = "",
+    frozen_forecast_hash: str = "",
+    settlements: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
+    """Populate Feature → State → Parameter → Simulation → Selection → Settlement.
+
+    Additive. Research-only graphs remain valid if runtime artifacts are empty.
+    Settlement nodes are intended for a sidecar after freeze; passing them here
+    does not rewrite frozen forecast bytes by itself.
+    """
+    graph = dict(graph or {})
+    nodes: dict[str, dict[str, Any]] = {}
+    for node in graph.get("nodes") or []:
+        if isinstance(node, dict) and node.get("id"):
+            nodes[str(node["id"])] = dict(node)
+    edges: list[dict[str, Any]] = [dict(e) for e in (graph.get("edges") or []) if isinstance(e, dict)]
+
+    def add_node(node: dict[str, Any]) -> str:
+        nid = str(node["id"])
+        if nid not in nodes:
+            nodes[nid] = node
+        else:
+            for k, v in node.items():
+                if k == "id":
+                    continue
+                if v is not None and nodes[nid].get(k) in (None, "", [], {}):
+                    nodes[nid][k] = v
+        return nid
+
+    def add_edge(edge_type: str, src: str, dst: str, **attrs: Any) -> None:
+        edges.append(_edge(edge_type, src, dst, **attrs))
+
+    for feat in features or []:
+        if not isinstance(feat, dict):
+            continue
+        entity = str(feat.get("entity") or "")
+        name = str(feat.get("featureName") or "")
+        if not entity or not name:
+            continue
+        feat_nid = add_node(_node(
+            _nid("Feature", entity, name, feat.get("eventId")),
+            "Feature",
+            entity=entity,
+            featureName=name,
+            family=feat.get("family"),
+            asOf=feat.get("asOf"),
+            trainedModel=False,
+        ))
+        subject_id = entity.split(":", 1)[-1] if ":" in entity else entity
+        subject_nid = add_node(_node(_nid("Subject", subject_id), "Subject", subjectId=subject_id))
+        add_edge("derived_from", feat_nid, subject_nid, via="feature_store")
+        for h in feat.get("sourceHashes") or []:
+            src_nid = add_node(_node(_nid("SourceDocument", h), "SourceDocument", contentHash=h))
+            add_edge("derived_from", feat_nid, src_nid, via="feature_source")
+        for h in feat.get("claimHashes") or []:
+            claim_nid = add_node(_node(_nid("EvidenceClaim", h), "EvidenceClaim", claimHash=h))
+            add_edge("feeds", claim_nid, feat_nid, via="claim_hash")
+
+    for snap in snapshots or []:
+        if not isinstance(snap, dict):
+            continue
+        subject_id = str(snap.get("playerId") or snap.get("subjectId") or "")
+        event_id = str(snap.get("eventId") or "")
+        snap_hash = str(snap.get("parameter_snapshot_hash") or "")
+        if not snap_hash:
+            continue
+        snap_nid = add_node(_node(
+            _nid("ParameterSnapshot", snap_hash),
+            "ParameterSnapshot",
+            parameterSnapshotHash=snap_hash,
+            subjectId=subject_id,
+            eventId=event_id,
+            market=snap.get("market"),
+        ))
+        if subject_id:
+            subject_nid = add_node(_node(_nid("Subject", subject_id), "Subject", subjectId=subject_id))
+            add_edge("derived_from", snap_nid, subject_nid)
+        if event_id:
+            event_nid = add_node(_node(_nid("Event", event_id), "Event", eventId=event_id))
+            add_edge("applies_to", snap_nid, event_nid)
+        layers = snap.get("layers") if isinstance(snap.get("layers"), dict) else {}
+        role = snap.get("role_epoch") if isinstance(snap.get("role_epoch"), dict) else {}
+        if role or layers.get("subject"):
+            role_nid = add_node(_node(
+                _nid("RoleState", subject_id, event_id),
+                "RoleState",
+                subjectId=subject_id,
+                eventId=event_id,
+                supportN=(role.get("support_n") if role else None),
+            ))
+            add_edge("feeds", role_nid, snap_nid)
+        part = snap.get("participation") if isinstance(snap.get("participation"), dict) else {}
+        if part:
+            part_nid = add_node(_node(
+                _nid("ParticipationState", part.get("inputHash") or subject_id),
+                "ParticipationState",
+                unit=part.get("unit"),
+                source=part.get("source"),
+                inputHash=part.get("inputHash"),
+                subjectId=subject_id,
+            ))
+            add_edge("feeds", part_nid, snap_nid, via="participation_before_opportunity")
+        opp_hash = str((layers.get("lineage") or {}).get("opportunityInputHash") or snap.get("opportunityInputHash") or "")
+        if not opp_hash:
+            opp_hash = str((snap.get("parameters") or {}).get("opportunityInputHash") or "")
+        if opp_hash:
+            opp_nid = add_node(_node(
+                _nid("OpportunityState", opp_hash),
+                "OpportunityState",
+                inputHash=opp_hash,
+                subjectId=subject_id,
+            ))
+            add_edge("feeds", opp_nid, snap_nid)
+            if part:
+                add_edge("feeds", _nid("ParticipationState", part.get("inputHash") or subject_id), opp_nid)
+        eff_hash = str((layers.get("lineage") or {}).get("efficiencyInputHash") or (snap.get("parameters") or {}).get("efficiencyInputHash") or "")
+        if eff_hash:
+            eff_nid = add_node(_node(
+                _nid("EfficiencyState", eff_hash),
+                "EfficiencyState",
+                inputHash=eff_hash,
+                subjectId=subject_id,
+            ))
+            add_edge("feeds", eff_nid, snap_nid)
+        for h in snap.get("evidence_hashes") or []:
+            claim_nid = add_node(_node(_nid("EvidenceClaim", h), "EvidenceClaim", claimHash=h))
+            add_edge("feeds", claim_nid, snap_nid, via="evidence_hash")
+
+    for ev in evaluations or []:
+        if not isinstance(ev, dict):
+            continue
+        row = ev.get("row") if isinstance(ev.get("row"), dict) else ev
+        pid = str(row.get("projectionId") or ev.get("projectionId") or "")
+        if not pid:
+            continue
+        snap = ev.get("parameterSnapshot") if isinstance(ev.get("parameterSnapshot"), dict) else {}
+        snap_hash = str(snap.get("parameter_snapshot_hash") or ev.get("parameterSnapshotHash") or "")
+        sim_nid = add_node(_node(
+            _nid("Simulation", pid),
+            "Simulation",
+            projectionId=pid,
+            eventId=row.get("eventId"),
+            worldCount=ev.get("worldCount") or ev.get("nWorlds"),
+        ))
+        eval_nid = add_node(_node(
+            _nid("PropEvaluation", pid),
+            "PropEvaluation",
+            projectionId=pid,
+            grade=ev.get("grade"),
+            pHigher=ev.get("pHigher"),
+            pLower=ev.get("pLower"),
+            pPush=ev.get("pPush"),
+        ))
+        offer_nid = add_node(_node(_nid("Offer", pid), "Offer", projectionId=pid))
+        add_edge("applies_to", eval_nid, offer_nid)
+        add_edge("produces", sim_nid, eval_nid)
+        if snap_hash:
+            snap_nid = add_node(_node(
+                _nid("ParameterSnapshot", snap_hash),
+                "ParameterSnapshot",
+                parameterSnapshotHash=snap_hash,
+            ))
+            add_edge("feeds", snap_nid, sim_nid)
+
+    forecast_nid = None
+    if run_id:
+        forecast_nid = add_node(_node(
+            _nid("Forecast", run_id),
+            "Forecast",
+            runId=run_id,
+            forecastCutoff=forecast_cutoff,
+            frozenForecastHash=frozen_forecast_hash or None,
+        ))
+
+    for sel in selections or []:
+        if not isinstance(sel, dict):
+            continue
+        pid = str(sel.get("projectionId") or (sel.get("row") or {}).get("projectionId") or "")
+        if not pid:
+            continue
+        sel_nid = add_node(_node(
+            _nid("Selection", pid),
+            "Selection",
+            projectionId=pid,
+            grade=sel.get("grade"),
+            selectedSide=sel.get("selectedSide") or sel.get("direction"),
+        ))
+        add_edge("selects", sel_nid, _nid("Offer", pid))
+        add_edge("derived_from", sel_nid, _nid("PropEvaluation", pid))
+        if forecast_nid:
+            add_edge("produces", forecast_nid, sel_nid)
+
+    for rec in settlements or []:
+        if not isinstance(rec, dict):
+            continue
+        pid = str(rec.get("projectionId") or "")
+        if not pid:
+            continue
+        set_nid = add_node(_node(
+            _nid("Settlement", pid, rec.get("settlement") or rec.get("result")),
+            "Settlement",
+            projectionId=pid,
+            result=rec.get("settlement") or rec.get("result"),
+            frozenForecastHash=rec.get("frozenForecastHash") or frozen_forecast_hash or None,
+        ))
+        add_edge("settles", set_nid, _nid("Offer", pid))
+        add_edge("settles", set_nid, _nid("Selection", pid))
+        if forecast_nid:
+            add_edge("settles", set_nid, forecast_nid)
+        learn_nid = add_node(_node(
+            _nid("LearningObservation", pid),
+            "LearningObservation",
+            projectionId=pid,
+            futureOnly=True,
+            doesNotRewriteForecast=True,
+            doesNotDecideResearchReuse=True,
+        ))
+        add_edge("derived_from", learn_nid, set_nid)
+
+    unique_edges = _unique_edges(edges)
+    node_list = [nodes[k] for k in sorted(nodes)]
+    body = {
+        "schema": "pillars_dcm.evidence_graph.v2",
+        "canonical": True,
+        "runtimeLineage": True,
+        "legacyScopeCompatibility": ["PLAYER->SUBJECT", "TEAM->AFFILIATION/COUNTERPARTY"],
+        "nodeTypes": list(NODE_TYPES),
+        "edgeTypes": list(EDGE_TYPES),
+        "nodeCount": len(node_list),
+        "edgeCount": len(unique_edges),
+        "nodes": node_list,
+        "edges": unique_edges,
+        "runId": run_id or graph.get("runId"),
+        "forecastCutoff": forecast_cutoff or graph.get("forecastCutoff"),
+    }
+    body["contentHash"] = content_hash({k: v for k, v in body.items() if k != "contentHash"})
+    return body
+
+
+def trace_runtime_lineage(graph: dict[str, Any], selection: dict[str, Any]) -> dict[str, Any]:
+    """Selection → PropEvaluation → Simulation → ParameterSnapshot → Feature/Claim."""
+    base = trace_selection(graph, selection)
+    projection_id = base.get("projectionId") or ""
+    nodes = {n["id"]: n for n in graph.get("nodes") or [] if isinstance(n, dict)}
+    edges = [e for e in graph.get("edges") or [] if isinstance(e, dict)]
+
+    def neighbors(nid: str, *, reverse: bool = False) -> list[str]:
+        out = []
+        for edge in edges:
+            if reverse and edge.get("to") == nid:
+                out.append(str(edge.get("from")))
+            elif not reverse and edge.get("from") == nid:
+                out.append(str(edge.get("to")))
+        return out
+
+    extra: list[dict[str, Any]] = []
+    sel_nid = _nid("Selection", projection_id)
+    eval_nid = _nid("PropEvaluation", projection_id)
+    sim_nid = _nid("Simulation", projection_id)
+    for nid in (sel_nid, eval_nid, sim_nid):
+        if nid in nodes:
+            extra.append(nodes[nid])
+    if sim_nid in nodes:
+        for parent in neighbors(sim_nid, reverse=True):
+            if parent in nodes and nodes[parent].get("type") == "ParameterSnapshot":
+                extra.append(nodes[parent])
+                for gp in neighbors(parent, reverse=True):
+                    if gp in nodes and nodes[gp].get("type") in {
+                        "Feature", "RoleState", "ParticipationState",
+                        "OpportunityState", "EfficiencyState", "EvidenceClaim",
+                    }:
+                        extra.append(nodes[gp])
+    types = list(base.get("nodeTypes") or []) + [n.get("type") for n in extra]
+    return {
+        **base,
+        "runtimePath": extra,
+        "runtimeNodeTypes": [n.get("type") for n in extra],
+        "lineageNodeTypes": types,
+        "hasParameterSnapshot": "ParameterSnapshot" in types,
+        "hasSimulation": "Simulation" in types,
+    }
+
