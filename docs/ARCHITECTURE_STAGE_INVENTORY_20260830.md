@@ -21,9 +21,9 @@ Audit pack `audit/runs/RUN_60612c8a7bcf7df1` is a **regression fixture, not a go
 | source research | PARTIAL | File/Bundle/Fixture providers + `authority.py`; basketball SourceAdapters (`BasketballReferenceGameLogAdapter`, `BasketballReferencePlayerAdapter`, `PrizePicksOfferAdapter`). Live fetch opt-in (`DCM_LIVE_FETCH`); CI uses HTML fixtures. Other sports adapters still missing. |
 | normalized stats | PARTIAL | PR #7 `dcm/research/gamelog.py` basketball aliases (MP/TRB→minutes/reb) COMPLETE for basketball; other sports alias coverage incomplete. |
 | EvidenceGraph | COMPLETE | First-class `dcm/research/evidence_graph.py` (`evidence_graph.json` + content hash). Nodes: SourceDocument/EvidenceClaim/Player/Team/Event/MarketDefinition/Offer/NormalizedStat. Edges: supports/derived_from/applies_to/conflicts_with. `trace_selection` resolves Selection→SourceDocument. jsonl remains the transport. |
-| FeatureStore | MISSING | `IndexedStore` sqlite is append-only run records, not a cutoff-safe feature store. |
-| Role / availability | STUB | `dcm/research/role_epoch.py` `RoleEpochBuilder.stub` ("Partitions only when starter/bench/teammate-out claims exist"). Availability is a status string on the snapshot. |
-| ParameterSnapshots | PARTIAL | `dcm/model/parameters.py` five scopes + `parameters/snapshots.json`; opportunity vs efficiency split (PR #7); role-epoch constructor is stub. |
+| FeatureStore | COMPLETE | `dcm/ml/feature_store.py` cutoff-immutable records (entity/eventId/featureName/value/asOf/sourceHashes/transformationVersion/featureSchemaVersion, family in ROLE/OPPORTUNITY/EFFICIENCY/MATCHUP/CONTEXT). Runner writes `feature_store.jsonl` + `feature_store_manifest.json`; L3/L5/L10/L15/L20/season means from the full log. Observations only — no trained-model claim. |
+| Role / availability | COMPLETE | `dcm/research/role_epoch.py` `RoleEpochBuilder.v2-20260830` (not a stub): GS/starter flags, minutes change-points, teammate-out epochs, role-comparable sample, hierarchical shrinkage weights. Availability remains a status string on the snapshot. |
+| ParameterSnapshots | PARTIAL | `dcm/model/parameters.py` five scopes + `parameters/snapshots.json`; opportunity vs efficiency split (PR #7). Basketball path calls `RoleEpochBuilder` + `OpportunityModel`/`EfficiencyModel`; comparable_logs drive minutes/fga/tpa/fta/reb/ast; shrinkage weights (`roleWeight`/`playerWeight`/`priorWeight`) on the snapshot. Thin role support (`support_n` < 3) does not set `evidenceUsed`. Joint minute conservation still MISSING. |
 | Joint EventWorld | PARTIAL | Shared `generate_event_contexts` (`worlds.py`); player worlds still independent. Joint **team minute conservation** MISSING. Quarter worlds MISSING. |
 | PrimitiveStatLedger | PARTIAL | `contracts/schemas.py` + football `ledger.py` + basketball `minimal.py`; runner MC path uses dict worlds, not always the ledger. |
 | market derivation | PARTIAL | `value_from_stats` composites from one world; PRA/PR/PA/RA identities in basketball conservation. Not all markets share one joint ledger. |
@@ -56,6 +56,8 @@ Audit pack `audit/runs/RUN_60612c8a7bcf7df1` is a **regression fixture, not a go
 
 ## Out of scope for this P0
 
-FeatureStore, RoleEpochBuilder production constructor, joint minute conservation, quarter worlds, champion promotion, LR advance, V1 hash rewrite, merge to main.
+Joint minute conservation, quarter worlds, champion promotion, LR advance, V1 hash rewrite, merge to main.
 
 P1 (this line): PlayerOfferSets COMPLETE, EvidenceGraph COMPLETE (minimal first-class), full-season packets PARTIAL (basketball), SourceAdapters basketball-first.
+
+P2 (this line): RoleEpochBuilder COMPLETE (production constructor, not stub); FeatureStore COMPLETE (observations, no trained models); ParameterSnapshots PARTIAL (role-comparable minutes + hierarchical shrink wired on basketball).

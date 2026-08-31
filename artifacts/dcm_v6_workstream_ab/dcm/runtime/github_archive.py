@@ -94,6 +94,8 @@ PACK_FILES = (
     "research_population_manifest.json",
     "player_research_packets.json",
     "evidence_graph.json",
+    "feature_store.jsonl",
+    "feature_store_manifest.json",
     "MOUNT_STATE.json",
     "RUN_AUDIT.md",
     "pick_evidence.json",

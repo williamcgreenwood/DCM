@@ -921,7 +921,14 @@ def run_dcm(
             evidence_graph = json.loads(graph_path.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError):
             evidence_graph = {}
-    (dest / "hashes.json").write_text(json.dumps({"boardHash": board.get("contentHash"), "harSha256": har_sha, "frozenForecastHash": freeze["frozenForecastHash"], "evidenceGraphHash": evidence_graph.get("contentHash"), "checkpointPending": False, "schemaV1Expected": "6e78dacc19843338643bdcabc7477fd3ce2dd065da1e9629646dacc21cdb1f22", "schemaV2": (schema_root.get("v2") or {})}, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    feature_store_hash = None
+    feature_manifest_path = dest / "feature_store_manifest.json"
+    if feature_manifest_path.is_file():
+        try:
+            feature_store_hash = json.loads(feature_manifest_path.read_text(encoding="utf-8")).get("contentHash")
+        except (OSError, json.JSONDecodeError):
+            feature_store_hash = None
+    (dest / "hashes.json").write_text(json.dumps({"boardHash": board.get("contentHash"), "harSha256": har_sha, "frozenForecastHash": freeze["frozenForecastHash"], "evidenceGraphHash": evidence_graph.get("contentHash"), "featureStoreHash": feature_store_hash, "checkpointPending": False, "schemaV1Expected": "6e78dacc19843338643bdcabc7477fd3ce2dd065da1e9629646dacc21cdb1f22", "schemaV2": (schema_root.get("v2") or {})}, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
     blockers = []
     if excluded:

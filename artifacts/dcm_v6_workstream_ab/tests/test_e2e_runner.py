@@ -98,6 +98,8 @@ def test_a_synthetic_smoke(tmp_path: Path):
         "research_population_manifest.json",
         "player_research_packets.json",
         "evidence_graph.json",
+        "feature_store.jsonl",
+        "feature_store_manifest.json",
         "evidence/claims.json",
         "top25_ranked.json",
         "top25_qualified.json",

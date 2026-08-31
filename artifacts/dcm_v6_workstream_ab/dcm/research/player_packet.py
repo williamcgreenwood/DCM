@@ -19,6 +19,7 @@ from dcm.research.gamelog import normalize_basketball_logs
 
 WINDOW_SIZES = (3, 5, 10, 15, 20)
 WINDOW_KEYS = {n: f"L{n}" for n in WINDOW_SIZES}
+WINDOW_STAT_KEYS = ("minutes", "pts", "reb", "ast", "fga", "tpa", "fta")
 
 
 def _f(value: Any) -> float | None:
@@ -52,26 +53,35 @@ def _sort_logs(logs: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return sorted(logs, key=key)
 
 
-def _window(logs: list[dict[str, Any]], n: int) -> dict[str, Any]:
+def window_means(logs: list[dict[str, Any]], n: int) -> dict[str, Any]:
+    """Derived window from the FULL log. Does not replace the full log.
+
+    L5/L10/... are slices of the already-normalized season, newest-last.
+    tpa/fta means are additive; support_n stays based on minutes/pts/reb/ast/fga
+    so existing packet tests remain stable when those extra fields are missing.
+    """
     slice_logs = logs[-n:] if n < len(logs) else list(logs)
-    minutes, mn = _avg(slice_logs, "minutes")
-    pts, pn = _avg(slice_logs, "pts")
-    reb, rn = _avg(slice_logs, "reb")
-    ast, an = _avg(slice_logs, "ast")
-    fga, fn = _avg(slice_logs, "fga")
+    avgs: dict[str, float | None] = {}
+    counts: dict[str, int] = {}
+    for key in WINDOW_STAT_KEYS:
+        mu, cn = _avg(slice_logs, key)
+        avgs[f"{key}_mean"] = mu
+        counts[key] = cn
+    pts, reb, ast = avgs["pts_mean"], avgs["reb_mean"], avgs["ast_mean"]
+    core = tuple(counts[k] for k in ("minutes", "pts", "reb", "ast", "fga"))
     return {
         "nRequested": n,
         "nAvailable": len(slice_logs),
-        "minutes_mean": minutes,
-        "pts_mean": pts,
-        "reb_mean": reb,
-        "ast_mean": ast,
-        "fga_mean": fga,
+        **avgs,
         "pra_mean": (None if pts is None or reb is None or ast is None else pts + reb + ast),
-        "support_n": min(x for x in (mn, pn, rn, an, fn) if x) if any((mn, pn, rn, an, fn)) else 0,
+        "support_n": min(x for x in core if x) if any(core) else 0,
         "derivedFromFullLog": True,
         "doesNotReplaceFullLog": True,
     }
+
+
+def _window(logs: list[dict[str, Any]], n: int) -> dict[str, Any]:
+    return window_means(logs, n)
 
 
 def _pra_identity(logs: list[dict[str, Any]]) -> dict[str, Any]:

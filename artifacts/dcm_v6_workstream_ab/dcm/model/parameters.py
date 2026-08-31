@@ -15,8 +15,11 @@ from statistics import mean, pstdev
 from typing import Any
 
 from dcm.contracts.hashes import content_hash
+from dcm.model.basketball_efficiency import EfficiencyModel
+from dcm.model.basketball_opportunity import OpportunityModel
 from dcm.research.classify import market_definition_id
 from dcm.research.gamelog import normalize_basketball_logs
+from dcm.research.role_epoch import RoleEpochBuilder
 
 
 def _f(v: Any, default: float) -> float:
@@ -116,57 +119,121 @@ def build_parameter_snapshot(row: dict[str, Any], claims: list[dict[str, Any]]) 
     opportunity_support_from_logs = 0
     minutes_source = "PRIOR"
 
+    role_epoch_summary: dict[str, Any] | None = None
+    shrinkage_out = {"roleWeight": 0.0, "seasonWeight": 0.0, "priorWeight": 1.0}
+
     if family == "basketball":
-        norm = normalize_basketball_logs(logs, league=str(row.get("league") or "") or None)
-        logs = norm["logs"]
-        logs_normalized = len(logs)
+        league = str(row.get("league") or "") or None
+        norm = normalize_basketball_logs(logs, league=league)
+        full_logs = norm["logs"]
+        logs_normalized = len(full_logs)
         logs_rejected = len(norm["rejected"])
-        minutes, mn = _avg(logs, "minutes")
-        fga, fn = _avg(logs, "fga")
-        tpa, tn = _avg(logs, "tpa")
-        fta, ftan = _avg(logs, "fta")
-        reb, rn = _avg(logs, "reb")
-        ast, an = _avg(logs, "ast")
-        prior_minutes = 34.0 if row.get("league") == "NBA" else 31.0
+        today_context = {
+            "role": player.get("role"),
+            "projected_role": player.get("projected_role") or player.get("role"),
+            "status": player.get("status"),
+            "teammate_out": player.get("teammate_out") or event.get("teammate_out"),
+            "league": league,
+        }
+        role_epoch = RoleEpochBuilder().build(player, claims=all_claims, today_context=today_context)
+        comparable_raw = role_epoch.get("comparable_logs") or []
+        if comparable_raw:
+            comp_norm = normalize_basketball_logs(comparable_raw, league=league)
+            comparable = comp_norm["logs"] or full_logs
+        else:
+            comparable = full_logs
+        shrinkage_out = dict(role_epoch.get("shrinkage") or shrinkage_out)
+        role_support = int(role_epoch.get("support_n") or 0)
+        minutes, mn = _avg(comparable, "minutes")
+        fga, fn = _avg(comparable, "fga")
+        tpa, tn = _avg(comparable, "tpa")
+        fta, ftan = _avg(comparable, "fta")
+        reb, rn = _avg(comparable, "reb")
+        ast, an = _avg(comparable, "ast")
         opportunity_support_from_logs = mn
-        if mn > 0 and minutes is not None:
+        # Thin role-comparable sample is not opportunity evidence by itself.
+        if mn >= 3 and minutes is not None:
             evidence_used = True
             minutes_source = "LOGS"
-            observed_minutes = minutes if mn >= 3 else _shrink(minutes, mn, prior_minutes)
-            mm = _f(opp.get("minutes_mean"), observed_minutes)
             opp_n = max(opp_n, mn)
+        elif mn > 0 and minutes is not None:
+            evidence_used = False
+            minutes_source = "LOGS"
+            opp_n = mn
         else:
             # Labeled PRIOR for engineering only. Do not treat generic minutes as
             # player research, and do not let claimed support_n paper over mn==0.
             evidence_used = False
             minutes_source = "PRIOR"
-            mm = prior_minutes
             opp_n = 0
         pace = _f(team.get("pace_multiplier"), 1.0) * _f(event.get("pace_multiplier"), 1.0)
         matchup = _f(team.get("matchup_efficiency_multiplier"), 1.0) * _f(event.get("matchup_efficiency_multiplier"), 1.0)
+        role_multiplier = _f(opp.get("role_multiplier"), 1.0)
+        opp_fit = OpportunityModel().fit(
+            comparable,
+            season_logs=full_logs,
+            pace=pace,
+            shrinkage=shrinkage_out,
+            league=league,
+            role_multiplier=role_multiplier,
+            support_n=role_support,
+        )
+        eff_fit = EfficiencyModel().fit(
+            comparable,
+            matchup=matchup,
+            shrinkage=shrinkage_out,
+            league=league,
+        )
+        if opp.get("minutes_mean") is not None:
+            mm = _f(opp.get("minutes_mean"), opp_fit["minutes_mean"]) * role_multiplier
+        else:
+            mm = opp_fit["minutes_mean"]
+
+        def _rate_claimed(claim_map: dict, key: str, fitted: float, mul: float = 1.0) -> float:
+            if key in claim_map and claim_map.get(key) is not None:
+                return _f(claim_map.get(key), fitted) * mul
+            return fitted
+
         params.update({
-            "minutes_mean": mm * _f(opp.get("role_multiplier"), 1.0),
-            "minutes_sd": max(0.75, _f(opp.get("minutes_sd"), _sd(logs, "minutes", 4.5))),
-            "fga_per_min": max(0.01, _f(eff.get("fga_per_min"), _shrink(fga / minutes if fga is not None and minutes else None, fn, 0.55)) * pace),
-            "three_pa_share": max(0.0, min(1.0, _f(eff.get("three_pa_share"), _shrink(tpa / fga if tpa is not None and fga else None, tn, 0.42)))),
-            "two_fg_pct": max(0.05, min(0.95, _f(eff.get("two_fg_pct"), 0.52) * matchup)),
-            "three_fg_pct": max(0.05, min(0.80, _f(eff.get("three_fg_pct"), 0.36) * matchup)),
-            "fta_per_min": max(0.0, _f(eff.get("fta_per_min"), _shrink(fta / minutes if fta is not None and minutes else None, ftan, 0.18)) * pace),
-            "ft_pct": max(0.2, min(1.0, _f(eff.get("ft_pct"), 0.78))),
-            "reb_per_min": max(0.0, _f(eff.get("reb_per_min"), _shrink(reb / minutes if reb is not None and minutes else None, rn, 0.23)) * pace),
-            "ast_per_min": max(0.0, _f(eff.get("ast_per_min"), _shrink(ast / minutes if ast is not None and minutes else None, an, 0.14)) * pace),
-            "stl_per_min": max(0.0, _f(eff.get("stl_per_min"), 0.03) * pace),
-            "blk_per_min": max(0.0, _f(eff.get("blk_per_min"), 0.025) * pace),
-            "tov_per_min": max(0.0, _f(eff.get("tov_per_min"), 0.08) * pace),
+            "minutes_mean": mm,
+            "minutes_sd": max(0.75, _f(opp.get("minutes_sd"), opp_fit["minutes_sd"])),
+            "fga_per_min": max(0.01, _rate_claimed(eff, "fga_per_min", opp_fit["fga_per_min"], pace)),
+            "three_pa_share": max(0.0, min(1.0, _rate_claimed(eff, "three_pa_share", opp_fit["three_pa_share"]))),
+            "two_fg_pct": max(0.05, min(0.95, _rate_claimed(eff, "two_fg_pct", eff_fit["two_fg_pct"], matchup if "two_fg_pct" in eff else 1.0))),
+            "three_fg_pct": max(0.05, min(0.80, _rate_claimed(eff, "three_fg_pct", eff_fit["three_fg_pct"], matchup if "three_fg_pct" in eff else 1.0))),
+            "fta_per_min": max(0.0, _rate_claimed(eff, "fta_per_min", opp_fit["fta_per_min"], pace)),
+            "ft_pct": max(0.2, min(1.0, _rate_claimed(eff, "ft_pct", eff_fit["ft_pct"]))),
+            "reb_per_min": max(0.0, _rate_claimed(eff, "reb_per_min", opp_fit["reb_per_min"], pace)),
+            "ast_per_min": max(0.0, _rate_claimed(eff, "ast_per_min", opp_fit["ast_per_min"], pace)),
+            "stl_per_min": max(0.0, _f(eff.get("stl_per_min"), opp_fit["stl_per_min"]) if "stl_per_min" in eff else opp_fit["stl_per_min"]),
+            "blk_per_min": max(0.0, _f(eff.get("blk_per_min"), opp_fit["blk_per_min"]) if "blk_per_min" in eff else opp_fit["blk_per_min"]),
+            "tov_per_min": max(0.0, _f(eff.get("tov_per_min"), opp_fit["tov_per_min"]) if "tov_per_min" in eff else opp_fit["tov_per_min"]),
+            "priorWeight": shrinkage_out.get("priorWeight"),
+            "playerWeight": shrinkage_out.get("seasonWeight"),
+            "roleWeight": shrinkage_out.get("roleWeight"),
+            "opportunityInputHash": opp_fit.get("inputHash"),
+            "efficiencyInputHash": eff_fit.get("inputHash"),
             "_log_support": {
                 "logsNormalized": logs_normalized,
                 "logsRejected": logs_rejected,
                 "evidenceUsed": evidence_used,
                 "opportunitySupportFromLogs": opportunity_support_from_logs,
                 "minutesSource": minutes_source,
+                "roleSupportN": role_support,
+                "selectedEpoch": (role_epoch.get("selected_epoch") or {}).get("label"),
             },
         })
-        eff_n = max(eff_n, fn, rn, an)
+        role_epoch_summary = {
+            "builder": role_epoch.get("builder"),
+            "selected_epoch": role_epoch.get("selected_epoch"),
+            "support_n": role_support,
+            "shrinkage": shrinkage_out,
+            "invented": False,
+            "epochCount": len(role_epoch.get("epochs") or []),
+            "projectedRole": role_epoch.get("projectedRole"),
+        }
+        logs = comparable
+        eff_n = max(eff_n, fn, rn, an, int(eff_fit.get("support_n") or 0))
     elif family == "gridiron":
         role = str(player.get("role") or row.get("role") or "QB").upper()
         params["role"] = role
@@ -262,7 +329,12 @@ def build_parameter_snapshot(row: dict[str, Any], claims: list[dict[str, Any]]) 
             *(["MARKET"] if used_legacy_market else []),
         }),
         "legacy_market_fallback": used_legacy_market,
+        "priorWeight": shrinkage_out.get("priorWeight"),
+        "playerWeight": shrinkage_out.get("seasonWeight"),
+        "roleWeight": shrinkage_out.get("roleWeight"),
     }
+    if role_epoch_summary is not None:
+        snapshot["role_epoch"] = role_epoch_summary
     for key in ("minutes_mean", "minutes_sd", "pass_att_mean", "pass_att_sd", "rush_att_mean", "rush_att_sd", "routes_mean", "routes_sd", "pa_mean", "pa_sd"):
         if key in params:
             snapshot["opportunity"][key] = params[key]

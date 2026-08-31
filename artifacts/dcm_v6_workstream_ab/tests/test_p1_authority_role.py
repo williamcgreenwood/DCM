@@ -65,3 +65,7 @@ def test_role_epoch_builder_partitions_when_claims_exist():
     assert built["invented"] is False
     assert built["log_count"] == 3
     assert built["partitions"]["starter"]
+    assert "stub" not in str(built.get("builder") or "").lower()
+    assert "epochs" in built
+    assert "shrinkage" in built
+    assert built["comparable_logs"] is not None

@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+from dcm.ml.feature_store import persist_feature_store
 from dcm.research.evidence_graph import build_evidence_graph
 from dcm.research.player_offer_set import build_player_offer_sets, player_offer_sets_document
 from dcm.research.player_packet import build_packets_for_offer_sets, packets_document
@@ -45,7 +46,8 @@ def emit_packets_and_graph(
     pack_doc = _write(Path(dest) / "player_research_packets.json", packets_document(packets))
     graph = build_evidence_graph(claims or [], offer_sets, packets)
     graph_doc = _write(Path(dest) / "evidence_graph.json", graph)
-    return {"packets": packets, "packetsDoc": pack_doc, "graph": graph_doc}
+    feature_manifest = persist_feature_store(Path(dest), packets, offer_sets, cutoff)
+    return {"packets": packets, "packetsDoc": pack_doc, "graph": graph_doc, "featureStore": feature_manifest}
 
 
 def emit_player_centric_research(
