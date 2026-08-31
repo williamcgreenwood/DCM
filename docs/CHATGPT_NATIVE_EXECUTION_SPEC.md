@@ -191,6 +191,18 @@ dcm-host settle \
 
 Settlement is append-only and cannot rewrite forecast artifacts.
 
+## 11. Optional archive/export
+
+```bash
+dcm-host archive \
+  --run /mnt/data/dcm_runs/<run_id> \
+  --format github-pack
+```
+
+This emits a compact content-addressed archive pack containing permitted normalized research/provenance, indexes, hashes, run manifest, forecast/audit artifacts and settlement/learning sidecars. It must exclude raw private HAR bytes, credentials and source material whose license forbids storage.
+
+Forecast correctness must never depend on GitHub write permission. If the host has a write-capable GitHub/Codex integration it may commit the pack into the declared research/run archive layout; otherwise the pack remains a local/exported artifact for a later authorized writer.
+
 ## Optional single-command shell
 
 For environments with an orchestration callback/tool interface:
