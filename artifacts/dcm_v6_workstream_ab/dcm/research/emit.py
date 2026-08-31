@@ -18,6 +18,7 @@ from dcm.research.population import (
 )
 from dcm.research.staged import stage_research
 from dcm.research.subject_offer_set import build_subject_offer_sets, subject_offer_sets_document
+from dcm.research.universal_plan import build_universal_host_research_plan
 
 
 def _write(path: Path, payload: dict[str, Any]) -> dict[str, Any]:
@@ -48,6 +49,10 @@ def emit_offer_sets_and_manifest(
         Path(dest) / "research_dependency_graph.json",
         build_research_dependency_graph(subject_sets, population=manifest),
     )
+    universal_plan = _write(
+        Path(dest) / "universal_host_research_plan.json",
+        build_universal_host_research_plan(manifest, subject_offer_sets=subject_sets),
+    )
 
     # Transitional compatibility artifacts for existing basketball/gridiron
     # research/model consumers. They are projections of the canonical layer.
@@ -66,6 +71,7 @@ def emit_offer_sets_and_manifest(
         "subjectOfferSets": subject_sets,
         "subjectOfferSetsDoc": subject_doc,
         "researchDependencyGraph": dependency_graph,
+        "universalHostResearchPlan": universal_plan,
         "offerSets": legacy_sets,
         "offerSetsDoc": legacy_offer_doc,
         "manifest": man_doc,
