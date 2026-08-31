@@ -30,6 +30,13 @@ from dcm.model.parameters import build_parameter_snapshot
 from dcm.model.ranking import rank_candidates
 from dcm.model.uncertainty import probability_bundle
 from dcm.learning.calibration import apply_calibration, cell_key
+from dcm.model.event_world_joint import (
+    basketball_teammate_groups,
+    simulate_joint_team_worlds,
+    summarize_joint_meta,
+)
+from dcm.model.market_derive import UnknownMarketError
+from dcm.model.quarter_worlds import QuarterPluginIncomplete
 from dcm.model.worlds import generate_event_contexts, simulate_player_worlds, value_from_stats
 from dcm.research.classify import accounting_classify as _classify
 from dcm.research.emit import emit_offer_sets_and_manifest, emit_packets_and_graph
@@ -521,6 +528,9 @@ def run_dcm(
     classified: list[dict[str, Any]] = []
     conservation_failures = 0
     unsupported = excluded = unresolved = evidence_blocked = 0
+    teammate_groups = basketball_teammate_groups(rows)
+    joint_world_cache: dict[tuple[str, str, int], dict[str, list[dict[str, float]]]] = {}
+    joint_meta_acc: list[dict[str, Any]] = []
 
     for row in rows:
         state, blocker = _classify(row)
@@ -551,6 +561,7 @@ def run_dcm(
             evidence_blocked += 1
 
         key = (str(row["eventId"]), str(row["playerId"]), str(snapshot["parameter_snapshot_hash"]))
+        board_id = str(row.get("boardId") or "FULL_GAME")
         try:
             if key not in world_cache:
                 ctx_key = (str(row.get("sportFamily") or ""), str(row.get("eventId") or ""), gov.max_worlds)
@@ -558,14 +569,41 @@ def run_dcm(
                     event_context_cache[ctx_key] = generate_event_contexts(
                         ctx_key[0], ctx_key[1], n=gov.max_worlds, seed=har_sha
                     )
-                world_cache[key] = simulate_player_worlds(
-                    row,
-                    n=gov.max_worlds,
-                    seed=har_sha,
-                    parameter_snapshot=snapshot,
-                    event_contexts=event_context_cache[ctx_key],
-                )
-            values = [value_from_stats(row["market"], w) for w in world_cache[key]]
+                group_key = (str(row.get("eventId") or ""), str(row.get("teamId") or ""))
+                group = teammate_groups.get(group_key) or {}
+                use_joint = str(row.get("sportFamily") or "") == "basketball" and len(group) >= 2
+                if use_joint:
+                    jkey = (group_key[0], group_key[1], gov.max_worlds)
+                    if jkey not in joint_world_cache:
+                        specs = []
+                        for _pid, prow in group.items():
+                            psnap = build_parameter_snapshot(prow, bundle["claims"])
+                            specs.append({"row": prow, "snapshot": psnap})
+                        joint = simulate_joint_team_worlds(
+                            specs,
+                            n=gov.max_worlds,
+                            seed=har_sha,
+                            event_contexts=event_context_cache[ctx_key],
+                        )
+                        joint_world_cache[jkey] = joint["worlds"]
+                        joint_meta_acc.append(joint["meta"])
+                    pid = str(row["playerId"])
+                    world_cache[key] = joint_world_cache[jkey][pid]
+                else:
+                    world_cache[key] = simulate_player_worlds(
+                        row,
+                        n=gov.max_worlds,
+                        seed=har_sha,
+                        parameter_snapshot=snapshot,
+                        event_contexts=event_context_cache[ctx_key],
+                    )
+            values = [value_from_stats(row["market"], w, board_id=board_id) for w in world_cache[key]]
+        except QuarterPluginIncomplete as exc:
+            rec["state"] = "UNSUPPORTED"; rec["blocker"] = getattr(exc, "blocker", None) or "QUARTER_PLUGIN_INCOMPLETE"
+            unsupported += 1; classified.append(rec); continue
+        except UnknownMarketError as exc:
+            rec["state"] = "UNSUPPORTED"; rec["blocker"] = getattr(exc, "blocker", None) or "UNVERIFIED_MARKET_DEFINITION"
+            unsupported += 1; classified.append(rec); continue
         except KeyError:
             rec["state"] = "UNSUPPORTED"; rec["blocker"] = "UNSUPPORTED_FAIL_CLOSED"
             unsupported += 1; classified.append(rec); continue
@@ -603,14 +641,34 @@ def run_dcm(
                     n=target_worlds,
                     seed=har_sha,
                 )
-            world_cache[key] = simulate_player_worlds(
-                row,
-                n=target_worlds,
-                seed=har_sha,
-                parameter_snapshot=snapshot,
-                event_contexts=event_context_cache[adaptive_ctx_key],
-            )
-            values = [value_from_stats(row["market"], w) for w in world_cache[key]]
+            group_key = (str(row.get("eventId") or ""), str(row.get("teamId") or ""))
+            group = teammate_groups.get(group_key) or {}
+            use_joint = str(row.get("sportFamily") or "") == "basketball" and len(group) >= 2
+            if use_joint:
+                jkey = (group_key[0], group_key[1], target_worlds)
+                if jkey not in joint_world_cache:
+                    specs = []
+                    for _pid, prow in group.items():
+                        psnap = build_parameter_snapshot(prow, bundle["claims"])
+                        specs.append({"row": prow, "snapshot": psnap})
+                    joint = simulate_joint_team_worlds(
+                        specs,
+                        n=target_worlds,
+                        seed=har_sha,
+                        event_contexts=event_context_cache[adaptive_ctx_key],
+                    )
+                    joint_world_cache[jkey] = joint["worlds"]
+                    joint_meta_acc.append(joint["meta"])
+                world_cache[key] = joint_world_cache[jkey][str(row["playerId"])]
+            else:
+                world_cache[key] = simulate_player_worlds(
+                    row,
+                    n=target_worlds,
+                    seed=har_sha,
+                    parameter_snapshot=snapshot,
+                    event_contexts=event_context_cache[adaptive_ctx_key],
+                )
+            values = [value_from_stats(row["market"], w, board_id=board_id) for w in world_cache[key]]
             dist = from_worlds(values, float(row["line"]))
             preliminary = max(
                 dist["pHigher"] if row.get("offeredHigher") else 0.0,
@@ -735,8 +793,16 @@ def run_dcm(
         NodeCount=len(world_cache),
         EventContextSets=len(event_context_cache),
         SimulatedPlayerWorlds=sum(len(v) for v in world_cache.values()),
+        JointTeams=len(joint_meta_acc),
     )
     (dest / "performance" / "model.json").write_text(json.dumps(model_perf, indent=2) + "\n", encoding="utf-8")
+    independent_events = len({k[0] for k in world_cache}) - len({m.get("eventId") for m in joint_meta_acc})
+    event_worlds_meta = summarize_joint_meta(joint_meta_acc, independent_events=max(0, independent_events))
+    (dest / "event_worlds_meta.json").write_text(
+        json.dumps(event_worlds_meta, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    if not event_worlds_meta["conservationFlags"]["identitiesHeld"]:
+        conservation_failures += 1
     stages_done.add("MODEL")
 
     ranked = rank_candidates(modeled, top_k=25, seed=har_sha)
@@ -835,6 +901,8 @@ def run_dcm(
         "cardSize": len(card),
         "modeledCardSize": len(card),
         "eventWorlds": len(world_cache),
+        "eventWorldAllocation": event_worlds_meta.get("allocationMode"),
+        "jointMinuteConservation": event_worlds_meta.get("conservationFlags"),
         "conservationFailures": conservation_failures,
         "researchRequested": bundle["requested"],
         "researchReused": bundle["reused"],
@@ -937,6 +1005,11 @@ def run_dcm(
         blockers.append({"code": "UNSUPPORTED_FAIL_CLOSED", "count": unsupported})
     if unresolved:
         blockers.append({"code": "UNRESOLVED", "count": unresolved})
+    if conservation_failures:
+        blockers.append({"code": "PRIMITIVE_CONSERVATION_FAILURE", "count": conservation_failures})
+    flags = freeze.get("jointMinuteConservation") or {}
+    if flags.get("identitiesHeld") is False:
+        blockers.append({"code": "PRIMITIVE_CONSERVATION_FAILURE", "count": 1, "source": "event_worlds_meta"})
     (dest / "blockers.json").write_text(json.dumps(blockers, indent=2) + "\n", encoding="utf-8")
 
     store = IndexedStore(dest / "index.sqlite")

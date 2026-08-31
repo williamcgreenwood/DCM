@@ -100,6 +100,7 @@ def test_a_synthetic_smoke(tmp_path: Path):
         "evidence_graph.json",
         "feature_store.jsonl",
         "feature_store_manifest.json",
+        "event_worlds_meta.json",
         "evidence/claims.json",
         "top25_ranked.json",
         "top25_qualified.json",

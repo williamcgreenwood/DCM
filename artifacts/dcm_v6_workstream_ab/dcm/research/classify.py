@@ -14,7 +14,13 @@ SUPPORTED_FAMILIES = {"basketball", "gridiron", "baseball"}
 PRODUCTION_LEAGUES = {"NBA", "WNBA", "NFL", "CFB"}
 SHADOW_LEAGUES = {"MLB"}
 
-BASKETBALL_MARKETS = {"pts", "reb", "ast", "pra", "3pm", "stl", "blk", "pr", "pa", "ra"}
+BASKETBALL_MARKETS = {
+    "pts", "reb", "ast", "pra", "pr", "pa", "ra",
+    "3pm", "3pa", "tpa", "fgm", "fga", "fg_made", "fg_att",
+    "2pm", "2pa", "twopm", "twopa", "fg2m",
+    "ftm", "fta", "tov", "to", "oreb", "stl", "blk", "blk_stl",
+    "qtrs_w_3plus_pts",
+}
 GRIDIRON_MARKETS = set(MARKET_FROM_STATS) | {
     "pass_yds", "rush_yds", "rec_yds", "receptions", "pass_rush_yds", "rush_rec_yds",
 }

@@ -141,10 +141,93 @@ def _contextualize(
     return p
 
 
-def sample_basketball(rng: random.Random, minutes: float, parameters: dict[str, Any] | None = None) -> dict[str, float]:
+LEDGER_KEYS = (
+    "minutes", "fgm", "fga", "tpm", "three_pm", "tpa", "three_pa",
+    "twopm", "twopa", "ftm", "fta", "oreb", "dreb", "reb", "ast",
+    "stl", "blk", "tov", "pf", "pts",
+)
+
+
+def assert_ledger_identities(ledger: dict[str, Any]) -> None:
+    """Fail closed when a world violates basketball counting identities."""
+    three_pa = float(ledger.get("three_pa", ledger.get("tpa", 0)))
+    three_pm = float(ledger.get("three_pm", ledger.get("tpm", 0)))
+    twopa = float(ledger["twopa"])
+    twopm = float(ledger["twopm"])
+    fga = float(ledger["fga"])
+    fgm = float(ledger["fgm"])
+    oreb = float(ledger["oreb"])
+    dreb = float(ledger["dreb"])
+    reb = float(ledger["reb"])
+    pts = float(ledger["pts"])
+    ftm = float(ledger["ftm"])
+    failed = []
+    if abs(twopa - (fga - three_pa)) > 1e-9:
+        failed.append("2PA")
+    if abs(twopm - (fgm - three_pm)) > 1e-9:
+        failed.append("2PM")
+    if abs(fgm - (twopm + three_pm)) > 1e-9:
+        failed.append("FGM")
+    if abs(reb - (oreb + dreb)) > 1e-9:
+        failed.append("REB")
+    if abs(pts - (2 * twopm + 3 * three_pm + ftm)) > 1e-9:
+        failed.append("PTS")
+    if fgm > fga + 1e-9:
+        failed.append("MADE_FGA")
+    if three_pm > three_pa + 1e-9:
+        failed.append("MADE_TPA")
+    if float(ledger.get("ftm", 0)) > float(ledger.get("fta", 0)) + 1e-9:
+        failed.append("MADE_FTA")
+    if failed:
+        raise RuntimeError(f"PRIMITIVE_CONSERVATION_FAILURE:{failed}")
+
+
+def as_primitive_ledger(stats: dict[str, Any]) -> dict[str, float]:
+    """Canonical PrimitiveStatLedger dict. Applies oreb/dreb split if only reb is present."""
+    out = dict(stats)
+    if "tpa" not in out and "three_pa" in out:
+        out["tpa"] = out["three_pa"]
+    if "tpm" not in out and "three_pm" in out:
+        out["tpm"] = out["three_pm"]
+    if "three_pa" not in out and "tpa" in out:
+        out["three_pa"] = out["tpa"]
+    if "three_pm" not in out and "tpm" in out:
+        out["three_pm"] = out["tpm"]
+    if "reb" in out and ("oreb" not in out or "dreb" not in out):
+        reb = max(0, int(round(float(out["reb"]))))
+        share = float(out.get("oreb_share") or 0.22)
+        oreb = int(round(reb * share))
+        oreb = min(max(0, oreb), reb)
+        out["oreb"] = oreb
+        out["dreb"] = reb - oreb
+        out["reb"] = reb
+    if "pf" not in out:
+        out["pf"] = 0
+    if "twopa" not in out and "fga" in out:
+        out["twopa"] = float(out["fga"]) - float(out.get("tpa") or 0)
+    if "twopm" not in out and "fgm" in out:
+        out["twopm"] = float(out["fgm"]) - float(out.get("tpm") or 0)
+    ledger = {k: float(out[k]) for k in LEDGER_KEYS if k in out}
+    for k in LEDGER_KEYS:
+        if k not in ledger:
+            raise RuntimeError(f"PRIMITIVE_CONSERVATION_FAILURE:missing:{k}")
+    assert_ledger_identities(ledger)
+    return ledger
+
+
+def sample_basketball(
+    rng: random.Random,
+    minutes: float,
+    parameters: dict[str, Any] | None = None,
+    *,
+    allocated_fga: int | None = None,
+) -> dict[str, float]:
     p = parameters or {}
-    fga_mean = minutes * max(0.01, _p(p, "fga_per_min", 0.55))
-    fga = _nonneg_int_gauss(rng, fga_mean, max(1.0, fga_mean ** 0.5))
+    if allocated_fga is None:
+        fga_mean = minutes * max(0.01, _p(p, "fga_per_min", 0.55))
+        fga = _nonneg_int_gauss(rng, fga_mean, max(1.0, fga_mean ** 0.5))
+    else:
+        fga = max(0, int(allocated_fga))
     tpa = _binomial(rng, fga, _p(p, "three_pa_share", 0.42))
     twopa = fga - tpa
     tpm = _binomial(rng, tpa, _p(p, "three_fg_pct", 0.36))
@@ -164,18 +247,24 @@ def sample_basketball(rng: random.Random, minutes: float, parameters: dict[str, 
     stl_mean = minutes * max(0.0, _p(p, "stl_per_min", 0.03))
     blk_mean = minutes * max(0.0, _p(p, "blk_per_min", 0.025))
     tov_mean = minutes * max(0.0, _p(p, "tov_per_min", 0.08))
+    pf_mean = minutes * max(0.0, _p(p, "pf_per_min", 0.07))
     ast = _nonneg_int_gauss(rng, ast_mean, max(0.65, ast_mean ** 0.5))
     stl = _poisson(rng, stl_mean)
     blk = _poisson(rng, blk_mean)
     tov = _nonneg_int_gauss(rng, tov_mean, max(0.55, tov_mean ** 0.5))
+    pf = _nonneg_int_gauss(rng, pf_mean, max(0.45, pf_mean ** 0.5))
 
     pts = 2 * twopm + 3 * tpm + ftm
-    return {
-        "minutes": minutes, "fga": fga, "tpa": tpa, "twopa": twopa, "fgm": fgm,
-        "tpm": tpm, "twopm": twopm, "fta": fta, "ftm": ftm, "oreb": oreb,
-        "dreb": dreb, "reb": reb, "ast": ast, "stl": stl, "blk": blk, "tov": tov,
-        "pts": pts, "pra": pts + reb + ast, "pr": pts + reb, "pa": pts + ast, "ra": reb + ast,
+    # Composites are derived from this ledger, never independently sampled.
+    stats = {
+        "minutes": minutes, "fga": fga, "tpa": tpa, "three_pa": tpa, "twopa": twopa,
+        "fgm": fgm, "tpm": tpm, "three_pm": tpm, "twopm": twopm, "fta": fta, "ftm": ftm,
+        "oreb": oreb, "dreb": dreb, "reb": reb, "ast": ast, "stl": stl, "blk": blk,
+        "tov": tov, "pf": pf, "pts": pts,
+        "pra": pts + reb + ast, "pr": pts + reb, "pa": pts + ast, "ra": reb + ast,
     }
+    assert_ledger_identities(stats)
+    return stats
 
 def sample_football(rng: random.Random, role: str, parameters: dict[str, Any] | None = None) -> dict[str, float]:
     p = parameters or {}
@@ -273,9 +362,13 @@ MARKET_FROM_STATS = {
 }
 
 
-def value_from_stats(market: str, stats: dict[str, float]) -> float:
-    if market == "pra":
-        return stats["pts"] + stats["reb"] + stats["ast"]
+def value_from_stats(market: str, stats: dict[str, float], board_id: str = "FULL_GAME") -> float:
+    from dcm.model.market_derive import derive_market, looks_like_basketball_ledger
+
+    if looks_like_basketball_ledger(stats):
+        return derive_market(stats, market, board_id=board_id)
+    if market == "pra" and "pts" in stats and "reb" in stats and "ast" in stats:
+        return float(stats["pts"]) + float(stats["reb"]) + float(stats["ast"])
     key = MARKET_FROM_STATS.get(market, market)
     if key not in stats:
         raise KeyError(market)
@@ -308,7 +401,11 @@ def simulate_player_worlds(
             sd_minutes = max(0.5, _p(world_params, "minutes_sd", 4.5))
             regulation = 48.0 if row.get("league") == "NBA" else 40.0
             minutes = _clip(rng.gauss(mean_minutes, sd_minutes), 0.0, regulation + 10.0)
-            worlds.append(sample_basketball(rng, minutes, world_params))
+            world = sample_basketball(rng, minutes, world_params)
+            from dcm.model.quarter_worlds import attach_quarter_state
+            q_rng = _rng(f"{seed}:QUARTER:{row['playerId']}:{row['eventId']}:{idx}")
+            attach_quarter_state(world, q_rng)
+            worlds.append(world)
         elif family == "gridiron":
             worlds.append(
                 sample_football(
