@@ -72,7 +72,7 @@ Status meanings:
 
 | Subsystem | Status | Evidence / action |
 |---|---|---|
-| SportPlugin registry | PARTIAL | Capability manifests exist, but the full required contract (Identity/Research/CanonicalStats/Role/Participation/Opportunity/Efficiency/EventWorld/Primitive/Market/Calibration/Settlement/etc.) is not yet represented as one validated interface. |
+| SportPlugin contract | PARTIAL, executable | Full 24-component universal contract is now import-validated and emitted per run. Basketball/gridiron bindings expose exact IMPLEMENTED/PARTIAL gaps; `productionCompleteSports=[]` until every required component is IMPLEMENTED. |
 | Basketball deep plugin | PARTIAL to strong | Joint worlds, minute conservation, market derivation and current research packets exist; still needs migration behind full SportPlugin contract and prospective validation. |
 | Gridiron deep plugin | PARTIAL to strong | Opportunity/yardage worlds and current research paths exist; full universal plugin contract and broader market coverage remain. |
 | Baseball plugin | PARTIAL / SHADOW | MLB remains shadow, not production. |
@@ -137,8 +137,7 @@ Status meanings:
 4. Expand EvidenceGraph runtime population through
    Feature → Role/Participation → ParameterSnapshot → Simulation →
    PropEvaluation → Selection → Settlement → LearningObservation.
-5. Make the full `SportPlugin` interface executable and validate capability
-   only when every required component is registered and tested.
+5. Close the explicit PARTIAL bindings reported by `sport_plugin_contract_registry.json`; do not promote universal sport capability until its 24-component contract is fully IMPLEMENTED and import-resolved.
 6. Finish one reference sport end to end under that interface, then promote no
    additional sport beyond SHADOW/RESEARCH until its deep plugin is complete.
 7. Complete portable release regeneration and fresh-conversation acceptance
