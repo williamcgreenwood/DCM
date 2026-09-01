@@ -1,6 +1,6 @@
 {
-  "contentHash": "9e0f2de43cf1623f8795956ed6682960dcbcf767ceade289aba3ccce1b8bd6d2",
-  "moduleCount": 217,
+  "contentHash": "13dac424a7978adf14ba786f047deb31859bb185f783eeb81edaa4703a89bf98",
+  "moduleCount": 226,
   "modules": [
     {
       "classes": 0,
@@ -2185,71 +2185,79 @@
     },
     {
       "classes": 1,
-      "functions": 7,
+      "functions": 8,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/ml/feature_store.py",
-      "sha256": "134f7da6d1d6920a6a47c208abba46374774204856192bfcaef97f39c901c933",
+      "sha256": "85261bb717dafbc1637ecc2d9148428757f6d27f4ab54bf3bfc1e61310a3a4fa",
       "symbols": [
         {
-          "doc": null,
-          "endLine": 40,
+          "doc": "Canonical consumer for ACTIVE_FEATURE signal outputs.",
+          "endLine": 77,
           "kind": "function",
-          "line": 39,
+          "line": 44,
+          "name": "signal_evaluation_feature_records",
+          "qualname": "signal_evaluation_feature_records"
+        },
+        {
+          "doc": null,
+          "endLine": 81,
+          "kind": "function",
+          "line": 80,
           "name": "_s",
           "qualname": "_s"
         },
         {
           "doc": null,
-          "endLine": 69,
+          "endLine": 110,
           "kind": "function",
-          "line": 43,
+          "line": 84,
           "name": "feature_record",
           "qualname": "feature_record"
         },
         {
           "doc": null,
-          "endLine": 77,
+          "endLine": 118,
           "kind": "function",
-          "line": 72,
+          "line": 113,
           "name": "_identity",
           "qualname": "_identity"
         },
         {
           "doc": null,
-          "endLine": 82,
+          "endLine": 123,
           "kind": "function",
-          "line": 80,
+          "line": 121,
           "name": "_logs_from_packet",
           "qualname": "_logs_from_packet"
         },
         {
           "doc": "Build cutoff-immutable feature records from a PlayerResearchPacket.",
-          "endLine": 190,
+          "endLine": 231,
           "kind": "class",
-          "line": 85,
+          "line": 126,
           "name": "FeatureStore",
           "qualname": "FeatureStore"
         },
         {
           "doc": null,
-          "endLine": 190,
+          "endLine": 231,
           "kind": "method",
-          "line": 92,
+          "line": 133,
           "name": "build_from_packet",
           "qualname": "FeatureStore.build_from_packet"
         },
         {
           "doc": null,
-          "endLine": 122,
+          "endLine": 163,
           "kind": "method",
-          "line": 110,
+          "line": 151,
           "name": "add",
           "qualname": "FeatureStore.build_from_packet.add"
         },
         {
           "doc": "Write feature_store.jsonl + feature_store_manifest.json. Observations only.",
-          "endLine": 310,
+          "endLine": 351,
           "kind": "function",
-          "line": 193,
+          "line": 234,
           "name": "persist_feature_store",
           "qualname": "persist_feature_store"
         }
@@ -8381,6 +8389,469 @@
     {
       "classes": 0,
       "functions": 0,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/signals/__init__.py",
+      "sha256": "00db9f3b9378995c70516792ad316dedecede339e9a4653fb7e2a4576506c55d",
+      "symbols": [],
+      "workstream": "UNMAPPED"
+    },
+    {
+      "classes": 2,
+      "functions": 5,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/signals/compiler.py",
+      "sha256": "92386b92c547e3b77afcf985cc529872a87287a60e39e3b655b3af5e93c8cf82",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 14,
+          "kind": "class",
+          "line": 13,
+          "name": "SignalCompileError",
+          "qualname": "SignalCompileError"
+        },
+        {
+          "doc": null,
+          "endLine": 136,
+          "kind": "class",
+          "line": 17,
+          "name": "SignalCompiler",
+          "qualname": "SignalCompiler"
+        },
+        {
+          "doc": null,
+          "endLine": 19,
+          "kind": "method",
+          "line": 18,
+          "name": "__init__",
+          "qualname": "SignalCompiler.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 91,
+          "kind": "method",
+          "line": 21,
+          "name": "compile",
+          "qualname": "SignalCompiler.compile"
+        },
+        {
+          "doc": null,
+          "endLine": 115,
+          "kind": "method",
+          "line": 94,
+          "name": "_cycle_members",
+          "qualname": "SignalCompiler._cycle_members"
+        },
+        {
+          "doc": null,
+          "endLine": 110,
+          "kind": "method",
+          "line": 99,
+          "name": "visit",
+          "qualname": "SignalCompiler._cycle_members.visit"
+        },
+        {
+          "doc": null,
+          "endLine": 136,
+          "kind": "method",
+          "line": 118,
+          "name": "_topological_order",
+          "qualname": "SignalCompiler._topological_order"
+        }
+      ],
+      "workstream": "UNMAPPED"
+    },
+    {
+      "classes": 5,
+      "functions": 8,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/signals/contracts.py",
+      "sha256": "aa87c073868bddf39e3d68ff963b5b8080514ed624b1dc86769b71cddb5e22a3",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 16,
+          "kind": "class",
+          "line": 10,
+          "name": "SignalStage",
+          "qualname": "SignalStage"
+        },
+        {
+          "doc": null,
+          "endLine": 26,
+          "kind": "class",
+          "line": 19,
+          "name": "LifecycleState",
+          "qualname": "LifecycleState"
+        },
+        {
+          "doc": null,
+          "endLine": 66,
+          "kind": "class",
+          "line": 34,
+          "name": "SignalField",
+          "qualname": "SignalField"
+        },
+        {
+          "doc": null,
+          "endLine": 47,
+          "kind": "method",
+          "line": 41,
+          "name": "__post_init__",
+          "qualname": "SignalField.__post_init__"
+        },
+        {
+          "doc": null,
+          "endLine": 57,
+          "kind": "method",
+          "line": 50,
+          "name": "from_mapping",
+          "qualname": "SignalField.from_mapping"
+        },
+        {
+          "doc": null,
+          "endLine": 66,
+          "kind": "method",
+          "line": 59,
+          "name": "to_dict",
+          "qualname": "SignalField.to_dict"
+        },
+        {
+          "doc": null,
+          "endLine": 88,
+          "kind": "class",
+          "line": 70,
+          "name": "EvidenceRequirement",
+          "qualname": "EvidenceRequirement"
+        },
+        {
+          "doc": null,
+          "endLine": 81,
+          "kind": "method",
+          "line": 76,
+          "name": "from_mapping",
+          "qualname": "EvidenceRequirement.from_mapping"
+        },
+        {
+          "doc": null,
+          "endLine": 88,
+          "kind": "method",
+          "line": 83,
+          "name": "to_dict",
+          "qualname": "EvidenceRequirement.to_dict"
+        },
+        {
+          "doc": null,
+          "endLine": 193,
+          "kind": "class",
+          "line": 92,
+          "name": "SignalOperatorSpec",
+          "qualname": "SignalOperatorSpec"
+        },
+        {
+          "doc": null,
+          "endLine": 132,
+          "kind": "method",
+          "line": 119,
+          "name": "__post_init__",
+          "qualname": "SignalOperatorSpec.__post_init__"
+        },
+        {
+          "doc": "Parse without mutating or destructively canonicalizing source JSON.",
+          "endLine": 164,
+          "kind": "method",
+          "line": 135,
+          "name": "from_mapping",
+          "qualname": "SignalOperatorSpec.from_mapping"
+        },
+        {
+          "doc": null,
+          "endLine": 193,
+          "kind": "method",
+          "line": 166,
+          "name": "to_dict",
+          "qualname": "SignalOperatorSpec.to_dict"
+        }
+      ],
+      "workstream": "UNMAPPED"
+    },
+    {
+      "classes": 1,
+      "functions": 2,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/signals/donor_accounting.py",
+      "sha256": "5d7c4dc1398ee648c0263cb62138645ba8655defa7e43a117661107f6dad9e67",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 36,
+          "kind": "class",
+          "line": 20,
+          "name": "DonorAccountingReport",
+          "qualname": "DonorAccountingReport"
+        },
+        {
+          "doc": null,
+          "endLine": 36,
+          "kind": "method",
+          "line": 27,
+          "name": "to_dict",
+          "qualname": "DonorAccountingReport.to_dict"
+        },
+        {
+          "doc": null,
+          "endLine": 67,
+          "kind": "function",
+          "line": 39,
+          "name": "audit_donor_matrix",
+          "qualname": "audit_donor_matrix"
+        }
+      ],
+      "workstream": "UNMAPPED"
+    },
+    {
+      "classes": 2,
+      "functions": 4,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/signals/executor.py",
+      "sha256": "b90a49fc50ff0299c54354a000a44bc15df024366569489d14e946f0b5c7211e",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 19,
+          "kind": "function",
+          "line": 17,
+          "name": "_hash",
+          "qualname": "_hash"
+        },
+        {
+          "doc": null,
+          "endLine": 53,
+          "kind": "class",
+          "line": 23,
+          "name": "SignalEvaluation",
+          "qualname": "SignalEvaluation"
+        },
+        {
+          "doc": null,
+          "endLine": 53,
+          "kind": "method",
+          "line": 37,
+          "name": "to_dict",
+          "qualname": "SignalEvaluation.to_dict"
+        },
+        {
+          "doc": null,
+          "endLine": 99,
+          "kind": "class",
+          "line": 56,
+          "name": "SignalExecutor",
+          "qualname": "SignalExecutor"
+        },
+        {
+          "doc": null,
+          "endLine": 59,
+          "kind": "method",
+          "line": 57,
+          "name": "__init__",
+          "qualname": "SignalExecutor.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 99,
+          "kind": "method",
+          "line": 61,
+          "name": "execute",
+          "qualname": "SignalExecutor.execute"
+        }
+      ],
+      "workstream": "UNMAPPED"
+    },
+    {
+      "classes": 2,
+      "functions": 5,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/signals/integration_gate.py",
+      "sha256": "48b19fee3dee3a5e346fac024f7c382fcd699d4da651108867fa66dcdaee418c",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 57,
+          "kind": "class",
+          "line": 42,
+          "name": "BindingCatalog",
+          "qualname": "BindingCatalog"
+        },
+        {
+          "doc": null,
+          "endLine": 51,
+          "kind": "method",
+          "line": 50,
+          "name": "sport_exists",
+          "qualname": "BindingCatalog.sport_exists"
+        },
+        {
+          "doc": null,
+          "endLine": 54,
+          "kind": "method",
+          "line": 53,
+          "name": "market_is_applicable",
+          "qualname": "BindingCatalog.market_is_applicable"
+        },
+        {
+          "doc": null,
+          "endLine": 57,
+          "kind": "method",
+          "line": 56,
+          "name": "unit_for",
+          "qualname": "BindingCatalog.unit_for"
+        },
+        {
+          "doc": null,
+          "endLine": 107,
+          "kind": "class",
+          "line": 60,
+          "name": "SignalIntegrationGate",
+          "qualname": "SignalIntegrationGate"
+        },
+        {
+          "doc": null,
+          "endLine": 62,
+          "kind": "method",
+          "line": 61,
+          "name": "__init__",
+          "qualname": "SignalIntegrationGate.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 107,
+          "kind": "method",
+          "line": 64,
+          "name": "validate",
+          "qualname": "SignalIntegrationGate.validate"
+        }
+      ],
+      "workstream": "UNMAPPED"
+    },
+    {
+      "classes": 0,
+      "functions": 2,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/signals/overlap.py",
+      "sha256": "eb6e0f6c57ef5736fffe1e948e1f88f01cbd627d1d7850f1d16eb2da536650f0",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 33,
+          "kind": "function",
+          "line": 10,
+          "name": "semantic_signature",
+          "qualname": "semantic_signature"
+        },
+        {
+          "doc": null,
+          "endLine": 37,
+          "kind": "function",
+          "line": 36,
+          "name": "resolved_overlap_group",
+          "qualname": "resolved_overlap_group"
+        }
+      ],
+      "workstream": "UNMAPPED"
+    },
+    {
+      "classes": 3,
+      "functions": 8,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/signals/registry.py",
+      "sha256": "fa6d7c08d1db3cd53e23e4cabf64969ea5b8d1f649543a90f90cd7fd8f154a39",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 27,
+          "kind": "class",
+          "line": 13,
+          "name": "CompiledOperator",
+          "qualname": "CompiledOperator"
+        },
+        {
+          "doc": null,
+          "endLine": 27,
+          "kind": "method",
+          "line": 20,
+          "name": "to_dict",
+          "qualname": "CompiledOperator.to_dict"
+        },
+        {
+          "doc": null,
+          "endLine": 58,
+          "kind": "class",
+          "line": 31,
+          "name": "CompiledRegistry",
+          "qualname": "CompiledRegistry"
+        },
+        {
+          "doc": null,
+          "endLine": 37,
+          "kind": "method",
+          "line": 36,
+          "name": "by_id",
+          "qualname": "CompiledRegistry.by_id"
+        },
+        {
+          "doc": null,
+          "endLine": 46,
+          "kind": "method",
+          "line": 39,
+          "name": "counts",
+          "qualname": "CompiledRegistry.counts"
+        },
+        {
+          "doc": null,
+          "endLine": 58,
+          "kind": "method",
+          "line": 49,
+          "name": "build",
+          "qualname": "CompiledRegistry.build"
+        },
+        {
+          "doc": null,
+          "endLine": 75,
+          "kind": "class",
+          "line": 61,
+          "name": "SignalRegistry",
+          "qualname": "SignalRegistry"
+        },
+        {
+          "doc": null,
+          "endLine": 63,
+          "kind": "method",
+          "line": 62,
+          "name": "__init__",
+          "qualname": "SignalRegistry.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 68,
+          "kind": "method",
+          "line": 65,
+          "name": "register",
+          "qualname": "SignalRegistry.register"
+        },
+        {
+          "doc": null,
+          "endLine": 72,
+          "kind": "method",
+          "line": 70,
+          "name": "extend",
+          "qualname": "SignalRegistry.extend"
+        },
+        {
+          "doc": null,
+          "endLine": 75,
+          "kind": "method",
+          "line": 74,
+          "name": "candidates",
+          "qualname": "SignalRegistry.candidates"
+        }
+      ],
+      "workstream": "UNMAPPED"
+    },
+    {
+      "classes": 0,
+      "functions": 0,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/sports/__init__.py",
       "sha256": "30408f4a40398666573fd31a9903c974504b9b3787cd045a590e70fcd1ff975c",
       "symbols": [],
@@ -12505,6 +12976,183 @@
     },
     {
       "classes": 0,
+      "functions": 21,
+      "path": "artifacts/dcm_v6_workstream_ab/tests/test_signal_governance.py",
+      "sha256": "72a8ceedcb84b40e7dfebd9e2573e32c8633541690dcf0218d49dc2ba2e0722b",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 22,
+          "kind": "function",
+          "line": 21,
+          "name": "field",
+          "qualname": "field"
+        },
+        {
+          "doc": null,
+          "endLine": 43,
+          "kind": "function",
+          "line": 25,
+          "name": "spec",
+          "qualname": "spec"
+        },
+        {
+          "doc": null,
+          "endLine": 47,
+          "kind": "function",
+          "line": 46,
+          "name": "compiled_one",
+          "qualname": "compiled_one"
+        },
+        {
+          "doc": null,
+          "endLine": 53,
+          "kind": "function",
+          "line": 50,
+          "name": "test_active_operator_with_zero_consumer_fails_activation",
+          "qualname": "test_active_operator_with_zero_consumer_fails_activation"
+        },
+        {
+          "doc": null,
+          "endLine": 62,
+          "kind": "function",
+          "line": 56,
+          "name": "test_dependency_cycle_fails_compile",
+          "qualname": "test_dependency_cycle_fails_compile"
+        },
+        {
+          "doc": null,
+          "endLine": 72,
+          "kind": "function",
+          "line": 65,
+          "name": "test_active_dependency_must_also_be_executable",
+          "qualname": "test_active_dependency_must_also_be_executable"
+        },
+        {
+          "doc": null,
+          "endLine": 79,
+          "kind": "function",
+          "line": 75,
+          "name": "test_missing_unit_or_dimension_fails_contract_ingestion",
+          "qualname": "test_missing_unit_or_dimension_fails_contract_ingestion"
+        },
+        {
+          "doc": null,
+          "endLine": 94,
+          "kind": "function",
+          "line": 82,
+          "name": "test_baseball_pitch_operator_cannot_bind_to_hockey_generically",
+          "qualname": "test_baseball_pitch_operator_cannot_bind_to_hockey_generically"
+        },
+        {
+          "doc": null,
+          "endLine": 106,
+          "kind": "function",
+          "line": 97,
+          "name": "test_invalid_market_definition_pair_fails",
+          "qualname": "test_invalid_market_definition_pair_fails"
+        },
+        {
+          "doc": null,
+          "endLine": 111,
+          "kind": "function",
+          "line": 109,
+          "name": "test_post_cutoff_input_fails",
+          "qualname": "test_post_cutoff_input_fails"
+        },
+        {
+          "doc": null,
+          "endLine": 119,
+          "kind": "function",
+          "line": 114,
+          "name": "test_compiled_hash_is_deterministic_across_source_ordering",
+          "qualname": "test_compiled_hash_is_deterministic_across_source_ordering"
+        },
+        {
+          "doc": null,
+          "endLine": 134,
+          "kind": "function",
+          "line": 122,
+          "name": "test_semantic_duplicates_do_not_execute_twice",
+          "qualname": "test_semantic_duplicates_do_not_execute_twice"
+        },
+        {
+          "doc": null,
+          "endLine": 130,
+          "kind": "method",
+          "line": 128,
+          "name": "handler",
+          "qualname": "test_semantic_duplicates_do_not_execute_twice.handler"
+        },
+        {
+          "doc": null,
+          "endLine": 143,
+          "kind": "function",
+          "line": 137,
+          "name": "test_overlap_groups_are_preserved_for_related_non_duplicates",
+          "qualname": "test_overlap_groups_are_preserved_for_related_non_duplicates"
+        },
+        {
+          "doc": null,
+          "endLine": 150,
+          "kind": "function",
+          "line": 147,
+          "name": "test_rejected_donor_behavior_cannot_activate",
+          "qualname": "test_rejected_donor_behavior_cannot_activate"
+        },
+        {
+          "doc": null,
+          "endLine": 157,
+          "kind": "function",
+          "line": 153,
+          "name": "test_probability_and_hard_gate_override_flags_are_structurally_impossible",
+          "qualname": "test_probability_and_hard_gate_override_flags_are_structurally_impossible"
+        },
+        {
+          "doc": null,
+          "endLine": 171,
+          "kind": "function",
+          "line": 160,
+          "name": "test_active_hard_gate_requires_canonical_authorization",
+          "qualname": "test_active_hard_gate_requires_canonical_authorization"
+        },
+        {
+          "doc": null,
+          "endLine": 186,
+          "kind": "function",
+          "line": 174,
+          "name": "test_feature_store_is_an_explicit_runtime_consumer",
+          "qualname": "test_feature_store_is_an_explicit_runtime_consumer"
+        },
+        {
+          "doc": null,
+          "endLine": 195,
+          "kind": "function",
+          "line": 189,
+          "name": "test_donor_matrix_accounts_for_all_58_without_activation",
+          "qualname": "test_donor_matrix_accounts_for_all_58_without_activation"
+        },
+        {
+          "doc": null,
+          "endLine": 204,
+          "kind": "function",
+          "line": 198,
+          "name": "test_donor_matrix_cannot_silently_self_activate",
+          "qualname": "test_donor_matrix_cannot_silently_self_activate"
+        },
+        {
+          "doc": null,
+          "endLine": 226,
+          "kind": "function",
+          "line": 207,
+          "name": "test_schema_is_draft_2020_12_and_source_parse_is_non_destructive",
+          "qualname": "test_schema_is_draft_2020_12_and_source_parse_is_non_destructive"
+        }
+      ],
+      "workstream": "UNMAPPED"
+    },
+    {
+      "classes": 0,
       "functions": 3,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_source_catalog.py",
       "sha256": "eb1fddededda4e160ce54831653aa81ddcd724aee26bc6121a185fdd8385694c",
@@ -12997,5 +13645,5 @@
   "parseErrors": [],
   "root": "artifacts/dcm_v6_workstream_ab",
   "schema": "pillars_dcm.code_inventory.v1",
-  "symbolCount": 1384
+  "symbolCount": 1455
 }

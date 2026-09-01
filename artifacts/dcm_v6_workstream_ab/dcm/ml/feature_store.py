@@ -12,6 +12,10 @@ from typing import Any
 from dcm.contracts.hashes import content_hash
 from dcm.research.player_packet import WINDOW_SIZES, window_means
 from dcm.research.role_epoch import RoleEpochBuilder
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from dcm.signals.executor import SignalEvaluation
 
 FEATURE_SCHEMA_VERSION = "dcm.feature_store.v2-20260831"
 TRANSFORMATION_VERSION = "dcm.features.windows.v1-20260830"
@@ -34,6 +38,43 @@ FEATURE_FAMILIES = frozenset({
     "CONTEXT",
 })
 WINDOW_STATS = ("minutes", "pts", "reb", "ast", "fga", "tpa", "fta")
+SIGNAL_FEATURE_CONSUMER = "dcm.ml.feature_store.signal_evaluation_feature_records"
+
+
+def signal_evaluation_feature_records(
+    evaluations: list["SignalEvaluation"] | tuple["SignalEvaluation", ...],
+    *,
+    entity: str,
+    event_id: str,
+    as_of: str,
+    source_hashes: list[str] | tuple[str, ...] = (),
+) -> list[dict[str, Any]]:
+    """Canonical consumer for ACTIVE_FEATURE signal outputs.
+
+    Signal operators remain deterministic feature transforms. This adapter
+    cannot alter probability or hard eligibility and records evaluation lineage.
+    """
+    records: list[dict[str, Any]] = []
+    for evaluation in evaluations:
+        if evaluation.lifecycle_state != "ACTIVE_FEATURE":
+            continue
+        if SIGNAL_FEATURE_CONSUMER not in evaluation.consumers:
+            continue
+        for output_name, value in sorted(evaluation.outputs.items()):
+            record = feature_record(
+                entity=entity,
+                event_id=event_id,
+                feature_name=f"signal:{evaluation.operator_id}:{output_name}",
+                value=value,
+                as_of=as_of,
+                source_hashes=sorted({*source_hashes, evaluation.output_hash}),
+                family="CONTEXT",
+                transformation_version=f"signal:{evaluation.operator_id}:{evaluation.version}",
+            )
+            record["signalEvaluationHash"] = evaluation.output_hash
+            record["signalOperatorId"] = evaluation.operator_id
+            records.append(record)
+    return records
 
 
 def _s(value: Any) -> str:

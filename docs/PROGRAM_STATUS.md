@@ -1,6 +1,6 @@
 # DCM Program Status
 
-Canonical integration line: `integration/v6-ml-architecture-20260830` (PR #10).
+Canonical integration line: `integration/v6-ml-architecture-20260830` at merge commit `8311b2aaeef16b508b6ef21c01c22ad990b9ad5d` (through PR #15).
 
 This file is the human dashboard. It must be updated on every coding pass together with a new immutable pass record under `docs/engineering_passes/`.
 
@@ -17,9 +17,9 @@ This file is the human dashboard. It must be updated on every coding pass togeth
 
 | Workstream | Target | Current | State | Next acceptance gate |
 |---|---:|---:|---|---|
-| P0 Canonical spine / HAR / integrity | 10 | 9 | STRONG PARTIAL | refresh canonical matrix against current head; production root remains independently gated |
+| P0 Canonical spine / HAR / integrity | 10 | 9 | STRONG PARTIAL | preserve authenticated v5.4.1 roots in release retrieval; production root remains independently gated |
 | P1 Universal research / evidence | 10 | 8 | STRONG PARTIAL | live host observation loop closing SportResearchSchema coverage; remaining adapter PLAYER/TEAM lookups |
-| P2 Feature / state / parameter layer | 10 | 9 | STRONG PARTIAL | remaining sport-neutral feature dispatch; packet-shaped FeatureStore observations |
+| P2 Feature / state / parameter layer | 10 | 9 | STRONG PARTIAL | activate only validated signal operators with real producers/consumers; packet-shaped FeatureStore observations |
 | P3 SportPlugin physics | 10 | 6 | PARTIAL | close remaining 24-component plugin bindings sport by sport; no generic production fallback |
 | P4 Probability / uncertainty / grading / portfolio | 10 | 8 | STRONG PARTIAL | universal shared-world/correlation coverage; final-refresh integration |
 | P5 Audit / portability / ChatGPT-native execution | 10 | 8 | STRONG PARTIAL | exact-wheel fresh ChatGPT HAR acceptance; immutable release retrieval |
@@ -32,6 +32,15 @@ This file is the human dashboard. It must be updated on every coding pass togeth
 | P12 Research archive / index / reuse | 10 | 7 | PARTIAL | high-volume queryable store; retention/licensing enforcement beyond local blobs |
 | P13 Performance / search / token optimization | 10 | 6 | PARTIAL | measured CPU/RSS/token certification; host-performance remains uncertified |
 | P14 Production operations / observability | 10 | 5 | PARTIAL | run health/readiness, failure taxonomy, deterministic recovery, release gates |
+| P15 P380X donor signal governance | 10 | 7 | PARTIAL | Tranche C research truth; exact donor definition compilation only from available archive bytes; evidence-earned activation only |
+
+## P380X Tranche A/B status
+
+Tranche A accounts for all 58 principal donor components without activating any of them. Exact donor ZIP bytes were not available, so the recorded archive state is `EXACT_ARCHIVE_BYTES_UNAVAILABLE`; the disposition matrix is doctrine/reference data outside the runtime package.
+
+Tranche B provides an executable typed `SignalOperatorSpec`, deterministic compiler/registry, lifecycle and consumer activation gates, SportPlugin/MarketDefinition/unit/temporal validation, dependency DAG and cycle rejection, semantic duplicate suppression, overlap groups, a compact executor, and a canonical FeatureStore consumer. This completes the bounded governance foundation, not the later donor capabilities. No donor forecasting operator is production-active merely because its matrix entry exists.
+
+Learning revision remains `LR000000`; predictive superiority remains `NONE`; production-root certification remains false.
 
 ## Definition of “finished”
 

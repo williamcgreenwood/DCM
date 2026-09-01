@@ -1,21 +1,21 @@
 {
   "schema": "pillars_dcm.dcm6_ros_requirement_trace.v1",
   "specId": "DCM6-ROS-EG-001",
-  "updatedAtUtc": "2026-08-31T21:27:00Z",
+  "updatedAtUtc": "2026-09-01T19:30:00Z",
   "predictiveClaim": "NONE",
   "learningRevision": "LR000000",
   "requirements": [
     {
       "requirement": "Authenticate canonical v5.4.1 source and learning ledger hashes before normative migration",
       "specSection": "Phase 0",
-      "code": "dcm_v6/canonical_mount/MOUNT_STATE.json",
-      "schema": "MOUNT_STATE",
-      "test": null,
-      "runtimeProducer": null,
-      "runtimeConsumer": "dcm.runtime.mount_v541",
+      "code": "docs/PHASE0_CANONICAL_AUTHENTICATION.md",
+      "schema": "canonical SHA-256 root of trust",
+      "test": "exact-byte SHA-256 verification on ChatGPT Work",
+      "runtimeProducer": "configured Pillars project source access",
+      "runtimeConsumer": "Phase 0 authentication gate",
       "auditArtifact": "docs/PHASE0_CANONICAL_AUTHENTICATION.md",
-      "status": "BLOCKED",
-      "evidence": "MOUNT_STATE.state=ABSENT_IN_THIS_WORKSPACE; canonical files not in this workspace"
+      "status": "COMPLETE",
+      "evidence": "Source 3,222,380 bytes and ledger 3,953,122 bytes exactly match both frozen SHA-256 roots; repository-local mount remains a separate runtime concern"
     },
     {
       "requirement": "StatePack snapshot authenticates actual packaged file bytes",
@@ -40,6 +40,42 @@
       "auditArtifact": null,
       "status": "NOT_STARTED",
       "evidence": "Phase 1 index pack only"
+    },
+    {
+      "requirement": "Account for every principal P380X donor component without implicit activation",
+      "specSection": "P380X Tranche A",
+      "code": "artifacts/dcm_v6_workstream_ab/dcm/signals/donor_accounting.py",
+      "schema": "pillars_dcm.p380x_donor_accounting.v1",
+      "test": "artifacts/dcm_v6_workstream_ab/tests/test_signal_governance.py::test_donor_matrix_accounts_for_all_58_without_activation",
+      "runtimeProducer": "audit_donor_matrix",
+      "runtimeConsumer": "engineering audit / activation gate",
+      "auditArtifact": "docs/donor/p380x/TRANCHE_AB_REPORT.json",
+      "status": "COMPLETE",
+      "evidence": "All 58 matrix entries have governed dispositions; activeCount=0; exact archive state is EXACT_ARCHIVE_BYTES_UNAVAILABLE"
+    },
+    {
+      "requirement": "Compile typed stage-bound signal operators against SportPlugin, MarketDefinition, unit, temporal, dependency, overlap, consumer and lifecycle contracts",
+      "specSection": "P380X Tranche B",
+      "code": "artifacts/dcm_v6_workstream_ab/dcm/signals/compiler.py",
+      "schema": "SignalOperatorSpec.schema.json Draft 2020-12",
+      "test": "artifacts/dcm_v6_workstream_ab/tests/test_signal_governance.py",
+      "runtimeProducer": "SignalCompiler.compile / SignalExecutor.execute",
+      "runtimeConsumer": "dcm.ml.feature_store.signal_evaluation_feature_records",
+      "auditArtifact": "CompiledRegistry.registry_hash / SignalEvaluation.output_hash",
+      "status": "IMPLEMENTED_INTEGRATED",
+      "evidence": "Fail-closed compiler, deterministic registry hash, semantic dedupe, overlap groups, stable DAG execution and FeatureStore consumer are executable; no donor operator is activated by documentation alone"
+    },
+    {
+      "requirement": "Prevent rejected donor forecasting behaviors from entering production",
+      "specSection": "P380X Tranche B critical rejections",
+      "code": "artifacts/dcm_v6_workstream_ab/dcm/signals/integration_gate.py",
+      "schema": "SignalOperatorSpec hard invariants",
+      "test": "test_rejected_donor_behavior_cannot_activate / test_probability_and_hard_gate_override_flags_are_structurally_impossible",
+      "runtimeProducer": "SignalIntegrationGate.validate",
+      "runtimeConsumer": "SignalCompiler.compile",
+      "auditArtifact": "CompiledOperator.reasons",
+      "status": "COMPLETE",
+      "evidence": "Confidence-to-probability, forced prediction/inverse/card size, filler, fraud, leak and host-specific mandatory behaviors fail closed; direct probability and hard-gate override flags are structurally forbidden"
     }
   ]
 }
