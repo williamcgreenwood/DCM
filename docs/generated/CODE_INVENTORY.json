@@ -1,6 +1,6 @@
 {
-  "contentHash": "37f51892180709231357d570fe0acaa1f50a9cd20505d7a4e135b1259e045b5c",
-  "moduleCount": 210,
+  "contentHash": "9e0f2de43cf1623f8795956ed6682960dcbcf767ceade289aba3ccce1b8bd6d2",
+  "moduleCount": 217,
   "modules": [
     {
       "classes": 0,
@@ -4515,21 +4515,21 @@
       "classes": 0,
       "functions": 3,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/batch.py",
-      "sha256": "b1851b5bb324f599db656e24cc4a2168671afbcb1ee59eebc5ac83e9dfc207e3",
+      "sha256": "7fc25431fc39dc561415c3c73f82c33105c4db05a82a1163463c20ee7901b934",
       "symbols": [
         {
           "doc": null,
-          "endLine": 46,
+          "endLine": 47,
           "kind": "function",
-          "line": 36,
+          "line": 37,
           "name": "scheduler_score",
           "qualname": "scheduler_score"
         },
         {
           "doc": null,
-          "endLine": 57,
+          "endLine": 58,
           "kind": "function",
-          "line": 49,
+          "line": 50,
           "name": "_event_id_of",
           "qualname": "_event_id_of"
         },
@@ -4537,7 +4537,7 @@
           "doc": null,
           "endLine": 215,
           "kind": "function",
-          "line": 60,
+          "line": 61,
           "name": "build_next_research_batch",
           "qualname": "build_next_research_batch"
         }
@@ -4695,6 +4695,31 @@
           "line": 186,
           "name": "market_definition_id",
           "qualname": "market_definition_id"
+        }
+      ],
+      "workstream": "P1"
+    },
+    {
+      "classes": 0,
+      "functions": 2,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/research/classify_runtime.py",
+      "sha256": "a9cb81213dc330943da52a79f7a9f90f84f4bec2c69d51484de96004fdb8f358",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 23,
+          "kind": "function",
+          "line": 17,
+          "name": "refine_delta",
+          "qualname": "refine_delta"
+        },
+        {
+          "doc": null,
+          "endLine": 70,
+          "kind": "function",
+          "line": 26,
+          "name": "classify_requests",
+          "qualname": "classify_requests"
         }
       ],
       "workstream": "P1"
@@ -5170,6 +5195,119 @@
       "workstream": "P1"
     },
     {
+      "classes": 1,
+      "functions": 12,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/research/freshness.py",
+      "sha256": "68d32e9096935ad6d1f809f4924c14c3538d87676bccd311dc8264c1e78c51a7",
+      "symbols": [
+        {
+          "doc": "Unknown freshness policy input. Fail closed.",
+          "endLine": 97,
+          "kind": "class",
+          "line": 96,
+          "name": "FreshnessPolicyError",
+          "qualname": "FreshnessPolicyError"
+        },
+        {
+          "doc": null,
+          "endLine": 107,
+          "kind": "function",
+          "line": 100,
+          "name": "normalize_status",
+          "qualname": "normalize_status"
+        },
+        {
+          "doc": null,
+          "endLine": 116,
+          "kind": "function",
+          "line": 110,
+          "name": "normalize_volatility",
+          "qualname": "normalize_volatility"
+        },
+        {
+          "doc": null,
+          "endLine": 130,
+          "kind": "function",
+          "line": 119,
+          "name": "category_for",
+          "qualname": "category_for"
+        },
+        {
+          "doc": null,
+          "endLine": 146,
+          "kind": "function",
+          "line": 133,
+          "name": "is_immutable_completed_fact",
+          "qualname": "is_immutable_completed_fact"
+        },
+        {
+          "doc": null,
+          "endLine": 157,
+          "kind": "function",
+          "line": 149,
+          "name": "event_multiplier",
+          "qualname": "event_multiplier"
+        },
+        {
+          "doc": null,
+          "endLine": 175,
+          "kind": "function",
+          "line": 160,
+          "name": "effective_half_life",
+          "qualname": "effective_half_life"
+        },
+        {
+          "doc": null,
+          "endLine": 200,
+          "kind": "function",
+          "line": 178,
+          "name": "freshness_score",
+          "qualname": "freshness_score"
+        },
+        {
+          "doc": null,
+          "endLine": 215,
+          "kind": "function",
+          "line": 203,
+          "name": "parse_utc",
+          "qualname": "parse_utc"
+        },
+        {
+          "doc": null,
+          "endLine": 221,
+          "kind": "function",
+          "line": 218,
+          "name": "hours_between",
+          "qualname": "hours_between"
+        },
+        {
+          "doc": null,
+          "endLine": 265,
+          "kind": "function",
+          "line": 224,
+          "name": "derive_freshness_inputs",
+          "qualname": "derive_freshness_inputs"
+        },
+        {
+          "doc": null,
+          "endLine": 345,
+          "kind": "function",
+          "line": 268,
+          "name": "evaluate_freshness",
+          "qualname": "evaluate_freshness"
+        },
+        {
+          "doc": "Refine a classify_delta result using derived timestamps. Never invent times.",
+          "endLine": 427,
+          "kind": "function",
+          "line": 348,
+          "name": "apply_adaptive_freshness",
+          "qualname": "apply_adaptive_freshness"
+        }
+      ],
+      "workstream": "P1"
+    },
+    {
       "classes": 0,
       "functions": 9,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/gamelog.py",
@@ -5327,6 +5465,47 @@
           "line": 295,
           "name": "looks_like_gridiron_log",
           "qualname": "looks_like_gridiron_log"
+        }
+      ],
+      "workstream": "P1"
+    },
+    {
+      "classes": 0,
+      "functions": 4,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/research/historical_gap.py",
+      "sha256": "e3ae01c440031d16b08daa4803572f1ee900195c5e81656880f64edca7a97d3c",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 28,
+          "kind": "function",
+          "line": 19,
+          "name": "_ids",
+          "qualname": "_ids"
+        },
+        {
+          "doc": null,
+          "endLine": 40,
+          "kind": "function",
+          "line": 31,
+          "name": "stored_event_ids",
+          "qualname": "stored_event_ids"
+        },
+        {
+          "doc": null,
+          "endLine": 67,
+          "kind": "function",
+          "line": 43,
+          "name": "resolve_history_gap",
+          "qualname": "resolve_history_gap"
+        },
+        {
+          "doc": null,
+          "endLine": 95,
+          "kind": "function",
+          "line": 70,
+          "name": "apply_history_gap",
+          "qualname": "apply_history_gap"
         }
       ],
       "workstream": "P1"
@@ -6427,6 +6606,255 @@
           "line": 105,
           "name": "stage_research",
           "qualname": "stage_research"
+        }
+      ],
+      "workstream": "P1"
+    },
+    {
+      "classes": 4,
+      "functions": 26,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/research/statepack.py",
+      "sha256": "002df1dc5b1580a7dda86f8d6f3d7b4798122521e4ef024e7f264ca080d97eaa",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 90,
+          "kind": "class",
+          "line": 89,
+          "name": "StatePackError",
+          "qualname": "StatePackError"
+        },
+        {
+          "doc": null,
+          "endLine": 94,
+          "kind": "class",
+          "line": 93,
+          "name": "UnsupportedSchemaVersion",
+          "qualname": "UnsupportedSchemaVersion"
+        },
+        {
+          "doc": null,
+          "endLine": 98,
+          "kind": "class",
+          "line": 97,
+          "name": "StatePackIntegrityError",
+          "qualname": "StatePackIntegrityError"
+        },
+        {
+          "doc": null,
+          "endLine": 102,
+          "kind": "function",
+          "line": 101,
+          "name": "_utc_now",
+          "qualname": "_utc_now"
+        },
+        {
+          "doc": null,
+          "endLine": 109,
+          "kind": "function",
+          "line": 105,
+          "name": "_asof_day",
+          "qualname": "_asof_day"
+        },
+        {
+          "doc": null,
+          "endLine": 113,
+          "kind": "function",
+          "line": 112,
+          "name": "sha256_bytes",
+          "qualname": "sha256_bytes"
+        },
+        {
+          "doc": null,
+          "endLine": 121,
+          "kind": "function",
+          "line": 116,
+          "name": "sha256_file",
+          "qualname": "sha256_file"
+        },
+        {
+          "doc": null,
+          "endLine": 128,
+          "kind": "function",
+          "line": 124,
+          "name": "write_deterministic_gzip",
+          "qualname": "write_deterministic_gzip"
+        },
+        {
+          "doc": null,
+          "endLine": 133,
+          "kind": "function",
+          "line": 131,
+          "name": "read_gzip_bytes",
+          "qualname": "read_gzip_bytes"
+        },
+        {
+          "doc": null,
+          "endLine": 142,
+          "kind": "function",
+          "line": 136,
+          "name": "scan_secrets",
+          "qualname": "scan_secrets"
+        },
+        {
+          "doc": null,
+          "endLine": 152,
+          "kind": "function",
+          "line": 145,
+          "name": "_connect",
+          "qualname": "_connect"
+        },
+        {
+          "doc": null,
+          "endLine": 168,
+          "kind": "function",
+          "line": 155,
+          "name": "detected_schema_version",
+          "qualname": "detected_schema_version"
+        },
+        {
+          "doc": null,
+          "endLine": 192,
+          "kind": "function",
+          "line": 171,
+          "name": "apply_migrations",
+          "qualname": "apply_migrations"
+        },
+        {
+          "doc": null,
+          "endLine": 558,
+          "kind": "class",
+          "line": 195,
+          "name": "StatePack",
+          "qualname": "StatePack"
+        },
+        {
+          "doc": null,
+          "endLine": 206,
+          "kind": "method",
+          "line": 196,
+          "name": "__init__",
+          "qualname": "StatePack.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 213,
+          "kind": "method",
+          "line": 208,
+          "name": "_init_db",
+          "qualname": "StatePack._init_db"
+        },
+        {
+          "doc": null,
+          "endLine": 229,
+          "kind": "method",
+          "line": 215,
+          "name": "sqlite_health",
+          "qualname": "StatePack.sqlite_health"
+        },
+        {
+          "doc": null,
+          "endLine": 242,
+          "kind": "method",
+          "line": 231,
+          "name": "put_blob",
+          "qualname": "StatePack.put_blob"
+        },
+        {
+          "doc": null,
+          "endLine": 291,
+          "kind": "method",
+          "line": 244,
+          "name": "index_claim",
+          "qualname": "StatePack.index_claim"
+        },
+        {
+          "doc": null,
+          "endLine": 337,
+          "kind": "method",
+          "line": 293,
+          "name": "ingest_store",
+          "qualname": "StatePack.ingest_store"
+        },
+        {
+          "doc": null,
+          "endLine": 345,
+          "kind": "method",
+          "line": 339,
+          "name": "_load_blob",
+          "qualname": "StatePack._load_blob"
+        },
+        {
+          "doc": null,
+          "endLine": 364,
+          "kind": "method",
+          "line": 347,
+          "name": "query_entity",
+          "qualname": "StatePack.query_entity"
+        },
+        {
+          "doc": null,
+          "endLine": 372,
+          "kind": "method",
+          "line": 366,
+          "name": "query_source",
+          "qualname": "StatePack.query_source"
+        },
+        {
+          "doc": null,
+          "endLine": 380,
+          "kind": "method",
+          "line": 374,
+          "name": "query_asof",
+          "qualname": "StatePack.query_asof"
+        },
+        {
+          "doc": null,
+          "endLine": 392,
+          "kind": "method",
+          "line": 382,
+          "name": "counts",
+          "qualname": "StatePack.counts"
+        },
+        {
+          "doc": null,
+          "endLine": 400,
+          "kind": "method",
+          "line": 394,
+          "name": "deterministic_records",
+          "qualname": "StatePack.deterministic_records"
+        },
+        {
+          "doc": null,
+          "endLine": 410,
+          "kind": "method",
+          "line": 402,
+          "name": "export_object",
+          "qualname": "StatePack.export_object"
+        },
+        {
+          "doc": null,
+          "endLine": 481,
+          "kind": "method",
+          "line": 412,
+          "name": "snapshot",
+          "qualname": "StatePack.snapshot"
+        },
+        {
+          "doc": null,
+          "endLine": 528,
+          "kind": "method",
+          "line": 483,
+          "name": "integrity_ok",
+          "qualname": "StatePack.integrity_ok"
+        },
+        {
+          "doc": null,
+          "endLine": 558,
+          "kind": "method",
+          "line": 530,
+          "name": "restore_from_export",
+          "qualname": "StatePack.restore_from_export"
         }
       ],
       "workstream": "P1"
@@ -9836,6 +10264,79 @@
     },
     {
       "classes": 0,
+      "functions": 8,
+      "path": "artifacts/dcm_v6_workstream_ab/tests/test_freshness.py",
+      "sha256": "bd9952cc8e9ad752be6bd52b5cdafa541017880a0df899bbae622c94c9cb75d0",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 29,
+          "kind": "function",
+          "line": 17,
+          "name": "test_completed_game_facts_do_not_expire",
+          "qualname": "test_completed_game_facts_do_not_expire"
+        },
+        {
+          "doc": null,
+          "endLine": 42,
+          "kind": "function",
+          "line": 32,
+          "name": "test_season_recent_form_is_not_an_immutable_fact",
+          "qualname": "test_season_recent_form_is_not_an_immutable_fact"
+        },
+        {
+          "doc": null,
+          "endLine": 49,
+          "kind": "function",
+          "line": 45,
+          "name": "test_event_multiplier_piecewise",
+          "qualname": "test_event_multiplier_piecewise"
+        },
+        {
+          "doc": null,
+          "endLine": 79,
+          "kind": "function",
+          "line": 52,
+          "name": "test_status_claim_decays_near_tipoff",
+          "qualname": "test_status_claim_decays_near_tipoff"
+        },
+        {
+          "doc": null,
+          "endLine": 86,
+          "kind": "function",
+          "line": 82,
+          "name": "test_gtd_is_governed_alias_for_game_time_decision",
+          "qualname": "test_gtd_is_governed_alias_for_game_time_decision"
+        },
+        {
+          "doc": null,
+          "endLine": 96,
+          "kind": "function",
+          "line": 89,
+          "name": "test_unknown_inputs_fail_closed",
+          "qualname": "test_unknown_inputs_fail_closed"
+        },
+        {
+          "doc": null,
+          "endLine": 101,
+          "kind": "function",
+          "line": 99,
+          "name": "test_efficiency_is_not_mapped_to_opportunity_category",
+          "qualname": "test_efficiency_is_not_mapped_to_opportunity_category"
+        },
+        {
+          "doc": null,
+          "endLine": 114,
+          "kind": "function",
+          "line": 104,
+          "name": "test_effective_half_life_matches_spec_defaults",
+          "qualname": "test_effective_half_life_matches_spec_defaults"
+        }
+      ],
+      "workstream": "UNMAPPED"
+    },
+    {
+      "classes": 0,
       "functions": 14,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_gamelog_normalize.py",
       "sha256": "3886fe7807c9c488c2600ea735b4961005f00cb1500ddd0d09fd76621dade6c9",
@@ -10394,6 +10895,39 @@
           "line": 142,
           "name": "test_har_run_synthetic_does_not_promote_lr",
           "qualname": "test_har_run_synthetic_does_not_promote_lr"
+        }
+      ],
+      "workstream": "UNMAPPED"
+    },
+    {
+      "classes": 0,
+      "functions": 3,
+      "path": "artifacts/dcm_v6_workstream_ab/tests/test_historical_gap.py",
+      "sha256": "55cc8cdb272fbbb7ceb36311d492795f71aade3085e850a286f0cc5c973c13db",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 17,
+          "kind": "function",
+          "line": 5,
+          "name": "test_append_only_missing_events_38_40",
+          "qualname": "test_append_only_missing_events_38_40"
+        },
+        {
+          "doc": null,
+          "endLine": 27,
+          "kind": "function",
+          "line": 20,
+          "name": "test_unexpected_extra_is_audited_not_deleted",
+          "qualname": "test_unexpected_extra_is_audited_not_deleted"
+        },
+        {
+          "doc": null,
+          "endLine": 35,
+          "kind": "function",
+          "line": 30,
+          "name": "test_stored_event_ids_prefer_eventId",
+          "qualname": "test_stored_event_ids_prefer_eventId"
         }
       ],
       "workstream": "UNMAPPED"
@@ -12070,6 +12604,55 @@
     },
     {
       "classes": 0,
+      "functions": 5,
+      "path": "artifacts/dcm_v6_workstream_ab/tests/test_statepack.py",
+      "sha256": "a35045a8ce273fdb012148a7aedc06b06d9c5296e763c3e9ffe56124604ce89f",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 29,
+          "kind": "function",
+          "line": 16,
+          "name": "_claim",
+          "qualname": "_claim"
+        },
+        {
+          "doc": null,
+          "endLine": 45,
+          "kind": "function",
+          "line": 32,
+          "name": "test_statepack_indexes_store_and_queries_entity_source_asof",
+          "qualname": "test_statepack_indexes_store_and_queries_entity_source_asof"
+        },
+        {
+          "doc": null,
+          "endLine": 64,
+          "kind": "function",
+          "line": 48,
+          "name": "test_snapshot_round_trip_preserves_semantic_hash",
+          "qualname": "test_snapshot_round_trip_preserves_semantic_hash"
+        },
+        {
+          "doc": null,
+          "endLine": 77,
+          "kind": "function",
+          "line": 67,
+          "name": "test_corrupt_export_fails_closed",
+          "qualname": "test_corrupt_export_fails_closed"
+        },
+        {
+          "doc": null,
+          "endLine": 89,
+          "kind": "function",
+          "line": 80,
+          "name": "test_outcomes_are_indexed_and_do_not_decide_reuse",
+          "qualname": "test_outcomes_are_indexed_and_do_not_decide_reuse"
+        }
+      ],
+      "workstream": "UNMAPPED"
+    },
+    {
+      "classes": 0,
       "functions": 9,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_status_start_gates.py",
       "sha256": "a3dc38e5f722198b85d04b42420232a634f607f1a7b0f4a2730560e7dcee9090",
@@ -12414,5 +12997,5 @@
   "parseErrors": [],
   "root": "artifacts/dcm_v6_workstream_ab",
   "schema": "pillars_dcm.code_inventory.v1",
-  "symbolCount": 1319
+  "symbolCount": 1384
 }

@@ -2,10 +2,10 @@
 
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
-- Modules: **210**
-- Symbols: **1319**
+- Modules: **217**
+- Symbols: **1384**
 - Parse errors: **0**
-- Inventory hash: `37f51892180709231357d570fe0acaa1f50a9cd20505d7a4e135b1259e045b5c`
+- Inventory hash: `9e0f2de43cf1623f8795956ed6682960dcbcf767ceade289aba3ccce1b8bd6d2`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -94,14 +94,17 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/cache.py` | 1 | 5 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/claims.py` | 0 | 3 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/classify.py` | 0 | 7 |
+| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/classify_runtime.py` | 0 | 2 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/coverage.py` | 0 | 11 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/dependency_graph.py` | 0 | 4 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/emit.py` | 0 | 4 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/entity_graph.py` | 0 | 4 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/entity_packets.py` | 0 | 13 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/evidence_graph.py` | 0 | 16 |
+| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/freshness.py` | 1 | 12 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/gamelog.py` | 0 | 9 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/gridiron_gamelog.py` | 0 | 9 |
+| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/historical_gap.py` | 0 | 4 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/host_plan.py` | 0 | 1 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/lineup.py` | 0 | 3 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/player_offer_set.py` | 1 | 6 |
@@ -114,6 +117,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/scopes.py` | 0 | 6 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/source_catalog.py` | 0 | 5 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/staged.py` | 0 | 5 |
+| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/statepack.py` | 4 | 26 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/subject_offer_set.py` | 1 | 10 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/temporal.py` | 1 | 4 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/universal_packets.py` | 0 | 7 |
@@ -179,10 +183,12 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_fail_closed_regressions.py` | 0 | 8 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_feature_store.py` | 0 | 3 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_football_registry.py` | 0 | 16 |
+| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_freshness.py` | 0 | 8 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_gamelog_normalize.py` | 0 | 14 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_github_archive.py` | 0 | 24 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_gridiron_plugin.py` | 0 | 19 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_har_ingest.py` | 0 | 9 |
+| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_historical_gap.py` | 0 | 3 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_host_native.py` | 0 | 6 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_joint_event_world.py` | 0 | 10 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_line_surface.py` | 0 | 3 |
@@ -213,6 +219,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_source_catalog.py` | 0 | 3 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_sport_plugin_full_contract.py` | 0 | 3 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_sport_research_schema.py` | 0 | 3 |
+| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_statepack.py` | 0 | 5 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_status_start_gates.py` | 0 | 9 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_subject_offer_set_universal.py` | 0 | 5 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_three_layer_card.py` | 0 | 9 |
@@ -962,9 +969,9 @@ _No class/function symbols._
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/batch.py`
 
-- `function` **scheduler_score** L36
-- `function` **_event_id_of** L49
-- `function` **build_next_research_batch** L60
+- `function` **scheduler_score** L37
+- `function` **_event_id_of** L50
+- `function` **build_next_research_batch** L61
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/cache.py`
 
@@ -990,6 +997,11 @@ _No class/function symbols._
 - `function` **research_disposition** L103 — Return (deep_research?, class).
 - `function` **classify_rows** L148
 - `function` **market_definition_id** L186
+
+### `artifacts/dcm_v6_workstream_ab/dcm/research/classify_runtime.py`
+
+- `function` **refine_delta** L17
+- `function` **classify_requests** L26
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/coverage.py`
 
@@ -1061,6 +1073,22 @@ _No class/function symbols._
 - `function` **trace_runtime_lineage** L704 — Selection → PropEvaluation → Simulation → ParameterSnapshot → Feature/Claim.
 - `method` **trace_runtime_lineage.neighbors** L711
 
+### `artifacts/dcm_v6_workstream_ab/dcm/research/freshness.py`
+
+- `class` **FreshnessPolicyError** L96 — Unknown freshness policy input. Fail closed.
+- `function` **normalize_status** L100
+- `function` **normalize_volatility** L110
+- `function` **category_for** L119
+- `function` **is_immutable_completed_fact** L133
+- `function` **event_multiplier** L149
+- `function` **effective_half_life** L160
+- `function` **freshness_score** L178
+- `function` **parse_utc** L203
+- `function` **hours_between** L218
+- `function` **derive_freshness_inputs** L224
+- `function` **evaluate_freshness** L268
+- `function` **apply_adaptive_freshness** L348 — Refine a classify_delta result using derived timestamps. Never invent times.
+
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/gamelog.py`
 
 - `function` **_present** L123
@@ -1084,6 +1112,13 @@ _No class/function symbols._
 - `function` **normalize_gridiron_logs** L248 — Split a log list into valid canonical rows and rejected originals.
 - `function` **assert_compatible_gridiron_logs** L268 — Coverage helper: opportunity-valid logs plus market counting-stat presence.
 - `function` **looks_like_gridiron_log** L295
+
+### `artifacts/dcm_v6_workstream_ab/dcm/research/historical_gap.py`
+
+- `function` **_ids** L19
+- `function` **stored_event_ids** L31
+- `function` **resolve_history_gap** L43
+- `function` **apply_history_gap** L70
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/host_plan.py`
 
@@ -1244,6 +1279,39 @@ _No class/function symbols._
 - `function` **pass_b_needed** L46 — Deepen when the candidate is serious, thin, or near a decision boundary.
 - `function` **deepen_player_packet** L69 — Return a Pass-B overlay. Does not mutate Pass A or replace the full log.
 - `function` **stage_research** L105
+
+### `artifacts/dcm_v6_workstream_ab/dcm/research/statepack.py`
+
+- `class` **StatePackError** L89
+- `class` **UnsupportedSchemaVersion** L93
+- `class` **StatePackIntegrityError** L97
+- `function` **_utc_now** L101
+- `function` **_asof_day** L105
+- `function` **sha256_bytes** L112
+- `function` **sha256_file** L116
+- `function` **write_deterministic_gzip** L124
+- `function` **read_gzip_bytes** L131
+- `function` **scan_secrets** L136
+- `function` **_connect** L145
+- `function` **detected_schema_version** L155
+- `function` **apply_migrations** L171
+- `class` **StatePack** L195
+- `method` **StatePack.__init__** L196
+- `method` **StatePack._init_db** L208
+- `method` **StatePack.sqlite_health** L215
+- `method` **StatePack.put_blob** L231
+- `method` **StatePack.index_claim** L244
+- `method` **StatePack.ingest_store** L293
+- `method` **StatePack._load_blob** L339
+- `method` **StatePack.query_entity** L347
+- `method` **StatePack.query_source** L366
+- `method` **StatePack.query_asof** L374
+- `method` **StatePack.counts** L382
+- `method` **StatePack.deterministic_records** L394
+- `method` **StatePack.export_object** L402
+- `method` **StatePack.snapshot** L412
+- `method` **StatePack.integrity_ok** L483
+- `method` **StatePack.restore_from_export** L530
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/subject_offer_set.py`
 
@@ -1808,6 +1876,17 @@ _No class/function symbols._
 - `function` **test_ledger_hash_changes_on_corruption** L139
 - `function` **test_market_definition_key_is_exact_tuple** L145
 
+### `artifacts/dcm_v6_workstream_ab/tests/test_freshness.py`
+
+- `function` **test_completed_game_facts_do_not_expire** L17
+- `function` **test_season_recent_form_is_not_an_immutable_fact** L32
+- `function` **test_event_multiplier_piecewise** L45
+- `function` **test_status_claim_decays_near_tipoff** L52
+- `function` **test_gtd_is_governed_alias_for_game_time_decision** L82
+- `function` **test_unknown_inputs_fail_closed** L89
+- `function` **test_efficiency_is_not_mapped_to_opportunity_category** L99
+- `function` **test_effective_half_life_matches_spec_defaults** L104
+
 ### `artifacts/dcm_v6_workstream_ab/tests/test_gamelog_normalize.py`
 
 - `function` **_player_request** L14
@@ -1885,6 +1964,12 @@ _No class/function symbols._
 - `function` **test_mount_refuses_wrong_hash** L122
 - `function` **test_mount_copies_only_on_match** L132
 - `function` **test_har_run_synthetic_does_not_promote_lr** L142
+
+### `artifacts/dcm_v6_workstream_ab/tests/test_historical_gap.py`
+
+- `function` **test_append_only_missing_events_38_40** L5
+- `function` **test_unexpected_extra_is_audited_not_deleted** L20
+- `function` **test_stored_event_ids_prefer_eventId** L30
 
 ### `artifacts/dcm_v6_workstream_ab/tests/test_host_native.py`
 
@@ -2150,6 +2235,14 @@ _No class/function symbols._
 - `function` **test_basketball_and_gridiron_research_schemas_are_complete** L13
 - `function` **test_unknown_sport_research_schema_fails_closed** L24
 - `function` **test_universal_host_plan_includes_sport_specific_subject_requirements** L30
+
+### `artifacts/dcm_v6_workstream_ab/tests/test_statepack.py`
+
+- `function` **_claim** L16
+- `function` **test_statepack_indexes_store_and_queries_entity_source_asof** L32
+- `function` **test_snapshot_round_trip_preserves_semantic_hash** L48
+- `function` **test_corrupt_export_fails_closed** L67
+- `function` **test_outcomes_are_indexed_and_do_not_decide_reuse** L80
 
 ### `artifacts/dcm_v6_workstream_ab/tests/test_status_start_gates.py`
 
