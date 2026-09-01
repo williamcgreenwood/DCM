@@ -1,12 +1,12 @@
 {
-  "contentHash": "37f51892180709231357d570fe0acaa1f50a9cd20505d7a4e135b1259e045b5c",
-  "moduleCount": 210,
+  "contentHash": "c9eb7f6f831d3e807e4f86d335f1ee0929ce1a285a13af82b87e100a6e39f58f",
+  "moduleCount": 217,
   "modules": [
     {
       "classes": 0,
       "functions": 0,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/__init__.py",
-      "sha256": "e14f1270502b01ef07e5b6834c92e4babbcf6cae5668f07448d8d5a5f8831052",
+      "sha256": "69efdd888e08a82848ef6e922f6259d15f4d708100976f9f0cbaad68c8c0fc31",
       "symbols": [],
       "workstream": "UNMAPPED"
     },
@@ -14,7 +14,7 @@
       "classes": 0,
       "functions": 0,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/__main__.py",
-      "sha256": "0829cd6e618ba12f07ef6937212776bff5d309a5821f3fa0826543e49e832887",
+      "sha256": "ca4603caf0858cdb083d03ba886ee977f39d74eccecdddece4c2975ec6d0da36",
       "symbols": [],
       "workstream": "UNMAPPED"
     },
@@ -22,7 +22,7 @@
       "classes": 0,
       "functions": 2,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/archive.py",
-      "sha256": "a2f7665b9047402b79ad79ca11c6534928c9e3da23bc7e397a86675d80f9460f",
+      "sha256": "cb6e177738e8d2876991164593ce6f7566090e97793338a2a52f9bfc9843c802",
       "symbols": [
         {
           "doc": null,
@@ -47,7 +47,7 @@
       "classes": 0,
       "functions": 0,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/chat/__init__.py",
-      "sha256": "94af07e6940e575613834dcf74e016e07d37cd9f410f1a403ce1505ba3751502",
+      "sha256": "c4710e2b49bdd9de3261a0bc257ff4a61b0b126bd3c2ede9713e99f5f6005013",
       "symbols": [],
       "workstream": "P7"
     },
@@ -55,7 +55,7 @@
       "classes": 0,
       "functions": 0,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/chat/__main__.py",
-      "sha256": "ddf7f8c0ccdf80270cd0e4110e210cbafacf8bd4788eea40826c4319d8ff8809",
+      "sha256": "545dca759e83cf4a4ae7277b36891734c44194f5f2cdbf12582902003deebf29",
       "symbols": [],
       "workstream": "P7"
     },
@@ -63,7 +63,7 @@
       "classes": 0,
       "functions": 2,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/chat/archive.py",
-      "sha256": "0f7f000128a228e5cafbfd49d842337f37a01aed0d470c8d533bb8e56eb28df9",
+      "sha256": "38dbc30f5d43bb53fbd66c6c5449dd5756ffbe4a6462b97980ae4b2e47fef2c8",
       "symbols": [
         {
           "doc": null,
@@ -88,7 +88,7 @@
       "classes": 0,
       "functions": 4,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/chat/cli.py",
-      "sha256": "4ac19ced1cb55fd3d3058b311459e5d8fe8495545208958d930290278a0d02eb",
+      "sha256": "c16b913fac2c6314bc3a7fc0014d35e36ba511b1123f234448e2559428fcac21",
       "symbols": [
         {
           "doc": null,
@@ -129,7 +129,7 @@
       "classes": 0,
       "functions": 0,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/chat/contracts.py",
-      "sha256": "a55c296a2dc0b9e89f734995cf445768562ef2d827a255d88c62d466e32796d3",
+      "sha256": "12c989623dec34aa1b051e8dd1f7ff0e0c506fb9db335b2c928b22c4cb9b1e2d",
       "symbols": [],
       "workstream": "P7"
     },
@@ -137,7 +137,7 @@
       "classes": 0,
       "functions": 4,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/chat/evidence_import.py",
-      "sha256": "affd7aa65e1cd32ccab916cf215d52bd42b7e04ddb06d20645bc6777edb4e466",
+      "sha256": "f190a43653f079c3982526c812237a0d1710850979215edce750e4cd5817ac3b",
       "symbols": [
         {
           "doc": null,
@@ -178,7 +178,7 @@
       "classes": 0,
       "functions": 1,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/chat/report.py",
-      "sha256": "8ef32a4566d3076e81a164fb26d20a7bf47713baeef55da9963ec634a7f195a1",
+      "sha256": "16557038281bfde73aa02c8dd0456cb7f7cf611a36e109bf0c2722e20c4693a0",
       "symbols": [
         {
           "doc": null,
@@ -195,7 +195,7 @@
       "classes": 0,
       "functions": 1,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/chat/research_bridge.py",
-      "sha256": "476468101c5ed330f33230b3ad79e0a586ef9c5056c00e72e925b7c379bb1ef9",
+      "sha256": "7088dca9a93219b73221170ef5aa0ec26eb42d6e78ab036d798cdb73ed03f14b",
       "symbols": [
         {
           "doc": null,
@@ -212,7 +212,7 @@
       "classes": 1,
       "functions": 17,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/chat/session.py",
-      "sha256": "b13da5fb8378c45a91dc8760911a8208a5f89ad88447b28e12f4b04dd2e9303d",
+      "sha256": "f94e9f6d6668c97219a97bf939a877a62ad473dbc06112994680083e3cb14b74",
       "symbols": [
         {
           "doc": null,
@@ -365,7 +365,7 @@
       "classes": 0,
       "functions": 4,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/chat/state.py",
-      "sha256": "b51efb24e1ee5cd7289ae699a2ab14a487850814a87d5b740ce595ddb25eff89",
+      "sha256": "0832ccb7e9c9962329faf6f4ab7fb266d6dba1d58a460a6005d84502b8db006b",
       "symbols": [
         {
           "doc": null,
@@ -406,7 +406,7 @@
       "classes": 0,
       "functions": 0,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/contracts/__init__.py",
-      "sha256": "7aeab96d3c6a1bf613cdda25c8db807c8eea6e0247b7933aedc6b7598c42a087",
+      "sha256": "ffb1c09ebf96af18dfed5b80482d7f25583cdf871e575a72d642e9c62c395270",
       "symbols": [],
       "workstream": "P0"
     },
@@ -414,7 +414,7 @@
       "classes": 1,
       "functions": 0,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/contracts/codes.py",
-      "sha256": "e1cb123920d0d5299e0512e671ec7888da88c44ac5e7cdc0ade4d9eb267343ef",
+      "sha256": "50ef45ec75f241fd61276a06ddcdf88c6995e9f75437c6593f5cc30123e642c3",
       "symbols": [
         {
           "doc": null,
@@ -431,7 +431,7 @@
       "classes": 0,
       "functions": 0,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/contracts/failure_codes.py",
-      "sha256": "153c3aa8d8d2ad7fe5f480a130ae51fcce41b2f9a4deec905a8dff249f1409c8",
+      "sha256": "d43d952afbe3990e94814039d6072989517f214f14b8416fe979bd963a7ef213",
       "symbols": [],
       "workstream": "P0"
     },
@@ -439,7 +439,7 @@
       "classes": 1,
       "functions": 6,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/contracts/hashes.py",
-      "sha256": "a43ad08221272458f6337a1712827d07d2145cb6b9952aa3e52fb96b72d337f7",
+      "sha256": "e7f266d80c41bc16f7d8bbc0f0f35b92c3b8fb763a58f6f6373ffaa342e67301",
       "symbols": [
         {
           "doc": null,
@@ -504,7 +504,7 @@
       "classes": 1,
       "functions": 8,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/contracts/immutables.py",
-      "sha256": "811c1ea3417f889ac84e67b2774e5c680eb326f034c327ed27f98e327a075ab1",
+      "sha256": "a5fab94bc030edf5b45ee95ca38d81866511be220dc9bd96c64c80f0d3aeb347",
       "symbols": [
         {
           "doc": null,
@@ -585,7 +585,7 @@
       "classes": 0,
       "functions": 0,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/contracts/phase_bc.py",
-      "sha256": "72cb8181d79767221e1d4428e0faff05ec73aa45eaf5acaa2b3e574aa319dbcd",
+      "sha256": "91b5f99cbc9db81b03392b6c2f6abd2c895e34c239504f7e103b617b0180edfb",
       "symbols": [],
       "workstream": "P0"
     },
@@ -593,7 +593,7 @@
       "classes": 25,
       "functions": 16,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/contracts/schemas.py",
-      "sha256": "a9b1e3defdb1580bad111866ac330eaaddb2008d5c5bdb5ee1b750c0ef2a9ac6",
+      "sha256": "18a581b026a09690e4b5be2e13fa2c08b89ba064667053bcb2b846f2f0a61dbe",
       "symbols": [
         {
           "doc": null,
@@ -930,7 +930,7 @@
       "classes": 4,
       "functions": 5,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/contracts/universal_entities.py",
-      "sha256": "b1c41a651c0663e678cfec85334778779b1cea6490e0b02d4b5408babf2b27e8",
+      "sha256": "8598479ad1d46738952bc8c76ef80b8cd6486bfbd896186fc895023796554bbb",
       "symbols": [
         {
           "doc": null,
@@ -1011,7 +1011,7 @@
       "classes": 0,
       "functions": 0,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/dataset.py",
-      "sha256": "e6d81d3530a7f36f53ec661c80b3cdd39558fdd14aab159fe1db20ca13c2d9b8",
+      "sha256": "785c77846a70e914529e50f266c908e045ad88a5b411d7ca6c3dfdedec97b377",
       "symbols": [],
       "workstream": "UNMAPPED"
     },
@@ -1019,7 +1019,7 @@
       "classes": 0,
       "functions": 0,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/identity/__init__.py",
-      "sha256": "ab5d47ced7ca9b0ee41a52c90ecf36a8efe0f7a7d5b9da8597e7d3cb9d4c8c44",
+      "sha256": "d50ae53d7deef7bf7fff641032b82632ef2669bb909d27344b30b55239fb3b13",
       "symbols": [],
       "workstream": "P0"
     },
@@ -1027,7 +1027,7 @@
       "classes": 0,
       "functions": 5,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/identity/resolve.py",
-      "sha256": "dfc44a93a3a815135df49b66c21afac422e1b522cc1e70aeff41d8aa1301ed9e",
+      "sha256": "bbcb43fb4e53bae994cfa6ab2e3adc39c1c79dca0bcf821677dd3f6b2dabb309",
       "symbols": [
         {
           "doc": null,
@@ -1076,7 +1076,7 @@
       "classes": 0,
       "functions": 0,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/ingest/__init__.py",
-      "sha256": "94b2f4b0ca9cfda60b23899175604cd2bf387183b7845011592a105f2eba6359",
+      "sha256": "29b63c5c4b4363dbb69c8ac623aa9a8d40f02f5459af132cc65d09d1f1413fc8",
       "symbols": [],
       "workstream": "P0"
     },
@@ -1084,7 +1084,7 @@
       "classes": 0,
       "functions": 6,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/ingest/board.py",
-      "sha256": "c76ddfdb4fa5918f22dd5ff1dbe5b37e61665212982fefdebde67003545d367c",
+      "sha256": "ae0a594bfa85e7147b73b236fd62f0af38bc703438344518b7ab7e4f61bee24a",
       "symbols": [
         {
           "doc": null,
@@ -1141,7 +1141,7 @@
       "classes": 0,
       "functions": 6,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/ingest/composite.py",
-      "sha256": "39fa630eb8e6701ee2e3e243c15e6f202187f7b99787e09f4cd75613f05a90ab",
+      "sha256": "85cd9177f5b1fe02e5eba80b8f9de958ccc42ab9f76c4fc8e555ab896f796c84",
       "symbols": [
         {
           "doc": null,
@@ -1198,7 +1198,7 @@
       "classes": 0,
       "functions": 13,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/ingest/har.py",
-      "sha256": "a777c37a19052a6a1a699b270fef63b3a77b3b8848cd231ce556b947b0810c3e",
+      "sha256": "18c1dee23c14c4705ba7f6484663e6dd2de228e866063c55984655222bbcbc80",
       "symbols": [
         {
           "doc": null,
@@ -1311,7 +1311,7 @@
       "classes": 0,
       "functions": 4,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/ingest/markets.py",
-      "sha256": "da816bb7bdc7c24f1e66f9875564d43b319be31789bdc9fdb03085e6405a0ae4",
+      "sha256": "9d0e329cf7da69ac4859c68d7db90172e36b5207d28c525bb5b7e2666752f14c",
       "symbols": [
         {
           "doc": null,
@@ -1352,7 +1352,7 @@
       "classes": 0,
       "functions": 3,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/ingest/outlier.py",
-      "sha256": "580958f03a101dc11203ee75bb39bb02a8a869bf06e9e4aa55f20f40ca7fd602",
+      "sha256": "7758ef9094761e7be35b95286830e117ab2e185b3cfeb1073f44a6411f8bb803",
       "symbols": [
         {
           "doc": null,
@@ -1385,7 +1385,7 @@
       "classes": 0,
       "functions": 13,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/ingest/prizepicks.py",
-      "sha256": "7a7996254b99b471fb95df0b9fc075b5b1465a90fbe07b75b79f7551ef7de37b",
+      "sha256": "1e2384865d6c95d79bb0532cf84d777b20bebf691105f225b94d8eed2581deb5",
       "symbols": [
         {
           "doc": null,
@@ -1498,7 +1498,7 @@
       "classes": 0,
       "functions": 5,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/ingest/sanitize.py",
-      "sha256": "fc5645876b7e6dcf8f04a50665bde812c8fd0bc0c44a5c6f64053d1402d870ed",
+      "sha256": "36bc328f4277573a3c5d3879fd0396809b1c0bbc6e57ed1b30de68f5385d638d",
       "symbols": [
         {
           "doc": null,
@@ -1547,7 +1547,7 @@
       "classes": 0,
       "functions": 2,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/ingest/wsab_bind.py",
-      "sha256": "76f822f4ca0b3d22fe9b0035eff96e19615a021733f26441faadb13b622f2ef6",
+      "sha256": "312d574fd624070c107560233ff96b974eb2f2f67a44b1654d37890fffe589f3",
       "symbols": [
         {
           "doc": null,
@@ -1572,7 +1572,7 @@
       "classes": 0,
       "functions": 0,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/learning/__init__.py",
-      "sha256": "0ae8411957132f8a634d839deb1a58ddd24038bb67939f5d6bcf92d6ef3fc047",
+      "sha256": "40aa876f44eb8c2a7b90f26794572bdb7b2d490523317d5da157b529c89ab285",
       "symbols": [],
       "workstream": "P6"
     },
@@ -1580,7 +1580,7 @@
       "classes": 0,
       "functions": 6,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/learning/calibration.py",
-      "sha256": "59dd40faade11de70b2433041d0b4cbf23d3fef033bc66e812cf0c082b437dc7",
+      "sha256": "809401434fffe1c302da6d27a373134a5340e1b5b55ae8651fa108e18793c65b",
       "symbols": [
         {
           "doc": null,
@@ -1637,7 +1637,7 @@
       "classes": 1,
       "functions": 13,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/learning/dataset.py",
-      "sha256": "34877b4f7b530737f1d96fbbbf18d1821ce59e2eeec21e6c3f9572db45a6d05f",
+      "sha256": "887ba0f05d621ec4b262272ad0d20abc8ff901aab916efffce0e7cffa5056300",
       "symbols": [
         {
           "doc": "Run dest has no settlements sidecar; builder will not invent labels.",
@@ -1758,7 +1758,7 @@
       "classes": 0,
       "functions": 3,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/learning/failure_class.py",
-      "sha256": "a1c0f4a1f1a829c6d71b1ed00230a3fc6e947551121349fbe1ce96a62b120ebd",
+      "sha256": "71813e7ae3f76c7a618baf59dcee7f944ab38dba5e7f710a87ed71ab2050d87d",
       "symbols": [
         {
           "doc": null,
@@ -1791,7 +1791,7 @@
       "classes": 0,
       "functions": 13,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/learning/postgame.py",
-      "sha256": "06abb252c2d9980d48f5c7a41919ad39d33c2e6ea89a144b9ecbf98703feb3c8",
+      "sha256": "386cf106672cbea3182d7124ad7d7fe293a72b97504c8d3fa39ab130e977b333",
       "symbols": [
         {
           "doc": null,
@@ -1904,7 +1904,7 @@
       "classes": 0,
       "functions": 10,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/learning/registry.py",
-      "sha256": "3c69be0862cf9199e0df495ee99b5c1d109d102c53349e1d1afe1343acb0c3a9",
+      "sha256": "5838bfaff8d56d3b24e2f94ac72b5ec9b5bf6b319877192eaecc687fc0e3eb7a",
       "symbols": [
         {
           "doc": null,
@@ -1993,7 +1993,7 @@
       "classes": 0,
       "functions": 5,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/learning/sidecar.py",
-      "sha256": "7647dd4ecc8811c81c99766b645d21c9c9881f6678d4d6e3fa83f4c1bb548307",
+      "sha256": "5c8f7993bd05e0c4011fd7a81ea9be79d37abb7b0467c16bc88c4e24b50948be",
       "symbols": [
         {
           "doc": null,
@@ -2042,7 +2042,7 @@
       "classes": 1,
       "functions": 15,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/learning/walkforward.py",
-      "sha256": "d67d4f64efe942c6561486954103da2e13536e4b5e420ad18c5ad8b10a689a65",
+      "sha256": "a69f43e53a4227dc736fb7b2189286119ab410d25f0b4d6f6811dd43576798bd",
       "symbols": [
         {
           "doc": "Test fold decisionCutoff is not strictly after every train cutoff.",
@@ -2179,7 +2179,7 @@
       "classes": 0,
       "functions": 0,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/ml/__init__.py",
-      "sha256": "33884d82179a9e7b76201228d665db41b705fdf65023631417275d7a9b9ea209",
+      "sha256": "3ecc4df854cd7f69ce8470adfb2fc6a1761633a032d36c7ee9d1e385cb3cc2fd",
       "symbols": [],
       "workstream": "P2"
     },
@@ -2187,7 +2187,7 @@
       "classes": 1,
       "functions": 7,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/ml/feature_store.py",
-      "sha256": "134f7da6d1d6920a6a47c208abba46374774204856192bfcaef97f39c901c933",
+      "sha256": "9ff552725860f5bcee2dc980f4cba1b1be220279e479f70edb711b7bc64b8456",
       "symbols": [
         {
           "doc": null,
@@ -2260,7 +2260,7 @@
       "classes": 0,
       "functions": 0,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/model/__init__.py",
-      "sha256": "60de170d90026f5de041860042d500435b9b48905985bec28c90efec22bf391e",
+      "sha256": "7df8aca56f3ee3d2c03338bc1c306293c6fa7af79bd9f1cce383c5e288ddcd44",
       "symbols": [],
       "workstream": "P2-P4"
     },
@@ -2268,7 +2268,7 @@
       "classes": 0,
       "functions": 2,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/model/availability.py",
-      "sha256": "dfd504db8008fbea091cc7590f0a2b2efaccc452a0a674a4eaa981e1ea1cf972",
+      "sha256": "df4506ef12f22af51d34383b812250d39c9670431dd59482cd3b6e0d71746ac0",
       "symbols": [
         {
           "doc": null,
@@ -2293,7 +2293,7 @@
       "classes": 1,
       "functions": 6,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/model/basketball_efficiency.py",
-      "sha256": "fdaa2388690c7597bed142301af4bcd194f3a81f97efa4e1186630487896f817",
+      "sha256": "daf0decb64a51da13721ce97c5d73553e3f09ab2f4549fd289f35d7b9770490a",
       "symbols": [
         {
           "doc": null,
@@ -2358,7 +2358,7 @@
       "classes": 1,
       "functions": 8,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/model/basketball_opportunity.py",
-      "sha256": "c0de6948c1891df3af53cea9311355fbcc075439e9d6c98fbdca72936bec349d",
+      "sha256": "06fc4ed2f2bab690c860448688a32cb0e9480468e517980201311b0bf3d7490b",
       "symbols": [
         {
           "doc": null,
@@ -2439,7 +2439,7 @@
       "classes": 0,
       "functions": 1,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/model/distributions.py",
-      "sha256": "d63a29cfdeb34aa9628e34645d896802725825ff9213b5473c74664ed0cdf62a",
+      "sha256": "a863470fad3bc0cd2f50386e07f2a23b53738f116ff712edbe5f87231aa33874",
       "symbols": [
         {
           "doc": null,
@@ -2456,7 +2456,7 @@
       "classes": 0,
       "functions": 8,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/model/event_world_joint.py",
-      "sha256": "4dba3b9685116a3d831e9a32e5c63e038366b55e50858fd8be119e08ef3ea913",
+      "sha256": "dce242d747ad0900eff19203c99b06ed062fc79512fc8b6ea0e57b66d157d4ef",
       "symbols": [
         {
           "doc": null,
@@ -2529,7 +2529,7 @@
       "classes": 0,
       "functions": 14,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/model/explanation.py",
-      "sha256": "961288a691661489433131fe4fd502d80e3e87b485f57904fe1412aa81a663b8",
+      "sha256": "5bacac06a7d860dfb6381e813d13c180040d5839eca43ac3f846d3ba947d862e",
       "symbols": [
         {
           "doc": null,
@@ -2650,7 +2650,7 @@
       "classes": 0,
       "functions": 1,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/model/grade.py",
-      "sha256": "c7b4381bf44dc64d9df6e2573eb82d056d59bd00b5c7cab3e4a28ddc81ea3dec",
+      "sha256": "01bcad1c5c464c4a8363418a3ae4b8a75d9551bb91ef679ee7214c17d5adfde7",
       "symbols": [
         {
           "doc": null,
@@ -2667,7 +2667,7 @@
       "classes": 3,
       "functions": 13,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/model/gridiron_models.py",
-      "sha256": "a7fcf01d3efe12b5bcaac70c9285ad00cfa436bb437f7e0aecd03affea3d9f57",
+      "sha256": "a41ad7e13e2dfe094ef65665ea6e129a23bd1aa57cc61cfc8fe74f68c7411939",
       "symbols": [
         {
           "doc": null,
@@ -2804,7 +2804,7 @@
       "classes": 0,
       "functions": 4,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/model/line_surface.py",
-      "sha256": "9f736b1e91088e316aa90358b52597d5b42a309d8e1dea4ac496990deb6cb7b1",
+      "sha256": "2f1c5de2741acc2a5bcd612e6eaca2974c24a39891a09d1d61fa6fa5a7d37f7b",
       "symbols": [
         {
           "doc": null,
@@ -2845,7 +2845,7 @@
       "classes": 1,
       "functions": 8,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/model/market_derive.py",
-      "sha256": "02be350500226ed7e59ffaf0a9a815df3e2e4c5338d4cbc287d9e5f7635d42a4",
+      "sha256": "6bae76eb38c87c551f7d685be6021a47530da8e37a4406809784d3d2695560e8",
       "symbols": [
         {
           "doc": "Unknown or unverified market. Fail closed \u2014 never nearest-match.",
@@ -2926,7 +2926,7 @@
       "classes": 0,
       "functions": 8,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/model/parameters.py",
-      "sha256": "75be28b5ce53b3271fa0070e43dea91c92ae9b6f1ac1aa8982fcad9ec3ec0d99",
+      "sha256": "59342f605e42f8dad89b32f3e897fc24ac9b1e5faafc12d71722b69d9f005bd0",
       "symbols": [
         {
           "doc": null,
@@ -2999,7 +2999,7 @@
       "classes": 1,
       "functions": 5,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/model/participation.py",
-      "sha256": "3428d2c28a643b0bae3a76462f6761b9eaa45bf9aae23a3566ce7abee3254c67",
+      "sha256": "b35354c830da947d21a4b38302756bb81b078f4d3ab475548c0240d7c344e38d",
       "symbols": [
         {
           "doc": null,
@@ -3056,7 +3056,7 @@
       "classes": 1,
       "functions": 9,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/model/quarter_worlds.py",
-      "sha256": "7bf4312a3b013e5792b74d0177e5f64159fc64a6f4ca3e60d92d38b73463e363",
+      "sha256": "7edac61218776938f0c3be55b12e7a65643a5b8c82882c4fa11a6c9fd5c826dc",
       "symbols": [
         {
           "doc": null,
@@ -3145,7 +3145,7 @@
       "classes": 0,
       "functions": 2,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/model/ranking.py",
-      "sha256": "395b074dc1e2941ba68be8cef55ea69a2f39b8903fe6087b1de92ff648aa666b",
+      "sha256": "0b0950f66d9fc2c820cf89201aebec0b4d1d7c9a60eb9eb5ce2811c3bb4a8b7d",
       "symbols": [
         {
           "doc": null,
@@ -3170,7 +3170,7 @@
       "classes": 0,
       "functions": 3,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/model/uncertainty.py",
-      "sha256": "2eedee613f3aa936aed5d61731cc49b3bf51f8bbe625477bf69073b1017a41b4",
+      "sha256": "e204c9442fecd09af6c36bd4cb0e058fd4b5e0cbd344316bb5312b6437de815f",
       "symbols": [
         {
           "doc": null,
@@ -3203,7 +3203,7 @@
       "classes": 0,
       "functions": 16,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/model/worlds.py",
-      "sha256": "1d8512e334e03ac067e281f9c05077dc62a7a8e98d2d9a814550c1bc1c3f6d9e",
+      "sha256": "c8346260865dccb497dad9f6849b1ae08364d9f251d64f325d0ac2331c0dc3cb",
       "symbols": [
         {
           "doc": null,
@@ -3340,7 +3340,7 @@
       "classes": 0,
       "functions": 0,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/platform/__init__.py",
-      "sha256": "677f46a00d506aad9baddf3c85eb89ab8acfc09b98b6cc30cde693b7293c3255",
+      "sha256": "619943cb8295bb42186e328976ec65b1652a37029ea53614a4df7f9d5ad1a82c",
       "symbols": [],
       "workstream": "UNMAPPED"
     },
@@ -3348,7 +3348,7 @@
       "classes": 0,
       "functions": 0,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/platform/prizepicks/__init__.py",
-      "sha256": "eb882c08e981ea1d7fd90948ba352f8f067ea04cf6d9f21ae0143bb461a9a52e",
+      "sha256": "1a7082e6d3c9d0a8de3808fc08313c887f0e8abe43f86dd3974d559f2e9da773",
       "symbols": [],
       "workstream": "UNMAPPED"
     },
@@ -3356,7 +3356,7 @@
       "classes": 1,
       "functions": 3,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/platform/prizepicks/entry_contract.py",
-      "sha256": "f571baa024f55e29a9d4ac8bc422b0bdd0bb81050366c31e1489bf737a0a11fc",
+      "sha256": "8e9fc5fc6963dfebdac3c82c4120a0284b1db1227d89aee556e95495ee70b6e0",
       "symbols": [
         {
           "doc": null,
@@ -3397,7 +3397,7 @@
       "classes": 0,
       "functions": 0,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/platform/prizepicks/leaderboard.py",
-      "sha256": "a85206751ac74c43319710f3687b8e0b468848eb812862099acf4f5204bc81ba",
+      "sha256": "ce0b67b9c5a35410f8813ceda1764465ff85234bcc971f8f97a14aa67fb516eb",
       "symbols": [],
       "workstream": "UNMAPPED"
     },
@@ -3405,7 +3405,7 @@
       "classes": 0,
       "functions": 0,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/platform/prizepicks/minimum_guarantee.py",
-      "sha256": "fab4015ee173de4b82e5f77a40d0f22dbb0bbb65e749117eeacc890ef2cb3ba0",
+      "sha256": "8c8a2730a710e9e58b8359bef76564a6f459dba378c85ba7b23fb222790f4a64",
       "symbols": [],
       "workstream": "UNMAPPED"
     },
@@ -3413,7 +3413,7 @@
       "classes": 1,
       "functions": 2,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/platform/prizepicks/participation.py",
-      "sha256": "c8dfe160b6c6e7dff2f44b0d04a925944560f7581f862d3ca63cd13faf268df6",
+      "sha256": "4dce45543bd49ed70f98ecf5c0b83772082126854199417da8e202abe683bb3b",
       "symbols": [
         {
           "doc": "World-realized participation. Reboot evaluation consumes this; it does not decide economics.",
@@ -3446,7 +3446,7 @@
       "classes": 0,
       "functions": 2,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/platform/prizepicks/payouts.py",
-      "sha256": "09c1b84dee5a0492fd72a6c2135f9b488a81fa4d51dec8274e72a4d351cc6784",
+      "sha256": "54ab238f6d04cdaaa19afc36eb0f6ea470f3973185934353f437318624ba33e8",
       "symbols": [
         {
           "doc": "rows maps (payout_tier_count, win_count) -> return amount (not multiplier).",
@@ -3471,7 +3471,7 @@
       "classes": 1,
       "functions": 4,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/platform/prizepicks/reboot.py",
-      "sha256": "16abc648d418ae55432911565979b66885981f780b9cca9596070832b7a90321",
+      "sha256": "f0af2382ed7a5548987984a526caa141ddc11ad843a3633cb640cf1230f1f3df",
       "symbols": [
         {
           "doc": null,
@@ -3520,7 +3520,7 @@
       "classes": 2,
       "functions": 6,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/platform/prizepicks/settlement.py",
-      "sha256": "c630a7495a02123ddd6b751c279c0d25613b1fd8ec82242d69bd0f3d2b35341f",
+      "sha256": "d861991f7dc2d1e2fc4adf9a70b041f045fecac89903fa966056a225c59350ea",
       "symbols": [
         {
           "doc": "Optional. Without this, Leaderboard return is UNMODELED.",
@@ -3593,7 +3593,7 @@
       "classes": 0,
       "functions": 1,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/postgame.py",
-      "sha256": "fec679a996a6f31b5a544394df1c6ed51cffdb6c155fda71e61eb39a0260ca58",
+      "sha256": "3b92a32eff9b3c73b8321ae230a974345b522f121c1f73fa370001282ed9be55",
       "symbols": [
         {
           "doc": null,
@@ -3610,7 +3610,7 @@
       "classes": 0,
       "functions": 14,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/release.py",
-      "sha256": "4589d788a90dc4b928a02e9b768814f7e430edef27a909ba0e83a5fc412a33f0",
+      "sha256": "501afef58b7a4e14bebd62b6aa114dac1528b3c05b83c8ce24037e7b31383a12",
       "symbols": [
         {
           "doc": null,
@@ -3731,7 +3731,7 @@
       "classes": 0,
       "functions": 0,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/__init__.py",
-      "sha256": "6d2fa50781050da21d02f5af4316f242dbe34dbcfbfbf69d3adfa33fa71405a2",
+      "sha256": "69a785f1ea67a42e3306276deb02bd221bddc2115ee94e66b1acc1dc89c51ac1",
       "symbols": [],
       "workstream": "P1"
     },
@@ -3739,7 +3739,7 @@
       "classes": 0,
       "functions": 0,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/adapters/__init__.py",
-      "sha256": "2b65938954bc35803165bae072f991dd3766160b465ecc2b85127c67ba90713e",
+      "sha256": "b2a230a7c383fbb18989517901acda57a78f5e1f299611329fdfc72c1e2f9211",
       "symbols": [],
       "workstream": "P1"
     },
@@ -3747,7 +3747,7 @@
       "classes": 1,
       "functions": 7,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/adapters/base.py",
-      "sha256": "814b2431a6943963f06fdc839745b776f851d45e2f9da2ab0b85aacfd9850a65",
+      "sha256": "38d702bfd4895fe68c7ae42dae0402dee0061bbb909d814f40ede8fa32e159eb",
       "symbols": [
         {
           "doc": null,
@@ -3820,7 +3820,7 @@
       "classes": 7,
       "functions": 26,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/adapters/basketball_reference.py",
-      "sha256": "e969aeef96926a8f5f143ae8b30f9719266c3e1faed0fed20bb30ceacaa132a0",
+      "sha256": "59deda1e37f229ccaef4d865b9c5a6b789187f9c4b1cabfbeb3df9f325ee8629",
       "symbols": [
         {
           "doc": null,
@@ -4093,7 +4093,7 @@
       "classes": 1,
       "functions": 6,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/adapters/espn_status.py",
-      "sha256": "0c98661fa9aaf00f1a73397b624afe198e2389f4bcba2b3d32a06590879db906",
+      "sha256": "dd63833d8e0476829e7c9660677f975ee2bd4a1c730f4af521a8eaa96f3ff59f",
       "symbols": [
         {
           "doc": null,
@@ -4158,7 +4158,7 @@
       "classes": 1,
       "functions": 8,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/adapters/html_tables.py",
-      "sha256": "4456a87ae1c5a5ef67b278c5a1459ead02104cab07928dc280d9eef7b2ebead3",
+      "sha256": "04cbcebd0836dd272dd817cbf5fb26e4a80384216256740f28519a0183d245e4",
       "symbols": [
         {
           "doc": null,
@@ -4239,7 +4239,7 @@
       "classes": 3,
       "functions": 6,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/adapters/official_league.py",
-      "sha256": "96ed5f009853c1dea3394b46839b23d62c180896e24c1831f77f76a30be3472c",
+      "sha256": "e5dfa41c9c2be3d5d9f12274f22bdb0314a0e662adf74fb30a4e9d6831d2b45e",
       "symbols": [
         {
           "doc": null,
@@ -4320,7 +4320,7 @@
       "classes": 1,
       "functions": 5,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/adapters/prizepicks.py",
-      "sha256": "320816d97117c75345b8774eb9dc835e3edf686003d25847f116493ff89bc18a",
+      "sha256": "ba641c667e35193e9ad499335db36d0aa3bddab459c7e2b01ac270c9b0fe7b0e",
       "symbols": [
         {
           "doc": null,
@@ -4377,7 +4377,7 @@
       "classes": 2,
       "functions": 7,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/adapters/pro_football_reference.py",
-      "sha256": "22ed508c56adac434f4c516f648b97ef2766312a12f2093d102e5fc98f81f71d",
+      "sha256": "d5b8213c1d88b531431a13b8cf627f2548e179697762230402e8f9867666ee24",
       "symbols": [
         {
           "doc": null,
@@ -4458,7 +4458,7 @@
       "classes": 1,
       "functions": 5,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/authority.py",
-      "sha256": "2e5536babf38693c993f23b63c9dd74f444b18e2bf7ab445f7ab0a9e91d515c7",
+      "sha256": "f9de352db05d9a7122852a14a1e8d8b73a4214ef61982b49cadb83a9d9e8e708",
       "symbols": [
         {
           "doc": null,
@@ -4515,21 +4515,21 @@
       "classes": 0,
       "functions": 3,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/batch.py",
-      "sha256": "b1851b5bb324f599db656e24cc4a2168671afbcb1ee59eebc5ac83e9dfc207e3",
+      "sha256": "10dad3f643859aff79c641a625ceb2721384e0569b4de80ed811d0743fd15b3e",
       "symbols": [
         {
           "doc": null,
-          "endLine": 46,
+          "endLine": 47,
           "kind": "function",
-          "line": 36,
+          "line": 37,
           "name": "scheduler_score",
           "qualname": "scheduler_score"
         },
         {
           "doc": null,
-          "endLine": 57,
+          "endLine": 58,
           "kind": "function",
-          "line": 49,
+          "line": 50,
           "name": "_event_id_of",
           "qualname": "_event_id_of"
         },
@@ -4537,7 +4537,7 @@
           "doc": null,
           "endLine": 215,
           "kind": "function",
-          "line": 60,
+          "line": 61,
           "name": "build_next_research_batch",
           "qualname": "build_next_research_batch"
         }
@@ -4548,7 +4548,7 @@
       "classes": 1,
       "functions": 5,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/cache.py",
-      "sha256": "30f0ce9ea7ae133f706696d0a7b79717ac7aa3d8f1bebdd847b0e456f162298a",
+      "sha256": "aa998613bb2cae509586444176889c76efbbd8d404bf4809eb1aacb099b8a9c0",
       "symbols": [
         {
           "doc": null,
@@ -4605,7 +4605,7 @@
       "classes": 0,
       "functions": 3,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/claims.py",
-      "sha256": "fa297f4dc5cb2ddbec2a0f6e13410299be051eba5ea0944f055b84151f93ac61",
+      "sha256": "e224e689af8d3285faedf392440a8fe74c9645f0d0997426b0d3087225af4ba2",
       "symbols": [
         {
           "doc": null,
@@ -4638,7 +4638,7 @@
       "classes": 0,
       "functions": 7,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/classify.py",
-      "sha256": "bfcaa0523470702187e97d0cf95840fed9d35b964d59cd7bd2d0c62eb70fbd1c",
+      "sha256": "8bd7c45fcd88ce47ac5101fe70141c582748e1b34234647b11735e65b1017afd",
       "symbols": [
         {
           "doc": null,
@@ -4701,9 +4701,34 @@
     },
     {
       "classes": 0,
+      "functions": 2,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/research/classify_runtime.py",
+      "sha256": "18a35b253d2ee23a44024caa6012cfbab76aef7eef39fc6453dda846aa89d352",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 23,
+          "kind": "function",
+          "line": 17,
+          "name": "refine_delta",
+          "qualname": "refine_delta"
+        },
+        {
+          "doc": null,
+          "endLine": 70,
+          "kind": "function",
+          "line": 26,
+          "name": "classify_requests",
+          "qualname": "classify_requests"
+        }
+      ],
+      "workstream": "P1"
+    },
+    {
+      "classes": 0,
       "functions": 11,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/coverage.py",
-      "sha256": "86257d17dcc014d4b91076ff321ab18f4a4a4e5d4e9dd187ca29dd1b3e26b727",
+      "sha256": "27febbf3a45030cbf98e1969948ef65b5a908aa4f309ae25c77194bcc61c74cf",
       "symbols": [
         {
           "doc": null,
@@ -4800,7 +4825,7 @@
       "classes": 0,
       "functions": 4,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/dependency_graph.py",
-      "sha256": "d1fce7599737f5e985bc25c32d1c47cabd4ba451bf1c621a1e9059a7bbf95dc7",
+      "sha256": "6d60c128f286b4f35fc362d15b8de7fa473ffd8807dd7f88d0cd0f28f603792e",
       "symbols": [
         {
           "doc": null,
@@ -4841,7 +4866,7 @@
       "classes": 0,
       "functions": 4,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/emit.py",
-      "sha256": "566e573c8e7388273126c931166f776a40d4c11c475b818aa62cbb95bdb734c7",
+      "sha256": "a421b2aa73499d7cbafb696229d00b7ae308ff1b3b6a7bcd1e247623c83b2734",
       "symbols": [
         {
           "doc": null,
@@ -4882,7 +4907,7 @@
       "classes": 0,
       "functions": 4,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/entity_graph.py",
-      "sha256": "34dcc7441f729607e4379ddb7bab3074cd649ff947bc4599cc5d07c49792ee63",
+      "sha256": "5dff850752ed9585beaf62b77902dd029b31b65923b8ff8aceed2b0b2a495793",
       "symbols": [
         {
           "doc": null,
@@ -4923,7 +4948,7 @@
       "classes": 0,
       "functions": 13,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/entity_packets.py",
-      "sha256": "4df328d90bd8cd5e1ade44ef4648ed982b3c1a4b691e89e245ce022e7b734b1b",
+      "sha256": "f9a12f5b67191234fcc75b938e7fca3514b8c2ff0d252b97a019b91d047b6951",
       "symbols": [
         {
           "doc": null,
@@ -5036,7 +5061,7 @@
       "classes": 0,
       "functions": 16,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/evidence_graph.py",
-      "sha256": "90e61b6105cbe6d1c22b96ec4c11ee111a18323686c7a9d8a34bfe49f9dea817",
+      "sha256": "9d6ee602e633e1d33af5c9f3063f573366eb5a8d11df0503a66dabfdb5fd1b7e",
       "symbols": [
         {
           "doc": null,
@@ -5170,10 +5195,123 @@
       "workstream": "P1"
     },
     {
+      "classes": 1,
+      "functions": 12,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/research/freshness.py",
+      "sha256": "cd26f20197b77f9e773b5b5435ed7226f9ab0fddecea05570075a14b89517799",
+      "symbols": [
+        {
+          "doc": "Unknown freshness policy input. Fail closed.",
+          "endLine": 97,
+          "kind": "class",
+          "line": 96,
+          "name": "FreshnessPolicyError",
+          "qualname": "FreshnessPolicyError"
+        },
+        {
+          "doc": null,
+          "endLine": 107,
+          "kind": "function",
+          "line": 100,
+          "name": "normalize_status",
+          "qualname": "normalize_status"
+        },
+        {
+          "doc": null,
+          "endLine": 116,
+          "kind": "function",
+          "line": 110,
+          "name": "normalize_volatility",
+          "qualname": "normalize_volatility"
+        },
+        {
+          "doc": null,
+          "endLine": 130,
+          "kind": "function",
+          "line": 119,
+          "name": "category_for",
+          "qualname": "category_for"
+        },
+        {
+          "doc": null,
+          "endLine": 146,
+          "kind": "function",
+          "line": 133,
+          "name": "is_immutable_completed_fact",
+          "qualname": "is_immutable_completed_fact"
+        },
+        {
+          "doc": null,
+          "endLine": 157,
+          "kind": "function",
+          "line": 149,
+          "name": "event_multiplier",
+          "qualname": "event_multiplier"
+        },
+        {
+          "doc": null,
+          "endLine": 175,
+          "kind": "function",
+          "line": 160,
+          "name": "effective_half_life",
+          "qualname": "effective_half_life"
+        },
+        {
+          "doc": null,
+          "endLine": 200,
+          "kind": "function",
+          "line": 178,
+          "name": "freshness_score",
+          "qualname": "freshness_score"
+        },
+        {
+          "doc": null,
+          "endLine": 215,
+          "kind": "function",
+          "line": 203,
+          "name": "parse_utc",
+          "qualname": "parse_utc"
+        },
+        {
+          "doc": null,
+          "endLine": 221,
+          "kind": "function",
+          "line": 218,
+          "name": "hours_between",
+          "qualname": "hours_between"
+        },
+        {
+          "doc": null,
+          "endLine": 265,
+          "kind": "function",
+          "line": 224,
+          "name": "derive_freshness_inputs",
+          "qualname": "derive_freshness_inputs"
+        },
+        {
+          "doc": null,
+          "endLine": 345,
+          "kind": "function",
+          "line": 268,
+          "name": "evaluate_freshness",
+          "qualname": "evaluate_freshness"
+        },
+        {
+          "doc": "Refine a classify_delta result using derived timestamps. Never invent times.",
+          "endLine": 427,
+          "kind": "function",
+          "line": 348,
+          "name": "apply_adaptive_freshness",
+          "qualname": "apply_adaptive_freshness"
+        }
+      ],
+      "workstream": "P1"
+    },
+    {
       "classes": 0,
       "functions": 9,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/gamelog.py",
-      "sha256": "8afe0bce2db6dad8d70cae529e1317b40796fb9447a30b5af587048baa54e151",
+      "sha256": "49f2441bd676c9222db53b7433acec0e89524919fb2634606057866e2c7dba90",
       "symbols": [
         {
           "doc": null,
@@ -5254,7 +5392,7 @@
       "classes": 0,
       "functions": 9,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/gridiron_gamelog.py",
-      "sha256": "f6cbb7dfc3e37af052ef61dad3067625d0ac4e248f29b19bccd130a0d5af2092",
+      "sha256": "9901d172dbec3ed807b6c3f458f1943913ed84c1e759c7021c80f43842d8314a",
       "symbols": [
         {
           "doc": "Parse 71 or '71%' into 0.71. Already-fractional values in [0, 1] stay.",
@@ -5333,9 +5471,50 @@
     },
     {
       "classes": 0,
+      "functions": 4,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/research/historical_gap.py",
+      "sha256": "f89777f14b0467e1962ca05f3f0aef0c0aeb29c21106a8e4f6de3abda00c71df",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 28,
+          "kind": "function",
+          "line": 19,
+          "name": "_ids",
+          "qualname": "_ids"
+        },
+        {
+          "doc": null,
+          "endLine": 40,
+          "kind": "function",
+          "line": 31,
+          "name": "stored_event_ids",
+          "qualname": "stored_event_ids"
+        },
+        {
+          "doc": null,
+          "endLine": 67,
+          "kind": "function",
+          "line": 43,
+          "name": "resolve_history_gap",
+          "qualname": "resolve_history_gap"
+        },
+        {
+          "doc": null,
+          "endLine": 95,
+          "kind": "function",
+          "line": 70,
+          "name": "apply_history_gap",
+          "qualname": "apply_history_gap"
+        }
+      ],
+      "workstream": "P1"
+    },
+    {
+      "classes": 0,
       "functions": 1,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/host_plan.py",
-      "sha256": "51d348b9c9374b1155082b609dc3b7aa8f18c339123177bf231fe6a43b6ee331",
+      "sha256": "aade0d6bc08ae15ce5fcdda41155c7fcaf5061073e1aedaa3847f2d2690b4140",
       "symbols": [
         {
           "doc": null,
@@ -5352,7 +5531,7 @@
       "classes": 0,
       "functions": 3,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/lineup.py",
-      "sha256": "931fc8e5c228fe62462a2e5051a346297d9c7cec3c3e885340b3ba5ab2685cd0",
+      "sha256": "fd275337a16f3e7ce05a196f35faf78fd21cc975632a6eb6af4be38622c24ab4",
       "symbols": [
         {
           "doc": null,
@@ -5385,7 +5564,7 @@
       "classes": 1,
       "functions": 6,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/player_offer_set.py",
-      "sha256": "5fe65cdb369dad1b528cd6f330147b6e508136bd2b4ecd0c511254673cb685c8",
+      "sha256": "7f2db88e7cb62799137ca9b687b94c9a399ec69d68973b5df00c6f2bd2bc4311",
       "symbols": [
         {
           "doc": null,
@@ -5450,7 +5629,7 @@
       "classes": 0,
       "functions": 13,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/player_packet.py",
-      "sha256": "7419e3dfa128772d3aaf2ed857b379cd02078428cbe5514944bf100a3d0679c6",
+      "sha256": "7e280832a22bd9fc2134774a5a95b27b7de7e4630a213ddaa316cee3da844d2a",
       "symbols": [
         {
           "doc": null,
@@ -5563,7 +5742,7 @@
       "classes": 0,
       "functions": 5,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/population.py",
-      "sha256": "ec634094213c7d088c5619caf2fc7c0f1836ec24deca81cf4b64ec87d86b2b30",
+      "sha256": "f851aa8f784c83f431be6fa90b9d4a3957287fb14e3fbe106a3226df312ba9eb",
       "symbols": [
         {
           "doc": null,
@@ -5612,7 +5791,7 @@
       "classes": 4,
       "functions": 17,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/provider.py",
-      "sha256": "2e95d06b5c5990b033261ccb5ed6494c34216467f0b209d57a5b522119293a0c",
+      "sha256": "e5784e917f2167dd6a069723d751de8ec1e3e63fa7365db6e61c45d4a3b9c63d",
       "symbols": [
         {
           "doc": null,
@@ -5789,7 +5968,7 @@
       "classes": 0,
       "functions": 6,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/requests.py",
-      "sha256": "5b960ae9b42067cc0f4edbd8d800a1879c70e0a5486d352e21d660b423eccc34",
+      "sha256": "e22608ebd7b5fa655d34aa0390c91cb152cbb47f0d638af7e8665dcbe5f62810",
       "symbols": [
         {
           "doc": null,
@@ -5846,7 +6025,7 @@
       "classes": 1,
       "functions": 26,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/research_store.py",
-      "sha256": "2e8a380bd9fc277d3d28540e9ff50fb4f6e5827b5e460a0c1a6eca4fef025e1a",
+      "sha256": "7cd9e49250b874994d3629d876aeb90dccf7f269a043b25c7ae157d628a94a8a",
       "symbols": [
         {
           "doc": null,
@@ -6071,7 +6250,7 @@
       "classes": 1,
       "functions": 24,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/role_epoch.py",
-      "sha256": "aac259a45504ce5523e0ae6b758a01c4c3b36a2a46de6d1bbaa8fe58be99161d",
+      "sha256": "7f935b6294fc4005af19f86835f5355fd9cf4949c579d69bca096cf3f651138f",
       "symbols": [
         {
           "doc": null,
@@ -6280,7 +6459,7 @@
       "classes": 0,
       "functions": 6,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/scopes.py",
-      "sha256": "d9f32b32dbd15e0a376bee64cb3bb79d34d6ba2c683f00bcc8d8805fa8a6d7f9",
+      "sha256": "95040e8b91c2ed71dd7cea230da707d2e4867303b8e7268bd95db6e66c383855",
       "symbols": [
         {
           "doc": null,
@@ -6337,7 +6516,7 @@
       "classes": 0,
       "functions": 5,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/source_catalog.py",
-      "sha256": "be994a1845f3352ab710aa63e3498c2839d92bc9cf874f911783e5ec539d0a1c",
+      "sha256": "e7ae0b3b16f449a1410e0af44d05dc0cb21b0cd03887e894de16ded0da4095bd",
       "symbols": [
         {
           "doc": null,
@@ -6386,7 +6565,7 @@
       "classes": 0,
       "functions": 5,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/staged.py",
-      "sha256": "13b35579e4f89b208e02df7170f4f881eca2af768bcc2f582604443afd64432a",
+      "sha256": "869447f28e797d5207120d4098faaf205cc609a13660428fe98ef9d82b607886",
       "symbols": [
         {
           "doc": null,
@@ -6432,10 +6611,259 @@
       "workstream": "P1"
     },
     {
+      "classes": 4,
+      "functions": 26,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/research/statepack.py",
+      "sha256": "447866354ac4287531c5fe223bbea819f3bd3e12123770e09f18542b2c00bf66",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 90,
+          "kind": "class",
+          "line": 89,
+          "name": "StatePackError",
+          "qualname": "StatePackError"
+        },
+        {
+          "doc": null,
+          "endLine": 94,
+          "kind": "class",
+          "line": 93,
+          "name": "UnsupportedSchemaVersion",
+          "qualname": "UnsupportedSchemaVersion"
+        },
+        {
+          "doc": null,
+          "endLine": 98,
+          "kind": "class",
+          "line": 97,
+          "name": "StatePackIntegrityError",
+          "qualname": "StatePackIntegrityError"
+        },
+        {
+          "doc": null,
+          "endLine": 102,
+          "kind": "function",
+          "line": 101,
+          "name": "_utc_now",
+          "qualname": "_utc_now"
+        },
+        {
+          "doc": null,
+          "endLine": 109,
+          "kind": "function",
+          "line": 105,
+          "name": "_asof_day",
+          "qualname": "_asof_day"
+        },
+        {
+          "doc": null,
+          "endLine": 113,
+          "kind": "function",
+          "line": 112,
+          "name": "sha256_bytes",
+          "qualname": "sha256_bytes"
+        },
+        {
+          "doc": null,
+          "endLine": 121,
+          "kind": "function",
+          "line": 116,
+          "name": "sha256_file",
+          "qualname": "sha256_file"
+        },
+        {
+          "doc": null,
+          "endLine": 128,
+          "kind": "function",
+          "line": 124,
+          "name": "write_deterministic_gzip",
+          "qualname": "write_deterministic_gzip"
+        },
+        {
+          "doc": null,
+          "endLine": 133,
+          "kind": "function",
+          "line": 131,
+          "name": "read_gzip_bytes",
+          "qualname": "read_gzip_bytes"
+        },
+        {
+          "doc": null,
+          "endLine": 142,
+          "kind": "function",
+          "line": 136,
+          "name": "scan_secrets",
+          "qualname": "scan_secrets"
+        },
+        {
+          "doc": null,
+          "endLine": 152,
+          "kind": "function",
+          "line": 145,
+          "name": "_connect",
+          "qualname": "_connect"
+        },
+        {
+          "doc": null,
+          "endLine": 168,
+          "kind": "function",
+          "line": 155,
+          "name": "detected_schema_version",
+          "qualname": "detected_schema_version"
+        },
+        {
+          "doc": null,
+          "endLine": 192,
+          "kind": "function",
+          "line": 171,
+          "name": "apply_migrations",
+          "qualname": "apply_migrations"
+        },
+        {
+          "doc": null,
+          "endLine": 558,
+          "kind": "class",
+          "line": 195,
+          "name": "StatePack",
+          "qualname": "StatePack"
+        },
+        {
+          "doc": null,
+          "endLine": 206,
+          "kind": "method",
+          "line": 196,
+          "name": "__init__",
+          "qualname": "StatePack.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 213,
+          "kind": "method",
+          "line": 208,
+          "name": "_init_db",
+          "qualname": "StatePack._init_db"
+        },
+        {
+          "doc": null,
+          "endLine": 229,
+          "kind": "method",
+          "line": 215,
+          "name": "sqlite_health",
+          "qualname": "StatePack.sqlite_health"
+        },
+        {
+          "doc": null,
+          "endLine": 242,
+          "kind": "method",
+          "line": 231,
+          "name": "put_blob",
+          "qualname": "StatePack.put_blob"
+        },
+        {
+          "doc": null,
+          "endLine": 291,
+          "kind": "method",
+          "line": 244,
+          "name": "index_claim",
+          "qualname": "StatePack.index_claim"
+        },
+        {
+          "doc": null,
+          "endLine": 337,
+          "kind": "method",
+          "line": 293,
+          "name": "ingest_store",
+          "qualname": "StatePack.ingest_store"
+        },
+        {
+          "doc": null,
+          "endLine": 345,
+          "kind": "method",
+          "line": 339,
+          "name": "_load_blob",
+          "qualname": "StatePack._load_blob"
+        },
+        {
+          "doc": null,
+          "endLine": 364,
+          "kind": "method",
+          "line": 347,
+          "name": "query_entity",
+          "qualname": "StatePack.query_entity"
+        },
+        {
+          "doc": null,
+          "endLine": 372,
+          "kind": "method",
+          "line": 366,
+          "name": "query_source",
+          "qualname": "StatePack.query_source"
+        },
+        {
+          "doc": null,
+          "endLine": 380,
+          "kind": "method",
+          "line": 374,
+          "name": "query_asof",
+          "qualname": "StatePack.query_asof"
+        },
+        {
+          "doc": null,
+          "endLine": 392,
+          "kind": "method",
+          "line": 382,
+          "name": "counts",
+          "qualname": "StatePack.counts"
+        },
+        {
+          "doc": null,
+          "endLine": 400,
+          "kind": "method",
+          "line": 394,
+          "name": "deterministic_records",
+          "qualname": "StatePack.deterministic_records"
+        },
+        {
+          "doc": null,
+          "endLine": 410,
+          "kind": "method",
+          "line": 402,
+          "name": "export_object",
+          "qualname": "StatePack.export_object"
+        },
+        {
+          "doc": null,
+          "endLine": 481,
+          "kind": "method",
+          "line": 412,
+          "name": "snapshot",
+          "qualname": "StatePack.snapshot"
+        },
+        {
+          "doc": null,
+          "endLine": 528,
+          "kind": "method",
+          "line": 483,
+          "name": "integrity_ok",
+          "qualname": "StatePack.integrity_ok"
+        },
+        {
+          "doc": null,
+          "endLine": 558,
+          "kind": "method",
+          "line": 530,
+          "name": "restore_from_export",
+          "qualname": "StatePack.restore_from_export"
+        }
+      ],
+      "workstream": "P1"
+    },
+    {
       "classes": 1,
       "functions": 10,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/subject_offer_set.py",
-      "sha256": "cdf6355a01b1c2e0dfb711d1d843acedd0002fb3af01157e0191fd188aa78219",
+      "sha256": "4df220822e99dea97df811add2dafdd2c833c8f48e91efb712ea7c49f4d8c262",
       "symbols": [
         {
           "doc": null,
@@ -6532,7 +6960,7 @@
       "classes": 1,
       "functions": 4,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/temporal.py",
-      "sha256": "479efa5c169f358213c15dbf41e2e9769b86eec1e594d1df44adbbac5aad2301",
+      "sha256": "7d2607daac87b4b7c11e46e43da8f311c5cc05ffaea474941cffefc95a933460",
       "symbols": [
         {
           "doc": null,
@@ -6581,7 +7009,7 @@
       "classes": 0,
       "functions": 7,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/universal_packets.py",
-      "sha256": "5f5679758c2be3b7ed06a80aa71fcf1766af26004f83681c23feade647e00ee6",
+      "sha256": "a4b3f7d74badf568280b95a5ab8d0cd2e293f38616fae24356b695fefcbab883",
       "symbols": [
         {
           "doc": null,
@@ -6646,7 +7074,7 @@
       "classes": 0,
       "functions": 1,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/universal_plan.py",
-      "sha256": "805b7071ecf71fe6db91ff30fa92d79a6ee837060bc9808b227523ba6302242b",
+      "sha256": "2647e4be54783bba2ea795249ac57aaa2f4bca47fc8ce834dd9cf85b073adc3d",
       "symbols": [
         {
           "doc": null,
@@ -6663,7 +7091,7 @@
       "classes": 0,
       "functions": 10,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/runner.py",
-      "sha256": "06eba789169d69dd995984881e3f3816613d7ae245788008e995bf0b527e4cc9",
+      "sha256": "1babcb02201f3e61f229caf49963bfb6137996a3a30f06e0b11ba24e050417e2",
       "symbols": [
         {
           "doc": "Always write dest/audit/. Optionally copy+commit+push a GitHub pack.",
@@ -6752,7 +7180,7 @@
       "classes": 0,
       "functions": 0,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/runtime/__init__.py",
-      "sha256": "9a398ea74faa77c15559521049767b7806d8c61b227592df99af2c86385a6d17",
+      "sha256": "1ae38d02b4c79ccf886755c1f5439bb91858c05f2f0b9984990035f64993777b",
       "symbols": [],
       "workstream": "P5-P14"
     },
@@ -6760,7 +7188,7 @@
       "classes": 0,
       "functions": 4,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/runtime/benchmark.py",
-      "sha256": "8d33d87044a5c3e2f4ce5c7741573aa987f62ea5c29a2feb6b61f7befcb1259d",
+      "sha256": "ba23eb65950a3e3ea0096357c3c61d00dee1040ccbf89a3e5e5c5b43daf54135",
       "symbols": [
         {
           "doc": null,
@@ -6801,7 +7229,7 @@
       "classes": 0,
       "functions": 3,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/runtime/checkpoint.py",
-      "sha256": "3a0be2fec9a613b6d321f791c4017b8cb3d0ef66d30b1a03c3fac89c9663ad70",
+      "sha256": "5ca82530773860bb2d6fbf3110c70472bc7ff2f93bfc61c3bd3f47b67b6458d4",
       "symbols": [
         {
           "doc": null,
@@ -6834,7 +7262,7 @@
       "classes": 1,
       "functions": 4,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/runtime/cutoff.py",
-      "sha256": "883f39580ba1b9a90fc54d7888c2a0c2cdced5d068e97b50ff24e113ee472141",
+      "sha256": "87339d444e8664146c3472d2862a2b0289f8b716b93aa77307c55c78da4ecfda",
       "symbols": [
         {
           "doc": "--cutoff omitted and --cutoff-from-capture was not set (or capture times absent).",
@@ -6883,7 +7311,7 @@
       "classes": 2,
       "functions": 13,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/runtime/dag.py",
-      "sha256": "1687bc08d6801c23654c668147f834199df8ad52a8c172939ee9e783496e1296",
+      "sha256": "f9c0ff8565966f9f37f0a782f9f23a1c184443e3a4475846da7312a6a10daee1",
       "symbols": [
         {
           "doc": null,
@@ -7012,7 +7440,7 @@
       "classes": 0,
       "functions": 2,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/runtime/freeze.py",
-      "sha256": "b7f0aec3187e33ac63c426c5386ca137038fb5128c75b4b3f37fd45534217c8e",
+      "sha256": "e70c747d6d447a678e96d12c95f796a50b2d0ac69224972047e7dda21517ad0a",
       "symbols": [
         {
           "doc": null,
@@ -7037,7 +7465,7 @@
       "classes": 0,
       "functions": 38,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/runtime/github_archive.py",
-      "sha256": "ff3ca7840b62264f7c22c6f1923a23d740f117de7b3cec9077cd1d5c26200c5a",
+      "sha256": "de991117da4c9d79bceff327b627f65283a16460ee9ae1765ed518849cc826f5",
       "symbols": [
         {
           "doc": "Return secret-like tokens found in file text. Empty list means clean.",
@@ -7350,7 +7778,7 @@
       "classes": 1,
       "functions": 4,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/runtime/governor.py",
-      "sha256": "5e390aa53a31a151ceb544ac191b87ec9e3218c24420d9ed3acd925b4b6eab1e",
+      "sha256": "1dc6d941e65b8abda9d88655e8cfda789924d1cb33d3cd9e3f8fb28537ab3451",
       "symbols": [
         {
           "doc": null,
@@ -7399,7 +7827,7 @@
       "classes": 0,
       "functions": 3,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/runtime/har_run.py",
-      "sha256": "e945fc56a5f6b4f60063b35f64b4b074f5f0e26ab6b46fb814c3a23f8d8739b1",
+      "sha256": "f65ce7652dcbeec5795f2d27ea2916cebd16a74a0add53809685edb7ac7ec03a",
       "symbols": [
         {
           "doc": null,
@@ -7432,7 +7860,7 @@
       "classes": 0,
       "functions": 10,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/runtime/mount_v541.py",
-      "sha256": "65b3da0748bc844a0bb8e659d9b70cab83b0e54f8ee33c97dbefdbbbd0f55324",
+      "sha256": "1385650ac3b62a70c0639a1b6c32206ad0e9b91e0b861e4796d800bea7f11053",
       "symbols": [
         {
           "doc": null,
@@ -7521,7 +7949,7 @@
       "classes": 1,
       "functions": 2,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/runtime/perf.py",
-      "sha256": "450838f2caa0dee07954ce3e2b5e02749552d44a1216264fa98cf8c93b0b807c",
+      "sha256": "1795be1e5bdb6b11f212d64d20c5196051ee5fc53f050e1696eec0328095b21f",
       "symbols": [
         {
           "doc": null,
@@ -7554,7 +7982,7 @@
       "classes": 0,
       "functions": 2,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/runtime/pipeline.py",
-      "sha256": "494d141bdb264fbe4243b45e8e8a67076953323fea62490f04e520e87a65f7b4",
+      "sha256": "316773f145b6a9d0cdc7bf1905302bb33d66064ec8ac45c92fdf23091f4aa755",
       "symbols": [
         {
           "doc": null,
@@ -7579,7 +8007,7 @@
       "classes": 0,
       "functions": 1,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/runtime/readiness.py",
-      "sha256": "2aa94590dccc96029c0d4605fb4f48eee3adbd8692c294d1a7260afa6fb74b4a",
+      "sha256": "fa8f13fc2026156b8bd4f7c7e70d63e2d78084cdc0344813921ff20eff7a77ee",
       "symbols": [
         {
           "doc": null,
@@ -7596,7 +8024,7 @@
       "classes": 0,
       "functions": 5,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/runtime/schema_root.py",
-      "sha256": "a675140839ec0d29f27e0194d145d732a00cdf3c4a1d42ec0edbc0841ded62ff",
+      "sha256": "abc38db07d23e01f02e4c2d77d7f4b1c5a86be821febe1c1d4f4de2af1a3bc4e",
       "symbols": [
         {
           "doc": null,
@@ -7645,7 +8073,7 @@
       "classes": 1,
       "functions": 4,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/runtime/store.py",
-      "sha256": "5fbfdeb7621c5f23dc4888f6266f06d51942b9d0fb5bd5bdb2f1ce2c455dbcc7",
+      "sha256": "d40d5c58f057ed14011172b69959001234f3b90dd234476aadf6b4eb1335c61a",
       "symbols": [
         {
           "doc": null,
@@ -7694,7 +8122,7 @@
       "classes": 0,
       "functions": 0,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/selection/__init__.py",
-      "sha256": "80929ab6cd275447e6030f34dfcaa08d748b87447e94abda28db7648391bff4b",
+      "sha256": "ea8234ed81daa4b6ef7094339fccbfa1186878e5c8fd11296870118bf4f190db",
       "symbols": [],
       "workstream": "P4"
     },
@@ -7702,7 +8130,7 @@
       "classes": 0,
       "functions": 17,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/selection/card_layers.py",
-      "sha256": "b64f3c511160b23e4e4b5aaea8d6e23fea732e052c4a8ab1f1de386a9e828454",
+      "sha256": "b01ac2a1d81de90a8ddf378d8d561f599dbd4781bc4ce80db34c60fa09b68161",
       "symbols": [
         {
           "doc": null,
@@ -7847,7 +8275,7 @@
       "classes": 1,
       "functions": 3,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/selection/eligibility.py",
-      "sha256": "63c8e6f96e63cfcf00e2e72b0c0aed390676969cee6a15b67c8f60483a1a2c09",
+      "sha256": "d51fb2300bf0929db72c7a8332e981837338d8fb829cd4189adb4889df7d9614",
       "symbols": [
         {
           "doc": null,
@@ -7888,7 +8316,7 @@
       "classes": 0,
       "functions": 5,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/selection/portfolio.py",
-      "sha256": "7eaf90336d3e44c0b156b9b4df83a175885bdd4bb27c9effe0c46e9600be03bd",
+      "sha256": "0470758d2c6754ee784e7d8d662e51c5aa38c33ff4925092e6e07b17a1179540",
       "symbols": [
         {
           "doc": null,
@@ -7937,7 +8365,7 @@
       "classes": 0,
       "functions": 1,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/settle.py",
-      "sha256": "cb6ee097cfcd5b80865994fefd3979b1f58ec4759aeb504ef789711ec2365c14",
+      "sha256": "57d52f8a38e575807ed760165c2dca61968ea8db50ce5fd94ffc7e61325deab5",
       "symbols": [
         {
           "doc": null,
@@ -7954,7 +8382,7 @@
       "classes": 0,
       "functions": 0,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/sports/__init__.py",
-      "sha256": "30408f4a40398666573fd31a9903c974504b9b3787cd045a590e70fcd1ff975c",
+      "sha256": "7bf95ca5d0e21586e9e7460177a4acf38cd75bdcf12aaed781ec15b7ae4f1233",
       "symbols": [],
       "workstream": "P3"
     },
@@ -7962,7 +8390,7 @@
       "classes": 0,
       "functions": 0,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/sports/baseball/__init__.py",
-      "sha256": "069ce99ca5e35d22e9188bd1df7153dcdd83d7d41f7df5411bbe8b3df2c15f07",
+      "sha256": "e415f3c66c0efb8556248b2217b4b9e09c729e24501457e0d1569a87eb2896fc",
       "symbols": [],
       "workstream": "P3"
     },
@@ -7970,7 +8398,7 @@
       "classes": 0,
       "functions": 2,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/sports/baseball/pa.py",
-      "sha256": "d00f51deed4bb882e8f4a142169d71642d6cb37039fd0c2e1c6cb13e79e70db8",
+      "sha256": "e219da89d60eba91610a5f7c61290aa8606dbedcc7962657c9dcbd6fea4cfdf2",
       "symbols": [
         {
           "doc": null,
@@ -7995,7 +8423,7 @@
       "classes": 0,
       "functions": 0,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/sports/basketball/__init__.py",
-      "sha256": "244565a8a7dafeb72d66867fcce429d4cc3d5f5d09e675200272ae692e789976",
+      "sha256": "9a38648971f5dda41f80e4f1ceebf9e58d02632414d36d2d00d362422077d513",
       "symbols": [],
       "workstream": "P3"
     },
@@ -8003,7 +8431,7 @@
       "classes": 0,
       "functions": 5,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/sports/basketball/minimal.py",
-      "sha256": "72adb5db3973bd0c7cc6334eabf3aa15be3f32b73c07cebbb0b99eacecd77ef6",
+      "sha256": "07a09aeb20183de0b58b389c4ecdf51e3b5d1e05c5417704bab3cb02e4e0cc61",
       "symbols": [
         {
           "doc": null,
@@ -8052,7 +8480,7 @@
       "classes": 0,
       "functions": 0,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/sports/common/__init__.py",
-      "sha256": "1668e51d9775dedc4d4be70d8bc63912848bd0e42746f65600fcbd61bd00f5b6",
+      "sha256": "8ba74c6bcfc340c459eb349121cccf7f44c49780b6dacb75b56bbbfae0de57a1",
       "symbols": [],
       "workstream": "P3"
     },
@@ -8060,7 +8488,7 @@
       "classes": 2,
       "functions": 11,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/sports/common/contract.py",
-      "sha256": "4b6c276548615dbc38e4f5d355740a63e7bd906fd28ecd4dcfa96a982907503d",
+      "sha256": "8a86e1f23cccb32d9d6ed8a73eb341acb9e270fa415e68ef28762eefaf0d3798",
       "symbols": [
         {
           "doc": null,
@@ -8173,7 +8601,7 @@
       "classes": 1,
       "functions": 4,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/sports/common/plugin.py",
-      "sha256": "84d39943aec778cac67d5efe79404698fe77f2f8c8c3a2393537b76956e8283f",
+      "sha256": "a771bce57d23044b2baa713326e1029ee262d0079909f18c5daa82f9f2e07ef9",
       "symbols": [
         {
           "doc": null,
@@ -8222,7 +8650,7 @@
       "classes": 1,
       "functions": 7,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/sports/common/research_schema.py",
-      "sha256": "48c417fe3707786f65a93039912e923a116859c57a5dc375192de2e537db24aa",
+      "sha256": "01f116c7602b82856558a5d46055a0fc1892368189a77457962864a3667d26e4",
       "symbols": [
         {
           "doc": null,
@@ -8295,7 +8723,7 @@
       "classes": 0,
       "functions": 0,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/sports/football/__init__.py",
-      "sha256": "a9c7db7341b54cf03d5217adc9dae1027bda6e851cfaa45825840f76c4327074",
+      "sha256": "03c3178d4b836dcb9563023b46015fb583767fd740ef7f1da00990c7ed9939b9",
       "symbols": [],
       "workstream": "P3"
     },
@@ -8303,7 +8731,7 @@
       "classes": 1,
       "functions": 2,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/sports/football/appearance.py",
-      "sha256": "bfc81883241bd41a7e13ca67c17873e9b5bda3f0852526c9ad81daeabe1029e0",
+      "sha256": "3a77fdedd4be778149a4c87857653238e1d16abf6f4226dc51d3cff21c4ad432",
       "symbols": [
         {
           "doc": null,
@@ -8336,7 +8764,7 @@
       "classes": 0,
       "functions": 6,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/sports/football/conservation.py",
-      "sha256": "efb80c3a3356cd88b6d0ca0d017175cc32b270a6cceaf003c31bb6ef0b89d2d8",
+      "sha256": "92ffe2f155031a31007789b84452b8d20dc1fe1c003cc1c5295c1001982acbdc",
       "symbols": [
         {
           "doc": null,
@@ -8393,7 +8821,7 @@
       "classes": 0,
       "functions": 2,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/sports/football/efficiency.py",
-      "sha256": "77072d3d122e0ae9014c6d46e2da60a8db42cd2b760577b7c4a644403becb4ab",
+      "sha256": "24b49c978c32ab0d1792d6f15a842c6dceb21b5ff90b82f88514d38703436949",
       "symbols": [
         {
           "doc": null,
@@ -8418,7 +8846,7 @@
       "classes": 3,
       "functions": 5,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/sports/football/ledger.py",
-      "sha256": "7c96947167db7d2b3bf827ba077626d5dd093e91618a1a40cda08b7809202ca7",
+      "sha256": "acb01775afa4440d2fb895f5f2fc83f92ec01022f8f15b23bd2e9b9416d54cfe",
       "symbols": [
         {
           "doc": null,
@@ -8491,7 +8919,7 @@
       "classes": 1,
       "functions": 5,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/sports/football/opportunity.py",
-      "sha256": "8c20e4dde9f14dcc8ca922da0c8fedb9219e204a372fdf42afc3068d8be86402",
+      "sha256": "c9b29391000947d43c36f109c467de6eb8b7c508624046f56541bce7db90fd35",
       "symbols": [
         {
           "doc": null,
@@ -8548,7 +8976,7 @@
       "classes": 1,
       "functions": 3,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/sports/football/projection.py",
-      "sha256": "346512e9e5b66fc23052f547000813fb877d70a7044567309d2e4a87507f80d5",
+      "sha256": "d525bce0d8654b479aa848b263e18d78843c8345bd86d0ad23d6717c0b9a8c8b",
       "symbols": [
         {
           "doc": null,
@@ -8589,7 +9017,7 @@
       "classes": 0,
       "functions": 5,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/sports/football/registry.py",
-      "sha256": "7ca175ae5255449c43262b6d57c8d13080064b04179e0592141cc2b65d7e8e4f",
+      "sha256": "0fc16f89d1abe360211156f40ce728784a2da73e6eb6959ef1b0643d04fbcd31",
       "symbols": [
         {
           "doc": null,
@@ -8638,7 +9066,7 @@
       "classes": 0,
       "functions": 3,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/sports/football/settlement_map.py",
-      "sha256": "c9f8e8dd37c68d1237e0e3a900cfbb65d07d0e8b39d7b894430cb0a6c25bb277",
+      "sha256": "da3d9a47b4131337a3cbbc2c74e36dbd7694cd370fd2cacdae96978ebd7d035f",
       "symbols": [
         {
           "doc": null,
@@ -8671,7 +9099,7 @@
       "classes": 0,
       "functions": 0,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/validation/__init__.py",
-      "sha256": "8edc5440034845fb438ec5f855d630d9884f3be0d500dfc06e08b7298def8880",
+      "sha256": "1097baa98b2696029288a42a9f5a1461bb9c2de28dd3e009f0057d7605fae780",
       "symbols": [],
       "workstream": "UNMAPPED"
     },
@@ -8679,7 +9107,7 @@
       "classes": 1,
       "functions": 2,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/validation/conservation_harness.py",
-      "sha256": "304007f53d05b2b5e137d23315249a74f85001ac47f873880d66645743d74c32",
+      "sha256": "3d0e87d636cd671ad78c983b28765dd7534ffeadb91bc2d6e66ac025a3e2dd5c",
       "symbols": [
         {
           "doc": null,
@@ -8712,7 +9140,7 @@
       "classes": 1,
       "functions": 6,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/version.py",
-      "sha256": "f90cfae76cb06ad779048e5cb0656ab63a59706d887493e56616bc94f7d1160e",
+      "sha256": "1191da24eeb34668f75cf449a1ab619654daf51359bfe0fe4999cfe8bb8ffc0d",
       "symbols": [
         {
           "doc": "Requested --version does not resolve to this build's VERSION.json.",
@@ -8777,7 +9205,7 @@
       "classes": 0,
       "functions": 0,
       "path": "artifacts/dcm_v6_workstream_ab/pillars_dcm/__init__.py",
-      "sha256": "86780f88db0efd4b328f70479e58226f5c350541776a3c3a88e7b33f6ec97b5f",
+      "sha256": "5fcf316b5dd3a9ee9f9b9f36c0ec210c33634baaa2a8c33dfa49ca7f41fe6d1e",
       "symbols": [],
       "workstream": "UNMAPPED"
     },
@@ -8785,7 +9213,7 @@
       "classes": 0,
       "functions": 0,
       "path": "artifacts/dcm_v6_workstream_ab/pillars_dcm/__main__.py",
-      "sha256": "0d45c24e531c7ac8da9a184593262f6e2aad6a902cf0c1c66c660810e297f31b",
+      "sha256": "8e91e467c40bc0f0e9d526ef23501fef5ec0aade11ac2f144833fcbbdef44068",
       "symbols": [],
       "workstream": "UNMAPPED"
     },
@@ -8793,7 +9221,7 @@
       "classes": 0,
       "functions": 0,
       "path": "artifacts/dcm_v6_workstream_ab/pillars_dcm/release.py",
-      "sha256": "80ca6c530790736a61581dbc6f8acfe2d0b71c29375db43e26234db53a6e0922",
+      "sha256": "af7f73de0b88458b49b489417099852388f7194f19a37780aca147b3b9188135",
       "symbols": [],
       "workstream": "UNMAPPED"
     },
@@ -8801,7 +9229,7 @@
       "classes": 0,
       "functions": 0,
       "path": "artifacts/dcm_v6_workstream_ab/pillars_dcm/runner.py",
-      "sha256": "3643d7385034c13dbf372460a62f626b447b3f41bc2fca61caab29cd18324c6f",
+      "sha256": "a69a909e00ce52691df2930b0516e0623d8788c1f676d826a44042915885f9d9",
       "symbols": [],
       "workstream": "UNMAPPED"
     },
@@ -8809,7 +9237,7 @@
       "classes": 0,
       "functions": 0,
       "path": "artifacts/dcm_v6_workstream_ab/tests/conftest.py",
-      "sha256": "0cb67ba91674c07e557440292720aa3c3c111f4c41b7db1f4d219a7c68dc6f52",
+      "sha256": "37944150c32f0dfc654bf8a1e3bd54aefcd29c881417175060f18425726e22e2",
       "symbols": [],
       "workstream": "UNMAPPED"
     },
@@ -8817,7 +9245,7 @@
       "classes": 0,
       "functions": 8,
       "path": "artifacts/dcm_v6_workstream_ab/tests/fixtures.py",
-      "sha256": "cfad15a03456397e5b9b810f323a8350d08a36bc97364efeff31ee33eb1d6cd7",
+      "sha256": "85c17d39b41e12851f5bf440b9b166888a1239dd2315443396b5392488fc24e3",
       "symbols": [
         {
           "doc": null,
@@ -8890,7 +9318,7 @@
       "classes": 0,
       "functions": 0,
       "path": "artifacts/dcm_v6_workstream_ab/tests/live_sanitized/__init__.py",
-      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
       "symbols": [],
       "workstream": "UNMAPPED"
     },
@@ -8898,7 +9326,7 @@
       "classes": 0,
       "functions": 4,
       "path": "artifacts/dcm_v6_workstream_ab/tests/live_sanitized/test_live_prizepicks_har.py",
-      "sha256": "178505c0684214b2ff8f45b2d9aec23d4bc8ed2c40f04257778dded7cf0843ef",
+      "sha256": "db42dacf8a8b27cb8071f7ba6bd2585fa2edd2e605501bd732ab40bd8cf48469",
       "symbols": [
         {
           "doc": null,
@@ -8939,7 +9367,7 @@
       "classes": 0,
       "functions": 2,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_bundle_e2e_resume.py",
-      "sha256": "8bc23b41402957afd2c69823d61063a85b3b04b484489a8ffd0d2d7150e5961a",
+      "sha256": "e59347c21cde5f494ba11191b2f18408d8e745d21d639e494ae75ada3d9e3bc7",
       "symbols": [
         {
           "doc": null,
@@ -8964,7 +9392,7 @@
       "classes": 0,
       "functions": 2,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_bundle_provider.py",
-      "sha256": "b2fb021fdec2415ab80b453d8a52ca47bd4724dd24819ce404e1a95f3df6aa74",
+      "sha256": "3df36523657b6ce038946f495e343075fe6d4376bd8255d350c9d7dd5dd9a406",
       "symbols": [
         {
           "doc": null,
@@ -8989,7 +9417,7 @@
       "classes": 0,
       "functions": 18,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_e2e_runner.py",
-      "sha256": "7968670baf3c7c7add08408cc6d132f21060d9c1cf56f7d4db38e5dc84d0eaa0",
+      "sha256": "e665aebc3f1cec35d66e4028322ce4c6918ad5f1bf44dbd0ce3aa9787253355d",
       "symbols": [
         {
           "doc": null,
@@ -9142,7 +9570,7 @@
       "classes": 0,
       "functions": 21,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_e2e_world_to_lineup.py",
-      "sha256": "5f7b05f125db0b8f5e12c3a622e46cfb2f3daa4cf6feba9d18c222f74abd81c3",
+      "sha256": "14247ce6df05626fc70892e6918c61d43852f9f472cb9cdcea2cc8d0f9238bd4",
       "symbols": [
         {
           "doc": null,
@@ -9319,7 +9747,7 @@
       "classes": 0,
       "functions": 13,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_entity_packets.py",
-      "sha256": "ba304fff68decfcce2eeaf93dd8b8aef4927f7a5c51b4ded85d7454de753c1b6",
+      "sha256": "37f55b82a7acff2a3adee8eeff8b19fdffee6fbb851f1b1243108b9eae1379e5",
       "symbols": [
         {
           "doc": null,
@@ -9432,7 +9860,7 @@
       "classes": 0,
       "functions": 9,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_evidence_coverage.py",
-      "sha256": "08959262bfc8bca727b6b3f08d82f9a4ccf7b67088791979208fda79c3163208",
+      "sha256": "007b090e6d1e41b359bbaa1aad1ca82398399dd0f4303f3a3ec49fbd13d3d567",
       "symbols": [
         {
           "doc": null,
@@ -9513,7 +9941,7 @@
       "classes": 0,
       "functions": 2,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_evidence_graph.py",
-      "sha256": "1d5d68facfedb6d4151ccfef4ba5c38e13793b89ba67ca89bd303c073bc85a84",
+      "sha256": "a12ec7ae26e09ea2075240a35c8276e9090c7d7762d1644b590538952e19e87e",
       "symbols": [
         {
           "doc": null,
@@ -9538,7 +9966,7 @@
       "classes": 0,
       "functions": 6,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_explanation.py",
-      "sha256": "32a52c229716f2da3d9ff9f4387bf293f3c3ebe7c99870df948729b7cdf1b5eb",
+      "sha256": "2753176de72fb1d9f49906ab226c1db7cfe3ad39833b41b1e4fc33c271de8626",
       "symbols": [
         {
           "doc": null,
@@ -9595,7 +10023,7 @@
       "classes": 0,
       "functions": 8,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_fail_closed_regressions.py",
-      "sha256": "49f5194e7cd8a35d5e2619f8637151367582f71813b8ea6bd64adf3d8012c689",
+      "sha256": "5427e9eb6cd1435a5af3a4f6b90f01caba1f9e47b46797c2bea0d0aa56c3f9aa",
       "symbols": [
         {
           "doc": null,
@@ -9668,7 +10096,7 @@
       "classes": 0,
       "functions": 3,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_feature_store.py",
-      "sha256": "57579053b7d728e4b34bf2ca29a6cdeacfb096aa194173acc55bf23923a4dc96",
+      "sha256": "828c22f7bba904282f94e505c0b4ed6f0ced67323df41a1c37707df3f1d166ab",
       "symbols": [
         {
           "doc": null,
@@ -9701,7 +10129,7 @@
       "classes": 0,
       "functions": 16,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_football_registry.py",
-      "sha256": "c4675b86b475cb133fedc7481023e053adb067ceeae6f74ac8224b942fbe8236",
+      "sha256": "3db103f77b345c1d1991229b76362c7510fa1ed22a7032bd3071664caf0a1d2a",
       "symbols": [
         {
           "doc": null,
@@ -9836,9 +10264,82 @@
     },
     {
       "classes": 0,
+      "functions": 8,
+      "path": "artifacts/dcm_v6_workstream_ab/tests/test_freshness.py",
+      "sha256": "79a9a90d4d474ffb698eab297d03e9a4ae0ca58ffa67e147fb2b3b2c67e35230",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 29,
+          "kind": "function",
+          "line": 17,
+          "name": "test_completed_game_facts_do_not_expire",
+          "qualname": "test_completed_game_facts_do_not_expire"
+        },
+        {
+          "doc": null,
+          "endLine": 42,
+          "kind": "function",
+          "line": 32,
+          "name": "test_season_recent_form_is_not_an_immutable_fact",
+          "qualname": "test_season_recent_form_is_not_an_immutable_fact"
+        },
+        {
+          "doc": null,
+          "endLine": 49,
+          "kind": "function",
+          "line": 45,
+          "name": "test_event_multiplier_piecewise",
+          "qualname": "test_event_multiplier_piecewise"
+        },
+        {
+          "doc": null,
+          "endLine": 79,
+          "kind": "function",
+          "line": 52,
+          "name": "test_status_claim_decays_near_tipoff",
+          "qualname": "test_status_claim_decays_near_tipoff"
+        },
+        {
+          "doc": null,
+          "endLine": 86,
+          "kind": "function",
+          "line": 82,
+          "name": "test_gtd_is_governed_alias_for_game_time_decision",
+          "qualname": "test_gtd_is_governed_alias_for_game_time_decision"
+        },
+        {
+          "doc": null,
+          "endLine": 96,
+          "kind": "function",
+          "line": 89,
+          "name": "test_unknown_inputs_fail_closed",
+          "qualname": "test_unknown_inputs_fail_closed"
+        },
+        {
+          "doc": null,
+          "endLine": 101,
+          "kind": "function",
+          "line": 99,
+          "name": "test_efficiency_is_not_mapped_to_opportunity_category",
+          "qualname": "test_efficiency_is_not_mapped_to_opportunity_category"
+        },
+        {
+          "doc": null,
+          "endLine": 114,
+          "kind": "function",
+          "line": 104,
+          "name": "test_effective_half_life_matches_spec_defaults",
+          "qualname": "test_effective_half_life_matches_spec_defaults"
+        }
+      ],
+      "workstream": "UNMAPPED"
+    },
+    {
+      "classes": 0,
       "functions": 14,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_gamelog_normalize.py",
-      "sha256": "3886fe7807c9c488c2600ea735b4961005f00cb1500ddd0d09fd76621dade6c9",
+      "sha256": "f218d96781e33e19a60f69a4e8e20668aaf0a7440ecc56216e4b069cd30efad4",
       "symbols": [
         {
           "doc": null,
@@ -9959,7 +10460,7 @@
       "classes": 0,
       "functions": 24,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_github_archive.py",
-      "sha256": "90d59b5ba168d01b4f88c48ec69833c47165d13f2960d88bcd32806c628714de",
+      "sha256": "2f18ca657a18baed6fd5b42d362e12b83b6a586c5d0e3c7038712ec9c9bd7a51",
       "symbols": [
         {
           "doc": null,
@@ -10160,7 +10661,7 @@
       "classes": 0,
       "functions": 19,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_gridiron_plugin.py",
-      "sha256": "5c659d7b4dbd76e4c80eb62b2afd4fffa1a42236d802f552d4d05d308381144e",
+      "sha256": "7c7e5ec7da10635610d4efab5cb63bdda17d4c464fbf73d6b3c4f99096a57d32",
       "symbols": [
         {
           "doc": null,
@@ -10321,7 +10822,7 @@
       "classes": 0,
       "functions": 9,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_har_ingest.py",
-      "sha256": "c01d57bebb033d4ed0987c2c5592715adad0ea5d40aef09b8c7f95e9976f92e9",
+      "sha256": "309130355ccd8cc48d2aee84f18f5738125c0c23ad44f7356957d6d0a9b139f1",
       "symbols": [
         {
           "doc": null,
@@ -10400,9 +10901,42 @@
     },
     {
       "classes": 0,
+      "functions": 3,
+      "path": "artifacts/dcm_v6_workstream_ab/tests/test_historical_gap.py",
+      "sha256": "c07c12234c0fec7348ccce687df3bdeff3e4982f2c907759c22c6c1af1938984",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 17,
+          "kind": "function",
+          "line": 5,
+          "name": "test_append_only_missing_events_38_40",
+          "qualname": "test_append_only_missing_events_38_40"
+        },
+        {
+          "doc": null,
+          "endLine": 27,
+          "kind": "function",
+          "line": 20,
+          "name": "test_unexpected_extra_is_audited_not_deleted",
+          "qualname": "test_unexpected_extra_is_audited_not_deleted"
+        },
+        {
+          "doc": null,
+          "endLine": 35,
+          "kind": "function",
+          "line": 30,
+          "name": "test_stored_event_ids_prefer_eventId",
+          "qualname": "test_stored_event_ids_prefer_eventId"
+        }
+      ],
+      "workstream": "UNMAPPED"
+    },
+    {
+      "classes": 0,
       "functions": 6,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_host_native.py",
-      "sha256": "63660261f593eb3b225d96304f9d76eb675831e7df8689179c5d259796d6d32f",
+      "sha256": "9f7c91d094cf04b47072b326aba0051dd2938eb31957bbd0d799eea3aa6e7c2c",
       "symbols": [
         {
           "doc": null,
@@ -10459,7 +10993,7 @@
       "classes": 0,
       "functions": 10,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_joint_event_world.py",
-      "sha256": "53ce5b75de72cab80304f423f9a03d3ff356fcd880d1c234b92f3a5827d4037e",
+      "sha256": "f8e8db3ec55b0dd0657a2bbe15bb7bb4d301db6d3650d4e10878b90b79538eee",
       "symbols": [
         {
           "doc": null,
@@ -10548,7 +11082,7 @@
       "classes": 0,
       "functions": 3,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_line_surface.py",
-      "sha256": "48b852a95072724ecab9c46876d50e4df5a487a59ce847d8105e9cf0d558cfe6",
+      "sha256": "279895385e641f2ca196821906e6e54f350db980cbd68668bd9ae6279bcf59c1",
       "symbols": [
         {
           "doc": null,
@@ -10581,7 +11115,7 @@
       "classes": 0,
       "functions": 5,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_lineage_and_schema.py",
-      "sha256": "99794bd59839e527552a0345ecce4d768a9eda823937e28191eca15e8e7023f9",
+      "sha256": "dcc2536dc1e40bdf88c0c80549821eefe4288b225e08409614c478ad5725945f",
       "symbols": [
         {
           "doc": null,
@@ -10630,7 +11164,7 @@
       "classes": 0,
       "functions": 7,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_market_derive.py",
-      "sha256": "c0e6e0f50145ccfb744d2a48104567fd9387c30476b2cb075f85c4625222e9c7",
+      "sha256": "9a6a6da8cd057eb7c9ab3e8e7f86f03ae18749b762710a9446157045716e6e1a",
       "symbols": [
         {
           "doc": null,
@@ -10695,7 +11229,7 @@
       "classes": 0,
       "functions": 10,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_multi_har.py",
-      "sha256": "64655a03772cd2577b58a6a2496984f1073a447e377ad55d8c55d1096cbb7e70",
+      "sha256": "adccac155d77c1ff1460cdbfe9cc2b849462a79d093402c86542033f09591c38",
       "symbols": [
         {
           "doc": null,
@@ -10784,7 +11318,7 @@
       "classes": 0,
       "functions": 6,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_official_predicates.py",
-      "sha256": "ae979dc275f273694a2288bcc12419cfb293838fc9a5201e8db06bdb2ea038e5",
+      "sha256": "0d3cd70a042b7925b3bad8895fd5bba35a389e27dd9df09a6c8e3b98fbcd4cd2",
       "symbols": [
         {
           "doc": null,
@@ -10841,7 +11375,7 @@
       "classes": 0,
       "functions": 3,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_p1_authority_role.py",
-      "sha256": "f9862223b74447da8ab4e67594663ff4f6db28e9ff49109b23ddcf66535fedb6",
+      "sha256": "6aadbe716b3dabf5fd0f747896a5b3e921642a935c428446e265f3c84d1a8d62",
       "symbols": [
         {
           "doc": null,
@@ -10874,7 +11408,7 @@
       "classes": 0,
       "functions": 8,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_p4_freeze_contract.py",
-      "sha256": "3a72b548a1c23981ed1965f8a5025f968938cc60cf9f5a87f922a73ed6cfde8f",
+      "sha256": "37a6aef38ee34c3599d798c551dc72a0dfc6f8e74ece5f96a1712bdcf769d60a",
       "symbols": [
         {
           "doc": null,
@@ -10947,7 +11481,7 @@
       "classes": 0,
       "functions": 10,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_p6_learning.py",
-      "sha256": "ba2dba21a075ef6b1a9c643b85b5b573062078a0599d784afac4ffd91d3c38b5",
+      "sha256": "1ad9cad4a199936143320606ff9942d07d6162b897df56eb74250a1077c8b56f",
       "symbols": [
         {
           "doc": null,
@@ -11036,7 +11570,7 @@
       "classes": 0,
       "functions": 7,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_p8_status_cache_availability.py",
-      "sha256": "a25a674a5eedcf41ddeed7c043d6a148ddca1ecbf5b5ed48362e5cfd920c0848",
+      "sha256": "aa8d68735bf0f6d4ef68e2533371186f4815c3577d296fa107ea6bb2a062d4fc",
       "symbols": [
         {
           "doc": null,
@@ -11101,7 +11635,7 @@
       "classes": 0,
       "functions": 2,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_parameter_snapshot_scopes.py",
-      "sha256": "000af6e71414eb3bf7fa14004b59b2e100f1f9fcca10aaaa4fa4963288e4850e",
+      "sha256": "b5e2e5190873465e3d99499de3d4db263b9db6c0132a124f34c36173253e31ef",
       "symbols": [
         {
           "doc": null,
@@ -11126,7 +11660,7 @@
       "classes": 0,
       "functions": 2,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_phase_bc_v2.py",
-      "sha256": "2424dfae5ff001e8e069fd92274a6e315a8bb2ab6dc8e70873ca29b80805d73c",
+      "sha256": "d6fa6b70e79d50df5d525406034fc765a33c591bd3efb68344dd059cadf9fa7d",
       "symbols": [
         {
           "doc": null,
@@ -11151,7 +11685,7 @@
       "classes": 0,
       "functions": 4,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_player_offer_set.py",
-      "sha256": "4da186f8ed00ee1351ce3ed372657b5474f98958d874ca5202857adfc4283ca5",
+      "sha256": "36fd8c39a5eea2fc3db0e33328ba58da36a6f9af2b14ff29be08184c3217a3ca",
       "symbols": [
         {
           "doc": null,
@@ -11192,7 +11726,7 @@
       "classes": 0,
       "functions": 7,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_player_packet.py",
-      "sha256": "797721ec820d2b83cb722657581285e2c63825e8a378702b76127d3766dc7b6f",
+      "sha256": "194461552905e2e96110fce1500d0ef2fd7c385ce44e62f27c86be5e1f0e9bbd",
       "symbols": [
         {
           "doc": null,
@@ -11257,7 +11791,7 @@
       "classes": 0,
       "functions": 5,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_plugin_contract.py",
-      "sha256": "e8998d5e7cae2828774614bc005dc4151c2940bb49b0b285dc4d023c91c12e67",
+      "sha256": "df7d92fc9f622c64f36e31ec0f0520a5a385b1acfdc3beefb18e45586d1330dd",
       "symbols": [
         {
           "doc": null,
@@ -11306,7 +11840,7 @@
       "classes": 0,
       "functions": 4,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_postgame_integrity.py",
-      "sha256": "15a5eb54e59519bf591ea77c054c2c0f2c7196b415e2e2e0f0675695f400a4f7",
+      "sha256": "38c92f256173727743f7c90b6c00acc94335766dd0fb0abf7f94b02006144ff3",
       "symbols": [
         {
           "doc": null,
@@ -11347,7 +11881,7 @@
       "classes": 0,
       "functions": 16,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_production_hardening.py",
-      "sha256": "baa50be074f7edb5b6ae39589a01cc685fba6c81d9db3a1b8b961d27f5985dcd",
+      "sha256": "636bb997c120804c64330d2aa31d2eff8cf09933c390dedddb6f0e0ce7aecf08",
       "symbols": [
         {
           "doc": null,
@@ -11484,7 +12018,7 @@
       "classes": 0,
       "functions": 6,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_quarter_worlds.py",
-      "sha256": "0f77180d13e3690682d522e13685da11f575fac74f167aec2ced314f5eb85c10",
+      "sha256": "7158549fd259df5a6895e46dc9200225492939f29f8963019880521da86d9dfe",
       "symbols": [
         {
           "doc": null,
@@ -11541,7 +12075,7 @@
       "classes": 0,
       "functions": 5,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_release_freshness.py",
-      "sha256": "dea2cc80c55a99eb71aa3eb1868d3890c1e986922a84456f455abda9a7e7201d",
+      "sha256": "214af85159123975c617b704f4e0c9f707431d0172affffa48d47d3cb2184a17",
       "symbols": [
         {
           "doc": null,
@@ -11590,7 +12124,7 @@
       "classes": 0,
       "functions": 4,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_research_efficiency.py",
-      "sha256": "fc5e9c105dc984b43329644bd194158cba90f200c7978d22373822557f97f6a9",
+      "sha256": "abd129be6306c889e60347eb10e5fb5e9c79bda07a61cbe78a125cad92b79ad0",
       "symbols": [
         {
           "doc": null,
@@ -11631,7 +12165,7 @@
       "classes": 0,
       "functions": 3,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_research_population.py",
-      "sha256": "5c0575d36f6975eb9a646bfad908cba852806b07d59433cd54025f4a5291453e",
+      "sha256": "a6ce5bb61b05aa30f37206e1ed22a3fcf078ffc875b656bd94670b591f0944bb",
       "symbols": [
         {
           "doc": null,
@@ -11664,7 +12198,7 @@
       "classes": 0,
       "functions": 9,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_research_store.py",
-      "sha256": "f61ee54261a81737e6da59b57cec396dd94974c0f9a1f4ec8d3c4ac8cdf6727f",
+      "sha256": "8c6f910a04e5282b63b5e4c77a7747eeda2a0eb5a1b914c8fb35a1ac97fb1b66",
       "symbols": [
         {
           "doc": null,
@@ -11745,7 +12279,7 @@
       "classes": 0,
       "functions": 9,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_role_epoch.py",
-      "sha256": "ddba1463b34478a29d676fcf17706e812a594384c3902a033d36bd687b6c3e78",
+      "sha256": "33099d2e52b220b47c39edd98b2be268aabe27b41e2347f15091d0eaeff169fc",
       "symbols": [
         {
           "doc": null,
@@ -11826,7 +12360,7 @@
       "classes": 0,
       "functions": 5,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_runtime_lineage.py",
-      "sha256": "17ecb5de7cc6947dd3fed348723410bdd49be72e9b359e1cb34693915dac0cd8",
+      "sha256": "e1bbd15d8cfe5a832e895de8495f35ffe40ef119a144ac70bc393e6484d8447d",
       "symbols": [
         {
           "doc": null,
@@ -11875,7 +12409,7 @@
       "classes": 0,
       "functions": 4,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_schema_v2_fields.py",
-      "sha256": "3e4dd9f2ea59517f20affb460d86366507875a2ee7310b9bb1460df1fa8b8bc0",
+      "sha256": "5e851a06344bcfe6aca57a3207cfa85b34bc513c942fff5817cd30dfd48b6e7a",
       "symbols": [
         {
           "doc": null,
@@ -11916,7 +12450,7 @@
       "classes": 0,
       "functions": 6,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_settlement_population.py",
-      "sha256": "56b69dd79eff58689b5ceb655729fbd1f3376251e033e450a743b0816560bf2e",
+      "sha256": "34a4a564c2615b249688563f0fd7dfdd0c58671aff6e9eb8a77218105a1c9754",
       "symbols": [
         {
           "doc": null,
@@ -11973,7 +12507,7 @@
       "classes": 0,
       "functions": 3,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_source_catalog.py",
-      "sha256": "eb1fddededda4e160ce54831653aa81ddcd724aee26bc6121a185fdd8385694c",
+      "sha256": "0751dac5c09ac00b77b41e4db086e5d983712a3ed26dde8026a4e71bb8cf12c7",
       "symbols": [
         {
           "doc": null,
@@ -12006,7 +12540,7 @@
       "classes": 0,
       "functions": 3,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_sport_plugin_full_contract.py",
-      "sha256": "fc2681a5203d8095d57205b7e83a33ad53e5910dcc0d0c38cc69871afb1521db",
+      "sha256": "b3211f4c1812af88b16624a751b6f25b21f71083cc17ebbd9d7ecd79cb75fabd",
       "symbols": [
         {
           "doc": null,
@@ -12039,7 +12573,7 @@
       "classes": 0,
       "functions": 3,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_sport_research_schema.py",
-      "sha256": "f8370627ae2ca8202de54b8275db9a42b7e9b63416fbd6e3f5570e982e239105",
+      "sha256": "86d5a75a407774b694ff6648f7c7023d09f2d5a00a7b9103d965eb9c833a158d",
       "symbols": [
         {
           "doc": null,
@@ -12070,9 +12604,58 @@
     },
     {
       "classes": 0,
+      "functions": 5,
+      "path": "artifacts/dcm_v6_workstream_ab/tests/test_statepack.py",
+      "sha256": "6edc69a3bcd9d6d1c55bd01f5e6e8c1e9209bd87b81002d05406274717d7c82f",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 29,
+          "kind": "function",
+          "line": 16,
+          "name": "_claim",
+          "qualname": "_claim"
+        },
+        {
+          "doc": null,
+          "endLine": 45,
+          "kind": "function",
+          "line": 32,
+          "name": "test_statepack_indexes_store_and_queries_entity_source_asof",
+          "qualname": "test_statepack_indexes_store_and_queries_entity_source_asof"
+        },
+        {
+          "doc": null,
+          "endLine": 64,
+          "kind": "function",
+          "line": 48,
+          "name": "test_snapshot_round_trip_preserves_semantic_hash",
+          "qualname": "test_snapshot_round_trip_preserves_semantic_hash"
+        },
+        {
+          "doc": null,
+          "endLine": 77,
+          "kind": "function",
+          "line": 67,
+          "name": "test_corrupt_export_fails_closed",
+          "qualname": "test_corrupt_export_fails_closed"
+        },
+        {
+          "doc": null,
+          "endLine": 89,
+          "kind": "function",
+          "line": 80,
+          "name": "test_outcomes_are_indexed_and_do_not_decide_reuse",
+          "qualname": "test_outcomes_are_indexed_and_do_not_decide_reuse"
+        }
+      ],
+      "workstream": "UNMAPPED"
+    },
+    {
+      "classes": 0,
       "functions": 9,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_status_start_gates.py",
-      "sha256": "a3dc38e5f722198b85d04b42420232a634f607f1a7b0f4a2730560e7dcee9090",
+      "sha256": "0e7ac6277b3085bccfc3afa837e8bc3ea2a52aa3ae1a58fb72f66a2b36b4b46b",
       "symbols": [
         {
           "doc": null,
@@ -12153,7 +12736,7 @@
       "classes": 0,
       "functions": 5,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_subject_offer_set_universal.py",
-      "sha256": "66b89f68ce4c8c1cab803b83308cbbc8491dbe31de14e00fb7489049c82d487e",
+      "sha256": "a165d32bd3b1093460e3185530f1fac97dc5f3f37b4976ae604d5a51aa08d123",
       "symbols": [
         {
           "doc": null,
@@ -12202,7 +12785,7 @@
       "classes": 0,
       "functions": 9,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_three_layer_card.py",
-      "sha256": "d6bd9d68bb76c47a7eb0def19af4383d6cafbefd7ddb174a737fa7a1d35f14ed",
+      "sha256": "5430df56eb62fdc4955112066d43aa10c7b507748ee496bb07fed7368bc3c18c",
       "symbols": [
         {
           "doc": null,
@@ -12283,7 +12866,7 @@
       "classes": 0,
       "functions": 6,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_universal_scopes.py",
-      "sha256": "151ec420d12cd2e11df1e08ab4fcb11ec3ee115ef9de40dc2ed769eb9b9bd2b6",
+      "sha256": "0f34adac8fb15262f01ef06513ec156724585f27ae3ab286ee7796c4e5a22594",
       "symbols": [
         {
           "doc": null,
@@ -12340,7 +12923,7 @@
       "classes": 0,
       "functions": 1,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_v541_mount.py",
-      "sha256": "38e5e659c3881743de3431c1d77b5576f0e83b7adc27fbde02430702d0a5d075",
+      "sha256": "852f50a2257284dabf6cee9524db971cd2022c105ba755b5c2af663a51b431bd",
       "symbols": [
         {
           "doc": null,
@@ -12357,7 +12940,7 @@
       "classes": 0,
       "functions": 6,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_version_cutoff.py",
-      "sha256": "12ab852aaebe037ca5f40d40e00b667e63c764b3bbc8806e99081c266e4dec0d",
+      "sha256": "ee4756b4e250adb785a394dedbf7acb329472c11abbdb81a02e4a8a848b4b170",
       "symbols": [
         {
           "doc": null,
@@ -12414,5 +12997,5 @@
   "parseErrors": [],
   "root": "artifacts/dcm_v6_workstream_ab",
   "schema": "pillars_dcm.code_inventory.v1",
-  "symbolCount": 1319
+  "symbolCount": 1384
 }
