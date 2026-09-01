@@ -42,7 +42,7 @@
   "tests": {
     "targetedSignalGovernance": "19 passed",
     "localFullRegression": "321 passed; 22 failed solely because text-only checkout intentionally omitted exact fixture/HAR/release bytes",
-    "remoteFullCi": "PENDING"
+    "remoteFullCi": "GitHub Actions run #195 passed on code head 6cf8a15d40e839748ce6f76c0d980da70fb448df"
   },
   "claims": {
     "learningRevision": "LR000000",
