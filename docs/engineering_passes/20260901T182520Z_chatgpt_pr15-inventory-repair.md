@@ -4,7 +4,7 @@
 - Date: 2026-09-01
 - Branch: `grok/p12-statepack-queryable-store-20260831`
 - Starting SHA: `fc455813e1c2cdf4f865052b10a50c3922438176`
-- Implementation commit: `f27226cae76391e47da7373324be756aa46b9a8f`
+- Inventory repair commit: `f5a7d679a55da42fb0e4751f44294a3023694354`
 - PR: https://github.com/williamcgreenwood/DCM/pull/15
 
 ## Scope
@@ -26,10 +26,12 @@ exact PR head's complete Python surface.
 - `python scripts/build_code_inventory.py --check`: passed.
 - `python -m compileall -q artifacts/dcm_v6_workstream_ab/dcm artifacts/dcm_v6_workstream_ab/tests`: passed.
 - Generated inventory: 217 modules, 1,384 symbols, zero parse errors.
-- Inventory semantic hash: `c9eb7f6f831d3e807e4f86d335f1ee0929ce1a285a13af82b87e100a6e39f58f`.
+- Inventory semantic hash: `9e0f2de43cf1623f8795956ed6682960dcbcf767ceade289aba3ccce1b8bd6d2`.
+- GitHub Actions run `33543962532` / run #189: full workflow passed, including
+  installation, CLI/host/synthetic smoke, 324 tests, code-inventory stale-check,
+  and benchmark smoke.
 
-The pushed commit must still pass the full GitHub Actions workflow, including
-benchmark smoke, before PR #15 is considered green.
+PR #15 is green on the exact inventory repair commit.
 
 ## Governance truth
 
