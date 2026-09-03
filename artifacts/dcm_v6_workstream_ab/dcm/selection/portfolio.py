@@ -5,6 +5,8 @@ from collections import Counter
 from math import sqrt
 from typing import Any
 
+from dcm.selection.card_layers import is_modeled_playable
+
 COMPONENTS = {
     "pra": {"pts", "reb", "ast"}, "pr": {"pts", "reb"}, "pa": {"pts", "ast"}, "ra": {"reb", "ast"},
     "pass_rush_yds": {"pass_yds", "rush_yds"}, "rush_rec_yds": {"rush_yds", "rec_yds"},
@@ -69,6 +71,14 @@ def build_card(
             break
         row = p["row"]
         if row.get("modifier") == "GOBLIN" or p.get("grade") != "PLAYABLE":
+            continue
+        # Status/start hard gates: PLAYER_STATUS_UNCERTAIN / OUT / started event
+        # cannot land on strict_card even if the caller skipped the qualified filter.
+        if not is_modeled_playable(
+            p,
+            cutoff=p.get("forecastCutoff") or p.get("forecastDecisionCutoff"),
+            snapshot=p.get("parameterSnapshot") or p.get("snapshot"),
+        ):
             continue
 
         pid = str(row["playerId"])

@@ -1,0 +1,14 @@
+[
+  {
+    "code": "GOBLIN_SELECTION_FORBIDDEN",
+    "count": 2569
+  },
+  {
+    "code": "UNSUPPORTED_FAIL_CLOSED",
+    "count": 7234
+  },
+  {
+    "code": "UNRESOLVED",
+    "count": 1895
+  }
+]

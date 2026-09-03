@@ -3,6 +3,23 @@ from __future__ import annotations
 
 import math
 
+# Reliability is not a probability. Slim/freeze rows keep these as separate keys.
+PROBABILITY_CONTRACT_KEYS = (
+    "selectedP",
+    "evidenceSafeP",
+    "lowerBound",
+    "reliability",
+    "dataQuality",
+    "volatility",
+    "fragility",
+    "oodRisk",
+    "falseSignRisk",
+    "monteCarloSE",
+    "epistemicUncertainty",
+)
+RELIABILITY_IS_NOT_PROBABILITY = True
+
+
 
 def evidence_safe_probability(raw_p: float, *, support_n: int, data_quality: float, ood_risk: float, synthetic: bool) -> float:
     if synthetic:

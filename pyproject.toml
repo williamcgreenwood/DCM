@@ -16,6 +16,7 @@ dev = ["pytest>=8.0"]
 [project.scripts]
 pillars-dcm = "dcm.runner:main"
 dcm = "dcm.runner:main"
+dcm-host = "dcm.chat.cli:main"
 
 [tool.setuptools.package-dir]
 "" = "artifacts/dcm_v6_workstream_ab"
@@ -25,9 +26,16 @@ where = ["artifacts/dcm_v6_workstream_ab"]
 include = ["dcm*", "pillars_dcm*"]
 
 [tool.setuptools.package-data]
-dcm = ["VERSION.json", "data/synthetic_har.json"]
+dcm = [
+    "VERSION.json",
+    "data/synthetic_har.json",
+    "data/source_catalog.json",
+    "signals/schemas/*.json",
+    "algorithms/data/*",
+    "algorithms/schemas/*.json",
+]
 
 [tool.pytest.ini_options]
-testpaths = ["artifacts/dcm_v6_workstream_ab/tests"]
+testpaths = ["artifacts/dcm_v6_workstream_ab/tests", "tests/governance"]
 pythonpath = ["artifacts/dcm_v6_workstream_ab"]
 addopts = "-q"

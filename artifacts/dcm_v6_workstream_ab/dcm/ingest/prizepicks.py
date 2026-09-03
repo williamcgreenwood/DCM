@@ -97,6 +97,16 @@ def _board_id(duration: dict | None, attrs: dict) -> str:
     d = _attrs(duration)
     name = str(d.get("name") or d.get("display_name") or attrs.get("board_time") or attrs.get("projection_type") or "FULL_GAME")
     u = name.upper()
+    if "QTRS" in u or "QUARTERS WITH" in u or "QTRS W" in u:
+        return "QTRS"
+    if "1ST Q" in u or u in {"Q1", "1Q"} or "FIRST QUARTER" in u:
+        return "Q1"
+    if "2ND Q" in u or u in {"Q2", "2Q"} or "SECOND QUARTER" in u:
+        return "Q2"
+    if "3RD Q" in u or u in {"Q3", "3Q"} or "THIRD QUARTER" in u:
+        return "Q3"
+    if "4TH Q" in u or u in {"Q4", "4Q"} or "FOURTH QUARTER" in u:
+        return "Q4"
     if "1H" in u or "FIRST HALF" in u or "1ST HALF" in u:
         return "1H"
     if "2H" in u or "SECOND HALF" in u:

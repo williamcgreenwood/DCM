@@ -17,6 +17,8 @@ def _frozen_claim(req: dict) -> dict:
     scope = req["scope"]
     if scope == "SPORT":
         value = {"distribution_family": "count", "overtime": "INCLUDE_FULL_GAME", "rules_or_distribution_context": True}
+    elif scope == "COMPETITION":
+        value = {"competition_context": True, "league": req.get("league")}
     elif scope == "EVENT":
         value = {
             "event_context": True,
@@ -26,15 +28,17 @@ def _frozen_claim(req: dict) -> dict:
             "venue": "test-arena",
             "surface": "wood",
         }
-    elif scope == "TEAM":
+    elif scope in {"TEAM", "AFFILIATION", "COUNTERPARTY"}:
         value = {
             "team_context": True,
             "pace_multiplier": 1.0,
             "matchup_efficiency_multiplier": 1.0,
             "injury_cluster": False,
             "plays": 65,
+            "pass_defense": 1.0,
+            "rush_defense": 1.0,
         }
-    elif scope == "PLAYER":
+    elif scope in {"PLAYER", "SUBJECT"}:
         value = {
             "status": "ACTIVE",
             "role": "starter",
@@ -46,6 +50,8 @@ def _frozen_claim(req: dict) -> dict:
                 {"minutes": 29, "fga": 11, "pass_att": 28, "role": "bench"},
             ],
         }
+    elif scope == "ENVIRONMENT":
+        value = {"environment_context": True, "environment": "indoor", "surface": "wood", "venue": "test-arena"}
     elif scope == "MARKET_DEFINITION":
         value = {"definition_verified": True}
     else:
@@ -94,6 +100,8 @@ def test_checkpoint_bundle_resume_validate_snapshot_model_freeze(tmp_path: Path)
         "COMPLETE_FROZEN",
         "COMPLETE_WITH_UNSUPPORTED_ROWS",
         "EMPTY_CARD_COMPLETE",
+        "RESEARCHED_MODELED_CARD",
+        "RESEARCHED_MODELED_TOP25",
     }
     assert (dest / "parameters" / "snapshots.json").is_file()
     snaps = json.loads((dest / "parameters" / "snapshots.json").read_text())
@@ -102,4 +110,8 @@ def test_checkpoint_bundle_resume_validate_snapshot_model_freeze(tmp_path: Path)
     assert freeze["learningRevision"] == "LR000000"
     assert freeze["predictiveClaim"] == "NONE"
     assert freeze["researchComplete"] is True
+    assert freeze["productionCertified"] is False
+    assert freeze["executionMode"] == "RESEARCHED_MODELED"
     assert (dest / "frozen_forecast.json").is_file()
+    assert json.loads((dest / "production_certified_card.json").read_text()) == []
+    assert (dest / "top25_ranked.json").is_file()

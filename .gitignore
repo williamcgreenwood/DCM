@@ -16,6 +16,12 @@ dcm_v6/RUNS/**
 dcm_v6/canonical_mount/v5.4.1_copy/**
 !dcm_v6/canonical_mount/v5.4.1_copy/.gitkeep
 
+# GitHub-verifiable run audits (no HARs, no sqlite).
+!audit/
+!audit/**
+!audit/runs/
+!audit/runs/**
+
 # Raw capture safety: never commit live HAR/session material.
 *.har
 *.har.gz
@@ -46,3 +52,13 @@ artifacts/**/*.egg-info/
 
 # Stale portable blobs are not a release channel.
 artifacts/dcm_v6_workstream_ab.zip
+
+# Portable release outputs (rebuild with python -m dcm.release)
+dist/
+artifacts/release/
+build/
+*.whl
+
+# Never commit trained-weight blobs. P6 learning is JSONL/JSON only.
+*.pkl
+*.joblib

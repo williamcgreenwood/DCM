@@ -42,6 +42,9 @@ export function OperatorConsole() {
           <p className="mt-2 max-w-xl text-sm text-muted">
             Operator console for freeze artifacts. The browser never computes probabilities, grades, or cards.
           </p>
+          <p className="mt-2 font-mono text-[11px] text-muted">
+            Algorithmic Constitution DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903 · LR000000 · predictive NONE
+          </p>
         </div>
       </header>
       <main className="mx-auto grid max-w-6xl gap-6 px-4 py-6 sm:px-8 lg:grid-cols-[280px_1fr]">

@@ -36,7 +36,21 @@ def test_full_har_research_plan_far_below_legacy_20k():
     assert planned["legacy_market_emitted"] is False
     assert not any(r["scope"] == "MARKET" for r in requests)
     scopes = Counter(r["scope"] for r in requests)
-    assert set(scopes) <= {"SPORT", "EVENT", "TEAM", "PLAYER", "MARKET_DEFINITION", "OFFER"}
+    assert set(scopes) <= {
+        "SPORT",
+        "COMPETITION",
+        "EVENT",
+        "ENVIRONMENT",
+        "AFFILIATION",
+        "SUBJECT",
+        "COUNTERPARTY",
+        "MARKET_DEFINITION",
+        "OFFER",
+    }
+    assert "PLAYER" not in scopes
+    assert "TEAM" not in scopes
+    assert "SUBJECT" in scopes
+    assert "AFFILIATION" in scopes
     # hierarchy, not alphabetical
     ranks = [r["hierarchy_rank"] for r in requests]
     assert ranks == sorted(ranks)

@@ -52,3 +52,156 @@ def test_market_coverage_requires_verified_definition():
 
     good = coverage_report(requests, [_claim("MARKET", "M1", {"definition_verified": True})])
     assert good["complete"] is True
+
+
+def test_player_object_exists_is_not_coverage():
+    requests = [{
+        "request_id": "REQ_P",
+        "scope": "PLAYER",
+        "scope_id": "P1",
+        "need": "status_role_logs_opportunity_efficiency",
+        "sportFamily": "basketball",
+        "league": "WNBA",
+        "market": "pts",
+    }]
+    # A PLAYER object / identity shell is not evidence coverage.
+    report = coverage_report(requests, [_claim("PLAYER", "P1", {"playerId": "P1", "playerName": "Paige"})])
+    assert report["complete"] is False
+    missing = report["requests"][0]["missing"]
+    assert "PLAYER_STATUS" in missing
+    assert "PLAYER_ROLE" in missing
+    assert "ROLE_COMPARABLE_GAME_LOGS_MIN_3" in missing
+
+
+def test_points_market_incomplete_without_fga_or_pts():
+    requests = [{
+        "request_id": "REQ_P",
+        "scope": "PLAYER",
+        "scope_id": "P1",
+        "need": "status_role_logs_opportunity_efficiency",
+        "sportFamily": "basketball",
+        "league": "WNBA",
+        "market": "pts",
+    }]
+    logs = [{"minutes": 30, "reb": 4, "ast": 6} for _ in range(3)]
+    report = coverage_report(requests, [_claim("PLAYER", "P1", {
+        "status": "ACTIVE",
+        "role": "starter",
+        "game_logs": logs,
+        "opportunity": {"support_n": 3},
+        "efficiency": {"support_n": 3},
+    })])
+    assert report["complete"] is False
+    assert "MARKET_STAT_PTS" in report["requests"][0]["missing"]
+
+    good_logs = [{"minutes": 30, "pts": 18, "fga": 14, "tpa": 5, "fta": 4, "reb": 4, "ast": 6} for _ in range(3)]
+    good = coverage_report(requests, [_claim("PLAYER", "P1", {
+        "status": "ACTIVE",
+        "role": "starter",
+        "game_logs": good_logs,
+        "opportunity": {"support_n": 3},
+        "efficiency": {"support_n": 3},
+    })])
+    assert good["complete"] is True
+
+
+def test_pra_requires_minutes_pts_reb_ast():
+    requests = [{
+        "request_id": "REQ_P",
+        "scope": "PLAYER",
+        "scope_id": "P1",
+        "need": "status_role_logs_opportunity_efficiency",
+        "sportFamily": "basketball",
+        "league": "WNBA",
+        "market": "pra",
+    }]
+    incomplete = coverage_report(requests, [_claim("PLAYER", "P1", {
+        "status": "ACTIVE",
+        "role": "starter",
+        "game_logs": [{"minutes": 30, "pts": 18} for _ in range(3)],
+        "opportunity": {"support_n": 3},
+        "efficiency": {"support_n": 3},
+    })])
+    assert incomplete["complete"] is False
+    assert "MARKET_STAT_PRA" in incomplete["requests"][0]["missing"]
+
+    complete = coverage_report(requests, [_claim("PLAYER", "P1", {
+        "status": "ACTIVE",
+        "role": "starter",
+        "game_logs": [{"minutes": 30, "pts": 18, "reb": 4, "ast": 6} for _ in range(3)],
+        "opportunity": {"support_n": 3},
+        "efficiency": {"support_n": 3},
+    })])
+    assert complete["complete"] is True
+
+
+def test_football_player_path_not_subject_to_basketball_market_codes():
+    requests = [{
+        "request_id": "REQ_P",
+        "scope": "PLAYER",
+        "scope_id": "QB1",
+        "need": "status_role_logs_opportunity_efficiency",
+        "sportFamily": "gridiron",
+        "league": "NFL",
+        "market": "pass_yds",
+    }]
+    logs = [{"pass_att": 34, "rush_att": 4} for _ in range(3)]
+    report = coverage_report(requests, [_claim("PLAYER", "QB1", {
+        "status": "ACTIVE",
+        "role": "QB",
+        "game_logs": logs,
+        "opportunity": {"support_n": 3},
+        "efficiency": {"support_n": 3},
+    })])
+    assert report["complete"] is True
+    missing = report["requests"][0]["missing"]
+    assert "MARKET_STAT_PTS" not in missing
+    assert "GAMELOG_MINUTES" not in missing
+
+
+def test_points_requires_shot_attempts_not_just_pts_totals():
+    requests = [{
+        "request_id": "REQ_P",
+        "scope": "PLAYER",
+        "scope_id": "P1",
+        "need": "status_role_logs_opportunity_efficiency",
+        "sportFamily": "basketball",
+        "league": "WNBA",
+        "market": "pts",
+    }]
+    totals_only = [{"minutes": 30, "pts": 18, "fga": 14, "reb": 4, "ast": 6} for _ in range(3)]
+    report = coverage_report(requests, [_claim("PLAYER", "P1", {
+        "status": "ACTIVE",
+        "role": "starter",
+        "game_logs": totals_only,
+        "opportunity": {"support_n": 3},
+        "efficiency": {"support_n": 3},
+    })])
+    assert report["complete"] is False
+    assert "MARKET_STAT_PTS" in report["requests"][0]["missing"]
+
+
+def test_fixture_team_pace_one_is_not_coverage():
+    requests = [{
+        "request_id": "REQ_T",
+        "scope": "TEAM",
+        "scope_id": "DAL",
+        "need": "pace_matchup",
+        "sportFamily": "basketball",
+        "league": "WNBA",
+    }]
+    prior = coverage_report(requests, [_claim("TEAM", "DAL", {
+        "pace_multiplier": 1.0,
+        "matchup_efficiency_multiplier": 1.0,
+        "injury_cluster": False,
+    })])
+    assert prior["complete"] is False
+    assert "BASKETBALL_TEAM_PACE" in prior["requests"][0]["missing"]
+    real = coverage_report(requests, [_claim("TEAM", "DAL", {
+        "pace": 82.4,
+        "ortg": 105.4,
+        "drtg": 102.1,
+        "team_context": True,
+    })])
+    assert real["complete"] is True
+

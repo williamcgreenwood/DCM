@@ -44,7 +44,7 @@ def classify_source(source_id: str, url: str = "") -> str:
         return "OFFICIAL_LEAGUE"
     if "TEAM" in token:
         return "OFFICIAL_TEAM"
-    if any(k in token for k in ("BOXSCORE", "BOX_SCORE", "STATSHEET")):
+    if any(k in token for k in ("BOXSCORE", "BOX_SCORE", "STATSHEET", "BASKETBALL-REFERENCE", "BASKETBALL_REFERENCE", "SPORTS-REFERENCE")):
         return "BOX_SCORE_VENDOR"
     if any(k in token for k in ("BEAT", "REPORTER", "TWITTER", "X.COM")):
         return "BEAT_REPORTER"

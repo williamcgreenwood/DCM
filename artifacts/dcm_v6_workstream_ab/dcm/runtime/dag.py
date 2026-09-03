@@ -18,7 +18,47 @@ STATES = (
 )
 
 LINE_DEPENDENT = {"MARKET_LINE", "LINE_SURFACE", "GRADE", "RANK", "PORTFOLIO", "FREEZE"}
-RESEARCH_STABLE = {"PLAYER_HISTORY", "TEAM_RESEARCH", "EVENT_RESEARCH", "SPORT_RULES"}
+RESEARCH_STABLE = {
+    "PLAYER_HISTORY",
+    "SUBJECT_HISTORY",
+    "TEAM_RESEARCH",
+    "AFFILIATION_RESEARCH",
+    "EVENT_RESEARCH",
+    "SPORT_RULES",
+}
+DELTA_INVALIDATION = {
+    "APPEND_MISSING_HISTORY": (
+        "FEATURE", "ROLE", "PARTICIPATION", "OPPORTUNITY", "EFFICIENCY",
+        "PARAMETER", "EVENT_WORLDS", "GRADE", "RANK", "PORTFOLIO", "FREEZE",
+    ),
+    "REFRESH_CURRENT_CONTEXT": (
+        "AVAILABILITY", "OPPORTUNITY", "EVENT_WORLDS", "GRADE", "RANK", "PORTFOLIO", "FREEZE",
+    ),
+    "NEW_OPPONENT_REQUIRED": (
+        "COUNTERPARTY", "MATCHUP", "EVENT_WORLDS", "GRADE", "RANK", "PORTFOLIO", "FREEZE",
+    ),
+    "TEAM_CHANGED": (
+        "ROLE", "PARTICIPATION", "OPPORTUNITY", "EFFICIENCY", "PARAMETER",
+        "EVENT_WORLDS", "GRADE", "RANK", "PORTFOLIO", "FREEZE",
+    ),
+    "ROLE_EPOCH_CHANGED": (
+        "ROLE", "PARTICIPATION", "OPPORTUNITY", "EFFICIENCY", "PARAMETER",
+        "EVENT_WORLDS", "GRADE", "RANK", "PORTFOLIO", "FREEZE",
+    ),
+    "DEFINITION_CHANGED": (
+        "MARKET_LINE", "LINE_SURFACE", "GRADE", "RANK", "PORTFOLIO", "FREEZE",
+    ),
+    "REPLACE_INVALIDATED": (
+        "FEATURE", "ROLE", "PARTICIPATION", "OPPORTUNITY", "EFFICIENCY",
+        "PARAMETER", "EVENT_WORLDS", "GRADE", "RANK", "PORTFOLIO", "FREEZE",
+    ),
+    "CONTRADICTED_REVERIFY": (
+        "FEATURE", "PARAMETER", "EVENT_WORLDS", "GRADE", "RANK", "PORTFOLIO", "FREEZE",
+    ),
+    "REFRESH_STALE": (
+        "FEATURE", "PARAMETER", "EVENT_WORLDS", "GRADE", "RANK", "PORTFOLIO", "FREEZE",
+    ),
+}
 
 
 def node_key(
@@ -105,13 +145,30 @@ class Dag:
 
     def invalidate_line_descendants(self) -> list[str]:
         """A line change invalidates market/grade/rank/portfolio/freeze, not research."""
+        return self.invalidate_types(LINE_DEPENDENT)
+
+    def invalidate_types(self, types: Iterable[str]) -> list[str]:
+        wanted = {str(t) for t in types}
         hit = []
         for n in self.nodes.values():
-            if n.node_type in LINE_DEPENDENT:
+            if n.node_type in wanted:
                 n.state = "INVALIDATED"
                 n.artifact_hash = None
                 hit.append(n.key)
         return hit
+
+    def invalidate_for_delta(self, delta_class: str) -> list[str]:
+        """Invalidate only downstream nodes that depend on this evidence class.
+
+        Subject/affiliation historical research is never invalidated by a line change.
+        """
+        if str(delta_class) == "REUSE_VALID":
+            return []
+        types = DELTA_INVALIDATION.get(str(delta_class), LINE_DEPENDENT)
+        return self.invalidate_types(types)
+
+    def preserved_research_nodes(self) -> list[str]:
+        return [n.key for n in self.nodes.values() if n.node_type in RESEARCH_STABLE]
 
     def reused(self) -> int:
         return sum(1 for n in self.nodes.values() if n.state == "COMPLETE_VERIFIED")

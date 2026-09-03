@@ -7,6 +7,16 @@ Executable Workstreams A and B only.
 
 E2E runner: `python -m dcm.runner --synthetic --out /workspace/dcm_v6/RUNS`. `runtime/pipeline.py` remains the WSAB world-to-lineup slice. HAR ingest is `dcm.ingest.har` + `dcm.runner`. Not optimized 6.0. Host performance not certified.
 
+
+Learning (settled dests only; never invents labels; LR stays LR000000):
+
+```
+python -m dcm.learning.dataset --dest /workspace/dcm_v6/RUNS/<id>
+python -m dcm.dataset --dest /workspace/dcm_v6/RUNS/<id> --out /workspace/dcm_v6/RUNS/<id>
+python -m dcm.learning.walkforward --dataset /workspace/dcm_v6/RUNS/<id>/training_dataset.jsonl
+python -m dcm.learning.registry --registry /workspace/dcm_v6/RUNS/<id>/model_registry.json --register-shadow shadow.logistic.v1
+```
+
 ## What this package is not
 
 HAR ingest, live-board normalizer, research/ranking/portfolio, MLB PA engine, other-sport registries, DPMM/GPLVM, Learning Revision promotion, six-pick fill, inferred NFLP reboot, fabricated CFB regular-season reboot.

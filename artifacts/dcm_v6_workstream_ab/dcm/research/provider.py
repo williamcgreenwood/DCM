@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any, Protocol
 from urllib.parse import parse_qsl, urlsplit
 
+from dcm.research.cache import ResearchCache, cache_identity
 from dcm.research.claims import claim_record, conflict_ledger, dedupe
 from dcm.research.coverage import coverage_report
 from dcm.contracts.hashes import content_hash
@@ -93,13 +94,17 @@ class FixtureProvider:
         scope = request["scope"]
         if scope == "SPORT":
             value = {"distribution_family": "development_fixture", "overtime": "INCLUDE_FULL_GAME"}
+        elif scope == "COMPETITION":
+            value = {"competition_context": True, "production_eligible": False}
         elif scope == "EVENT":
             value = {"starters_known": True, "environment": "neutral_fixture"}
-        elif scope == "TEAM":
+        elif scope in {"TEAM", "AFFILIATION", "COUNTERPARTY"}:
             value = {"pace_multiplier": 1.0, "matchup_efficiency_multiplier": 1.0, "injury_cluster": False}
-        elif scope == "PLAYER":
+        elif scope in {"PLAYER", "SUBJECT"}:
             value = {"status": "ACTIVE", "role": "starter_or_feature", "opportunity": {"support_n": 0},
                      "efficiency": {"support_n": 0}, "game_logs": [], "production_eligible": False}
+        elif scope == "ENVIRONMENT":
+            value = {"environment_context": "neutral_fixture", "weather": None, "surface": None, "production_eligible": False}
         elif scope == "MARKET_DEFINITION":
             value = {"definition_verified": False, "production_eligible": False}
         elif scope == "OFFER":
@@ -233,18 +238,47 @@ def claims_by_scope(claims: list[dict[str, Any]]) -> dict[tuple[str, str], list[
     return out
 
 
-def collect(requests: list[dict], provider: ResearchProvider) -> dict[str, Any]:
+def collect(requests: list[dict], provider: ResearchProvider, cache: ResearchCache | None = None) -> dict[str, Any]:
     claims: list[dict] = []
     missing: list[str] = []
     malformed: list[str] = []
     reused = 0
+    cache_hits = 0
     seen_scope: set[tuple[str, str]] = set()
+    kind_map = {
+        "PLAYER": "PLAYER_GAME_LOG",
+        "SUBJECT": "PLAYER_GAME_LOG",
+        "TEAM": "TEAM_GAME_LOG",
+        "AFFILIATION": "TEAM_GAME_LOG",
+        "COUNTERPARTY": "TEAM_GAME_LOG",
+        "EVENT": "EVENT_STATUS",
+        "ENVIRONMENT": "EVENT_STATUS",
+        "SPORT": "MARKET_DEFINITION",
+        "COMPETITION": "MARKET_DEFINITION",
+        "MARKET_DEFINITION": "MARKET_DEFINITION",
+        "OFFER": "LINE",
+    }
     for req in requests:
         key = (str(req["scope"]), str(req["scope_id"]))
         if key in seen_scope and req["scope"] not in {"OFFER"}:
             reused += 1
             continue
         seen_scope.add(key)
+        ident = None
+        if cache is not None:
+            ident = cache_identity(
+                source_id=type(provider).__name__,
+                adapter_version="collect-1",
+                as_of=str(req.get("forecast_cutoff") or ""),
+                entity=f"{req['scope']}:{req['scope_id']}",
+                kind=kind_map.get(str(req["scope"]), "PLAYER_GAME_LOG"),
+            )
+            hit = cache.get(ident, as_of=str(req.get("forecast_cutoff") or ""))
+            if hit is not None:
+                cache_hits += 1
+                reused += 1
+                claims.extend(hit if isinstance(hit, list) else [hit])
+                continue
         try:
             got = provider.resolve(req)
         except (ValueError, TypeError, json.JSONDecodeError):
@@ -254,6 +288,9 @@ def collect(requests: list[dict], provider: ResearchProvider) -> dict[str, Any]:
             missing.append(req["request_id"])
         else:
             claims.extend(got)
+            if cache is not None and ident is not None:
+                published = str((got[0] or {}).get("published_at") or req.get("forecast_cutoff") or "")
+                cache.put(ident, got, published_at=published)
     claims = dedupe(claims)
     conflicts = conflict_ledger(claims)
     fixture_claims = [c for c in claims if _is_fixture_claim(c)]
@@ -271,7 +308,7 @@ def collect(requests: list[dict], provider: ResearchProvider) -> dict[str, Any]:
     )
     return {
         "claims": claims, "missing": missing, "malformed": malformed, "requested": len(requests),
-        "reused": reused, "complete": structural_complete, "production_ready": production_ready,
+        "reused": reused, "cacheHits": cache_hits, "complete": structural_complete, "production_ready": production_ready,
         "coverage": coverage,
         "conflicts": conflicts,
         "evidence_mode": "PRODUCTION" if production_ready else "SYNTHETIC_OR_INCOMPLETE",

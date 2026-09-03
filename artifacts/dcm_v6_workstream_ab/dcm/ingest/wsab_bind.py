@@ -27,7 +27,7 @@ def _cfb_official_names() -> set[str]:
 _CFB_OFFICIAL = _cfb_official_names()
 
 _FOOTBALL_MARKETS = set(PRIMITIVE_SPECS) | set(DERIVED_SPECS)
-_BASKETBALL_MARKETS = {"pts", "reb", "ast", "pra", "3pm", "stl"}
+_BASKETBALL_MARKETS = {"pts", "reb", "ast", "pra", "pr", "pa", "ra", "3pm", "3pa", "tpa", "fgm", "fga", "2pm", "2pa", "ftm", "fta", "tov", "oreb", "stl", "blk", "blk_stl", "qtrs_w_3plus_pts", "fg_made", "fg_att", "to", "fg2m"}
 
 
 def annotate_rows(rows: list[dict]) -> list[dict]:

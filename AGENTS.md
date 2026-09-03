@@ -11,7 +11,7 @@ simpler forecasting app. The production path is:
 HAR capture(s)
 → deterministic request-scope reconciliation
 → immutable board freeze
-→ Sport → Event → Team → Player → Market research
+→ Sport → Competition → Event → Affiliation / Subject / Counterparty / Environment → MarketDefinition / Offer research
 → frozen EvidenceGraph
 → opportunity model
 → conditional efficiency model
@@ -44,6 +44,20 @@ HAR capture(s)
 - LR remains `LR000000` until chronological unseen settlements satisfy an
   explicitly tested promotion contract.
 - Predictive claim remains `NONE` until evidence earns a different claim.
+
+## Algorithmic Constitution
+
+The DCM inherits `DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903`. It is
+mandatory, CI-gated, and inherited by all future versions unless a newer
+constitution is adopted under an Architecture Decision Record.
+
+- Canonical text: `docs/architecture/DCM_ALGORITHMIC_CONSTITUTION.md`
+- Machine-readable registry: `configs/algorithm_registry.json`
+- Runtime: `dcm.algorithms` (selection engine, HAR AlgorithmExecutionPlan)
+- Silent algorithm retirement is prohibited.
+- ChatGPT-native deterministic fallbacks are required for optional packages.
+- Do not create a second EvidenceGraph, ResearchStore, probability, ranking,
+  SportPlugin, or persistence engine to satisfy the constitution.
 
 ## Prop-board doctrine
 
@@ -88,9 +102,9 @@ those fields separate throughout the pipeline and reporting.
 
 Research is hierarchical and reusable:
 
-Sport → Event → Team → Player → Market
+Sport → Competition → Event → Affiliation / Subject / Counterparty / Environment → MarketDefinition / Offer
 
-Do not independently research every prop when evidence can be reused.
+Team/player/opponent terminology belongs inside sport/platform adapters and compatibility views, not the universal core. The canonical research unit is SubjectOfferSet = Subject + Event. Do not independently research every prop when evidence can be reused.
 
 Production evidence must be structured, timestamped, source/content hashed,
 claim hashed, cutoff-safe, and traceable. Fixture/synthetic evidence is
@@ -155,7 +169,7 @@ Correctness precedes optimization. Measure before certifying.
 Benchmark representative boards and record wall time, CPU time, peak RSS,
 world count, research count/reuse, cache hits, and artifact/database sizes.
 
-Prefer event/team/player evidence reuse, DAG invalidation, content-addressed
+Prefer event/affiliation/subject/counterparty evidence reuse, DAG invalidation, content-addressed
 caching, adaptive simulation, bounded parallelism, deterministic RNG streams,
 streaming ingest, indexed storage, and batched writes when tests prove semantic
 equivalence.
@@ -203,3 +217,43 @@ If a requirement cannot be completed because exact canonical bytes, future
 settlements, official data, or external evidence do not exist, implement the
 correct fail-closed boundary and state the precise external dependency. Never
 fill the gap by invention.
+
+
+## Mandatory program-status governance
+
+Every coding pass must update repository-visible progress. Before merge, the agent must:
+
+1. inspect `docs/PROGRAM_STATUS.json`, `docs/PROGRAM_STATUS.md`, the universal implementation matrix, and the most recent `docs/engineering_passes/` records;
+2. add one new immutable engineering-pass record;
+3. update any changed workstream score/status and explain the executable evidence;
+4. add newly discovered missing work rather than hiding it;
+5. run/update the code inventory generator when Python modules/classes/functions change;
+6. leave an ordered next-pass task list.
+
+A pass that changes code but does not update the pass ledger is incomplete.
+
+Status must be based on executable integration, not file/module existence. No agent may downgrade a known blocker silently or mark a scaffold/fixture/shadow path COMPLETE.
+
+## ChatGPT/Grok host-native law
+
+ChatGPT is the priority execution host; Grok may implement the same public host contract. The canonical contract is `docs/CHATGPT_NATIVE_EXECUTION_SPEC.md`.
+
+The DCM must expose a small stable host API/CLI instead of requiring the host to understand internal modules. Required host operations are runtime doctor, HAR prepare, next optimized research batch, evidence import, coverage, forecast, report, resume, audit and settlement.
+
+Repository read access is not runtime execution. Fresh-host acceptance requires an exact installable release artifact plus manifest/hashes. The host may perform web/tool research, but Python remains the only forecasting/model engine.
+
+Host observations must be simple source/entity/data records. The engine owns canonical scope resolution, normalization, cutoff checks, source policy, reliability/freshness rules, semantic hashing, dedupe/conflicts and EvidenceGraph lineage.
+
+## Universal research depth law
+
+The research depth demonstrated by any named player/team/matchup example is a depth benchmark only. Universal core contracts must remain Sport/Competition/Event/Affiliation/Subject/Counterparty/Environment/MarketDefinition/Offer based.
+
+Every SportPlugin must declare required/applicable subject, affiliation, counterparty, event, environment and market fields. The research scheduler must acquire reusable evidence once and fan it out to dependent offers. No one-search-per-prop architecture is acceptable.
+
+Source acquisition must use a versioned source catalog with authority, coverage, authentication, latency, cost/rate limits, licensing/storage constraints, identifier mapping and fallback ordering. Official sources and configured structured APIs should precede generic search when they cover the needed field.
+
+## Research and run storage law
+
+Never commit raw private HARs, credentials, cookies, tokens or prohibited copyrighted source dumps. GitHub may contain compact normalized evidence/provenance, content hashes, research indexes, run manifests and audit artifacts when permitted.
+
+High-volume or high-churn research must use a content-addressed artifact/database/object-store layer referenced from GitHub by stable manifests/hashes rather than bloating Git history.
