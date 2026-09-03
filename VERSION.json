@@ -16,6 +16,7 @@
   ],
   "expectedV1Hash": "6e78dacc19843338643bdcabc7477fd3ce2dd065da1e9629646dacc21cdb1f22",
   "gitCommit": "",
+  "algorithmConstitutionVersion": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
   "hostPerformanceCertified": false,
   "learningRevision": "LR000000",
   "optimizedDcm60Claim": false,

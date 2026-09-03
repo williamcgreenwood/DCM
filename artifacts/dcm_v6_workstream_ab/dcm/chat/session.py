@@ -11,6 +11,7 @@ import subprocess
 from pathlib import Path
 from typing import Any
 
+from dcm.algorithms.constitution import ALGORITHM_CONSTITUTION_VERSION, constitution_identity
 from dcm.chat.archive import archive_run, audit_run
 from dcm.chat.contracts import REQUIRED_PREPARE_ARTIFACTS
 from dcm.chat.evidence_import import import_observations
@@ -55,11 +56,18 @@ def doctor(*, release_manifest: Path | None = None, workspace: Path | None = Non
         blockers.append("PRODUCTION_ROOT_NOT_MOUNTED")
     if PREDICTIVE_CLAIM != "NONE":
         blockers.append("PREDICTIVE_CLAIM_UNEXPECTED")
+    try:
+        constitution = constitution_identity()
+    except Exception as exc:  # doctor must still report identity
+        constitution = {"error": str(exc)}
+        blockers.append("ALGORITHM_CONSTITUTION_UNAVAILABLE")
     return {
         "schema": "pillars_dcm.host_doctor.v1",
         "software": SOFTWARE,
         "learningRevision": LEARNING_REVISION,
         "predictiveClaim": PREDICTIVE_CLAIM,
+        "algorithmConstitutionVersion": ALGORITHM_CONSTITUTION_VERSION,
+        "algorithmConstitution": constitution,
         "gitCommit": _git_commit(),
         "expectedV1Hash": EXPECTED_V1_HASH,
         "v1HashRewritten": False,

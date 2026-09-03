@@ -19,6 +19,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from dcm.algorithms.execution_plan import constitution_run_hashes, persist_har_algorithm_execution_plan
 from dcm.contracts.hashes import content_hash
 from dcm.identity.resolve import build_player_index, freeze_map, resolve_row
 from dcm.ingest.board import freeze_board, write_board
@@ -363,6 +364,14 @@ def run_dcm(
     )
     n_board = dag.add("BOARD_FREEZE", "board")
     dag.complete(n_board.key, board["contentHash"])
+    plan_payload = persist_har_algorithm_execution_plan(
+        dest,
+        {
+            "n_offers": len(board.get("rows") or []),
+            "har_sha256": har_sha,
+            "consumer": "dcm.runner.run_dcm",
+        },
+    )
 
     rows = [resolve_row(r) for r in board["rows"]]
     id_map = freeze_map(rows)
@@ -386,7 +395,12 @@ def run_dcm(
         (dest / "accounting.json").write_text(json.dumps(acc, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         (dest / "population_full.jsonl").write_text("".join(json.dumps({"projectionId": p["row"]["projectionId"], "state": p["state"], "blocker": p["blocker"], "league": p["row"].get("league"), "sportFamily": p["row"].get("sportFamily"), "modifier": p["row"].get("modifier"), "status": p["row"].get("status"), "offeredHigher": p["row"].get("offeredHigher"), "offeredLower": p["row"].get("offeredLower")}) + "\n" for p in classified), encoding="utf-8")
         (dest / "full_population.jsonl").write_text((dest / "population_full.jsonl").read_text(encoding="utf-8"), encoding="utf-8")
-        hashes = {"boardHash": board.get("contentHash"), "harSha256": har_sha, "schemaV1Expected": "6e78dacc19843338643bdcabc7477fd3ce2dd065da1e9629646dacc21cdb1f22"}
+        hashes = {
+            "boardHash": board.get("contentHash"),
+            "harSha256": har_sha,
+            "schemaV1Expected": "6e78dacc19843338643bdcabc7477fd3ce2dd065da1e9629646dacc21cdb1f22",
+            **constitution_run_hashes(plan_payload),
+        }
         (dest / "hashes.json").write_text(json.dumps(hashes, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         write_card_layer_files(
             dest,
@@ -1200,7 +1214,7 @@ def run_dcm(
     (dest / "frozen_forecast.sha256").write_text(freeze["frozenForecastHash"] + "\n", encoding="utf-8")
     (dest / "population_full.jsonl").write_text("".join(json.dumps(p) + "\n" for p in full_population), encoding="utf-8")
     (dest / "accounting.json").write_text(json.dumps({**(board.get("accounting") or {}), "states": states_count, "playable": len(qualified), "cardSize": len(card)}, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    (dest / "hashes.json").write_text(json.dumps({"boardHash": board.get("contentHash"), "harSha256": har_sha, "frozenForecastHash": freeze["frozenForecastHash"], "evidenceGraphHash": evidence_graph.get("contentHash"), "featureStoreHash": feature_store_hash, "explanationsHash": explanations_hash, "gitCommit": git_commit, "checkpointPending": False, "schemaV1Expected": "6e78dacc19843338643bdcabc7477fd3ce2dd065da1e9629646dacc21cdb1f22", "schemaV2": (schema_root.get("v2") or {})}, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    (dest / "hashes.json").write_text(json.dumps({"boardHash": board.get("contentHash"), "harSha256": har_sha, "frozenForecastHash": freeze["frozenForecastHash"], "evidenceGraphHash": evidence_graph.get("contentHash"), "featureStoreHash": feature_store_hash, "explanationsHash": explanations_hash, "gitCommit": git_commit, "checkpointPending": False, "schemaV1Expected": "6e78dacc19843338643bdcabc7477fd3ce2dd065da1e9629646dacc21cdb1f22", "schemaV2": (schema_root.get("v2") or {}), **constitution_run_hashes(plan_payload)}, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
     blockers = []
     if excluded:

@@ -1,8 +1,8 @@
 # DCM universal implementation matrix — 2026-08-31
 
-Baseline refreshed through PR #16 merge `37e78ccfeff0bda74f8592bd46fb7d26e4b158e4` and the PR #17 CFB guarded-launch child branch. PR #17 branch state is implementation evidence pending integration, not a claim that all football or the full DCM is complete.
+Baseline refreshed through PR #17 merge `cdb428f6a05406184fe265b0a1e81abec92cd1f9` and the R0 Algorithmic Constitution child branch. R0 is constitution/registry/selection/HAR-plan/CI, not a claim that Research OS or the full DCM is complete.
 This matrix is code-path status, not predictive validation. LR remains
-`LR000000`; predictive superiority remains `NONE`.
+`LR000000`; predictive superiority remains `NONE`. Constitution version: `DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903`.
 
 Status meanings:
 
@@ -12,6 +12,20 @@ Status meanings:
 - **MISSING** — required subsystem has no adequate implementation.
 - **INCORRECT** — implementation exists but violates the universal directive or a hard invariant.
 - **OBSOLETE** — superseded compatibility/prototype architecture that must not become canonical.
+
+## P16 — Algorithmic Constitution (R0)
+
+| Subsystem | Status | Evidence / action |
+|---|---|---|
+| Constitution document | COMPLETE for R0 | `docs/architecture/DCM_ALGORITHMIC_CONSTITUTION.md` loaded and hashed by `dcm.algorithms.constitution`. |
+| Algorithm registry | COMPLETE for R0 | `configs/algorithm_registry.json` generated from `dcm.algorithms.catalog`; CI stale-check. |
+| AlgorithmSelectionEngine | COMPLETE for R0 | Cheapest exact first; conditionals emit evaluation telemetry. |
+| HAR AlgorithmExecutionPlan | COMPLETE for R0 | Runner persists `algorithm_execution_plan.json` before research. |
+| ChatGPT-native CORE primitives | COMPLETE for R0 | Searching/indexing/sorting/grouping/scheduling/cache/stdlib ML in `dcm.algorithms`. |
+| Weighted set-cover / submodular | COMPLETE as primitives | Registered CORE; live AcquisitionAction packing remains R1. |
+| Silent retirement CI | COMPLETE for R0 | `tests/governance/` plus registry `--check`. |
+| BoardGraph / RequirementGraph / AcquisitionAction | MISSING as live HAR OS | Next tranche (R1). Do not claim complete. |
+| Drive-first indexed retrieval | PARTIAL | Persistence law documented; existing ResearchStore/archive unchanged this pass. |
 
 ## P0 — canonical spine / integrity
 

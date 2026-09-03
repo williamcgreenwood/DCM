@@ -2,15 +2,30 @@
 
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
-- Modules: **229**
-- Symbols: **1471**
+- Modules: **244**
+- Symbols: **1684**
 - Parse errors: **0**
-- Inventory hash: `38b8812f389c89a1ea47ed795e967e48ae3b681353aab317f7c0c7a6c4a80672`
+- Inventory hash: `5a5e788ffebc80d7ed60e4fdc247264008e99f6e03af0fe6ffb87555b4e86808`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/__init__.py` | 0 | 0 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/__main__.py` | 0 | 0 |
+| P16 | `artifacts/dcm_v6_workstream_ab/dcm/algorithms/__init__.py` | 0 | 0 |
+| P16 | `artifacts/dcm_v6_workstream_ab/dcm/algorithms/cache.py` | 2 | 7 |
+| P16 | `artifacts/dcm_v6_workstream_ab/dcm/algorithms/catalog.py` | 0 | 3 |
+| P16 | `artifacts/dcm_v6_workstream_ab/dcm/algorithms/constitution.py` | 0 | 6 |
+| P16 | `artifacts/dcm_v6_workstream_ab/dcm/algorithms/contracts.py` | 4 | 7 |
+| P16 | `artifacts/dcm_v6_workstream_ab/dcm/algorithms/execution_plan.py` | 0 | 3 |
+| P16 | `artifacts/dcm_v6_workstream_ab/dcm/algorithms/graph.py` | 0 | 6 |
+| P16 | `artifacts/dcm_v6_workstream_ab/dcm/algorithms/grouping.py` | 1 | 17 |
+| P16 | `artifacts/dcm_v6_workstream_ab/dcm/algorithms/indexing.py` | 8 | 37 |
+| P16 | `artifacts/dcm_v6_workstream_ab/dcm/algorithms/ml_families.py` | 0 | 13 |
+| P16 | `artifacts/dcm_v6_workstream_ab/dcm/algorithms/registry.py` | 0 | 15 |
+| P16 | `artifacts/dcm_v6_workstream_ab/dcm/algorithms/scheduling.py` | 1 | 12 |
+| P16 | `artifacts/dcm_v6_workstream_ab/dcm/algorithms/searching.py` | 4 | 43 |
+| P16 | `artifacts/dcm_v6_workstream_ab/dcm/algorithms/selection.py` | 1 | 3 |
+| P16 | `artifacts/dcm_v6_workstream_ab/dcm/algorithms/sorting.py` | 1 | 17 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/archive.py` | 0 | 2 |
 | P7 | `artifacts/dcm_v6_workstream_ab/dcm/chat/__init__.py` | 0 | 0 |
 | P7 | `artifacts/dcm_v6_workstream_ab/dcm/chat/__main__.py` | 0 | 0 |
@@ -66,7 +81,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P2-P4 | `artifacts/dcm_v6_workstream_ab/dcm/model/parameters.py` | 0 | 8 |
 | P2-P4 | `artifacts/dcm_v6_workstream_ab/dcm/model/participation.py` | 1 | 5 |
 | P2-P4 | `artifacts/dcm_v6_workstream_ab/dcm/model/quarter_worlds.py` | 1 | 9 |
-| P2-P4 | `artifacts/dcm_v6_workstream_ab/dcm/model/ranking.py` | 0 | 2 |
+| P2-P4 | `artifacts/dcm_v6_workstream_ab/dcm/model/ranking.py` | 0 | 3 |
 | P2-P4 | `artifacts/dcm_v6_workstream_ab/dcm/model/uncertainty.py` | 0 | 3 |
 | P2-P4 | `artifacts/dcm_v6_workstream_ab/dcm/model/worlds.py` | 0 | 16 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/platform/__init__.py` | 0 | 0 |
@@ -90,7 +105,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/adapters/prizepicks.py` | 1 | 5 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/adapters/pro_football_reference.py` | 2 | 7 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/authority.py` | 1 | 5 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/batch.py` | 0 | 3 |
+| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/batch.py` | 0 | 4 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/cache.py` | 1 | 5 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/claims.py` | 0 | 3 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/classify.py` | 0 | 7 |
@@ -143,14 +158,14 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P4 | `artifacts/dcm_v6_workstream_ab/dcm/selection/eligibility.py` | 1 | 3 |
 | P4 | `artifacts/dcm_v6_workstream_ab/dcm/selection/portfolio.py` | 0 | 5 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/settle.py` | 0 | 1 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/signals/__init__.py` | 0 | 0 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/signals/compiler.py` | 2 | 5 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/signals/contracts.py` | 5 | 8 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/signals/donor_accounting.py` | 1 | 2 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/signals/executor.py` | 2 | 4 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/signals/integration_gate.py` | 2 | 5 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/signals/overlap.py` | 0 | 2 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/signals/registry.py` | 3 | 8 |
+| P15 | `artifacts/dcm_v6_workstream_ab/dcm/signals/__init__.py` | 0 | 0 |
+| P15 | `artifacts/dcm_v6_workstream_ab/dcm/signals/compiler.py` | 2 | 5 |
+| P15 | `artifacts/dcm_v6_workstream_ab/dcm/signals/contracts.py` | 5 | 8 |
+| P15 | `artifacts/dcm_v6_workstream_ab/dcm/signals/donor_accounting.py` | 1 | 2 |
+| P15 | `artifacts/dcm_v6_workstream_ab/dcm/signals/executor.py` | 2 | 4 |
+| P15 | `artifacts/dcm_v6_workstream_ab/dcm/signals/integration_gate.py` | 2 | 5 |
+| P15 | `artifacts/dcm_v6_workstream_ab/dcm/signals/overlap.py` | 0 | 2 |
+| P15 | `artifacts/dcm_v6_workstream_ab/dcm/signals/registry.py` | 3 | 8 |
 | P3 | `artifacts/dcm_v6_workstream_ab/dcm/sports/__init__.py` | 0 | 0 |
 | P3 | `artifacts/dcm_v6_workstream_ab/dcm/sports/baseball/__init__.py` | 0 | 0 |
 | P3 | `artifacts/dcm_v6_workstream_ab/dcm/sports/baseball/pa.py` | 0 | 2 |
@@ -249,6 +264,263 @@ _No class/function symbols._
 
 _No class/function symbols._
 
+### `artifacts/dcm_v6_workstream_ab/dcm/algorithms/__init__.py`
+
+_No class/function symbols._
+
+### `artifacts/dcm_v6_workstream_ab/dcm/algorithms/cache.py`
+
+- `class` **LRUCache** L8
+- `method` **LRUCache.__init__** L9
+- `method` **LRUCache.get** L15
+- `method` **LRUCache.put** L23
+- `method` **LRUCache.__contains__** L29
+- `class` **LFUCache** L33
+- `method` **LFUCache.__init__** L34
+- `method` **LFUCache.get** L39
+- `method` **LFUCache.put** L45
+
+### `artifacts/dcm_v6_workstream_ab/dcm/algorithms/catalog.py`
+
+- `function` **_a** L10
+- `function` **_ml** L719
+- `function` **registry_document** L840
+
+### `artifacts/dcm_v6_workstream_ab/dcm/algorithms/constitution.py`
+
+- `function` **_candidates** L13
+- `function` **constitution_path** L37
+- `function` **load_constitution_text** L44
+- `function` **constitution_sha256** L48
+- `function` **prompt_declared_constitution_sha256** L53 — Lineage hash declared by the v3 master prompt. Not a substitute for file bytes.
+- `function` **constitution_identity** L58
+
+### `artifacts/dcm_v6_workstream_ab/dcm/algorithms/contracts.py`
+
+- `class` **AlgorithmNotProductionActive** L33 — Raised when a permanent challenger is invoked as a production algorithm.
+- `function` **_tuple_of** L37
+- `class` **AlgorithmRecord** L46
+- `method` **AlgorithmRecord.__post_init__** L76
+- `method` **AlgorithmRecord.from_mapping** L94
+- `method` **AlgorithmRecord.to_dict** L126
+- `method` **AlgorithmRecord.payload_for_hash** L158
+- `class` **AlgorithmSelection** L165
+- `method` **AlgorithmSelection.to_dict** L177
+- `class` **HarAlgorithmExecutionPlan** L193
+- `method` **HarAlgorithmExecutionPlan.to_dict** L205
+
+### `artifacts/dcm_v6_workstream_ab/dcm/algorithms/execution_plan.py`
+
+- `function` **build_har_algorithm_execution_plan** L36
+- `function` **constitution_run_hashes** L102 — Sidecar hashes for hashes.json. Not forecast-semantic fields.
+- `function` **persist_har_algorithm_execution_plan** L121
+
+### `artifacts/dcm_v6_workstream_ab/dcm/algorithms/graph.py`
+
+- `function` **build_csr** L12
+- `function` **cycles** L16
+- `function` **dag_or_reject** L20
+- `function` **traverse** L24
+- `function` **shortest_undirected** L30
+- `function` **hypergraph_from_bundles** L34
+
+### `artifacts/dcm_v6_workstream_ab/dcm/algorithms/grouping.py`
+
+- `function` **composite_group** L11
+- `class` **UnionFind** L18
+- `method` **UnionFind.__init__** L19
+- `method` **UnionFind.find** L23
+- `method` **UnionFind.union** L30
+- `method` **UnionFind.components** L41
+- `function` **connected_components** L48
+- `function` **tarjan_scc** L59
+- `method` **tarjan_scc.strongconnect** L67
+- `function` **kahn_layers** L99
+- `function` **hypergraph_group** L119
+- `function` **constraint_group** L123
+- `function` **hierarchical_agglomerative** L143
+- `function` **set_cover_groups** L167
+- `function` **topological_group_order** L176
+- `function` **louvain_fallback** L180 — Deterministic connected-component fallback when Leiden/Louvain packages are absent.
+- `function` **dbscan_fallback** L185
+- `function` **gaussian_mixture_1d** L189 — Tiny 1-D GMM for soft archetype membership (stdlib).
+
+### `artifacts/dcm_v6_workstream_ab/dcm/algorithms/indexing.py`
+
+- `function` **hash_table** L13
+- `function` **content_address** L20
+- `class` **BloomFilter** L28
+- `method` **BloomFilter.__init__** L29
+- `method` **BloomFilter._positions** L34
+- `method` **BloomFilter.add** L40
+- `method` **BloomFilter.__contains__** L45
+- `method` **BloomFilter.might_contain** L52
+- `class` **XorFilterFallback** L56 — Portable XOR-filter stand-in: Bloom with a static snapshot contract.
+- `class` **CuckooFilter** L60
+- `method` **CuckooFilter.__init__** L61
+- `method` **CuckooFilter._fp** L66
+- `method` **CuckooFilter._i1** L69
+- `method` **CuckooFilter._i2** L72
+- `method` **CuckooFilter.add** L75
+- `method` **CuckooFilter.__contains__** L92
+- `class` **Bitset** L97
+- `method` **Bitset.__init__** L98
+- `method` **Bitset.add** L102
+- `method` **Bitset.__contains__** L110
+- `method` **Bitset.intersection** L115
+- `function` **merkle_leaves** L123
+- `function` **merkle_root** L137
+- `function` **merkle_proof** L151
+- `class` **CSRGraph** L171
+- `method` **CSRGraph.__init__** L172
+- `method` **CSRGraph.neighbors** L185
+- `method` **CSRGraph.predecessors** L188
+- `class` **HypergraphIncidence** L192
+- `method` **HypergraphIncidence.__init__** L193
+- `method` **HypergraphIncidence.add_edge** L197
+- `method` **HypergraphIncidence.edges_for** L203
+- `method` **HypergraphIncidence.members** L206
+- `function` **bitemporal_key** L210
+- `function` **sqlite_composite_index** L214
+- `function` **open_memory_index** L221
+- `class` **SimHashIndex** L231
+- `method` **SimHashIndex.__init__** L232
+- `method` **SimHashIndex.add** L235
+- `method` **SimHashIndex.nearest** L238
+- `class` **MinHashLSHIndex** L247
+- `method` **MinHashLSHIndex.__init__** L248
+- `method` **MinHashLSHIndex.add** L254
+- `method` **MinHashLSHIndex.query** L259
+- `function` **git_blob_identity** L263
+
+### `artifacts/dcm_v6_workstream_ab/dcm/algorithms/ml_families.py`
+
+- `function` **ewma** L15
+- `function` **cusum** L25 — Return indexes where a mean shift is detected.
+- `function` **page_hinkley** L43
+- `function` **empirical_bayes_shrink** L64
+- `function` **isotonic_regression** L71 — Pool-adjacent-violators; xs used only for pairing/order.
+- `function` **_pav_expand** L96
+- `function` **platt_scale** L126
+- `function` **split_conformal** L143
+- `function` **empirical_quantile** L152
+- `function` **zscore_ood** L161
+- `function` **ridge_closed_form** L170 — Tiny-matrix ridge using Gaussian elimination (stdlib).
+- `function` **_solve** L188
+- `function` **not_active_challenger** L206
+
+### `artifacts/dcm_v6_workstream_ab/dcm/algorithms/registry.py`
+
+- `function` **_candidates** L20
+- `function` **registry_path** L43
+- `function` **_hash_record** L50
+- `function` **_finalize_records** L55
+- `function` **catalog_bytes** L65
+- `function` **_canonical_registry_bytes** L71
+- `function` **load_registry_payload** L75
+- `function` **load_algorithm_registry** L87
+- `function` **algorithm_registry_sha256** L103 — Hash exact canonical registry bytes (sort_keys JSON + trailing newline).
+- `function` **require_algorithm** L113
+- `function` **algorithms_by_lifecycle** L122
+- `function` **algorithms_by_family** L126
+- `function` **assert_catalog_matches_committed_json** L130
+- `function` **catalog_source_records** L137
+- `function` **resolve_implementation** L141
+
+### `artifacts/dcm_v6_workstream_ab/dcm/algorithms/scheduling.py`
+
+- `function` **requirement_weight** L11
+- `method` **requirement_weight.clip** L35
+- `function` **acquisition_cost** L50
+- `function` **expected_marginal_gain** L72
+- `function` **utility** L82
+- `class` **LazyGreedyScheduler** L87 — CELF-style lazy greedy maximizer for AcquisitionAction utilities.
+- `method` **LazyGreedyScheduler.seed** L96
+- `method` **LazyGreedyScheduler.next_action** L105
+- `method` **LazyGreedyScheduler.run** L124
+- `function` **greedy_value_density_pack** L134
+- `function` **first_fit_decreasing** L152
+- `function` **cover_actions** L179
+- `function` **lazy_submodular_select** L184
+
+### `artifacts/dcm_v6_workstream_ab/dcm/algorithms/searching.py`
+
+- `function` **exact_hash_lookup** L11
+- `function` **composite_key** L15
+- `function` **binary_search** L19
+- `function` **range_search** L26
+- `class` **InvertedIndex** L30
+- `method` **InvertedIndex.__init__** L31
+- `method` **InvertedIndex.add** L36
+- `method` **InvertedIndex.postings_for** L49
+- `method` **InvertedIndex.boolean_and** L52
+- `method` **InvertedIndex.boolean_or** L61
+- `function` **bm25** L68
+- `function` **bm25f** L100
+- `function` **wand_topk** L120 — Block-Max WAND-style Top-K over in-memory BM25 scores.
+- `class` **Trie** L138
+- `method` **Trie.__init__** L139
+- `method` **Trie.insert** L142
+- `method` **Trie.prefix** L148
+- `method` **Trie.prefix.walk** L156
+- `method` **Trie.get** L168
+- `class` **AhoCorasick** L179
+- `method` **AhoCorasick.__init__** L180
+- `method` **AhoCorasick.add** L185
+- `method` **AhoCorasick.build** L198
+- `method` **AhoCorasick.find** L213
+- `function` **levenshtein** L225
+- `function` **fuzzy_retrieve** L244
+- `function` **_stable_hash64** L254
+- `function` **minhash_signature** L259
+- `function` **minhash_jaccard** L270
+- `function` **simhash** L277
+- `function` **hamming64** L290
+- `class` **LSHIndex** L294
+- `method` **LSHIndex.__init__** L295
+- `method` **LSHIndex.add** L300
+- `method` **LSHIndex.query** L309
+- `function` **reciprocal_rank_fusion** L322
+- `function` **maximal_marginal_relevance** L330
+- `function` **bfs** L355
+- `function` **dfs** L369
+- `method` **dfs.walk** L373
+- `function` **bidirectional_search** L385
+- `function` **_expand_frontier** L415
+- `function` **weighted_set_cover** L434
+- `function` **submodular_lazy_greedy** L463
+- `function` **brute_force_cosine** L506
+- `method` **brute_force_cosine._norm** L512
+- `function` **not_active_challenger** L525
+
+### `artifacts/dcm_v6_workstream_ab/dcm/algorithms/selection.py`
+
+- `class` **AlgorithmSelectionEngine** L50
+- `method` **AlgorithmSelectionEngine.__post_init__** L53
+- `method` **AlgorithmSelectionEngine.record** L58
+- `method` **AlgorithmSelectionEngine.select** L64
+
+### `artifacts/dcm_v6_workstream_ab/dcm/algorithms/sorting.py`
+
+- `function` **timsort** L10
+- `function` **heap_topk** L14
+- `function` **heap_bottomk** L24
+- `function` **_key_of** L34
+- `function` **quickselect** L38
+- `method` **quickselect.partition** L45
+- `function` **introselect** L66
+- `function` **counting_sort** L74
+- `function` **radix_sort** L91
+- `function` **bucket_sort** L108
+- `function` **k_way_merge** L125
+- `function` **external_merge_sort** L146
+- `function` **multi_key_sort** L151
+- `class` **_Reverse** L166
+- `method` **_Reverse.__init__** L167
+- `method` **_Reverse.__lt__** L170
+- `method` **_Reverse.__eq__** L173
+- `function` **topological_kahn** L177
+
 ### `artifacts/dcm_v6_workstream_ab/dcm/archive.py`
 
 - `function` **_find_repo_root** L23
@@ -291,28 +563,28 @@ _No class/function symbols._
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/chat/research_bridge.py`
 
-- `function` **next_research_batch** L13
+- `function` **next_research_batch** L14
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/chat/session.py`
 
-- `function` **_git_commit** L28
-- `function` **doctor** L42
-- `class` **HostSession** L84 — One run directory, one Python probability engine.
-- `method` **HostSession.__init__** L87
-- `method` **HostSession.open** L92
-- `method` **HostSession.prepare** L99
-- `method` **HostSession._host_state** L130
-- `method` **HostSession._save_host_state** L133
-- `method` **HostSession._write_prepare_artifacts** L142
-- `method` **HostSession.next_research_batch** L177
-- `method` **HostSession.import_evidence** L191
-- `method` **HostSession.coverage** L200
-- `method` **HostSession.forecast** L236
-- `method` **HostSession.report** L270
-- `method` **HostSession.resume** L277
-- `method` **HostSession.audit** L293
-- `method` **HostSession.archive** L298
-- `method` **HostSession.settle** L303
+- `function` **_git_commit** L29
+- `function` **doctor** L43
+- `class` **HostSession** L92 — One run directory, one Python probability engine.
+- `method` **HostSession.__init__** L95
+- `method` **HostSession.open** L100
+- `method` **HostSession.prepare** L107
+- `method` **HostSession._host_state** L138
+- `method` **HostSession._save_host_state** L141
+- `method` **HostSession._write_prepare_artifacts** L150
+- `method` **HostSession.next_research_batch** L185
+- `method` **HostSession.import_evidence** L199
+- `method` **HostSession.coverage** L208
+- `method` **HostSession.forecast** L244
+- `method` **HostSession.report** L278
+- `method` **HostSession.resume** L285
+- `method` **HostSession.audit** L301
+- `method` **HostSession.archive** L306
+- `method` **HostSession.settle** L311
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/chat/state.py`
 
@@ -759,8 +1031,9 @@ _No class/function symbols._
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/model/ranking.py`
 
-- `function` **selection_score** L9
-- `function` **rank_candidates** L23
+- `function` **selection_score** L11
+- `function` **frontier_slice** L25 — Partial Top-K without requiring a second full-board sort.
+- `function` **rank_candidates** L34
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/model/uncertainty.py`
 
@@ -846,20 +1119,20 @@ _No class/function symbols._
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/release.py`
 
-- `function` **_sha256_bytes** L37
-- `function` **repo_root** L41
-- `function` **package_root** L49
-- `function` **count_pytest_functions** L57
-- `function` **resolve_git_commit** L65 — Populate gitCommit from git rev-parse HEAD. FAIL if blank.
-- `function` **canonical_package_files** L85 — Ordered (relative, absolute) files of the canonical Python package tree.
-- `function` **build_complete_project_source** L105
-- `function` **capability_document** L125
-- `function` **_ensure_build_deps** L159
-- `function` **build_wheel** L178 — Build an installable pillars-dcm wheel into dest (and dest/../dist if present).
-- `function` **build_portable** L221
-- `function` **verify_extraction** L353
-- `function` **verify_complete_project_source** L387
-- `function` **main** L417
+- `function` **_sha256_bytes** L39
+- `function` **repo_root** L43
+- `function` **package_root** L51
+- `function` **count_pytest_functions** L59
+- `function` **resolve_git_commit** L67 — Populate gitCommit from git rev-parse HEAD. FAIL if blank.
+- `function` **canonical_package_files** L87 — Ordered (relative, absolute) files of the canonical Python package tree.
+- `function` **build_complete_project_source** L107
+- `function` **capability_document** L127
+- `function` **_ensure_build_deps** L161
+- `function` **build_wheel** L180 — Build an installable pillars-dcm wheel into dest (and dest/../dist if present).
+- `function` **build_portable** L223
+- `function` **verify_extraction** L361
+- `function` **verify_complete_project_source** L395
+- `function` **main** L425
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/__init__.py`
 
@@ -982,9 +1255,10 @@ _No class/function symbols._
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/batch.py`
 
-- `function` **scheduler_score** L37
-- `function` **_event_id_of** L50
-- `function` **build_next_research_batch** L61
+- `function` **scheduler_score** L39
+- `function` **_event_id_of** L52
+- `function` **_request_id_of** L63
+- `function` **build_next_research_batch** L67
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/cache.py`
 
@@ -1364,16 +1638,16 @@ _No class/function symbols._
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/runner.py`
 
-- `function` **_finalize_archive** L102 — Always write dest/audit/. Optionally copy+commit+push a GitHub pack.
-- `function` **_synthetic_path** L162
-- `function` **_run_id** L175
-- `function` **_git_commit_sha** L179 — Best-effort git HEAD. Never writes git config. Missing git is None, not a crash.
-- `function` **_default_model_config** L199
-- `function` **_active_calibration** L210
-- `function` **run_dcm** L219
-- `method` **run_dcm._snapshot_for** L601
-- `method` **run_dcm.slim** L915
-- `function` **main** L1287
+- `function` **_finalize_archive** L103 — Always write dest/audit/. Optionally copy+commit+push a GitHub pack.
+- `function` **_synthetic_path** L163
+- `function` **_run_id** L176
+- `function` **_git_commit_sha** L180 — Best-effort git HEAD. Never writes git config. Missing git is None, not a crash.
+- `function` **_default_model_config** L200
+- `function` **_active_calibration** L211
+- `function` **run_dcm** L220
+- `method` **run_dcm._snapshot_for** L615
+- `method` **run_dcm.slim** L929
+- `function` **main** L1301
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/runtime/__init__.py`
 
@@ -2086,11 +2360,11 @@ _No class/function symbols._
 ### `artifacts/dcm_v6_workstream_ab/tests/test_host_native.py`
 
 - `function` **test_doctor_reports_identity_and_does_not_claim_performance** L20
-- `function` **test_cli_help_exits_zero** L34
-- `function` **test_cli_doctor** L40
-- `function` **test_host_session_prepare_next_research_import_coverage_report** L48
-- `function` **test_observation_rejects_secret_url** L139
-- `function` **test_cli_prepare_synthetic** L155
+- `function` **test_cli_help_exits_zero** L38
+- `function` **test_cli_doctor** L44
+- `function` **test_host_session_prepare_next_research_import_coverage_report** L52
+- `function` **test_observation_rejects_secret_url** L150
+- `function` **test_cli_prepare_synthetic** L166
 
 ### `artifacts/dcm_v6_workstream_ab/tests/test_joint_event_world.py`
 
@@ -2266,8 +2540,8 @@ _No class/function symbols._
 - `function` **test_committed_zip_absent** L14
 - `function` **test_manifests_are_not_stale_41** L22
 - `function` **test_portable_release_builder_and_extraction** L42
-- `function` **test_release_manifest_requires_git_commit** L62
-- `function` **test_portable_release_git_commit_and_complete_project_source** L70
+- `function` **test_release_manifest_requires_git_commit** L65
+- `function` **test_portable_release_git_commit_and_complete_project_source** L73
 
 ### `artifacts/dcm_v6_workstream_ab/tests/test_research_efficiency.py`
 

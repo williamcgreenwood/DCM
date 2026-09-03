@@ -1,6 +1,6 @@
 {
-  "contentHash": "38b8812f389c89a1ea47ed795e967e48ae3b681353aab317f7c0c7a6c4a80672",
-  "moduleCount": 229,
+  "contentHash": "5a5e788ffebc80d7ed60e4fdc247264008e99f6e03af0fe6ffb87555b4e86808",
+  "moduleCount": 244,
   "modules": [
     {
       "classes": 0,
@@ -17,6 +17,1828 @@
       "sha256": "0829cd6e618ba12f07ef6937212776bff5d309a5821f3fa0826543e49e832887",
       "symbols": [],
       "workstream": "UNMAPPED"
+    },
+    {
+      "classes": 0,
+      "functions": 0,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/algorithms/__init__.py",
+      "sha256": "1b83511581526580587a8ce58f9763bb4940f55cc92c34e437be92e18cc61bf6",
+      "symbols": [],
+      "workstream": "P16"
+    },
+    {
+      "classes": 2,
+      "functions": 7,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/algorithms/cache.py",
+      "sha256": "ed638285c73cd30468f77447178a4cb687ca3bb68bc7d46a8829a2f4598f5085",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 30,
+          "kind": "class",
+          "line": 8,
+          "name": "LRUCache",
+          "qualname": "LRUCache"
+        },
+        {
+          "doc": null,
+          "endLine": 13,
+          "kind": "method",
+          "line": 9,
+          "name": "__init__",
+          "qualname": "LRUCache.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 21,
+          "kind": "method",
+          "line": 15,
+          "name": "get",
+          "qualname": "LRUCache.get"
+        },
+        {
+          "doc": null,
+          "endLine": 27,
+          "kind": "method",
+          "line": 23,
+          "name": "put",
+          "qualname": "LRUCache.put"
+        },
+        {
+          "doc": null,
+          "endLine": 30,
+          "kind": "method",
+          "line": 29,
+          "name": "__contains__",
+          "qualname": "LRUCache.__contains__"
+        },
+        {
+          "doc": null,
+          "endLine": 51,
+          "kind": "class",
+          "line": 33,
+          "name": "LFUCache",
+          "qualname": "LFUCache"
+        },
+        {
+          "doc": null,
+          "endLine": 37,
+          "kind": "method",
+          "line": 34,
+          "name": "__init__",
+          "qualname": "LFUCache.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 43,
+          "kind": "method",
+          "line": 39,
+          "name": "get",
+          "qualname": "LFUCache.get"
+        },
+        {
+          "doc": null,
+          "endLine": 51,
+          "kind": "method",
+          "line": 45,
+          "name": "put",
+          "qualname": "LFUCache.put"
+        }
+      ],
+      "workstream": "P16"
+    },
+    {
+      "classes": 0,
+      "functions": 3,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/algorithms/catalog.py",
+      "sha256": "0b2105845a1b4faeb0209716e3589c01dc07791ea6e456a9ad35252935635e61",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 69,
+          "kind": "function",
+          "line": 10,
+          "name": "_a",
+          "qualname": "_a"
+        },
+        {
+          "doc": null,
+          "endLine": 834,
+          "kind": "function",
+          "line": 719,
+          "name": "_ml",
+          "qualname": "_ml"
+        },
+        {
+          "doc": null,
+          "endLine": 846,
+          "kind": "function",
+          "line": 840,
+          "name": "registry_document",
+          "qualname": "registry_document"
+        }
+      ],
+      "workstream": "P16"
+    },
+    {
+      "classes": 0,
+      "functions": 6,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/algorithms/constitution.py",
+      "sha256": "444c4cb704ed93a0ce31e5d53d64b728312e7aaf282ee88308ed312434ac35f5",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 34,
+          "kind": "function",
+          "line": 13,
+          "name": "_candidates",
+          "qualname": "_candidates"
+        },
+        {
+          "doc": null,
+          "endLine": 41,
+          "kind": "function",
+          "line": 37,
+          "name": "constitution_path",
+          "qualname": "constitution_path"
+        },
+        {
+          "doc": null,
+          "endLine": 45,
+          "kind": "function",
+          "line": 44,
+          "name": "load_constitution_text",
+          "qualname": "load_constitution_text"
+        },
+        {
+          "doc": null,
+          "endLine": 50,
+          "kind": "function",
+          "line": 48,
+          "name": "constitution_sha256",
+          "qualname": "constitution_sha256"
+        },
+        {
+          "doc": "Lineage hash declared by the v3 master prompt. Not a substitute for file bytes.",
+          "endLine": 55,
+          "kind": "function",
+          "line": 53,
+          "name": "prompt_declared_constitution_sha256",
+          "qualname": "prompt_declared_constitution_sha256"
+        },
+        {
+          "doc": null,
+          "endLine": 72,
+          "kind": "function",
+          "line": 58,
+          "name": "constitution_identity",
+          "qualname": "constitution_identity"
+        }
+      ],
+      "workstream": "P16"
+    },
+    {
+      "classes": 4,
+      "functions": 7,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/algorithms/contracts.py",
+      "sha256": "740c0e21511b5e63a667a53dc7566c4aed45ae5a8130940873bb1d5bee90619a",
+      "symbols": [
+        {
+          "doc": "Raised when a permanent challenger is invoked as a production algorithm.",
+          "endLine": 34,
+          "kind": "class",
+          "line": 33,
+          "name": "AlgorithmNotProductionActive",
+          "qualname": "AlgorithmNotProductionActive"
+        },
+        {
+          "doc": null,
+          "endLine": 42,
+          "kind": "function",
+          "line": 37,
+          "name": "_tuple_of",
+          "qualname": "_tuple_of"
+        },
+        {
+          "doc": null,
+          "endLine": 161,
+          "kind": "class",
+          "line": 46,
+          "name": "AlgorithmRecord",
+          "qualname": "AlgorithmRecord"
+        },
+        {
+          "doc": null,
+          "endLine": 91,
+          "kind": "method",
+          "line": 76,
+          "name": "__post_init__",
+          "qualname": "AlgorithmRecord.__post_init__"
+        },
+        {
+          "doc": null,
+          "endLine": 124,
+          "kind": "method",
+          "line": 94,
+          "name": "from_mapping",
+          "qualname": "AlgorithmRecord.from_mapping"
+        },
+        {
+          "doc": null,
+          "endLine": 156,
+          "kind": "method",
+          "line": 126,
+          "name": "to_dict",
+          "qualname": "AlgorithmRecord.to_dict"
+        },
+        {
+          "doc": null,
+          "endLine": 161,
+          "kind": "method",
+          "line": 158,
+          "name": "payload_for_hash",
+          "qualname": "AlgorithmRecord.payload_for_hash"
+        },
+        {
+          "doc": null,
+          "endLine": 189,
+          "kind": "class",
+          "line": 165,
+          "name": "AlgorithmSelection",
+          "qualname": "AlgorithmSelection"
+        },
+        {
+          "doc": null,
+          "endLine": 189,
+          "kind": "method",
+          "line": 177,
+          "name": "to_dict",
+          "qualname": "AlgorithmSelection.to_dict"
+        },
+        {
+          "doc": null,
+          "endLine": 217,
+          "kind": "class",
+          "line": 193,
+          "name": "HarAlgorithmExecutionPlan",
+          "qualname": "HarAlgorithmExecutionPlan"
+        },
+        {
+          "doc": null,
+          "endLine": 217,
+          "kind": "method",
+          "line": 205,
+          "name": "to_dict",
+          "qualname": "HarAlgorithmExecutionPlan.to_dict"
+        }
+      ],
+      "workstream": "P16"
+    },
+    {
+      "classes": 0,
+      "functions": 3,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/algorithms/execution_plan.py",
+      "sha256": "4921182f0ba28ea6f6a5ce4f151d581e31c6c03cf588a3d8b9225fa808288f8e",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 99,
+          "kind": "function",
+          "line": 36,
+          "name": "build_har_algorithm_execution_plan",
+          "qualname": "build_har_algorithm_execution_plan"
+        },
+        {
+          "doc": "Sidecar hashes for hashes.json. Not forecast-semantic fields.",
+          "endLine": 118,
+          "kind": "function",
+          "line": 102,
+          "name": "constitution_run_hashes",
+          "qualname": "constitution_run_hashes"
+        },
+        {
+          "doc": null,
+          "endLine": 131,
+          "kind": "function",
+          "line": 121,
+          "name": "persist_har_algorithm_execution_plan",
+          "qualname": "persist_har_algorithm_execution_plan"
+        }
+      ],
+      "workstream": "P16"
+    },
+    {
+      "classes": 0,
+      "functions": 6,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/algorithms/graph.py",
+      "sha256": "7ff38bfbc574b36c70c25130b91737a3aa87d4506b2f9ee012a6bb4828f7c4ae",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 13,
+          "kind": "function",
+          "line": 12,
+          "name": "build_csr",
+          "qualname": "build_csr"
+        },
+        {
+          "doc": null,
+          "endLine": 17,
+          "kind": "function",
+          "line": 16,
+          "name": "cycles",
+          "qualname": "cycles"
+        },
+        {
+          "doc": null,
+          "endLine": 21,
+          "kind": "function",
+          "line": 20,
+          "name": "dag_or_reject",
+          "qualname": "dag_or_reject"
+        },
+        {
+          "doc": null,
+          "endLine": 27,
+          "kind": "function",
+          "line": 24,
+          "name": "traverse",
+          "qualname": "traverse"
+        },
+        {
+          "doc": null,
+          "endLine": 31,
+          "kind": "function",
+          "line": 30,
+          "name": "shortest_undirected",
+          "qualname": "shortest_undirected"
+        },
+        {
+          "doc": null,
+          "endLine": 38,
+          "kind": "function",
+          "line": 34,
+          "name": "hypergraph_from_bundles",
+          "qualname": "hypergraph_from_bundles"
+        }
+      ],
+      "workstream": "P16"
+    },
+    {
+      "classes": 1,
+      "functions": 17,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/algorithms/grouping.py",
+      "sha256": "3e12058547817f8c4f290e5f93ef3ad3da92a51058d2046356de03bdcf68adfa",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 15,
+          "kind": "function",
+          "line": 11,
+          "name": "composite_group",
+          "qualname": "composite_group"
+        },
+        {
+          "doc": null,
+          "endLine": 45,
+          "kind": "class",
+          "line": 18,
+          "name": "UnionFind",
+          "qualname": "UnionFind"
+        },
+        {
+          "doc": null,
+          "endLine": 21,
+          "kind": "method",
+          "line": 19,
+          "name": "__init__",
+          "qualname": "UnionFind.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 28,
+          "kind": "method",
+          "line": 23,
+          "name": "find",
+          "qualname": "UnionFind.find"
+        },
+        {
+          "doc": null,
+          "endLine": 39,
+          "kind": "method",
+          "line": 30,
+          "name": "union",
+          "qualname": "UnionFind.union"
+        },
+        {
+          "doc": null,
+          "endLine": 45,
+          "kind": "method",
+          "line": 41,
+          "name": "components",
+          "qualname": "UnionFind.components"
+        },
+        {
+          "doc": null,
+          "endLine": 56,
+          "kind": "function",
+          "line": 48,
+          "name": "connected_components",
+          "qualname": "connected_components"
+        },
+        {
+          "doc": null,
+          "endLine": 96,
+          "kind": "function",
+          "line": 59,
+          "name": "tarjan_scc",
+          "qualname": "tarjan_scc"
+        },
+        {
+          "doc": null,
+          "endLine": 88,
+          "kind": "method",
+          "line": 67,
+          "name": "strongconnect",
+          "qualname": "tarjan_scc.strongconnect"
+        },
+        {
+          "doc": null,
+          "endLine": 116,
+          "kind": "function",
+          "line": 99,
+          "name": "kahn_layers",
+          "qualname": "kahn_layers"
+        },
+        {
+          "doc": null,
+          "endLine": 120,
+          "kind": "function",
+          "line": 119,
+          "name": "hypergraph_group",
+          "qualname": "hypergraph_group"
+        },
+        {
+          "doc": null,
+          "endLine": 140,
+          "kind": "function",
+          "line": 123,
+          "name": "constraint_group",
+          "qualname": "constraint_group"
+        },
+        {
+          "doc": null,
+          "endLine": 164,
+          "kind": "function",
+          "line": 143,
+          "name": "hierarchical_agglomerative",
+          "qualname": "hierarchical_agglomerative"
+        },
+        {
+          "doc": null,
+          "endLine": 173,
+          "kind": "function",
+          "line": 167,
+          "name": "set_cover_groups",
+          "qualname": "set_cover_groups"
+        },
+        {
+          "doc": null,
+          "endLine": 177,
+          "kind": "function",
+          "line": 176,
+          "name": "topological_group_order",
+          "qualname": "topological_group_order"
+        },
+        {
+          "doc": "Deterministic connected-component fallback when Leiden/Louvain packages are absent.",
+          "endLine": 182,
+          "kind": "function",
+          "line": 180,
+          "name": "louvain_fallback",
+          "qualname": "louvain_fallback"
+        },
+        {
+          "doc": null,
+          "endLine": 186,
+          "kind": "function",
+          "line": 185,
+          "name": "dbscan_fallback",
+          "qualname": "dbscan_fallback"
+        },
+        {
+          "doc": "Tiny 1-D GMM for soft archetype membership (stdlib).",
+          "endLine": 219,
+          "kind": "function",
+          "line": 189,
+          "name": "gaussian_mixture_1d",
+          "qualname": "gaussian_mixture_1d"
+        }
+      ],
+      "workstream": "P16"
+    },
+    {
+      "classes": 8,
+      "functions": 37,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/algorithms/indexing.py",
+      "sha256": "42905fcdd939622d8120486d560a22b1dcb46696598b29065545352847092b38",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 17,
+          "kind": "function",
+          "line": 13,
+          "name": "hash_table",
+          "qualname": "hash_table"
+        },
+        {
+          "doc": null,
+          "endLine": 25,
+          "kind": "function",
+          "line": 20,
+          "name": "content_address",
+          "qualname": "content_address"
+        },
+        {
+          "doc": null,
+          "endLine": 53,
+          "kind": "class",
+          "line": 28,
+          "name": "BloomFilter",
+          "qualname": "BloomFilter"
+        },
+        {
+          "doc": null,
+          "endLine": 32,
+          "kind": "method",
+          "line": 29,
+          "name": "__init__",
+          "qualname": "BloomFilter.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 38,
+          "kind": "method",
+          "line": 34,
+          "name": "_positions",
+          "qualname": "BloomFilter._positions"
+        },
+        {
+          "doc": null,
+          "endLine": 43,
+          "kind": "method",
+          "line": 40,
+          "name": "add",
+          "qualname": "BloomFilter.add"
+        },
+        {
+          "doc": null,
+          "endLine": 50,
+          "kind": "method",
+          "line": 45,
+          "name": "__contains__",
+          "qualname": "BloomFilter.__contains__"
+        },
+        {
+          "doc": null,
+          "endLine": 53,
+          "kind": "method",
+          "line": 52,
+          "name": "might_contain",
+          "qualname": "BloomFilter.might_contain"
+        },
+        {
+          "doc": "Portable XOR-filter stand-in: Bloom with a static snapshot contract.",
+          "endLine": 57,
+          "kind": "class",
+          "line": 56,
+          "name": "XorFilterFallback",
+          "qualname": "XorFilterFallback"
+        },
+        {
+          "doc": null,
+          "endLine": 94,
+          "kind": "class",
+          "line": 60,
+          "name": "CuckooFilter",
+          "qualname": "CuckooFilter"
+        },
+        {
+          "doc": null,
+          "endLine": 64,
+          "kind": "method",
+          "line": 61,
+          "name": "__init__",
+          "qualname": "CuckooFilter.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 67,
+          "kind": "method",
+          "line": 66,
+          "name": "_fp",
+          "qualname": "CuckooFilter._fp"
+        },
+        {
+          "doc": null,
+          "endLine": 70,
+          "kind": "method",
+          "line": 69,
+          "name": "_i1",
+          "qualname": "CuckooFilter._i1"
+        },
+        {
+          "doc": null,
+          "endLine": 73,
+          "kind": "method",
+          "line": 72,
+          "name": "_i2",
+          "qualname": "CuckooFilter._i2"
+        },
+        {
+          "doc": null,
+          "endLine": 90,
+          "kind": "method",
+          "line": 75,
+          "name": "add",
+          "qualname": "CuckooFilter.add"
+        },
+        {
+          "doc": null,
+          "endLine": 94,
+          "kind": "method",
+          "line": 92,
+          "name": "__contains__",
+          "qualname": "CuckooFilter.__contains__"
+        },
+        {
+          "doc": null,
+          "endLine": 120,
+          "kind": "class",
+          "line": 97,
+          "name": "Bitset",
+          "qualname": "Bitset"
+        },
+        {
+          "doc": null,
+          "endLine": 100,
+          "kind": "method",
+          "line": 98,
+          "name": "__init__",
+          "qualname": "Bitset.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 108,
+          "kind": "method",
+          "line": 102,
+          "name": "add",
+          "qualname": "Bitset.add"
+        },
+        {
+          "doc": null,
+          "endLine": 113,
+          "kind": "method",
+          "line": 110,
+          "name": "__contains__",
+          "qualname": "Bitset.__contains__"
+        },
+        {
+          "doc": null,
+          "endLine": 120,
+          "kind": "method",
+          "line": 115,
+          "name": "intersection",
+          "qualname": "Bitset.intersection"
+        },
+        {
+          "doc": null,
+          "endLine": 134,
+          "kind": "function",
+          "line": 123,
+          "name": "merkle_leaves",
+          "qualname": "merkle_leaves"
+        },
+        {
+          "doc": null,
+          "endLine": 148,
+          "kind": "function",
+          "line": 137,
+          "name": "merkle_root",
+          "qualname": "merkle_root"
+        },
+        {
+          "doc": null,
+          "endLine": 168,
+          "kind": "function",
+          "line": 151,
+          "name": "merkle_proof",
+          "qualname": "merkle_proof"
+        },
+        {
+          "doc": null,
+          "endLine": 189,
+          "kind": "class",
+          "line": 171,
+          "name": "CSRGraph",
+          "qualname": "CSRGraph"
+        },
+        {
+          "doc": null,
+          "endLine": 183,
+          "kind": "method",
+          "line": 172,
+          "name": "__init__",
+          "qualname": "CSRGraph.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 186,
+          "kind": "method",
+          "line": 185,
+          "name": "neighbors",
+          "qualname": "CSRGraph.neighbors"
+        },
+        {
+          "doc": null,
+          "endLine": 189,
+          "kind": "method",
+          "line": 188,
+          "name": "predecessors",
+          "qualname": "CSRGraph.predecessors"
+        },
+        {
+          "doc": null,
+          "endLine": 207,
+          "kind": "class",
+          "line": 192,
+          "name": "HypergraphIncidence",
+          "qualname": "HypergraphIncidence"
+        },
+        {
+          "doc": null,
+          "endLine": 195,
+          "kind": "method",
+          "line": 193,
+          "name": "__init__",
+          "qualname": "HypergraphIncidence.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 201,
+          "kind": "method",
+          "line": 197,
+          "name": "add_edge",
+          "qualname": "HypergraphIncidence.add_edge"
+        },
+        {
+          "doc": null,
+          "endLine": 204,
+          "kind": "method",
+          "line": 203,
+          "name": "edges_for",
+          "qualname": "HypergraphIncidence.edges_for"
+        },
+        {
+          "doc": null,
+          "endLine": 207,
+          "kind": "method",
+          "line": 206,
+          "name": "members",
+          "qualname": "HypergraphIncidence.members"
+        },
+        {
+          "doc": null,
+          "endLine": 211,
+          "kind": "function",
+          "line": 210,
+          "name": "bitemporal_key",
+          "qualname": "bitemporal_key"
+        },
+        {
+          "doc": null,
+          "endLine": 218,
+          "kind": "function",
+          "line": 214,
+          "name": "sqlite_composite_index",
+          "qualname": "sqlite_composite_index"
+        },
+        {
+          "doc": null,
+          "endLine": 228,
+          "kind": "function",
+          "line": 221,
+          "name": "open_memory_index",
+          "qualname": "open_memory_index"
+        },
+        {
+          "doc": null,
+          "endLine": 244,
+          "kind": "class",
+          "line": 231,
+          "name": "SimHashIndex",
+          "qualname": "SimHashIndex"
+        },
+        {
+          "doc": null,
+          "endLine": 233,
+          "kind": "method",
+          "line": 232,
+          "name": "__init__",
+          "qualname": "SimHashIndex.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 236,
+          "kind": "method",
+          "line": 235,
+          "name": "add",
+          "qualname": "SimHashIndex.add"
+        },
+        {
+          "doc": null,
+          "endLine": 244,
+          "kind": "method",
+          "line": 238,
+          "name": "nearest",
+          "qualname": "SimHashIndex.nearest"
+        },
+        {
+          "doc": null,
+          "endLine": 260,
+          "kind": "class",
+          "line": 247,
+          "name": "MinHashLSHIndex",
+          "qualname": "MinHashLSHIndex"
+        },
+        {
+          "doc": null,
+          "endLine": 252,
+          "kind": "method",
+          "line": 248,
+          "name": "__init__",
+          "qualname": "MinHashLSHIndex.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 257,
+          "kind": "method",
+          "line": 254,
+          "name": "add",
+          "qualname": "MinHashLSHIndex.add"
+        },
+        {
+          "doc": null,
+          "endLine": 260,
+          "kind": "method",
+          "line": 259,
+          "name": "query",
+          "qualname": "MinHashLSHIndex.query"
+        },
+        {
+          "doc": null,
+          "endLine": 265,
+          "kind": "function",
+          "line": 263,
+          "name": "git_blob_identity",
+          "qualname": "git_blob_identity"
+        }
+      ],
+      "workstream": "P16"
+    },
+    {
+      "classes": 0,
+      "functions": 13,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/algorithms/ml_families.py",
+      "sha256": "70a6d813ca72dcb37d509f1130ae3a28f1d6810c73f462a7e65166a9cf49a86c",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 22,
+          "kind": "function",
+          "line": 15,
+          "name": "ewma",
+          "qualname": "ewma"
+        },
+        {
+          "doc": "Return indexes where a mean shift is detected.",
+          "endLine": 40,
+          "kind": "function",
+          "line": 25,
+          "name": "cusum",
+          "qualname": "cusum"
+        },
+        {
+          "doc": null,
+          "endLine": 61,
+          "kind": "function",
+          "line": 43,
+          "name": "page_hinkley",
+          "qualname": "page_hinkley"
+        },
+        {
+          "doc": null,
+          "endLine": 68,
+          "kind": "function",
+          "line": 64,
+          "name": "empirical_bayes_shrink",
+          "qualname": "empirical_bayes_shrink"
+        },
+        {
+          "doc": "Pool-adjacent-violators; xs used only for pairing/order.",
+          "endLine": 93,
+          "kind": "function",
+          "line": 71,
+          "name": "isotonic_regression",
+          "qualname": "isotonic_regression"
+        },
+        {
+          "doc": null,
+          "endLine": 123,
+          "kind": "function",
+          "line": 96,
+          "name": "_pav_expand",
+          "qualname": "_pav_expand"
+        },
+        {
+          "doc": null,
+          "endLine": 140,
+          "kind": "function",
+          "line": 126,
+          "name": "platt_scale",
+          "qualname": "platt_scale"
+        },
+        {
+          "doc": null,
+          "endLine": 149,
+          "kind": "function",
+          "line": 143,
+          "name": "split_conformal",
+          "qualname": "split_conformal"
+        },
+        {
+          "doc": null,
+          "endLine": 158,
+          "kind": "function",
+          "line": 152,
+          "name": "empirical_quantile",
+          "qualname": "empirical_quantile"
+        },
+        {
+          "doc": null,
+          "endLine": 167,
+          "kind": "function",
+          "line": 161,
+          "name": "zscore_ood",
+          "qualname": "zscore_ood"
+        },
+        {
+          "doc": "Tiny-matrix ridge using Gaussian elimination (stdlib).",
+          "endLine": 185,
+          "kind": "function",
+          "line": 170,
+          "name": "ridge_closed_form",
+          "qualname": "ridge_closed_form"
+        },
+        {
+          "doc": null,
+          "endLine": 203,
+          "kind": "function",
+          "line": 188,
+          "name": "_solve",
+          "qualname": "_solve"
+        },
+        {
+          "doc": null,
+          "endLine": 207,
+          "kind": "function",
+          "line": 206,
+          "name": "not_active_challenger",
+          "qualname": "not_active_challenger"
+        }
+      ],
+      "workstream": "P16"
+    },
+    {
+      "classes": 0,
+      "functions": 15,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/algorithms/registry.py",
+      "sha256": "28b4927f6261919b870daa577bac397f1f9bf8ecac20ec46835fdf8dd34183f7",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 40,
+          "kind": "function",
+          "line": 20,
+          "name": "_candidates",
+          "qualname": "_candidates"
+        },
+        {
+          "doc": null,
+          "endLine": 47,
+          "kind": "function",
+          "line": 43,
+          "name": "registry_path",
+          "qualname": "registry_path"
+        },
+        {
+          "doc": null,
+          "endLine": 52,
+          "kind": "function",
+          "line": 50,
+          "name": "_hash_record",
+          "qualname": "_hash_record"
+        },
+        {
+          "doc": null,
+          "endLine": 62,
+          "kind": "function",
+          "line": 55,
+          "name": "_finalize_records",
+          "qualname": "_finalize_records"
+        },
+        {
+          "doc": null,
+          "endLine": 68,
+          "kind": "function",
+          "line": 65,
+          "name": "catalog_bytes",
+          "qualname": "catalog_bytes"
+        },
+        {
+          "doc": null,
+          "endLine": 72,
+          "kind": "function",
+          "line": 71,
+          "name": "_canonical_registry_bytes",
+          "qualname": "_canonical_registry_bytes"
+        },
+        {
+          "doc": null,
+          "endLine": 83,
+          "kind": "function",
+          "line": 75,
+          "name": "load_registry_payload",
+          "qualname": "load_registry_payload"
+        },
+        {
+          "doc": null,
+          "endLine": 100,
+          "kind": "function",
+          "line": 87,
+          "name": "load_algorithm_registry",
+          "qualname": "load_algorithm_registry"
+        },
+        {
+          "doc": "Hash exact canonical registry bytes (sort_keys JSON + trailing newline).",
+          "endLine": 110,
+          "kind": "function",
+          "line": 103,
+          "name": "algorithm_registry_sha256",
+          "qualname": "algorithm_registry_sha256"
+        },
+        {
+          "doc": null,
+          "endLine": 119,
+          "kind": "function",
+          "line": 113,
+          "name": "require_algorithm",
+          "qualname": "require_algorithm"
+        },
+        {
+          "doc": null,
+          "endLine": 123,
+          "kind": "function",
+          "line": 122,
+          "name": "algorithms_by_lifecycle",
+          "qualname": "algorithms_by_lifecycle"
+        },
+        {
+          "doc": null,
+          "endLine": 127,
+          "kind": "function",
+          "line": 126,
+          "name": "algorithms_by_family",
+          "qualname": "algorithms_by_family"
+        },
+        {
+          "doc": null,
+          "endLine": 134,
+          "kind": "function",
+          "line": 130,
+          "name": "assert_catalog_matches_committed_json",
+          "qualname": "assert_catalog_matches_committed_json"
+        },
+        {
+          "doc": null,
+          "endLine": 138,
+          "kind": "function",
+          "line": 137,
+          "name": "catalog_source_records",
+          "qualname": "catalog_source_records"
+        },
+        {
+          "doc": null,
+          "endLine": 146,
+          "kind": "function",
+          "line": 141,
+          "name": "resolve_implementation",
+          "qualname": "resolve_implementation"
+        }
+      ],
+      "workstream": "P16"
+    },
+    {
+      "classes": 1,
+      "functions": 12,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/algorithms/scheduling.py",
+      "sha256": "7be083aae24bd008824fbecfb4fec6d8b00d715d310dd981d87ea6448895ca3b",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 47,
+          "kind": "function",
+          "line": 11,
+          "name": "requirement_weight",
+          "qualname": "requirement_weight"
+        },
+        {
+          "doc": null,
+          "endLine": 36,
+          "kind": "method",
+          "line": 35,
+          "name": "clip",
+          "qualname": "requirement_weight.clip"
+        },
+        {
+          "doc": null,
+          "endLine": 69,
+          "kind": "function",
+          "line": 50,
+          "name": "acquisition_cost",
+          "qualname": "acquisition_cost"
+        },
+        {
+          "doc": null,
+          "endLine": 79,
+          "kind": "function",
+          "line": 72,
+          "name": "expected_marginal_gain",
+          "qualname": "expected_marginal_gain"
+        },
+        {
+          "doc": null,
+          "endLine": 83,
+          "kind": "function",
+          "line": 82,
+          "name": "utility",
+          "qualname": "utility"
+        },
+        {
+          "doc": "CELF-style lazy greedy maximizer for AcquisitionAction utilities.",
+          "endLine": 131,
+          "kind": "class",
+          "line": 87,
+          "name": "LazyGreedyScheduler",
+          "qualname": "LazyGreedyScheduler"
+        },
+        {
+          "doc": null,
+          "endLine": 103,
+          "kind": "method",
+          "line": 96,
+          "name": "seed",
+          "qualname": "LazyGreedyScheduler.seed"
+        },
+        {
+          "doc": null,
+          "endLine": 122,
+          "kind": "method",
+          "line": 105,
+          "name": "next_action",
+          "qualname": "LazyGreedyScheduler.next_action"
+        },
+        {
+          "doc": null,
+          "endLine": 131,
+          "kind": "method",
+          "line": 124,
+          "name": "run",
+          "qualname": "LazyGreedyScheduler.run"
+        },
+        {
+          "doc": null,
+          "endLine": 149,
+          "kind": "function",
+          "line": 134,
+          "name": "greedy_value_density_pack",
+          "qualname": "greedy_value_density_pack"
+        },
+        {
+          "doc": null,
+          "endLine": 176,
+          "kind": "function",
+          "line": 152,
+          "name": "first_fit_decreasing",
+          "qualname": "first_fit_decreasing"
+        },
+        {
+          "doc": null,
+          "endLine": 181,
+          "kind": "function",
+          "line": 179,
+          "name": "cover_actions",
+          "qualname": "cover_actions"
+        },
+        {
+          "doc": null,
+          "endLine": 192,
+          "kind": "function",
+          "line": 184,
+          "name": "lazy_submodular_select",
+          "qualname": "lazy_submodular_select"
+        }
+      ],
+      "workstream": "P16"
+    },
+    {
+      "classes": 4,
+      "functions": 43,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/algorithms/searching.py",
+      "sha256": "e8cfeff6dc4cf07cf3afbf1fc9bc314a95b554c2c117bc1a9e8ce27011b0f0c3",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 12,
+          "kind": "function",
+          "line": 11,
+          "name": "exact_hash_lookup",
+          "qualname": "exact_hash_lookup"
+        },
+        {
+          "doc": null,
+          "endLine": 16,
+          "kind": "function",
+          "line": 15,
+          "name": "composite_key",
+          "qualname": "composite_key"
+        },
+        {
+          "doc": null,
+          "endLine": 23,
+          "kind": "function",
+          "line": 19,
+          "name": "binary_search",
+          "qualname": "binary_search"
+        },
+        {
+          "doc": null,
+          "endLine": 27,
+          "kind": "function",
+          "line": 26,
+          "name": "range_search",
+          "qualname": "range_search"
+        },
+        {
+          "doc": null,
+          "endLine": 65,
+          "kind": "class",
+          "line": 30,
+          "name": "InvertedIndex",
+          "qualname": "InvertedIndex"
+        },
+        {
+          "doc": null,
+          "endLine": 34,
+          "kind": "method",
+          "line": 31,
+          "name": "__init__",
+          "qualname": "InvertedIndex.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 47,
+          "kind": "method",
+          "line": 36,
+          "name": "add",
+          "qualname": "InvertedIndex.add"
+        },
+        {
+          "doc": null,
+          "endLine": 50,
+          "kind": "method",
+          "line": 49,
+          "name": "postings_for",
+          "qualname": "InvertedIndex.postings_for"
+        },
+        {
+          "doc": null,
+          "endLine": 59,
+          "kind": "method",
+          "line": 52,
+          "name": "boolean_and",
+          "qualname": "InvertedIndex.boolean_and"
+        },
+        {
+          "doc": null,
+          "endLine": 65,
+          "kind": "method",
+          "line": 61,
+          "name": "boolean_or",
+          "qualname": "InvertedIndex.boolean_or"
+        },
+        {
+          "doc": null,
+          "endLine": 97,
+          "kind": "function",
+          "line": 68,
+          "name": "bm25",
+          "qualname": "bm25"
+        },
+        {
+          "doc": null,
+          "endLine": 117,
+          "kind": "function",
+          "line": 100,
+          "name": "bm25f",
+          "qualname": "bm25f"
+        },
+        {
+          "doc": "Block-Max WAND-style Top-K over in-memory BM25 scores.",
+          "endLine": 135,
+          "kind": "function",
+          "line": 120,
+          "name": "wand_topk",
+          "qualname": "wand_topk"
+        },
+        {
+          "doc": null,
+          "endLine": 176,
+          "kind": "class",
+          "line": 138,
+          "name": "Trie",
+          "qualname": "Trie"
+        },
+        {
+          "doc": null,
+          "endLine": 140,
+          "kind": "method",
+          "line": 139,
+          "name": "__init__",
+          "qualname": "Trie.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 146,
+          "kind": "method",
+          "line": 142,
+          "name": "insert",
+          "qualname": "Trie.insert"
+        },
+        {
+          "doc": null,
+          "endLine": 166,
+          "kind": "method",
+          "line": 148,
+          "name": "prefix",
+          "qualname": "Trie.prefix"
+        },
+        {
+          "doc": null,
+          "endLine": 162,
+          "kind": "method",
+          "line": 156,
+          "name": "walk",
+          "qualname": "Trie.prefix.walk"
+        },
+        {
+          "doc": null,
+          "endLine": 176,
+          "kind": "method",
+          "line": 168,
+          "name": "get",
+          "qualname": "Trie.get"
+        },
+        {
+          "doc": null,
+          "endLine": 222,
+          "kind": "class",
+          "line": 179,
+          "name": "AhoCorasick",
+          "qualname": "AhoCorasick"
+        },
+        {
+          "doc": null,
+          "endLine": 183,
+          "kind": "method",
+          "line": 180,
+          "name": "__init__",
+          "qualname": "AhoCorasick.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 196,
+          "kind": "method",
+          "line": 185,
+          "name": "add",
+          "qualname": "AhoCorasick.add"
+        },
+        {
+          "doc": null,
+          "endLine": 211,
+          "kind": "method",
+          "line": 198,
+          "name": "build",
+          "qualname": "AhoCorasick.build"
+        },
+        {
+          "doc": null,
+          "endLine": 222,
+          "kind": "method",
+          "line": 213,
+          "name": "find",
+          "qualname": "AhoCorasick.find"
+        },
+        {
+          "doc": null,
+          "endLine": 241,
+          "kind": "function",
+          "line": 225,
+          "name": "levenshtein",
+          "qualname": "levenshtein"
+        },
+        {
+          "doc": null,
+          "endLine": 251,
+          "kind": "function",
+          "line": 244,
+          "name": "fuzzy_retrieve",
+          "qualname": "fuzzy_retrieve"
+        },
+        {
+          "doc": null,
+          "endLine": 256,
+          "kind": "function",
+          "line": 254,
+          "name": "_stable_hash64",
+          "qualname": "_stable_hash64"
+        },
+        {
+          "doc": null,
+          "endLine": 267,
+          "kind": "function",
+          "line": 259,
+          "name": "minhash_signature",
+          "qualname": "minhash_signature"
+        },
+        {
+          "doc": null,
+          "endLine": 274,
+          "kind": "function",
+          "line": 270,
+          "name": "minhash_jaccard",
+          "qualname": "minhash_jaccard"
+        },
+        {
+          "doc": null,
+          "endLine": 287,
+          "kind": "function",
+          "line": 277,
+          "name": "simhash",
+          "qualname": "simhash"
+        },
+        {
+          "doc": null,
+          "endLine": 291,
+          "kind": "function",
+          "line": 290,
+          "name": "hamming64",
+          "qualname": "hamming64"
+        },
+        {
+          "doc": null,
+          "endLine": 319,
+          "kind": "class",
+          "line": 294,
+          "name": "LSHIndex",
+          "qualname": "LSHIndex"
+        },
+        {
+          "doc": null,
+          "endLine": 298,
+          "kind": "method",
+          "line": 295,
+          "name": "__init__",
+          "qualname": "LSHIndex.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 307,
+          "kind": "method",
+          "line": 300,
+          "name": "add",
+          "qualname": "LSHIndex.add"
+        },
+        {
+          "doc": null,
+          "endLine": 319,
+          "kind": "method",
+          "line": 309,
+          "name": "query",
+          "qualname": "LSHIndex.query"
+        },
+        {
+          "doc": null,
+          "endLine": 327,
+          "kind": "function",
+          "line": 322,
+          "name": "reciprocal_rank_fusion",
+          "qualname": "reciprocal_rank_fusion"
+        },
+        {
+          "doc": null,
+          "endLine": 352,
+          "kind": "function",
+          "line": 330,
+          "name": "maximal_marginal_relevance",
+          "qualname": "maximal_marginal_relevance"
+        },
+        {
+          "doc": null,
+          "endLine": 366,
+          "kind": "function",
+          "line": 355,
+          "name": "bfs",
+          "qualname": "bfs"
+        },
+        {
+          "doc": null,
+          "endLine": 382,
+          "kind": "function",
+          "line": 369,
+          "name": "dfs",
+          "qualname": "dfs"
+        },
+        {
+          "doc": null,
+          "endLine": 379,
+          "kind": "method",
+          "line": 373,
+          "name": "walk",
+          "qualname": "dfs.walk"
+        },
+        {
+          "doc": null,
+          "endLine": 412,
+          "kind": "function",
+          "line": 385,
+          "name": "bidirectional_search",
+          "qualname": "bidirectional_search"
+        },
+        {
+          "doc": null,
+          "endLine": 431,
+          "kind": "function",
+          "line": 415,
+          "name": "_expand_frontier",
+          "qualname": "_expand_frontier"
+        },
+        {
+          "doc": null,
+          "endLine": 460,
+          "kind": "function",
+          "line": 434,
+          "name": "weighted_set_cover",
+          "qualname": "weighted_set_cover"
+        },
+        {
+          "doc": null,
+          "endLine": 503,
+          "kind": "function",
+          "line": 463,
+          "name": "submodular_lazy_greedy",
+          "qualname": "submodular_lazy_greedy"
+        },
+        {
+          "doc": null,
+          "endLine": 522,
+          "kind": "function",
+          "line": 506,
+          "name": "brute_force_cosine",
+          "qualname": "brute_force_cosine"
+        },
+        {
+          "doc": null,
+          "endLine": 513,
+          "kind": "method",
+          "line": 512,
+          "name": "_norm",
+          "qualname": "brute_force_cosine._norm"
+        },
+        {
+          "doc": null,
+          "endLine": 528,
+          "kind": "function",
+          "line": 525,
+          "name": "not_active_challenger",
+          "qualname": "not_active_challenger"
+        }
+      ],
+      "workstream": "P16"
+    },
+    {
+      "classes": 1,
+      "functions": 3,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/algorithms/selection.py",
+      "sha256": "41d7ae99b6d7b583211d0e78c123fa68c6a0f3d0b892d0b787251338157afd0a",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 132,
+          "kind": "class",
+          "line": 50,
+          "name": "AlgorithmSelectionEngine",
+          "qualname": "AlgorithmSelectionEngine"
+        },
+        {
+          "doc": null,
+          "endLine": 56,
+          "kind": "method",
+          "line": 53,
+          "name": "__post_init__",
+          "qualname": "AlgorithmSelectionEngine.__post_init__"
+        },
+        {
+          "doc": null,
+          "endLine": 62,
+          "kind": "method",
+          "line": 58,
+          "name": "record",
+          "qualname": "AlgorithmSelectionEngine.record"
+        },
+        {
+          "doc": null,
+          "endLine": 132,
+          "kind": "method",
+          "line": 64,
+          "name": "select",
+          "qualname": "AlgorithmSelectionEngine.select"
+        }
+      ],
+      "workstream": "P16"
+    },
+    {
+      "classes": 1,
+      "functions": 17,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/algorithms/sorting.py",
+      "sha256": "0f6582cd549ce8804a1dd9cc493741dee4ff9378afe6d9d878fef391d915a944",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 11,
+          "kind": "function",
+          "line": 10,
+          "name": "timsort",
+          "qualname": "timsort"
+        },
+        {
+          "doc": null,
+          "endLine": 21,
+          "kind": "function",
+          "line": 14,
+          "name": "heap_topk",
+          "qualname": "heap_topk"
+        },
+        {
+          "doc": null,
+          "endLine": 31,
+          "kind": "function",
+          "line": 24,
+          "name": "heap_bottomk",
+          "qualname": "heap_bottomk"
+        },
+        {
+          "doc": null,
+          "endLine": 35,
+          "kind": "function",
+          "line": 34,
+          "name": "_key_of",
+          "qualname": "_key_of"
+        },
+        {
+          "doc": null,
+          "endLine": 63,
+          "kind": "function",
+          "line": 38,
+          "name": "quickselect",
+          "qualname": "quickselect"
+        },
+        {
+          "doc": null,
+          "endLine": 53,
+          "kind": "method",
+          "line": 45,
+          "name": "partition",
+          "qualname": "quickselect.partition"
+        },
+        {
+          "doc": null,
+          "endLine": 71,
+          "kind": "function",
+          "line": 66,
+          "name": "introselect",
+          "qualname": "introselect"
+        },
+        {
+          "doc": null,
+          "endLine": 88,
+          "kind": "function",
+          "line": 74,
+          "name": "counting_sort",
+          "qualname": "counting_sort"
+        },
+        {
+          "doc": null,
+          "endLine": 105,
+          "kind": "function",
+          "line": 91,
+          "name": "radix_sort",
+          "qualname": "radix_sort"
+        },
+        {
+          "doc": null,
+          "endLine": 122,
+          "kind": "function",
+          "line": 108,
+          "name": "bucket_sort",
+          "qualname": "bucket_sort"
+        },
+        {
+          "doc": null,
+          "endLine": 143,
+          "kind": "function",
+          "line": 125,
+          "name": "k_way_merge",
+          "qualname": "k_way_merge"
+        },
+        {
+          "doc": null,
+          "endLine": 148,
+          "kind": "function",
+          "line": 146,
+          "name": "external_merge_sort",
+          "qualname": "external_merge_sort"
+        },
+        {
+          "doc": null,
+          "endLine": 163,
+          "kind": "function",
+          "line": 151,
+          "name": "multi_key_sort",
+          "qualname": "multi_key_sort"
+        },
+        {
+          "doc": null,
+          "endLine": 174,
+          "kind": "class",
+          "line": 166,
+          "name": "_Reverse",
+          "qualname": "_Reverse"
+        },
+        {
+          "doc": null,
+          "endLine": 168,
+          "kind": "method",
+          "line": 167,
+          "name": "__init__",
+          "qualname": "_Reverse.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 171,
+          "kind": "method",
+          "line": 170,
+          "name": "__lt__",
+          "qualname": "_Reverse.__lt__"
+        },
+        {
+          "doc": null,
+          "endLine": 174,
+          "kind": "method",
+          "line": 173,
+          "name": "__eq__",
+          "qualname": "_Reverse.__eq__"
+        },
+        {
+          "doc": null,
+          "endLine": 197,
+          "kind": "function",
+          "line": 177,
+          "name": "topological_kahn",
+          "qualname": "topological_kahn"
+        }
+      ],
+      "workstream": "P16"
     },
     {
       "classes": 0,
@@ -129,7 +1951,7 @@
       "classes": 0,
       "functions": 0,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/chat/contracts.py",
-      "sha256": "a55c296a2dc0b9e89f734995cf445768562ef2d827a255d88c62d466e32796d3",
+      "sha256": "910ad68d28947b04acd781133f86f132941d3e0ca3392ee59e3b760600b39aeb",
       "symbols": [],
       "workstream": "P7"
     },
@@ -195,13 +2017,13 @@
       "classes": 0,
       "functions": 1,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/chat/research_bridge.py",
-      "sha256": "476468101c5ed330f33230b3ad79e0a586ef9c5056c00e72e925b7c379bb1ef9",
+      "sha256": "a57d2fcfa5330147eba22d555d68b3afa6d8c95888d928cefc16797f8a2faa3f",
       "symbols": [
         {
           "doc": null,
-          "endLine": 55,
+          "endLine": 61,
           "kind": "function",
-          "line": 13,
+          "line": 14,
           "name": "next_research_batch",
           "qualname": "next_research_batch"
         }
@@ -212,149 +2034,149 @@
       "classes": 1,
       "functions": 17,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/chat/session.py",
-      "sha256": "b13da5fb8378c45a91dc8760911a8208a5f89ad88447b28e12f4b04dd2e9303d",
+      "sha256": "672ef351f3022aed601b76cb5d6190416c45411c68536f068d708149893c19c7",
       "symbols": [
         {
           "doc": null,
-          "endLine": 39,
+          "endLine": 40,
           "kind": "function",
-          "line": 28,
+          "line": 29,
           "name": "_git_commit",
           "qualname": "_git_commit"
         },
         {
           "doc": null,
-          "endLine": 81,
+          "endLine": 89,
           "kind": "function",
-          "line": 42,
+          "line": 43,
           "name": "doctor",
           "qualname": "doctor"
         },
         {
           "doc": "One run directory, one Python probability engine.",
-          "endLine": 307,
+          "endLine": 315,
           "kind": "class",
-          "line": 84,
+          "line": 92,
           "name": "HostSession",
           "qualname": "HostSession"
         },
         {
           "doc": null,
-          "endLine": 89,
+          "endLine": 97,
           "kind": "method",
-          "line": 87,
+          "line": 95,
           "name": "__init__",
           "qualname": "HostSession.__init__"
         },
         {
           "doc": null,
-          "endLine": 96,
+          "endLine": 104,
           "kind": "method",
-          "line": 92,
+          "line": 100,
           "name": "open",
           "qualname": "HostSession.open"
         },
         {
           "doc": null,
-          "endLine": 128,
+          "endLine": 136,
           "kind": "method",
-          "line": 99,
+          "line": 107,
           "name": "prepare",
           "qualname": "HostSession.prepare"
         },
         {
           "doc": null,
-          "endLine": 131,
+          "endLine": 139,
           "kind": "method",
-          "line": 130,
+          "line": 138,
           "name": "_host_state",
           "qualname": "HostSession._host_state"
         },
         {
           "doc": null,
-          "endLine": 140,
+          "endLine": 148,
           "kind": "method",
-          "line": 133,
+          "line": 141,
           "name": "_save_host_state",
           "qualname": "HostSession._save_host_state"
         },
         {
           "doc": null,
-          "endLine": 175,
+          "endLine": 183,
           "kind": "method",
-          "line": 142,
+          "line": 150,
           "name": "_write_prepare_artifacts",
           "qualname": "HostSession._write_prepare_artifacts"
         },
         {
           "doc": null,
-          "endLine": 189,
+          "endLine": 197,
           "kind": "method",
-          "line": 177,
+          "line": 185,
           "name": "next_research_batch",
           "qualname": "HostSession.next_research_batch"
         },
         {
           "doc": null,
-          "endLine": 198,
+          "endLine": 206,
           "kind": "method",
-          "line": 191,
+          "line": 199,
           "name": "import_evidence",
           "qualname": "HostSession.import_evidence"
         },
         {
           "doc": null,
-          "endLine": 234,
+          "endLine": 242,
           "kind": "method",
-          "line": 200,
+          "line": 208,
           "name": "coverage",
           "qualname": "HostSession.coverage"
         },
         {
           "doc": null,
-          "endLine": 268,
+          "endLine": 276,
           "kind": "method",
-          "line": 236,
+          "line": 244,
           "name": "forecast",
           "qualname": "HostSession.forecast"
         },
         {
           "doc": null,
-          "endLine": 275,
+          "endLine": 283,
           "kind": "method",
-          "line": 270,
+          "line": 278,
           "name": "report",
           "qualname": "HostSession.report"
         },
         {
           "doc": null,
-          "endLine": 291,
+          "endLine": 299,
           "kind": "method",
-          "line": 277,
+          "line": 285,
           "name": "resume",
           "qualname": "HostSession.resume"
         },
         {
           "doc": null,
-          "endLine": 296,
+          "endLine": 304,
           "kind": "method",
-          "line": 293,
+          "line": 301,
           "name": "audit",
           "qualname": "HostSession.audit"
         },
         {
           "doc": null,
-          "endLine": 301,
+          "endLine": 309,
           "kind": "method",
-          "line": 298,
+          "line": 306,
           "name": "archive",
           "qualname": "HostSession.archive"
         },
         {
           "doc": null,
-          "endLine": 307,
+          "endLine": 315,
           "kind": "method",
-          "line": 303,
+          "line": 311,
           "name": "settle",
           "qualname": "HostSession.settle"
         }
@@ -3151,23 +4973,31 @@
     },
     {
       "classes": 0,
-      "functions": 2,
+      "functions": 3,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/model/ranking.py",
-      "sha256": "395b074dc1e2941ba68be8cef55ea69a2f39b8903fe6087b1de92ff648aa666b",
+      "sha256": "23e670e11ed45761c01f3f0c06e120a45fd1771b4038adbe0ae0f8e658098d8e",
       "symbols": [
         {
           "doc": null,
-          "endLine": 20,
+          "endLine": 22,
           "kind": "function",
-          "line": 9,
+          "line": 11,
           "name": "selection_score",
           "qualname": "selection_score"
         },
         {
-          "doc": null,
-          "endLine": 48,
+          "doc": "Partial Top-K without requiring a second full-board sort.",
+          "endLine": 31,
           "kind": "function",
-          "line": 23,
+          "line": 25,
+          "name": "frontier_slice",
+          "qualname": "frontier_slice"
+        },
+        {
+          "doc": null,
+          "endLine": 67,
+          "kind": "function",
+          "line": 34,
           "name": "rank_candidates",
           "qualname": "rank_candidates"
         }
@@ -3618,117 +5448,117 @@
       "classes": 0,
       "functions": 14,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/release.py",
-      "sha256": "4589d788a90dc4b928a02e9b768814f7e430edef27a909ba0e83a5fc412a33f0",
+      "sha256": "fead354689dbf5d1222118e252af13138a93dd5bc2ccb554611910f24594cf4a",
       "symbols": [
         {
           "doc": null,
-          "endLine": 38,
+          "endLine": 40,
           "kind": "function",
-          "line": 37,
+          "line": 39,
           "name": "_sha256_bytes",
           "qualname": "_sha256_bytes"
         },
         {
           "doc": null,
-          "endLine": 46,
+          "endLine": 48,
           "kind": "function",
-          "line": 41,
+          "line": 43,
           "name": "repo_root",
           "qualname": "repo_root"
         },
         {
           "doc": null,
-          "endLine": 54,
+          "endLine": 56,
           "kind": "function",
-          "line": 49,
+          "line": 51,
           "name": "package_root",
           "qualname": "package_root"
         },
         {
           "doc": null,
-          "endLine": 62,
+          "endLine": 64,
           "kind": "function",
-          "line": 57,
+          "line": 59,
           "name": "count_pytest_functions",
           "qualname": "count_pytest_functions"
         },
         {
           "doc": "Populate gitCommit from git rev-parse HEAD. FAIL if blank.",
-          "endLine": 82,
+          "endLine": 84,
           "kind": "function",
-          "line": 65,
+          "line": 67,
           "name": "resolve_git_commit",
           "qualname": "resolve_git_commit"
         },
         {
           "doc": "Ordered (relative, absolute) files of the canonical Python package tree.",
-          "endLine": 102,
+          "endLine": 104,
           "kind": "function",
-          "line": 85,
+          "line": 87,
           "name": "canonical_package_files",
           "qualname": "canonical_package_files"
         },
         {
           "doc": null,
-          "endLine": 122,
+          "endLine": 124,
           "kind": "function",
-          "line": 105,
+          "line": 107,
           "name": "build_complete_project_source",
           "qualname": "build_complete_project_source"
         },
         {
           "doc": null,
-          "endLine": 156,
+          "endLine": 158,
           "kind": "function",
-          "line": 125,
+          "line": 127,
           "name": "capability_document",
           "qualname": "capability_document"
         },
         {
           "doc": null,
-          "endLine": 175,
+          "endLine": 177,
           "kind": "function",
-          "line": 159,
+          "line": 161,
           "name": "_ensure_build_deps",
           "qualname": "_ensure_build_deps"
         },
         {
           "doc": "Build an installable pillars-dcm wheel into dest (and dest/../dist if present).",
-          "endLine": 218,
+          "endLine": 220,
           "kind": "function",
-          "line": 178,
+          "line": 180,
           "name": "build_wheel",
           "qualname": "build_wheel"
         },
         {
           "doc": null,
-          "endLine": 350,
+          "endLine": 358,
           "kind": "function",
-          "line": 221,
+          "line": 223,
           "name": "build_portable",
           "qualname": "build_portable"
         },
         {
           "doc": null,
-          "endLine": 384,
+          "endLine": 392,
           "kind": "function",
-          "line": 353,
+          "line": 361,
           "name": "verify_extraction",
           "qualname": "verify_extraction"
         },
         {
           "doc": null,
-          "endLine": 414,
+          "endLine": 422,
           "kind": "function",
-          "line": 387,
+          "line": 395,
           "name": "verify_complete_project_source",
           "qualname": "verify_complete_project_source"
         },
         {
           "doc": null,
-          "endLine": 443,
+          "endLine": 451,
           "kind": "function",
-          "line": 417,
+          "line": 425,
           "name": "main",
           "qualname": "main"
         }
@@ -4521,31 +6351,39 @@
     },
     {
       "classes": 0,
-      "functions": 3,
+      "functions": 4,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/batch.py",
-      "sha256": "7fc25431fc39dc561415c3c73f82c33105c4db05a82a1163463c20ee7901b934",
+      "sha256": "e4b43401d85bcabee96bfbc69b7eeafdee1e32b416649eca5e46f6a9c07a5790",
       "symbols": [
         {
           "doc": null,
-          "endLine": 47,
+          "endLine": 49,
           "kind": "function",
-          "line": 37,
+          "line": 39,
           "name": "scheduler_score",
           "qualname": "scheduler_score"
         },
         {
           "doc": null,
-          "endLine": 58,
+          "endLine": 60,
           "kind": "function",
-          "line": 50,
+          "line": 52,
           "name": "_event_id_of",
           "qualname": "_event_id_of"
         },
         {
           "doc": null,
-          "endLine": 215,
+          "endLine": 64,
           "kind": "function",
-          "line": 61,
+          "line": 63,
+          "name": "_request_id_of",
+          "qualname": "_request_id_of"
+        },
+        {
+          "doc": null,
+          "endLine": 234,
+          "kind": "function",
+          "line": 67,
           "name": "build_next_research_batch",
           "qualname": "build_next_research_batch"
         }
@@ -7099,85 +8937,85 @@
       "classes": 0,
       "functions": 10,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/runner.py",
-      "sha256": "d56b779abb024e86ace23442edcb5879dfe4057f137abaa4ece29545d53a526a",
+      "sha256": "b4cd07462d515f2cea3a89c455d5a8b562f5b88ba5f1ed7ad5e4ca8a9433a943",
       "symbols": [
         {
           "doc": "Always write dest/audit/. Optionally copy+commit+push a GitHub pack.",
-          "endLine": 158,
+          "endLine": 159,
           "kind": "function",
-          "line": 102,
+          "line": 103,
           "name": "_finalize_archive",
           "qualname": "_finalize_archive"
         },
         {
           "doc": null,
-          "endLine": 171,
+          "endLine": 172,
           "kind": "function",
-          "line": 162,
+          "line": 163,
           "name": "_synthetic_path",
           "qualname": "_synthetic_path"
         },
         {
           "doc": null,
-          "endLine": 176,
+          "endLine": 177,
           "kind": "function",
-          "line": 175,
+          "line": 176,
           "name": "_run_id",
           "qualname": "_run_id"
         },
         {
           "doc": "Best-effort git HEAD. Never writes git config. Missing git is None, not a crash.",
-          "endLine": 196,
+          "endLine": 197,
           "kind": "function",
-          "line": 179,
+          "line": 180,
           "name": "_git_commit_sha",
           "qualname": "_git_commit_sha"
         },
         {
           "doc": null,
-          "endLine": 207,
+          "endLine": 208,
           "kind": "function",
-          "line": 199,
+          "line": 200,
           "name": "_default_model_config",
           "qualname": "_default_model_config"
         },
         {
           "doc": null,
-          "endLine": 216,
+          "endLine": 217,
           "kind": "function",
-          "line": 210,
+          "line": 211,
           "name": "_active_calibration",
           "qualname": "_active_calibration"
         },
         {
           "doc": null,
-          "endLine": 1284,
+          "endLine": 1298,
           "kind": "function",
-          "line": 219,
+          "line": 220,
           "name": "run_dcm",
           "qualname": "run_dcm"
         },
         {
           "doc": null,
-          "endLine": 608,
+          "endLine": 622,
           "kind": "method",
-          "line": 601,
+          "line": 615,
           "name": "_snapshot_for",
           "qualname": "run_dcm._snapshot_for"
         },
         {
           "doc": null,
-          "endLine": 953,
+          "endLine": 967,
           "kind": "method",
-          "line": 915,
+          "line": 929,
           "name": "slim",
           "qualname": "run_dcm.slim"
         },
         {
           "doc": null,
-          "endLine": 1402,
+          "endLine": 1416,
           "kind": "function",
-          "line": 1287,
+          "line": 1301,
           "name": "main",
           "qualname": "main"
         }
@@ -8392,7 +10230,7 @@
       "path": "artifacts/dcm_v6_workstream_ab/dcm/signals/__init__.py",
       "sha256": "00db9f3b9378995c70516792ad316dedecede339e9a4653fb7e2a4576506c55d",
       "symbols": [],
-      "workstream": "UNMAPPED"
+      "workstream": "P15"
     },
     {
       "classes": 2,
@@ -8457,7 +10295,7 @@
           "qualname": "SignalCompiler._topological_order"
         }
       ],
-      "workstream": "UNMAPPED"
+      "workstream": "P15"
     },
     {
       "classes": 5,
@@ -8570,7 +10408,7 @@
           "qualname": "SignalOperatorSpec.to_dict"
         }
       ],
-      "workstream": "UNMAPPED"
+      "workstream": "P15"
     },
     {
       "classes": 1,
@@ -8603,7 +10441,7 @@
           "qualname": "audit_donor_matrix"
         }
       ],
-      "workstream": "UNMAPPED"
+      "workstream": "P15"
     },
     {
       "classes": 2,
@@ -8660,7 +10498,7 @@
           "qualname": "SignalExecutor.execute"
         }
       ],
-      "workstream": "UNMAPPED"
+      "workstream": "P15"
     },
     {
       "classes": 2,
@@ -8725,7 +10563,7 @@
           "qualname": "SignalIntegrationGate.validate"
         }
       ],
-      "workstream": "UNMAPPED"
+      "workstream": "P15"
     },
     {
       "classes": 0,
@@ -8750,7 +10588,7 @@
           "qualname": "resolved_overlap_group"
         }
       ],
-      "workstream": "UNMAPPED"
+      "workstream": "P15"
     },
     {
       "classes": 3,
@@ -8847,7 +10685,7 @@
           "qualname": "SignalRegistry.candidates"
         }
       ],
-      "workstream": "UNMAPPED"
+      "workstream": "P15"
     },
     {
       "classes": 0,
@@ -11562,11 +13400,11 @@
       "classes": 0,
       "functions": 6,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_host_native.py",
-      "sha256": "63660261f593eb3b225d96304f9d76eb675831e7df8689179c5d259796d6d32f",
+      "sha256": "2f4ab923e6f4488793a73691b70ecae560fdd10d076619ed73721fe1d86f6cb6",
       "symbols": [
         {
           "doc": null,
-          "endLine": 31,
+          "endLine": 35,
           "kind": "function",
           "line": 20,
           "name": "test_doctor_reports_identity_and_does_not_claim_performance",
@@ -11574,41 +13412,41 @@
         },
         {
           "doc": null,
-          "endLine": 37,
+          "endLine": 41,
           "kind": "function",
-          "line": 34,
+          "line": 38,
           "name": "test_cli_help_exits_zero",
           "qualname": "test_cli_help_exits_zero"
         },
         {
           "doc": null,
-          "endLine": 45,
+          "endLine": 49,
           "kind": "function",
-          "line": 40,
+          "line": 44,
           "name": "test_cli_doctor",
           "qualname": "test_cli_doctor"
         },
         {
           "doc": null,
-          "endLine": 136,
+          "endLine": 147,
           "kind": "function",
-          "line": 48,
+          "line": 52,
           "name": "test_host_session_prepare_next_research_import_coverage_report",
           "qualname": "test_host_session_prepare_next_research_import_coverage_report"
         },
         {
           "doc": null,
-          "endLine": 152,
+          "endLine": 163,
           "kind": "function",
-          "line": 139,
+          "line": 150,
           "name": "test_observation_rejects_secret_url",
           "qualname": "test_observation_rejects_secret_url"
         },
         {
           "doc": null,
-          "endLine": 172,
+          "endLine": 183,
           "kind": "function",
-          "line": 155,
+          "line": 166,
           "name": "test_cli_prepare_synthetic",
           "qualname": "test_cli_prepare_synthetic"
         }
@@ -12701,7 +14539,7 @@
       "classes": 0,
       "functions": 5,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_release_freshness.py",
-      "sha256": "dea2cc80c55a99eb71aa3eb1868d3890c1e986922a84456f455abda9a7e7201d",
+      "sha256": "c8ed42a0fc7e18f616179a6a2c2c31b48f9b2cef86701d325efcc30b3d1cbc7f",
       "symbols": [
         {
           "doc": null,
@@ -12721,7 +14559,7 @@
         },
         {
           "doc": null,
-          "endLine": 59,
+          "endLine": 62,
           "kind": "function",
           "line": 42,
           "name": "test_portable_release_builder_and_extraction",
@@ -12729,17 +14567,17 @@
         },
         {
           "doc": null,
-          "endLine": 67,
+          "endLine": 70,
           "kind": "function",
-          "line": 62,
+          "line": 65,
           "name": "test_release_manifest_requires_git_commit",
           "qualname": "test_release_manifest_requires_git_commit"
         },
         {
           "doc": null,
-          "endLine": 107,
+          "endLine": 110,
           "kind": "function",
-          "line": 70,
+          "line": 73,
           "name": "test_portable_release_git_commit_and_complete_project_source",
           "qualname": "test_portable_release_git_commit_and_complete_project_source"
         }
@@ -13800,5 +15638,5 @@
   "parseErrors": [],
   "root": "artifacts/dcm_v6_workstream_ab",
   "schema": "pillars_dcm.code_inventory.v1",
-  "symbolCount": 1471
+  "symbolCount": 1684
 }

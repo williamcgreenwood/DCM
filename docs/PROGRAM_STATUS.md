@@ -1,8 +1,8 @@
 # DCM Program Status
 
-Canonical integration line: `integration/v6-ml-architecture-20260830` at merge commit `37e78ccfeff0bda74f8592bd46fb7d26e4b158e4` (through PR #16).
+Canonical integration line: `integration/v6-ml-architecture-20260830` at merge commit `cdb428f6a05406184fe265b0a1e81abec92cd1f9` (through PR #17 CFB guarded launch).
 
-Active guarded-launch delivery: PR #17 on `chatgpt/cfb-guarded-launch-20260902`. The CFB work described below is implemented and tested on the PR branch but is not canonical integration truth until PR #17 merges.
+Active R0 delivery: `grok/r0-algorithmic-constitution-20260903` targeting integration only. No merge to `main` is authorized.
 
 This file is the human dashboard. It must be updated on every coding pass together with a new immutable pass record under `docs/engineering_passes/`.
 
@@ -20,7 +20,7 @@ This file is the human dashboard. It must be updated on every coding pass togeth
 | Workstream | Target | Current | State | Next acceptance gate |
 |---|---:|---:|---|---|
 | P0 Canonical spine / HAR / integrity | 10 | 9 | STRONG PARTIAL | preserve authenticated v5.4.1 roots in release retrieval; production root remains independently gated |
-| P1 Universal research / evidence | 10 | 8 | STRONG PARTIAL | execute a current CFB HAR through host web research and close market-specific evidence gaps without blanket board rejection |
+| P1 Universal research / evidence | 10 | 8 | STRONG PARTIAL | R1 BoardGraph / MarketDemandGraph / RequirementGraph / live AcquisitionAction packing; current CFB HAR host research |
 | P2 Feature / state / parameter layer | 10 | 9 | STRONG PARTIAL | validate CFB role-comparable/current/prior support on real boards; activate only evidence-backed signal operators |
 | P3 SportPlugin physics | 10 | 6 | PARTIAL | operationally accept the guarded CFB market set on a current board; continue remaining 24-component plugin bindings sport by sport |
 | P4 Probability / uncertainty / grading / portfolio | 10 | 8 | STRONG PARTIAL | prospective CFB settlement/calibration evidence; universal shared-world/correlation coverage; final-refresh integration |
@@ -35,12 +35,35 @@ This file is the human dashboard. It must be updated on every coding pass togeth
 | P13 Performance / search / token optimization | 10 | 6 | PARTIAL | measured CPU/RSS/token certification; host-performance remains uncertified |
 | P14 Production operations / observability | 10 | 5 | PARTIAL | run health/readiness, failure taxonomy, deterministic recovery, release gates |
 | P15 P380X donor signal governance | 10 | 7 | PARTIAL | Tranche C research truth; exact donor definition compilation only from available archive bytes; evidence-earned activation only |
+| P16 Algorithmic Constitution / strategy registry | 10 | 8 | STRONG PARTIAL | R0 complete in software: constitution, registry, selection engine, HAR plan, CI gates. R1 live Research OS graphs remain |
 
-## 2026 CFB guarded-launch status — PR #17
+Constitution version `DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903` is inherited. Learning revision remains `LR000000`; predictive superiority remains `NONE`; production-root certification remains false.
 
-The PR #17 branch establishes a bounded College Football guarded-launch path without claiming universal football completion or predictive validation.
+## R0 Algorithmic Constitution status
 
-Implemented and tested on the branch:
+Implemented and tested on this branch:
+
+- Permanent constitution document, schema, catalog-generated registry, and SHA-256 of exact committed registry bytes.
+- `AlgorithmSelectionEngine` prefers cheapest exact deterministic strategies; HNSW/Leiden/CP-SAT conditionals emit evaluation telemetry when not activated.
+- HAR `algorithm_execution_plan.json` is persisted by the canonical runner before research.
+- Ranking uses Timsort for the full modeled population and heap partial Top-K for frontier isolation.
+- Research batching consumes weighted set-cover as coverage telemetry and heap Top-K for event ordering without replacing EvidenceGraph/ResearchStore.
+- Release manifests and `hashes.json` carry constitution/registry hashes; those hashes are excluded from `_CONTEXT_FIELDS` forecast identity.
+- Governance tests under `tests/governance/` and CI `--check` gates prevent silent algorithm omission.
+
+Not claimed by R0:
+
+- BoardGraph / MarketDemandGraph / RequirementGraph / live AcquisitionAction packing (R1);
+- Drive-first indexed retrieval as the primary query engine (storage law remains documented; existing ResearchStore/archive path is unchanged);
+- live mixed-sport HAR research OS acceptance;
+- production-root certification;
+- predictive superiority.
+
+## 2026 CFB guarded-launch status — merged via PR #17
+
+The PR #17 branch established a bounded College Football guarded-launch path without claiming universal football completion or predictive validation. It is now on the integration HEAD above.
+
+Implemented and tested:
 
 - HAR accounting remains first; platform modifiers are handled after extraction and existing fail-closed integrity rules remain intact.
 - CFB research completeness is evaluated per prop for modeling instead of using unrelated global missing evidence as a blanket board veto.
@@ -55,9 +78,8 @@ Implemented and tested on the branch:
 - CFB EventWorld context includes competitive, controlled-lead and blowout/starter-curtailment workload regimes; these affect opportunity rather than directly forcing Higher/Lower.
 - ChatGPT-native CFB research instructions request current 2026 and prior 2025 history, current team/opponent/event/venue/weather, depth/availability/transfer/system changes, team tendencies and opponent defense where market-relevant.
 - Dedicated acceptance tests prove 8/8 fixture offers reach probability evaluation and that real-shaped partial evidence can continue per supported CFB prop while the overall bundle remains incomplete.
-- The official generated inventory after this implementation is 229 modules, 1,471 symbols and 0 parse errors.
 
-Not earned by this guarded launch:
+Not earned by the guarded launch:
 
 - prospective CFB calibration;
 - learned reliability thresholds;
@@ -69,17 +91,13 @@ Not earned by this guarded launch:
 - host performance certification;
 - predictive superiority.
 
-A current September 2026 live CFB HAR has not been supplied in this pass. The existing sanitized August 29, 2026 HAR remains historical accounting evidence, not a current forecast acceptance.
-
-Learning revision remains `LR000000`; predictive superiority remains `NONE`; production-root certification remains false.
+A current September 2026 live CFB HAR has not been supplied. The existing sanitized August 29, 2026 HAR remains historical accounting evidence, not a current forecast acceptance.
 
 ## P380X Tranche A/B status
 
 Tranche A accounts for all 58 principal donor components without activating any of them. Exact donor ZIP bytes were not available, so the recorded archive state is `EXACT_ARCHIVE_BYTES_UNAVAILABLE`; the disposition matrix is doctrine/reference data outside the runtime package.
 
 Tranche B provides an executable typed `SignalOperatorSpec`, deterministic compiler/registry, lifecycle and consumer activation gates, SportPlugin/MarketDefinition/unit/temporal validation, dependency DAG and cycle rejection, semantic duplicate suppression, overlap groups, a compact executor, and a canonical FeatureStore consumer. This completes the bounded governance foundation, not the later donor capabilities. No donor forecasting operator is production-active merely because its matrix entry exists.
-
-Learning revision remains `LR000000`; predictive superiority remains `NONE`; production-root certification remains false.
 
 ## Definition of “finished”
 
@@ -98,7 +116,9 @@ The DCM is not “finished” because modules exist. A subsystem reaches 10/10 o
 
 ## Required repository control files
 
-- `AGENTS.md` — coding-agent law.
+- `AGENTS.md` — coding-agent law, including Algorithmic Constitution inheritance.
+- `docs/architecture/DCM_ALGORITHMIC_CONSTITUTION.md` — permanent inherited constitution.
+- `configs/algorithm_registry.json` — machine-readable algorithm registry.
 - `docs/PROGRAM_STATUS.md` — human dashboard.
 - `docs/PROGRAM_STATUS.json` — machine-readable workstream registry.
 - `docs/UNIVERSAL_IMPLEMENTATION_MATRIX_20260831.md` — detailed subsystem audit.
@@ -106,5 +126,7 @@ The DCM is not “finished” because modules exist. A subsystem reaches 10/10 o
 - `docs/engineering_passes/` — append-only pass records.
 - `docs/CHATGPT_NATIVE_EXECUTION_SPEC.md` — host/runtime contract.
 - `scripts/build_code_inventory.py` — generated module/class/function inventory.
+- `scripts/export_algorithm_registry.py` — catalog → committed registry bytes.
 
 No agent may claim “complete” without updating these records and proving the corresponding tests.
+Learning revision remains `LR000000`; predictive superiority remains `NONE`; production-root certification remains false.

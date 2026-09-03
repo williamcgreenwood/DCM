@@ -30,6 +30,8 @@ PATH_WORKSTREAMS = {
     "/selection/": "P4",
     "/runtime/": "P5-P14",
     "/learning/": "P6",
+    "/algorithms/": "P16",
+    "/signals/": "P15",
 }
 
 

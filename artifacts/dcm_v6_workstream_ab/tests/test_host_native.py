@@ -25,6 +25,10 @@ def test_doctor_reports_identity_and_does_not_claim_performance():
     assert report["probabilityEngine"] == "python-dcm"
     assert report["hostComputesProbabilities"] is False
     assert report["hostPerformanceCertified"] is False
+    assert report["algorithmConstitutionVersion"] == "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903"
+    assert report["algorithmConstitution"]["sha256"]
+    assert report["algorithmConstitution"]["registrySha256"]
+    assert "ALGORITHM_CONSTITUTION_UNAVAILABLE" not in (report.get("blockers") or [])
     assert report["v1HashRewritten"] is False
     assert "prepare" in report["commands"]
     assert report["sourceCatalog"]["secretsInRepo"] is False
@@ -67,8 +71,13 @@ def test_host_session_prepare_next_research_import_coverage_report(tmp_path: Pat
         "research_requests.json",
         "universal_host_research_plan.json",
         "universal_research_packets.json",
+        "algorithm_execution_plan.json",
     ):
         assert (dest / name).is_file(), name
+    plan = json.loads((dest / "algorithm_execution_plan.json").read_text())
+    assert plan["constitutionVersion"] == "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903"
+    assert plan["researchMayBegin"] is True
+    assert plan["planHash"]
 
     reqs = json.loads((dest / "research_requests.json").read_text())
     scopes = {r["scope"] for r in reqs}
@@ -82,6 +91,8 @@ def test_host_session_prepare_next_research_import_coverage_report(tmp_path: Pat
     assert "fanout" in batch["priorityFormula"]
     assert (dest / "host_research_batch.json").is_file()
     assert batch["selectedCount"] >= 1
+    assert batch.get("algorithmSelection", {}).get("selectedAlgorithmId") == "ALG-SCHED-001"
+    assert "ALG-SEARCH-019" in (batch.get("algorithmIds") or []) or batch.get("algorithmSelection")
 
     subject = next(r for r in reqs if r["scope"] == "SUBJECT")
     obs = {

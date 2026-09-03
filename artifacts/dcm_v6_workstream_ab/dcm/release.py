@@ -22,6 +22,8 @@ from typing import Any
 
 from dcm.runtime.schema_root import EXPECTED_SHA256, SCHEMA_V2_EXPECTED_SHA256, SCHEMA_V2_ID, sha256_file, v2_schema_path
 from dcm.sports.common.plugin import CAPABILITIES, PRODUCTION, REGISTRY, RESEARCH, SHADOW, UNSUPPORTED
+from dcm.algorithms.constitution import ALGORITHM_CONSTITUTION_VERSION, constitution_sha256
+from dcm.algorithms.registry import algorithm_registry_sha256
 from dcm.version import LEARNING_REVISION, PREDICTIVE_CLAIM, SOFTWARE, load_version_manifest, version_json_path
 
 _SKIP_DIR_NAMES = frozenset({"__pycache__", ".pyc", "egg-info", ".egg-info"})
@@ -255,6 +257,9 @@ def build_portable(
         "optimizedDcm60Claim": False,
         "hostPerformanceCertified": False,
         "gitCommit": git_commit,
+        "algorithmConstitutionVersion": ALGORITHM_CONSTITUTION_VERSION,
+        "algorithmConstitutionSha256": constitution_sha256(),
+        "algorithmRegistrySha256": algorithm_registry_sha256(),
         "schemaId": SCHEMA_V2_ID,
         "schemaHash": schema_hash,
         "schemaHashExpected": SCHEMA_V2_EXPECTED_SHA256,
@@ -344,6 +349,9 @@ Settle a frozen run (outcomes are supplied; never invented):
         "RELEASE_MANIFEST.contentHash": release["contentHash"],
         "COMPLETE_PROJECT_SOURCE.bundleSha256": bundle_sha,
         "gitCommit": git_commit,
+        "algorithmConstitutionVersion": ALGORITHM_CONSTITUTION_VERSION,
+        "algorithmConstitutionSha256": constitution_sha256(),
+        "algorithmRegistrySha256": algorithm_registry_sha256(),
         "wheelSha256": wheel_info.get("sha256"),
     }
     (dest / "HASHES.json").write_text(json.dumps(hashes, indent=2, sort_keys=True) + "\n", encoding="utf-8")
