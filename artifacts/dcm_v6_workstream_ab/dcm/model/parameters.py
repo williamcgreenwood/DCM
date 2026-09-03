@@ -30,6 +30,7 @@ from dcm.research.gridiron_gamelog import normalize_gridiron_logs
 from dcm.research.role_epoch import RoleEpochBuilder
 from dcm.research.scopes import claims_for
 from dcm.sports.football.research_requirements import assess_football_support
+from dcm.sports.football.cfb_role import resolve_cfb_role_state
 
 
 def _f(v: Any, default: float) -> float:
@@ -452,6 +453,12 @@ def build_parameter_snapshot(
             definition_verified=bool(market.get("definition_verified")),
             team_event=team_event,
         )
+        if cfb_role_state and not cfb_role_state.get("resolved"):
+            football_support["playableSupport"] = False
+            football_support["playableBlockers"] = list(dict.fromkeys([
+                *(football_support.get("playableBlockers") or []),
+                "CFB_ROLE_STATE_UNCERTAIN",
+            ]))
         # Market-specific support counts replace generic all-purpose support for
         # guarded-launch decisions. Pure opportunity markets do not require an
         # irrelevant efficiency sample just to be modelable.
