@@ -1,7 +1,7 @@
 {
   "schema": "pillars_dcm.dcm6_ros_requirement_trace.v1",
   "specId": "DCM6-ROS-EG-001",
-  "updatedAtUtc": "2026-09-01T19:30:00Z",
+  "updatedAtUtc": "2026-09-03T06:14:00Z",
   "predictiveClaim": "NONE",
   "learningRevision": "LR000000",
   "requirements": [
@@ -76,6 +76,90 @@
       "auditArtifact": "CompiledOperator.reasons",
       "status": "COMPLETE",
       "evidence": "Confidence-to-probability, forced prediction/inverse/card size, filler, fraud, leak and host-specific mandatory behaviors fail closed; direct probability and hard-gate override flags are structurally forbidden"
+    },
+    {
+      "requirement": "Evaluate CFB research sufficiency per prop instead of using unrelated global bundle gaps as a blanket modeling veto",
+      "specSection": "CFB guarded launch / research modelability",
+      "code": "artifacts/dcm_v6_workstream_ab/dcm/sports/football/research_requirements.py; artifacts/dcm_v6_workstream_ab/dcm/runner.py",
+      "schema": "minimum_model_support + model_support + playableSupport",
+      "test": "artifacts/dcm_v6_workstream_ab/tests/test_cfb_guarded_launch.py::test_real_cfb_partial_global_bundle_does_not_checkpoint_supported_rows",
+      "runtimeProducer": "assess_football_support / build_parameter_snapshot",
+      "runtimeConsumer": "run_dcm CFB classification and selection firewall",
+      "auditArtifact": "research_partial.json",
+      "status": "IMPLEMENTED_TESTED",
+      "evidence": "Real-shaped CFB partial evidence continues supported rows while preserving globally incomplete research as an audit signal; zero-evidence checkpoint behavior remains fail-closed"
+    },
+    {
+      "requirement": "Separate opportunity-only CFB market support from efficiency-dependent market support",
+      "specSection": "CFB guarded launch / evidence sufficiency",
+      "code": "artifacts/dcm_v6_workstream_ab/dcm/sports/football/research_requirements.py; artifacts/dcm_v6_workstream_ab/dcm/model/parameters.py",
+      "schema": "market-specific football evidence requirements",
+      "test": "artifacts/dcm_v6_workstream_ab/tests/test_gridiron_plugin.py",
+      "runtimeProducer": "football market support resolver",
+      "runtimeConsumer": "ParameterSnapshot minimum model support and production eligibility",
+      "auditArtifact": "ParameterSnapshot.model_support",
+      "status": "IMPLEMENTED_TESTED",
+      "evidence": "pass_att and rush_att do not require irrelevant yardage efficiency; yardage/conversion markets retain relevant efficiency support requirements"
+    },
+    {
+      "requirement": "Model explicit early-season CFB role states without 1:1 transfer opportunity carryover",
+      "specSection": "CFB guarded launch / role state",
+      "code": "artifacts/dcm_v6_workstream_ab/dcm/sports/football/cfb_role.py",
+      "schema": "CFB role-state enum and carryover flags",
+      "test": "artifacts/dcm_v6_workstream_ab/tests/test_gridiron_plugin.py",
+      "runtimeProducer": "resolve_cfb_role_state",
+      "runtimeConsumer": "ParameterSnapshot / PLAYABLE support",
+      "auditArtifact": "ParameterSnapshot.cfb_role_state",
+      "status": "IMPLEMENTED_TESTED",
+      "evidence": "Returning, rotation, promoted, transfer, true-freshman, new-QB, new-system, injury-return and uncertain states are explicit; ROLE_UNCERTAIN blocks PLAYABLE support and transfer opportunity carryover is false"
+    },
+    {
+      "requirement": "Represent CFB competitive, controlled-lead and blowout starter-curtailment as opportunity regimes rather than prop-direction rules",
+      "specSection": "CFB guarded launch / EventWorld",
+      "code": "artifacts/dcm_v6_workstream_ab/dcm/model/gridiron_models.py; artifacts/dcm_v6_workstream_ab/dcm/model/worlds.py",
+      "schema": "GRIDIRON_TEAM_EVENT_V2_CFB_REGIMES_2026-09-02",
+      "test": "artifacts/dcm_v6_workstream_ab/tests/test_gridiron_plugin.py",
+      "runtimeProducer": "gridiron team/event context and shared regime draw",
+      "runtimeConsumer": "simulate_player_worlds opportunity quantities",
+      "auditArtifact": "ParameterSnapshot.event_regime_weights",
+      "status": "IMPLEMENTED_TESTED",
+      "evidence": "Regime context modifies pass/rush/routes opportunity and starter curtailment; it does not directly force Higher or Lower"
+    },
+    {
+      "requirement": "Support verified CFB pass attempts, pass completions and rush attempts through football primitive, settlement, market-derive and simulation paths",
+      "specSection": "CFB guarded launch / physical markets",
+      "code": "artifacts/dcm_v6_workstream_ab/dcm/sports/common/plugin.py; artifacts/dcm_v6_workstream_ab/dcm/model/worlds.py; artifacts/dcm_v6_workstream_ab/dcm/model/market_derive.py; artifacts/dcm_v6_workstream_ab/dcm/sports/football/settlement_map.py",
+      "schema": "football market aliases and primitive derivation",
+      "test": "artifacts/dcm_v6_workstream_ab/tests/test_gridiron_plugin.py; artifacts/dcm_v6_workstream_ab/tests/test_cfb_guarded_launch.py",
+      "runtimeProducer": "gridiron EventWorld primitive stats",
+      "runtimeConsumer": "market derivation / probability distribution",
+      "auditArtifact": "CFB guarded-launch classified rows and probability bundle",
+      "status": "IMPLEMENTED_TESTED",
+      "evidence": "Guarded market set includes pass_yds, pass_att, pass_cmp, rush_yds, rush_att, rec_yds, receptions, pass_rush_yds and rush_rec_yds"
+    },
+    {
+      "requirement": "Give ChatGPT-native CFB research explicit current/prior history, role, team, opponent, event and environment instructions while reusing the canonical evidence pipeline",
+      "specSection": "CFB guarded launch / host research bridge",
+      "code": "artifacts/dcm_v6_workstream_ab/dcm/research/host_plan.py",
+      "schema": "universal host research task scopes",
+      "test": "full repository CI plus CFB guarded-launch acceptance suite",
+      "runtimeProducer": "host research planner",
+      "runtimeConsumer": "dcm-host next-research / evidence import / ResearchStore / EvidenceGraph",
+      "auditArtifact": "host research plan and imported EvidenceClaims",
+      "status": "IMPLEMENTED_TESTED",
+      "evidence": "CFB instructions request 2026 and 2025 history, depth/availability/transfers/system changes, team tendencies, opponent defense, venue/weather and market definitions without introducing a second truth store"
+    },
+    {
+      "requirement": "Prove a bounded CFB HAR-to-probability acceptance path without claiming calibration",
+      "specSection": "CFB guarded launch / acceptance",
+      "code": "artifacts/dcm_v6_workstream_ab/fixtures/cfb_guarded_launch_har.json",
+      "schema": "8-offer synthetic CFB guarded-launch HAR",
+      "test": "artifacts/dcm_v6_workstream_ab/tests/test_cfb_guarded_launch.py::test_cfb_guarded_launch_har_to_probability_fixture",
+      "runtimeProducer": "HAR ingest -> ResearchPopulation -> ParameterSnapshot -> EventWorld",
+      "runtimeConsumer": "from_worlds Higher/Lower/Push probability bundle",
+      "auditArtifact": "CI test result",
+      "status": "IMPLEMENTED_TESTED",
+      "evidence": "8/8 fixture offers reach probability evaluation and satisfy the probability simplex; this is functional acceptance, not predictive validation or calibration"
     }
   ]
 }
