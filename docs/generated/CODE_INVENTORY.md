@@ -2,10 +2,10 @@
 
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
-- Modules: **217**
-- Symbols: **1384**
+- Modules: **226**
+- Symbols: **1455**
 - Parse errors: **0**
-- Inventory hash: `9e0f2de43cf1623f8795956ed6682960dcbcf767ceade289aba3ccce1b8bd6d2`
+- Inventory hash: `13dac424a7978adf14ba786f047deb31859bb185f783eeb81edaa4703a89bf98`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -51,7 +51,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P6 | `artifacts/dcm_v6_workstream_ab/dcm/learning/sidecar.py` | 0 | 5 |
 | P6 | `artifacts/dcm_v6_workstream_ab/dcm/learning/walkforward.py` | 1 | 15 |
 | P2 | `artifacts/dcm_v6_workstream_ab/dcm/ml/__init__.py` | 0 | 0 |
-| P2 | `artifacts/dcm_v6_workstream_ab/dcm/ml/feature_store.py` | 1 | 7 |
+| P2 | `artifacts/dcm_v6_workstream_ab/dcm/ml/feature_store.py` | 1 | 8 |
 | P2-P4 | `artifacts/dcm_v6_workstream_ab/dcm/model/__init__.py` | 0 | 0 |
 | P2-P4 | `artifacts/dcm_v6_workstream_ab/dcm/model/availability.py` | 0 | 2 |
 | P2-P4 | `artifacts/dcm_v6_workstream_ab/dcm/model/basketball_efficiency.py` | 1 | 6 |
@@ -143,6 +143,14 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P4 | `artifacts/dcm_v6_workstream_ab/dcm/selection/eligibility.py` | 1 | 3 |
 | P4 | `artifacts/dcm_v6_workstream_ab/dcm/selection/portfolio.py` | 0 | 5 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/settle.py` | 0 | 1 |
+| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/signals/__init__.py` | 0 | 0 |
+| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/signals/compiler.py` | 2 | 5 |
+| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/signals/contracts.py` | 5 | 8 |
+| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/signals/donor_accounting.py` | 1 | 2 |
+| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/signals/executor.py` | 2 | 4 |
+| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/signals/integration_gate.py` | 2 | 5 |
+| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/signals/overlap.py` | 0 | 2 |
+| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/signals/registry.py` | 3 | 8 |
 | P3 | `artifacts/dcm_v6_workstream_ab/dcm/sports/__init__.py` | 0 | 0 |
 | P3 | `artifacts/dcm_v6_workstream_ab/dcm/sports/baseball/__init__.py` | 0 | 0 |
 | P3 | `artifacts/dcm_v6_workstream_ab/dcm/sports/baseball/pa.py` | 0 | 2 |
@@ -216,6 +224,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_runtime_lineage.py` | 0 | 5 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_schema_v2_fields.py` | 0 | 4 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_settlement_population.py` | 0 | 6 |
+| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_signal_governance.py` | 0 | 21 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_source_catalog.py` | 0 | 3 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_sport_plugin_full_contract.py` | 0 | 3 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_sport_research_schema.py` | 0 | 3 |
@@ -597,14 +606,15 @@ _No class/function symbols._
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/ml/feature_store.py`
 
-- `function` **_s** L39
-- `function` **feature_record** L43
-- `function` **_identity** L72
-- `function` **_logs_from_packet** L80
-- `class` **FeatureStore** L85 — Build cutoff-immutable feature records from a PlayerResearchPacket.
-- `method` **FeatureStore.build_from_packet** L92
-- `method` **FeatureStore.build_from_packet.add** L110
-- `function` **persist_feature_store** L193 — Write feature_store.jsonl + feature_store_manifest.json. Observations only.
+- `function` **signal_evaluation_feature_records** L44 — Canonical consumer for ACTIVE_FEATURE signal outputs.
+- `function` **_s** L80
+- `function` **feature_record** L84
+- `function` **_identity** L113
+- `function` **_logs_from_packet** L121
+- `class` **FeatureStore** L126 — Build cutoff-immutable feature records from a PlayerResearchPacket.
+- `method` **FeatureStore.build_from_packet** L133
+- `method` **FeatureStore.build_from_packet.add** L151
+- `function` **persist_feature_store** L234 — Write feature_store.jsonl + feature_store_manifest.json. Observations only.
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/model/__init__.py`
 
@@ -1552,6 +1562,80 @@ _No class/function symbols._
 
 - `function` **main** L15
 
+### `artifacts/dcm_v6_workstream_ab/dcm/signals/__init__.py`
+
+_No class/function symbols._
+
+### `artifacts/dcm_v6_workstream_ab/dcm/signals/compiler.py`
+
+- `class` **SignalCompileError** L13
+- `class` **SignalCompiler** L17
+- `method` **SignalCompiler.__init__** L18
+- `method` **SignalCompiler.compile** L21
+- `method` **SignalCompiler._cycle_members** L94
+- `method` **SignalCompiler._cycle_members.visit** L99
+- `method` **SignalCompiler._topological_order** L118
+
+### `artifacts/dcm_v6_workstream_ab/dcm/signals/contracts.py`
+
+- `class` **SignalStage** L10
+- `class` **LifecycleState** L19
+- `class` **SignalField** L34
+- `method` **SignalField.__post_init__** L41
+- `method` **SignalField.from_mapping** L50
+- `method` **SignalField.to_dict** L59
+- `class` **EvidenceRequirement** L70
+- `method` **EvidenceRequirement.from_mapping** L76
+- `method` **EvidenceRequirement.to_dict** L83
+- `class` **SignalOperatorSpec** L92
+- `method` **SignalOperatorSpec.__post_init__** L119
+- `method` **SignalOperatorSpec.from_mapping** L135 — Parse without mutating or destructively canonicalizing source JSON.
+- `method` **SignalOperatorSpec.to_dict** L166
+
+### `artifacts/dcm_v6_workstream_ab/dcm/signals/donor_accounting.py`
+
+- `class` **DonorAccountingReport** L20
+- `method` **DonorAccountingReport.to_dict** L27
+- `function` **audit_donor_matrix** L39
+
+### `artifacts/dcm_v6_workstream_ab/dcm/signals/executor.py`
+
+- `function` **_hash** L17
+- `class` **SignalEvaluation** L23
+- `method` **SignalEvaluation.to_dict** L37
+- `class` **SignalExecutor** L56
+- `method` **SignalExecutor.__init__** L57
+- `method` **SignalExecutor.execute** L61
+
+### `artifacts/dcm_v6_workstream_ab/dcm/signals/integration_gate.py`
+
+- `class` **BindingCatalog** L42
+- `method` **BindingCatalog.sport_exists** L50
+- `method` **BindingCatalog.market_is_applicable** L53
+- `method` **BindingCatalog.unit_for** L56
+- `class` **SignalIntegrationGate** L60
+- `method` **SignalIntegrationGate.__init__** L61
+- `method` **SignalIntegrationGate.validate** L64
+
+### `artifacts/dcm_v6_workstream_ab/dcm/signals/overlap.py`
+
+- `function` **semantic_signature** L10
+- `function` **resolved_overlap_group** L36
+
+### `artifacts/dcm_v6_workstream_ab/dcm/signals/registry.py`
+
+- `class` **CompiledOperator** L13
+- `method` **CompiledOperator.to_dict** L20
+- `class` **CompiledRegistry** L31
+- `method` **CompiledRegistry.by_id** L36
+- `method` **CompiledRegistry.counts** L39
+- `method` **CompiledRegistry.build** L49
+- `class` **SignalRegistry** L61
+- `method` **SignalRegistry.__init__** L62
+- `method` **SignalRegistry.register** L65
+- `method` **SignalRegistry.extend** L70
+- `method` **SignalRegistry.candidates** L74
+
 ### `artifacts/dcm_v6_workstream_ab/dcm/sports/__init__.py`
 
 _No class/function symbols._
@@ -2217,6 +2301,30 @@ _No class/function symbols._
 - `function` **test_settle_card_only_subset** L127
 - `function` **test_settle_missing_outcome_is_unknown_platform_rule** L140
 - `function` **test_ledger_append_does_not_rewrite_frozen_forecast** L152
+
+### `artifacts/dcm_v6_workstream_ab/tests/test_signal_governance.py`
+
+- `function` **field** L21
+- `function` **spec** L25
+- `function` **compiled_one** L46
+- `function` **test_active_operator_with_zero_consumer_fails_activation** L50
+- `function` **test_dependency_cycle_fails_compile** L56
+- `function` **test_active_dependency_must_also_be_executable** L65
+- `function` **test_missing_unit_or_dimension_fails_contract_ingestion** L75
+- `function` **test_baseball_pitch_operator_cannot_bind_to_hockey_generically** L82
+- `function` **test_invalid_market_definition_pair_fails** L97
+- `function` **test_post_cutoff_input_fails** L109
+- `function` **test_compiled_hash_is_deterministic_across_source_ordering** L114
+- `function` **test_semantic_duplicates_do_not_execute_twice** L122
+- `method` **test_semantic_duplicates_do_not_execute_twice.handler** L128
+- `function` **test_overlap_groups_are_preserved_for_related_non_duplicates** L137
+- `function` **test_rejected_donor_behavior_cannot_activate** L147
+- `function` **test_probability_and_hard_gate_override_flags_are_structurally_impossible** L153
+- `function` **test_active_hard_gate_requires_canonical_authorization** L160
+- `function` **test_feature_store_is_an_explicit_runtime_consumer** L174
+- `function` **test_donor_matrix_accounts_for_all_58_without_activation** L189
+- `function` **test_donor_matrix_cannot_silently_self_activate** L198
+- `function` **test_schema_is_draft_2020_12_and_source_parse_is_non_destructive** L207
 
 ### `artifacts/dcm_v6_workstream_ab/tests/test_source_catalog.py`
 

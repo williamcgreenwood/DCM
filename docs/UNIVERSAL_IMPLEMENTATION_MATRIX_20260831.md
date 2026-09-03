@@ -1,6 +1,6 @@
 # DCM universal implementation matrix — 2026-08-31
 
-Baseline audited and governance-refreshed: PR #10 head `c9e75c7259d176d3014af8fc9163706e5589d139` after the SportPlugin-contract tranche merged.
+Baseline refreshed through PR #15 merge `8311b2aaeef16b508b6ef21c01c22ad990b9ad5d` and the P380X Tranche A/B child branch.
 This matrix is code-path status, not predictive validation. LR remains
 `LR000000`; predictive superiority remains `NONE`.
 
@@ -18,7 +18,7 @@ Status meanings:
 | Subsystem | Status | Evidence / action |
 |---|---|---|
 | Python single canonical engine | COMPLETE | Python runner is authoritative; viewer/UI is not a second probability engine. |
-| Exact v5.4.1 root expectations | COMPLETE as gate | Expected source/ledger hashes are frozen; bytes are not mounted in repo, so production root remains closed. |
+| Exact v5.4.1 root authentication | COMPLETE as root-of-trust verification | Exact source (3,222,380 bytes) and learning ledger (3,953,122 bytes) match both frozen SHA-256 values. Repository-local runtime mounting/release retrieval remains separate; production root remains closed. |
 | Learning revision / predictive claim separation | COMPLETE | LR000000 and predictive NONE remain explicit. |
 | HAR board accounting | COMPLETE for current supported capture paths | Existing P0–P8 tests enforce accounting, Goblin exclusion after counting, side/modifier fail-closed and started-event gates. |
 | Green Goblin prohibition | COMPLETE | Extract/account then exclude from selectable population. |
@@ -67,6 +67,7 @@ Status meanings:
 | ParameterSnapshot | PARTIAL | Snapshots expose layered SUBJECT/AFFILIATION/COUNTERPARTY/EVENT/ENVIRONMENT/MARKET/AVAILABILITY/PARTICIPATION/OPPORTUNITY/EFFICIENCY containers plus evidence-hash lineage. PLAYER/TEAM remain compatibility scopes_used. |
 | ML model registry with training metadata | PARTIAL | Governance pieces exist; not every active parameter model is an earned trained ML champion. |
 | No-fake-ML gate | COMPLETE as doctrine/gate | Predictive superiority remains NONE and LR000000; engineering simulations are not mislabeled trained superiority. |
+| Governed signal operators | PARTIAL, executable foundation | Tranche B provides typed contracts, SportPlugin/MarketDefinition/unit/cutoff validation, deterministic DAG compilation, semantic dedupe/overlap groups, consumer/test activation gates, executor audit hashes, and a FeatureStore consumer. No donor operator is active from documentation alone; Tranche C+ capabilities remain future work. |
 
 ## P3 — sport physics
 
@@ -127,11 +128,11 @@ Status meanings:
 
 ## Highest-priority next code migrations
 
-1. Drive a fresh-host wheel+HAR acceptance test through `dcm-host` without a source checkout.
-2. Close remaining PLAYER/TEAM claim lookups so they exist only inside source/sport adapters.
-3. Close remaining PARTIAL SportPlugin bindings (FeatureSchema, EnvironmentModel, MarketDefinitionRegistry/minimal, ValidationSuite).
-4. Finish one reference sport end to end under the 24-component interface.
-5. High-volume queryable research artifact store referenced by hashes.
+1. P380X Tranche C: Research Truth Integration using the existing StatePack/EvidenceGraph/freshness path.
+2. Drive a fresh-host wheel+HAR acceptance test through `dcm-host` without a source checkout.
+3. Close remaining PLAYER/TEAM claim lookups so they exist only inside source/sport adapters.
+4. Close remaining PARTIAL SportPlugin bindings (FeatureSchema, EnvironmentModel, MarketDefinitionRegistry/minimal, ValidationSuite).
+5. Finish one reference sport end to end under the 24-component interface.
 6. Accumulate chronological settlements before any predictive or Learning Revision promotion.
 
 ## P7–P14 completion program
@@ -148,5 +149,6 @@ The detailed P0–P6 matrix remains the modeling/system audit. The following wor
 | P12 Research archive/index/reuse | PARTIAL | Content-addressed `ResearchStore` hydrates blobs (not pointers) for delta classification, entity/source/as-of indexes, append-only game-log merge, outcome memory that cannot decide reuse, and DAG invalidation by delta class. High-volume DB/object store still future. |
 | P13 Performance/search/token optimization | PARTIAL | Fan-out × importance × freshness × uncertainty / cost scheduler and event batching exist. Host performance is not certified. |
 | P14 Production operations/observability | PARTIAL | Host doctor, run_manifest, host_state, engineering-pass ledger. Full ops health/recovery remains. |
+| P15 P380X donor signal governance | PARTIAL | Tranche A/B is executable and tested: 58/58 dispositions, zero implicit activations, typed compiler/registry/executor, deterministic hashes, semantic/cross-sport/unit/cutoff gates, and FeatureStore consumer. Research-truth, matchup, decision, learning, and portfolio donor tranches are not implemented by this pass. |
 
 See `docs/PROGRAM_STATUS.md`, `docs/PROGRAM_STATUS.json`, `docs/CHATGPT_NATIVE_EXECUTION_SPEC.md`, and `docs/engineering_passes/`.
