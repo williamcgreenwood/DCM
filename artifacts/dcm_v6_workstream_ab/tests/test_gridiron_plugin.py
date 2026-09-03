@@ -282,7 +282,8 @@ def test_nfl_and_cfb_row_reaches_modeled_path_with_fixture():
     }
     cfb_claims = [
         _claim("PLAYER", "CFB_QB_001", {
-            "status": "ACTIVE", "role": "QB", "game_logs": cfb_packet["gameLogs"],
+            "status": "ACTIVE", "role": "QB", "depth_chart_role": "starter", "prior_season_starts": 8,
+            "game_logs": cfb_packet["gameLogs"],
             "opportunity": {"support_n": cfb_packet["gameLogCount"]},
             "efficiency": {"support_n": cfb_packet["gameLogCount"]},
         }),
