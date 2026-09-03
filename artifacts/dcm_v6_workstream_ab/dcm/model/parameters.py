@@ -409,6 +409,11 @@ def build_parameter_snapshot(
         params["pace"] = team_event.get("pace")
         params["pass_defense"] = team_event.get("pass_defense")
         params["rush_defense"] = team_event.get("rush_defense")
+        params["league"] = league
+        params["consensus_spread"] = team_event.get("consensus_spread")
+        params["game_total"] = team_event.get("game_total")
+        params["event_regime_weights"] = team_event.get("event_regime_weights")
+        params["starter_curtailment"] = team_event.get("starter_curtailment")
         params["priorWeight"] = shrinkage_out.get("priorWeight")
         params["playerWeight"] = shrinkage_out.get("seasonWeight")
         params["roleWeight"] = shrinkage_out.get("roleWeight")
