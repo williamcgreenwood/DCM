@@ -99,6 +99,7 @@ def generate_event_contexts(
             "efficiency": _clip(rng.gauss(1.0, 0.045), 0.86, 1.14),
             "opportunity": _clip(rng.gauss(1.0, 0.045), 0.86, 1.14),
             "environment": _clip(rng.gauss(1.0, 0.035), 0.88, 1.12),
+            "regime_draw": rng.random(),
         })
     return out
 
@@ -124,12 +125,26 @@ def _contextualize(
             if key in p:
                 p[key] = _p(p, key, 0.5) * eff
     elif family == "gridiron":
+        regime_multiplier = 1.0
+        regime_state = "COMPETITIVE"
+        weights = p.get("event_regime_weights") if isinstance(p.get("event_regime_weights"), dict) else {}
+        curtail = p.get("starter_curtailment") if isinstance(p.get("starter_curtailment"), dict) else {}
+        draw = float(context.get("regime_draw", 0.5))
+        competitive = float(weights.get("competitive") or 1.0)
+        controlled = float(weights.get("controlled_lead") or 0.0)
+        if draw >= competitive + controlled:
+            regime_state = "BLOWOUT"
+            regime_multiplier = float(curtail.get("blowout") or 0.72)
+        elif draw >= competitive:
+            regime_state = "CONTROLLED_LEAD"
+            regime_multiplier = float(curtail.get("controlled_lead") or 0.90)
         for key in ("pass_att_mean", "rush_att_mean", "routes_mean"):
             if key in p:
-                p[key] = _p(p, key, 0.0) * opp
+                p[key] = _p(p, key, 0.0) * opp * regime_multiplier
         for key in ("pass_ypa", "rush_ypa", "rec_ypr"):
             if key in p:
                 p[key] = _p(p, key, 0.0) * eff * env
+        p["_event_regime"] = regime_state
     elif family == "baseball":
         if "pa_mean" in p:
             p["pa_mean"] = _p(p, "pa_mean", 4.2) * opp
