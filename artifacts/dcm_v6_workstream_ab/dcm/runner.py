@@ -510,6 +510,7 @@ def run_dcm(
     # offers may continue through partial research for per-prop modelability.
     cfb_guarded_research_continue = (
         not synthetic
+        and bool(bundle.get("claims"))
         and any(
             str(r.get("sportFamily") or "") == "gridiron"
             and str(r.get("league") or "").upper() == "CFB"
