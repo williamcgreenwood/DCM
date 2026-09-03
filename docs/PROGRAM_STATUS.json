@@ -1,8 +1,8 @@
 {
   "schema": "pillars_dcm.program_status.v1",
-  "updatedAtUtc": "2026-09-01T19:30:00Z",
+  "updatedAtUtc": "2026-09-03T06:12:00Z",
   "canonicalIntegrationBranch": "integration/v6-ml-architecture-20260830",
-  "canonicalIntegrationPr": 15,
+  "canonicalIntegrationPr": 16,
   "scoreScale": {
     "0": "MISSING",
     "10": "COMPLETE_EXECUTABLE_INTEGRATED_TESTED_AUDITABLE_PORTABLE",
@@ -42,7 +42,7 @@
       "current": 8,
       "state": "STRONG_PARTIAL",
       "next": [
-        "live host observations closing SportResearchSchema coverage",
+        "execute a current CFB HAR through host web research and close market-specific evidence gaps without blanket board rejection",
         "retire remaining PLAYER/TEAM lookup aliases at adapters"
       ]
     },
@@ -53,8 +53,8 @@
       "current": 9,
       "state": "STRONG_PARTIAL",
       "next": [
-        "activate only validated signal operators with real producers and consumers",
-        "FeatureStore observations still packet-shaped"
+        "validate CFB current-season prior-season and role-comparable support on real boards",
+        "activate only validated signal operators with real producers and consumers"
       ]
     },
     {
@@ -64,8 +64,8 @@
       "current": 6,
       "state": "PARTIAL",
       "next": [
-        "close all 24 required bindings per sport",
-        "plugin-owned validation suites"
+        "operationally accept the guarded CFB physical market set on a current live board",
+        "close all 24 required bindings per promoted sport"
       ]
     },
     {
@@ -75,6 +75,7 @@
       "current": 8,
       "state": "STRONG_PARTIAL",
       "next": [
+        "prospective CFB settlement and calibration evidence",
         "universal correlation/shared-world coverage",
         "final refresh integration"
       ]
@@ -87,7 +88,7 @@
       "state": "STRONG_PARTIAL",
       "next": [
         "immutable release retrieval",
-        "fresh-chat HAR acceptance"
+        "current-HAR fresh ChatGPT acceptance"
       ]
     },
     {
@@ -98,6 +99,7 @@
       "state": "PARTIAL_EXTERNAL_VALIDATION",
       "next": [
         "exact platform coverage",
+        "prospective CFB settlements",
         "CRPS/subgroups",
         "chronological unseen settlement evidence"
       ]
@@ -109,7 +111,7 @@
       "current": 7,
       "state": "PARTIAL",
       "next": [
-        "forecast/settle on a fresh wheel+HAR",
+        "forecast a current CFB HAR on a fresh wheel through the host contract",
         "no second probability engine"
       ]
     },
@@ -152,7 +154,7 @@
       "state": "PARTIAL",
       "next": [
         "wheel/release exact-hash install",
-        "HAR-only fresh ChatGPT acceptance"
+        "current HAR-only fresh ChatGPT acceptance"
       ]
     },
     {
