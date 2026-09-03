@@ -11,6 +11,8 @@ from dcm.research.claims import claim_record
 from dcm.research.classify import market_definition_id
 from dcm.research.population import build_research_population_manifest
 from dcm.research.requests import plan_research
+from dcm.research.provider import write_bundle
+from dcm.runner import run_dcm
 
 FIXTURE = Path(__file__).resolve().parents[1] / "fixtures" / "cfb_guarded_launch_har.json"
 CUTOFF = "2026-09-02T18:00:00Z"
@@ -135,3 +137,50 @@ def test_cfb_guarded_launch_har_to_probability_fixture():
         assert 0.0 <= dist["pLower"] <= 1.0
         modeled += 1
     assert modeled == 8
+
+
+def _web_claims(rows: list[dict]) -> list[dict]:
+    out = []
+    for claim in _claims(rows):
+        out.append(claim_record(
+            source_id="TEST_CFB_WEB_ACCEPTANCE",
+            url="https://example.com/cfb-guarded-launch-source",
+            published_at=CUTOFF,
+            observed_at=CUTOFF,
+            forecast_cutoff=CUTOFF,
+            semantic_scope=str(claim["semantic_scope"]),
+            scope_id=str(claim["scope_id"]),
+            claim_type="cfb_guarded_launch_web_fixture",
+            claim_value=claim["claim_value"],
+            reliability=0.80,
+            freshness=1.0,
+        ))
+    return out
+
+
+def test_real_cfb_partial_global_bundle_does_not_checkpoint_supported_rows(tmp_path: Path):
+    raw = json.loads(FIXTURE.read_text(encoding="utf-8"))
+    raw.pop("_pillars", None)  # exercise the real/non-synthetic HAR branch
+    har_path = tmp_path / "cfb-real-shape.har.json"
+    har_path.write_text(json.dumps(raw), encoding="utf-8")
+
+    rows = ingest_har(raw)["rows"]
+    bundle_path = tmp_path / "cfb-partial-evidence.jsonl"
+    write_bundle(bundle_path, _web_claims(rows))
+
+    result = run_dcm(
+        input_path=har_path,
+        forecast_cutoff=CUTOFF,
+        output_root=tmp_path / "runs",
+        research="bundle",
+        bundle_path=bundle_path,
+        workspace=tmp_path,
+    )
+    assert result["runState"] != "INCOMPLETE_CHECKPOINTED"
+    classified = result["classified"]
+    modeled = [r for r in classified if r["state"] in {"MODELED", "MODELED_DIAGNOSTIC"}]
+    assert len(modeled) == 8
+    assert all(r.get("blocker") != "RESEARCH_INCOMPLETE" for r in modeled)
+    partial = json.loads((Path(result["dest"]) / "research_partial.json").read_text())
+    assert partial["state"] == "PARTIAL_RESEARCH_CONTINUE_CFB_PER_PROP"
+    assert partial["missingRequestIds"], "test bundle must remain globally incomplete"
