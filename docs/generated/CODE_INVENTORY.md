@@ -2,10 +2,10 @@
 
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
-- Modules: **226**
-- Symbols: **1455**
+- Modules: **229**
+- Symbols: **1469**
 - Parse errors: **0**
-- Inventory hash: `13dac424a7978adf14ba786f047deb31859bb185f783eeb81edaa4703a89bf98`
+- Inventory hash: `86d82bc948adc4ff1755c3c8d50e316dae75584347de463ba2fdf14bedb7790c`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -162,12 +162,14 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P3 | `artifacts/dcm_v6_workstream_ab/dcm/sports/common/research_schema.py` | 1 | 7 |
 | P3 | `artifacts/dcm_v6_workstream_ab/dcm/sports/football/__init__.py` | 0 | 0 |
 | P3 | `artifacts/dcm_v6_workstream_ab/dcm/sports/football/appearance.py` | 1 | 2 |
+| P3 | `artifacts/dcm_v6_workstream_ab/dcm/sports/football/cfb_role.py` | 0 | 3 |
 | P3 | `artifacts/dcm_v6_workstream_ab/dcm/sports/football/conservation.py` | 0 | 6 |
 | P3 | `artifacts/dcm_v6_workstream_ab/dcm/sports/football/efficiency.py` | 0 | 2 |
 | P3 | `artifacts/dcm_v6_workstream_ab/dcm/sports/football/ledger.py` | 3 | 5 |
 | P3 | `artifacts/dcm_v6_workstream_ab/dcm/sports/football/opportunity.py` | 1 | 5 |
 | P3 | `artifacts/dcm_v6_workstream_ab/dcm/sports/football/projection.py` | 1 | 3 |
 | P3 | `artifacts/dcm_v6_workstream_ab/dcm/sports/football/registry.py` | 0 | 5 |
+| P3 | `artifacts/dcm_v6_workstream_ab/dcm/sports/football/research_requirements.py` | 0 | 3 |
 | P3 | `artifacts/dcm_v6_workstream_ab/dcm/sports/football/settlement_map.py` | 0 | 3 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/validation/__init__.py` | 0 | 0 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/validation/conservation_harness.py` | 1 | 2 |
@@ -182,6 +184,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/live_sanitized/test_live_prizepicks_har.py` | 0 | 4 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_bundle_e2e_resume.py` | 0 | 2 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_bundle_provider.py` | 0 | 2 |
+| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_cfb_guarded_launch.py` | 0 | 3 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_e2e_runner.py` | 0 | 18 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_e2e_world_to_lineup.py` | 0 | 21 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_entity_packets.py` | 0 | 13 |
@@ -194,7 +197,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_freshness.py` | 0 | 8 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_gamelog_normalize.py` | 0 | 14 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_github_archive.py` | 0 | 24 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_gridiron_plugin.py` | 0 | 19 |
+| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_gridiron_plugin.py` | 0 | 24 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_har_ingest.py` | 0 | 9 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_historical_gap.py` | 0 | 3 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_host_native.py` | 0 | 6 |
@@ -711,26 +714,26 @@ _No class/function symbols._
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/model/market_derive.py`
 
-- `class` **UnknownMarketError** L129 — Unknown or unverified market. Fail closed — never nearest-match.
-- `method` **UnknownMarketError.__init__** L132
-- `function` **canonicalize_market** L138 — Exact alias lookup. Returns None when the key is not registered.
-- `function` **is_registered** L148
-- `function` **looks_like_basketball_ledger** L152
-- `function` **looks_like_gridiron_ledger** L160
-- `function` **_num** L167
-- `function` **_formulas** L174
-- `function` **derive_market** L213 — Map a ledger + market key to a scalar. Never independently samples.
+- `class` **UnknownMarketError** L138 — Unknown or unverified market. Fail closed — never nearest-match.
+- `method` **UnknownMarketError.__init__** L141
+- `function` **canonicalize_market** L147 — Exact alias lookup. Returns None when the key is not registered.
+- `function` **is_registered** L157
+- `function` **looks_like_basketball_ledger** L161
+- `function` **looks_like_gridiron_ledger** L169
+- `function` **_num** L176
+- `function` **_formulas** L183
+- `function` **derive_market** L225 — Map a ledger + market key to a scalar. Never independently samples.
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/model/parameters.py`
 
-- `function` **_f** L34
-- `function` **_pairs** L42
-- `function` **_merge** L50
-- `function` **_avg** L57
-- `function` **_sd** L69
-- `function` **_shrink** L79
-- `function` **build_parameter_snapshot** L85
-- `method` **build_parameter_snapshot._rate_claimed** L278
+- `function` **_f** L36
+- `function` **_pairs** L44
+- `function` **_merge** L52
+- `function` **_avg** L59
+- `function` **_sd** L71
+- `function` **_shrink** L81
+- `function` **build_parameter_snapshot** L87
+- `method` **build_parameter_snapshot._rate_claimed** L284
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/model/participation.py`
 
@@ -775,14 +778,14 @@ _No class/function symbols._
 - `function` **_categorical_counts** L49
 - `function` **_p** L74
 - `function` **generate_event_contexts** L81 — Create deterministic latent event states shared by every player.
-- `function` **_contextualize** L106
-- `function` **assert_ledger_identities** L151 — Fail closed when a world violates basketball counting identities.
-- `function` **as_primitive_ledger** L185 — Canonical PrimitiveStatLedger dict. Applies oreb/dreb split if only reb is present.
-- `function` **sample_basketball** L218
-- `function` **sample_football** L269
-- `function` **sample_baseball_batter** L312
-- `function` **value_from_stats** L367
-- `function` **simulate_player_worlds** L390
+- `function` **_contextualize** L107
+- `function` **assert_ledger_identities** L166 — Fail closed when a world violates basketball counting identities.
+- `function` **as_primitive_ledger** L200 — Canonical PrimitiveStatLedger dict. Applies oreb/dreb split if only reb is present.
+- `function` **sample_basketball** L233
+- `function` **sample_football** L284
+- `function` **sample_baseball_batter** L327
+- `function` **value_from_stats** L383
+- `function` **simulate_player_worlds** L406
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/platform/__init__.py`
 
@@ -1113,15 +1116,15 @@ _No class/function symbols._
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/gridiron_gamelog.py`
 
-- `function` **parse_pct** L121 — Parse 71 or '71%' into 0.71. Already-fractional values in [0, 1] stay.
-- `function` **_index_row** L134
-- `function` **_present** L141
-- `function` **_market_stat_ok** L145
-- `function` **normalize_gridiron_log** L162 — Return a canonical gridiron log, or None if opportunity cannot be resolved.
-- `method` **normalize_gridiron_log._take** L174
-- `function` **normalize_gridiron_logs** L248 — Split a log list into valid canonical rows and rejected originals.
-- `function` **assert_compatible_gridiron_logs** L268 — Coverage helper: opportunity-valid logs plus market counting-stat presence.
-- `function` **looks_like_gridiron_log** L295
+- `function` **parse_pct** L127 — Parse 71 or '71%' into 0.71. Already-fractional values in [0, 1] stay.
+- `function` **_index_row** L140
+- `function` **_present** L147
+- `function` **_market_stat_ok** L151
+- `function` **normalize_gridiron_log** L174 — Return a canonical gridiron log, or None if opportunity cannot be resolved.
+- `method` **normalize_gridiron_log._take** L186
+- `function` **normalize_gridiron_logs** L260 — Split a log list into valid canonical rows and rejected originals.
+- `function` **assert_compatible_gridiron_logs** L280 — Coverage helper: opportunity-valid logs plus market counting-stat presence.
+- `function` **looks_like_gridiron_log** L307
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/historical_gap.py`
 
@@ -1132,7 +1135,7 @@ _No class/function symbols._
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/host_plan.py`
 
-- `function` **build_host_research_plan** L136
+- `function` **build_host_research_plan** L165
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/lineup.py`
 
@@ -1368,9 +1371,9 @@ _No class/function symbols._
 - `function` **_default_model_config** L199
 - `function` **_active_calibration** L210
 - `function` **run_dcm** L219
-- `method` **run_dcm._snapshot_for** L571
-- `method` **run_dcm.slim** L867
-- `function` **main** L1239
+- `method` **run_dcm._snapshot_for** L601
+- `method` **run_dcm.slim** L915
+- `function` **main** L1287
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/runtime/__init__.py`
 
@@ -1710,6 +1713,12 @@ _No class/function symbols._
 - `method` **FootballAppearanceProcess.as_payload** L24
 - `function` **appearance_process_for** L36
 
+### `artifacts/dcm_v6_workstream_ab/dcm/sports/football/cfb_role.py`
+
+- `function` **_truthy** L25
+- `function` **_num** L31
+- `function` **resolve_cfb_role_state** L38
+
 ### `artifacts/dcm_v6_workstream_ab/dcm/sports/football/conservation.py`
 
 - `function` **_rule** L13
@@ -1759,11 +1768,17 @@ _No class/function symbols._
 - `function` **football_market_definitions** L183
 - `function` **lookup_market** L206
 
+### `artifacts/dcm_v6_workstream_ab/dcm/sports/football/research_requirements.py`
+
+- `function` **_row_has** L27
+- `function` **support_count** L31
+- `function` **assess_football_support** L37 — Return independent minimum-model and PLAYABLE support states.
+
 ### `artifacts/dcm_v6_workstream_ab/dcm/sports/football/settlement_map.py`
 
-- `function` **canonicalize_prizepicks_football_market** L52
-- `function` **settle_football_market** L65 — Map a primitive ledger + PrizePicks football market to a scalar identity.
-- `function` **settle_football_player** L81 — World-projection settlement from a PrimitiveStatLedger. Unknown → fail closed.
+- `function` **canonicalize_prizepicks_football_market** L61
+- `function` **settle_football_market** L74 — Map a primitive ledger + PrizePicks football market to a scalar identity.
+- `function` **settle_football_player** L90 — World-projection settlement from a PrimitiveStatLedger. Unknown → fail closed.
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/validation/__init__.py`
 
@@ -1836,6 +1851,12 @@ _No class/function symbols._
 
 - `function` **test_bundle_provider_roundtrip_hashes** L8
 - `function` **test_market_definition_split_reuses_across_offers** L43
+
+### `artifacts/dcm_v6_workstream_ab/tests/test_cfb_guarded_launch.py`
+
+- `function` **_claim** L19
+- `function` **_claims** L55
+- `function` **test_cfb_guarded_launch_har_to_probability_fixture** L105
 
 ### `artifacts/dcm_v6_workstream_ab/tests/test_e2e_runner.py`
 
@@ -2017,25 +2038,30 @@ _No class/function symbols._
 
 ### `artifacts/dcm_v6_workstream_ab/tests/test_gridiron_plugin.py`
 
-- `function` **_html** L30
-- `function` **_claim** L34
-- `function` **_qb_logs** L47
-- `function` **_wr_logs** L66
-- `function` **test_pfr_aliases_normalize_pass_and_receiving** L83
-- `function` **test_off_pct_parses_and_dnp_rejected** L103
-- `function` **test_adapter_fixture_nfl_qb_and_cfb_qb** L112
-- `function` **test_adapter_fixture_wr_targets_receptions** L129
-- `function` **test_role_epoch_gridiron_starter_depth_and_qb_identity** L139
-- `function` **test_opportunity_and_efficiency_qb_vs_skill** L165
-- `function` **test_team_event_missing_defense_fail_closed_for_playable** L178
-- `function` **test_derive_markets_from_primitive_ledger** L192
-- `function` **test_unknown_football_market_fails_closed** L208
-- `function` **test_cfb_pass_yards_from_fixture_ledger** L220
-- `function` **test_nfl_and_cfb_row_reaches_modeled_path_with_fixture** L228
-- `function` **test_skill_receptions_path_from_fixture** L297
-- `function` **test_production_capable_only_full_path_markets** L322
-- `function` **test_missing_opponent_defense_blocks_playable_snapshot** L337
-- `function` **test_fixture_pass_yards_offer_derived_from_primitive_ledger** L358 — One-line demo: a fixture NFL pass-yards offer equals ledger pass_yds.
+- `function` **_html** L32
+- `function` **_claim** L36
+- `function` **_qb_logs** L49
+- `function` **_wr_logs** L68
+- `function` **test_pfr_aliases_normalize_pass_and_receiving** L85
+- `function` **test_off_pct_parses_and_dnp_rejected** L105
+- `function` **test_adapter_fixture_nfl_qb_and_cfb_qb** L114
+- `function` **test_adapter_fixture_wr_targets_receptions** L131
+- `function` **test_role_epoch_gridiron_starter_depth_and_qb_identity** L141
+- `function` **test_opportunity_and_efficiency_qb_vs_skill** L167
+- `function` **test_team_event_missing_defense_fail_closed_for_playable** L180
+- `function` **test_derive_markets_from_primitive_ledger** L194
+- `function` **test_unknown_football_market_fails_closed** L210
+- `function` **test_cfb_pass_yards_from_fixture_ledger** L222
+- `function` **test_nfl_and_cfb_row_reaches_modeled_path_with_fixture** L230
+- `function` **test_skill_receptions_path_from_fixture** L300
+- `function` **test_production_capable_only_full_path_markets** L325
+- `function` **test_missing_opponent_defense_blocks_playable_snapshot** L340
+- `function` **test_fixture_pass_yards_offer_derived_from_primitive_ledger** L361 — One-line demo: a fixture NFL pass-yards offer equals ledger pass_yds.
+- `function` **test_cfb_attempt_markets_are_opportunity_only_for_model_support** L367
+- `function` **test_cfb_yardage_market_can_model_thin_but_not_playable** L388
+- `function` **test_cfb_market_support_holds_zero_history_for_research** L409
+- `function` **test_cfb_blowout_regime_is_explicit_not_directional** L427
+- `function` **test_cfb_role_state_transfer_and_promoted_are_not_returning_starters** L442
 
 ### `artifacts/dcm_v6_workstream_ab/tests/test_har_ingest.py`
 
