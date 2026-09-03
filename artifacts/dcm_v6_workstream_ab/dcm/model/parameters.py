@@ -187,6 +187,7 @@ def build_parameter_snapshot(
     shrinkage_out = {"roleWeight": 0.0, "seasonWeight": 0.0, "priorWeight": 1.0}
     participation_state: dict[str, Any] | None = None
     football_support: dict[str, Any] | None = None
+    cfb_role_state: dict[str, Any] | None = None
 
     if family == "basketball":
         league = str(row.get("league") or "") or None
@@ -327,6 +328,7 @@ def build_parameter_snapshot(
     elif family == "gridiron":
         league = str(row.get("league") or "") or None
         role = str(player.get("role") or row.get("role") or "QB").upper()
+        cfb_role_state = resolve_cfb_role_state(player, role=role) if league == "CFB" else None
         params["role"] = role
         norm = normalize_gridiron_logs(logs, league=league)
         full_logs = norm["logs"]
