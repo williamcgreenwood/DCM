@@ -188,6 +188,8 @@ def build_parameter_snapshot(
     participation_state: dict[str, Any] | None = None
     football_support: dict[str, Any] | None = None
     cfb_role_state: dict[str, Any] | None = None
+    current_season_support_n = 0
+    prior_season_support_n = 0
 
     if family == "basketball":
         league = str(row.get("league") or "") or None
@@ -334,6 +336,9 @@ def build_parameter_snapshot(
         full_logs = norm["logs"]
         logs_normalized = len(full_logs)
         logs_rejected = len(norm["rejected"])
+        if league == "CFB":
+            current_season_support_n = sum(1 for g in full_logs if str(g.get("date") or g.get("game_date") or "").startswith("2026"))
+            prior_season_support_n = sum(1 for g in full_logs if str(g.get("date") or g.get("game_date") or "").startswith("2025"))
         today_context = {
             "role": player.get("role") or role,
             "projected_role": player.get("projected_role") or player.get("role") or role,
