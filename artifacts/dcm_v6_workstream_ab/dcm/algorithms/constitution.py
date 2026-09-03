@@ -65,8 +65,12 @@ def constitution_identity() -> dict[str, str]:
         raise RuntimeError("ALGORITHM_CONSTITUTION_BODY_INCOMPLETE")
     return {
         "version": ALGORITHM_CONSTITUTION_VERSION,
-        "sha256": constitution_sha256(text),
+        "constitutionDocumentSha256": constitution_sha256(text),
+        "constitutionLineageHash": PROMPT_DECLARED_CONSTITUTION_SHA256,
+        "algorithmRegistrySha256": algorithm_registry_sha256(),
         "path": str(constitution_path()),
+        # Compatibility aliases. Never treat lineage and document hashes as interchangeable.
+        "sha256": constitution_sha256(text),
         "promptDeclaredSha256": PROMPT_DECLARED_CONSTITUTION_SHA256,
         "registrySha256": algorithm_registry_sha256(),
     }

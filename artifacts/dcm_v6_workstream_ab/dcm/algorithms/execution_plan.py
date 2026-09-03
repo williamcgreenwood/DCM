@@ -4,7 +4,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Mapping
 
-from dcm.algorithms.constitution import ALGORITHM_CONSTITUTION_VERSION, constitution_sha256
+from dcm.algorithms.constitution import ALGORITHM_CONSTITUTION_VERSION, constitution_sha256, prompt_declared_constitution_sha256
 from dcm.algorithms.contracts import AlgorithmSelection, HarAlgorithmExecutionPlan
 from dcm.algorithms.indexing import merkle_root
 from dcm.algorithms.registry import algorithm_registry_sha256
@@ -60,15 +60,15 @@ def build_har_algorithm_execution_plan(
     # BoardGraph/RequirementGraph remain R1. Research may begin only after the
     # algorithm plan exists; those graphs are recorded as not-yet-claimed.
     notes = [
-        "AlgorithmExecutionPlan is emitted before external research.",
-        "CFB guarded launch emits BoardGraph/MarketDemandGraph/RequirementGraph and live AcquisitionAction packing before collect().",
-        "Mixed-sport universal Research OS remaining work is deferred; this is not a claim that full R1 is complete.",
+        "AlgorithmExecutionPlan is emitted before external research with researchMayBegin=false.",
+        "Only ResearchOSReadiness may authorize researchMayBegin=true after BoardGraph/MarketDemandGraph/RequirementGraph, indexes, reusable-evidence lookup, AcquisitionActions, and source routing are proven.",
         "One-prop-one-search is non-compliant when shared evidence can satisfy multiple requirements.",
     ]
     payload = {
         "schema": "pillars_dcm.har_algorithm_execution_plan.v1",
         "constitutionVersion": ALGORITHM_CONSTITUTION_VERSION,
-        "constitutionSha256": constitution_sha256(),
+        "constitutionDocumentSha256": constitution_sha256(),
+        "constitutionLineageHash": prompt_declared_constitution_sha256(),
         "algorithmRegistrySha256": algorithm_registry_sha256(),
         "phases": phases,
         "selections": [s.to_dict() for s in selections],
@@ -80,7 +80,7 @@ def build_har_algorithm_execution_plan(
     plan_hash = content_hash(payload)
     merkle = merkle_root(
         [
-            payload["constitutionSha256"],
+            payload["constitutionDocumentSha256"],
             payload["algorithmRegistrySha256"],
             plan_hash,
         ]
@@ -89,14 +89,16 @@ def build_har_algorithm_execution_plan(
     return HarAlgorithmExecutionPlan(
         schema=payload["schema"],
         constitution_version=ALGORITHM_CONSTITUTION_VERSION,
-        constitution_sha256=payload["constitutionSha256"],
+        constitution_sha256=payload["constitutionDocumentSha256"],
         registry_sha256=payload["algorithmRegistrySha256"],
         phases=tuple(phases),
         selections=tuple(selections),
         evaluated_conditionals=tuple(payload["evaluatedConditionals"]),
         plan_hash=plan_hash,
-        research_may_begin=True,
+        research_may_begin=False,
         notes=tuple(notes),
+        constitution_document_sha256=payload["constitutionDocumentSha256"],
+        constitution_lineage_hash=payload["constitutionLineageHash"],
     )
 
 
@@ -104,14 +106,15 @@ def constitution_run_hashes(plan: dict[str, Any] | None = None) -> dict[str, Any
     """Sidecar hashes for hashes.json. Not forecast-semantic fields."""
     ident = {
         "algorithmConstitutionVersion": ALGORITHM_CONSTITUTION_VERSION,
-        "algorithmConstitutionSha256": constitution_sha256(),
+        "constitutionDocumentSha256": constitution_sha256(),
+        "constitutionLineageHash": prompt_declared_constitution_sha256(),
         "algorithmRegistrySha256": algorithm_registry_sha256(),
     }
     if plan:
         ident["algorithmExecutionPlanHash"] = plan.get("planHash")
         ident["runMerkleRoot"] = merkle_root(
             [
-                ident["algorithmConstitutionSha256"],
+                ident["constitutionDocumentSha256"],
                 ident["algorithmRegistrySha256"],
                 str(plan.get("planHash") or ""),
             ]

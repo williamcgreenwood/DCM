@@ -65,7 +65,7 @@ def _modeled_rows(population: list[dict[str, Any]]) -> list[dict[str, Any]]:
         pid = str(row.get("projectionId") or "")
         if not pid or pid in seen:
             continue
-        if str(row.get("state") or "") != "MODELED":
+        if str(row.get("state") or "") not in {"MODELED", "MODELED_DIAGNOSTIC"}:
             continue
         seen.add(pid)
         out.append(row)

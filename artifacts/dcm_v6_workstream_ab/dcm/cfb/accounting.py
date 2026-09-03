@@ -6,7 +6,7 @@ from typing import Any
 
 from dcm.contracts.hashes import content_hash
 from dcm.research.classify import accounting_classify, research_disposition
-from dcm.research.indexes import SUPPORTED_CFB_MARKETS
+from dcm.cfb.markets import ACTIVE_CFB_MARKETS, GUARDED_LAUNCH_MARKETS, NEWLY_ACTIVATED_MARKETS
 from dcm.sports.football.research_requirements import MARKET_REQUIREMENTS
 
 
@@ -55,7 +55,8 @@ def account_cfb_board(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "goblin": len(goblins),
         "nonGoblin": len(non_goblins),
         "supported": len(supported),
-        "supportedMarketDefinitions": sorted(MARKET_REQUIREMENTS),
+        "supportedMarketDefinitions": sorted({_market(r) for r in supported if _market(r)}),
+        "registeredMarketDefinitions": sorted(MARKET_REQUIREMENTS),
         "supportedNonGoblinOffers": len(supported),
         "unsupported": len(unsupported),
         "unsupportedMarkets": sorted({_market(r) for r in unsupported if _market(r)}),
@@ -71,9 +72,10 @@ def account_cfb_board(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "uniqueTeams": len(teams),
         "eventIds": events,
         "meaningfulTop100": len(supported) >= 100,
-        "newMarketsActivatedToday": [],
+        "newMarketsActivatedToday": list(NEWLY_ACTIVATED_MARKETS),
+        "guardedLaunchMarkets": list(GUARDED_LAUNCH_MARKETS),
+        "activeMarketDefinitions": list(ACTIVE_CFB_MARKETS),
         "goblinsExcludedFromSelectionAfterAccounting": True,
-        "guardedLaunchMarkets": list(SUPPORTED_CFB_MARKETS),
     }
     body["contentHash"] = content_hash({k: v for k, v in body.items() if k != "contentHash"})
     return body

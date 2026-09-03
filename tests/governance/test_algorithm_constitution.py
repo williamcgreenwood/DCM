@@ -33,7 +33,7 @@ def test_constitution_version_and_body():
 def test_har_algorithm_execution_plan_before_research():
     plan = build_har_algorithm_execution_plan({"n_offers": 8, "hnsw_installed": False, "leiden_installed": False})
     payload = plan.to_dict()
-    assert payload["researchMayBegin"] is True
+    assert payload["researchMayBegin"] is False
     assert payload["constitutionVersion"] == ALGORITHM_CONSTITUTION_VERSION
     assert payload["constitutionSha256"] == constitution_sha256()
     assert payload["algorithmRegistrySha256"]

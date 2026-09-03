@@ -21,7 +21,10 @@ from typing import Any
 
 from dcm.algorithms.execution_plan import constitution_run_hashes, persist_har_algorithm_execution_plan
 from dcm.algorithms.telemetry import AlgorithmTelemetry
+from dcm.cfb.event_worlds import cfb_teammate_groups, simulate_joint_cfb_event_worlds
 from dcm.cfb.launch import emit_cfb_forecast_artifacts, persist_algorithm_telemetry, prepare_cfb_research_os
+from dcm.cfb.refresh import apply_final_refresh
+from dcm.research.material_facts import apply_hold_playable, hold_playable_scope_ids, resolve_material_facts
 from dcm.contracts.hashes import content_hash
 from dcm.identity.resolve import build_player_index, freeze_map, resolve_row
 from dcm.ingest.board import freeze_board, write_board
@@ -383,6 +386,8 @@ def run_dcm(
             consumer=f"HarAlgorithmExecutionPlan.{phase.get('phaseId')}",
             artifact="algorithm_execution_plan.json",
             activated=bool(phase.get("activated", True)),
+            phase="SELECTED",
+            note="plan selection is not live execution",
         )
 
     rows = [resolve_row(r) for r in board["rows"]]
@@ -487,13 +492,16 @@ def run_dcm(
     planned = plan_research(rows, forecast_cutoff, research_shadow=research_shadow)
     requests = planned["requests"]
     (dest / "research_requests.json").write_text(json.dumps(requests, indent=2) + "\n", encoding="utf-8")
-    prepare_cfb_research_os(
+    from dcm.research.readiness import require_research_may_begin
+
+    os_art = prepare_cfb_research_os(
         dest,
         rows,
         requests,
         coverage=None,
         telemetry=telemetry,
     )
+    require_research_may_begin(dest)
     if research == "file":
         provider: Any = FileProvider(evidence_dir or dest / "evidence")
     elif research == "bundle":
@@ -644,8 +652,11 @@ def run_dcm(
     conservation_failures = 0
     unsupported = excluded = unresolved = evidence_blocked = 0
     teammate_groups = basketball_teammate_groups(rows)
+    cfb_groups = cfb_teammate_groups(rows)
     joint_world_cache: dict[tuple[str, str, int], dict[str, list[dict[str, float]]]] = {}
     joint_meta_acc: list[dict[str, Any]] = []
+    material_facts_payload = resolve_material_facts(bundle.get("claims") or [], cutoff=forecast_cutoff)
+    hold_ids = hold_playable_scope_ids(material_facts_payload)
 
     def _snapshot_for(prow: dict[str, Any]) -> dict[str, Any]:
         return build_parameter_snapshot(
@@ -711,21 +722,32 @@ def run_dcm(
                         ctx_key[0], ctx_key[1], n=gov.max_worlds, seed=har_sha
                     )
                 group_key = (str(row.get("eventId") or ""), str(row.get("teamId") or ""))
-                group = teammate_groups.get(group_key) or {}
-                use_joint = str(row.get("sportFamily") or "") == "basketball" and len(group) >= 2
-                if use_joint:
+                family = str(row.get("sportFamily") or "")
+                league = str(row.get("league") or "").upper()
+                group = (cfb_groups if family == "gridiron" and league == "CFB" else teammate_groups).get(group_key) or {}
+                use_joint_bball = family == "basketball" and len(group) >= 2
+                use_joint_cfb = family == "gridiron" and league == "CFB" and len(group) >= 2
+                if use_joint_bball or use_joint_cfb:
                     jkey = (group_key[0], group_key[1], gov.max_worlds)
                     if jkey not in joint_world_cache:
                         specs = []
                         for _pid, prow in group.items():
                             psnap = _snapshot_for(prow)
                             specs.append({"row": prow, "snapshot": psnap})
-                        joint = simulate_joint_team_worlds(
-                            specs,
-                            n=gov.max_worlds,
-                            seed=har_sha,
-                            event_contexts=event_context_cache[ctx_key],
-                        )
+                        if use_joint_cfb:
+                            joint = simulate_joint_cfb_event_worlds(
+                                specs,
+                                n=gov.max_worlds,
+                                seed=har_sha,
+                                event_contexts=event_context_cache[ctx_key],
+                            )
+                        else:
+                            joint = simulate_joint_team_worlds(
+                                specs,
+                                n=gov.max_worlds,
+                                seed=har_sha,
+                                event_contexts=event_context_cache[ctx_key],
+                            )
                         joint_world_cache[jkey] = joint["worlds"]
                         joint_meta_acc.append(joint["meta"])
                     pid = str(row["playerId"])
@@ -783,21 +805,32 @@ def run_dcm(
                     seed=har_sha,
                 )
             group_key = (str(row.get("eventId") or ""), str(row.get("teamId") or ""))
-            group = teammate_groups.get(group_key) or {}
-            use_joint = str(row.get("sportFamily") or "") == "basketball" and len(group) >= 2
-            if use_joint:
+            family = str(row.get("sportFamily") or "")
+            league = str(row.get("league") or "").upper()
+            group = (cfb_groups if family == "gridiron" and league == "CFB" else teammate_groups).get(group_key) or {}
+            use_joint_bball = family == "basketball" and len(group) >= 2
+            use_joint_cfb = family == "gridiron" and league == "CFB" and len(group) >= 2
+            if use_joint_bball or use_joint_cfb:
                 jkey = (group_key[0], group_key[1], target_worlds)
                 if jkey not in joint_world_cache:
                     specs = []
                     for _pid, prow in group.items():
                         psnap = _snapshot_for(prow)
                         specs.append({"row": prow, "snapshot": psnap})
-                    joint = simulate_joint_team_worlds(
-                        specs,
-                        n=target_worlds,
-                        seed=har_sha,
-                        event_contexts=event_context_cache[adaptive_ctx_key],
-                    )
+                    if use_joint_cfb:
+                        joint = simulate_joint_cfb_event_worlds(
+                            specs,
+                            n=target_worlds,
+                            seed=har_sha,
+                            event_contexts=event_context_cache[adaptive_ctx_key],
+                        )
+                    else:
+                        joint = simulate_joint_team_worlds(
+                            specs,
+                            n=target_worlds,
+                            seed=har_sha,
+                            event_contexts=event_context_cache[adaptive_ctx_key],
+                        )
                     joint_world_cache[jkey] = joint["worlds"]
                     joint_meta_acc.append(joint["meta"])
                 world_cache[key] = joint_world_cache[jkey][str(row["playerId"])]
@@ -915,7 +948,9 @@ def run_dcm(
             "researchOnly": blocker in {"RESEARCH_ONLY_NOT_SELECTABLE", "SHADOW_SUPPORTED_NOT_SELECTABLE"},
             "worldCount": len(values),
             "_selectionOutcomes": selection_outcomes,
+            "_worldValues": list(values),
         })
+        rec = apply_hold_playable(rec, hold_ids)
         gate = status_start_hard_blocker(
             rec, cutoff=forecast_cutoff, snapshot=snapshot,
         )
@@ -949,21 +984,57 @@ def run_dcm(
         conservation_failures += 1
     stages_done.add("MODEL")
 
+    if any(
+        ((s.get("role_epoch") or {}).get("governedChangePoints") or {}).get("executed")
+        for s in parameter_cache.values()
+    ):
+        telemetry.record("ALG-ML-TIME-001", problem_class="EWMA", producer="dcm.algorithms.ml_families.ewma", consumer="dcm.research.role_epoch.governed_change_points", artifact="parameters/snapshots.json", phase="EXECUTED")
+        telemetry.record("ALG-ML-TIME-002", problem_class="CUSUM", producer="dcm.algorithms.ml_families.cusum", consumer="dcm.research.role_epoch.governed_change_points", artifact="parameters/snapshots.json", phase="EXECUTED")
+        telemetry.record("ALG-ML-TIME-003", problem_class="PAGE_HINKLEY", producer="dcm.algorithms.ml_families.page_hinkley", consumer="dcm.research.role_epoch.governed_change_points", artifact="parameters/snapshots.json", phase="EXECUTED")
+
     ranked = rank_candidates(modeled, top_k=25, seed=har_sha)
-    telemetry.record("ALG-SORT-001", problem_class="FINAL_RANK", producer="dcm.model.ranking.rank_candidates", consumer="dcm.runner.run_dcm", artifact="top100.json")
-    telemetry.record("ALG-SORT-003", problem_class="TOPK_PARTIAL", producer="dcm.model.ranking.rank_candidates", consumer="dcm.runner.run_dcm", artifact="top25_qualified.json")
-    # Strict card is PLAYABLE-grade modeled rows. Production root is a later layer.
-    # Final pre-freeze status/start strip: late OUT / UNCERTAIN / started cannot
-    # land on qualified / strict_card even if grade is PLAYABLE.
+    telemetry.record("ALG-SORT-001", problem_class="FINAL_RANK", producer="dcm.model.ranking.rank_candidates", consumer="dcm.runner.run_dcm", artifact="top100.json", phase="EXECUTED")
+    telemetry.record("ALG-SORT-003", problem_class="TOPK_PARTIAL", producer="dcm.model.ranking.rank_candidates", consumer="dcm.runner.run_dcm", artifact="top25_qualified.json", phase="EXECUTED")
+    started_events = {
+        str(p.get("row", p).get("eventId") or "")
+        for p in modeled
+        if str((p.get("row") or p).get("gameStatus") or "").upper() in {"STARTED", "LIVE", "IN_PROGRESS"}
+    }
+    refresh = apply_final_refresh(
+        ranked,
+        claims=bundle.get("claims") or [],
+        cutoff=forecast_cutoff,
+        started_events=started_events,
+    )
+    _write_refresh = dest / "cfb_final_refresh.json"
+    _write_refresh.write_text(json.dumps(refresh["report"], indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    ranked = refresh["modeled"]
     qualified = apply_pre_freeze_status_start_gates(ranked, cutoff=forecast_cutoff)
     card = build_card(qualified)
     exposure = exposure_report(card)
+    remaining_actions = 0
+    try:
+        remaining_actions = int((json.loads((dest / "acquisition_actions.json").read_text()) or {}).get("actionCount") or 0)
+    except Exception:
+        remaining_actions = 0
     cfb_forecast = emit_cfb_forecast_artifacts(
         dest,
-        modeled=modeled,
+        modeled=ranked,
         qualified=qualified,
         classified=classified,
         telemetry=telemetry,
+        unresolved_actions=remaining_actions,
+        evidence_imported=bool(bundle.get("claims")),
+        material_facts=material_facts_payload,
+    )
+    prepare_cfb_research_os(
+        dest,
+        rows,
+        requests,
+        claims=bundle.get("claims") or [],
+        coverage=bundle.get("coverage"),
+        telemetry=telemetry,
+        frontier_offer_ids_set=set(cfb_forecast.get("frontierOfferIds") or []),
     )
     n_rank = dag.add("RANK", "board", parents=[n_worlds.key])
     dag.complete(n_rank.key, content_hash([p["row"]["projectionId"] for p in ranked[:25]]))
@@ -1263,6 +1334,28 @@ def run_dcm(
     (dest / "accounting.json").write_text(json.dumps({**(board.get("accounting") or {}), "states": states_count, "playable": len(qualified), "cardSize": len(card)}, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     (dest / "hashes.json").write_text(json.dumps({"boardHash": board.get("contentHash"), "harSha256": har_sha, "frozenForecastHash": freeze["frozenForecastHash"], "evidenceGraphHash": evidence_graph.get("contentHash"), "featureStoreHash": feature_store_hash, "explanationsHash": explanations_hash, "gitCommit": git_commit, "checkpointPending": False, "schemaV1Expected": "6e78dacc19843338643bdcabc7477fd3ce2dd065da1e9629646dacc21cdb1f22", "schemaV2": (schema_root.get("v2") or {}), **constitution_run_hashes(plan_payload)}, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     persist_algorithm_telemetry(dest, telemetry)
+    from dcm.algorithms.indexing import merkle_root
+    from dcm.runtime.archive_receipt import archive_reconcile, archive_retry, build_archive_receipt, persist_archive_receipt
+    hashes_payload = json.loads((dest / "hashes.json").read_text(encoding="utf-8"))
+    freeze_merkle = merkle_root([
+        str(hashes_payload.get("harSha256") or ""),
+        str(freeze.get("frozenForecastHash") or ""),
+        str(hashes_payload.get("evidenceGraphHash") or ""),
+        str(hashes_payload.get("featureStoreHash") or ""),
+        str(hashes_payload.get("runMerkleRoot") or ""),
+    ])
+    hashes_payload["freezeMerkleRoot"] = freeze_merkle
+    (dest / "hashes.json").write_text(json.dumps(hashes_payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    persist_archive_receipt(dest, build_archive_receipt(
+        dest,
+        merkel_root=freeze_merkle,
+        hashes=hashes_payload,
+        local_status="WRITTEN",
+        drive_status="NOT_CONFIGURED",
+        github_status="NOT_PUSHED",
+    ))
+    archive_retry(dest)
+    archive_reconcile(dest)
 
     blockers = []
     if excluded:

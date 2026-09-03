@@ -40,8 +40,8 @@ def _cap(family: str, league: str, markets: tuple[str, ...], state: str) -> None
 
 _cap("basketball", "NBA", ("pts", "reb", "ast", "pra", "pr", "pa", "ra", "3pm", "3pa", "tpa", "fgm", "fga", "fg_made", "fg_att", "2pm", "2pa", "twopm", "twopa", "fg2m", "ftm", "fta", "tov", "to", "oreb", "stl", "blk", "blk_stl", "qtrs_w_3plus_pts"), PRODUCTION)
 _cap("basketball", "WNBA", ("pts", "reb", "ast", "pra", "pr", "pa", "ra", "3pm", "3pa", "tpa", "fgm", "fga", "fg_made", "fg_att", "2pm", "2pa", "twopm", "twopa", "fg2m", "ftm", "fta", "tov", "to", "oreb", "stl", "blk", "blk_stl", "qtrs_w_3plus_pts"), PRODUCTION)
-_cap("gridiron", "NFL", ("pass_yds", "pass_att", "pass_cmp", "rush_yds", "rush_att", "rec_yds", "receptions", "pass_rush_yds", "rush_rec_yds"), PRODUCTION)
-_cap("gridiron", "CFB", ("pass_yds", "pass_att", "pass_cmp", "rush_yds", "rush_att", "rec_yds", "receptions", "pass_rush_yds", "rush_rec_yds"), PRODUCTION)
+_cap("gridiron", "NFL", ("pass_yds", "pass_att", "pass_cmp", "pass_td", "interceptions", "rush_yds", "rush_att", "rush_td", "rec_yds", "receptions", "rec_td", "targets", "pass_rush_yds", "rush_rec_yds", "rush_rec_td", "pass_rush_td", "fg_made", "xp_made", "kicking_pts"), PRODUCTION)
+_cap("gridiron", "CFB", ("pass_yds", "pass_att", "pass_cmp", "pass_td", "interceptions", "rush_yds", "rush_att", "rush_td", "rec_yds", "receptions", "rec_td", "targets", "pass_rush_yds", "rush_rec_yds", "rush_rec_td", "pass_rush_td", "fg_made", "xp_made", "kicking_pts"), PRODUCTION)
 _cap("gridiron", "NFLP", ("pass_yds", "rush_yds", "rec_yds", "receptions"), RESEARCH)
 _cap("gridiron", "CFL", ("pass_yds", "rush_yds", "rec_yds", "receptions", "pass_rush_yds", "rush_rec_yds"), UNSUPPORTED)
 _cap("baseball", "MLB", ("h", "tb", "k", "hits_runs_rbi"), SHADOW)
@@ -54,7 +54,7 @@ def selection_state(family: str, league: str, market: str) -> str:
     return CAPABILITIES.get((family, league, market), UNSUPPORTED)
 
 
-register(SportPluginManifest("gridiron", "1.2.0", ("NFL", "CFB", "NFLP", "CFL", "UFL"), "play/snap/route/target/dropback", ("snaps", "routes", "targets", "dropbacks", "carries"), PRODUCTION, known_unsupported=("CFL_REBOOT", "NFLP_PRESEASON", "DEF_TACKLES_PLAYABLE", "KICKING_PLAYABLE"), test_ids=("WSAB_BASELINE_46", "gridiron_p7_e2e"),))
+register(SportPluginManifest("gridiron", "1.3.0", ("NFL", "CFB", "NFLP", "CFL", "UFL"), "play/snap/route/target/dropback", ("snaps", "routes", "targets", "dropbacks", "carries"), PRODUCTION, known_unsupported=("CFL_REBOOT", "NFLP_PRESEASON", "DEF_TACKLES_PLAYABLE", "LONGEST_PLAY_MARKETS", "FANTASY_UNVERSIONED"), test_ids=("WSAB_BASELINE_46", "gridiron_p7_e2e"),))
 register(SportPluginManifest("basketball", "1.1.0", ("NBA", "WNBA"), "possession/stint/minute", ("minutes", "possessions"), PRODUCTION, test_ids=("basketball_minimal_e2e",)))
 register(SportPluginManifest("baseball", "0.2.0", ("MLB", "NPB"), "PA/pitch/base-out", ("PA", "BF"), SHADOW))
 register(SportPluginManifest("combat", "0.1.0", ("UFC", "BOXING"), "fight_second/round", ("fight_seconds",), RESEARCH, known_unsupported=("BOXING_AS_UFC",)))

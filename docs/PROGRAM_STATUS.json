@@ -1,6 +1,6 @@
 {
   "schema": "pillars_dcm.program_status.v1",
-  "updatedAtUtc": "2026-09-03T21:32:00Z",
+  "updatedAtUtc": "2026-09-03T23:35:00Z",
   "canonicalIntegrationBranch": "integration/v6-ml-architecture-20260830",
   "canonicalIntegrationPr": 18,
   "scoreScale": {
@@ -62,10 +62,10 @@
       "id": "P3",
       "name": "SportPlugin physics",
       "target": 10,
-      "current": 6,
-      "state": "PARTIAL",
+      "current": 8,
+      "state": "STRONG_PARTIAL",
       "next": [
-        "operationally accept the guarded CFB physical market set on a current live board",
+        "operationally accept the 19 CFB PRODUCTION markets on a current live board",
         "close all 24 required bindings per promoted sport"
       ]
     },
@@ -73,12 +73,11 @@
       "id": "P4",
       "name": "Probability / uncertainty / grading / portfolio",
       "target": 10,
-      "current": 8,
+      "current": 9,
       "state": "STRONG_PARTIAL",
       "next": [
         "prospective CFB settlement and calibration evidence",
-        "universal correlation/shared-world coverage",
-        "final refresh integration"
+        "universal correlation/shared-world coverage"
       ]
     },
     {
@@ -109,8 +108,8 @@
       "id": "P7",
       "name": "Host-native execution contract",
       "target": 10,
-      "current": 7,
-      "state": "PARTIAL",
+      "current": 8,
+      "state": "STRONG_PARTIAL",
       "next": [
         "forecast a current CFB HAR on a fresh wheel through the host contract",
         "no second probability engine"
@@ -162,9 +161,10 @@
       "id": "P12",
       "name": "Research archive / index / reuse",
       "target": 10,
-      "current": 7,
-      "state": "PARTIAL",
+      "current": 8,
+      "state": "STRONG_PARTIAL",
       "next": [
+        "Drive credentials as PRIMARY object store",
         "high-volume queryable artifact store",
         "retention and licensing enforcement"
       ]
@@ -173,7 +173,7 @@
       "id": "P13",
       "name": "Performance / search / token optimization",
       "target": 10,
-      "current": 6,
+      "current": 7,
       "state": "PARTIAL",
       "next": [
         "measured CPU/RSS/token certification",

@@ -157,7 +157,7 @@ def build_board_graph(
         "edgeCount": len(edges),
         "componentCount": len(components),
         "cycleCount": len(sccs),
-        "csrForwardDegree": {k: len(v) for k, v in list(csr.forward.items())[:0]},
+        "csrForwardDegree": {k: len(v) for k, v in list(csr.forward.items())[:64]},
         "nodes": sorted(nodes.values(), key=lambda r: r["id"]),
         "edges": [{"type": t, "from": a, "to": b} for t, a, b in sorted(edges)],
         "aliasComponents": {str(k): [str(x) for x in v if str(x).startswith(("Subject:", "ALIAS:"))] for k, v in uf.components().items() if any(str(x).startswith("Subject:") for x in v)},

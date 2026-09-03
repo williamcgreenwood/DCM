@@ -166,6 +166,35 @@ def detect_change_points(minutes: list[float], *, min_seg: int = MIN_SEGMENT, th
     return sorted(cuts)
 
 
+def governed_change_points(values: list[float]) -> dict[str, Any]:
+    """Execute cataloged RoleEpoch detectors. Does not silently rewrite greedy cuts.
+
+    EWMA / CUSUM / Page-Hinkley are REQUIRED_CORE time-series algorithms.
+    PELT remains a challenger (greedy binary segmentation is the portable fallback).
+    """
+    from dcm.algorithms.ml_families import cusum, ewma, page_hinkley
+
+    series = [float(x) for x in values]
+    greedy = detect_change_points(series)
+    if not series:
+        return {
+            "greedy": greedy,
+            "ewma": [],
+            "cusum": [],
+            "pageHinkley": [],
+            "executed": ["ALG-ML-TIME-001", "ALG-ML-TIME-002", "ALG-ML-TIME-003"],
+        }
+    smoothed = ewma(series, alpha=0.3)
+    return {
+        "greedy": greedy,
+        "ewma": [round(v, 6) for v in smoothed],
+        "cusum": [int(i) for i in cusum(series)],
+        "pageHinkley": [int(i) for i in page_hinkley(series)],
+        "executed": ["ALG-ML-TIME-001", "ALG-ML-TIME-002", "ALG-ML-TIME-003"],
+        "peltChallengerUnused": True,
+    }
+
+
 def shrinkage_weights(role_n: int, season_n: int) -> dict[str, float]:
     """role_sample → player_season → archetype/league prior. Sums to 1.
 
@@ -388,6 +417,7 @@ class RoleEpochBuilder:
         threshold = _starter_threshold(str(league) if league else None)
         minutes_series = [float(row["minutes"]) for row in prepared]
         cuts = detect_change_points(minutes_series)
+        governed = governed_change_points(minutes_series)
 
         per_game: list[str] = []
         for row in prepared:
@@ -471,6 +501,7 @@ class RoleEpochBuilder:
             "claim_roles": parts["claim_roles"],
             "invented": False,
             "projectedRole": projected,
+            "governedChangePoints": governed,
         }
 
     def _build_gridiron(
@@ -511,6 +542,7 @@ class RoleEpochBuilder:
         threshold = STARTER_SNAPS.get(str(league or "").upper(), 35.0)
         share_series = [float(row["_share"]) for row in prepared]
         cuts = detect_change_points(share_series, threshold=GRIDIRON_CHANGEPOINT)
+        governed = governed_change_points(share_series)
 
         # QB-identity cuts: new qb_id starts a segment.
         qb_cut = set(cuts)
@@ -603,6 +635,8 @@ class RoleEpochBuilder:
             "invented": False,
             "projectedRole": projected,
             "qbIdentity": is_qb,
+            "qb_id": (selected or {}).get("qb_id") if selected else None,
+            "governedChangePoints": governed,
         }
 
 

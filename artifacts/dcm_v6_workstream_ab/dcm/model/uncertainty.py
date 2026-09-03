@@ -50,11 +50,14 @@ def probability_bundle(
         ood_risk=ood_risk, synthetic=synthetic,
     )
     mc_se = math.sqrt(max(0.0, raw_selected_p * (1.0 - raw_selected_p)) / max(1, n_worlds))
-    epistemic = min(0.45, (1.0 - min(1.0, support_n / 12.0)) * 0.20 + (1.0 - data_quality) * 0.15 + ood_risk * 0.15)
-    aleatoric = min(1.0, max(0.0, volatility))
+    from dcm.algorithms.ml_families import split_conformal
+
+    conformal_q = split_conformal([mc_se, epistemic_proxy := min(0.45, (1.0 - min(1.0, support_n / 12.0)) * 0.20 + (1.0 - data_quality) * 0.15 + ood_risk * 0.15), aleatoric := min(1.0, max(0.0, volatility))])
+    epistemic = epistemic_proxy
+    aleatoric = aleatoric
     successes = safe * max(1, n_worlds)
     lcb = wilson_lower_bound(successes, max(1, n_worlds))
-    lcb = max(0.01, lcb - epistemic * 0.35)
+    lcb = max(0.01, lcb - max(epistemic * 0.35, conformal_q))
     reliability = max(0.0, min(1.0, data_quality * (1.0 - ood_risk * 0.5) * min(1.0, support_n / 8.0)))
     false_sign = max(0.0, min(0.5, 0.5 - abs(safe - 0.5) + epistemic * 0.25))
     return {
@@ -67,4 +70,5 @@ def probability_bundle(
         "reliability": reliability,
         "false_sign_risk": false_sign,
         "calibration_state": "INACTIVE_ZERO_ELIGIBLE_SETTLEMENTS",
+        "conformal_q": conformal_q,
     }

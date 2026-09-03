@@ -29,8 +29,9 @@ class AlgorithmTelemetry:
         applicability: str = "APPLICABLE",
         count: int = 1,
         note: str | None = None,
+        phase: str = "EXECUTED",
     ) -> dict[str, Any]:
-        key = f"{algorithm_id}|{consumer}|{producer}"
+        key = f"{algorithm_id}|{consumer}|{producer}|{phase}"
         row = self._rows.get(key)
         if row is None:
             rec = self.engine.record(algorithm_id)
@@ -45,12 +46,21 @@ class AlgorithmTelemetry:
                 "fallback": fallback or rec.fallback_algorithm_id,
                 "activated": bool(activated),
                 "execution_count": 0,
+                "built_count": 0,
+                "queried_count": 0,
+                "phase": phase,
                 "artifact": artifact,
                 "note": note,
             }
             self._rows[key] = row
             self._order.append(key)
-        row["execution_count"] = int(row["execution_count"]) + int(count)
+        if phase == "BUILT":
+            row["built_count"] = int(row["built_count"]) + int(count)
+        elif phase == "QUERIED":
+            row["queried_count"] = int(row["queried_count"]) + int(count)
+            row["execution_count"] = int(row["execution_count"]) + int(count)
+        elif phase in {"EXECUTED", "FALLBACK_EXECUTED"}:
+            row["execution_count"] = int(row["execution_count"]) + int(count)
         if artifact and not row.get("artifact"):
             row["artifact"] = artifact
         return row
@@ -77,20 +87,29 @@ class AlgorithmTelemetry:
             applicability="APPLICABLE" if sel.activated else "CONDITIONAL_NOT_ACTIVATED",
             count=count,
             note=";".join(sel.reasons[:4]),
+            phase="EXECUTED",
         )
 
     def snapshot(self) -> dict[str, Any]:
         executions = [self._rows[k] for k in self._order]
         by_id: dict[str, int] = defaultdict(int)
+        queried: dict[str, int] = defaultdict(int)
+        built: dict[str, int] = defaultdict(int)
         for row in executions:
-            if row.get("activated"):
-                by_id[str(row["algorithm_id"])] += int(row["execution_count"])
+            aid = str(row["algorithm_id"])
+            built[aid] += int(row.get("built_count") or 0)
+            queried[aid] += int(row.get("queried_count") or 0)
+            if row.get("activated") and int(row.get("execution_count") or 0) > 0:
+                by_id[aid] += int(row["execution_count"])
         body = {
             "schema": "pillars_dcm.algorithm_execution_telemetry.v1",
             "executions": executions,
             "activatedCounts": dict(sorted(by_id.items())),
+            "queriedCounts": dict(sorted((k, v) for k, v in queried.items() if v)),
+            "builtCounts": dict(sorted((k, v) for k, v in built.items() if v)),
             "activatedAlgorithmCount": len(by_id),
             "rowCount": len(executions),
+            "note": "BUILT is not QUERIED. Construction of an unused index is not successful algorithm execution.",
         }
         body["contentHash"] = content_hash({k: v for k, v in body.items() if k != "contentHash"})
         return body

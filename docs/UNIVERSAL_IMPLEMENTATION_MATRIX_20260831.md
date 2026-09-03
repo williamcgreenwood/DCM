@@ -1,8 +1,9 @@
 # DCM universal implementation matrix — 2026-08-31
 
-Baseline refreshed through PR #17 merge `cdb428f6a05406184fe265b0a1e81abec92cd1f9` and the R0 Algorithmic Constitution child branch. R0 is constitution/registry/selection/HAR-plan/CI, not a claim that Research OS or the full DCM is complete.
-This matrix is code-path status, not predictive validation. LR remains
+Baseline refreshed through PR #19 CFB reference-implementation consumer pass on `grok/cfb-guarded-launch-today-20260903`. R0 constitution remains inherited. This matrix is code-path status, not predictive validation. LR remains
 `LR000000`; predictive superiority remains `NONE`. Constitution version: `DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903`.
+
+CFB software reference path is executable (19 ACTIVE markets, holdPlayable consumer, retrieval cascade queried, RoleEpoch EWMA/CUSUM/Page-Hinkley, JOINT_TEAM EventWorlds, archive retry/reconcile). Current-HAR acceptance is `CURRENT_REAL_HAR_ACCEPTANCE_PENDING_EXTERNAL_INPUT`.
 
 Status meanings:
 
@@ -24,8 +25,8 @@ Status meanings:
 | ChatGPT-native CORE primitives | COMPLETE for R0 | Searching/indexing/sorting/grouping/scheduling/cache/stdlib ML in `dcm.algorithms`. |
 | Weighted set-cover / submodular | COMPLETE as primitives | Registered CORE; live AcquisitionAction packing remains R1. |
 | Silent retirement CI | COMPLETE for R0 | `tests/governance/` plus registry `--check`. |
-| BoardGraph / RequirementGraph / AcquisitionAction | CFB live slice STRONG PARTIAL | Guarded CFB path emits graphs and live CELF packing before research. Mixed-sport R1 remainder and current live HAR research remain. |
-| Drive-first indexed retrieval | PARTIAL | Persistence law documented; existing ResearchStore/archive unchanged this pass. |
+| BoardGraph / RequirementGraph / AcquisitionAction | CFB COMPLETE for declared scope | Guarded CFB path emits graphs, live CELF packing, ResearchOSReadiness before research. Mixed-sport R1 remainder remains. |
+| Drive-first indexed retrieval | PARTIAL + BLOCKED_EXTERNAL | Local DriveObjectCatalog identifies exact objects then fail-closes `NOT_CONFIGURED`. Drive credentials are external. |
 
 ## P0 — canonical spine / integrity
 

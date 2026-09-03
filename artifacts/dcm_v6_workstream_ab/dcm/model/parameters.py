@@ -79,9 +79,11 @@ def _sd(logs: list[dict], key: str, fallback: float) -> float:
 
 
 def _shrink(sample: float | None, n: int, prior: float, prior_n: float = 5.0) -> float:
+    from dcm.algorithms.ml_families import empirical_bayes_shrink
+
     if sample is None or n <= 0:
         return prior
-    return (sample * n + prior * prior_n) / (n + prior_n)
+    return empirical_bayes_shrink(float(sample), float(n), float(prior), float(prior_n))
 
 
 def build_parameter_snapshot(
@@ -324,6 +326,7 @@ def build_parameter_snapshot(
             "invented": False,
             "epochCount": len(role_epoch.get("epochs") or []),
             "projectedRole": role_epoch.get("projectedRole"),
+            "governedChangePoints": role_epoch.get("governedChangePoints"),
         }
         logs = comparable
         eff_n = max(eff_n, fn, rn, an, int(eff_fit.get("support_n") or 0))
@@ -348,6 +351,9 @@ def build_parameter_snapshot(
             "qb_id": player.get("qb_id"),
         }
         role_epoch = RoleEpochBuilder().build(player, claims=all_claims, today_context=today_context)
+        if role_epoch.get("qb_id") and not player.get("qb_id"):
+            player = dict(player)
+            player["qb_id"] = role_epoch.get("qb_id")
         comparable_raw = role_epoch.get("comparable_logs") or []
         if comparable_raw:
             comp_norm = normalize_gridiron_logs(comparable_raw, league=league)
@@ -448,6 +454,7 @@ def build_parameter_snapshot(
             "projectedRole": role_epoch.get("projectedRole"),
             "mode": "gridiron",
             "qbIdentity": role_epoch.get("qbIdentity"),
+            "governedChangePoints": role_epoch.get("governedChangePoints"),
         }
         logs = comparable
         eff_n = max(eff_n, int(eff_fit.get("support_n") or 0), opportunity_support_from_logs)
@@ -506,7 +513,26 @@ def build_parameter_snapshot(
         and gridiron_defense_ok
     )
     data_quality = max(0.0, min(1.0, rel * 0.65 + fresh * 0.20 + min(1.0, min(opp_n, eff_n) / 10.0) * 0.15))
-    ood = max(0.0, min(1.0, _f(player.get("ood_risk"), 0.15 if min(opp_n, eff_n) >= 5 else 0.45)))
+    claimed_ood = player.get("ood_risk")
+    if claimed_ood is not None:
+        ood = max(0.0, min(1.0, _f(claimed_ood, 0.45)))
+    else:
+        from dcm.algorithms.ml_families import zscore_ood
+
+        sample_key = "pass_yds" if family == "gridiron" else "pts"
+        pop = []
+        for log_row in logs:
+            if isinstance(log_row, dict) and log_row.get(sample_key) is not None:
+                try:
+                    pop.append(float(log_row[sample_key]))
+                except (TypeError, ValueError):
+                    pass
+        if len(pop) >= 3:
+            last = pop[-1]
+            z = zscore_ood(last, pop[:-1] if len(pop) > 3 else pop)
+            ood = max(0.0, min(1.0, z / 6.0))
+        else:
+            ood = 0.15 if min(opp_n, eff_n) >= 5 else 0.45
     blocker = None
     if synthetic: blocker = "SYNTHETIC_EVIDENCE_NOT_SELECTABLE"
     elif not definition_verified: blocker = "UNVERIFIED_MARKET_DEFINITION"

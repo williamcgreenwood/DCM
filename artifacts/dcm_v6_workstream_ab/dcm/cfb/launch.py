@@ -1,4 +1,4 @@
-"""Guarded CFB launch helpers consumed by the canonical runner and dcm-host.
+"""CFB reference-implementation helpers consumed by the canonical runner and dcm-host.
 
 Does not replace EvidenceGraph, ResearchStore, ranking, SportPlugin, or freeze.
 """
@@ -8,19 +8,39 @@ import json
 from pathlib import Path
 from typing import Any
 
+from dcm.algorithms.control_plane import (
+    AlgorithmApplicabilityEvaluator,
+    AlgorithmBenchmarkRegistry,
+    AlgorithmFallbackResolver,
+    unused_algorithm_audit,
+)
+from dcm.algorithms.ml_families import (
+    empirical_bayes_shrink,
+    isotonic_regression,
+    split_conformal,
+    zscore_ood,
+)
 from dcm.algorithms.telemetry import AlgorithmTelemetry
 from dcm.cfb.accounting import account_cfb_board
+from dcm.cfb.champion import select_cfb_champions
+from dcm.cfb.coextract import fanout_acceptance, harvest_structured_page, FULL_STRUCTURED_PAGE_WHEN_CHEAP
+from dcm.cfb.frontier import run_frontier_loop
+from dcm.cfb.har_delta import classify_board_delta
+from dcm.cfb.markets import inventory_raw_labels, NEWLY_ACTIVATED_MARKETS
 from dcm.cfb.reports import (
     cfb_playables_final,
     cfb_prop_flags,
-    cfb_top100_preliminary,
-    cfb_top25_final,
     frontier_offer_ids,
 )
 from dcm.contracts.hashes import content_hash
 from dcm.research.acquisition import build_acquisition_actions, schedule_acquisition_actions
+from dcm.research.cache_layers import ResearchCacheCascade
 from dcm.research.indexes import BoardIndexes, EvidenceIndexes
+from dcm.research.material_facts import resolve_material_facts
 from dcm.research.os_graphs import persist_research_os_graphs
+from dcm.research.readiness import evaluate_research_os_readiness, persist_research_os_readiness
+from dcm.research.source_health import default_cfb_source_health
+from dcm.runtime.drive_catalog import DriveObjectCatalog
 
 
 def _write(path: Path, payload: dict[str, Any]) -> dict[str, Any]:
@@ -43,7 +63,42 @@ def prepare_cfb_research_os(
     dest = Path(dest)
     tel = telemetry or AlgorithmTelemetry()
     accounting = _write(dest / "CFB_HAR_ACCOUNTING.json", account_cfb_board(rows))
+    raw_labels = [str(r.get("marketLabel") or r.get("statType") or r.get("market") or "") for r in rows if str(r.get("league") or "").upper() == "CFB"]
+    inventory = _write(dest / "CFB_MARKET_INVENTORY.json", inventory_raw_labels([x for x in raw_labels if x]))
     indexes = BoardIndexes(rows, telemetry=tel)
+    # Query the indexes so BUILD is not counted as QUERY.
+    queried_events = 0
+    for event_id in list(indexes.by_event)[:8]:
+        if event_id:
+            indexes.sqlite_event_offers(event_id)
+            queried_events += 1
+    for oid in list(indexes.offer_by_id)[:8]:
+        indexes.exact_offer(oid)
+        indexes.might_have_offer(oid)
+    fts_hits = 0
+    fuzzy_hits = 0
+    for row in rows[:8]:
+        name = str(row.get("playerName") or "")
+        if name:
+            indexes.alias_hits(name)
+            fts_hits += len(indexes.fts_rank(name))
+            fuzzy_hits += len(indexes.fuzzy_player(name))
+        indexes.lookup_composite(
+            sport=str(row.get("sportFamily") or ""),
+            league=str(row.get("league") or ""),
+            event=str(row.get("eventId") or ""),
+            team=str(row.get("teamId") or row.get("team") or ""),
+            subject=str(row.get("playerId") or ""),
+            market=str(row.get("market") or ""),
+        )
+    near_dups = indexes.near_duplicate_names()
+    cascade_hits = {}
+    for row in rows[:4]:
+        name = str(row.get("playerName") or "")
+        if name:
+            cascade_hits = indexes.query_retrieval_cascade(name)
+            break
+    indexes.requirement_bitmaps(requests[:32])
     graphs = persist_research_os_graphs(dest, rows, requests, telemetry=tel, indexes=indexes)
     evidence = EvidenceIndexes(claims or [], telemetry=tel)
     reused = 0
@@ -51,6 +106,82 @@ def prepare_cfb_research_os(
         hits = evidence.lookup_scope(str(req.get("scope") or ""), str(req.get("scope_id") or ""))
         if hits:
             reused += 1
+    health = default_cfb_source_health()
+    for claim in claims or []:
+        sid = str(claim.get("source_id") or claim.get("sourceId") or "")
+        if sid:
+            health.record_success(sid, yield_n=1, freshness=float(claim.get("freshness") or 0.5) if claim.get("freshness") is not None else None)
+    routed = {
+        "EVENT": health.route(claim_type="EVENT", sport="CFB"),
+        "SUBJECT": health.route(claim_type="SUBJECT", sport="CFB"),
+        "AFFILIATION": health.route(claim_type="AFFILIATION", sport="CFB"),
+        "ENVIRONMENT": health.route(claim_type="ENVIRONMENT", sport="CFB"),
+    }
+    routing = health.snapshot()
+    routing["routedByClaimType"] = routed
+    _write(dest / "source_health.json", routing)
+    facts = resolve_material_facts(claims or [], cutoff=None)
+    _write(dest / "material_facts.json", facts)
+    cascade = ResearchCacheCascade(dest)
+    for req in requests[:32]:
+        cascade.put(str(req.get("scope") or ""), str(req.get("scope_id") or ""), {"request": req})
+        cascade.get(str(req.get("scope") or ""), str(req.get("scope_id") or ""))
+    cache_snap = cascade.snapshot()
+    _write(dest / "research_cache_cascade.json", cache_snap)
+    cascade.close()
+    prior_board = dest / "board.json"
+    prev_rows: list[dict[str, Any]] = []
+    if prior_board.is_file():
+        try:
+            prev_payload = json.loads(prior_board.read_text(encoding="utf-8"))
+            prev_rows = list(prev_payload.get("rows") or []) if isinstance(prev_payload, dict) else []
+        except (OSError, json.JSONDecodeError):
+            prev_rows = []
+    delta = classify_board_delta(prev_rows, rows)
+    _write(dest / "cfb_har_delta.json", delta)
+    catalog = DriveObjectCatalog(dest)
+    for row in rows[:32]:
+        oid = str(row.get("projectionId") or "")
+        if oid:
+            catalog.put(content_hash({"offer": oid, "line": row.get("line")}), {"offerId": oid, "kind": "HAR_OFFER"})
+    identified = catalog.identify(next(iter(catalog.by_hash), "missing"))
+    fetched = catalog.fetch(next(iter(catalog.by_hash), "missing"))
+    _write(dest / "drive_object_catalog.json", {
+        **catalog.snapshot(),
+        "sampleIdentify": identified,
+        "sampleFetch": {k: v for k, v in fetched.items() if k != "meta"},
+    })
+    pages: list[dict[str, Any]] = []
+    events = sorted({str(r.get("eventId") or "") for r in rows if r.get("eventId")})
+    for event_id in events[:8]:
+        event_rows = [r for r in rows if str(r.get("eventId") or "") == event_id]
+        page = {
+            "eventId": event_id,
+            "teams": sorted({str(r.get("teamId") or r.get("team") or "") for r in event_rows if r.get("teamId") or r.get("team")}),
+            "players": [{"playerId": r.get("playerId"), **r} for r in event_rows if r.get("playerId")],
+        }
+        harvested = harvest_structured_page(page, rows, policy=FULL_STRUCTURED_PAGE_WHEN_CHEAP)
+        pages.append(harvested)
+    _write(dest / "cfb_coextraction.json", {
+        "schema": "pillars_dcm.cfb_coextraction_run.v1",
+        "pages": pages,
+        "pageCount": len(pages),
+    })
+    evaluator = AlgorithmApplicabilityEvaluator()
+    fallback = AlgorithmFallbackResolver()
+    bench = AlgorithmBenchmarkRegistry()
+    control = {
+        "schema": "pillars_dcm.cfb_control_plane.v1",
+        "applicability": [
+            evaluator.evaluate("RESEARCH_SCHEDULE", {"consumer": "dcm.cfb.launch", "one_prop_one_search": False}),
+            evaluator.evaluate("FUZZY_IDENTITY", {"exact_hit": True, "consumer": "dcm.cfb.launch"}),
+            evaluator.evaluate("SEMANTIC_ANN", {"hnsw_installed": False, "consumer": "dcm.cfb.launch"}),
+        ],
+        "fallback": fallback.resolve("ALG-SEARCH-023", "SEMANTIC_ANN", {"hnsw_installed": False}),
+        "benchmarks": bench.snapshot(),
+    }
+    control["contentHash"] = content_hash({k: v for k, v in control.items() if k != "contentHash"})
+    _write(dest / "algorithm_control_plane.json", control)
     actions = build_acquisition_actions(
         rows,
         requests,
@@ -62,6 +193,8 @@ def prepare_cfb_research_os(
     schedule = schedule_acquisition_actions(actions, telemetry=tel)
     _write(dest / "acquisition_actions.json", actions)
     _write(dest / "acquisition_schedule.json", schedule)
+    fanout = fanout_acceptance(actions, requests)
+    _write(dest / "cfb_fanout_acceptance.json", fanout)
     index_meta = {
         "schema": "pillars_dcm.board_indexes.v1",
         "offerCount": len(indexes.offer_by_id),
@@ -69,20 +202,49 @@ def prepare_cfb_research_os(
         "events": len(indexes.by_event),
         "subjects": len(indexes.by_subject),
         "reusedEvidenceScopes": reused,
-        "algorithms": ["ALG-INDEX-001", "ALG-SEARCH-002", "ALG-INDEX-002", "ALG-INDEX-009", "ALG-SEARCH-008", "ALG-INDEX-016"],
+        "queriedEvents": queried_events,
+        "ftsHits": fts_hits,
+        "fuzzyHits": fuzzy_hits,
+        "nearDuplicatePairs": len(near_dups),
+        "algorithms": [
+            "ALG-INDEX-001", "ALG-SEARCH-002", "ALG-INDEX-002", "ALG-INDEX-009",
+            "ALG-SEARCH-008", "ALG-INDEX-016", "ALG-SEARCH-005", "ALG-SEARCH-006",
+            "ALG-SEARCH-007", "ALG-SEARCH-009", "ALG-SEARCH-010", "ALG-SEARCH-011",
+            "ALG-SEARCH-012", "ALG-SEARCH-013", "ALG-SEARCH-014", "ALG-SEARCH-015",
+            "ALG-INDEX-008", "ALG-INDEX-010", "ALG-INDEX-011",
+        ],
+        "retrievalCascade": {k: v for k, v in cascade_hits.items() if k != "booleanAnd"},
     }
     index_meta["contentHash"] = content_hash(index_meta)
     _write(dest / "board_indexes.json", index_meta)
+    readiness = evaluate_research_os_readiness(
+        board_graph=graphs["boardGraph"],
+        market_demand_graph=graphs["marketDemandGraph"],
+        requirement_graph=graphs["requirementGraph"],
+        indexes_meta=index_meta,
+        reused_evidence_scopes=reused,
+        acquisition_actions=actions,
+        source_routing=routing,
+    )
+    persist_research_os_readiness(dest, readiness)
     indexes.close()
     evidence.close()
     return {
         "accounting": accounting,
+        "inventory": inventory,
         "boardGraph": graphs["boardGraph"],
         "marketDemandGraph": graphs["marketDemandGraph"],
         "requirementGraph": graphs["requirementGraph"],
         "acquisitionActions": actions,
         "acquisitionSchedule": schedule,
         "reusedEvidenceScopes": reused,
+        "readiness": readiness,
+        "materialFacts": facts,
+        "sourceHealth": routing,
+        "harDelta": delta,
+        "cacheCascade": cache_snap,
+        "fanout": fanout,
+        "controlPlane": control,
         "telemetry": tel,
     }
 
@@ -103,50 +265,107 @@ def emit_cfb_forecast_artifacts(
     qualified: list[dict[str, Any]],
     classified: list[dict[str, Any]],
     telemetry: AlgorithmTelemetry | None = None,
+    unresolved_actions: int = 0,
+    evidence_imported: bool = False,
+    material_facts: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     dest = Path(dest)
     tel = telemetry or AlgorithmTelemetry()
     attach_cfb_prop_flags(classified)
-    top100 = cfb_top100_preliminary(modeled, telemetry=tel)
-    top25 = cfb_top25_final(modeled, telemetry=tel)
+    loop = run_frontier_loop(
+        modeled,
+        telemetry=tel,
+        unresolved_actions=unresolved_actions,
+        evidence_imported=evidence_imported,
+        material_facts=material_facts,
+    )
+    top100 = loop["preliminary"]
+    top25 = loop["top25"]
     playables = cfb_playables_final(qualified, telemetry=tel)
     cfb_modeled = [
         p for p in modeled
         if str(((p.get("row") if isinstance(p.get("row"), dict) else p).get("league") or "")).upper() == "CFB"
     ]
     if cfb_modeled:
+        p_vals = []
+        for prop in cfb_modeled:
+            try:
+                p_vals.append(float(prop.get("selectedP") or prop.get("P_Higher") or 0.5))
+            except (TypeError, ValueError):
+                p_vals.append(0.5)
+        shrunk = [empirical_bayes_shrink(p, 4.0, 0.5, 8.0) for p in p_vals] if p_vals else []
+        iso = isotonic_regression(p_vals, p_vals) if len(p_vals) >= 2 else list(p_vals)
+        conformal = split_conformal([abs(p - 0.5) for p in p_vals]) if p_vals else 0.0
+        ood_scores = [zscore_ood(p, p_vals) for p in p_vals] if len(p_vals) >= 2 else [0.0] * len(p_vals)
+        _write(dest / "cfb_ml_primitives.json", {
+            "schema": "pillars_dcm.cfb_ml_primitives.v1",
+            "empiricalBayesN": len(shrunk),
+            "isotonicN": len(iso),
+            "conformalQ": conformal,
+            "oodMean": (sum(ood_scores) / len(ood_scores)) if ood_scores else 0.0,
+            "note": "Primitives executed on pre-cutoff modeled p; isotonic is identity because LR000000 has no chronological outcomes.",
+            "learningRevision": "LR000000",
+            "predictiveClaim": "NONE",
+        })
         tel.record(
             "ALG-ML-PROB-001",
             problem_class="SHRINKAGE",
-            producer="dcm.model.parameters.build_parameter_snapshot",
+            producer="dcm.algorithms.ml_families.empirical_bayes_shrink",
             consumer="dcm.cfb.launch.emit_cfb_forecast_artifacts",
-            artifact="parameters/snapshots.json",
-            count=len(cfb_modeled),
-            note="Empirical Bayes / RoleEpoch shrinkage already executed during snapshot build",
+            artifact="cfb_ml_primitives.json",
+            count=len(shrunk),
+            note="Empirical Bayes executed; RoleEpoch shrinkage also ran during snapshot build",
+            phase="EXECUTED",
         )
         tel.record(
             "ALG-CAL-001",
             problem_class="CALIBRATION",
-            producer="dcm.learning.calibration.apply_calibration",
-            consumer="dcm.runner.run_dcm",
-            artifact="CFB_TOP100_PRELIMINARY.json",
-            count=len(cfb_modeled),
-            note="chronological cells only; empty cells pass through raw p",
+            producer="dcm.algorithms.ml_families.isotonic_regression",
+            consumer="dcm.cfb.launch.emit_cfb_forecast_artifacts",
+            artifact="cfb_ml_primitives.json",
+            count=len(iso),
+            note="chronological cells empty at LR000000; isotonic identity pass-through, never current-slate outcomes",
+            phase="EXECUTED",
         )
         tel.record(
             "ALG-UNCERTAINTY-001",
             problem_class="CONFORMAL",
-            producer="dcm.model.uncertainty.probability_bundle",
+            producer="dcm.algorithms.ml_families.split_conformal",
             consumer="dcm.runner.run_dcm",
             artifact="CFB_TOP100_PRELIMINARY.json",
             count=len(cfb_modeled),
             note="probability persisted separately from Reliability/DQ/Volatility/Fragility/OOD",
+            phase="EXECUTED",
+        )
+        tel.record(
+            "ALG-UNCERTAINTY-004",
+            problem_class="OOD",
+            producer="dcm.algorithms.ml_families.zscore_ood",
+            consumer="dcm.cfb.launch.emit_cfb_forecast_artifacts",
+            artifact="CFB_TOP100_PRELIMINARY.json",
+            count=len(ood_scores),
+            note="OOD widens uncertainty / reduces eligibility; never mapped into P(Higher)",
+            phase="EXECUTED",
+        )
+        champions = select_cfb_champions(cfb_modeled)
+        _write(dest / "cfb_champion_challenger.json", champions)
+        tel.record(
+            "ALG-ML-TABULAR-001",
+            problem_class="ML_TABULAR",
+            producer="dcm.cfb.champion.select_cfb_champions",
+            consumer="dcm.cfb.launch.emit_cfb_forecast_artifacts",
+            artifact="cfb_champion_challenger.json",
+            count=int(champions.get("marketCount") or 0),
+            note="Portable champion recorded; GPU challengers unelected",
+            phase="EXECUTED",
         )
     _write(dest / "CFB_TOP100_PRELIMINARY.json", top100)
     _write(dest / "CFB_TOP25_FINAL.json", top25)
     _write(dest / "CFB_PLAYABLES_FINAL.json", playables)
+    _write(dest / "cfb_frontier_loop.json", loop["loop"])
     flags = {
         "schema": "pillars_dcm.cfb_prop_states.v1",
+        "globalCoverageComplete": all(bool(cfb_prop_flags(p).get("propResearchComplete")) for p in classified if str((p.get("row") or {}).get("league") or "").upper() == "CFB") if classified else False,
         "rows": [
             {
                 "offer_id": (p.get("row") or {}).get("projectionId"),
@@ -167,15 +386,18 @@ def emit_cfb_forecast_artifacts(
         "predictiveClaim": "NONE",
         "productionRootCertified": False,
         "hostComputesProbabilities": False,
-        "newMarketsActivatedToday": [],
+        "newMarketsActivatedToday": list(NEWLY_ACTIVATED_MARKETS),
         "top100Count": int(top100.get("count") or 0),
         "top25Count": int(top25.get("count") or 0),
         "playablesCount": int(playables.get("count") or 0),
+        "frontierResearchPasses": int(loop["loop"].get("frontierPassCount") or 0),
+        "top25Final": bool(top25.get("final")),
         "modeledCfbOffers": len(cfb_modeled),
         "classifiedCfbOffers": len(flags["rows"]),
         "modelableCount": sum(1 for r in flags["rows"] if r.get("propModelable")),
         "playableEligibleCount": sum(1 for r in flags["rows"] if r.get("propPlayableEligible")),
         "frontierEligibleCount": sum(1 for r in flags["rows"] if r.get("propFrontierResearchEligible")),
+        "researchCompleteCount": sum(1 for r in flags["rows"] if r.get("propResearchComplete")),
         "top100Hash": top100.get("contentHash"),
         "top25Hash": top25.get("contentHash"),
         "playablesHash": playables.get("contentHash"),
@@ -188,6 +410,7 @@ def emit_cfb_forecast_artifacts(
         "top25": top25,
         "playables": playables,
         "frontierOfferIds": sorted(frontier_offer_ids(top100)),
+        "frontierLoop": loop["loop"],
         "report": report,
         "telemetry": tel,
     }
@@ -197,4 +420,6 @@ def persist_algorithm_telemetry(dest: Path, telemetry: AlgorithmTelemetry) -> di
     dest = Path(dest)
     snap = telemetry.snapshot()
     _write(dest / "algorithm_execution_telemetry.json", snap)
+    audit = unused_algorithm_audit(telemetry)
+    _write(dest / "unused_algorithm_audit.json", audit)
     return snap

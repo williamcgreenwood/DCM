@@ -218,7 +218,7 @@ class HostSession:
             self.dest,
             store_root=self.workspace / "dcm_v6" / "research_store",
         )
-        modeling_permitted = True
+        modeling_permitted = bool(coverage.get("complete")) or bool(coverage.get("completeRequests"))
         mount = mount_default(self.workspace)
         production_selection_permitted = bool(coverage.get("complete")) and mount.get("state") == "HASH_VERIFIED_EXTRACTED"
         payload = {

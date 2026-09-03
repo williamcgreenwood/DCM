@@ -13,8 +13,8 @@ from dcm.research.os_graphs import build_board_graph, build_market_demand_graph,
 from dcm.research.provider import write_bundle
 from dcm.research.requests import plan_research
 from dcm.runner import run_dcm
+from dcm.cfb.markets import NEWLY_ACTIVATED_MARKETS
 from dcm.sports.football.research_requirements import MARKET_REQUIREMENTS
-
 from tests.test_cfb_guarded_launch import CUTOFF, FIXTURE, _claims, _web_claims
 
 
@@ -40,9 +40,10 @@ def test_cfb_accounting_before_goblin_exclusion():
     assert acc["supported"] == 8
     assert acc["unsupported"] == 0
     assert acc["goblinsExcludedFromSelectionAfterAccounting"] is True
-    assert set(acc["supportedMarketDefinitions"]) == set(MARKET_REQUIREMENTS)
+    assert set(acc["supportedMarketDefinitions"]) <= set(MARKET_REQUIREMENTS)
+    assert set(acc["registeredMarketDefinitions"]) == set(MARKET_REQUIREMENTS)
     assert acc["meaningfulTop100"] is False
-    assert acc["newMarketsActivatedToday"] == []
+    assert acc["newMarketsActivatedToday"] == list(NEWLY_ACTIVATED_MARKETS)
 
 
 def test_graphs_exist_before_research_and_use_constitution_primitives():
@@ -254,8 +255,11 @@ def test_partial_bundle_still_emits_graphs_and_per_prop_states(tmp_path: Path):
     if result["runState"] != "INCOMPLETE_CHECKPOINTED":
         states = json.loads((dest / "cfb_prop_states.json").read_text())
         assert states["rows"]
-        # modelable != playableSupport is preserved independently
-        assert any(
-            row.get("footballModelable") != row.get("playableSupport") or True
-            for row in states["rows"]
-        )
+        for row in states["rows"]:
+            assert "propModelable" in row
+            assert "propPlayableEligible" in row
+            assert "propResearchComplete" in row
+            assert "propFrontierResearchEligible" in row
+            # Independence: research completeness is not inferred from modelability.
+            if row.get("propModelable") and not row.get("propResearchComplete"):
+                assert row.get("propPlayableEligible") is False

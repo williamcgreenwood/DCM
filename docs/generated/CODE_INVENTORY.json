@@ -1,6 +1,6 @@
 {
-  "contentHash": "612a8cd82cfb25a767ad4e3bae86d302bfb713905937619376fc08669c0eae9e",
-  "moduleCount": 253,
+  "contentHash": "0f6693681e3ed41d7abcf3a5feec2d4a758301817f0fc54d639e2ada4e669384",
+  "moduleCount": 268,
   "modules": [
     {
       "classes": 0,
@@ -144,7 +144,7 @@
       "classes": 0,
       "functions": 6,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/algorithms/constitution.py",
-      "sha256": "444c4cb704ed93a0ce31e5d53d64b728312e7aaf282ee88308ed312434ac35f5",
+      "sha256": "1c0781dd0365062ce6ff1a95c75c235bd00f7f767aa1d0201955839a81367e7d",
       "symbols": [
         {
           "doc": null,
@@ -188,7 +188,7 @@
         },
         {
           "doc": null,
-          "endLine": 72,
+          "endLine": 76,
           "kind": "function",
           "line": 58,
           "name": "constitution_identity",
@@ -201,7 +201,7 @@
       "classes": 4,
       "functions": 7,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/algorithms/contracts.py",
-      "sha256": "740c0e21511b5e63a667a53dc7566c4aed45ae5a8130940873bb1d5bee90619a",
+      "sha256": "428662e56d92bf4ff29af6bbd08d6881982b0ce724c8bde14d746d22bcdd2059",
       "symbols": [
         {
           "doc": "Raised when a permanent challenger is invoked as a production algorithm.",
@@ -277,7 +277,7 @@
         },
         {
           "doc": null,
-          "endLine": 217,
+          "endLine": 223,
           "kind": "class",
           "line": 193,
           "name": "HarAlgorithmExecutionPlan",
@@ -285,11 +285,148 @@
         },
         {
           "doc": null,
-          "endLine": 217,
+          "endLine": 223,
           "kind": "method",
-          "line": 205,
+          "line": 207,
           "name": "to_dict",
           "qualname": "HarAlgorithmExecutionPlan.to_dict"
+        }
+      ],
+      "workstream": "P16"
+    },
+    {
+      "classes": 5,
+      "functions": 11,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/algorithms/control_plane.py",
+      "sha256": "94948e95df3e9b460218e20ea0f828411bbdc46405b2fa0cf4dafed59bb6b71d",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 42,
+          "kind": "class",
+          "line": 29,
+          "name": "AlgorithmApplicabilityEvaluator",
+          "qualname": "AlgorithmApplicabilityEvaluator"
+        },
+        {
+          "doc": null,
+          "endLine": 31,
+          "kind": "method",
+          "line": 30,
+          "name": "__init__",
+          "qualname": "AlgorithmApplicabilityEvaluator.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 42,
+          "kind": "method",
+          "line": 33,
+          "name": "evaluate",
+          "qualname": "AlgorithmApplicabilityEvaluator.evaluate"
+        },
+        {
+          "doc": null,
+          "endLine": 57,
+          "kind": "class",
+          "line": 45,
+          "name": "AlgorithmFallbackResolver",
+          "qualname": "AlgorithmFallbackResolver"
+        },
+        {
+          "doc": null,
+          "endLine": 47,
+          "kind": "method",
+          "line": 46,
+          "name": "__init__",
+          "qualname": "AlgorithmFallbackResolver.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 57,
+          "kind": "method",
+          "line": 49,
+          "name": "resolve",
+          "qualname": "AlgorithmFallbackResolver.resolve"
+        },
+        {
+          "doc": null,
+          "endLine": 83,
+          "kind": "class",
+          "line": 60,
+          "name": "AlgorithmBenchmarkRegistry",
+          "qualname": "AlgorithmBenchmarkRegistry"
+        },
+        {
+          "doc": null,
+          "endLine": 71,
+          "kind": "method",
+          "line": 61,
+          "name": "__init__",
+          "qualname": "AlgorithmBenchmarkRegistry.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 74,
+          "kind": "method",
+          "line": 73,
+          "name": "lookup",
+          "qualname": "AlgorithmBenchmarkRegistry.lookup"
+        },
+        {
+          "doc": null,
+          "endLine": 83,
+          "kind": "method",
+          "line": 76,
+          "name": "snapshot",
+          "qualname": "AlgorithmBenchmarkRegistry.snapshot"
+        },
+        {
+          "doc": "Runtime plan distinct from the HAR AlgorithmExecutionPlan artifact.",
+          "endLine": 111,
+          "kind": "class",
+          "line": 86,
+          "name": "AlgorithmExecutionPlan",
+          "qualname": "AlgorithmExecutionPlan"
+        },
+        {
+          "doc": null,
+          "endLine": 90,
+          "kind": "method",
+          "line": 89,
+          "name": "__init__",
+          "qualname": "AlgorithmExecutionPlan.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 102,
+          "kind": "method",
+          "line": 92,
+          "name": "add",
+          "qualname": "AlgorithmExecutionPlan.add"
+        },
+        {
+          "doc": null,
+          "endLine": 111,
+          "kind": "method",
+          "line": 104,
+          "name": "snapshot",
+          "qualname": "AlgorithmExecutionPlan.snapshot"
+        },
+        {
+          "doc": "Named telemetry type required by the constitution control plane.",
+          "endLine": 115,
+          "kind": "class",
+          "line": 114,
+          "name": "AlgorithmExecutionTelemetry",
+          "qualname": "AlgorithmExecutionTelemetry"
+        },
+        {
+          "doc": null,
+          "endLine": 130,
+          "kind": "function",
+          "line": 118,
+          "name": "unused_algorithm_audit",
+          "qualname": "unused_algorithm_audit"
         }
       ],
       "workstream": "P16"
@@ -298,11 +435,11 @@
       "classes": 0,
       "functions": 3,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/algorithms/execution_plan.py",
-      "sha256": "e7715d47c1f54152737b9fe95c7584be18031755a2fd9031b6a6e592add794e7",
+      "sha256": "c6113c56a184a812bc2c63a4b5e75972f37dd5f72382107620242b1e1e5d7ca8",
       "symbols": [
         {
           "doc": null,
-          "endLine": 100,
+          "endLine": 102,
           "kind": "function",
           "line": 36,
           "name": "build_har_algorithm_execution_plan",
@@ -310,17 +447,17 @@
         },
         {
           "doc": "Sidecar hashes for hashes.json. Not forecast-semantic fields.",
-          "endLine": 119,
+          "endLine": 122,
           "kind": "function",
-          "line": 103,
+          "line": 105,
           "name": "constitution_run_hashes",
           "qualname": "constitution_run_hashes"
         },
         {
           "doc": null,
-          "endLine": 132,
+          "endLine": 135,
           "kind": "function",
-          "line": 122,
+          "line": 125,
           "name": "persist_har_algorithm_execution_plan",
           "qualname": "persist_har_algorithm_execution_plan"
         }
@@ -1844,11 +1981,11 @@
       "classes": 1,
       "functions": 4,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/algorithms/telemetry.py",
-      "sha256": "119deb75550e796f771c5bcd29dae5eb04d0e7e1bbafa9c561d794ed1adaca5b",
+      "sha256": "0a2fd19f4bd2e792fc85ba7253fa7fdb3a31c92f7072ad10d8b2adac31eee96f",
       "symbols": [
         {
           "doc": "Records constitution algorithm executions on the live HAR path.",
-          "endLine": 96,
+          "endLine": 115,
           "kind": "class",
           "line": 11,
           "name": "AlgorithmTelemetry",
@@ -1864,7 +2001,7 @@
         },
         {
           "doc": null,
-          "endLine": 56,
+          "endLine": 66,
           "kind": "method",
           "line": 19,
           "name": "record",
@@ -1872,17 +2009,17 @@
         },
         {
           "doc": null,
-          "endLine": 80,
+          "endLine": 91,
           "kind": "method",
-          "line": 58,
+          "line": 68,
           "name": "select_and_record",
           "qualname": "AlgorithmTelemetry.select_and_record"
         },
         {
           "doc": null,
-          "endLine": 96,
+          "endLine": 115,
           "kind": "method",
-          "line": 82,
+          "line": 93,
           "name": "snapshot",
           "qualname": "AlgorithmTelemetry.snapshot"
         }
@@ -1916,17 +2053,26 @@
     },
     {
       "classes": 0,
-      "functions": 0,
+      "functions": 1,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/cfb/__init__.py",
-      "sha256": "fa5923168a1e2873aae99d6b50f4f5ca8a466b0dfae45acbb5e024b9cb1287a6",
-      "symbols": [],
+      "sha256": "eb1a168f0705f9063541679e16e5aaca62bdf1464e4951c1445a44c5e90d6d38",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 32,
+          "kind": "function",
+          "line": 19,
+          "name": "__getattr__",
+          "qualname": "__getattr__"
+        }
+      ],
       "workstream": "UNMAPPED"
     },
     {
       "classes": 0,
       "functions": 3,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/cfb/accounting.py",
-      "sha256": "38a2659f4d9660493dfcc4439944c2650d74160e919f7b988561dcd1df3249de",
+      "sha256": "9bc333f02d0ffd74e643a4e774781764a41a3e2a6353521e43dac3943f73aac9",
       "symbols": [
         {
           "doc": null,
@@ -1946,7 +2092,7 @@
         },
         {
           "doc": "Account every CFB offer, then classify Goblins / support / modelability gates.",
-          "endLine": 79,
+          "endLine": 81,
           "kind": "function",
           "line": 21,
           "name": "account_cfb_board",
@@ -1957,47 +2103,212 @@
     },
     {
       "classes": 0,
-      "functions": 5,
-      "path": "artifacts/dcm_v6_workstream_ab/dcm/cfb/launch.py",
-      "sha256": "1685181b5d05c7e856d153d15fbbb8c4d9a0e3144dbae1fac55ede6bc4c66e94",
+      "functions": 3,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/cfb/champion.py",
+      "sha256": "04e073f91373cf214a49f22bb4a68b7405a79a8a3b7a915815cc4575102c7b08",
+      "symbols": [
+        {
+          "doc": "Prefer lower log-loss / Brier / ECE; require portable CPU.",
+          "endLine": 56,
+          "kind": "function",
+          "line": 52,
+          "name": "_metrics_ok",
+          "qualname": "_metrics_ok"
+        },
+        {
+          "doc": null,
+          "endLine": 103,
+          "kind": "function",
+          "line": 59,
+          "name": "select_champion",
+          "qualname": "select_champion"
+        },
+        {
+          "doc": null,
+          "endLine": 137,
+          "kind": "function",
+          "line": 106,
+          "name": "select_cfb_champions",
+          "qualname": "select_cfb_champions"
+        }
+      ],
+      "workstream": "UNMAPPED"
+    },
+    {
+      "classes": 0,
+      "functions": 3,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/cfb/coextract.py",
+      "sha256": "f646ed68c57bdc8199bf15a63775c28494130cd6814b283226711f9667503f19",
       "symbols": [
         {
           "doc": null,
-          "endLine": 29,
+          "endLine": 46,
           "kind": "function",
           "line": 26,
+          "name": "_board_ids",
+          "qualname": "_board_ids"
+        },
+        {
+          "doc": "Extract every relevant board entity visible in one structured page.",
+          "endLine": 132,
+          "kind": "function",
+          "line": 49,
+          "name": "harvest_structured_page",
+          "qualname": "harvest_structured_page"
+        },
+        {
+          "doc": "executed AcquisitionActions << independent unresolved prop requirements.",
+          "endLine": 152,
+          "kind": "function",
+          "line": 135,
+          "name": "fanout_acceptance",
+          "qualname": "fanout_acceptance"
+        }
+      ],
+      "workstream": "UNMAPPED"
+    },
+    {
+      "classes": 0,
+      "functions": 3,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/cfb/event_worlds.py",
+      "sha256": "db25567fbe32964bc18cdae8faff9cb9c9218b1011c6186937b108fbcd42a5d4",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 32,
+          "kind": "function",
+          "line": 15,
+          "name": "cfb_teammate_groups",
+          "qualname": "cfb_teammate_groups"
+        },
+        {
+          "doc": null,
+          "endLine": 48,
+          "kind": "function",
+          "line": 35,
+          "name": "_share_int",
+          "qualname": "_share_int"
+        },
+        {
+          "doc": "Shared team plays/pass-rate/rush-rate \u2192 player opportunity \u2192 efficiency.",
+          "endLine": 174,
+          "kind": "function",
+          "line": 51,
+          "name": "simulate_joint_cfb_event_worlds",
+          "qualname": "simulate_joint_cfb_event_worlds"
+        }
+      ],
+      "workstream": "UNMAPPED"
+    },
+    {
+      "classes": 0,
+      "functions": 3,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/cfb/frontier.py",
+      "sha256": "e1f0f90cd9213db4fd6a8d3b198b609cf157f22d897ef1fe0eacc504e9f52a15",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 22,
+          "kind": "function",
+          "line": 17,
+          "name": "_unresolved_material",
+          "qualname": "_unresolved_material"
+        },
+        {
+          "doc": "Cheap EVSI stand-in: rank displacement \u00d7 unresolved materiality \u00d7 uncertainty.",
+          "endLine": 32,
+          "kind": "function",
+          "line": 25,
+          "name": "estimate_frontier_impact",
+          "qualname": "estimate_frontier_impact"
+        },
+        {
+          "doc": null,
+          "endLine": 125,
+          "kind": "function",
+          "line": 35,
+          "name": "run_frontier_loop",
+          "qualname": "run_frontier_loop"
+        }
+      ],
+      "workstream": "UNMAPPED"
+    },
+    {
+      "classes": 0,
+      "functions": 3,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/cfb/har_delta.py",
+      "sha256": "41d24fe39e1b6536fbe805842f11730919479db47fbcdc5ace1ec3d1922ce88b",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 24,
+          "kind": "function",
+          "line": 23,
+          "name": "_oid",
+          "qualname": "_oid"
+        },
+        {
+          "doc": null,
+          "endLine": 33,
+          "kind": "function",
+          "line": 27,
+          "name": "_identity",
+          "qualname": "_identity"
+        },
+        {
+          "doc": null,
+          "endLine": 118,
+          "kind": "function",
+          "line": 36,
+          "name": "classify_board_delta",
+          "qualname": "classify_board_delta"
+        }
+      ],
+      "workstream": "UNMAPPED"
+    },
+    {
+      "classes": 0,
+      "functions": 5,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/cfb/launch.py",
+      "sha256": "dc2ded73740d9f125d8f89a4399a8e6c0f095d15a9db8f80ef0041bf2a5a4001",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 49,
+          "kind": "function",
+          "line": 46,
           "name": "_write",
           "qualname": "_write"
         },
         {
           "doc": "Emit graphs, indexes, and live AcquisitionActions BEFORE web acquisition.",
-          "endLine": 87,
+          "endLine": 249,
           "kind": "function",
-          "line": 32,
+          "line": 52,
           "name": "prepare_cfb_research_os",
           "qualname": "prepare_cfb_research_os"
         },
         {
           "doc": null,
-          "endLine": 96,
+          "endLine": 258,
           "kind": "function",
-          "line": 90,
+          "line": 252,
           "name": "attach_cfb_prop_flags",
           "qualname": "attach_cfb_prop_flags"
         },
         {
           "doc": null,
-          "endLine": 193,
+          "endLine": 416,
           "kind": "function",
-          "line": 99,
+          "line": 261,
           "name": "emit_cfb_forecast_artifacts",
           "qualname": "emit_cfb_forecast_artifacts"
         },
         {
           "doc": null,
-          "endLine": 200,
+          "endLine": 425,
           "kind": "function",
-          "line": 196,
+          "line": 419,
           "name": "persist_algorithm_telemetry",
           "qualname": "persist_algorithm_telemetry"
         }
@@ -2006,9 +2317,75 @@
     },
     {
       "classes": 0,
+      "functions": 5,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/cfb/markets.py",
+      "sha256": "008c7d110e38d9e471eb8cac103ea97503330d75c74122eab19d144378dab268",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 351,
+          "kind": "function",
+          "line": 342,
+          "name": "canonicalize_cfb_market",
+          "qualname": "canonicalize_cfb_market"
+        },
+        {
+          "doc": null,
+          "endLine": 390,
+          "kind": "function",
+          "line": 354,
+          "name": "classify_raw_market_label",
+          "qualname": "classify_raw_market_label"
+        },
+        {
+          "doc": null,
+          "endLine": 410,
+          "kind": "function",
+          "line": 393,
+          "name": "inventory_raw_labels",
+          "qualname": "inventory_raw_labels"
+        },
+        {
+          "doc": null,
+          "endLine": 415,
+          "kind": "function",
+          "line": 413,
+          "name": "is_active_cfb_market",
+          "qualname": "is_active_cfb_market"
+        },
+        {
+          "doc": null,
+          "endLine": 421,
+          "kind": "function",
+          "line": 418,
+          "name": "contract_for",
+          "qualname": "contract_for"
+        }
+      ],
+      "workstream": "UNMAPPED"
+    },
+    {
+      "classes": 0,
+      "functions": 1,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/cfb/refresh.py",
+      "sha256": "3b3a690ffa7988423e55135740ba9e2580c21b0ceb5607a9874d05a38e555f50",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 114,
+          "kind": "function",
+          "line": 30,
+          "name": "apply_final_refresh",
+          "qualname": "apply_final_refresh"
+        }
+      ],
+      "workstream": "UNMAPPED"
+    },
+    {
+      "classes": 0,
       "functions": 11,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/cfb/reports.py",
-      "sha256": "3fa39971d021a7b6b43933c90eafcea58fe2dcb0f2d64bd6197ba4b93d07b527",
+      "sha256": "e9b389f6e7720355d333f643eb5ba9b28073b72c778dfcbe084d8a02d286907f",
       "symbols": [
         {
           "doc": null,
@@ -2044,7 +2421,7 @@
         },
         {
           "doc": null,
-          "endLine": 51,
+          "endLine": 65,
           "kind": "function",
           "line": 37,
           "name": "cfb_prop_flags",
@@ -2052,49 +2429,49 @@
         },
         {
           "doc": null,
-          "endLine": 101,
+          "endLine": 115,
           "kind": "function",
-          "line": 54,
+          "line": 68,
           "name": "cfb_top100_row",
           "qualname": "cfb_top100_row"
         },
         {
           "doc": "Filter CFB \u2192 heap partial Top-K \u2192 deterministic Timsort of the frontier.",
-          "endLine": 130,
-          "kind": "function",
-          "line": 104,
-          "name": "rank_cfb_modeled",
-          "qualname": "rank_cfb_modeled"
-        },
-        {
-          "doc": null,
           "endLine": 144,
           "kind": "function",
-          "line": 133,
-          "name": "cfb_top100_preliminary",
-          "qualname": "cfb_top100_preliminary"
+          "line": 118,
+          "name": "rank_cfb_modeled",
+          "qualname": "rank_cfb_modeled"
         },
         {
           "doc": null,
           "endLine": 158,
           "kind": "function",
           "line": 147,
+          "name": "cfb_top100_preliminary",
+          "qualname": "cfb_top100_preliminary"
+        },
+        {
+          "doc": null,
+          "endLine": 172,
+          "kind": "function",
+          "line": 161,
           "name": "cfb_top25_final",
           "qualname": "cfb_top25_final"
         },
         {
           "doc": null,
-          "endLine": 194,
+          "endLine": 208,
           "kind": "function",
-          "line": 161,
+          "line": 175,
           "name": "cfb_playables_final",
           "qualname": "cfb_playables_final"
         },
         {
           "doc": null,
-          "endLine": 207,
+          "endLine": 221,
           "kind": "function",
-          "line": 197,
+          "line": 211,
           "name": "frontier_offer_ids",
           "qualname": "frontier_offer_ids"
         }
@@ -2253,13 +2630,13 @@
       "classes": 0,
       "functions": 1,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/chat/research_bridge.py",
-      "sha256": "00a86b922621511ba36dfa363b5b4575d966da7e9acb88f702766e17705826cb",
+      "sha256": "93a64e1c7032f207d66aceb16e41847053618d4e95a4587e5e3434f4d3c599c8",
       "symbols": [
         {
           "doc": null,
-          "endLine": 64,
+          "endLine": 66,
           "kind": "function",
-          "line": 14,
+          "line": 15,
           "name": "next_research_batch",
           "qualname": "next_research_batch"
         }
@@ -2270,7 +2647,7 @@
       "classes": 1,
       "functions": 18,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/chat/session.py",
-      "sha256": "35e6893a0d3b0424a2a9f40285626f518da68aae1a5f626c720004192193af3d",
+      "sha256": "e2b8f9dc48cbf24347357f2c51601c65980930cb29777be366ae89cc35841cd3",
       "symbols": [
         {
           "doc": null,
@@ -3377,37 +3754,37 @@
       "classes": 0,
       "functions": 4,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/ingest/markets.py",
-      "sha256": "da816bb7bdc7c24f1e66f9875564d43b319be31789bdc9fdb03085e6405a0ae4",
+      "sha256": "31112096e4e90680f4ce1fb304846b3176a1a8147621a03e7ac2f785df6b8c8c",
       "symbols": [
         {
           "doc": null,
-          "endLine": 200,
+          "endLine": 255,
           "kind": "function",
-          "line": 199,
+          "line": 254,
           "name": "_norm",
           "qualname": "_norm"
         },
         {
           "doc": "Return (market_key, market_label). Unknown keys stay as a slug \u2014 fail closed later.",
-          "endLine": 211,
+          "endLine": 266,
           "kind": "function",
-          "line": 203,
+          "line": 258,
           "name": "map_stat",
           "qualname": "map_stat"
         },
         {
           "doc": null,
-          "endLine": 223,
+          "endLine": 278,
           "kind": "function",
-          "line": 214,
+          "line": 269,
           "name": "map_league",
           "qualname": "map_league"
         },
         {
           "doc": null,
-          "endLine": 227,
+          "endLine": 282,
           "kind": "function",
-          "line": 226,
+          "line": 281,
           "name": "market_label",
           "qualname": "market_label"
         }
@@ -3646,7 +4023,7 @@
       "classes": 0,
       "functions": 6,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/learning/calibration.py",
-      "sha256": "59dd40faade11de70b2433041d0b4cbf23d3fef033bc66e812cf0c082b437dc7",
+      "sha256": "bde4429f601f90be656488bcf05f3f35b1fc720d9d2bb55c19c40f540e6e426c",
       "symbols": [
         {
           "doc": null,
@@ -3658,7 +4035,7 @@
         },
         {
           "doc": null,
-          "endLine": 60,
+          "endLine": 73,
           "kind": "function",
           "line": 24,
           "name": "apply_calibration",
@@ -3666,33 +4043,33 @@
         },
         {
           "doc": null,
-          "endLine": 82,
+          "endLine": 95,
           "kind": "function",
-          "line": 63,
+          "line": 76,
           "name": "build_challenger_cells",
           "qualname": "build_challenger_cells"
         },
         {
           "doc": null,
-          "endLine": 92,
+          "endLine": 105,
           "kind": "function",
-          "line": 85,
+          "line": 98,
           "name": "_clip_p",
           "qualname": "_clip_p"
         },
         {
           "doc": null,
-          "endLine": 109,
+          "endLine": 122,
           "kind": "function",
-          "line": 94,
+          "line": 107,
           "name": "expected_calibration_error",
           "qualname": "expected_calibration_error"
         },
         {
           "doc": "Readiness report only. Does not activate cells or advance LR000000.",
-          "endLine": 146,
+          "endLine": 159,
           "kind": "function",
-          "line": 111,
+          "line": 124,
           "name": "evaluate_calibration_readiness",
           "qualname": "evaluate_calibration_readiness"
         }
@@ -3824,29 +4201,29 @@
       "classes": 0,
       "functions": 3,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/learning/failure_class.py",
-      "sha256": "a1c0f4a1f1a829c6d71b1ed00230a3fc6e947551121349fbe1ce96a62b120ebd",
+      "sha256": "cb55ddbbfc7f0303d5273d583ad480eeebc8a22268a71c6041f90bf3bd4d7b2e",
       "symbols": [
         {
           "doc": null,
-          "endLine": 41,
+          "endLine": 55,
           "kind": "function",
-          "line": 35,
+          "line": 49,
           "name": "_f",
           "qualname": "_f"
         },
         {
           "doc": null,
-          "endLine": 51,
+          "endLine": 65,
           "kind": "function",
-          "line": 43,
+          "line": 57,
           "name": "_blob",
           "qualname": "_blob"
         },
         {
           "doc": "Assign one failure class. Never authorizes a permanent model patch from one result.",
-          "endLine": 148,
+          "endLine": 172,
           "kind": "function",
-          "line": 53,
+          "line": 67,
           "name": "classify_failure",
           "qualname": "classify_failure"
         }
@@ -3857,7 +4234,7 @@
       "classes": 0,
       "functions": 13,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/learning/postgame.py",
-      "sha256": "06abb252c2d9980d48f5c7a41919ad39d33c2e6ea89a144b9ecbf98703feb3c8",
+      "sha256": "0fa2f33c6dbf241bc5bd780c098c482770eb6d42bfe3f8ce3106ff95d2b94e2a",
       "symbols": [
         {
           "doc": null,
@@ -3970,7 +4347,7 @@
       "classes": 0,
       "functions": 10,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/learning/registry.py",
-      "sha256": "3c69be0862cf9199e0df495ee99b5c1d109d102c53349e1d1afe1343acb0c3a9",
+      "sha256": "7c0da72943c2fd23b5cedc486294c7ecd9120b1f297011e5ffd994020ae8fc47",
       "symbols": [
         {
           "doc": null,
@@ -4253,77 +4630,77 @@
       "classes": 1,
       "functions": 8,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/ml/feature_store.py",
-      "sha256": "85261bb717dafbc1637ecc2d9148428757f6d27f4ab54bf3bfc1e61310a3a4fa",
+      "sha256": "26e9d0033384998c1065242d52e25ab6bf3983d5b91f1ea219ffc0e7455cd229",
       "symbols": [
         {
           "doc": "Canonical consumer for ACTIVE_FEATURE signal outputs.",
-          "endLine": 77,
+          "endLine": 109,
           "kind": "function",
-          "line": 44,
+          "line": 76,
           "name": "signal_evaluation_feature_records",
           "qualname": "signal_evaluation_feature_records"
         },
         {
           "doc": null,
-          "endLine": 81,
+          "endLine": 113,
           "kind": "function",
-          "line": 80,
+          "line": 112,
           "name": "_s",
           "qualname": "_s"
         },
         {
           "doc": null,
-          "endLine": 110,
+          "endLine": 142,
           "kind": "function",
-          "line": 84,
+          "line": 116,
           "name": "feature_record",
           "qualname": "feature_record"
         },
         {
           "doc": null,
-          "endLine": 118,
+          "endLine": 150,
           "kind": "function",
-          "line": 113,
+          "line": 145,
           "name": "_identity",
           "qualname": "_identity"
         },
         {
           "doc": null,
-          "endLine": 123,
+          "endLine": 155,
           "kind": "function",
-          "line": 121,
+          "line": 153,
           "name": "_logs_from_packet",
           "qualname": "_logs_from_packet"
         },
         {
           "doc": "Build cutoff-immutable feature records from a PlayerResearchPacket.",
-          "endLine": 231,
+          "endLine": 257,
           "kind": "class",
-          "line": 126,
+          "line": 158,
           "name": "FeatureStore",
           "qualname": "FeatureStore"
         },
         {
           "doc": null,
-          "endLine": 231,
+          "endLine": 257,
           "kind": "method",
-          "line": 133,
+          "line": 165,
           "name": "build_from_packet",
           "qualname": "FeatureStore.build_from_packet"
         },
         {
           "doc": null,
-          "endLine": 163,
+          "endLine": 198,
           "kind": "method",
-          "line": 151,
+          "line": 186,
           "name": "add",
           "qualname": "FeatureStore.build_from_packet.add"
         },
         {
           "doc": "Write feature_store.jsonl + feature_store_manifest.json. Observations only.",
-          "endLine": 351,
+          "endLine": 377,
           "kind": "function",
-          "line": 234,
+          "line": 260,
           "name": "persist_feature_store",
           "qualname": "persist_feature_store"
         }
@@ -4739,135 +5116,143 @@
     },
     {
       "classes": 3,
-      "functions": 13,
+      "functions": 14,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/model/gridiron_models.py",
-      "sha256": "ea00f43c3c2ef649f27fc1f6254dcb06f64be2dfa2671ca525aba92651c113cb",
+      "sha256": "3a6eece50042ccda710c2d7cc8f693461d23026c91a70a721a0058ecefacb7cd",
       "symbols": [
         {
           "doc": null,
-          "endLine": 57,
+          "endLine": 77,
           "kind": "function",
-          "line": 52,
+          "line": 72,
           "name": "_f",
           "qualname": "_f"
         },
         {
           "doc": null,
-          "endLine": 66,
+          "endLine": 86,
           "kind": "function",
-          "line": 60,
+          "line": 80,
           "name": "_avg",
           "qualname": "_avg"
         },
         {
           "doc": null,
-          "endLine": 75,
+          "endLine": 95,
           "kind": "function",
-          "line": 69,
+          "line": 89,
           "name": "_sd",
           "qualname": "_sd"
         },
         {
           "doc": null,
-          "endLine": 91,
+          "endLine": 111,
           "kind": "function",
-          "line": 78,
+          "line": 98,
           "name": "_blend",
           "qualname": "_blend"
         },
         {
           "doc": null,
-          "endLine": 97,
+          "endLine": 117,
           "kind": "function",
-          "line": 94,
+          "line": 114,
           "name": "_rate",
           "qualname": "_rate"
         },
         {
           "doc": null,
-          "endLine": 102,
+          "endLine": 122,
           "kind": "function",
-          "line": 100,
+          "line": 120,
           "name": "league_priors",
           "qualname": "league_priors"
         },
         {
           "doc": null,
-          "endLine": 113,
+          "endLine": 135,
           "kind": "function",
-          "line": 105,
+          "line": 125,
           "name": "_role_bucket",
           "qualname": "_role_bucket"
         },
         {
-          "doc": "Snaps / dropbacks / routes / targets / carries from role-comparable logs.",
-          "endLine": 208,
+          "doc": "Empirical Bayes shrink toward the declared prior. Never uses outcomes.",
+          "endLine": 148,
+          "kind": "function",
+          "line": 138,
+          "name": "_eb",
+          "qualname": "_eb"
+        },
+        {
+          "doc": "Snaps / dropbacks / routes / targets / carries / kicking attempts from role-comparable logs.",
+          "endLine": 257,
           "kind": "class",
-          "line": 116,
+          "line": 151,
           "name": "GridironOpportunityModel",
           "qualname": "GridironOpportunityModel"
         },
         {
           "doc": null,
-          "endLine": 208,
+          "endLine": 257,
           "kind": "method",
-          "line": 121,
+          "line": 156,
           "name": "fit",
           "qualname": "GridironOpportunityModel.fit"
         },
         {
-          "doc": "YPA / completion / catch-rate / YPR from comparable logs. No opportunity invention.",
-          "endLine": 301,
+          "doc": "YPA / completion / catch-rate / YPR / TD-INT / FG-XP rates from comparable logs.",
+          "endLine": 364,
           "kind": "class",
-          "line": 211,
+          "line": 260,
           "name": "GridironEfficiencyModel",
           "qualname": "GridironEfficiencyModel"
         },
         {
           "doc": null,
-          "endLine": 301,
+          "endLine": 364,
           "kind": "method",
-          "line": 216,
+          "line": 268,
           "name": "fit",
           "qualname": "GridironEfficiencyModel.fit"
         },
         {
           "doc": null,
-          "endLine": 251,
+          "endLine": 303,
           "kind": "method",
-          "line": 237,
+          "line": 289,
           "name": "_sum_rate",
           "qualname": "GridironEfficiencyModel.fit._sum_rate"
         },
         {
           "doc": null,
-          "endLine": 268,
+          "endLine": 319,
           "kind": "method",
-          "line": 260,
+          "line": 318,
           "name": "_b",
           "qualname": "GridironEfficiencyModel.fit._b"
         },
         {
           "doc": "Team plays / pass-rate / rush-rate / pace plus opponent pass/rush defense.",
-          "endLine": 397,
+          "endLine": 459,
           "kind": "class",
-          "line": 304,
+          "line": 367,
           "name": "TeamEventModel",
           "qualname": "TeamEventModel"
         },
         {
           "doc": null,
-          "endLine": 397,
+          "endLine": 459,
           "kind": "method",
-          "line": 313,
+          "line": 377,
           "name": "fit",
           "qualname": "TeamEventModel.fit"
         },
         {
           "doc": null,
-          "endLine": 333,
+          "endLine": 397,
           "kind": "method",
-          "line": 327,
+          "line": 391,
           "name": "_first",
           "qualname": "TeamEventModel.fit._first"
         }
@@ -4919,77 +5304,77 @@
       "classes": 1,
       "functions": 8,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/model/market_derive.py",
-      "sha256": "9d06a3ef554ca8f52b45bdc3b9b59545303efba30739076521dcfacab22e5999",
+      "sha256": "928e7e24516d4dba8397e4a219f8c961d739814dc80fa647336dbba389d66737",
       "symbols": [
         {
           "doc": "Unknown or unverified market. Fail closed \u2014 never nearest-match.",
-          "endLine": 144,
+          "endLine": 170,
           "kind": "class",
-          "line": 138,
+          "line": 164,
           "name": "UnknownMarketError",
           "qualname": "UnknownMarketError"
         },
         {
           "doc": null,
-          "endLine": 144,
+          "endLine": 170,
           "kind": "method",
-          "line": 141,
+          "line": 167,
           "name": "__init__",
           "qualname": "UnknownMarketError.__init__"
         },
         {
           "doc": "Exact alias lookup. Returns None when the key is not registered.",
-          "endLine": 154,
+          "endLine": 180,
           "kind": "function",
-          "line": 147,
+          "line": 173,
           "name": "canonicalize_market",
           "qualname": "canonicalize_market"
         },
         {
           "doc": null,
-          "endLine": 158,
+          "endLine": 184,
           "kind": "function",
-          "line": 157,
+          "line": 183,
           "name": "is_registered",
           "qualname": "is_registered"
         },
         {
           "doc": null,
-          "endLine": 166,
+          "endLine": 192,
           "kind": "function",
-          "line": 161,
+          "line": 187,
           "name": "looks_like_basketball_ledger",
           "qualname": "looks_like_basketball_ledger"
         },
         {
           "doc": null,
-          "endLine": 173,
+          "endLine": 199,
           "kind": "function",
-          "line": 169,
+          "line": 195,
           "name": "looks_like_gridiron_ledger",
           "qualname": "looks_like_gridiron_ledger"
         },
         {
           "doc": null,
-          "endLine": 180,
+          "endLine": 206,
           "kind": "function",
-          "line": 176,
+          "line": 202,
           "name": "_num",
           "qualname": "_num"
         },
         {
           "doc": null,
-          "endLine": 214,
+          "endLine": 250,
           "kind": "function",
-          "line": 183,
+          "line": 209,
           "name": "_formulas",
           "qualname": "_formulas"
         },
         {
           "doc": "Map a ledger + market key to a scalar. Never independently samples.",
-          "endLine": 249,
+          "endLine": 289,
           "kind": "function",
-          "line": 225,
+          "line": 265,
           "name": "derive_market",
           "qualname": "derive_market"
         }
@@ -5000,7 +5385,7 @@
       "classes": 0,
       "functions": 8,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/model/parameters.py",
-      "sha256": "6c59df72cc62dec7fdfab5a6a51ab5ce3b940e04a809c138c6467929830e3fbc",
+      "sha256": "a99f2e108e6e3827cbbb0964bb620b4893dbd00d694085da3750375d9e37b089",
       "symbols": [
         {
           "doc": null,
@@ -5044,7 +5429,7 @@
         },
         {
           "doc": null,
-          "endLine": 84,
+          "endLine": 86,
           "kind": "function",
           "line": 81,
           "name": "_shrink",
@@ -5052,17 +5437,17 @@
         },
         {
           "doc": null,
-          "endLine": 610,
+          "endLine": 636,
           "kind": "function",
-          "line": 87,
+          "line": 89,
           "name": "build_parameter_snapshot",
           "qualname": "build_parameter_snapshot"
         },
         {
           "doc": null,
-          "endLine": 287,
+          "endLine": 289,
           "kind": "method",
-          "line": 284,
+          "line": 286,
           "name": "_rate_claimed",
           "qualname": "build_parameter_snapshot._rate_claimed"
         }
@@ -5252,7 +5637,7 @@
       "classes": 0,
       "functions": 3,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/model/uncertainty.py",
-      "sha256": "2eedee613f3aa936aed5d61731cc49b3bf51f8bbe625477bf69073b1017a41b4",
+      "sha256": "b17065b2eafc8be70720456cafc7bbd46b0bab9aa05f9386ae417fd2ad638789",
       "symbols": [
         {
           "doc": null,
@@ -5272,7 +5657,7 @@
         },
         {
           "doc": null,
-          "endLine": 70,
+          "endLine": 74,
           "kind": "function",
           "line": 44,
           "name": "probability_bundle",
@@ -5285,7 +5670,7 @@
       "classes": 0,
       "functions": 16,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/model/worlds.py",
-      "sha256": "3a5b500127c8d68ddd899ddcb87d225b46a4f8aaef369a42e0760427a03a7434",
+      "sha256": "a452b310b1f1639b75fca0ba1ec1e2cf4983f1ef8f1676d4a941aa4e52bda031",
       "symbols": [
         {
           "doc": null,
@@ -5385,7 +5770,7 @@
         },
         {
           "doc": null,
-          "endLine": 325,
+          "endLine": 339,
           "kind": "function",
           "line": 284,
           "name": "sample_football",
@@ -5393,25 +5778,25 @@
         },
         {
           "doc": null,
-          "endLine": 372,
+          "endLine": 386,
           "kind": "function",
-          "line": 327,
+          "line": 341,
           "name": "sample_baseball_batter",
           "qualname": "sample_baseball_batter"
         },
         {
           "doc": null,
-          "endLine": 403,
+          "endLine": 421,
           "kind": "function",
-          "line": 383,
+          "line": 401,
           "name": "value_from_stats",
           "qualname": "value_from_stats"
         },
         {
           "doc": null,
-          "endLine": 464,
+          "endLine": 482,
           "kind": "function",
-          "line": 406,
+          "line": 424,
           "name": "simulate_player_worlds",
           "qualname": "simulate_player_worlds"
         }
@@ -6741,6 +7126,87 @@
       "workstream": "P1"
     },
     {
+      "classes": 1,
+      "functions": 8,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/research/cache_layers.py",
+      "sha256": "1bafcc08185882b8ff239896d68c9fcd98fd738272fd95cc04cc1bbc6c0b61b8",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 42,
+          "kind": "function",
+          "line": 41,
+          "name": "_key",
+          "qualname": "_key"
+        },
+        {
+          "doc": "Exact-first reuse. Web acquisition is L6 and never the first lookup.",
+          "endLine": 152,
+          "kind": "class",
+          "line": 45,
+          "name": "ResearchCacheCascade",
+          "qualname": "ResearchCacheCascade"
+        },
+        {
+          "doc": null,
+          "endLine": 59,
+          "kind": "method",
+          "line": 48,
+          "name": "__init__",
+          "qualname": "ResearchCacheCascade.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 71,
+          "kind": "method",
+          "line": 61,
+          "name": "put",
+          "qualname": "ResearchCacheCascade.put"
+        },
+        {
+          "doc": null,
+          "endLine": 101,
+          "kind": "method",
+          "line": 73,
+          "name": "get",
+          "qualname": "ResearchCacheCascade.get"
+        },
+        {
+          "doc": null,
+          "endLine": 135,
+          "kind": "method",
+          "line": 103,
+          "name": "disposition",
+          "qualname": "ResearchCacheCascade.disposition"
+        },
+        {
+          "doc": null,
+          "endLine": 146,
+          "kind": "method",
+          "line": 137,
+          "name": "snapshot",
+          "qualname": "ResearchCacheCascade.snapshot"
+        },
+        {
+          "doc": null,
+          "endLine": 152,
+          "kind": "method",
+          "line": 148,
+          "name": "close",
+          "qualname": "ResearchCacheCascade.close"
+        },
+        {
+          "doc": null,
+          "endLine": 158,
+          "kind": "function",
+          "line": 155,
+          "name": "content_address_bytes",
+          "qualname": "content_address_bytes"
+        }
+      ],
+      "workstream": "P1"
+    },
+    {
       "classes": 0,
       "functions": 3,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/claims.py",
@@ -6777,61 +7243,61 @@
       "classes": 0,
       "functions": 7,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/classify.py",
-      "sha256": "bfcaa0523470702187e97d0cf95840fed9d35b964d59cd7bd2d0c62eb70fbd1c",
+      "sha256": "5296c75a210b9eb4f3760c13b37d93fd882ad799db10624099b158e4f01fb68d",
       "symbols": [
         {
           "doc": null,
-          "endLine": 53,
+          "endLine": 56,
           "kind": "function",
-          "line": 50,
+          "line": 53,
           "name": "_offered_sides_known",
           "qualname": "_offered_sides_known"
         },
         {
           "doc": null,
-          "endLine": 58,
+          "endLine": 61,
           "kind": "function",
-          "line": 56,
+          "line": 59,
           "name": "_is_live",
           "qualname": "_is_live"
         },
         {
           "doc": null,
-          "endLine": 70,
+          "endLine": 73,
           "kind": "function",
-          "line": 61,
+          "line": 64,
           "name": "_unsupported_market",
           "qualname": "_unsupported_market"
         },
         {
           "doc": "Selection/accounting state. Goblins extracted then excluded; live stays MODELED+blocked.",
-          "endLine": 100,
+          "endLine": 103,
           "kind": "function",
-          "line": 73,
+          "line": 76,
           "name": "accounting_classify",
           "qualname": "accounting_classify"
         },
         {
           "doc": "Return (deep_research?, class).",
-          "endLine": 145,
+          "endLine": 148,
           "kind": "function",
-          "line": 103,
+          "line": 106,
           "name": "research_disposition",
           "qualname": "research_disposition"
         },
         {
           "doc": null,
-          "endLine": 183,
+          "endLine": 186,
           "kind": "function",
-          "line": 148,
+          "line": 151,
           "name": "classify_rows",
           "qualname": "classify_rows"
         },
         {
           "doc": null,
-          "endLine": 194,
+          "endLine": 197,
           "kind": "function",
-          "line": 186,
+          "line": 189,
           "name": "market_definition_id",
           "qualname": "market_definition_id"
         }
@@ -6867,7 +7333,7 @@
       "classes": 0,
       "functions": 11,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/coverage.py",
-      "sha256": "b23d311e9300de835f2704f728e0d366e7d23c519c01ef5e6eeecd9fc1c1b5e4",
+      "sha256": "73b29278ca2fd617c81a8b1d864483c12f8fbd00b048afb32a13377784f9af5b",
       "symbols": [
         {
           "doc": null,
@@ -6903,7 +7369,7 @@
         },
         {
           "doc": null,
-          "endLine": 75,
+          "endLine": 78,
           "kind": "function",
           "line": 63,
           "name": "_market_token",
@@ -6911,49 +7377,49 @@
         },
         {
           "doc": "Collect market tokens. A PLAYER object existing is never coverage by itself.",
-          "endLine": 92,
+          "endLine": 95,
           "kind": "function",
-          "line": 78,
+          "line": 81,
           "name": "_markets_for_request",
           "qualname": "_markets_for_request"
         },
         {
           "doc": null,
-          "endLine": 114,
+          "endLine": 117,
           "kind": "function",
-          "line": 95,
+          "line": 98,
           "name": "_event_missing",
           "qualname": "_event_missing"
         },
         {
           "doc": null,
-          "endLine": 148,
+          "endLine": 151,
           "kind": "function",
-          "line": 117,
+          "line": 120,
           "name": "_team_missing",
           "qualname": "_team_missing"
         },
         {
           "doc": "SportResearchSchema-driven extras. Does not replace existing field gates.",
-          "endLine": 209,
+          "endLine": 212,
           "kind": "function",
-          "line": 151,
+          "line": 154,
           "name": "_schema_missing",
           "qualname": "_schema_missing"
         },
         {
           "doc": null,
-          "endLine": 306,
+          "endLine": 309,
           "kind": "function",
-          "line": 212,
+          "line": 215,
           "name": "evaluate_request",
           "qualname": "evaluate_request"
         },
         {
           "doc": null,
-          "endLine": 319,
+          "endLine": 322,
           "kind": "function",
-          "line": 309,
+          "line": 312,
           "name": "coverage_report",
           "qualname": "coverage_report"
         }
@@ -7668,127 +8134,167 @@
     },
     {
       "classes": 2,
-      "functions": 13,
+      "functions": 18,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/indexes.py",
-      "sha256": "02d32e646b880ff50590ab9c3e7704cda972867830e014724b7d79630cc46e25",
+      "sha256": "a76fff04d27492d559cd253c1523038fa420a3121a9ae37e85216bdabf2dbc51",
       "symbols": [
         {
           "doc": "Exact indexes over a frozen board. No repeated full-board linear scans.",
-          "endLine": 140,
+          "endLine": 286,
           "kind": "class",
-          "line": 37,
+          "line": 30,
           "name": "BoardIndexes",
           "qualname": "BoardIndexes"
         },
         {
           "doc": null,
-          "endLine": 109,
+          "endLine": 102,
           "kind": "method",
-          "line": 40,
+          "line": 33,
           "name": "__init__",
           "qualname": "BoardIndexes.__init__"
         },
         {
           "doc": null,
-          "endLine": 112,
+          "endLine": 106,
           "kind": "method",
-          "line": 111,
+          "line": 104,
           "name": "exact_offer",
           "qualname": "BoardIndexes.exact_offer"
         },
         {
           "doc": null,
-          "endLine": 124,
+          "endLine": 119,
           "kind": "method",
-          "line": 114,
+          "line": 108,
           "name": "lookup_composite",
           "qualname": "BoardIndexes.lookup_composite"
+        },
+        {
+          "doc": null,
+          "endLine": 124,
+          "kind": "method",
+          "line": 121,
+          "name": "sqlite_event_offers",
+          "qualname": "BoardIndexes.sqlite_event_offers"
         },
         {
           "doc": null,
           "endLine": 128,
           "kind": "method",
           "line": 126,
-          "name": "sqlite_event_offers",
-          "qualname": "BoardIndexes.sqlite_event_offers"
-        },
-        {
-          "doc": null,
-          "endLine": 131,
-          "kind": "method",
-          "line": 130,
           "name": "might_have_offer",
           "qualname": "BoardIndexes.might_have_offer"
         },
         {
           "doc": null,
-          "endLine": 134,
+          "endLine": 132,
           "kind": "method",
-          "line": 133,
+          "line": 130,
           "name": "alias_hits",
           "qualname": "BoardIndexes.alias_hits"
         },
         {
-          "doc": null,
-          "endLine": 140,
+          "doc": "BM25 over player names. Never used to rediscover known offer IDs.",
+          "endLine": 154,
           "kind": "method",
-          "line": 136,
+          "line": 134,
+          "name": "fts_rank",
+          "qualname": "BoardIndexes.fts_rank"
+        },
+        {
+          "doc": null,
+          "endLine": 175,
+          "kind": "method",
+          "line": 156,
+          "name": "fuzzy_player",
+          "qualname": "BoardIndexes.fuzzy_player"
+        },
+        {
+          "doc": null,
+          "endLine": 200,
+          "kind": "method",
+          "line": 177,
+          "name": "near_duplicate_names",
+          "qualname": "BoardIndexes.near_duplicate_names"
+        },
+        {
+          "doc": null,
+          "endLine": 212,
+          "kind": "method",
+          "line": 202,
+          "name": "requirement_bitmaps",
+          "qualname": "BoardIndexes.requirement_bitmaps"
+        },
+        {
+          "doc": "Exact-first then lexical/fuzzy/near-dup fusion. Never embeddings for known IDs.",
+          "endLine": 280,
+          "kind": "method",
+          "line": 214,
+          "name": "query_retrieval_cascade",
+          "qualname": "BoardIndexes.query_retrieval_cascade"
+        },
+        {
+          "doc": null,
+          "endLine": 286,
+          "kind": "method",
+          "line": 282,
           "name": "close",
           "qualname": "BoardIndexes.close"
         },
         {
           "doc": "Exact reusable-evidence lookup. Web acquisition is last.",
-          "endLine": 185,
+          "endLine": 333,
           "kind": "class",
-          "line": 143,
+          "line": 289,
           "name": "EvidenceIndexes",
           "qualname": "EvidenceIndexes"
         },
         {
           "doc": null,
-          "endLine": 154,
+          "endLine": 300,
           "kind": "method",
-          "line": 146,
+          "line": 292,
           "name": "__init__",
           "qualname": "EvidenceIndexes.__init__"
         },
         {
           "doc": null,
-          "endLine": 170,
+          "endLine": 316,
           "kind": "method",
-          "line": 156,
+          "line": 302,
           "name": "add",
           "qualname": "EvidenceIndexes.add"
         },
         {
           "doc": null,
-          "endLine": 174,
+          "endLine": 321,
           "kind": "method",
-          "line": 172,
+          "line": 318,
           "name": "lookup_scope",
           "qualname": "EvidenceIndexes.lookup_scope"
         },
         {
           "doc": null,
-          "endLine": 179,
+          "endLine": 327,
           "kind": "method",
-          "line": 176,
+          "line": 323,
           "name": "has_hash",
           "qualname": "EvidenceIndexes.has_hash"
         },
         {
           "doc": null,
-          "endLine": 185,
+          "endLine": 333,
           "kind": "method",
-          "line": 181,
+          "line": 329,
           "name": "close",
           "qualname": "EvidenceIndexes.close"
         },
         {
           "doc": "Reverse index Requirement \u2192 Offers as Python bitsets plus id lists.",
-          "endLine": 212,
+          "endLine": 360,
           "kind": "function",
-          "line": 188,
+          "line": 336,
           "name": "requirement_offer_bitmaps",
           "qualname": "requirement_offer_bitmaps"
         }
@@ -7830,9 +8336,74 @@
     },
     {
       "classes": 0,
+      "functions": 7,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/research/material_facts.py",
+      "sha256": "6066bf5338a204a34727fe298c2466a0088642bc775840aec3d6328bb4708fca",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 28,
+          "kind": "function",
+          "line": 23,
+          "name": "_authority",
+          "qualname": "_authority"
+        },
+        {
+          "doc": null,
+          "endLine": 35,
+          "kind": "function",
+          "line": 31,
+          "name": "_freshness",
+          "qualname": "_freshness"
+        },
+        {
+          "doc": null,
+          "endLine": 42,
+          "kind": "function",
+          "line": 38,
+          "name": "_fact_key",
+          "qualname": "_fact_key"
+        },
+        {
+          "doc": null,
+          "endLine": 104,
+          "kind": "function",
+          "line": 45,
+          "name": "resolve_material_facts",
+          "qualname": "resolve_material_facts"
+        },
+        {
+          "doc": "Subject/event/affiliation ids whose unresolved conflicts hold PLAYABLE.",
+          "endLine": 117,
+          "kind": "function",
+          "line": 107,
+          "name": "hold_playable_scope_ids",
+          "qualname": "hold_playable_scope_ids"
+        },
+        {
+          "doc": "Demote PLAYABLE when a material conflict is unresolved. Never raises P.",
+          "endLine": 137,
+          "kind": "function",
+          "line": 120,
+          "name": "apply_hold_playable",
+          "qualname": "apply_hold_playable"
+        },
+        {
+          "doc": null,
+          "endLine": 147,
+          "kind": "function",
+          "line": 140,
+          "name": "json_safe_value",
+          "qualname": "json_safe_value"
+        }
+      ],
+      "workstream": "P1"
+    },
+    {
+      "classes": 0,
       "functions": 8,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/os_graphs.py",
-      "sha256": "4bc562c647352b79339630718fe1cb30c7f8b6202325865703a69a820d572da4",
+      "sha256": "a23bfa49e18d8c6d12dfd099e7331ec60038ec6b5dd912303e8d4975198139ae",
       "symbols": [
         {
           "doc": null,
@@ -7970,109 +8541,109 @@
       "classes": 0,
       "functions": 13,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/player_packet.py",
-      "sha256": "7419e3dfa128772d3aaf2ed857b379cd02078428cbe5514944bf100a3d0679c6",
+      "sha256": "0cf72c7a992ac7bfafbc7781d62e56d1e5433c8b081e6332ddeb68949e44d094",
       "symbols": [
         {
           "doc": null,
-          "endLine": 37,
+          "endLine": 39,
           "kind": "function",
-          "line": 32,
+          "line": 34,
           "name": "_is_gridiron_identity",
           "qualname": "_is_gridiron_identity"
         },
         {
           "doc": null,
-          "endLine": 49,
+          "endLine": 51,
           "kind": "function",
-          "line": 40,
+          "line": 42,
           "name": "_f",
           "qualname": "_f"
         },
         {
           "doc": null,
-          "endLine": 58,
+          "endLine": 60,
           "kind": "function",
-          "line": 52,
+          "line": 54,
           "name": "_avg",
           "qualname": "_avg"
         },
         {
           "doc": null,
-          "endLine": 68,
+          "endLine": 70,
           "kind": "function",
-          "line": 61,
+          "line": 63,
           "name": "_sort_logs",
           "qualname": "_sort_logs"
         },
         {
           "doc": null,
-          "endLine": 66,
+          "endLine": 68,
           "kind": "method",
-          "line": 62,
+          "line": 64,
           "name": "key",
           "qualname": "_sort_logs.key"
         },
         {
           "doc": "Derived window from the FULL log. Does not replace the full log.",
-          "endLine": 102,
+          "endLine": 104,
           "kind": "function",
-          "line": 71,
+          "line": 73,
           "name": "window_means",
           "qualname": "window_means"
         },
         {
           "doc": null,
-          "endLine": 106,
+          "endLine": 108,
           "kind": "function",
-          "line": 105,
+          "line": 107,
           "name": "_window",
           "qualname": "_window"
         },
         {
           "doc": null,
-          "endLine": 123,
+          "endLine": 125,
           "kind": "function",
-          "line": 109,
+          "line": 111,
           "name": "_pra_identity",
           "qualname": "_pra_identity"
         },
         {
           "doc": null,
-          "endLine": 137,
+          "endLine": 139,
           "kind": "function",
-          "line": 126,
+          "line": 128,
           "name": "_logs_from_adapter_records",
           "qualname": "_logs_from_adapter_records"
         },
         {
           "doc": null,
-          "endLine": 144,
+          "endLine": 146,
           "kind": "function",
-          "line": 140,
+          "line": 142,
           "name": "_logs_from_structured",
           "qualname": "_logs_from_structured"
         },
         {
           "doc": "Build a packet from adapter outputs and/or already-structured logs.",
-          "endLine": 356,
+          "endLine": 358,
           "kind": "function",
-          "line": 147,
+          "line": 149,
           "name": "build_player_research_packet",
           "qualname": "build_player_research_packet"
         },
         {
           "doc": "One packet per PlayerOfferSet. Reused across that set's markets.",
-          "endLine": 429,
+          "endLine": 431,
           "kind": "function",
-          "line": 359,
+          "line": 361,
           "name": "build_packets_for_offer_sets",
           "qualname": "build_packets_for_offer_sets"
         },
         {
           "doc": null,
-          "endLine": 441,
+          "endLine": 443,
           "kind": "function",
-          "line": 432,
+          "line": 434,
           "name": "packets_document",
           "qualname": "packets_document"
         }
@@ -8301,6 +8872,47 @@
           "line": 241,
           "name": "collect",
           "qualname": "collect"
+        }
+      ],
+      "workstream": "P1"
+    },
+    {
+      "classes": 0,
+      "functions": 4,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/research/readiness.py",
+      "sha256": "2195904f28a35f9c49ffc41bfa1f2c0d8414fd5969f4a1cadf6b3b7d902bf830",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 89,
+          "kind": "function",
+          "line": 28,
+          "name": "evaluate_research_os_readiness",
+          "qualname": "evaluate_research_os_readiness"
+        },
+        {
+          "doc": null,
+          "endLine": 108,
+          "kind": "function",
+          "line": 92,
+          "name": "persist_research_os_readiness",
+          "qualname": "persist_research_os_readiness"
+        },
+        {
+          "doc": null,
+          "endLine": 115,
+          "kind": "function",
+          "line": 111,
+          "name": "load_research_os_readiness",
+          "qualname": "load_research_os_readiness"
+        },
+        {
+          "doc": "Fail closed: external acquisition is illegal without readiness.",
+          "endLine": 123,
+          "kind": "function",
+          "line": 118,
+          "name": "require_research_may_begin",
+          "qualname": "require_research_may_begin"
         }
       ],
       "workstream": "P1"
@@ -8589,9 +9201,9 @@
     },
     {
       "classes": 1,
-      "functions": 24,
+      "functions": 25,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/role_epoch.py",
-      "sha256": "aac259a45504ce5523e0ae6b758a01c4c3b36a2a46de6d1bbaa8fe58be99161d",
+      "sha256": "05707ab61e9be76689f62606c50b23dce3009b5a08fc763198eb70f06c15e1ed",
       "symbols": [
         {
           "doc": null,
@@ -8682,114 +9294,122 @@
           "qualname": "detect_change_points.best_split"
         },
         {
-          "doc": "role_sample \u2192 player_season \u2192 archetype/league prior. Sums to 1.",
-          "endLine": 186,
+          "doc": "Execute cataloged RoleEpoch detectors. Does not silently rewrite greedy cuts.",
+          "endLine": 195,
           "kind": "function",
           "line": 169,
+          "name": "governed_change_points",
+          "qualname": "governed_change_points"
+        },
+        {
+          "doc": "role_sample \u2192 player_season \u2192 archetype/league prior. Sums to 1.",
+          "endLine": 215,
+          "kind": "function",
+          "line": 198,
           "name": "shrinkage_weights",
           "qualname": "shrinkage_weights"
         },
         {
           "doc": null,
-          "endLine": 221,
+          "endLine": 250,
           "kind": "function",
-          "line": 189,
+          "line": 218,
           "name": "partition_logs",
           "qualname": "partition_logs"
         },
         {
           "doc": null,
-          "endLine": 241,
+          "endLine": 270,
           "kind": "function",
-          "line": 224,
+          "line": 253,
           "name": "_projected_label",
           "qualname": "_projected_label"
         },
         {
           "doc": null,
-          "endLine": 262,
+          "endLine": 291,
           "kind": "function",
-          "line": 244,
+          "line": 273,
           "name": "_epoch_record",
           "qualname": "_epoch_record"
         },
         {
           "doc": null,
-          "endLine": 266,
+          "endLine": 295,
           "kind": "function",
-          "line": 265,
+          "line": 294,
           "name": "_strip_internal",
           "qualname": "_strip_internal"
         },
         {
           "doc": null,
-          "endLine": 279,
+          "endLine": 308,
           "kind": "function",
-          "line": 270,
+          "line": 299,
           "name": "_is_gridiron",
           "qualname": "_is_gridiron"
         },
         {
           "doc": "Primary share series: snaps, else routes, else targets, else pass_att, else rush_att.",
-          "endLine": 291,
+          "endLine": 320,
           "kind": "function",
-          "line": 282,
+          "line": 311,
           "name": "_share_value",
           "qualname": "_share_value"
         },
         {
           "doc": null,
-          "endLine": 300,
+          "endLine": 329,
           "kind": "function",
-          "line": 294,
+          "line": 323,
           "name": "_qb_id_of",
           "qualname": "_qb_id_of"
         },
         {
           "doc": null,
-          "endLine": 329,
+          "endLine": 358,
           "kind": "function",
-          "line": 303,
+          "line": 332,
           "name": "_gridiron_appearance",
           "qualname": "_gridiron_appearance"
         },
         {
           "doc": null,
-          "endLine": 339,
+          "endLine": 368,
           "kind": "function",
-          "line": 332,
+          "line": 361,
           "name": "_gridiron_label_from_share",
           "qualname": "_gridiron_label_from_share"
         },
         {
           "doc": null,
-          "endLine": 354,
+          "endLine": 383,
           "kind": "function",
-          "line": 342,
+          "line": 371,
           "name": "_projected_gridiron_label",
           "qualname": "_projected_gridiron_label"
         },
         {
           "doc": "Production role-epoch constructor. Builder id never contains 'stub'.",
-          "endLine": 606,
+          "endLine": 640,
           "kind": "class",
-          "line": 357,
+          "line": 386,
           "name": "RoleEpochBuilder",
           "qualname": "RoleEpochBuilder"
         },
         {
           "doc": null,
-          "endLine": 474,
+          "endLine": 505,
           "kind": "method",
-          "line": 362,
+          "line": 391,
           "name": "build",
           "qualname": "RoleEpochBuilder.build"
         },
         {
           "doc": null,
-          "endLine": 606,
+          "endLine": 640,
           "kind": "method",
-          "line": 476,
+          "line": 507,
           "name": "_build_gridiron",
           "qualname": "RoleEpochBuilder._build_gridiron"
         }
@@ -8898,6 +9518,79 @@
           "line": 96,
           "name": "catalog_summary",
           "qualname": "catalog_summary"
+        }
+      ],
+      "workstream": "P1"
+    },
+    {
+      "classes": 1,
+      "functions": 7,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/research/source_health.py",
+      "sha256": "ecb953e539dabe2c99219b492d3a6603677e66e3bda9d91b1849c93aaca3432c",
+      "symbols": [
+        {
+          "doc": "Claim-specific source routing with circuit breakers and bounded fallbacks.",
+          "endLine": 123,
+          "kind": "class",
+          "line": 14,
+          "name": "SourceHealthRegistry",
+          "qualname": "SourceHealthRegistry"
+        },
+        {
+          "doc": null,
+          "endLine": 29,
+          "kind": "method",
+          "line": 17,
+          "name": "__init__",
+          "qualname": "SourceHealthRegistry.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 60,
+          "kind": "method",
+          "line": 31,
+          "name": "_ensure",
+          "qualname": "SourceHealthRegistry._ensure"
+        },
+        {
+          "doc": null,
+          "endLine": 76,
+          "kind": "method",
+          "line": 62,
+          "name": "record_success",
+          "qualname": "SourceHealthRegistry.record_success"
+        },
+        {
+          "doc": null,
+          "endLine": 88,
+          "kind": "method",
+          "line": 78,
+          "name": "record_failure",
+          "qualname": "SourceHealthRegistry.record_failure"
+        },
+        {
+          "doc": "Prefer official/structured, then stats, then reporting, search last.",
+          "endLine": 107,
+          "kind": "method",
+          "line": 90,
+          "name": "route",
+          "qualname": "SourceHealthRegistry.route"
+        },
+        {
+          "doc": null,
+          "endLine": 123,
+          "kind": "method",
+          "line": 109,
+          "name": "snapshot",
+          "qualname": "SourceHealthRegistry.snapshot"
+        },
+        {
+          "doc": null,
+          "endLine": 162,
+          "kind": "function",
+          "line": 126,
+          "name": "default_cfb_source_health",
+          "qualname": "default_cfb_source_health"
         }
       ],
       "workstream": "P1"
@@ -9432,85 +10125,85 @@
       "classes": 0,
       "functions": 10,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/runner.py",
-      "sha256": "d165369ecfe679ca34d5f5c756087995d7ae1a566692f291c6f41806ec13e447",
+      "sha256": "f1828d028c52ef9ed448119c0eff7fc04ba8804e1829b28de67095a93a3bda6c",
       "symbols": [
         {
           "doc": "Always write dest/audit/. Optionally copy+commit+push a GitHub pack.",
-          "endLine": 161,
+          "endLine": 164,
           "kind": "function",
-          "line": 105,
+          "line": 108,
           "name": "_finalize_archive",
           "qualname": "_finalize_archive"
         },
         {
           "doc": null,
-          "endLine": 174,
+          "endLine": 177,
           "kind": "function",
-          "line": 165,
+          "line": 168,
           "name": "_synthetic_path",
           "qualname": "_synthetic_path"
         },
         {
           "doc": null,
-          "endLine": 179,
+          "endLine": 182,
           "kind": "function",
-          "line": 178,
+          "line": 181,
           "name": "_run_id",
           "qualname": "_run_id"
         },
         {
           "doc": "Best-effort git HEAD. Never writes git config. Missing git is None, not a crash.",
-          "endLine": 199,
+          "endLine": 202,
           "kind": "function",
-          "line": 182,
+          "line": 185,
           "name": "_git_commit_sha",
           "qualname": "_git_commit_sha"
         },
         {
           "doc": null,
-          "endLine": 210,
+          "endLine": 213,
           "kind": "function",
-          "line": 202,
+          "line": 205,
           "name": "_default_model_config",
           "qualname": "_default_model_config"
         },
         {
           "doc": null,
-          "endLine": 219,
+          "endLine": 222,
           "kind": "function",
-          "line": 213,
+          "line": 216,
           "name": "_active_calibration",
           "qualname": "_active_calibration"
         },
         {
           "doc": null,
-          "endLine": 1346,
+          "endLine": 1439,
           "kind": "function",
-          "line": 222,
+          "line": 225,
           "name": "run_dcm",
           "qualname": "run_dcm"
         },
         {
           "doc": null,
-          "endLine": 657,
+          "endLine": 668,
           "kind": "method",
-          "line": 650,
+          "line": 661,
           "name": "_snapshot_for",
           "qualname": "run_dcm._snapshot_for"
         },
         {
           "doc": null,
-          "endLine": 1011,
+          "endLine": 1082,
           "kind": "method",
-          "line": 973,
+          "line": 1044,
           "name": "slim",
           "qualname": "run_dcm.slim"
         },
         {
           "doc": null,
-          "endLine": 1464,
+          "endLine": 1557,
           "kind": "function",
-          "line": 1349,
+          "line": 1442,
           "name": "main",
           "qualname": "main"
         }
@@ -9523,6 +10216,79 @@
       "path": "artifacts/dcm_v6_workstream_ab/dcm/runtime/__init__.py",
       "sha256": "9a398ea74faa77c15559521049767b7806d8c61b227592df99af2c86385a6d17",
       "symbols": [],
+      "workstream": "P5-P14"
+    },
+    {
+      "classes": 1,
+      "functions": 7,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/runtime/archive_receipt.py",
+      "sha256": "5b6489410bddd3345c8cafff5ad854fca4849b033bc1953ed55bb9c113d43804",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 57,
+          "kind": "function",
+          "line": 15,
+          "name": "build_archive_receipt",
+          "qualname": "build_archive_receipt"
+        },
+        {
+          "doc": null,
+          "endLine": 70,
+          "kind": "function",
+          "line": 60,
+          "name": "persist_archive_receipt",
+          "qualname": "persist_archive_receipt"
+        },
+        {
+          "doc": "Retry remote archive. Local freeze is never invalidated.",
+          "endLine": 98,
+          "kind": "function",
+          "line": 73,
+          "name": "archive_retry",
+          "qualname": "archive_retry"
+        },
+        {
+          "doc": "Reconcile local freeze bytes against the receipt. Missing remote is legal.",
+          "endLine": 134,
+          "kind": "function",
+          "line": 101,
+          "name": "archive_reconcile",
+          "qualname": "archive_reconcile"
+        },
+        {
+          "doc": "Promoted when Drive/GitHub cannot complete. Never blocks freeze.",
+          "endLine": 153,
+          "kind": "class",
+          "line": 137,
+          "name": "LocalFallbackRunStore",
+          "qualname": "LocalFallbackRunStore"
+        },
+        {
+          "doc": null,
+          "endLine": 142,
+          "kind": "method",
+          "line": 140,
+          "name": "__init__",
+          "qualname": "LocalFallbackRunStore.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 147,
+          "kind": "method",
+          "line": 144,
+          "name": "put",
+          "qualname": "LocalFallbackRunStore.put"
+        },
+        {
+          "doc": null,
+          "endLine": 153,
+          "kind": "method",
+          "line": 149,
+          "name": "get",
+          "qualname": "LocalFallbackRunStore.get"
+        }
+      ],
       "workstream": "P5-P14"
     },
     {
@@ -9773,6 +10539,71 @@
           "line": 179,
           "name": "snapshot",
           "qualname": "Dag.snapshot"
+        }
+      ],
+      "workstream": "P5-P14"
+    },
+    {
+      "classes": 1,
+      "functions": 6,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/runtime/drive_catalog.py",
+      "sha256": "d63a886b8e72afd13ea29fa250eea46fdd7fec6ff9eb7c35d12c2d0dad294653",
+      "symbols": [
+        {
+          "doc": "Content-addressed local catalog of objects that *would* live on Drive.",
+          "endLine": 77,
+          "kind": "class",
+          "line": 21,
+          "name": "DriveObjectCatalog",
+          "qualname": "DriveObjectCatalog"
+        },
+        {
+          "doc": null,
+          "endLine": 28,
+          "kind": "method",
+          "line": 24,
+          "name": "__init__",
+          "qualname": "DriveObjectCatalog.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 34,
+          "kind": "method",
+          "line": 30,
+          "name": "put",
+          "qualname": "DriveObjectCatalog.put"
+        },
+        {
+          "doc": "Exact local identification. Does not fetch Drive.",
+          "endLine": 44,
+          "kind": "method",
+          "line": 36,
+          "name": "identify",
+          "qualname": "DriveObjectCatalog.identify"
+        },
+        {
+          "doc": null,
+          "endLine": 58,
+          "kind": "method",
+          "line": 46,
+          "name": "fetch",
+          "qualname": "DriveObjectCatalog.fetch"
+        },
+        {
+          "doc": null,
+          "endLine": 70,
+          "kind": "method",
+          "line": 60,
+          "name": "snapshot",
+          "qualname": "DriveObjectCatalog.snapshot"
+        },
+        {
+          "doc": null,
+          "endLine": 77,
+          "kind": "method",
+          "line": 72,
+          "name": "persist",
+          "qualname": "DriveObjectCatalog.persist"
         }
       ],
       "workstream": "P5-P14"
@@ -10657,45 +11488,45 @@
       "classes": 0,
       "functions": 5,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/selection/portfolio.py",
-      "sha256": "7eaf90336d3e44c0b156b9b4df83a175885bdd4bb27c9effe0c46e9600be03bd",
+      "sha256": "1bdd26638ee8bd3d856c355e9d8504bcf0bf36703f33beca2151ba5c36c419ac",
       "symbols": [
         {
           "doc": null,
-          "endLine": 19,
+          "endLine": 21,
           "kind": "function",
-          "line": 18,
+          "line": 20,
           "name": "_tags",
           "qualname": "_tags"
         },
         {
           "doc": null,
-          "endLine": 25,
+          "endLine": 27,
           "kind": "function",
-          "line": 22,
+          "line": 24,
           "name": "_composite_conflict",
           "qualname": "_composite_conflict"
         },
         {
           "doc": "Pearson correlation of aligned simulated pick outcomes.",
-          "endLine": 50,
+          "endLine": 52,
           "kind": "function",
-          "line": 28,
+          "line": 30,
           "name": "_selection_correlation",
           "qualname": "_selection_correlation"
         },
         {
           "doc": null,
-          "endLine": 123,
+          "endLine": 125,
           "kind": "function",
-          "line": 53,
+          "line": 55,
           "name": "build_card",
           "qualname": "build_card"
         },
         {
           "doc": null,
-          "endLine": 151,
+          "endLine": 153,
           "kind": "function",
-          "line": 126,
+          "line": 128,
           "name": "exposure_report",
           "qualname": "exposure_report"
         }
@@ -11405,7 +12236,7 @@
       "classes": 1,
       "functions": 4,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/sports/common/plugin.py",
-      "sha256": "dc6cf62dd97bb94decccdc6f5fad931dd75da9782d28fad76e9ddb909d93678d",
+      "sha256": "9fa1e75615709a3396f42fa22d3f4a16f22ffe196608e212d45bcdd5cf9cc807",
       "symbols": [
         {
           "doc": null,
@@ -11811,9 +12642,9 @@
     },
     {
       "classes": 1,
-      "functions": 3,
+      "functions": 5,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/sports/football/projection.py",
-      "sha256": "346512e9e5b66fc23052f547000813fb877d70a7044567309d2e4a87507f80d5",
+      "sha256": "1fd0e6e89603680fc818389afd05d6eda72c7abc8ed42b9ede76aca591bf2358",
       "symbols": [
         {
           "doc": null,
@@ -11833,17 +12664,33 @@
         },
         {
           "doc": null,
-          "endLine": 38,
+          "endLine": 29,
           "kind": "function",
           "line": 23,
+          "name": "_factor",
+          "qualname": "_factor"
+        },
+        {
+          "doc": "Restricted arithmetic: + - * with * binding tighter. No division, no parentheses.",
+          "endLine": 70,
+          "kind": "function",
+          "line": 32,
           "name": "_eval_formula",
           "qualname": "_eval_formula"
         },
         {
           "doc": null,
-          "endLine": 84,
+          "endLine": 56,
+          "kind": "method",
+          "line": 48,
+          "name": "flush",
+          "qualname": "_eval_formula.flush"
+        },
+        {
+          "doc": null,
+          "endLine": 116,
           "kind": "function",
-          "line": 41,
+          "line": 73,
           "name": "project_football_market",
           "qualname": "project_football_market"
         }
@@ -11854,45 +12701,45 @@
       "classes": 0,
       "functions": 5,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/sports/football/registry.py",
-      "sha256": "7ca175ae5255449c43262b6d57c8d13080064b04179e0592141cc2b65d7e8e4f",
+      "sha256": "6b42fd00c3ca00af40bc3e3255bc64e3f9e03d79b39e33c4742de3228ac2716b",
       "symbols": [
         {
           "doc": null,
-          "endLine": 134,
+          "endLine": 140,
           "kind": "function",
-          "line": 133,
+          "line": 139,
           "name": "football_primitive_keys",
           "qualname": "football_primitive_keys"
         },
         {
           "doc": "Return VERIFIED_TRUE, VERIFIED_FALSE, or UNKNOWN.",
-          "endLine": 154,
+          "endLine": 160,
           "kind": "function",
-          "line": 137,
+          "line": 143,
           "name": "football_stat_reboot_eligibility",
           "qualname": "football_stat_reboot_eligibility"
         },
         {
           "doc": null,
-          "endLine": 180,
+          "endLine": 186,
           "kind": "function",
-          "line": 157,
+          "line": 163,
           "name": "_market_for",
           "qualname": "_market_for"
         },
         {
           "doc": null,
-          "endLine": 203,
+          "endLine": 209,
           "kind": "function",
-          "line": 183,
+          "line": 189,
           "name": "football_market_definitions",
           "qualname": "football_market_definitions"
         },
         {
           "doc": null,
-          "endLine": 210,
+          "endLine": 216,
           "kind": "function",
-          "line": 206,
+          "line": 212,
           "name": "lookup_market",
           "qualname": "lookup_market"
         }
@@ -11903,29 +12750,29 @@
       "classes": 0,
       "functions": 3,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/sports/football/research_requirements.py",
-      "sha256": "469a1e18bbf6e26e39d729f0c441e8c9e053eaf29c70ef3ed23f753a20dc579d",
+      "sha256": "0d51c2ffede897ada693bcaf06f3a0a02f0f68e615cf982ec415ccd255a4f46a",
       "symbols": [
         {
           "doc": null,
-          "endLine": 28,
+          "endLine": 29,
           "kind": "function",
-          "line": 27,
+          "line": 28,
           "name": "_row_has",
           "qualname": "_row_has"
         },
         {
           "doc": null,
-          "endLine": 34,
+          "endLine": 35,
           "kind": "function",
-          "line": 31,
+          "line": 32,
           "name": "support_count",
           "qualname": "support_count"
         },
         {
           "doc": "Return independent minimum-model and PLAYABLE support states.",
-          "endLine": 105,
+          "endLine": 106,
           "kind": "function",
-          "line": 37,
+          "line": 38,
           "name": "assess_football_support",
           "qualname": "assess_football_support"
         }
@@ -11936,29 +12783,29 @@
       "classes": 0,
       "functions": 3,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/sports/football/settlement_map.py",
-      "sha256": "ff606ce117b97b97b87500faac9c3affd5f2ebc7ae14d8e3583671d170676066",
+      "sha256": "ebbded38d9623249694a89309809faba8172f88340a1687946b06d82eb4ee574",
       "symbols": [
         {
           "doc": null,
-          "endLine": 71,
+          "endLine": 99,
           "kind": "function",
-          "line": 61,
+          "line": 89,
           "name": "canonicalize_prizepicks_football_market",
           "qualname": "canonicalize_prizepicks_football_market"
         },
         {
           "doc": "Map a primitive ledger + PrizePicks football market to a scalar identity.",
-          "endLine": 87,
+          "endLine": 115,
           "kind": "function",
-          "line": 74,
+          "line": 102,
           "name": "settle_football_market",
           "qualname": "settle_football_market"
         },
         {
           "doc": "World-projection settlement from a PrimitiveStatLedger. Unknown \u2192 fail closed.",
-          "endLine": 98,
+          "endLine": 126,
           "kind": "function",
-          "line": 90,
+          "line": 118,
           "name": "settle_football_player",
           "qualname": "settle_football_player"
         }
@@ -12196,7 +13043,7 @@
       "classes": 0,
       "functions": 4,
       "path": "artifacts/dcm_v6_workstream_ab/tests/live_sanitized/test_live_prizepicks_har.py",
-      "sha256": "178505c0684214b2ff8f45b2d9aec23d4bc8ed2c40f04257778dded7cf0843ef",
+      "sha256": "9e828826da67e2aba3a13fa9dfd8d2b1c71567910fd272caafae966fa3cfa8ae",
       "symbols": [
         {
           "doc": null,
@@ -12334,9 +13181,178 @@
     },
     {
       "classes": 0,
+      "functions": 20,
+      "path": "artifacts/dcm_v6_workstream_ab/tests/test_cfb_reference_implementation.py",
+      "sha256": "817d9042ba443028eacc9650034bb2edd8aa6bfba3f53df740ae7a778f9d0fe2",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 45,
+          "kind": "function",
+          "line": 32,
+          "name": "test_exact_aliases_normalize_to_same_market",
+          "qualname": "test_exact_aliases_normalize_to_same_market"
+        },
+        {
+          "doc": null,
+          "endLine": 54,
+          "kind": "function",
+          "line": 48,
+          "name": "test_longest_play_is_genuine_unsupported_not_alias",
+          "qualname": "test_longest_play_is_genuine_unsupported_not_alias"
+        },
+        {
+          "doc": null,
+          "endLine": 67,
+          "kind": "function",
+          "line": 57,
+          "name": "test_inventory_covers_active_and_unsupported",
+          "qualname": "test_inventory_covers_active_and_unsupported"
+        },
+        {
+          "doc": null,
+          "endLine": 73,
+          "kind": "function",
+          "line": 70,
+          "name": "test_kicking_pts_formula_parses_multiplication",
+          "qualname": "test_kicking_pts_formula_parses_multiplication"
+        },
+        {
+          "doc": null,
+          "endLine": 82,
+          "kind": "function",
+          "line": 76,
+          "name": "test_kicking_pts_project_from_ledger",
+          "qualname": "test_kicking_pts_project_from_ledger"
+        },
+        {
+          "doc": null,
+          "endLine": 108,
+          "kind": "function",
+          "line": 85,
+          "name": "test_efficiency_fits_td_int_kicking_from_logs",
+          "qualname": "test_efficiency_fits_td_int_kicking_from_logs"
+        },
+        {
+          "doc": null,
+          "endLine": 118,
+          "kind": "function",
+          "line": 111,
+          "name": "test_empirical_bayes_and_stdlib_ml_primitives",
+          "qualname": "test_empirical_bayes_and_stdlib_ml_primitives"
+        },
+        {
+          "doc": null,
+          "endLine": 138,
+          "kind": "function",
+          "line": 121,
+          "name": "test_research_may_begin_false_until_readiness",
+          "qualname": "test_research_may_begin_false_until_readiness"
+        },
+        {
+          "doc": null,
+          "endLine": 149,
+          "kind": "function",
+          "line": 141,
+          "name": "test_har_delta_line_only_reuses_history",
+          "qualname": "test_har_delta_line_only_reuses_history"
+        },
+        {
+          "doc": null,
+          "endLine": 173,
+          "kind": "function",
+          "line": 152,
+          "name": "test_coextract_fanout_one_page_many_entities",
+          "qualname": "test_coextract_fanout_one_page_many_entities"
+        },
+        {
+          "doc": null,
+          "endLine": 188,
+          "kind": "function",
+          "line": 176,
+          "name": "test_champion_portable_and_gpu_rejected",
+          "qualname": "test_champion_portable_and_gpu_rejected"
+        },
+        {
+          "doc": null,
+          "endLine": 194,
+          "kind": "function",
+          "line": 191,
+          "name": "test_portfolio_combo_constraints",
+          "qualname": "test_portfolio_combo_constraints"
+        },
+        {
+          "doc": null,
+          "endLine": 202,
+          "kind": "function",
+          "line": 197,
+          "name": "test_learning_firewall_stays_lr000000",
+          "qualname": "test_learning_firewall_stays_lr000000"
+        },
+        {
+          "doc": null,
+          "endLine": 208,
+          "kind": "function",
+          "line": 205,
+          "name": "test_plugin_activates_new_markets",
+          "qualname": "test_plugin_activates_new_markets"
+        },
+        {
+          "doc": null,
+          "endLine": 229,
+          "kind": "function",
+          "line": 211,
+          "name": "test_hold_playable_demotes_conflict",
+          "qualname": "test_hold_playable_demotes_conflict"
+        },
+        {
+          "doc": null,
+          "endLine": 242,
+          "kind": "function",
+          "line": 232,
+          "name": "test_governed_role_epoch_executes_ewma_cusum_page_hinkley",
+          "qualname": "test_governed_role_epoch_executes_ewma_cusum_page_hinkley"
+        },
+        {
+          "doc": null,
+          "endLine": 265,
+          "kind": "function",
+          "line": 245,
+          "name": "test_archive_retry_reconcile_and_drive_catalog",
+          "qualname": "test_archive_retry_reconcile_and_drive_catalog"
+        },
+        {
+          "doc": null,
+          "endLine": 282,
+          "kind": "function",
+          "line": 268,
+          "name": "test_retrieval_cascade_queries_rrf_mmr_lsh",
+          "qualname": "test_retrieval_cascade_queries_rrf_mmr_lsh"
+        },
+        {
+          "doc": null,
+          "endLine": 291,
+          "kind": "function",
+          "line": 285,
+          "name": "test_failure_class_identity_and_stale",
+          "qualname": "test_failure_class_identity_and_stale"
+        },
+        {
+          "doc": null,
+          "endLine": 305,
+          "kind": "function",
+          "line": 294,
+          "name": "test_joint_cfb_event_worlds_emit_allocation_mode",
+          "qualname": "test_joint_cfb_event_worlds_emit_allocation_mode"
+        }
+      ],
+      "workstream": "UNMAPPED"
+    },
+    {
+      "classes": 0,
       "functions": 11,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_cfb_research_os.py",
-      "sha256": "88bf57d77efc742cfa72e21bf6d7445f875467fef9b47651062c5fdff377f5bc",
+      "sha256": "05331610c5c0df681dac37f41c583a4d87de9a419cf81d2b0c0e9c588a28a8cc",
       "symbols": [
         {
           "doc": null,
@@ -12356,7 +13372,7 @@
         },
         {
           "doc": null,
-          "endLine": 45,
+          "endLine": 46,
           "kind": "function",
           "line": 34,
           "name": "test_cfb_accounting_before_goblin_exclusion",
@@ -12364,65 +13380,65 @@
         },
         {
           "doc": null,
-          "endLine": 66,
+          "endLine": 67,
           "kind": "function",
-          "line": 48,
+          "line": 49,
           "name": "test_graphs_exist_before_research_and_use_constitution_primitives",
           "qualname": "test_graphs_exist_before_research_and_use_constitution_primitives"
         },
         {
           "doc": null,
-          "endLine": 80,
+          "endLine": 81,
           "kind": "function",
-          "line": 69,
+          "line": 70,
           "name": "test_modelable_is_not_playable_and_per_prop_flags",
           "qualname": "test_modelable_is_not_playable_and_per_prop_flags"
         },
         {
           "doc": null,
-          "endLine": 92,
+          "endLine": 93,
           "kind": "function",
-          "line": 83,
+          "line": 84,
           "name": "test_live_batch_uses_celf_not_one_prop_one_search",
           "qualname": "test_live_batch_uses_celf_not_one_prop_one_search"
         },
         {
           "doc": "SPORT/COMPETITION fanout must not consume the unique-offer budget alone.",
-          "endLine": 109,
+          "endLine": 110,
           "kind": "function",
-          "line": 95,
+          "line": 96,
           "name": "test_large_board_celf_does_not_starve_on_sport_mass",
           "qualname": "test_large_board_celf_does_not_starve_on_sport_mass"
         },
         {
           "doc": "FixtureProvider is engineering-only. Graphs still emit; playables stay 0.",
-          "endLine": 134,
+          "endLine": 135,
           "kind": "function",
-          "line": 113,
+          "line": 114,
           "name": "test_fixture_provider_cannot_create_production_playables",
           "qualname": "test_fixture_provider_cannot_create_production_playables"
         },
         {
           "doc": null,
-          "endLine": 226,
+          "endLine": 227,
           "kind": "function",
-          "line": 137,
+          "line": 138,
           "name": "test_cfb_fixture_end_to_end_top100_top25_playables_freeze",
           "qualname": "test_cfb_fixture_end_to_end_top100_top25_playables_freeze"
         },
         {
           "doc": null,
-          "endLine": 234,
+          "endLine": 235,
           "kind": "function",
-          "line": 229,
+          "line": 230,
           "name": "test_offered_side_only_and_goblin_after_accounting",
           "qualname": "test_offered_side_only_and_goblin_after_accounting"
         },
         {
           "doc": null,
-          "endLine": 261,
+          "endLine": 265,
           "kind": "function",
-          "line": 237,
+          "line": 238,
           "name": "test_partial_bundle_still_emits_graphs_and_per_prop_states",
           "qualname": "test_partial_bundle_still_emits_graphs_and_per_prop_states"
         }
@@ -13677,7 +14693,7 @@
       "classes": 0,
       "functions": 24,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_gridiron_plugin.py",
-      "sha256": "f2dbf1d21a3108d3a530d4249657a38152490d0fa970b1db2f52123159da18ef",
+      "sha256": "add089a1789501332bd39b27bfc58396190c5bff899178f2dfd2ff917434f740",
       "symbols": [
         {
           "doc": null,
@@ -13809,7 +14825,7 @@
         },
         {
           "doc": null,
-          "endLine": 337,
+          "endLine": 343,
           "kind": "function",
           "line": 325,
           "name": "test_production_capable_only_full_path_markets",
@@ -13817,57 +14833,57 @@
         },
         {
           "doc": null,
-          "endLine": 358,
+          "endLine": 364,
           "kind": "function",
-          "line": 340,
+          "line": 346,
           "name": "test_missing_opponent_defense_blocks_playable_snapshot",
           "qualname": "test_missing_opponent_defense_blocks_playable_snapshot"
         },
         {
           "doc": "One-line demo: a fixture NFL pass-yards offer equals ledger pass_yds.",
-          "endLine": 364,
+          "endLine": 370,
           "kind": "function",
-          "line": 361,
+          "line": 367,
           "name": "test_fixture_pass_yards_offer_derived_from_primitive_ledger",
           "qualname": "test_fixture_pass_yards_offer_derived_from_primitive_ledger"
         },
         {
           "doc": null,
-          "endLine": 385,
+          "endLine": 391,
           "kind": "function",
-          "line": 367,
+          "line": 373,
           "name": "test_cfb_attempt_markets_are_opportunity_only_for_model_support",
           "qualname": "test_cfb_attempt_markets_are_opportunity_only_for_model_support"
         },
         {
           "doc": null,
-          "endLine": 406,
+          "endLine": 412,
           "kind": "function",
-          "line": 388,
+          "line": 394,
           "name": "test_cfb_yardage_market_can_model_thin_but_not_playable",
           "qualname": "test_cfb_yardage_market_can_model_thin_but_not_playable"
         },
         {
           "doc": null,
-          "endLine": 424,
+          "endLine": 430,
           "kind": "function",
-          "line": 409,
+          "line": 415,
           "name": "test_cfb_market_support_holds_zero_history_for_research",
           "qualname": "test_cfb_market_support_holds_zero_history_for_research"
         },
         {
           "doc": null,
-          "endLine": 439,
+          "endLine": 445,
           "kind": "function",
-          "line": 427,
+          "line": 433,
           "name": "test_cfb_blowout_regime_is_explicit_not_directional",
           "qualname": "test_cfb_blowout_regime_is_explicit_not_directional"
         },
         {
           "doc": null,
-          "endLine": 462,
+          "endLine": 468,
           "kind": "function",
-          "line": 442,
+          "line": 448,
           "name": "test_cfb_role_state_transfer_and_promoted_are_not_returning_starters",
           "qualname": "test_cfb_role_state_transfer_and_promoted_are_not_returning_starters"
         }
@@ -16230,5 +17246,5 @@
   "parseErrors": [],
   "root": "artifacts/dcm_v6_workstream_ab",
   "schema": "pillars_dcm.code_inventory.v1",
-  "symbolCount": 1748
+  "symbolCount": 1858
 }

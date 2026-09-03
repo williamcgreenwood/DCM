@@ -323,18 +323,24 @@ def test_skill_receptions_path_from_fixture():
 
 
 def test_production_capable_only_full_path_markets():
+    active_19 = (
+        "pass_yds", "pass_att", "pass_cmp", "pass_td", "interceptions",
+        "rush_yds", "rush_att", "rush_td", "rec_yds", "receptions", "rec_td",
+        "targets", "pass_rush_yds", "rush_rec_yds", "rush_rec_td", "pass_rush_td",
+        "fg_made", "xp_made", "kicking_pts",
+    )
     for league in ("NFL", "CFB"):
-        for market in ("pass_yds", "pass_att", "pass_cmp", "rush_yds", "rush_att", "rec_yds", "receptions", "pass_rush_yds", "rush_rec_yds"):
+        for market in active_19:
             assert selection_state("gridiron", league, market) == PRODUCTION
         assert selection_state("gridiron", league, "def_tackles") == UNSUPPORTED
-        assert selection_state("gridiron", league, "fg_made") == UNSUPPORTED
-        assert selection_state("gridiron", league, "pass_td") == UNSUPPORTED
         assert selection_state("gridiron", league, "air_yards") == UNSUPPORTED
     assert selection_state("gridiron", "CFL", "pass_yds") == UNSUPPORTED
     assert selection_state("gridiron", "NFLP", "pass_yds") != PRODUCTION
     manifest = lookup("gridiron")
-    assert manifest.plugin_version == "1.2.0"
+    assert manifest.plugin_version == "1.3.0"
     assert "CFL_REBOOT" in manifest.known_unsupported
+    assert "LONGEST_PLAY_MARKETS" in manifest.known_unsupported
+    assert "FANTASY_UNVERSIONED" in manifest.known_unsupported
 
 
 def test_missing_opponent_defense_blocks_playable_snapshot():

@@ -22,17 +22,17 @@ This file is the human dashboard. It must be updated on every coding pass togeth
 | P0 Canonical spine / HAR / integrity | 10 | 9 | STRONG PARTIAL | preserve authenticated v5.4.1 roots in release retrieval; production root remains independently gated |
 | P1 Universal research / evidence | 10 | 9 | STRONG PARTIAL | current CFB HAR host research → imported evidence → modeled Top100/Top25/0–6 Playables; mixed-sport R1 remainder |
 | P2 Feature / state / parameter layer | 10 | 9 | STRONG PARTIAL | validate CFB role-comparable/current/prior support on real boards; activate only evidence-backed signal operators |
-| P3 SportPlugin physics | 10 | 6 | PARTIAL | operationally accept the guarded CFB market set on a current board; continue remaining 24-component plugin bindings sport by sport |
-| P4 Probability / uncertainty / grading / portfolio | 10 | 8 | STRONG PARTIAL | prospective CFB settlement/calibration evidence; universal shared-world/correlation coverage; final-refresh integration |
+| P3 SportPlugin physics | 10 | 8 | STRONG PARTIAL | 19 CFB PRODUCTION markets executable; remaining 24-component plugin bindings sport by sport; current-board operational acceptance |
+| P4 Probability / uncertainty / grading / portfolio | 10 | 9 | STRONG PARTIAL | prospective CFB settlement/calibration evidence; mixed-sport shared-world coverage |
 | P5 Audit / portability / ChatGPT-native execution | 10 | 8 | STRONG PARTIAL | current-HAR fresh ChatGPT acceptance; immutable release retrieval |
 | P6 Settlement / calibration / learning | 10 | 6 | PARTIAL + EXTERNAL VALIDATION | exact platform coverage; CFB prospective settlements; CRPS/subgroups; chronological unseen settlements before promotion |
-| P7 Host-native execution contract | 10 | 7 | PARTIAL | current CFB HAR forecast through `dcm-host cfb-launch` on a fresh wheel; no second engine |
+| P7 Host-native execution contract | 10 | 8 | STRONG PARTIAL | current CFB HAR forecast through `dcm-host cfb-launch` on a fresh wheel; no second engine |
 | P8 Universal source acquisition | 10 | 6 | PARTIAL | live adapter fetch beyond fixtures; conflict policy + licensed providers |
 | P9 Universal core migration | 10 | 9 | STRONG PARTIAL | retire remaining PLAYER/TEAM claim lookups at packet/parameter adapters |
 | P10 Full sport coverage | 10 | 3 | EARLY | each supported sport reaches 24/24 plugin components + validation suite |
 | P11 Release + fresh-environment acceptance | 10 | 7 | PARTIAL | wheel/release + exact hash + current HAR-only fresh ChatGPT acceptance |
-| P12 Research archive / index / reuse | 10 | 7 | PARTIAL | high-volume queryable store; retention/licensing enforcement beyond local blobs |
-| P13 Performance / search / token optimization | 10 | 6 | PARTIAL | measured CPU/RSS/token certification; host-performance remains uncertified |
+| P12 Research archive / index / reuse | 10 | 8 | STRONG PARTIAL | Drive credentials; high-volume queryable store; retention/licensing enforcement beyond local blobs |
+| P13 Performance / search / token optimization | 10 | 7 | PARTIAL | measured CPU/RSS/token certification; host-performance remains uncertified |
 | P14 Production operations / observability | 10 | 5 | PARTIAL | run health/readiness, failure taxonomy, deterministic recovery, release gates |
 | P15 P380X donor signal governance | 10 | 7 | PARTIAL | Tranche C research truth; exact donor definition compilation only from available archive bytes; evidence-earned activation only |
 | P16 Algorithmic Constitution / strategy registry | 10 | 9 | STRONG PARTIAL | CFB live CELF + telemetry done; remaining mixed-sport R1; keep CI gates; no silent algorithm retirement |
@@ -75,6 +75,26 @@ Not earned:
 - host performance certification
 - predictive superiority
 - full mixed-sport Research OS
+
+## 2026-09-03 CFB reference-implementation consumer pass
+
+Continues PR #19 from `ec1865e`. Does **not** complete mixed-sport R1 or claim a current live forecast.
+
+Software consumers closed this pass:
+
+- `holdPlayable` demotes PLAYABLE in MODEL + frontier recompute
+- RoleEpoch executes EWMA/CUSUM/Page-Hinkley
+- Retrieval cascade queried (BM25/BM25F/Trie/fuzzy/MinHash/SimHash/LSH/RRF/MMR/bitmaps) with registry-correct telemetry IDs
+- Source-health success recording; Drive catalog fail-closed; archive retry/reconcile; freeze merkle
+- Joint CFB EventWorlds `JOINT_TEAM` conservation meta; refresh re-grades on line change
+- Settlement of MODELED_DIAGNOSTIC; expanded failure taxonomy
+- 19 ACTIVE CFB MarketDefinitions already in tree (aliases + genuine unsupported)
+
+Measured: 397 pytest passed; inventory 268/1858 hash `0f6693681e3ed41d7abcf3a5feec2d4a758301817f0fc54d639e2ada4e669384`.
+
+Not earned: current 2026-09-03 HAR (`CURRENT_REAL_HAR_ACCEPTANCE_PENDING_EXTERNAL_INPUT`); LR promotion; production-root certification; Drive credentials.
+
+Verdict: `CFB_REFERENCE_IMPLEMENTATION_NOT_COMPLETE` only because current real HAR acceptance is pending external input.
 
 ## P380X Tranche A/B status
 

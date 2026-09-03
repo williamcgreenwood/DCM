@@ -37,15 +37,29 @@ def _support(p: dict[str, Any]) -> dict[str, Any]:
 def cfb_prop_flags(p: dict[str, Any]) -> dict[str, Any]:
     snap = p.get("parameterSnapshot") if isinstance(p.get("parameterSnapshot"), dict) else {}
     support = _support(p)
+    coverage = p.get("coverage") if isinstance(p.get("coverage"), dict) else {}
     modelable = bool(support.get("modelable", snap.get("minimum_model_support")))
     playable = bool(support.get("playableSupport")) and bool(p.get("modeledPlayable"))
-    research_complete = bool(snap.get("production_eligible")) or bool(support.get("modelable"))
-    frontier = bool(modelable) and not playable
+    # Five flags persist independently. Do not infer research-complete from modelable.
+    if "requiredComplete" in coverage:
+        research_complete = bool(coverage.get("requiredComplete"))
+    elif "propResearchComplete" in p:
+        research_complete = bool(p.get("propResearchComplete"))
+    else:
+        research_complete = False
+    if "propFrontierResearchEligible" in p:
+        frontier = bool(p.get("propFrontierResearchEligible"))
+    elif "frontierEligible" in coverage:
+        frontier = bool(coverage.get("frontierEligible"))
+    else:
+        frontier = bool(p.get("grade") in {"PLAYABLE", "LEAN"}) and not playable
+    global_complete = bool(coverage.get("globalComplete", p.get("globalCoverageComplete")))
     return {
         "propResearchComplete": research_complete,
         "propModelable": modelable,
         "propPlayableEligible": playable,
         "propFrontierResearchEligible": frontier,
+        "globalCoverageComplete": global_complete,
         "footballModelable": modelable,
         "playableSupport": bool(support.get("playableSupport")),
     }
