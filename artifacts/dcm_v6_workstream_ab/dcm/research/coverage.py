@@ -68,7 +68,7 @@ def _market_token(request: dict[str, Any]) -> str:
     for token in (
         "pra", "3pm", "threes", "points", "pts", "rebounds", "rebound", "reb",
         "assists", "assist", "ast", "steals", "stl", "blocks", "blk", "turnovers", "tov",
-        "pass_yds", "rush_yds", "rec_yds", "receptions", "pass_rush_yds", "rush_rec_yds",
+        "pass_yds", "pass_att", "pass_cmp", "rush_yds", "rush_att", "rec_yds", "receptions", "pass_rush_yds", "rush_rec_yds",
     ):
         if need == token or need.startswith(token + "_") or need.endswith("_" + token) or f"_{token}_" in need:
             return token
