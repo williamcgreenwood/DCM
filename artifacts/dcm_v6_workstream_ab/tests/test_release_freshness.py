@@ -53,6 +53,9 @@ def test_portable_release_builder_and_extraction(tmp_path: Path):
     assert (dest / "COMPLETE_PROJECT_SOURCE.txt").is_file()
     hashes = json.loads((dest / "HASHES.json").read_text())
     assert hashes.get("gitCommit")
+    assert hashes.get("algorithmConstitutionVersion") == "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903"
+    assert hashes.get("algorithmConstitutionSha256")
+    assert hashes.get("algorithmRegistrySha256")
     assert hashes["expectedV1Hash"] == EXPECTED_SHA256
     assert hashes["phase_bc_schema_v2.json"] == SCHEMA_V2_EXPECTED_SHA256
     n = count_pytest_functions(ROOT / "tests")

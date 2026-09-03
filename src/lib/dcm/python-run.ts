@@ -6,6 +6,7 @@ import type { DcmView } from "./types";
 function resolvePythonPkg(fs: typeof import("node:fs"), path: typeof import("node:path")): string | null {
   const candidates = [
     path.resolve(process.cwd(), "artifacts/dcm_v6_workstream_ab"),
+    "/workspace/DCM/artifacts/dcm_v6_workstream_ab",
     "/workspace/artifacts/dcm_v6_workstream_ab",
   ];
   for (const c of candidates) {
@@ -47,7 +48,11 @@ export const runPythonDcm = createServerFn({ method: "POST" })
       return pythonUnavailable("Canonical Python DCM is not mounted in this host.");
     }
 
-    const workspace = fs.existsSync("/workspace") ? "/workspace" : process.cwd();
+    const workspace = fs.existsSync("/workspace/DCM/pyproject.toml")
+      ? "/workspace/DCM"
+      : fs.existsSync("/workspace/pyproject.toml")
+        ? "/workspace"
+        : process.cwd();
     const outRoot = process.env.DCM_RUNS_DIR || "/tmp/dcm_v6/RUNS";
     fs.mkdirSync(outRoot, { recursive: true });
     const args = [

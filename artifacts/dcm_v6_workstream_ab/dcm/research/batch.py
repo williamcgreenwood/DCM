@@ -9,6 +9,8 @@ from __future__ import annotations
 from collections import defaultdict
 from typing import Any
 
+from dcm.algorithms.searching import weighted_set_cover
+from dcm.algorithms.sorting import heap_topk
 from dcm.research.requests import FRESHNESS_NEED, INFO_IMPORTANCE
 from dcm.research.classify_runtime import classify_requests
 from dcm.research.research_store import ResearchStore
@@ -58,6 +60,10 @@ def _event_id_of(request: dict[str, Any]) -> str:
     )
 
 
+def _request_id_of(request: dict[str, Any]) -> str:
+    return str(request.get("request_id") or request.get("requestId") or "")
+
+
 def build_next_research_batch(
     requests: list[dict[str, Any]],
     *,
@@ -76,7 +82,7 @@ def build_next_research_batch(
     cost = estimated_cost(catalog_source_id)
     scored: list[dict[str, Any]] = []
     for rec in classified:
-        req_id = str(rec.get("request_id") or rec.get("requestId") or "")
+        req_id = _request_id_of(rec)
         cov = coverage_by_id.get(req_id) or {}
         complete = bool(cov.get("complete")) and rec.get("deltaClass") == "REUSE_VALID"
         if complete or rec.get("deltaClass") == "REUSE_VALID":
@@ -118,10 +124,20 @@ def build_next_research_batch(
         else:
             ungrouped.append(rec)
 
+    event_items = list(by_event.items())
+    event_ranked = heap_topk(
+        event_items,
+        k=len(event_items),
+        key=lambda kv: sum(float(r.get("schedulerScore") or 0) for r in kv[1]),
+    ) if event_items else []
+    universe = [_request_id_of(r) for r in acquire if _request_id_of(r)]
+    cover_sets = {eid: [_request_id_of(r) for r in group if _request_id_of(r)] for eid, group in by_event.items()}
+    cover_ids, leftover = weighted_set_cover(universe, cover_sets) if universe else ([], set())
+
     batches: list[dict[str, Any]] = []
     selected: list[dict[str, Any]] = []
     offer_budget = 0
-    for event_id, group in sorted(by_event.items(), key=lambda kv: -sum(float(r.get("schedulerScore") or 0) for r in kv[1])):
+    for event_id, group in event_ranked:
         remaining = max_entities - len(selected)
         if remaining <= 0:
             break
@@ -176,6 +192,9 @@ def build_next_research_batch(
             "uncertainty_reduction / estimated_acquisition_cost"
         ),
         "batching": "event_first",
+        "algorithmIds": ["ALG-SCHED-001", "ALG-SCHED-002", "ALG-SEARCH-019", "ALG-SORT-002"],
+        "setCoverEventIds": list(cover_ids),
+        "setCoverUncoveredCount": len(leftover),
         "maxEntities": int(max_entities),
         "maxDependentOffers": int(max_dependent_offers),
         "unresolvedCount": len(acquire),

@@ -4,6 +4,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+from dcm.algorithms.selection import AlgorithmSelectionEngine
 from dcm.chat.state import read_json, write_json
 from dcm.research.batch import build_next_research_batch
 from dcm.research.provider import BundleProvider
@@ -51,5 +52,10 @@ def next_research_batch(
     acquired = int(batch.get("unresolvedCount") or 0)
     batch["storeTelemetry"] = store.telemetry(reused=reused, acquired=acquired)
     batch["hydratedClaimCount"] = len(reused_claims)
+    selection = AlgorithmSelectionEngine().select(
+        "RESEARCH_SCHEDULE",
+        {"consumer": "dcm.chat.research_bridge.next_research_batch"},
+    )
+    batch["algorithmSelection"] = selection.to_dict()
     write_json(dest / "host_research_batch.json", batch)
     return batch

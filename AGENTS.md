@@ -45,6 +45,20 @@ HAR capture(s)
   explicitly tested promotion contract.
 - Predictive claim remains `NONE` until evidence earns a different claim.
 
+## Algorithmic Constitution
+
+The DCM inherits `DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903`. It is
+mandatory, CI-gated, and inherited by all future versions unless a newer
+constitution is adopted under an Architecture Decision Record.
+
+- Canonical text: `docs/architecture/DCM_ALGORITHMIC_CONSTITUTION.md`
+- Machine-readable registry: `configs/algorithm_registry.json`
+- Runtime: `dcm.algorithms` (selection engine, HAR AlgorithmExecutionPlan)
+- Silent algorithm retirement is prohibited.
+- ChatGPT-native deterministic fallbacks are required for optional packages.
+- Do not create a second EvidenceGraph, ResearchStore, probability, ranking,
+  SportPlugin, or persistence engine to satisfy the constitution.
+
 ## Prop-board doctrine
 
 Every board run must:

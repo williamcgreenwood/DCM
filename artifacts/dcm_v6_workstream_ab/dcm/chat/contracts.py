@@ -25,6 +25,7 @@ REQUIRED_PREPARE_ARTIFACTS = (
     "sport_plugin_contract_registry.json",
     "evidence_coverage.json",
     "host_state.json",
+    "algorithm_execution_plan.json",
 )
 
 HOST_STATE_SCHEMA = "pillars_dcm.host_state.v1"

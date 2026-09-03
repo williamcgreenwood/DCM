@@ -1,8 +1,8 @@
 {
   "schema": "pillars_dcm.program_status.v1",
-  "updatedAtUtc": "2026-09-03T06:12:00Z",
+  "updatedAtUtc": "2026-09-03T19:50:00Z",
   "canonicalIntegrationBranch": "integration/v6-ml-architecture-20260830",
-  "canonicalIntegrationPr": 16,
+  "canonicalIntegrationPr": 17,
   "scoreScale": {
     "0": "MISSING",
     "10": "COMPLETE_EXECUTABLE_INTEGRATED_TESTED_AUDITABLE_PORTABLE",
@@ -202,6 +202,18 @@
         "Tranche C research-truth integration",
         "compile exact donor definitions only when archive bytes are available",
         "promote operators only after real producer-consumer integration and tests"
+      ]
+    },
+    {
+      "id": "P16",
+      "name": "Algorithmic Constitution / strategy registry",
+      "target": 10,
+      "current": 8,
+      "state": "STRONG_PARTIAL",
+      "next": [
+        "R1 BoardGraph MarketDemandGraph RequirementGraph AcquisitionAction live packing",
+        "keep constitution CI gates green",
+        "do not silently retire CORE/CONDITIONAL/CHALLENGER algorithms"
       ]
     }
   ],

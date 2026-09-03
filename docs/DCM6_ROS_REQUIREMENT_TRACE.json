@@ -1,10 +1,23 @@
 {
   "schema": "pillars_dcm.dcm6_ros_requirement_trace.v1",
   "specId": "DCM6-ROS-EG-001",
-  "updatedAtUtc": "2026-09-03T06:14:00Z",
+  "updatedAtUtc": "2026-09-03T19:50:00Z",
   "predictiveClaim": "NONE",
   "learningRevision": "LR000000",
+  "constitutionVersion": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
   "requirements": [
+    {
+      "requirement": "Permanent Algorithmic Constitution with machine-readable registry, selection engine, HAR execution plan, and CI gates",
+      "specSection": "v3 PART II-A / R0",
+      "code": "artifacts/dcm_v6_workstream_ab/dcm/algorithms",
+      "schema": "schemas/AlgorithmRequirement.schema.json",
+      "test": "tests/governance/test_algorithm_constitution.py",
+      "runtimeProducer": "AlgorithmSelectionEngine",
+      "runtimeConsumer": "dcm.runner.run_dcm / HarAlgorithmExecutionPlan",
+      "auditArtifact": "algorithm_execution_plan.json",
+      "status": "COMPLETE",
+      "evidence": "R0 constitution/registry/selection/HAR-plan/CI; BoardGraph/AcquisitionAction live packing remains R1"
+    },
     {
       "requirement": "Authenticate canonical v5.4.1 source and learning ledger hashes before normative migration",
       "specSection": "Phase 0",

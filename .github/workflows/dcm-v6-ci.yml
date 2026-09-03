@@ -50,6 +50,10 @@ jobs:
           DCM_SERIOUS_WORLDS: "128"
           DCM_MAX_WORLDS: "256"
         run: pytest -q
+      - name: Algorithm constitution gates
+        run: |
+          python scripts/export_algorithm_registry.py --check
+          python benchmarks/algorithm_frontier/core_smoke.py
       - name: Code inventory stale-check
         run: python scripts/build_code_inventory.py --check
       - name: Benchmark smoke
