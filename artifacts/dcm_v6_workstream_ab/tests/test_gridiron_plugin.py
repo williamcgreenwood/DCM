@@ -22,6 +22,8 @@ from dcm.research.role_epoch import RoleEpochBuilder
 from dcm.sports.common.plugin import PRODUCTION, UNSUPPORTED, lookup, selection_state
 from dcm.sports.football.ledger import build_football_world
 from dcm.sports.football.settlement_map import settle_football_market, settle_football_player
+from dcm.sports.football.research_requirements import assess_football_support
+from dcm.sports.football.cfb_role import resolve_cfb_role_state
 from tests.fixtures import build_cfb_game, build_nfl_game
 
 FIXTURES = Path(__file__).resolve().parent / "research_fixtures"
@@ -280,7 +282,8 @@ def test_nfl_and_cfb_row_reaches_modeled_path_with_fixture():
     }
     cfb_claims = [
         _claim("PLAYER", "CFB_QB_001", {
-            "status": "ACTIVE", "role": "QB", "game_logs": cfb_packet["gameLogs"],
+            "status": "ACTIVE", "role": "QB", "depth_chart_role": "starter", "prior_season_starts": 8,
+            "game_logs": cfb_packet["gameLogs"],
             "opportunity": {"support_n": cfb_packet["gameLogCount"]},
             "efficiency": {"support_n": cfb_packet["gameLogCount"]},
         }),
@@ -321,7 +324,7 @@ def test_skill_receptions_path_from_fixture():
 
 def test_production_capable_only_full_path_markets():
     for league in ("NFL", "CFB"):
-        for market in ("pass_yds", "rush_yds", "rec_yds", "receptions", "pass_rush_yds", "rush_rec_yds"):
+        for market in ("pass_yds", "pass_att", "pass_cmp", "rush_yds", "rush_att", "rec_yds", "receptions", "pass_rush_yds", "rush_rec_yds"):
             assert selection_state("gridiron", league, market) == PRODUCTION
         assert selection_state("gridiron", league, "def_tackles") == UNSUPPORTED
         assert selection_state("gridiron", league, "fg_made") == UNSUPPORTED
@@ -359,3 +362,101 @@ def test_fixture_pass_yards_offer_derived_from_primitive_ledger():
     """One-line demo: a fixture NFL pass-yards offer equals ledger pass_yds."""
     built = build_nfl_game()
     assert derive_market(built.ledger.values_for("NFL_QB_001"), "pass_yds") == built.ledger.values_for("NFL_QB_001")["pass_yds"]
+
+
+def test_cfb_attempt_markets_are_opportunity_only_for_model_support():
+    logs = normalize_gridiron_logs(_qb_logs(2))["logs"]
+    support = assess_football_support(
+        market="pass_att",
+        role="QB",
+        status="ACTIVE",
+        logs=logs,
+        definition_verified=True,
+        team_event={
+            "playsObserved": True,
+            "paceObserved": True,
+            "pass_defense": None,
+            "rush_defense": None,
+        },
+    )
+    assert support["modelable"] is True
+    assert support["efficiencyFields"] == []
+    assert support["playableSupport"] is False
+    assert "PLAYABLE_OPPORTUNITY_SUPPORT_LT3" in support["playableBlockers"]
+
+
+def test_cfb_yardage_market_can_model_thin_but_not_playable():
+    logs = normalize_gridiron_logs(_qb_logs(1))["logs"]
+    support = assess_football_support(
+        market="pass_yds",
+        role="QB",
+        status="ACTIVE",
+        logs=logs,
+        definition_verified=True,
+        team_event={
+            "playsObserved": True,
+            "paceObserved": True,
+            "pass_defense": 1.0,
+            "rush_defense": 1.0,
+        },
+    )
+    assert support["modelable"] is True
+    assert support["playableSupport"] is False
+    assert support["opportunitySupportN"] == 1
+    assert support["efficiencySupportN"] == 1
+
+
+def test_cfb_market_support_holds_zero_history_for_research():
+    support = assess_football_support(
+        market="rush_yds",
+        role="RB",
+        status="ACTIVE",
+        logs=[],
+        definition_verified=True,
+        team_event={
+            "playsObserved": True,
+            "paceObserved": True,
+            "pass_defense": 1.0,
+            "rush_defense": 1.0,
+        },
+    )
+    assert support["modelable"] is False
+    assert "MINIMUM_OPPORTUNITY_SUPPORT_MISSING" in support["modelBlockers"]
+
+
+def test_cfb_blowout_regime_is_explicit_not_directional():
+    model = TeamEventModel().fit(
+        {"plays": 72, "pass_rate": 0.55, "pace": 1.0},
+        {"spread": -28.5, "game_total": 55.5},
+        {"pass_defense": 0.98, "rush_defense": 1.02},
+        league="CFB",
+        market="pass_yds",
+    )
+    weights = model["event_regime_weights"]
+    assert set(weights) == {"competitive", "controlled_lead", "blowout"}
+    assert abs(sum(weights.values()) - 1.0) < 1e-9
+    assert weights["blowout"] > 0.05
+    assert model["starter_curtailment"]["blowout"] < 1.0
+
+
+def test_cfb_role_state_transfer_and_promoted_are_not_returning_starters():
+    transfer = resolve_cfb_role_state({
+        "role": "QB",
+        "depth_chart_role": "starter",
+        "previous_school": "OLD",
+        "prior_season_starts": 10,
+    }, role="QB")
+    assert transfer["primary"] == "TRANSFER_STARTER"
+    assert transfer["transferOpportunityCarryoverAllowed"] is False
+
+    promoted = resolve_cfb_role_state({
+        "role": "RB",
+        "depth_chart_role": "starter",
+        "prior_role": "backup",
+        "prior_season_starts": 1,
+    }, role="RB")
+    assert promoted["primary"] == "PROMOTED_STARTER"
+
+    unknown = resolve_cfb_role_state({"role": "WR"}, role="WR")
+    assert unknown["primary"] == "ROLE_UNCERTAIN"
+    assert unknown["resolved"] is False

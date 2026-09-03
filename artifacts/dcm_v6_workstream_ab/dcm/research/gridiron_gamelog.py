@@ -108,7 +108,13 @@ _MARKET_CODES = {
     "pass_yds": "MARKET_STAT_PASS_YDS",
     "passing_yards": "MARKET_STAT_PASS_YDS",
     "pass_yards": "MARKET_STAT_PASS_YDS",
+    "pass_att": "MARKET_STAT_PASS_ATT",
+    "pass_attempts": "MARKET_STAT_PASS_ATT",
+    "pass_cmp": "MARKET_STAT_PASS_CMP",
+    "completions": "MARKET_STAT_PASS_CMP",
     "rush_yds": "MARKET_STAT_RUSH_YDS",
+    "rush_att": "MARKET_STAT_RUSH_ATT",
+    "rush_attempts": "MARKET_STAT_RUSH_ATT",
     "rushing_yards": "MARKET_STAT_RUSH_YDS",
     "rec_yds": "MARKET_STAT_REC_YDS",
     "receiving_yards": "MARKET_STAT_REC_YDS",
@@ -146,6 +152,12 @@ def _market_stat_ok(row: dict[str, Any], market: str) -> bool:
     m = str(market or "").strip().lower()
     if m in {"pass_yds", "passing_yards", "pass_yards"}:
         return _present(row, "pass_yds", "pass_att")
+    if m in {"pass_att", "pass_attempts"}:
+        return _present(row, "pass_att")
+    if m in {"pass_cmp", "completions"}:
+        return _present(row, "pass_cmp", "pass_att")
+    if m in {"rush_att", "rush_attempts"}:
+        return _present(row, "rush_att")
     if m in {"rush_yds", "rushing_yards"}:
         return _present(row, "rush_yds", "rush_att")
     if m in {"rec_yds", "receiving_yards"}:

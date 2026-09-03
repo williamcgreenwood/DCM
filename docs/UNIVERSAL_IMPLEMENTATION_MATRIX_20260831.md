@@ -1,6 +1,6 @@
 # DCM universal implementation matrix — 2026-08-31
 
-Baseline refreshed through PR #15 merge `8311b2aaeef16b508b6ef21c01c22ad990b9ad5d` and the P380X Tranche A/B child branch.
+Baseline refreshed through PR #16 merge `37e78ccfeff0bda74f8592bd46fb7d26e4b158e4` and the PR #17 CFB guarded-launch child branch. PR #17 branch state is implementation evidence pending integration, not a claim that all football or the full DCM is complete.
 This matrix is code-path status, not predictive validation. LR remains
 `LR000000`; predictive superiority remains `NONE`.
 
@@ -41,7 +41,7 @@ Status meanings:
 | Universal host research plan | COMPLETE (planning artifact) | Emits reusable entity tasks and universal research questions. |
 | Legacy TEAM/PLAYER request planner | OBSOLETE as canonical / adapter-only | `plan_research` now emits SPORT/COMPETITION/EVENT/AFFILIATION/SUBJECT/COUNTERPARTY/ENVIRONMENT/MARKET_DEFINITION/OFFER. PLAYER/TEAM remain lookup aliases inside adapters/coverage/packets. |
 | SourceAdapterRegistry | PARTIAL | Versioned `source_catalog.json` plus basketball/official/platform adapters. Live fetch remains opt-in; no licensed provider is a hard dependency. |
-| SportResearchSchema | PARTIAL | Semantic coverage exists for basketball/gridiron and is consulted for SUBJECT/AFFILIATION/COUNTERPARTY/EVENT/ENVIRONMENT; remaining sports fail closed. |
+| SportResearchSchema | PARTIAL to strong for guarded CFB | Basketball/gridiron semantic coverage is consulted for SUBJECT/AFFILIATION/COUNTERPARTY/EVENT/ENVIRONMENT. CFB host instructions now explicitly request 2026+2025 history, role/depth/transfer/system state, team tendencies, opponent defense, event and environment context. Remaining sports fail closed. |
 | SubjectResearchPacket | PARTIAL | Universal wrapper + compatibility PlayerResearchPacket. |
 | AffiliationResearchPacket | PARTIAL | Universal wrapper over team packets. |
 | CounterpartyResearchPacket | PARTIAL | Canonical COUNTERPARTY requests; opponent packet still reuses affiliation evidence. |
@@ -51,20 +51,20 @@ Status meanings:
 | EvidenceGraph | COMPLETE (universal topology), PARTIAL (settlement-time freeze join) | V2 graph uses Subject/Affiliation/Counterparty. Freeze now attaches Feature, RoleState, ParticipationState, OpportunityState, EfficiencyState, ParameterSnapshot, Simulation, PropEvaluation, Selection, Forecast. Settlement/LearningObservation live in `settlement_lineage.json` so freeze bytes stay append-only. |
 | Semantic evidence coverage | PARTIAL | Real field-level gates exist for basketball/gridiron; must move under SportResearchSchema instead of legacy PLAYER/TEAM branching. |
 | Research cache / temporal evidence | COMPLETE for current provider path | As-of cache and pre-cutoff claim validation are executable. |
-| Automatic host web acquisition | PARTIAL | `dcm-host next-research` + evidence-import is executable. The host still performs the actual web fetch; Python never fabricates research. Fresh-wheel ChatGPT HAR acceptance remains open. |
+| Automatic host web acquisition | PARTIAL | `dcm-host next-research` + evidence-import is executable. CFB uses the same canonical ResearchStore/EvidenceGraph path with market-specific instructions and per-prop sufficiency. The host still performs the actual web fetch; Python never fabricates research. Current-live-HAR fresh ChatGPT acceptance remains open. |
 
 ## P2 — ML data / state layer
 
 | Subsystem | Status | Evidence / action |
 |---|---|---|
 | Immutable-as-of FeatureStore | PARTIAL | Feature families now include IDENTITY/PARTICIPATION/ROLE/OPPORTUNITY/EFFICIENCY/AFFILIATION/COUNTERPARTY/MATCHUP/EVENT/ENVIRONMENT/RECENCY/WORKLOAD/AVAILABILITY/MARKET/PLATFORM. Packet-shaped basketball/gridiron observations remain. |
-| RoleStateModel | PARTIAL | Role epochs/state logic exists for current subjects; universal SportPlugin-defined RoleStateSchema is incomplete. |
+| RoleStateModel | PARTIAL to strong for guarded CFB | Explicit CFB states cover returning starter/rotation, promoted starter, transfer starter/rotation, true freshman, new QB, new coordinator/system, injury return and role uncertain. Transfer opportunity does not carry over 1:1; universal SportPlugin-defined RoleStateSchema remains incomplete. |
 | ParticipationModel | COMPLETE for basketball/gridiron current path / PARTIAL universal | `dcm.model.participation.ParticipationModel` fits minutes (basketball) and snaps (gridiron) independently; OpportunityModel consumes that output. Other sports fail closed. |
-| OpportunityModel | PARTIAL | Explicit opportunity modeling exists in current engines. General sport-neutral dispatch is incomplete. |
-| EfficiencyModel | PARTIAL | Explicit efficiency separation exists in current engines. General sport-neutral dispatch is incomplete. |
+| OpportunityModel | PARTIAL to strong for guarded CFB | Explicit opportunity modeling now includes CFB pass/rush/routes workloads plus competitive/controlled-lead/blowout starter-curtailment regimes. Opportunity-only market sufficiency is independent of irrelevant efficiency evidence. General sport-neutral dispatch is incomplete. |
+| EfficiencyModel | PARTIAL | Explicit efficiency separation exists in current engines. CFB yardage/conversion markets retain relevant efficiency support requirements while opportunity-only markets do not. General sport-neutral dispatch is incomplete. |
 | Hierarchical shrinkage / role-comparable history | PARTIAL | Current packet/state logic has support/shrinkage concepts; not all sports have validated implementations. |
 | Availability state / mixture | COMPLETE for current team-sport path | Active/out/questionable logic is executable and selection-blocking where required. |
-| ParameterSnapshot | PARTIAL | Snapshots expose layered SUBJECT/AFFILIATION/COUNTERPARTY/EVENT/ENVIRONMENT/MARKET/AVAILABILITY/PARTICIPATION/OPPORTUNITY/EFFICIENCY containers plus evidence-hash lineage. PLAYER/TEAM remain compatibility scopes_used. |
+| ParameterSnapshot | PARTIAL to strong for guarded CFB | Snapshots expose layered SUBJECT/AFFILIATION/COUNTERPARTY/EVENT/ENVIRONMENT/MARKET/AVAILABILITY/PARTICIPATION/OPPORTUNITY/EFFICIENCY containers plus evidence-hash lineage. CFB snapshots also expose minimum model support, strict PLAYABLE support, current/prior/role-comparable sample counts, role state and event-regime parameters. PLAYER/TEAM remain compatibility scopes_used. |
 | ML model registry with training metadata | PARTIAL | Governance pieces exist; not every active parameter model is an earned trained ML champion. |
 | No-fake-ML gate | COMPLETE as doctrine/gate | Predictive superiority remains NONE and LR000000; engineering simulations are not mislabeled trained superiority. |
 | Governed signal operators | PARTIAL, executable foundation | Tranche B provides typed contracts, SportPlugin/MarketDefinition/unit/cutoff validation, deterministic DAG compilation, semantic dedupe/overlap groups, consumer/test activation gates, executor audit hashes, and a FeatureStore consumer. No donor operator is active from documentation alone; Tranche C+ capabilities remain future work. |
@@ -75,10 +75,10 @@ Status meanings:
 |---|---|---|
 | SportPlugin contract | PARTIAL, executable | Full 24-component universal contract is now import-validated and emitted per run. Basketball/gridiron bindings expose exact IMPLEMENTED/PARTIAL gaps; `productionCompleteSports=[]` until every required component is IMPLEMENTED. |
 | Basketball deep plugin | PARTIAL to strong | Joint worlds, minute conservation, market derivation and current research packets exist; still needs migration behind full SportPlugin contract and prospective validation. |
-| Gridiron deep plugin | PARTIAL to strong | Opportunity/yardage worlds and current research paths exist; full universal plugin contract and broader market coverage remain. |
+| Gridiron deep plugin | PARTIAL to strong | Guarded NFL/CFB physical support includes pass_yds, pass_att, pass_cmp, rush_yds, rush_att, rec_yds, receptions, pass_rush_yds and rush_rec_yds. CFB role-state, per-prop research sufficiency and workload-regime paths are executable; full universal plugin contract, exotic markets and prospective validation remain. |
 | Baseball plugin | PARTIAL / SHADOW | MLB remains shadow, not production. |
 | Combat, soccer, hockey, tennis, golf, esports, motorsport, etc. | MISSING or RESEARCH_ONLY for production depth | Universal architecture may name them; production capability has not been earned. |
-| Joint EventWorld | COMPLETE for some current supported team-sport paths / PARTIAL universal | Shared event resources are modeled where implemented; not every sport has physics. |
+| Joint EventWorld | COMPLETE for some current supported team-sport paths / PARTIAL universal | Shared event resources are modeled where implemented. CFB adds a shared competitive/controlled-lead/blowout regime draw that modifies opportunity/workload rather than directly forcing a prop side; not every sport has physics. |
 | Resource competition | PARTIAL | Basketball joint minute/resource constraints exist; broader sport-specific resource competition varies. |
 | PrimitiveOutcomeLedger | PARTIAL | Primitive/conservation infrastructure exists for current deep plugins; universal production coverage incomplete. |
 | Conservation rules | COMPLETE where registered / PARTIAL universal | Fail-closed conservation checks exist; every future sport still needs its own suite. |
@@ -94,7 +94,7 @@ Status meanings:
 | Aleatoric/epistemic/MC uncertainty separation | PARTIAL to strong | Current probability bundle separates uncertainty classes; universal model-specific uncertainty still expands with plugins. |
 | Reliability/DataQuality/Volatility/Fragility separation | COMPLETE as doctrine/output | Not conflated with probability. |
 | Line surface / unclamped tolerance | COMPLETE for serious current candidates | Existing line-surface logic retained. |
-| PLAYABLE/LEAN/PASS/TRAP grading | COMPLETE | No forced Playables. |
+| PLAYABLE/LEAN/PASS/TRAP grading | COMPLETE for current path | No forced Playables. CFB `MODELED_DIAGNOSTIC` rows cannot use diagnostic modeling as a loophole to become PLAYABLE when strict evidence/role support is incomplete. |
 | Demon stricter gates | COMPLETE | Modifier cannot promote weak selection. |
 | Top 25 ranked vs qualified separation | COMPLETE | Ranked Top25 is not synonymous with bets; qualified list unpadded. |
 | 0–6 card | COMPLETE | No forced six, no Lean padding. |
@@ -128,7 +128,7 @@ Status meanings:
 
 ## Highest-priority next code migrations
 
-1. P380X Tranche C: Research Truth Integration using the existing StatePack/EvidenceGraph/freshness path.
+1. Run an actual current CFB HAR through ChatGPT-native research → EvidenceGraph → ParameterSnapshots → CFB EventWorld → probability/uncertainty → grading/ranking/freeze; treat this as operational acceptance, not redesign.\n2. Begin prospective CFB settlement capture and calibration evidence without promoting LR000000 prematurely.\n3. P380X Tranche C: Research Truth Integration using the existing StatePack/EvidenceGraph/freshness path.
 2. Drive a fresh-host wheel+HAR acceptance test through `dcm-host` without a source checkout.
 3. Close remaining PLAYER/TEAM claim lookups so they exist only inside source/sport adapters.
 4. Close remaining PARTIAL SportPlugin bindings (FeatureSchema, EnvironmentModel, MarketDefinitionRegistry/minimal, ValidationSuite).

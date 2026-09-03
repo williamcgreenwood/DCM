@@ -80,7 +80,16 @@ _GRIDIRON_ALIASES: dict[str, str] = {
     "passing_yards": "pass_yds",
     "pass_yards": "pass_yds",
     "passyds": "pass_yds",
+    "pass_att": "pass_att",
+    "pass_attempts": "pass_att",
+    "passing_attempts": "pass_att",
+    "pass_cmp": "pass_cmp",
+    "completions": "pass_cmp",
+    "passing_completions": "pass_cmp",
     "rush_yds": "rush_yds",
+    "rush_att": "rush_att",
+    "rush_attempts": "rush_att",
+    "rushing_attempts": "rush_att",
     "rushing_yards": "rush_yds",
     "rush_yards": "rush_yds",
     "rec_yds": "rec_yds",
@@ -194,7 +203,10 @@ def _formulas() -> dict[str, Callable[[dict[str, Any]], float]]:
         "blk": lambda L: _num(L, "blk"),
         "blk_stl": lambda L: _num(L, "blk") + _num(L, "stl"),
         "pass_yds": lambda L: _num(L, "pass_yds"),
+        "pass_att": lambda L: _num(L, "pass_att"),
+        "pass_cmp": lambda L: _num(L, "pass_cmp"),
         "rush_yds": lambda L: _num(L, "rush_yds"),
+        "rush_att": lambda L: _num(L, "rush_att"),
         "rec_yds": lambda L: _num(L, "rec_yds"),
         "receptions": lambda L: _num(L, "receptions"),
         "pass_rush_yds": lambda L: _num(L, "pass_yds") + _num(L, "rush_yds"),
@@ -205,7 +217,7 @@ def _formulas() -> dict[str, Callable[[dict[str, Any]], float]]:
 FORMULAS = _formulas()
 
 GRIDIRON_MARKET_KEYS = frozenset({
-    "pass_yds", "rush_yds", "rec_yds", "receptions", "pass_rush_yds", "rush_rec_yds",
+    "pass_yds", "pass_att", "pass_cmp", "rush_yds", "rush_att", "rec_yds", "receptions", "pass_rush_yds", "rush_rec_yds",
 })
 BASKETBALL_MARKET_KEYS = (frozenset(k for k in FORMULAS) | frozenset({"qtrs_w_3plus_pts"})) - GRIDIRON_MARKET_KEYS
 

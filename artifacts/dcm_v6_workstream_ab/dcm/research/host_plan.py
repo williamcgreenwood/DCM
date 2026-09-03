@@ -132,6 +132,35 @@ _SCOPE_SPEC: dict[str, dict[str, Any]] = {
     },
 }
 
+_CFB_SCOPE_RESEARCH: dict[str, list[str]] = {
+    "EVENT": [
+        "CFB: verify scheduled start, event status, venue, home/away, surface/roof, temperature, wind, precipitation and severe-weather risk",
+        "CFB: collect consensus spread/game total and meaningful movement when reliably available; use only for workload/game-regime context",
+    ],
+    "ENVIRONMENT": [
+        "CFB: refresh weather close to cutoff; preserve venue/surface facts at longer freshness",
+    ],
+    "AFFILIATION": [
+        "CFB: research team once: 2026 plays/pass attempts/rush attempts/pass yards/rush yards/points plus 2025 system baseline",
+        "CFB: identify starting QB, current depth chart, injuries, coordinator/head-coach and major offensive-line/personnel changes",
+    ],
+    "COUNTERPARTY": [
+        "CFB: research opponent once: defensive plays faced, pass/rush attempts and yards allowed, sacks/pressure, turnovers, points/red-zone/explosive context",
+        "CFB: include current defensive injuries, depth-chart and coordinator/system changes; shrink tiny 2026 samples toward 2025",
+    ],
+    "SUBJECT": [
+        "CFB: obtain complete 2026 game log to date AND complete 2025 college game log when available; use older college history only when useful and clearly labeled",
+        "CFB: verify current school, position, opponent, roster membership, depth-chart role, starter/backup state, injury/availability and transfer history",
+        "CFB QB: pass attempts, completions, pass yards/TD/INT, sacks, rush attempts/yards and scrambles/designed rushes when verifiable",
+        "CFB RB: carries/rush yards, targets/receptions/receiving yards, snaps/routes/red-zone/goal-line role when verifiable",
+        "CFB WR/TE: targets/receptions/receiving yards, routes/snaps/target share/air-yard and red-zone usage when verifiable; never fabricate unavailable advanced fields",
+        "CFB transfer/new-role: preserve prior-school production but do not transfer old opportunity share 1:1 into the new offense",
+    ],
+    "MARKET_DEFINITION": [
+        "CFB: verify exact current platform full-game stat definition, overtime/push treatment and any market-specific semantics",
+    ],
+}
+
 
 def build_host_research_plan(
     requests: list[dict[str, Any]],
@@ -154,6 +183,9 @@ def build_host_research_plan(
         spec = _SCOPE_SPEC.get(scope, {"priority": 99, "requiredFields": [], "research": []})
         req_id = str(request.get("request_id") or "")
         cov = coverage_by_id.get(req_id) or {}
+        research_instructions = list(spec["research"])
+        if str(request.get("league") or "").upper() == "CFB":
+            research_instructions.extend(_CFB_SCOPE_RESEARCH.get(scope, []))
         tasks.append(
             {
                 "requestId": req_id,
@@ -165,7 +197,7 @@ def build_host_research_plan(
                 "priorityScore": request.get("priority_score"),
                 "dependentPropCount": request.get("dependent_prop_count"),
                 "requiredFields": spec["requiredFields"],
-                "researchInstructions": spec["research"],
+                "researchInstructions": research_instructions,
                 "knownMissing": cov.get("missing") or [],
                 "complete": bool(cov.get("complete")),
                 "bundleKey": {"scope": scope, "scopeId": request.get("scope_id")},

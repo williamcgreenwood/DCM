@@ -1,6 +1,6 @@
 {
-  "contentHash": "13dac424a7978adf14ba786f047deb31859bb185f783eeb81edaa4703a89bf98",
-  "moduleCount": 226,
+  "contentHash": "38b8812f389c89a1ea47ed795e967e48ae3b681353aab317f7c0c7a6c4a80672",
+  "moduleCount": 229,
   "modules": [
     {
       "classes": 0,
@@ -2675,7 +2675,7 @@
       "classes": 3,
       "functions": 13,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/model/gridiron_models.py",
-      "sha256": "a7fcf01d3efe12b5bcaac70c9285ad00cfa436bb437f7e0aecd03affea3d9f57",
+      "sha256": "ea00f43c3c2ef649f27fc1f6254dcb06f64be2dfa2671ca525aba92651c113cb",
       "symbols": [
         {
           "doc": null,
@@ -2783,7 +2783,7 @@
         },
         {
           "doc": "Team plays / pass-rate / rush-rate / pace plus opponent pass/rush defense.",
-          "endLine": 379,
+          "endLine": 397,
           "kind": "class",
           "line": 304,
           "name": "TeamEventModel",
@@ -2791,7 +2791,7 @@
         },
         {
           "doc": null,
-          "endLine": 379,
+          "endLine": 397,
           "kind": "method",
           "line": 313,
           "name": "fit",
@@ -2853,77 +2853,77 @@
       "classes": 1,
       "functions": 8,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/model/market_derive.py",
-      "sha256": "02be350500226ed7e59ffaf0a9a815df3e2e4c5338d4cbc287d9e5f7635d42a4",
+      "sha256": "9d06a3ef554ca8f52b45bdc3b9b59545303efba30739076521dcfacab22e5999",
       "symbols": [
         {
           "doc": "Unknown or unverified market. Fail closed \u2014 never nearest-match.",
-          "endLine": 135,
+          "endLine": 144,
           "kind": "class",
-          "line": 129,
+          "line": 138,
           "name": "UnknownMarketError",
           "qualname": "UnknownMarketError"
         },
         {
           "doc": null,
-          "endLine": 135,
+          "endLine": 144,
           "kind": "method",
-          "line": 132,
+          "line": 141,
           "name": "__init__",
           "qualname": "UnknownMarketError.__init__"
         },
         {
           "doc": "Exact alias lookup. Returns None when the key is not registered.",
-          "endLine": 145,
+          "endLine": 154,
           "kind": "function",
-          "line": 138,
+          "line": 147,
           "name": "canonicalize_market",
           "qualname": "canonicalize_market"
         },
         {
           "doc": null,
-          "endLine": 149,
+          "endLine": 158,
           "kind": "function",
-          "line": 148,
+          "line": 157,
           "name": "is_registered",
           "qualname": "is_registered"
         },
         {
           "doc": null,
-          "endLine": 157,
+          "endLine": 166,
           "kind": "function",
-          "line": 152,
+          "line": 161,
           "name": "looks_like_basketball_ledger",
           "qualname": "looks_like_basketball_ledger"
         },
         {
           "doc": null,
-          "endLine": 164,
+          "endLine": 173,
           "kind": "function",
-          "line": 160,
+          "line": 169,
           "name": "looks_like_gridiron_ledger",
           "qualname": "looks_like_gridiron_ledger"
         },
         {
           "doc": null,
-          "endLine": 171,
+          "endLine": 180,
           "kind": "function",
-          "line": 167,
+          "line": 176,
           "name": "_num",
           "qualname": "_num"
         },
         {
           "doc": null,
-          "endLine": 202,
+          "endLine": 214,
           "kind": "function",
-          "line": 174,
+          "line": 183,
           "name": "_formulas",
           "qualname": "_formulas"
         },
         {
           "doc": "Map a ledger + market key to a scalar. Never independently samples.",
-          "endLine": 237,
+          "endLine": 249,
           "kind": "function",
-          "line": 213,
+          "line": 225,
           "name": "derive_market",
           "qualname": "derive_market"
         }
@@ -2934,69 +2934,69 @@
       "classes": 0,
       "functions": 8,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/model/parameters.py",
-      "sha256": "75be28b5ce53b3271fa0070e43dea91c92ae9b6f1ac1aa8982fcad9ec3ec0d99",
+      "sha256": "6c59df72cc62dec7fdfab5a6a51ab5ce3b940e04a809c138c6467929830e3fbc",
       "symbols": [
         {
           "doc": null,
-          "endLine": 39,
+          "endLine": 41,
           "kind": "function",
-          "line": 34,
+          "line": 36,
           "name": "_f",
           "qualname": "_f"
         },
         {
           "doc": null,
-          "endLine": 47,
+          "endLine": 49,
           "kind": "function",
-          "line": 42,
+          "line": 44,
           "name": "_pairs",
           "qualname": "_pairs"
         },
         {
           "doc": null,
-          "endLine": 54,
+          "endLine": 56,
           "kind": "function",
-          "line": 50,
+          "line": 52,
           "name": "_merge",
           "qualname": "_merge"
         },
         {
           "doc": null,
-          "endLine": 66,
+          "endLine": 68,
           "kind": "function",
-          "line": 57,
+          "line": 59,
           "name": "_avg",
           "qualname": "_avg"
         },
         {
           "doc": null,
-          "endLine": 76,
+          "endLine": 78,
           "kind": "function",
-          "line": 69,
+          "line": 71,
           "name": "_sd",
           "qualname": "_sd"
         },
         {
           "doc": null,
-          "endLine": 82,
+          "endLine": 84,
           "kind": "function",
-          "line": 79,
+          "line": 81,
           "name": "_shrink",
           "qualname": "_shrink"
         },
         {
           "doc": null,
-          "endLine": 567,
+          "endLine": 610,
           "kind": "function",
-          "line": 85,
+          "line": 87,
           "name": "build_parameter_snapshot",
           "qualname": "build_parameter_snapshot"
         },
         {
           "doc": null,
-          "endLine": 281,
+          "endLine": 287,
           "kind": "method",
-          "line": 278,
+          "line": 284,
           "name": "_rate_claimed",
           "qualname": "build_parameter_snapshot._rate_claimed"
         }
@@ -3211,7 +3211,7 @@
       "classes": 0,
       "functions": 16,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/model/worlds.py",
-      "sha256": "1d8512e334e03ac067e281f9c05077dc62a7a8e98d2d9a814550c1bc1c3f6d9e",
+      "sha256": "3a5b500127c8d68ddd899ddcb87d225b46a4f8aaef369a42e0760427a03a7434",
       "symbols": [
         {
           "doc": null,
@@ -3271,7 +3271,7 @@
         },
         {
           "doc": "Create deterministic latent event states shared by every player.",
-          "endLine": 103,
+          "endLine": 104,
           "kind": "function",
           "line": 81,
           "name": "generate_event_contexts",
@@ -3279,65 +3279,65 @@
         },
         {
           "doc": null,
-          "endLine": 141,
+          "endLine": 156,
           "kind": "function",
-          "line": 106,
+          "line": 107,
           "name": "_contextualize",
           "qualname": "_contextualize"
         },
         {
           "doc": "Fail closed when a world violates basketball counting identities.",
-          "endLine": 182,
+          "endLine": 197,
           "kind": "function",
-          "line": 151,
+          "line": 166,
           "name": "assert_ledger_identities",
           "qualname": "assert_ledger_identities"
         },
         {
           "doc": "Canonical PrimitiveStatLedger dict. Applies oreb/dreb split if only reb is present.",
-          "endLine": 215,
+          "endLine": 230,
           "kind": "function",
-          "line": 185,
+          "line": 200,
           "name": "as_primitive_ledger",
           "qualname": "as_primitive_ledger"
         },
         {
           "doc": null,
-          "endLine": 267,
+          "endLine": 282,
           "kind": "function",
-          "line": 218,
+          "line": 233,
           "name": "sample_basketball",
           "qualname": "sample_basketball"
         },
         {
           "doc": null,
-          "endLine": 310,
+          "endLine": 325,
           "kind": "function",
-          "line": 269,
+          "line": 284,
           "name": "sample_football",
           "qualname": "sample_football"
         },
         {
           "doc": null,
-          "endLine": 357,
+          "endLine": 372,
           "kind": "function",
-          "line": 312,
+          "line": 327,
           "name": "sample_baseball_batter",
           "qualname": "sample_baseball_batter"
         },
         {
           "doc": null,
-          "endLine": 387,
+          "endLine": 403,
           "kind": "function",
-          "line": 367,
+          "line": 383,
           "name": "value_from_stats",
           "qualname": "value_from_stats"
         },
         {
           "doc": null,
-          "endLine": 448,
+          "endLine": 464,
           "kind": "function",
-          "line": 390,
+          "line": 406,
           "name": "simulate_player_worlds",
           "qualname": "simulate_player_worlds"
         }
@@ -4736,7 +4736,7 @@
       "classes": 0,
       "functions": 11,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/coverage.py",
-      "sha256": "86257d17dcc014d4b91076ff321ab18f4a4a4e5d4e9dd187ca29dd1b3e26b727",
+      "sha256": "b23d311e9300de835f2704f728e0d366e7d23c519c01ef5e6eeecd9fc1c1b5e4",
       "symbols": [
         {
           "doc": null,
@@ -5400,77 +5400,77 @@
       "classes": 0,
       "functions": 9,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/gridiron_gamelog.py",
-      "sha256": "f6cbb7dfc3e37af052ef61dad3067625d0ac4e248f29b19bccd130a0d5af2092",
+      "sha256": "15b7e5059e9301f8d3e8f13930a7c161e90cea4ed46239fa1efaac0cf7551ca9",
       "symbols": [
         {
           "doc": "Parse 71 or '71%' into 0.71. Already-fractional values in [0, 1] stay.",
-          "endLine": 131,
+          "endLine": 137,
           "kind": "function",
-          "line": 121,
+          "line": 127,
           "name": "parse_pct",
           "qualname": "parse_pct"
         },
         {
           "doc": null,
-          "endLine": 138,
+          "endLine": 144,
           "kind": "function",
-          "line": 134,
+          "line": 140,
           "name": "_index_row",
           "qualname": "_index_row"
         },
         {
           "doc": null,
-          "endLine": 142,
+          "endLine": 148,
           "kind": "function",
-          "line": 141,
+          "line": 147,
           "name": "_present",
           "qualname": "_present"
         },
         {
           "doc": null,
-          "endLine": 159,
+          "endLine": 171,
           "kind": "function",
-          "line": 145,
+          "line": 151,
           "name": "_market_stat_ok",
           "qualname": "_market_stat_ok"
         },
         {
           "doc": "Return a canonical gridiron log, or None if opportunity cannot be resolved.",
-          "endLine": 245,
+          "endLine": 257,
           "kind": "function",
-          "line": 162,
+          "line": 174,
           "name": "normalize_gridiron_log",
           "qualname": "normalize_gridiron_log"
         },
         {
           "doc": null,
-          "endLine": 182,
+          "endLine": 194,
           "kind": "method",
-          "line": 174,
+          "line": 186,
           "name": "_take",
           "qualname": "normalize_gridiron_log._take"
         },
         {
           "doc": "Split a log list into valid canonical rows and rejected originals.",
-          "endLine": 265,
+          "endLine": 277,
           "kind": "function",
-          "line": 248,
+          "line": 260,
           "name": "normalize_gridiron_logs",
           "qualname": "normalize_gridiron_logs"
         },
         {
           "doc": "Coverage helper: opportunity-valid logs plus market counting-stat presence.",
-          "endLine": 292,
+          "endLine": 304,
           "kind": "function",
-          "line": 268,
+          "line": 280,
           "name": "assert_compatible_gridiron_logs",
           "qualname": "assert_compatible_gridiron_logs"
         },
         {
           "doc": null,
-          "endLine": 303,
+          "endLine": 315,
           "kind": "function",
-          "line": 295,
+          "line": 307,
           "name": "looks_like_gridiron_log",
           "qualname": "looks_like_gridiron_log"
         }
@@ -5522,13 +5522,13 @@
       "classes": 0,
       "functions": 1,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/host_plan.py",
-      "sha256": "51d348b9c9374b1155082b609dc3b7aa8f18c339123177bf231fe6a43b6ee331",
+      "sha256": "46a1a2c6d212197644b81ba1d9dcabd15cd1f4e6a99fc6268e4e006a50e7a452",
       "symbols": [
         {
           "doc": null,
-          "endLine": 258,
+          "endLine": 290,
           "kind": "function",
-          "line": 136,
+          "line": 165,
           "name": "build_host_research_plan",
           "qualname": "build_host_research_plan"
         }
@@ -7099,7 +7099,7 @@
       "classes": 0,
       "functions": 10,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/runner.py",
-      "sha256": "06eba789169d69dd995984881e3f3816613d7ae245788008e995bf0b527e4cc9",
+      "sha256": "d56b779abb024e86ace23442edcb5879dfe4057f137abaa4ece29545d53a526a",
       "symbols": [
         {
           "doc": "Always write dest/audit/. Optionally copy+commit+push a GitHub pack.",
@@ -7151,7 +7151,7 @@
         },
         {
           "doc": null,
-          "endLine": 1236,
+          "endLine": 1284,
           "kind": "function",
           "line": 219,
           "name": "run_dcm",
@@ -7159,25 +7159,25 @@
         },
         {
           "doc": null,
-          "endLine": 578,
+          "endLine": 608,
           "kind": "method",
-          "line": 571,
+          "line": 601,
           "name": "_snapshot_for",
           "qualname": "run_dcm._snapshot_for"
         },
         {
           "doc": null,
-          "endLine": 905,
+          "endLine": 953,
           "kind": "method",
-          "line": 867,
+          "line": 915,
           "name": "slim",
           "qualname": "run_dcm.slim"
         },
         {
           "doc": null,
-          "endLine": 1354,
+          "endLine": 1402,
           "kind": "function",
-          "line": 1239,
+          "line": 1287,
           "name": "main",
           "qualname": "main"
         }
@@ -9072,7 +9072,7 @@
       "classes": 1,
       "functions": 4,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/sports/common/plugin.py",
-      "sha256": "84d39943aec778cac67d5efe79404698fe77f2f8c8c3a2393537b76956e8283f",
+      "sha256": "dc6cf62dd97bb94decccdc6f5fad931dd75da9782d28fad76e9ddb909d93678d",
       "symbols": [
         {
           "doc": null,
@@ -9227,6 +9227,39 @@
           "line": 36,
           "name": "appearance_process_for",
           "qualname": "appearance_process_for"
+        }
+      ],
+      "workstream": "P3"
+    },
+    {
+      "classes": 0,
+      "functions": 3,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/sports/football/cfb_role.py",
+      "sha256": "c25574c172ca893f62494dedca11f9b32ba8951f3b32014aae8f528a8820a4c5",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 28,
+          "kind": "function",
+          "line": 25,
+          "name": "_truthy",
+          "qualname": "_truthy"
+        },
+        {
+          "doc": null,
+          "endLine": 35,
+          "kind": "function",
+          "line": 31,
+          "name": "_num",
+          "qualname": "_num"
+        },
+        {
+          "doc": null,
+          "endLine": 103,
+          "kind": "function",
+          "line": 38,
+          "name": "resolve_cfb_role_state",
+          "qualname": "resolve_cfb_role_state"
         }
       ],
       "workstream": "P3"
@@ -9536,30 +9569,63 @@
     {
       "classes": 0,
       "functions": 3,
-      "path": "artifacts/dcm_v6_workstream_ab/dcm/sports/football/settlement_map.py",
-      "sha256": "c9f8e8dd37c68d1237e0e3a900cfbb65d07d0e8b39d7b894430cb0a6c25bb277",
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/sports/football/research_requirements.py",
+      "sha256": "469a1e18bbf6e26e39d729f0c441e8c9e053eaf29c70ef3ed23f753a20dc579d",
       "symbols": [
         {
           "doc": null,
-          "endLine": 62,
+          "endLine": 28,
           "kind": "function",
-          "line": 52,
+          "line": 27,
+          "name": "_row_has",
+          "qualname": "_row_has"
+        },
+        {
+          "doc": null,
+          "endLine": 34,
+          "kind": "function",
+          "line": 31,
+          "name": "support_count",
+          "qualname": "support_count"
+        },
+        {
+          "doc": "Return independent minimum-model and PLAYABLE support states.",
+          "endLine": 105,
+          "kind": "function",
+          "line": 37,
+          "name": "assess_football_support",
+          "qualname": "assess_football_support"
+        }
+      ],
+      "workstream": "P3"
+    },
+    {
+      "classes": 0,
+      "functions": 3,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/sports/football/settlement_map.py",
+      "sha256": "ff606ce117b97b97b87500faac9c3affd5f2ebc7ae14d8e3583671d170676066",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 71,
+          "kind": "function",
+          "line": 61,
           "name": "canonicalize_prizepicks_football_market",
           "qualname": "canonicalize_prizepicks_football_market"
         },
         {
           "doc": "Map a primitive ledger + PrizePicks football market to a scalar identity.",
-          "endLine": 78,
+          "endLine": 87,
           "kind": "function",
-          "line": 65,
+          "line": 74,
           "name": "settle_football_market",
           "qualname": "settle_football_market"
         },
         {
           "doc": "World-projection settlement from a PrimitiveStatLedger. Unknown \u2192 fail closed.",
-          "endLine": 89,
+          "endLine": 98,
           "kind": "function",
-          "line": 81,
+          "line": 90,
           "name": "settle_football_player",
           "qualname": "settle_football_player"
         }
@@ -9880,6 +9946,55 @@
           "line": 43,
           "name": "test_market_definition_split_reuses_across_offers",
           "qualname": "test_market_definition_split_reuses_across_offers"
+        }
+      ],
+      "workstream": "UNMAPPED"
+    },
+    {
+      "classes": 0,
+      "functions": 5,
+      "path": "artifacts/dcm_v6_workstream_ab/tests/test_cfb_guarded_launch.py",
+      "sha256": "9941457bc4c2872c631a9636b07e673bd1b45e3e54af3f0bb995770fe7ea12a8",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 34,
+          "kind": "function",
+          "line": 21,
+          "name": "_claim",
+          "qualname": "_claim"
+        },
+        {
+          "doc": null,
+          "endLine": 104,
+          "kind": "function",
+          "line": 57,
+          "name": "_claims",
+          "qualname": "_claims"
+        },
+        {
+          "doc": null,
+          "endLine": 139,
+          "kind": "function",
+          "line": 107,
+          "name": "test_cfb_guarded_launch_har_to_probability_fixture",
+          "qualname": "test_cfb_guarded_launch_har_to_probability_fixture"
+        },
+        {
+          "doc": null,
+          "endLine": 158,
+          "kind": "function",
+          "line": 142,
+          "name": "_web_claims",
+          "qualname": "_web_claims"
+        },
+        {
+          "doc": null,
+          "endLine": 186,
+          "kind": "function",
+          "line": 161,
+          "name": "test_real_cfb_partial_global_bundle_does_not_checkpoint_supported_rows",
+          "qualname": "test_real_cfb_partial_global_bundle_does_not_checkpoint_supported_rows"
         }
       ],
       "workstream": "UNMAPPED"
@@ -11130,161 +11245,201 @@
     },
     {
       "classes": 0,
-      "functions": 19,
+      "functions": 24,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_gridiron_plugin.py",
-      "sha256": "5c659d7b4dbd76e4c80eb62b2afd4fffa1a42236d802f552d4d05d308381144e",
+      "sha256": "f2dbf1d21a3108d3a530d4249657a38152490d0fa970b1db2f52123159da18ef",
       "symbols": [
         {
           "doc": null,
-          "endLine": 31,
+          "endLine": 33,
           "kind": "function",
-          "line": 30,
+          "line": 32,
           "name": "_html",
           "qualname": "_html"
         },
         {
           "doc": null,
-          "endLine": 44,
+          "endLine": 46,
           "kind": "function",
-          "line": 34,
+          "line": 36,
           "name": "_claim",
           "qualname": "_claim"
         },
         {
           "doc": null,
-          "endLine": 63,
+          "endLine": 65,
           "kind": "function",
-          "line": 47,
+          "line": 49,
           "name": "_qb_logs",
           "qualname": "_qb_logs"
         },
         {
           "doc": null,
-          "endLine": 80,
+          "endLine": 82,
           "kind": "function",
-          "line": 66,
+          "line": 68,
           "name": "_wr_logs",
           "qualname": "_wr_logs"
         },
         {
           "doc": null,
-          "endLine": 100,
+          "endLine": 102,
           "kind": "function",
-          "line": 83,
+          "line": 85,
           "name": "test_pfr_aliases_normalize_pass_and_receiving",
           "qualname": "test_pfr_aliases_normalize_pass_and_receiving"
         },
         {
           "doc": null,
-          "endLine": 109,
+          "endLine": 111,
           "kind": "function",
-          "line": 103,
+          "line": 105,
           "name": "test_off_pct_parses_and_dnp_rejected",
           "qualname": "test_off_pct_parses_and_dnp_rejected"
         },
         {
           "doc": null,
-          "endLine": 126,
+          "endLine": 128,
           "kind": "function",
-          "line": 112,
+          "line": 114,
           "name": "test_adapter_fixture_nfl_qb_and_cfb_qb",
           "qualname": "test_adapter_fixture_nfl_qb_and_cfb_qb"
         },
         {
           "doc": null,
-          "endLine": 136,
+          "endLine": 138,
           "kind": "function",
-          "line": 129,
+          "line": 131,
           "name": "test_adapter_fixture_wr_targets_receptions",
           "qualname": "test_adapter_fixture_wr_targets_receptions"
         },
         {
           "doc": null,
-          "endLine": 162,
+          "endLine": 164,
           "kind": "function",
-          "line": 139,
+          "line": 141,
           "name": "test_role_epoch_gridiron_starter_depth_and_qb_identity",
           "qualname": "test_role_epoch_gridiron_starter_depth_and_qb_identity"
         },
         {
           "doc": null,
-          "endLine": 175,
+          "endLine": 177,
           "kind": "function",
-          "line": 165,
+          "line": 167,
           "name": "test_opportunity_and_efficiency_qb_vs_skill",
           "qualname": "test_opportunity_and_efficiency_qb_vs_skill"
         },
         {
           "doc": null,
-          "endLine": 189,
+          "endLine": 191,
           "kind": "function",
-          "line": 178,
+          "line": 180,
           "name": "test_team_event_missing_defense_fail_closed_for_playable",
           "qualname": "test_team_event_missing_defense_fail_closed_for_playable"
         },
         {
           "doc": null,
-          "endLine": 205,
+          "endLine": 207,
           "kind": "function",
-          "line": 192,
+          "line": 194,
           "name": "test_derive_markets_from_primitive_ledger",
           "qualname": "test_derive_markets_from_primitive_ledger"
         },
         {
           "doc": null,
-          "endLine": 217,
+          "endLine": 219,
           "kind": "function",
-          "line": 208,
+          "line": 210,
           "name": "test_unknown_football_market_fails_closed",
           "qualname": "test_unknown_football_market_fails_closed"
         },
         {
           "doc": null,
-          "endLine": 225,
+          "endLine": 227,
           "kind": "function",
-          "line": 220,
+          "line": 222,
           "name": "test_cfb_pass_yards_from_fixture_ledger",
           "qualname": "test_cfb_pass_yards_from_fixture_ledger"
         },
         {
           "doc": null,
-          "endLine": 294,
+          "endLine": 297,
           "kind": "function",
-          "line": 228,
+          "line": 230,
           "name": "test_nfl_and_cfb_row_reaches_modeled_path_with_fixture",
           "qualname": "test_nfl_and_cfb_row_reaches_modeled_path_with_fixture"
         },
         {
           "doc": null,
-          "endLine": 319,
+          "endLine": 322,
           "kind": "function",
-          "line": 297,
+          "line": 300,
           "name": "test_skill_receptions_path_from_fixture",
           "qualname": "test_skill_receptions_path_from_fixture"
         },
         {
           "doc": null,
-          "endLine": 334,
+          "endLine": 337,
           "kind": "function",
-          "line": 322,
+          "line": 325,
           "name": "test_production_capable_only_full_path_markets",
           "qualname": "test_production_capable_only_full_path_markets"
         },
         {
           "doc": null,
-          "endLine": 355,
+          "endLine": 358,
           "kind": "function",
-          "line": 337,
+          "line": 340,
           "name": "test_missing_opponent_defense_blocks_playable_snapshot",
           "qualname": "test_missing_opponent_defense_blocks_playable_snapshot"
         },
         {
           "doc": "One-line demo: a fixture NFL pass-yards offer equals ledger pass_yds.",
-          "endLine": 361,
+          "endLine": 364,
           "kind": "function",
-          "line": 358,
+          "line": 361,
           "name": "test_fixture_pass_yards_offer_derived_from_primitive_ledger",
           "qualname": "test_fixture_pass_yards_offer_derived_from_primitive_ledger"
+        },
+        {
+          "doc": null,
+          "endLine": 385,
+          "kind": "function",
+          "line": 367,
+          "name": "test_cfb_attempt_markets_are_opportunity_only_for_model_support",
+          "qualname": "test_cfb_attempt_markets_are_opportunity_only_for_model_support"
+        },
+        {
+          "doc": null,
+          "endLine": 406,
+          "kind": "function",
+          "line": 388,
+          "name": "test_cfb_yardage_market_can_model_thin_but_not_playable",
+          "qualname": "test_cfb_yardage_market_can_model_thin_but_not_playable"
+        },
+        {
+          "doc": null,
+          "endLine": 424,
+          "kind": "function",
+          "line": 409,
+          "name": "test_cfb_market_support_holds_zero_history_for_research",
+          "qualname": "test_cfb_market_support_holds_zero_history_for_research"
+        },
+        {
+          "doc": null,
+          "endLine": 439,
+          "kind": "function",
+          "line": 427,
+          "name": "test_cfb_blowout_regime_is_explicit_not_directional",
+          "qualname": "test_cfb_blowout_regime_is_explicit_not_directional"
+        },
+        {
+          "doc": null,
+          "endLine": 462,
+          "kind": "function",
+          "line": 442,
+          "name": "test_cfb_role_state_transfer_and_promoted_are_not_returning_starters",
+          "qualname": "test_cfb_role_state_transfer_and_promoted_are_not_returning_starters"
         }
       ],
       "workstream": "UNMAPPED"
@@ -13645,5 +13800,5 @@
   "parseErrors": [],
   "root": "artifacts/dcm_v6_workstream_ab",
   "schema": "pillars_dcm.code_inventory.v1",
-  "symbolCount": 1455
+  "symbolCount": 1471
 }

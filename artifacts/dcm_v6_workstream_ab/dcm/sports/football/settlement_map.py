@@ -28,7 +28,16 @@ PRIZEPICKS_FOOTBALL_MARKETS: dict[str, str] = {
     "passing yards": "pass_yds",
     "pass yds": "pass_yds",
     "pass yards": "pass_yds",
+    "pass_att": "pass_att",
+    "pass attempts": "pass_att",
+    "passing attempts": "pass_att",
+    "pass_cmp": "pass_cmp",
+    "completions": "pass_cmp",
+    "passing completions": "pass_cmp",
     "rush_yds": "rush_yds",
+    "rush_att": "rush_att",
+    "rush attempts": "rush_att",
+    "rushing attempts": "rush_att",
     "rushing yards": "rush_yds",
     "rush yds": "rush_yds",
     "rec_yds": "rec_yds",
@@ -45,7 +54,7 @@ PRIZEPICKS_FOOTBALL_MARKETS: dict[str, str] = {
 }
 
 PRODUCTION_SETTLEMENT_MARKETS = frozenset({
-    "pass_yds", "rush_yds", "rec_yds", "receptions", "pass_rush_yds", "rush_rec_yds",
+    "pass_yds", "pass_att", "pass_cmp", "rush_yds", "rush_att", "rec_yds", "receptions", "pass_rush_yds", "rush_rec_yds",
 })
 
 

@@ -505,7 +505,19 @@ def run_dcm(
         f"{p.get('eventId')}|{p.get('teamId')}": p for p in (emitted.get("opponentPackets") or [])
     }
     n_res = dag.add("EVIDENCE", "board", parents=[n_id.key])
-    if not bundle["complete"]:
+    # Guarded CFB launch: preserve the established global checkpoint contract
+    # for every other execution mode. Only a real (non-synthetic) board with CFB
+    # offers may continue through partial research for per-prop modelability.
+    cfb_guarded_research_continue = (
+        not synthetic
+        and bool(bundle.get("claims"))
+        and any(
+            str(r.get("sportFamily") or "") == "gridiron"
+            and str(r.get("league") or "").upper() == "CFB"
+            for r in rows
+        )
+    )
+    if not bundle["complete"] and not cfb_guarded_research_continue:
         dag.block(n_res.key, "RESEARCH_INCOMPLETE")
         ck = write_checkpoint(
             dest / "checkpoint.json",
@@ -539,7 +551,21 @@ def run_dcm(
             archive_push=archive_push,
             repo_root=repo_root,
         )
-    dag.complete(n_res.key, content_hash([c["claim_hash"] for c in bundle["claims"]]))
+    if not bundle["complete"]:
+        (dest / "research_partial.json").write_text(
+            json.dumps(
+                {
+                    "state": "PARTIAL_RESEARCH_CONTINUE_CFB_PER_PROP",
+                    "missingRequestIds": bundle.get("missing") or [],
+                    "malformedRequestIds": bundle.get("malformed") or [],
+                    "coverage": bundle.get("coverage") or {},
+                },
+                indent=2,
+                sort_keys=True,
+            ) + "\n",
+            encoding="utf-8",
+        )
+    dag.complete(n_res.key, content_hash([cl["claim_hash"] for cl in bundle["claims"]]))
     research_perf = t.finish(NodeCount=len(requests), CacheHits=bundle["reused"], ResearchCacheHits=bundle.get("cacheHits") or 0)
     (dest / "performance" / "research.json").write_text(json.dumps(research_perf, indent=2) + "\n", encoding="utf-8")
     stages_done.add("RESEARCH")
@@ -547,8 +573,12 @@ def run_dcm(
     canonical_ready = mount.get("state") == "HASH_VERIFIED_EXTRACTED"
     schema_ready = bool(schema_root.get("productionEligible")) and schema_root.get("state") == "HASH_VERIFIED"
     production_research_ready = bool(bundle.get("production_ready"))
-    # Production root (v5/V1/production research). Must not zero modeled ranking or strict_card.
-    global_selection_gate = canonical_ready and schema_ready and production_research_ready and not synthetic
+    # Preserve the established root gate for non-CFB rows. CFB guarded launch
+    # permits row-level selection eligibility only when that row's snapshot has
+    # PLAYABLE support; global unrelated coverage remains an audit/certification
+    # signal and cannot manufacture a PLAYABLE.
+    root_selection_gate = canonical_ready and schema_ready and not synthetic
+    global_selection_gate = root_selection_gate and production_research_ready
 
     gov = Governor(
         fast_worlds=int(model_config["fastWorlds"]),
@@ -600,9 +630,26 @@ def run_dcm(
         start_blk = started_event_blocker(row, forecast_cutoff)
         if start_blk:
             rec["blocker"] = rec.get("blocker") or start_blk
-        production_selectable = global_selection_gate and bool(snapshot["production_eligible"]) and rec.get("blocker") is None
-        if not snapshot["production_eligible"] and not synthetic and rec.get("blocker") is None:
-            rec["blocker"] = snapshot.get("blocker") or "EVIDENCE_INSUFFICIENT"
+        is_cfb_guarded_row = (
+            str(row.get("sportFamily") or "") == "gridiron"
+            and str(row.get("league") or "").upper() == "CFB"
+        )
+        minimum_model_support = bool(snapshot.get("minimum_model_support", snapshot.get("production_eligible")))
+        if is_cfb_guarded_row and not minimum_model_support:
+            rec["state"] = "HELD_FOR_RESEARCH"
+            support = snapshot.get("model_support") if isinstance(snapshot.get("model_support"), dict) else {}
+            blockers = support.get("modelBlockers") or []
+            rec["blocker"] = rec.get("blocker") or (blockers[0] if blockers else snapshot.get("blocker") or "MINIMUM_MODEL_SUPPORT_MISSING")
+            rec["productionSelectable"] = False
+            evidence_blocked += 1
+            classified.append(rec)
+            continue
+
+        diagnostic_model = is_cfb_guarded_row and not bool(snapshot["production_eligible"])
+        row_selection_gate = root_selection_gate if is_cfb_guarded_row else global_selection_gate
+        production_selectable = row_selection_gate and bool(snapshot["production_eligible"]) and rec.get("blocker") is None
+        if diagnostic_model:
+            rec["blocker"] = rec.get("blocker") or snapshot.get("blocker") or "PLAYABLE_SUPPORT_INCOMPLETE"
             evidence_blocked += 1
 
         key = (str(row["eventId"]), str(row["playerId"]), str(snapshot["parameter_snapshot_hash"]))
@@ -786,7 +833,8 @@ def run_dcm(
         opp = snapshot.get("opportunity") or {}
         opportunity_mean = next((opp[k] for k in ("minutes_mean", "pass_att_mean", "routes_mean", "rush_att_mean", "pa_mean") if k in opp), None)
         rec.update({
-            "state": "MODELED", "grade": ev["grade"], "selectedSide": chosen_side,
+            "state": "MODELED_DIAGNOSTIC" if diagnostic_model else "MODELED",
+            "grade": ("LEAN" if diagnostic_model and ev["grade"] == "PLAYABLE" else ev["grade"]), "selectedSide": chosen_side,
             "selectedP": ev["rawP"], "rawP": ev["rawP"], "calibratedP": ev["calibratedP"],
             "evidenceSafeP": ev["evidenceSafeP"], "pHigher": dist["pHigher"], "pLower": dist["pLower"],
             "pPush": dist["pPush"], "mean": dist["mean"],
@@ -801,11 +849,11 @@ def run_dcm(
             "calibrationState": ev["calibrationState"], "parameterSnapshotHash": snapshot["parameter_snapshot_hash"],
             "evidenceHashes": snapshot["evidence_hashes"], "dependencyTags": snapshot["dependency_tags"],
             "productionSelectable": production_selectable,
-            "modeledPlayable": is_modeled_playable(
+            "modeledPlayable": (not diagnostic_model) and is_modeled_playable(
                 {
                     "row": row,
                     "grade": ev["grade"],
-                    "state": "MODELED",
+                    "state": "MODELED_DIAGNOSTIC" if diagnostic_model else "MODELED",
                     "blocker": rec.get("blocker") or blocker,
                     "parameterSnapshot": snapshot,
                     "forecastCutoff": forecast_cutoff,

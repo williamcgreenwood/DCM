@@ -17,7 +17,7 @@ from dcm.contracts.hashes import content_hash
 
 OPP_VERSION = "GRIDIRON_OPP_V1_2026-08-30"
 EFF_VERSION = "GRIDIRON_EFF_V1_2026-08-30"
-TEAM_EVENT_VERSION = "GRIDIRON_TEAM_EVENT_V1_2026-08-30"
+TEAM_EVENT_VERSION = "GRIDIRON_TEAM_EVENT_V2_CFB_REGIMES_2026-09-02"
 
 QB_ROLES = frozenset({"QB", "QUARTERBACK"})
 SKILL_ROLES = frozenset({"WR", "TE", "RB", "FB", "HB", "SLOT", "WR1", "WR2"})
@@ -344,6 +344,19 @@ class TeamEventModel:
             "rush_defense", "opp_rush_def", "rush_defense_multiplier",
             "matchup_rush_defense", sources=(opponent, team, event),
         ))
+        spread = _f(_first("consensus_spread", "spread", "closing_spread", sources=(event, team)))
+        total = _f(_first("game_total", "consensus_total", "total", sources=(event, team)))
+        # CFB guarded-launch regime prior. These are conservative workload-state
+        # weights, not a calibrated win probability and never a prop direction.
+        regime = {"competitive": 0.80, "controlled_lead": 0.15, "blowout": 0.05}
+        if str(league or "").upper() == "CFB" and spread is not None:
+            margin = abs(spread)
+            if margin > 21:
+                regime = {"competitive": 0.35, "controlled_lead": 0.30, "blowout": 0.35}
+            elif margin > 14:
+                regime = {"competitive": 0.50, "controlled_lead": 0.30, "blowout": 0.20}
+            elif margin > 7:
+                regime = {"competitive": 0.65, "controlled_lead": 0.25, "blowout": 0.10}
         missing: list[str] = []
         if plays is None and pace is None:
             missing.append("FOOTBALL_TEAM_PLAYS_OR_PACE")
@@ -367,13 +380,18 @@ class TeamEventModel:
             "paceObserved": pace is not None,
             "pass_defense": pass_def,
             "rush_defense": rush_def,
+            "consensus_spread": spread,
+            "game_total": total,
+            "event_regime_weights": regime,
+            "starter_curtailment": {"controlled_lead": 0.90, "blowout": 0.72},
             "missing": missing,
             "playableBlocker": missing[0] if missing else None,
             "definition_version": TEAM_EVENT_VERSION,
         }
         body["inputHash"] = content_hash({
             "plays": plays, "pass_rate": pass_rate, "rush_rate": rush_rate, "pace": pace,
-            "pass_defense": pass_def, "rush_defense": rush_def, "league": league, "market": mkt,
+            "pass_defense": pass_def, "rush_defense": rush_def, "spread": spread, "total": total,
+            "event_regime_weights": regime, "league": league, "market": mkt,
             "version": TEAM_EVENT_VERSION,
         })
         return body
