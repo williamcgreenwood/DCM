@@ -1,8 +1,8 @@
 # DCM Program Status
 
-Canonical integration line: `integration/v6-ml-architecture-20260830` at merge commit `cdb428f6a05406184fe265b0a1e81abec92cd1f9` (through PR #17 CFB guarded launch).
+Canonical integration line: `integration/v6-ml-architecture-20260830` at merge commit `59ea12487ad2e747a15427ba6bb9babd1b9f5907` (through PR #18 R0 Algorithmic Constitution).
 
-Active R0 delivery: `grok/r0-algorithmic-constitution-20260903` targeting integration only. No merge to `main` is authorized.
+Active CFB guarded-launch Research OS slice: `grok/cfb-guarded-launch-today-20260903` targeting integration only. No merge to `main` is authorized.
 
 This file is the human dashboard. It must be updated on every coding pass together with a new immutable pass record under `docs/engineering_passes/`.
 
@@ -20,13 +20,13 @@ This file is the human dashboard. It must be updated on every coding pass togeth
 | Workstream | Target | Current | State | Next acceptance gate |
 |---|---:|---:|---|---|
 | P0 Canonical spine / HAR / integrity | 10 | 9 | STRONG PARTIAL | preserve authenticated v5.4.1 roots in release retrieval; production root remains independently gated |
-| P1 Universal research / evidence | 10 | 8 | STRONG PARTIAL | R1 BoardGraph / MarketDemandGraph / RequirementGraph / live AcquisitionAction packing; current CFB HAR host research |
+| P1 Universal research / evidence | 10 | 9 | STRONG PARTIAL | current CFB HAR host research → imported evidence → modeled Top100/Top25/0–6 Playables; mixed-sport R1 remainder |
 | P2 Feature / state / parameter layer | 10 | 9 | STRONG PARTIAL | validate CFB role-comparable/current/prior support on real boards; activate only evidence-backed signal operators |
 | P3 SportPlugin physics | 10 | 6 | PARTIAL | operationally accept the guarded CFB market set on a current board; continue remaining 24-component plugin bindings sport by sport |
 | P4 Probability / uncertainty / grading / portfolio | 10 | 8 | STRONG PARTIAL | prospective CFB settlement/calibration evidence; universal shared-world/correlation coverage; final-refresh integration |
 | P5 Audit / portability / ChatGPT-native execution | 10 | 8 | STRONG PARTIAL | current-HAR fresh ChatGPT acceptance; immutable release retrieval |
 | P6 Settlement / calibration / learning | 10 | 6 | PARTIAL + EXTERNAL VALIDATION | exact platform coverage; CFB prospective settlements; CRPS/subgroups; chronological unseen settlements before promotion |
-| P7 Host-native execution contract | 10 | 7 | PARTIAL | current CFB HAR forecast through host CLI on a fresh wheel; no second engine |
+| P7 Host-native execution contract | 10 | 7 | PARTIAL | current CFB HAR forecast through `dcm-host cfb-launch` on a fresh wheel; no second engine |
 | P8 Universal source acquisition | 10 | 6 | PARTIAL | live adapter fetch beyond fixtures; conflict policy + licensed providers |
 | P9 Universal core migration | 10 | 9 | STRONG PARTIAL | retire remaining PLAYER/TEAM claim lookups at packet/parameter adapters |
 | P10 Full sport coverage | 10 | 3 | EARLY | each supported sport reaches 24/24 plugin components + validation suite |
@@ -35,63 +35,46 @@ This file is the human dashboard. It must be updated on every coding pass togeth
 | P13 Performance / search / token optimization | 10 | 6 | PARTIAL | measured CPU/RSS/token certification; host-performance remains uncertified |
 | P14 Production operations / observability | 10 | 5 | PARTIAL | run health/readiness, failure taxonomy, deterministic recovery, release gates |
 | P15 P380X donor signal governance | 10 | 7 | PARTIAL | Tranche C research truth; exact donor definition compilation only from available archive bytes; evidence-earned activation only |
-| P16 Algorithmic Constitution / strategy registry | 10 | 8 | STRONG PARTIAL | R0 complete in software: constitution, registry, selection engine, HAR plan, CI gates. R1 live Research OS graphs remain |
+| P16 Algorithmic Constitution / strategy registry | 10 | 9 | STRONG PARTIAL | CFB live CELF + telemetry done; remaining mixed-sport R1; keep CI gates; no silent algorithm retirement |
 
 Constitution version `DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903` is inherited. Learning revision remains `LR000000`; predictive superiority remains `NONE`; production-root certification remains false.
 
 ## R0 Algorithmic Constitution status
 
-Implemented and tested on this branch:
+Merged to integration via PR #18 at `59ea12487ad2e747a15427ba6bb9babd1b9f5907`.
 
-- Permanent constitution document, schema, catalog-generated registry, and SHA-256 of exact committed registry bytes.
-- `AlgorithmSelectionEngine` prefers cheapest exact deterministic strategies; HNSW/Leiden/CP-SAT conditionals emit evaluation telemetry when not activated.
-- HAR `algorithm_execution_plan.json` is persisted by the canonical runner before research.
-- Ranking uses Timsort for the full modeled population and heap partial Top-K for frontier isolation.
-- Research batching consumes weighted set-cover as coverage telemetry and heap Top-K for event ordering without replacing EvidenceGraph/ResearchStore.
-- Release manifests and `hashes.json` carry constitution/registry hashes; those hashes are excluded from `_CONTEXT_FIELDS` forecast identity.
-- Governance tests under `tests/governance/` and CI `--check` gates prevent silent algorithm omission.
+## 2026-09-03 CFB guarded-launch Research OS slice
 
-Not claimed by R0:
-
-- BoardGraph / MarketDemandGraph / RequirementGraph / live AcquisitionAction packing (R1);
-- Drive-first indexed retrieval as the primary query engine (storage law remains documented; existing ResearchStore/archive path is unchanged);
-- live mixed-sport HAR research OS acceptance;
-- production-root certification;
-- predictive superiority.
-
-## 2026 CFB guarded-launch status — merged via PR #17
-
-The PR #17 branch established a bounded College Football guarded-launch path without claiming universal football completion or predictive validation. It is now on the integration HEAD above.
+This slice makes BoardGraph / RequirementGraph / live AcquisitionAction packing executable on the canonical CFB path. It does **not** complete mixed-sport R1 or claim a current live forecast.
 
 Implemented and tested:
 
-- HAR accounting remains first; platform modifiers are handled after extraction and existing fail-closed integrity rules remain intact.
-- CFB research completeness is evaluated per prop for modeling instead of using unrelated global missing evidence as a blanket board veto.
-- Zero real evidence still preserves the existing `RESEARCH_REQUIRED / INCOMPLETE_CHECKPOINTED` fail-closed path.
-- Minimum model support is separate from strict PLAYABLE support.
-- Thin but defensibly parameterized rows may be `MODELED_DIAGNOSTIC`; diagnostic state cannot bypass the PLAYABLE firewall.
-- Supported guarded-launch physical markets are `pass_yds`, `pass_att`, `pass_cmp`, `rush_yds`, `rush_att`, `rec_yds`, `receptions`, `pass_rush_yds`, and `rush_rec_yds`.
-- Opportunity-only markets do not require irrelevant yardage-efficiency evidence; markets that depend on efficiency still require relevant efficiency support.
-- ParameterSnapshots expose current-season, prior-season and role-comparable support plus explicit CFB role state.
-- Explicit early-season role states include returning starter/rotation, promoted starter, transfer starter/rotation, true freshman, new QB, new coordinator/system, injury return and role uncertain.
-- Transfer history is retained as evidence but prior-school opportunity share is not carried over 1:1.
-- CFB EventWorld context includes competitive, controlled-lead and blowout/starter-curtailment workload regimes; these affect opportunity rather than directly forcing Higher/Lower.
-- ChatGPT-native CFB research instructions request current 2026 and prior 2025 history, current team/opponent/event/venue/weather, depth/availability/transfer/system changes, team tendencies and opponent defense where market-relevant.
-- Dedicated acceptance tests prove 8/8 fixture offers reach probability evaluation and that real-shaped partial evidence can continue per supported CFB prop while the overall bundle remains incomplete.
+- HAR accounting first; Goblins excluded from selection only after accounting.
+- AlgorithmExecutionPlan before research; algorithm telemetry with producer/consumer/count.
+- BoardGraph, MarketDemandGraph, RequirementGraph persist before `collect()`.
+- AcquisitionActions grouped by EVENT/TEAM/SUBJECT; live selector is `ALG-SCHED-001` (CELF), not a static queue.
+- SPORT/COMPETITION mass cannot consume the unique-offer budget and starve EVENT/TEAM batches.
+- Per-prop modelable ≠ playable flags independent of global research completion.
+- Ranking: filter CFB → heap Top-K → Timsort; Top100/Top25/0–6 Playables never padded.
+- `dcm-host cfb-launch` host workflow. Host does not compute probabilities.
+- No new markets. Aug 29 supported population is 308 ≥ 100.
 
-Not earned by the guarded launch:
+Measured:
 
-- prospective CFB calibration;
-- learned reliability thresholds;
-- historical settlement validation sufficient for promotion;
-- expanded exotic football markets;
-- full 24/24 SportPlugin coverage;
-- complete universal Research OS;
-- production-root certification;
-- host performance certification;
-- predictive superiority.
+- Fixture + web-claim bundle: 8 modeled diagnostic, Top100=8, Top25=8, Playables=0, freeze LR000000/NONE.
+- Compact live HAR: 20 CFB / 6 Goblin / 9 supported non-Goblin.
+- Aug 29 sanitized HAR: 1568 CFB / 229 Goblin / 308 supported; 994 actions; first packed batch EVENT+ENVIRONMENT+AFFILIATION.
+- No 2026-09-03 live CFB HAR was supplied.
 
-A current September 2026 live CFB HAR has not been supplied. The existing sanitized August 29, 2026 HAR remains historical accounting evidence, not a current forecast acceptance.
+Not earned:
+
+- production PLAYABLEs from a current board
+- prospective CFB calibration
+- LR promotion
+- production-root certification
+- host performance certification
+- predictive superiority
+- full mixed-sport Research OS
 
 ## P380X Tranche A/B status
 

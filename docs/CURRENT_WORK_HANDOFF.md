@@ -1,9 +1,9 @@
-# CURRENT WORK HANDOFF — R0 ALGORITHMIC CONSTITUTION
+# CURRENT WORK HANDOFF — CFB GUARDED LAUNCH TODAY
 
-- **Timestamp:** 2026-09-03T19:50:00Z
+- **Timestamp:** 2026-09-03T21:32:00Z
 - **Canonical integration branch:** `integration/v6-ml-architecture-20260830`
-- **Canonical integration HEAD:** `cdb428f6a05406184fe265b0a1e81abec92cd1f9` (PR #17 CFB guarded launch merged)
-- **Active branch:** `grok/r0-algorithmic-constitution-20260903`
+- **Canonical integration HEAD at branch start:** `59ea12487ad2e747a15427ba6bb9babd1b9f5907` (PR #18 R0 Algorithmic Constitution merged)
+- **Active branch:** `grok/cfb-guarded-launch-today-20260903`
 - **Target branch:** `integration/v6-ml-architecture-20260830` only. Do not merge to `main`.
 - **Constitution version:** `DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903`
 - **Learning revision:** `LR000000`
@@ -11,42 +11,41 @@
 - **Production root:** NOT CERTIFIED
 - **Host performance:** uncertified
 
-Do not continue stale Grok branches targeting `main` or superseded ChatGPT branches. Base every new pass on the current integration HEAD.
+`grok/r1-research-os-20260903` did not exist locally or on GitHub. R0 PR #18 was green and was merged to integration only before this slice.
 
-## COMPLETE NOW — R0
+Do not continue stale Grok branches targeting `main`. Base every new pass on the current integration HEAD after this PR merges.
 
-- Permanent constitution document, inheritance receipt, and ADR-ALG-CONST-001.
-- Machine-readable algorithm registry generated from `dcm.algorithms.catalog` to `configs/algorithm_registry.json`. Hash is computed from those exact bytes.
-- `AlgorithmRequirement.schema.json`, trace matrix, selection engine, HAR AlgorithmExecutionPlan.
-- Canonical runner emits `algorithm_execution_plan.json` before research.
-- Host doctor/release manifests carry constitution and registry hashes.
-- Ranking consumes Timsort + heap Top-K. Research batch consumes set-cover telemetry + heap event ordering.
-- Governance tests under `tests/governance/` and CI `export_algorithm_registry.py --check`.
-- ChatGPT-native CORE primitives with deterministic fallbacks for HNSW/Leiden/CP-SAT/TabPFN/etc. challengers.
-- No second EvidenceGraph, ResearchStore, probability, ranking, SportPlugin, or persistence engine.
+## COMPLETE NOW — CFB Research OS slice (guarded, not full R1)
 
-R0 does **not** close BoardGraph / MarketDemandGraph / RequirementGraph / live AcquisitionAction packing. Those remain R1.
+Executable on the canonical runner / `dcm-host cfb-launch`:
+
+1. HAR accounting (Goblins counted, excluded from selection only after accounting)
+2. AlgorithmExecutionPlan before research
+3. BoardGraph / MarketDemandGraph / RequirementGraph
+4. BoardIndexes cheapest-exact-first
+5. AcquisitionActions with live CELF (`ALG-SCHED-001`) + set-cover + packing
+6. Per-prop `propResearchComplete` / `propModelable` / `propPlayableEligible` / `propFrontierResearchEligible`
+7. CFB_TOP100_PRELIMINARY / CFB_TOP25_FINAL / CFB_PLAYABLES_FINAL (0–6, never forced)
+8. Algorithm execution telemetry with producer/consumer/count
+9. Freeze remains LR000000 / predictive NONE
+
+Fixture proof: 8/8 modeled diagnostic, Top100=8, Top25=8, Playables=0.
 
 ## NOT COMPLETE
 
-- R1 Universal Adaptive Research OS core (graphs + AcquisitionAction scheduler on live HAR).
-- R2 CFB research fan-out completion on a current user HAR.
-- Drive-first indexed retrieval replacing folder scans (storage law exists; existing store unchanged).
-- Full 24/24 SportPlugin coverage.
-- Prospective settlement / LR promotion.
-- Production-root certification.
-- Predictive superiority.
+- Full mixed-sport R1 certification (this slice is CFB-prioritized, graphs still build for the whole board)
+- A 2026-09-03 live CFB HAR (none supplied; Aug 29 sanitized HAR is historical)
+- Host web research against a current board producing production PLAYABLEs
+- Drive-first indexed retrieval
+- Production-root certification
+- Predictive superiority / LR promotion
+- New football markets (`player_td`, kicking, longest_*, unmapped `rush_yards` aliases)
 
 ## NEXT EXACT TRANCHE
 
-**R1 — Universal Adaptive Research OS core**, still on a child of current integration HEAD:
+1. Upload a current CFB HAR and run `dcm-host cfb-launch --research file`.
+2. Execute EVENT/TEAM-before-PLAYER host research using `host_research_batch.json`.
+3. Import HostObservations, coverage, forecast, freeze.
+4. Only then resume remaining mixed-sport R1, Drive, and other sports.
 
-1. Canonical BoardGraph / MarketDemandGraph / RequirementGraph before browsing.
-2. Distinct `ResearchRequest` vs `AcquisitionAction` with fan-out bitmaps.
-3. Adaptive lazy-greedy / weighted set-cover scheduler as the live batch selector (not telemetry-only).
-4. Source health/circuit breaker/co-extraction harvest policy.
-5. Per-prop modelable vs playable coverage independent of global completion.
-6. Reuse existing ResearchStore / EvidenceGraph / host observation pipeline.
-7. Prove on the mixed-sport HAR fixture even if some sports remain unsupported downstream.
-
-Do not start R2 live-CFB HAR research until R1 graphs exist. Do not change `LR000000`.
+Do not change `LR000000`. Do not force 5/6/12. Empty cards are legal.

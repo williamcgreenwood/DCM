@@ -20,6 +20,8 @@ from pathlib import Path
 from typing import Any
 
 from dcm.algorithms.execution_plan import constitution_run_hashes, persist_har_algorithm_execution_plan
+from dcm.algorithms.telemetry import AlgorithmTelemetry
+from dcm.cfb.launch import emit_cfb_forecast_artifacts, persist_algorithm_telemetry, prepare_cfb_research_os
 from dcm.contracts.hashes import content_hash
 from dcm.identity.resolve import build_player_index, freeze_map, resolve_row
 from dcm.ingest.board import freeze_board, write_board
@@ -372,6 +374,16 @@ def run_dcm(
             "consumer": "dcm.runner.run_dcm",
         },
     )
+    telemetry = AlgorithmTelemetry()
+    for phase in plan_payload.get("phases") or []:
+        telemetry.record(
+            str(phase.get("algorithmId") or "ALG-SEARCH-001"),
+            problem_class=str(phase.get("problemClass") or ""),
+            producer="dcm.algorithms.execution_plan.build_har_algorithm_execution_plan",
+            consumer=f"HarAlgorithmExecutionPlan.{phase.get('phaseId')}",
+            artifact="algorithm_execution_plan.json",
+            activated=bool(phase.get("activated", True)),
+        )
 
     rows = [resolve_row(r) for r in board["rows"]]
     id_map = freeze_map(rows)
@@ -402,6 +414,7 @@ def run_dcm(
             **constitution_run_hashes(plan_payload),
         }
         (dest / "hashes.json").write_text(json.dumps(hashes, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        persist_algorithm_telemetry(dest, telemetry)
         write_card_layer_files(
             dest,
             top25_ranked=[],
@@ -425,6 +438,13 @@ def run_dcm(
         planned = plan_research(rows, forecast_cutoff, research_shadow=research_shadow)
         (dest / "research_requests.json").write_text(
             json.dumps(planned["requests"], indent=2) + "\n", encoding="utf-8"
+        )
+        prepare_cfb_research_os(
+            dest,
+            rows,
+            planned["requests"],
+            coverage=None,
+            telemetry=telemetry,
         )
         host_plan = build_host_research_plan(
             planned["requests"],
@@ -467,6 +487,13 @@ def run_dcm(
     planned = plan_research(rows, forecast_cutoff, research_shadow=research_shadow)
     requests = planned["requests"]
     (dest / "research_requests.json").write_text(json.dumps(requests, indent=2) + "\n", encoding="utf-8")
+    prepare_cfb_research_os(
+        dest,
+        rows,
+        requests,
+        coverage=None,
+        telemetry=telemetry,
+    )
     if research == "file":
         provider: Any = FileProvider(evidence_dir or dest / "evidence")
     elif research == "bundle":
@@ -492,6 +519,14 @@ def run_dcm(
     (dest / "evidence" / "conflicts.json").write_text(
         json.dumps(bundle.get("conflicts") or [], indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
+    )
+    prepare_cfb_research_os(
+        dest,
+        rows,
+        requests,
+        claims=bundle.get("claims") or [],
+        coverage=bundle.get("coverage"),
+        telemetry=telemetry,
     )
     host_plan = build_host_research_plan(
         requests,
@@ -915,12 +950,21 @@ def run_dcm(
     stages_done.add("MODEL")
 
     ranked = rank_candidates(modeled, top_k=25, seed=har_sha)
+    telemetry.record("ALG-SORT-001", problem_class="FINAL_RANK", producer="dcm.model.ranking.rank_candidates", consumer="dcm.runner.run_dcm", artifact="top100.json")
+    telemetry.record("ALG-SORT-003", problem_class="TOPK_PARTIAL", producer="dcm.model.ranking.rank_candidates", consumer="dcm.runner.run_dcm", artifact="top25_qualified.json")
     # Strict card is PLAYABLE-grade modeled rows. Production root is a later layer.
     # Final pre-freeze status/start strip: late OUT / UNCERTAIN / started cannot
     # land on qualified / strict_card even if grade is PLAYABLE.
     qualified = apply_pre_freeze_status_start_gates(ranked, cutoff=forecast_cutoff)
     card = build_card(qualified)
     exposure = exposure_report(card)
+    cfb_forecast = emit_cfb_forecast_artifacts(
+        dest,
+        modeled=modeled,
+        qualified=qualified,
+        classified=classified,
+        telemetry=telemetry,
+    )
     n_rank = dag.add("RANK", "board", parents=[n_worlds.key])
     dag.complete(n_rank.key, content_hash([p["row"]["projectionId"] for p in ranked[:25]]))
     n_port = dag.add("PORTFOLIO", "board", parents=[n_rank.key])
@@ -1118,6 +1162,9 @@ def run_dcm(
         "evidenceBlocked": evidence_blocked,
         "portfolioExposure": exposure,
         "top25QualifiedCount": len(top25_qualified),
+        "cfbTop100Count": int((cfb_forecast.get("top100") or {}).get("count") or 0),
+        "cfbTop25Count": int((cfb_forecast.get("top25") or {}).get("count") or 0),
+        "cfbPlayablesCount": int((cfb_forecast.get("playables") or {}).get("count") or 0),
         "software": SOFTWARE,
         "gitCommit": git_commit,
         "featureStoreHash": feature_store_hash,
@@ -1215,6 +1262,7 @@ def run_dcm(
     (dest / "population_full.jsonl").write_text("".join(json.dumps(p) + "\n" for p in full_population), encoding="utf-8")
     (dest / "accounting.json").write_text(json.dumps({**(board.get("accounting") or {}), "states": states_count, "playable": len(qualified), "cardSize": len(card)}, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     (dest / "hashes.json").write_text(json.dumps({"boardHash": board.get("contentHash"), "harSha256": har_sha, "frozenForecastHash": freeze["frozenForecastHash"], "evidenceGraphHash": evidence_graph.get("contentHash"), "featureStoreHash": feature_store_hash, "explanationsHash": explanations_hash, "gitCommit": git_commit, "checkpointPending": False, "schemaV1Expected": "6e78dacc19843338643bdcabc7477fd3ce2dd065da1e9629646dacc21cdb1f22", "schemaV2": (schema_root.get("v2") or {}), **constitution_run_hashes(plan_payload)}, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    persist_algorithm_telemetry(dest, telemetry)
 
     blockers = []
     if excluded:

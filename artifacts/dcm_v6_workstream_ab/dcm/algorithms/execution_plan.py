@@ -60,8 +60,9 @@ def build_har_algorithm_execution_plan(
     # BoardGraph/RequirementGraph remain R1. Research may begin only after the
     # algorithm plan exists; those graphs are recorded as not-yet-claimed.
     notes = [
-        "R0 emits AlgorithmExecutionPlan before research.",
-        "BoardGraph/MarketDemandGraph/RequirementGraph remain the next Research OS tranche and are not claimed complete.",
+        "AlgorithmExecutionPlan is emitted before external research.",
+        "CFB guarded launch emits BoardGraph/MarketDemandGraph/RequirementGraph and live AcquisitionAction packing before collect().",
+        "Mixed-sport universal Research OS remaining work is deferred; this is not a claim that full R1 is complete.",
         "One-prop-one-search is non-compliant when shared evidence can satisfy multiple requirements.",
     ]
     payload = {

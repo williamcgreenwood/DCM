@@ -1,8 +1,8 @@
 {
   "schema": "pillars_dcm.program_status.v1",
-  "updatedAtUtc": "2026-09-03T19:50:00Z",
+  "updatedAtUtc": "2026-09-03T21:32:00Z",
   "canonicalIntegrationBranch": "integration/v6-ml-architecture-20260830",
-  "canonicalIntegrationPr": 17,
+  "canonicalIntegrationPr": 18,
   "scoreScale": {
     "0": "MISSING",
     "10": "COMPLETE_EXECUTABLE_INTEGRATED_TESTED_AUDITABLE_PORTABLE",
@@ -39,10 +39,11 @@
       "id": "P1",
       "name": "Universal research / evidence",
       "target": 10,
-      "current": 8,
+      "current": 9,
       "state": "STRONG_PARTIAL",
       "next": [
         "execute a current CFB HAR through host web research and close market-specific evidence gaps without blanket board rejection",
+        "finish mixed-sport R1 remainder after today's CFB slice",
         "retire remaining PLAYER/TEAM lookup aliases at adapters"
       ]
     },
@@ -208,11 +209,11 @@
       "id": "P16",
       "name": "Algorithmic Constitution / strategy registry",
       "target": 10,
-      "current": 8,
+      "current": 9,
       "state": "STRONG_PARTIAL",
       "next": [
-        "R1 BoardGraph MarketDemandGraph RequirementGraph AcquisitionAction live packing",
         "keep constitution CI gates green",
+        "mixed-sport Research OS remainder after CFB live CELF packing",
         "do not silently retire CORE/CONDITIONAL/CHALLENGER algorithms"
       ]
     }

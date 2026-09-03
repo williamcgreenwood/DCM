@@ -1,6 +1,6 @@
 {
-  "contentHash": "5a5e788ffebc80d7ed60e4fdc247264008e99f6e03af0fe6ffb87555b4e86808",
-  "moduleCount": 244,
+  "contentHash": "612a8cd82cfb25a767ad4e3bae86d302bfb713905937619376fc08669c0eae9e",
+  "moduleCount": 253,
   "modules": [
     {
       "classes": 0,
@@ -298,11 +298,11 @@
       "classes": 0,
       "functions": 3,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/algorithms/execution_plan.py",
-      "sha256": "4921182f0ba28ea6f6a5ce4f151d581e31c6c03cf588a3d8b9225fa808288f8e",
+      "sha256": "e7715d47c1f54152737b9fe95c7584be18031755a2fd9031b6a6e592add794e7",
       "symbols": [
         {
           "doc": null,
-          "endLine": 99,
+          "endLine": 100,
           "kind": "function",
           "line": 36,
           "name": "build_har_algorithm_execution_plan",
@@ -310,17 +310,17 @@
         },
         {
           "doc": "Sidecar hashes for hashes.json. Not forecast-semantic fields.",
-          "endLine": 118,
+          "endLine": 119,
           "kind": "function",
-          "line": 102,
+          "line": 103,
           "name": "constitution_run_hashes",
           "qualname": "constitution_run_hashes"
         },
         {
           "doc": null,
-          "endLine": 131,
+          "endLine": 132,
           "kind": "function",
-          "line": 121,
+          "line": 122,
           "name": "persist_har_algorithm_execution_plan",
           "qualname": "persist_har_algorithm_execution_plan"
         }
@@ -1841,6 +1841,55 @@
       "workstream": "P16"
     },
     {
+      "classes": 1,
+      "functions": 4,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/algorithms/telemetry.py",
+      "sha256": "119deb75550e796f771c5bcd29dae5eb04d0e7e1bbafa9c561d794ed1adaca5b",
+      "symbols": [
+        {
+          "doc": "Records constitution algorithm executions on the live HAR path.",
+          "endLine": 96,
+          "kind": "class",
+          "line": 11,
+          "name": "AlgorithmTelemetry",
+          "qualname": "AlgorithmTelemetry"
+        },
+        {
+          "doc": null,
+          "endLine": 17,
+          "kind": "method",
+          "line": 14,
+          "name": "__init__",
+          "qualname": "AlgorithmTelemetry.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 56,
+          "kind": "method",
+          "line": 19,
+          "name": "record",
+          "qualname": "AlgorithmTelemetry.record"
+        },
+        {
+          "doc": null,
+          "endLine": 80,
+          "kind": "method",
+          "line": 58,
+          "name": "select_and_record",
+          "qualname": "AlgorithmTelemetry.select_and_record"
+        },
+        {
+          "doc": null,
+          "endLine": 96,
+          "kind": "method",
+          "line": 82,
+          "name": "snapshot",
+          "qualname": "AlgorithmTelemetry.snapshot"
+        }
+      ],
+      "workstream": "P16"
+    },
+    {
       "classes": 0,
       "functions": 2,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/archive.py",
@@ -1861,6 +1910,193 @@
           "line": 33,
           "name": "main",
           "qualname": "main"
+        }
+      ],
+      "workstream": "UNMAPPED"
+    },
+    {
+      "classes": 0,
+      "functions": 0,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/cfb/__init__.py",
+      "sha256": "fa5923168a1e2873aae99d6b50f4f5ca8a466b0dfae45acbb5e024b9cb1287a6",
+      "symbols": [],
+      "workstream": "UNMAPPED"
+    },
+    {
+      "classes": 0,
+      "functions": 3,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/cfb/accounting.py",
+      "sha256": "38a2659f4d9660493dfcc4439944c2650d74160e919f7b988561dcd1df3249de",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 14,
+          "kind": "function",
+          "line": 13,
+          "name": "_is_cfb",
+          "qualname": "_is_cfb"
+        },
+        {
+          "doc": null,
+          "endLine": 18,
+          "kind": "function",
+          "line": 17,
+          "name": "_market",
+          "qualname": "_market"
+        },
+        {
+          "doc": "Account every CFB offer, then classify Goblins / support / modelability gates.",
+          "endLine": 79,
+          "kind": "function",
+          "line": 21,
+          "name": "account_cfb_board",
+          "qualname": "account_cfb_board"
+        }
+      ],
+      "workstream": "UNMAPPED"
+    },
+    {
+      "classes": 0,
+      "functions": 5,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/cfb/launch.py",
+      "sha256": "1685181b5d05c7e856d153d15fbbb8c4d9a0e3144dbae1fac55ede6bc4c66e94",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 29,
+          "kind": "function",
+          "line": 26,
+          "name": "_write",
+          "qualname": "_write"
+        },
+        {
+          "doc": "Emit graphs, indexes, and live AcquisitionActions BEFORE web acquisition.",
+          "endLine": 87,
+          "kind": "function",
+          "line": 32,
+          "name": "prepare_cfb_research_os",
+          "qualname": "prepare_cfb_research_os"
+        },
+        {
+          "doc": null,
+          "endLine": 96,
+          "kind": "function",
+          "line": 90,
+          "name": "attach_cfb_prop_flags",
+          "qualname": "attach_cfb_prop_flags"
+        },
+        {
+          "doc": null,
+          "endLine": 193,
+          "kind": "function",
+          "line": 99,
+          "name": "emit_cfb_forecast_artifacts",
+          "qualname": "emit_cfb_forecast_artifacts"
+        },
+        {
+          "doc": null,
+          "endLine": 200,
+          "kind": "function",
+          "line": 196,
+          "name": "persist_algorithm_telemetry",
+          "qualname": "persist_algorithm_telemetry"
+        }
+      ],
+      "workstream": "UNMAPPED"
+    },
+    {
+      "classes": 0,
+      "functions": 11,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/cfb/reports.py",
+      "sha256": "3fa39971d021a7b6b43933c90eafcea58fe2dcb0f2d64bd6197ba4b93d07b527",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 14,
+          "kind": "function",
+          "line": 13,
+          "name": "_row",
+          "qualname": "_row"
+        },
+        {
+          "doc": null,
+          "endLine": 19,
+          "kind": "function",
+          "line": 17,
+          "name": "_is_cfb",
+          "qualname": "_is_cfb"
+        },
+        {
+          "doc": null,
+          "endLine": 28,
+          "kind": "function",
+          "line": 22,
+          "name": "_offered_sides",
+          "qualname": "_offered_sides"
+        },
+        {
+          "doc": null,
+          "endLine": 34,
+          "kind": "function",
+          "line": 31,
+          "name": "_support",
+          "qualname": "_support"
+        },
+        {
+          "doc": null,
+          "endLine": 51,
+          "kind": "function",
+          "line": 37,
+          "name": "cfb_prop_flags",
+          "qualname": "cfb_prop_flags"
+        },
+        {
+          "doc": null,
+          "endLine": 101,
+          "kind": "function",
+          "line": 54,
+          "name": "cfb_top100_row",
+          "qualname": "cfb_top100_row"
+        },
+        {
+          "doc": "Filter CFB \u2192 heap partial Top-K \u2192 deterministic Timsort of the frontier.",
+          "endLine": 130,
+          "kind": "function",
+          "line": 104,
+          "name": "rank_cfb_modeled",
+          "qualname": "rank_cfb_modeled"
+        },
+        {
+          "doc": null,
+          "endLine": 144,
+          "kind": "function",
+          "line": 133,
+          "name": "cfb_top100_preliminary",
+          "qualname": "cfb_top100_preliminary"
+        },
+        {
+          "doc": null,
+          "endLine": 158,
+          "kind": "function",
+          "line": 147,
+          "name": "cfb_top25_final",
+          "qualname": "cfb_top25_final"
+        },
+        {
+          "doc": null,
+          "endLine": 194,
+          "kind": "function",
+          "line": 161,
+          "name": "cfb_playables_final",
+          "qualname": "cfb_playables_final"
+        },
+        {
+          "doc": null,
+          "endLine": 207,
+          "kind": "function",
+          "line": 197,
+          "name": "frontier_offer_ids",
+          "qualname": "frontier_offer_ids"
         }
       ],
       "workstream": "UNMAPPED"
@@ -1910,7 +2146,7 @@
       "classes": 0,
       "functions": 4,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/chat/cli.py",
-      "sha256": "4ac19ced1cb55fd3d3058b311459e5d8fe8495545208958d930290278a0d02eb",
+      "sha256": "714e736c720c949b850ef674976874d5187cdabdc8bf5a42c526d2af1d35ce66",
       "symbols": [
         {
           "doc": null,
@@ -1930,7 +2166,7 @@
         },
         {
           "doc": null,
-          "endLine": 92,
+          "endLine": 101,
           "kind": "function",
           "line": 23,
           "name": "build_parser",
@@ -1938,9 +2174,9 @@
         },
         {
           "doc": null,
-          "endLine": 157,
+          "endLine": 178,
           "kind": "function",
-          "line": 95,
+          "line": 104,
           "name": "main",
           "qualname": "main"
         }
@@ -1951,7 +2187,7 @@
       "classes": 0,
       "functions": 0,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/chat/contracts.py",
-      "sha256": "910ad68d28947b04acd781133f86f132941d3e0ca3392ee59e3b760600b39aeb",
+      "sha256": "d7ee3ba4f71c5547bbf3edf6dbfd2842c593f75ca58a5e64267c9cedbcaedc70",
       "symbols": [],
       "workstream": "P7"
     },
@@ -2017,11 +2253,11 @@
       "classes": 0,
       "functions": 1,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/chat/research_bridge.py",
-      "sha256": "a57d2fcfa5330147eba22d555d68b3afa6d8c95888d928cefc16797f8a2faa3f",
+      "sha256": "00a86b922621511ba36dfa363b5b4575d966da7e9acb88f702766e17705826cb",
       "symbols": [
         {
           "doc": null,
-          "endLine": 61,
+          "endLine": 64,
           "kind": "function",
           "line": 14,
           "name": "next_research_batch",
@@ -2032,9 +2268,9 @@
     },
     {
       "classes": 1,
-      "functions": 17,
+      "functions": 18,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/chat/session.py",
-      "sha256": "672ef351f3022aed601b76cb5d6190416c45411c68536f068d708149893c19c7",
+      "sha256": "35e6893a0d3b0424a2a9f40285626f518da68aae1a5f626c720004192193af3d",
       "symbols": [
         {
           "doc": null,
@@ -2179,6 +2415,14 @@
           "line": 311,
           "name": "settle",
           "qualname": "HostSession.settle"
+        },
+        {
+          "doc": "Guarded CFB vertical slice. Fixture/bundle can freeze; file research returns the host loop.",
+          "endLine": 396,
+          "kind": "function",
+          "line": 318,
+          "name": "cfb_launch",
+          "qualname": "cfb_launch"
         }
       ],
       "workstream": "P7"
@@ -5575,6 +5819,55 @@
     },
     {
       "classes": 0,
+      "functions": 5,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/research/acquisition.py",
+      "sha256": "12ab4f246e4027f5789b04489c1ab140d4cf234e050de9598ba7e4e890b387f4",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 47,
+          "kind": "function",
+          "line": 46,
+          "name": "_req_id",
+          "qualname": "_req_id"
+        },
+        {
+          "doc": "Group reusable-entity requests into fan-out AcquisitionActions.",
+          "endLine": 193,
+          "kind": "function",
+          "line": 50,
+          "name": "build_acquisition_actions",
+          "qualname": "build_acquisition_actions"
+        },
+        {
+          "doc": "Live CELF selector with set-cover + constrained batch packing.",
+          "endLine": 320,
+          "kind": "function",
+          "line": 196,
+          "name": "schedule_acquisition_actions",
+          "qualname": "schedule_acquisition_actions"
+        },
+        {
+          "doc": null,
+          "endLine": 238,
+          "kind": "method",
+          "line": 230,
+          "name": "gain_fn",
+          "qualname": "schedule_acquisition_actions.gain_fn"
+        },
+        {
+          "doc": null,
+          "endLine": 241,
+          "kind": "method",
+          "line": 240,
+          "name": "cost_fn",
+          "qualname": "schedule_acquisition_actions.cost_fn"
+        }
+      ],
+      "workstream": "P1"
+    },
+    {
+      "classes": 0,
       "functions": 0,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/adapters/__init__.py",
       "sha256": "2b65938954bc35803165bae072f991dd3766160b465ecc2b85127c67ba90713e",
@@ -6353,37 +6646,37 @@
       "classes": 0,
       "functions": 4,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/batch.py",
-      "sha256": "e4b43401d85bcabee96bfbc69b7eeafdee1e32b416649eca5e46f6a9c07a5790",
+      "sha256": "b3365c835d0721135c0ee7448435b04e28bf66f01e5bd4e5d8a3fef606b0ce9e",
       "symbols": [
         {
           "doc": null,
-          "endLine": 49,
+          "endLine": 50,
           "kind": "function",
-          "line": 39,
+          "line": 40,
           "name": "scheduler_score",
           "qualname": "scheduler_score"
         },
         {
           "doc": null,
-          "endLine": 60,
+          "endLine": 61,
           "kind": "function",
-          "line": 52,
+          "line": 53,
           "name": "_event_id_of",
           "qualname": "_event_id_of"
         },
         {
           "doc": null,
-          "endLine": 64,
+          "endLine": 65,
           "kind": "function",
-          "line": 63,
+          "line": 64,
           "name": "_request_id_of",
           "qualname": "_request_id_of"
         },
         {
           "doc": null,
-          "endLine": 234,
+          "endLine": 288,
           "kind": "function",
-          "line": 67,
+          "line": 68,
           "name": "build_next_research_batch",
           "qualname": "build_next_research_batch"
         }
@@ -7374,6 +7667,135 @@
       "workstream": "P1"
     },
     {
+      "classes": 2,
+      "functions": 13,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/research/indexes.py",
+      "sha256": "02d32e646b880ff50590ab9c3e7704cda972867830e014724b7d79630cc46e25",
+      "symbols": [
+        {
+          "doc": "Exact indexes over a frozen board. No repeated full-board linear scans.",
+          "endLine": 140,
+          "kind": "class",
+          "line": 37,
+          "name": "BoardIndexes",
+          "qualname": "BoardIndexes"
+        },
+        {
+          "doc": null,
+          "endLine": 109,
+          "kind": "method",
+          "line": 40,
+          "name": "__init__",
+          "qualname": "BoardIndexes.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 112,
+          "kind": "method",
+          "line": 111,
+          "name": "exact_offer",
+          "qualname": "BoardIndexes.exact_offer"
+        },
+        {
+          "doc": null,
+          "endLine": 124,
+          "kind": "method",
+          "line": 114,
+          "name": "lookup_composite",
+          "qualname": "BoardIndexes.lookup_composite"
+        },
+        {
+          "doc": null,
+          "endLine": 128,
+          "kind": "method",
+          "line": 126,
+          "name": "sqlite_event_offers",
+          "qualname": "BoardIndexes.sqlite_event_offers"
+        },
+        {
+          "doc": null,
+          "endLine": 131,
+          "kind": "method",
+          "line": 130,
+          "name": "might_have_offer",
+          "qualname": "BoardIndexes.might_have_offer"
+        },
+        {
+          "doc": null,
+          "endLine": 134,
+          "kind": "method",
+          "line": 133,
+          "name": "alias_hits",
+          "qualname": "BoardIndexes.alias_hits"
+        },
+        {
+          "doc": null,
+          "endLine": 140,
+          "kind": "method",
+          "line": 136,
+          "name": "close",
+          "qualname": "BoardIndexes.close"
+        },
+        {
+          "doc": "Exact reusable-evidence lookup. Web acquisition is last.",
+          "endLine": 185,
+          "kind": "class",
+          "line": 143,
+          "name": "EvidenceIndexes",
+          "qualname": "EvidenceIndexes"
+        },
+        {
+          "doc": null,
+          "endLine": 154,
+          "kind": "method",
+          "line": 146,
+          "name": "__init__",
+          "qualname": "EvidenceIndexes.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 170,
+          "kind": "method",
+          "line": 156,
+          "name": "add",
+          "qualname": "EvidenceIndexes.add"
+        },
+        {
+          "doc": null,
+          "endLine": 174,
+          "kind": "method",
+          "line": 172,
+          "name": "lookup_scope",
+          "qualname": "EvidenceIndexes.lookup_scope"
+        },
+        {
+          "doc": null,
+          "endLine": 179,
+          "kind": "method",
+          "line": 176,
+          "name": "has_hash",
+          "qualname": "EvidenceIndexes.has_hash"
+        },
+        {
+          "doc": null,
+          "endLine": 185,
+          "kind": "method",
+          "line": 181,
+          "name": "close",
+          "qualname": "EvidenceIndexes.close"
+        },
+        {
+          "doc": "Reverse index Requirement \u2192 Offers as Python bitsets plus id lists.",
+          "endLine": 212,
+          "kind": "function",
+          "line": 188,
+          "name": "requirement_offer_bitmaps",
+          "qualname": "requirement_offer_bitmaps"
+        }
+      ],
+      "workstream": "P1"
+    },
+    {
       "classes": 0,
       "functions": 3,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/lineup.py",
@@ -7402,6 +7824,79 @@
           "line": 70,
           "name": "build_lineup_effects",
           "qualname": "build_lineup_effects"
+        }
+      ],
+      "workstream": "P1"
+    },
+    {
+      "classes": 0,
+      "functions": 8,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/research/os_graphs.py",
+      "sha256": "4bc562c647352b79339630718fe1cb30c7f8b6202325865703a69a820d572da4",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 35,
+          "kind": "function",
+          "line": 34,
+          "name": "_is_cfb",
+          "qualname": "_is_cfb"
+        },
+        {
+          "doc": null,
+          "endLine": 39,
+          "kind": "function",
+          "line": 38,
+          "name": "_offer_id",
+          "qualname": "_offer_id"
+        },
+        {
+          "doc": "Fill dependent_offer_ids via exact composite-key grouping. No per-prop scans later.",
+          "endLine": 83,
+          "kind": "function",
+          "line": 42,
+          "name": "_attach_dependents",
+          "qualname": "_attach_dependents"
+        },
+        {
+          "doc": null,
+          "endLine": 173,
+          "kind": "function",
+          "line": 86,
+          "name": "build_board_graph",
+          "qualname": "build_board_graph"
+        },
+        {
+          "doc": null,
+          "endLine": 105,
+          "kind": "method",
+          "line": 98,
+          "name": "add_node",
+          "qualname": "build_board_graph.add_node"
+        },
+        {
+          "doc": null,
+          "endLine": 227,
+          "kind": "function",
+          "line": 176,
+          "name": "build_market_demand_graph",
+          "qualname": "build_market_demand_graph"
+        },
+        {
+          "doc": null,
+          "endLine": 319,
+          "kind": "function",
+          "line": 230,
+          "name": "build_requirement_graph",
+          "qualname": "build_requirement_graph"
+        },
+        {
+          "doc": null,
+          "endLine": 349,
+          "kind": "function",
+          "line": 322,
+          "name": "persist_research_os_graphs",
+          "qualname": "persist_research_os_graphs"
         }
       ],
       "workstream": "P1"
@@ -8937,85 +9432,85 @@
       "classes": 0,
       "functions": 10,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/runner.py",
-      "sha256": "b4cd07462d515f2cea3a89c455d5a8b562f5b88ba5f1ed7ad5e4ca8a9433a943",
+      "sha256": "d165369ecfe679ca34d5f5c756087995d7ae1a566692f291c6f41806ec13e447",
       "symbols": [
         {
           "doc": "Always write dest/audit/. Optionally copy+commit+push a GitHub pack.",
-          "endLine": 159,
+          "endLine": 161,
           "kind": "function",
-          "line": 103,
+          "line": 105,
           "name": "_finalize_archive",
           "qualname": "_finalize_archive"
         },
         {
           "doc": null,
-          "endLine": 172,
+          "endLine": 174,
           "kind": "function",
-          "line": 163,
+          "line": 165,
           "name": "_synthetic_path",
           "qualname": "_synthetic_path"
         },
         {
           "doc": null,
-          "endLine": 177,
+          "endLine": 179,
           "kind": "function",
-          "line": 176,
+          "line": 178,
           "name": "_run_id",
           "qualname": "_run_id"
         },
         {
           "doc": "Best-effort git HEAD. Never writes git config. Missing git is None, not a crash.",
-          "endLine": 197,
+          "endLine": 199,
           "kind": "function",
-          "line": 180,
+          "line": 182,
           "name": "_git_commit_sha",
           "qualname": "_git_commit_sha"
         },
         {
           "doc": null,
-          "endLine": 208,
+          "endLine": 210,
           "kind": "function",
-          "line": 200,
+          "line": 202,
           "name": "_default_model_config",
           "qualname": "_default_model_config"
         },
         {
           "doc": null,
-          "endLine": 217,
+          "endLine": 219,
           "kind": "function",
-          "line": 211,
+          "line": 213,
           "name": "_active_calibration",
           "qualname": "_active_calibration"
         },
         {
           "doc": null,
-          "endLine": 1298,
+          "endLine": 1346,
           "kind": "function",
-          "line": 220,
+          "line": 222,
           "name": "run_dcm",
           "qualname": "run_dcm"
         },
         {
           "doc": null,
-          "endLine": 622,
+          "endLine": 657,
           "kind": "method",
-          "line": 615,
+          "line": 650,
           "name": "_snapshot_for",
           "qualname": "run_dcm._snapshot_for"
         },
         {
           "doc": null,
-          "endLine": 967,
+          "endLine": 1011,
           "kind": "method",
-          "line": 929,
+          "line": 973,
           "name": "slim",
           "qualname": "run_dcm.slim"
         },
         {
           "doc": null,
-          "endLine": 1416,
+          "endLine": 1464,
           "kind": "function",
-          "line": 1301,
+          "line": 1349,
           "name": "main",
           "qualname": "main"
         }
@@ -11839,6 +12334,103 @@
     },
     {
       "classes": 0,
+      "functions": 11,
+      "path": "artifacts/dcm_v6_workstream_ab/tests/test_cfb_research_os.py",
+      "sha256": "88bf57d77efc742cfa72e21bf6d7445f875467fef9b47651062c5fdff377f5bc",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 23,
+          "kind": "function",
+          "line": 21,
+          "name": "_rows",
+          "qualname": "_rows"
+        },
+        {
+          "doc": null,
+          "endLine": 31,
+          "kind": "function",
+          "line": 26,
+          "name": "_real_shape_har",
+          "qualname": "_real_shape_har"
+        },
+        {
+          "doc": null,
+          "endLine": 45,
+          "kind": "function",
+          "line": 34,
+          "name": "test_cfb_accounting_before_goblin_exclusion",
+          "qualname": "test_cfb_accounting_before_goblin_exclusion"
+        },
+        {
+          "doc": null,
+          "endLine": 66,
+          "kind": "function",
+          "line": 48,
+          "name": "test_graphs_exist_before_research_and_use_constitution_primitives",
+          "qualname": "test_graphs_exist_before_research_and_use_constitution_primitives"
+        },
+        {
+          "doc": null,
+          "endLine": 80,
+          "kind": "function",
+          "line": 69,
+          "name": "test_modelable_is_not_playable_and_per_prop_flags",
+          "qualname": "test_modelable_is_not_playable_and_per_prop_flags"
+        },
+        {
+          "doc": null,
+          "endLine": 92,
+          "kind": "function",
+          "line": 83,
+          "name": "test_live_batch_uses_celf_not_one_prop_one_search",
+          "qualname": "test_live_batch_uses_celf_not_one_prop_one_search"
+        },
+        {
+          "doc": "SPORT/COMPETITION fanout must not consume the unique-offer budget alone.",
+          "endLine": 109,
+          "kind": "function",
+          "line": 95,
+          "name": "test_large_board_celf_does_not_starve_on_sport_mass",
+          "qualname": "test_large_board_celf_does_not_starve_on_sport_mass"
+        },
+        {
+          "doc": "FixtureProvider is engineering-only. Graphs still emit; playables stay 0.",
+          "endLine": 134,
+          "kind": "function",
+          "line": 113,
+          "name": "test_fixture_provider_cannot_create_production_playables",
+          "qualname": "test_fixture_provider_cannot_create_production_playables"
+        },
+        {
+          "doc": null,
+          "endLine": 226,
+          "kind": "function",
+          "line": 137,
+          "name": "test_cfb_fixture_end_to_end_top100_top25_playables_freeze",
+          "qualname": "test_cfb_fixture_end_to_end_top100_top25_playables_freeze"
+        },
+        {
+          "doc": null,
+          "endLine": 234,
+          "kind": "function",
+          "line": 229,
+          "name": "test_offered_side_only_and_goblin_after_accounting",
+          "qualname": "test_offered_side_only_and_goblin_after_accounting"
+        },
+        {
+          "doc": null,
+          "endLine": 261,
+          "kind": "function",
+          "line": 237,
+          "name": "test_partial_bundle_still_emits_graphs_and_per_prop_states",
+          "qualname": "test_partial_bundle_still_emits_graphs_and_per_prop_states"
+        }
+      ],
+      "workstream": "UNMAPPED"
+    },
+    {
+      "classes": 0,
       "functions": 18,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_e2e_runner.py",
       "sha256": "7968670baf3c7c7add08408cc6d132f21060d9c1cf56f7d4db38e5dc84d0eaa0",
@@ -13400,7 +13992,7 @@
       "classes": 0,
       "functions": 6,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_host_native.py",
-      "sha256": "2f4ab923e6f4488793a73691b70ecae560fdd10d076619ed73721fe1d86f6cb6",
+      "sha256": "2f9254613d55acd0fc68c3e36aac6d7778f7ee702422e26007edaedcfc4c7bd4",
       "symbols": [
         {
           "doc": null,
@@ -13428,7 +14020,7 @@
         },
         {
           "doc": null,
-          "endLine": 147,
+          "endLine": 151,
           "kind": "function",
           "line": 52,
           "name": "test_host_session_prepare_next_research_import_coverage_report",
@@ -13436,17 +14028,17 @@
         },
         {
           "doc": null,
-          "endLine": 163,
+          "endLine": 167,
           "kind": "function",
-          "line": 150,
+          "line": 154,
           "name": "test_observation_rejects_secret_url",
           "qualname": "test_observation_rejects_secret_url"
         },
         {
           "doc": null,
-          "endLine": 183,
+          "endLine": 187,
           "kind": "function",
-          "line": 166,
+          "line": 170,
           "name": "test_cli_prepare_synthetic",
           "qualname": "test_cli_prepare_synthetic"
         }
@@ -15638,5 +16230,5 @@
   "parseErrors": [],
   "root": "artifacts/dcm_v6_workstream_ab",
   "schema": "pillars_dcm.code_inventory.v1",
-  "symbolCount": 1684
+  "symbolCount": 1748
 }

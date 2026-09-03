@@ -2,10 +2,10 @@
 
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
-- Modules: **244**
-- Symbols: **1684**
+- Modules: **253**
+- Symbols: **1748**
 - Parse errors: **0**
-- Inventory hash: `5a5e788ffebc80d7ed60e4fdc247264008e99f6e03af0fe6ffb87555b4e86808`
+- Inventory hash: `612a8cd82cfb25a767ad4e3bae86d302bfb713905937619376fc08669c0eae9e`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -26,7 +26,12 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P16 | `artifacts/dcm_v6_workstream_ab/dcm/algorithms/searching.py` | 4 | 43 |
 | P16 | `artifacts/dcm_v6_workstream_ab/dcm/algorithms/selection.py` | 1 | 3 |
 | P16 | `artifacts/dcm_v6_workstream_ab/dcm/algorithms/sorting.py` | 1 | 17 |
+| P16 | `artifacts/dcm_v6_workstream_ab/dcm/algorithms/telemetry.py` | 1 | 4 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/archive.py` | 0 | 2 |
+| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/cfb/__init__.py` | 0 | 0 |
+| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/cfb/accounting.py` | 0 | 3 |
+| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/cfb/launch.py` | 0 | 5 |
+| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/cfb/reports.py` | 0 | 11 |
 | P7 | `artifacts/dcm_v6_workstream_ab/dcm/chat/__init__.py` | 0 | 0 |
 | P7 | `artifacts/dcm_v6_workstream_ab/dcm/chat/__main__.py` | 0 | 0 |
 | P7 | `artifacts/dcm_v6_workstream_ab/dcm/chat/archive.py` | 0 | 2 |
@@ -35,7 +40,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P7 | `artifacts/dcm_v6_workstream_ab/dcm/chat/evidence_import.py` | 0 | 4 |
 | P7 | `artifacts/dcm_v6_workstream_ab/dcm/chat/report.py` | 0 | 1 |
 | P7 | `artifacts/dcm_v6_workstream_ab/dcm/chat/research_bridge.py` | 0 | 1 |
-| P7 | `artifacts/dcm_v6_workstream_ab/dcm/chat/session.py` | 1 | 17 |
+| P7 | `artifacts/dcm_v6_workstream_ab/dcm/chat/session.py` | 1 | 18 |
 | P7 | `artifacts/dcm_v6_workstream_ab/dcm/chat/state.py` | 0 | 4 |
 | P0 | `artifacts/dcm_v6_workstream_ab/dcm/contracts/__init__.py` | 0 | 0 |
 | P0 | `artifacts/dcm_v6_workstream_ab/dcm/contracts/codes.py` | 1 | 0 |
@@ -96,6 +101,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/postgame.py` | 0 | 1 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/release.py` | 0 | 14 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/__init__.py` | 0 | 0 |
+| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/acquisition.py` | 0 | 5 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/adapters/__init__.py` | 0 | 0 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/adapters/base.py` | 1 | 7 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/adapters/basketball_reference.py` | 7 | 26 |
@@ -121,7 +127,9 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/gridiron_gamelog.py` | 0 | 9 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/historical_gap.py` | 0 | 4 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/host_plan.py` | 0 | 1 |
+| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/indexes.py` | 2 | 13 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/lineup.py` | 0 | 3 |
+| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/os_graphs.py` | 0 | 8 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/player_offer_set.py` | 1 | 6 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/player_packet.py` | 0 | 13 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/population.py` | 0 | 5 |
@@ -200,6 +208,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_bundle_e2e_resume.py` | 0 | 2 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_bundle_provider.py` | 0 | 2 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_cfb_guarded_launch.py` | 0 | 5 |
+| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_cfb_research_os.py` | 0 | 11 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_e2e_runner.py` | 0 | 18 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_e2e_world_to_lineup.py` | 0 | 21 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_entity_packets.py` | 0 | 13 |
@@ -312,8 +321,8 @@ _No class/function symbols._
 ### `artifacts/dcm_v6_workstream_ab/dcm/algorithms/execution_plan.py`
 
 - `function` **build_har_algorithm_execution_plan** L36
-- `function` **constitution_run_hashes** L102 — Sidecar hashes for hashes.json. Not forecast-semantic fields.
-- `function` **persist_har_algorithm_execution_plan** L121
+- `function` **constitution_run_hashes** L103 — Sidecar hashes for hashes.json. Not forecast-semantic fields.
+- `function` **persist_har_algorithm_execution_plan** L122
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/algorithms/graph.py`
 
@@ -521,10 +530,50 @@ _No class/function symbols._
 - `method` **_Reverse.__eq__** L173
 - `function` **topological_kahn** L177
 
+### `artifacts/dcm_v6_workstream_ab/dcm/algorithms/telemetry.py`
+
+- `class` **AlgorithmTelemetry** L11 — Records constitution algorithm executions on the live HAR path.
+- `method` **AlgorithmTelemetry.__init__** L14
+- `method` **AlgorithmTelemetry.record** L19
+- `method` **AlgorithmTelemetry.select_and_record** L58
+- `method` **AlgorithmTelemetry.snapshot** L82
+
 ### `artifacts/dcm_v6_workstream_ab/dcm/archive.py`
 
 - `function` **_find_repo_root** L23
 - `function` **main** L33
+
+### `artifacts/dcm_v6_workstream_ab/dcm/cfb/__init__.py`
+
+_No class/function symbols._
+
+### `artifacts/dcm_v6_workstream_ab/dcm/cfb/accounting.py`
+
+- `function` **_is_cfb** L13
+- `function` **_market** L17
+- `function` **account_cfb_board** L21 — Account every CFB offer, then classify Goblins / support / modelability gates.
+
+### `artifacts/dcm_v6_workstream_ab/dcm/cfb/launch.py`
+
+- `function` **_write** L26
+- `function` **prepare_cfb_research_os** L32 — Emit graphs, indexes, and live AcquisitionActions BEFORE web acquisition.
+- `function` **attach_cfb_prop_flags** L90
+- `function` **emit_cfb_forecast_artifacts** L99
+- `function` **persist_algorithm_telemetry** L196
+
+### `artifacts/dcm_v6_workstream_ab/dcm/cfb/reports.py`
+
+- `function` **_row** L13
+- `function` **_is_cfb** L17
+- `function` **_offered_sides** L22
+- `function` **_support** L31
+- `function` **cfb_prop_flags** L37
+- `function` **cfb_top100_row** L54
+- `function` **rank_cfb_modeled** L104 — Filter CFB → heap partial Top-K → deterministic Timsort of the frontier.
+- `function` **cfb_top100_preliminary** L133
+- `function` **cfb_top25_final** L147
+- `function` **cfb_playables_final** L161
+- `function` **frontier_offer_ids** L197
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/chat/__init__.py`
 
@@ -544,7 +593,7 @@ _No class/function symbols._
 - `function` **_print** L15
 - `function` **_add_run** L19
 - `function` **build_parser** L23
-- `function` **main** L95
+- `function` **main** L104
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/chat/contracts.py`
 
@@ -585,6 +634,7 @@ _No class/function symbols._
 - `method` **HostSession.audit** L301
 - `method` **HostSession.archive** L306
 - `method` **HostSession.settle** L311
+- `function` **cfb_launch** L318 — Guarded CFB vertical slice. Fixture/bundle can freeze; file research returns the host loop.
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/chat/state.py`
 
@@ -1138,6 +1188,14 @@ _No class/function symbols._
 
 _No class/function symbols._
 
+### `artifacts/dcm_v6_workstream_ab/dcm/research/acquisition.py`
+
+- `function` **_req_id** L46
+- `function` **build_acquisition_actions** L50 — Group reusable-entity requests into fan-out AcquisitionActions.
+- `function` **schedule_acquisition_actions** L196 — Live CELF selector with set-cover + constrained batch packing.
+- `method` **schedule_acquisition_actions.gain_fn** L230
+- `method` **schedule_acquisition_actions.cost_fn** L240
+
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/adapters/__init__.py`
 
 _No class/function symbols._
@@ -1255,10 +1313,10 @@ _No class/function symbols._
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/batch.py`
 
-- `function` **scheduler_score** L39
-- `function` **_event_id_of** L52
-- `function` **_request_id_of** L63
-- `function` **build_next_research_batch** L67
+- `function` **scheduler_score** L40
+- `function` **_event_id_of** L53
+- `function` **_request_id_of** L64
+- `function` **build_next_research_batch** L68
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/cache.py`
 
@@ -1411,11 +1469,40 @@ _No class/function symbols._
 
 - `function` **build_host_research_plan** L165
 
+### `artifacts/dcm_v6_workstream_ab/dcm/research/indexes.py`
+
+- `class` **BoardIndexes** L37 — Exact indexes over a frozen board. No repeated full-board linear scans.
+- `method` **BoardIndexes.__init__** L40
+- `method` **BoardIndexes.exact_offer** L111
+- `method` **BoardIndexes.lookup_composite** L114
+- `method` **BoardIndexes.sqlite_event_offers** L126
+- `method` **BoardIndexes.might_have_offer** L130
+- `method` **BoardIndexes.alias_hits** L133
+- `method` **BoardIndexes.close** L136
+- `class` **EvidenceIndexes** L143 — Exact reusable-evidence lookup. Web acquisition is last.
+- `method` **EvidenceIndexes.__init__** L146
+- `method` **EvidenceIndexes.add** L156
+- `method` **EvidenceIndexes.lookup_scope** L172
+- `method` **EvidenceIndexes.has_hash** L176
+- `method` **EvidenceIndexes.close** L181
+- `function` **requirement_offer_bitmaps** L188 — Reverse index Requirement → Offers as Python bitsets plus id lists.
+
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/lineup.py`
 
 - `function` **_f** L20
 - `function` **shrink_lineup_effect** L30 — Hierarchical shrink of a lineup/on-off delta toward 0 (no effect).
 - `function` **build_lineup_effects** L70 — Normalize a list of {label, with, without, minutes, rawEffect} rows.
+
+### `artifacts/dcm_v6_workstream_ab/dcm/research/os_graphs.py`
+
+- `function` **_is_cfb** L34
+- `function` **_offer_id** L38
+- `function` **_attach_dependents** L42 — Fill dependent_offer_ids via exact composite-key grouping. No per-prop scans later.
+- `function` **build_board_graph** L86
+- `method` **build_board_graph.add_node** L98
+- `function` **build_market_demand_graph** L176
+- `function` **build_requirement_graph** L230
+- `function` **persist_research_os_graphs** L322
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/player_offer_set.py`
 
@@ -1638,16 +1725,16 @@ _No class/function symbols._
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/runner.py`
 
-- `function` **_finalize_archive** L103 — Always write dest/audit/. Optionally copy+commit+push a GitHub pack.
-- `function` **_synthetic_path** L163
-- `function` **_run_id** L176
-- `function` **_git_commit_sha** L180 — Best-effort git HEAD. Never writes git config. Missing git is None, not a crash.
-- `function` **_default_model_config** L200
-- `function` **_active_calibration** L211
-- `function` **run_dcm** L220
-- `method` **run_dcm._snapshot_for** L615
-- `method` **run_dcm.slim** L929
-- `function` **main** L1301
+- `function` **_finalize_archive** L105 — Always write dest/audit/. Optionally copy+commit+push a GitHub pack.
+- `function` **_synthetic_path** L165
+- `function` **_run_id** L178
+- `function` **_git_commit_sha** L182 — Best-effort git HEAD. Never writes git config. Missing git is None, not a crash.
+- `function` **_default_model_config** L202
+- `function` **_active_calibration** L213
+- `function` **run_dcm** L222
+- `method` **run_dcm._snapshot_for** L650
+- `method` **run_dcm.slim** L973
+- `function` **main** L1349
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/runtime/__init__.py`
 
@@ -2134,6 +2221,20 @@ _No class/function symbols._
 - `function` **_web_claims** L142
 - `function` **test_real_cfb_partial_global_bundle_does_not_checkpoint_supported_rows** L161
 
+### `artifacts/dcm_v6_workstream_ab/tests/test_cfb_research_os.py`
+
+- `function` **_rows** L21
+- `function` **_real_shape_har** L26
+- `function` **test_cfb_accounting_before_goblin_exclusion** L34
+- `function` **test_graphs_exist_before_research_and_use_constitution_primitives** L48
+- `function` **test_modelable_is_not_playable_and_per_prop_flags** L69
+- `function` **test_live_batch_uses_celf_not_one_prop_one_search** L83
+- `function` **test_large_board_celf_does_not_starve_on_sport_mass** L95 — SPORT/COMPETITION fanout must not consume the unique-offer budget alone.
+- `function` **test_fixture_provider_cannot_create_production_playables** L113 — FixtureProvider is engineering-only. Graphs still emit; playables stay 0.
+- `function` **test_cfb_fixture_end_to_end_top100_top25_playables_freeze** L137
+- `function` **test_offered_side_only_and_goblin_after_accounting** L229
+- `function` **test_partial_bundle_still_emits_graphs_and_per_prop_states** L237
+
 ### `artifacts/dcm_v6_workstream_ab/tests/test_e2e_runner.py`
 
 - `function` **_synthetic_har** L29
@@ -2363,8 +2464,8 @@ _No class/function symbols._
 - `function` **test_cli_help_exits_zero** L38
 - `function` **test_cli_doctor** L44
 - `function` **test_host_session_prepare_next_research_import_coverage_report** L52
-- `function` **test_observation_rejects_secret_url** L150
-- `function` **test_cli_prepare_synthetic** L166
+- `function` **test_observation_rejects_secret_url** L154
+- `function` **test_cli_prepare_synthetic** L170
 
 ### `artifacts/dcm_v6_workstream_ab/tests/test_joint_event_world.py`
 

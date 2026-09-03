@@ -21,6 +21,8 @@ def next_research_batch(
     dest = Path(dest)
     requests = read_json(dest / "research_requests.json") or []
     coverage = read_json(dest / "evidence_coverage.json") or read_json(dest / "evidence" / "coverage.json") or {}
+    board = read_json(dest / "board.json") or {}
+    rows = board.get("rows") if isinstance(board, dict) else []
     store = ResearchStore(store_root or dest / "research_store")
     batch = build_next_research_batch(
         requests if isinstance(requests, list) else [],
@@ -28,6 +30,7 @@ def next_research_batch(
         store=store,
         max_entities=max_entities,
         max_dependent_offers=max_dependent_offers,
+        rows=rows if isinstance(rows, list) else [],
     )
     reused_claims = hydrate_reused_claims(
         store,
