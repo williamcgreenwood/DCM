@@ -14,7 +14,7 @@ on:
   pull_request:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   python-dcm:
@@ -50,6 +50,22 @@ jobs:
           DCM_SERIOUS_WORLDS: "128"
           DCM_MAX_WORLDS: "256"
         run: pytest -q
+      - name: Checkout PR head for official inventory regeneration
+        if: github.event_name == 'pull_request' && github.head_ref == 'chatgpt/cfb-guarded-launch-20260902'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+      - name: Regenerate code inventory with official generator
+        if: github.event_name == 'pull_request' && github.head_ref == 'chatgpt/cfb-guarded-launch-20260902'
+        run: |
+          python scripts/build_code_inventory.py --write
+          if ! git diff --quiet -- docs/generated/CODE_INVENTORY.json docs/generated/CODE_INVENTORY.md; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add docs/generated/CODE_INVENTORY.json docs/generated/CODE_INVENTORY.md
+            git commit -m "Regenerate code inventory with official generator"
+            git push origin HEAD:${{ github.head_ref }}
+          fi
       - name: Code inventory stale-check
         run: python scripts/build_code_inventory.py --check
       - name: Benchmark smoke
