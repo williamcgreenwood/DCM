@@ -505,14 +505,56 @@ def run_dcm(
         f"{p.get('eventId')}|{p.get('teamId')}": p for p in (emitted.get("opponentPackets") or [])
     }
     n_res = dag.add("EVIDENCE", "board", parents=[n_id.key])
-    # Guarded launch: research completeness is evaluated per market/offer.
-    # A missing unrelated entity must not checkpoint the entire supported CFB
-    # board. Thin rows are held or modeled diagnostically downstream.
+    # Guarded CFB launch: preserve the established global checkpoint contract
+    # for every other execution mode. Only a real (non-synthetic) board with CFB
+    # offers may continue through partial research for per-prop modelability.
+    cfb_guarded_research_continue = (
+        not synthetic
+        and any(
+            str(r.get("sportFamily") or "") == "gridiron"
+            and str(r.get("league") or "").upper() == "CFB"
+            for r in rows
+        )
+    )
+    if not bundle["complete"] and not cfb_guarded_research_continue:
+        dag.block(n_res.key, "RESEARCH_INCOMPLETE")
+        ck = write_checkpoint(
+            dest / "checkpoint.json",
+            {
+                "runId": run_id,
+                "dcmVersion": SOFTWARE,
+                "learningRevision": LEARNING_REVISION,
+                "forecastCutoff": forecast_cutoff,
+                "modelConfigHash": config_hash,
+                "calibrationStateHash": calibration_state.get("contentHash"),
+                "mountStateHash": content_hash(mount),
+                "schemaStateHash": content_hash(schema_root),
+                "artifactRoot": str(dest),
+                "completedStages": sorted(stages_done),
+                "pending": ["EVIDENCE"],
+                "nextDeterministicAction": "execute host_research_plan.json, write validated evidence files, then --resume checkpoint.json",
+                "rowCounts": {"raw": len(rows)},
+                "blockers": ["RESEARCH_INCOMPLETE"],
+            },
+        )
+        return _finalize_archive(
+            dest,
+            {
+                "run_id": run_id,
+                "dest": str(dest),
+                "runState": "INCOMPLETE_CHECKPOINTED",
+                "checkpoint": ck,
+                "research": bundle,
+            },
+            archive_github=archive_github,
+            archive_push=archive_push,
+            repo_root=repo_root,
+        )
     if not bundle["complete"]:
         (dest / "research_partial.json").write_text(
             json.dumps(
                 {
-                    "state": "PARTIAL_RESEARCH_CONTINUE_PER_PROP",
+                    "state": "PARTIAL_RESEARCH_CONTINUE_CFB_PER_PROP",
                     "missingRequestIds": bundle.get("missing") or [],
                     "malformedRequestIds": bundle.get("malformed") or [],
                     "coverage": bundle.get("coverage") or {},
@@ -522,7 +564,7 @@ def run_dcm(
             ) + "\n",
             encoding="utf-8",
         )
-    dag.complete(n_res.key, content_hash([c["claim_hash"] for c in bundle["claims"]]))
+    dag.complete(n_res.key, content_hash([cl["claim_hash"] for cl in bundle["claims"]]))
     research_perf = t.finish(NodeCount=len(requests), CacheHits=bundle["reused"], ResearchCacheHits=bundle.get("cacheHits") or 0)
     (dest / "performance" / "research.json").write_text(json.dumps(research_perf, indent=2) + "\n", encoding="utf-8")
     stages_done.add("RESEARCH")
@@ -530,9 +572,12 @@ def run_dcm(
     canonical_ready = mount.get("state") == "HASH_VERIFIED_EXTRACTED"
     schema_ready = bool(schema_root.get("productionEligible")) and schema_root.get("state") == "HASH_VERIFIED"
     production_research_ready = bool(bundle.get("production_ready"))
-    # Global bundle completeness is an audit signal, not a selection veto for
-    # unrelated rows. Per-row ParameterSnapshot support controls PLAYABLE state.
-    global_selection_gate = canonical_ready and schema_ready and not synthetic
+    # Preserve the established root gate for non-CFB rows. CFB guarded launch
+    # permits row-level selection eligibility only when that row's snapshot has
+    # PLAYABLE support; global unrelated coverage remains an audit/certification
+    # signal and cannot manufacture a PLAYABLE.
+    root_selection_gate = canonical_ready and schema_ready and not synthetic
+    global_selection_gate = root_selection_gate and production_research_ready
 
     gov = Governor(
         fast_worlds=int(model_config["fastWorlds"]),
@@ -584,8 +629,12 @@ def run_dcm(
         start_blk = started_event_blocker(row, forecast_cutoff)
         if start_blk:
             rec["blocker"] = rec.get("blocker") or start_blk
+        is_cfb_guarded_row = (
+            str(row.get("sportFamily") or "") == "gridiron"
+            and str(row.get("league") or "").upper() == "CFB"
+        )
         minimum_model_support = bool(snapshot.get("minimum_model_support", snapshot.get("production_eligible")))
-        if not minimum_model_support:
+        if is_cfb_guarded_row and not minimum_model_support:
             rec["state"] = "HELD_FOR_RESEARCH"
             support = snapshot.get("model_support") if isinstance(snapshot.get("model_support"), dict) else {}
             blockers = support.get("modelBlockers") or []
@@ -595,8 +644,9 @@ def run_dcm(
             classified.append(rec)
             continue
 
-        diagnostic_model = not bool(snapshot["production_eligible"])
-        production_selectable = global_selection_gate and bool(snapshot["production_eligible"]) and rec.get("blocker") is None
+        diagnostic_model = is_cfb_guarded_row and not bool(snapshot["production_eligible"])
+        row_selection_gate = root_selection_gate if is_cfb_guarded_row else global_selection_gate
+        production_selectable = row_selection_gate and bool(snapshot["production_eligible"]) and rec.get("blocker") is None
         if diagnostic_model:
             rec["blocker"] = rec.get("blocker") or snapshot.get("blocker") or "PLAYABLE_SUPPORT_INCOMPLETE"
             evidence_blocked += 1
