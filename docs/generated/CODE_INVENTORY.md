@@ -3,9 +3,9 @@
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
 - Modules: **229**
-- Symbols: **1469**
+- Symbols: **1471**
 - Parse errors: **0**
-- Inventory hash: `86d82bc948adc4ff1755c3c8d50e316dae75584347de463ba2fdf14bedb7790c`
+- Inventory hash: `38b8812f389c89a1ea47ed795e967e48ae3b681353aab317f7c0c7a6c4a80672`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -184,7 +184,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/live_sanitized/test_live_prizepicks_har.py` | 0 | 4 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_bundle_e2e_resume.py` | 0 | 2 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_bundle_provider.py` | 0 | 2 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_cfb_guarded_launch.py` | 0 | 3 |
+| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_cfb_guarded_launch.py` | 0 | 5 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_e2e_runner.py` | 0 | 18 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_e2e_world_to_lineup.py` | 0 | 21 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_entity_packets.py` | 0 | 13 |
@@ -1854,9 +1854,11 @@ _No class/function symbols._
 
 ### `artifacts/dcm_v6_workstream_ab/tests/test_cfb_guarded_launch.py`
 
-- `function` **_claim** L19
-- `function` **_claims** L55
-- `function` **test_cfb_guarded_launch_har_to_probability_fixture** L105
+- `function` **_claim** L21
+- `function` **_claims** L57
+- `function` **test_cfb_guarded_launch_har_to_probability_fixture** L107
+- `function` **_web_claims** L142
+- `function` **test_real_cfb_partial_global_bundle_does_not_checkpoint_supported_rows** L161
 
 ### `artifacts/dcm_v6_workstream_ab/tests/test_e2e_runner.py`
 

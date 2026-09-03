@@ -1,5 +1,5 @@
 {
-  "contentHash": "86d82bc948adc4ff1755c3c8d50e316dae75584347de463ba2fdf14bedb7790c",
+  "contentHash": "38b8812f389c89a1ea47ed795e967e48ae3b681353aab317f7c0c7a6c4a80672",
   "moduleCount": 229,
   "modules": [
     {
@@ -9952,33 +9952,49 @@
     },
     {
       "classes": 0,
-      "functions": 3,
+      "functions": 5,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_cfb_guarded_launch.py",
-      "sha256": "b93718eaa86ae05a71aedd80a82253ff7e6b163b6df82c10e8a1fe36176b75d1",
+      "sha256": "9941457bc4c2872c631a9636b07e673bd1b45e3e54af3f0bb995770fe7ea12a8",
       "symbols": [
         {
           "doc": null,
-          "endLine": 32,
+          "endLine": 34,
           "kind": "function",
-          "line": 19,
+          "line": 21,
           "name": "_claim",
           "qualname": "_claim"
         },
         {
           "doc": null,
-          "endLine": 102,
+          "endLine": 104,
           "kind": "function",
-          "line": 55,
+          "line": 57,
           "name": "_claims",
           "qualname": "_claims"
         },
         {
           "doc": null,
-          "endLine": 137,
+          "endLine": 139,
           "kind": "function",
-          "line": 105,
+          "line": 107,
           "name": "test_cfb_guarded_launch_har_to_probability_fixture",
           "qualname": "test_cfb_guarded_launch_har_to_probability_fixture"
+        },
+        {
+          "doc": null,
+          "endLine": 158,
+          "kind": "function",
+          "line": 142,
+          "name": "_web_claims",
+          "qualname": "_web_claims"
+        },
+        {
+          "doc": null,
+          "endLine": 186,
+          "kind": "function",
+          "line": 161,
+          "name": "test_real_cfb_partial_global_bundle_does_not_checkpoint_supported_rows",
+          "qualname": "test_real_cfb_partial_global_bundle_does_not_checkpoint_supported_rows"
         }
       ],
       "workstream": "UNMAPPED"
@@ -13784,5 +13800,5 @@
   "parseErrors": [],
   "root": "artifacts/dcm_v6_workstream_ab",
   "schema": "pillars_dcm.code_inventory.v1",
-  "symbolCount": 1469
+  "symbolCount": 1471
 }
