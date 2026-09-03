@@ -23,6 +23,7 @@ from dcm.sports.common.plugin import PRODUCTION, UNSUPPORTED, lookup, selection_
 from dcm.sports.football.ledger import build_football_world
 from dcm.sports.football.settlement_map import settle_football_market, settle_football_player
 from dcm.sports.football.research_requirements import assess_football_support
+from dcm.sports.football.cfb_role import resolve_cfb_role_state
 from tests.fixtures import build_cfb_game, build_nfl_game
 
 FIXTURES = Path(__file__).resolve().parent / "research_fixtures"
@@ -435,3 +436,26 @@ def test_cfb_blowout_regime_is_explicit_not_directional():
     assert abs(sum(weights.values()) - 1.0) < 1e-9
     assert weights["blowout"] > 0.05
     assert model["starter_curtailment"]["blowout"] < 1.0
+
+
+def test_cfb_role_state_transfer_and_promoted_are_not_returning_starters():
+    transfer = resolve_cfb_role_state({
+        "role": "QB",
+        "depth_chart_role": "starter",
+        "previous_school": "OLD",
+        "prior_season_starts": 10,
+    }, role="QB")
+    assert transfer["primary"] == "TRANSFER_STARTER"
+    assert transfer["transferOpportunityCarryoverAllowed"] is False
+
+    promoted = resolve_cfb_role_state({
+        "role": "RB",
+        "depth_chart_role": "starter",
+        "prior_role": "backup",
+        "prior_season_starts": 1,
+    }, role="RB")
+    assert promoted["primary"] == "PROMOTED_STARTER"
+
+    unknown = resolve_cfb_role_state({"role": "WR"}, role="WR")
+    assert unknown["primary"] == "ROLE_UNCERTAIN"
+    assert unknown["resolved"] is False
