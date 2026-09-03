@@ -29,6 +29,7 @@ from dcm.research.gamelog import normalize_basketball_logs
 from dcm.research.gridiron_gamelog import normalize_gridiron_logs
 from dcm.research.role_epoch import RoleEpochBuilder
 from dcm.research.scopes import claims_for
+from dcm.sports.football.research_requirements import assess_football_support
 
 
 def _f(v: Any, default: float) -> float:
@@ -184,6 +185,7 @@ def build_parameter_snapshot(
     role_epoch_summary: dict[str, Any] | None = None
     shrinkage_out = {"roleWeight": 0.0, "seasonWeight": 0.0, "priorWeight": 1.0}
     participation_state: dict[str, Any] | None = None
+    football_support: dict[str, Any] | None = None
 
     if family == "basketball":
         league = str(row.get("league") or "") or None
@@ -437,6 +439,19 @@ def build_parameter_snapshot(
         logs = comparable
         eff_n = max(eff_n, int(eff_fit.get("support_n") or 0), opportunity_support_from_logs)
         params["_team_event_blocker"] = team_event.get("playableBlocker")
+        football_support = assess_football_support(
+            market=str(row.get("market") or ""),
+            role=role,
+            status=str(player.get("status") or "UNKNOWN"),
+            logs=full_logs,
+            definition_verified=bool(market.get("definition_verified")),
+            team_event=team_event,
+        )
+        # Market-specific support counts replace generic all-purpose support for
+        # guarded-launch decisions. Pure opportunity markets do not require an
+        # irrelevant efficiency sample just to be modelable.
+        opp_n = int(football_support.get("opportunitySupportN") or 0)
+        eff_n = int(football_support.get("efficiencySupportN") or 0)
     elif family == "baseball":
         pa, pan = _avg(logs, "PA")
         params.update({
@@ -460,7 +475,12 @@ def build_parameter_snapshot(
     inactive_statuses = {"OUT", "DNP", "INACTIVE", "SUSPENDED", "IR", "PUP"}
     uncertain_statuses = {"QUESTIONABLE", "GTD", "GAME_TIME_DECISION", "DOUBTFUL", "LIMITED"}
     status_eligible = status in active_statuses
-    gridiron_defense_ok = family != "gridiron" or not params.get("_team_event_blocker")
+    gridiron_defense_ok = family != "gridiron" or bool((football_support or {}).get("playableSupport"))
+    minimum_model_support = (
+        bool((football_support or {}).get("modelable"))
+        if family == "gridiron"
+        else (definition_verified and opp_n >= 1 and eff_n >= 1 and status not in inactive_statuses)
+    )
     production_eligible = (
         not synthetic and status_eligible
         and opp_n >= 3 and eff_n >= 3 and definition_verified
@@ -474,6 +494,8 @@ def build_parameter_snapshot(
     elif status in inactive_statuses: blocker = "PLAYER_NOT_ACTIVE"
     elif status in uncertain_statuses: blocker = "PLAYER_STATUS_UNCERTAIN"
     elif status not in active_statuses: blocker = "PLAYER_STATUS_UNKNOWN"
+    elif family == "gridiron" and football_support and football_support.get("playableBlockers"):
+        blocker = str(football_support["playableBlockers"][0])
     elif opp_n < 3: blocker = "INSUFFICIENT_OPPORTUNITY_SAMPLE"
     elif eff_n < 3: blocker = "INSUFFICIENT_EFFICIENCY_SAMPLE"
     elif family == "gridiron" and params.get("_team_event_blocker"):
@@ -489,6 +511,8 @@ def build_parameter_snapshot(
         "status": status, "role": role, "opportunity": {"support_n": opp_n}, "efficiency": {"support_n": eff_n},
         "parameters": params, "reliability": rel, "freshness": fresh, "data_quality": data_quality,
         "ood_risk": ood, "synthetic": synthetic, "definition_verified": definition_verified,
+        "minimum_model_support": minimum_model_support,
+        "model_support": football_support if family == "gridiron" else None,
         "production_eligible": production_eligible, "blocker": blocker, "dependency_tags": sorted(tags),
         "evidence_hashes": sorted(str(c.get("claim_hash") or "") for c in all_claims if c.get("claim_hash")),
         "scopes_used": sorted({
