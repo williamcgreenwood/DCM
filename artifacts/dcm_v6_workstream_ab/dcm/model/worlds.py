@@ -358,7 +358,8 @@ def sample_baseball_batter(rng: random.Random, pa: float, parameters: dict[str, 
 
 MARKET_FROM_STATS = {
     "pts": "pts", "reb": "reb", "ast": "ast", "pra": "pra", "pr": "pr", "pa": "pa", "ra": "ra",
-    "3pm": "tpm", "stl": "stl", "blk": "blk", "pass_yds": "pass_yds", "rush_yds": "rush_yds",
+    "3pm": "tpm", "stl": "stl", "blk": "blk", "pass_yds": "pass_yds", "pass_att": "pass_att",
+    "pass_cmp": "pass_cmp", "rush_yds": "rush_yds", "rush_att": "rush_att",
     "rec_yds": "rec_yds", "receptions": "receptions", "pass_rush_yds": "pass_rush_yds",
     "rush_rec_yds": "rush_rec_yds", "h": "H", "tb": "TB", "k": "SO", "hits_runs_rbi": "hits_runs_rbi",
 }
