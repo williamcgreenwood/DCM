@@ -40,8 +40,8 @@ def _cap(family: str, league: str, markets: tuple[str, ...], state: str) -> None
 
 _cap("basketball", "NBA", ("pts", "reb", "ast", "pra", "pr", "pa", "ra", "3pm", "3pa", "tpa", "fgm", "fga", "fg_made", "fg_att", "2pm", "2pa", "twopm", "twopa", "fg2m", "ftm", "fta", "tov", "to", "oreb", "stl", "blk", "blk_stl", "qtrs_w_3plus_pts"), PRODUCTION)
 _cap("basketball", "WNBA", ("pts", "reb", "ast", "pra", "pr", "pa", "ra", "3pm", "3pa", "tpa", "fgm", "fga", "fg_made", "fg_att", "2pm", "2pa", "twopm", "twopa", "fg2m", "ftm", "fta", "tov", "to", "oreb", "stl", "blk", "blk_stl", "qtrs_w_3plus_pts"), PRODUCTION)
-_cap("gridiron", "NFL", ("pass_yds", "rush_yds", "rec_yds", "receptions", "pass_rush_yds", "rush_rec_yds"), PRODUCTION)
-_cap("gridiron", "CFB", ("pass_yds", "rush_yds", "rec_yds", "receptions", "pass_rush_yds", "rush_rec_yds"), PRODUCTION)
+_cap("gridiron", "NFL", ("pass_yds", "pass_att", "pass_cmp", "rush_yds", "rush_att", "rec_yds", "receptions", "pass_rush_yds", "rush_rec_yds"), PRODUCTION)
+_cap("gridiron", "CFB", ("pass_yds", "pass_att", "pass_cmp", "rush_yds", "rush_att", "rec_yds", "receptions", "pass_rush_yds", "rush_rec_yds"), PRODUCTION)
 _cap("gridiron", "NFLP", ("pass_yds", "rush_yds", "rec_yds", "receptions"), RESEARCH)
 _cap("gridiron", "CFL", ("pass_yds", "rush_yds", "rec_yds", "receptions", "pass_rush_yds", "rush_rec_yds"), UNSUPPORTED)
 _cap("baseball", "MLB", ("h", "tb", "k", "hits_runs_rbi"), SHADOW)
