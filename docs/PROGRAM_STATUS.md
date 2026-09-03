@@ -1,6 +1,8 @@
 # DCM Program Status
 
-Canonical integration line: `integration/v6-ml-architecture-20260830` at merge commit `8311b2aaeef16b508b6ef21c01c22ad990b9ad5d` (through PR #15).
+Canonical integration line: `integration/v6-ml-architecture-20260830` at merge commit `37e78ccfeff0bda74f8592bd46fb7d26e4b158e4` (through PR #16).
+
+Active guarded-launch delivery: PR #17 on `chatgpt/cfb-guarded-launch-20260902`. The CFB work described below is implemented and tested on the PR branch but is not canonical integration truth until PR #17 merges.
 
 This file is the human dashboard. It must be updated on every coding pass together with a new immutable pass record under `docs/engineering_passes/`.
 
@@ -18,21 +20,58 @@ This file is the human dashboard. It must be updated on every coding pass togeth
 | Workstream | Target | Current | State | Next acceptance gate |
 |---|---:|---:|---|---|
 | P0 Canonical spine / HAR / integrity | 10 | 9 | STRONG PARTIAL | preserve authenticated v5.4.1 roots in release retrieval; production root remains independently gated |
-| P1 Universal research / evidence | 10 | 8 | STRONG PARTIAL | live host observation loop closing SportResearchSchema coverage; remaining adapter PLAYER/TEAM lookups |
-| P2 Feature / state / parameter layer | 10 | 9 | STRONG PARTIAL | activate only validated signal operators with real producers/consumers; packet-shaped FeatureStore observations |
-| P3 SportPlugin physics | 10 | 6 | PARTIAL | close remaining 24-component plugin bindings sport by sport; no generic production fallback |
-| P4 Probability / uncertainty / grading / portfolio | 10 | 8 | STRONG PARTIAL | universal shared-world/correlation coverage; final-refresh integration |
-| P5 Audit / portability / ChatGPT-native execution | 10 | 8 | STRONG PARTIAL | exact-wheel fresh ChatGPT HAR acceptance; immutable release retrieval |
-| P6 Settlement / calibration / learning | 10 | 6 | PARTIAL + EXTERNAL VALIDATION | exact platform coverage; CRPS/subgroups; chronological unseen settlements before promotion |
-| P7 Host-native execution contract | 10 | 7 | PARTIAL | forecast/settle through host CLI on a fresh wheel+HAR; no second engine |
+| P1 Universal research / evidence | 10 | 8 | STRONG PARTIAL | execute a current CFB HAR through host web research and close market-specific evidence gaps without blanket board rejection |
+| P2 Feature / state / parameter layer | 10 | 9 | STRONG PARTIAL | validate CFB role-comparable/current/prior support on real boards; activate only evidence-backed signal operators |
+| P3 SportPlugin physics | 10 | 6 | PARTIAL | operationally accept the guarded CFB market set on a current board; continue remaining 24-component plugin bindings sport by sport |
+| P4 Probability / uncertainty / grading / portfolio | 10 | 8 | STRONG PARTIAL | prospective CFB settlement/calibration evidence; universal shared-world/correlation coverage; final-refresh integration |
+| P5 Audit / portability / ChatGPT-native execution | 10 | 8 | STRONG PARTIAL | current-HAR fresh ChatGPT acceptance; immutable release retrieval |
+| P6 Settlement / calibration / learning | 10 | 6 | PARTIAL + EXTERNAL VALIDATION | exact platform coverage; CFB prospective settlements; CRPS/subgroups; chronological unseen settlements before promotion |
+| P7 Host-native execution contract | 10 | 7 | PARTIAL | current CFB HAR forecast through host CLI on a fresh wheel; no second engine |
 | P8 Universal source acquisition | 10 | 6 | PARTIAL | live adapter fetch beyond fixtures; conflict policy + licensed providers |
 | P9 Universal core migration | 10 | 9 | STRONG PARTIAL | retire remaining PLAYER/TEAM claim lookups at packet/parameter adapters |
 | P10 Full sport coverage | 10 | 3 | EARLY | each supported sport reaches 24/24 plugin components + validation suite |
-| P11 Release + fresh-environment acceptance | 10 | 7 | PARTIAL | wheel/release + exact hash + HAR-only fresh ChatGPT acceptance |
+| P11 Release + fresh-environment acceptance | 10 | 7 | PARTIAL | wheel/release + exact hash + current HAR-only fresh ChatGPT acceptance |
 | P12 Research archive / index / reuse | 10 | 7 | PARTIAL | high-volume queryable store; retention/licensing enforcement beyond local blobs |
 | P13 Performance / search / token optimization | 10 | 6 | PARTIAL | measured CPU/RSS/token certification; host-performance remains uncertified |
 | P14 Production operations / observability | 10 | 5 | PARTIAL | run health/readiness, failure taxonomy, deterministic recovery, release gates |
 | P15 P380X donor signal governance | 10 | 7 | PARTIAL | Tranche C research truth; exact donor definition compilation only from available archive bytes; evidence-earned activation only |
+
+## 2026 CFB guarded-launch status — PR #17
+
+The PR #17 branch establishes a bounded College Football guarded-launch path without claiming universal football completion or predictive validation.
+
+Implemented and tested on the branch:
+
+- HAR accounting remains first; platform modifiers are handled after extraction and existing fail-closed integrity rules remain intact.
+- CFB research completeness is evaluated per prop for modeling instead of using unrelated global missing evidence as a blanket board veto.
+- Zero real evidence still preserves the existing `RESEARCH_REQUIRED / INCOMPLETE_CHECKPOINTED` fail-closed path.
+- Minimum model support is separate from strict PLAYABLE support.
+- Thin but defensibly parameterized rows may be `MODELED_DIAGNOSTIC`; diagnostic state cannot bypass the PLAYABLE firewall.
+- Supported guarded-launch physical markets are `pass_yds`, `pass_att`, `pass_cmp`, `rush_yds`, `rush_att`, `rec_yds`, `receptions`, `pass_rush_yds`, and `rush_rec_yds`.
+- Opportunity-only markets do not require irrelevant yardage-efficiency evidence; markets that depend on efficiency still require relevant efficiency support.
+- ParameterSnapshots expose current-season, prior-season and role-comparable support plus explicit CFB role state.
+- Explicit early-season role states include returning starter/rotation, promoted starter, transfer starter/rotation, true freshman, new QB, new coordinator/system, injury return and role uncertain.
+- Transfer history is retained as evidence but prior-school opportunity share is not carried over 1:1.
+- CFB EventWorld context includes competitive, controlled-lead and blowout/starter-curtailment workload regimes; these affect opportunity rather than directly forcing Higher/Lower.
+- ChatGPT-native CFB research instructions request current 2026 and prior 2025 history, current team/opponent/event/venue/weather, depth/availability/transfer/system changes, team tendencies and opponent defense where market-relevant.
+- Dedicated acceptance tests prove 8/8 fixture offers reach probability evaluation and that real-shaped partial evidence can continue per supported CFB prop while the overall bundle remains incomplete.
+- The official generated inventory after this implementation is 229 modules, 1,471 symbols and 0 parse errors.
+
+Not earned by this guarded launch:
+
+- prospective CFB calibration;
+- learned reliability thresholds;
+- historical settlement validation sufficient for promotion;
+- expanded exotic football markets;
+- full 24/24 SportPlugin coverage;
+- complete universal Research OS;
+- production-root certification;
+- host performance certification;
+- predictive superiority.
+
+A current September 2026 live CFB HAR has not been supplied in this pass. The existing sanitized August 29, 2026 HAR remains historical accounting evidence, not a current forecast acceptance.
+
+Learning revision remains `LR000000`; predictive superiority remains `NONE`; production-root certification remains false.
 
 ## P380X Tranche A/B status
 
@@ -62,7 +101,8 @@ The DCM is not “finished” because modules exist. A subsystem reaches 10/10 o
 - `AGENTS.md` — coding-agent law.
 - `docs/PROGRAM_STATUS.md` — human dashboard.
 - `docs/PROGRAM_STATUS.json` — machine-readable workstream registry.
-- `docs/UNIVERSAL_IMPLEMENTATION_MATRIX_20260831.md` — detailed P0–P6 subsystem audit.
+- `docs/UNIVERSAL_IMPLEMENTATION_MATRIX_20260831.md` — detailed subsystem audit.
+- `docs/CURRENT_WORK_HANDOFF.md` — current clean continuation point.
 - `docs/engineering_passes/` — append-only pass records.
 - `docs/CHATGPT_NATIVE_EXECUTION_SPEC.md` — host/runtime contract.
 - `scripts/build_code_inventory.py` — generated module/class/function inventory.
