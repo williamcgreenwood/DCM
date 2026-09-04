@@ -171,7 +171,7 @@ Verdict: `CFB_REFERENCE_IMPLEMENTATION_SOFTWARE_COMPLETE` for the declared CFB s
 
 ## 2026-09-04 Luna Max completion-context implementation pass
 
-Continues on `chatgpt/cfb-production-closure-v2-20260904` through implementation commit `1d2490ceef086248a00d27866574ab7b7ad7c3bf`; draft PR #21 targets `integration/v6-ml-architecture-20260830`. `main` is untouched.
+Continues on `chatgpt/cfb-production-closure-v2-20260904` through implementation commit `1d2490ceef086248a00d27866574ab7b7ad7c3bf` and generated-inventory repair commits `16138a4b1efc7a48e62f5c2ac79b8242f5294f0c` / `5bc75dced241a3081b16363b9a54b22663a00497`; draft PR #21 targets `integration/v6-ml-architecture-20260830`. Required GitHub CI run #248 is green; `main` is untouched.
 
 Closed in software for the declared CFB/offline scope:
 
@@ -201,12 +201,12 @@ Execution-closure gates:
 |---|---|---|
 | G0_SESSION_TRUTH | PASS | capability/timebox, authority, input hash, branch, and run manifests emitted |
 | G1_PRIVACY_BOUNDARY | PASS | raw ingress quarantined; fresh archive integrity passed; safe summaries only |
-| G2_RESTARTABLE_STATE | PASS_WITH_EXTERNAL_READBACK_PENDING | crash-safe local checkpoint/outbox/reconciliation tests pass; final Drive/GitHub checkpoint readback recorded separately |
+| G2_RESTARTABLE_STATE | PASS_WITH_EXTERNAL_READBACK | crash-safe local checkpoint/outbox/reconciliation tests pass; final Drive/GitHub checkpoint readback and required CI run #248 recorded |
 | G3_RUNTIME_CONSUMPTION | PASS_FOR_DECLARED_CFB_SCOPE | signals, rules, decisions, checkpoints, and lineage are consumed by the canonical runner |
 | G4_LINEAGE_SCHEMA | PASS_FOR_DECLARED_CFB_SCOPE | canonical content hashes and explicit edge provenance validated |
 | G5_CFB_RULES | PARTIAL | 19/19 mappings and dated snapshot emitted; platform settlement authority is not verified for production |
 | G6_EVALUATION_FIREWALL | PASS_OFFLINE | cutoff/accounting/full-population/future-only guards pass; calibration evidence is absent |
-| G7_RELEASE | PARTIAL | fresh wheel and E2E runs pass; required remote CI/host-performance/current-live research remain unverified |
+| G7_RELEASE | PARTIAL | fresh wheel and E2E runs pass; host-performance/current-live research remain unverified; required remote CI run #248 passed |
 
 Unearned states remain explicit: `SOFTWARE_CLOSED=PASS` for the declared offline scope; `HAR_ACCOUNTING_ACCEPTED=PASS`; `OPERATIONAL_ACCEPTED_WITH_CURRENT_HAR=PARTIAL`; `PREDICTIVE_CERTIFIED=DEFERRED`; `PRODUCTION_ROOT_CERTIFIED=FAIL`. Learning remains `LR000000`, predictive claim `NONE`, and no production picks are issued.
 

@@ -1,6 +1,6 @@
 {
   "schema": "pillars_dcm.program_status.v1",
-  "updatedAtUtc": "2026-09-04T14:49:18Z",
+  "updatedAtUtc": "2026-09-04T15:34:18Z",
   "canonicalIntegrationBranch": "integration/v6-ml-architecture-20260830",
   "canonicalIntegrationPr": 18,
   "scoreScale": {
@@ -239,20 +239,21 @@
   "latestPass": {
     "id": "20260904T144918Z_chatgpt_luna-max_completion-context",
     "commit": "1d2490ceef086248a00d27866574ab7b7ad7c3bf",
+    "branchHead": "5bc75dced241a3081b16363b9a54b22663a00497",
     "pullRequest": 21,
     "targetBranch": "integration/v6-ml-architecture-20260830",
     "mainTouched": false,
     "inventory": {
       "modules": 280,
       "symbols": 1997,
-      "contentHash": "8838c74b78c1e127a76ce44823873a40b51f5e5b6360ade620e414b5c470df41"
+      "contentHash": "4b338d5d7d29eea3a8b8909e55f92fc1d5a9aa87c8416df144341d0eb9f9fbad"
     },
     "wheelSha256": "c8b2adb426207d53d84c3e198c5a26f7084c1f21c248e0f688aa4b19ab601c5f"
   },
   "executionClosureGates": {
     "G0_SESSION_TRUTH": "PASS",
     "G1_PRIVACY_BOUNDARY": "PASS",
-    "G2_RESTARTABLE_STATE": "PASS_WITH_EXTERNAL_READBACK_PENDING",
+    "G2_RESTARTABLE_STATE": "PASS_WITH_EXTERNAL_READBACK",
     "G3_RUNTIME_CONSUMPTION": "PASS_FOR_DECLARED_CFB_SCOPE",
     "G4_LINEAGE_SCHEMA": "PASS_FOR_DECLARED_CFB_SCOPE",
     "G5_CFB_RULES": "PARTIAL_EXTERNAL_AUTHORITY",
@@ -291,6 +292,8 @@
     "suppliedHarAccountOnly": "PASS_TRUTHFUL_NONPRODUCTION",
     "suppliedHarFullFixture": "PASS_TRUTHFUL_NONPRODUCTION",
     "predictiveClaim": "NONE",
-    "learningRevision": "LR000000"
+    "learningRevision": "LR000000",
+    "githubRequiredChecks": "PASS_RUN_248",
+    "validatedHead": "5bc75dced241a3081b16363b9a54b22663a00497"
   }
 }
