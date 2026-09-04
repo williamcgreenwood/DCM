@@ -312,15 +312,29 @@ def sample_football(rng: random.Random, role: str, parameters: dict[str, Any] | 
         receptions = _binomial(rng, targets, _p(p, "catch_rate", 0.68))
         rec_yds = int(round(rng.gauss(receptions * max(0.0, _p(p, "rec_ypr", 11.5)), 17.0)))
     snaps = max(dropbacks if role == "QB" else (routes or rush_att), pass_att, rush_att, routes)
+    pass_td = _poisson(rng, max(0.0, pass_att * _p(p, "pass_td_rate", 0.045))) if pass_att else 0
+    interceptions = _poisson(rng, max(0.0, pass_att * _p(p, "int_rate", 0.025))) if pass_att else 0
+    rush_td = _poisson(rng, max(0.0, rush_att * _p(p, "rush_td_rate", 0.06))) if rush_att else 0
+    rec_td = _poisson(rng, max(0.0, (targets or 0) * _p(p, "rec_td_rate", 0.06))) if targets else 0
+    fg_att = _nonneg_int_gauss(rng, _p(p, "fg_att_mean", 1.8 if role in {"K", "PK"} else 0.0), 0.8) if role in {"K", "PK"} else 0
+    fg_made = _binomial(rng, fg_att, _p(p, "fg_rate", 0.82)) if fg_att else 0
+    xp_att = _nonneg_int_gauss(rng, _p(p, "xp_att_mean", 3.2 if role in {"K", "PK"} else 0.0), 1.0) if role in {"K", "PK"} else 0
+    xp_made = _binomial(rng, xp_att, _p(p, "xp_rate", 0.94)) if xp_att else 0
     stats = {
         "pass_att": pass_att, "pass_cmp": pass_cmp, "sacks_taken": sacks, "scramble_att": scramble,
         "designed_rush_att": designed, "rush_att": rush_att, "dropbacks": dropbacks,
         "pass_yds": pass_yds, "rush_yds": rush_yds, "rec_yds": rec_yds,
         "receptions": receptions, "targets": targets, "routes": routes,
         "snaps": snaps, "off_snaps": snaps,
+        "pass_td": pass_td, "interceptions": interceptions, "rush_td": rush_td, "rec_td": rec_td,
+        "fg_att": fg_att, "fg_made": fg_made, "xp_att": xp_att, "xp_made": xp_made,
         "pass_rush_yds": pass_yds + rush_yds, "rush_rec_yds": rush_yds + rec_yds,
+        "rush_rec_td": rush_td + rec_td, "pass_rush_td": pass_td + rush_td,
+        "kicking_pts": 3 * fg_made + xp_made,
     }
     if stats["pass_cmp"] > stats["pass_att"] or stats["receptions"] > stats["targets"] or stats["targets"] > stats["routes"]:
+        raise RuntimeError("PRIMITIVE_CONSERVATION_FAILURE")
+    if stats["fg_made"] > stats["fg_att"] or stats["xp_made"] > stats["xp_att"]:
         raise RuntimeError("PRIMITIVE_CONSERVATION_FAILURE")
     return stats
 
@@ -376,7 +390,11 @@ MARKET_FROM_STATS = {
     "3pm": "tpm", "stl": "stl", "blk": "blk", "pass_yds": "pass_yds", "pass_att": "pass_att",
     "pass_cmp": "pass_cmp", "rush_yds": "rush_yds", "rush_att": "rush_att",
     "rec_yds": "rec_yds", "receptions": "receptions", "pass_rush_yds": "pass_rush_yds",
-    "rush_rec_yds": "rush_rec_yds", "h": "H", "tb": "TB", "k": "SO", "hits_runs_rbi": "hits_runs_rbi",
+    "rush_rec_yds": "rush_rec_yds", "pass_td": "pass_td", "interceptions": "interceptions",
+    "rush_td": "rush_td", "rec_td": "rec_td", "targets": "targets",
+    "rush_rec_td": "rush_rec_td", "pass_rush_td": "pass_rush_td",
+    "fg_made": "fg_made", "xp_made": "xp_made", "kicking_pts": "kicking_pts",
+    "h": "H", "tb": "TB", "k": "SO", "hits_runs_rbi": "hits_runs_rbi",
 }
 
 

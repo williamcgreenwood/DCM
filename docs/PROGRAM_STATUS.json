@@ -1,8 +1,8 @@
 {
   "schema": "pillars_dcm.program_status.v1",
-  "updatedAtUtc": "2026-09-03T19:50:00Z",
+  "updatedAtUtc": "2026-09-04T15:34:18Z",
   "canonicalIntegrationBranch": "integration/v6-ml-architecture-20260830",
-  "canonicalIntegrationPr": 17,
+  "canonicalIntegrationPr": 18,
   "scoreScale": {
     "0": "MISSING",
     "10": "COMPLETE_EXECUTABLE_INTEGRATED_TESTED_AUDITABLE_PORTABLE",
@@ -39,10 +39,11 @@
       "id": "P1",
       "name": "Universal research / evidence",
       "target": 10,
-      "current": 8,
+      "current": 9,
       "state": "STRONG_PARTIAL",
       "next": [
         "execute a current CFB HAR through host web research and close market-specific evidence gaps without blanket board rejection",
+        "finish mixed-sport R1 remainder after today's CFB slice",
         "retire remaining PLAYER/TEAM lookup aliases at adapters"
       ]
     },
@@ -61,10 +62,10 @@
       "id": "P3",
       "name": "SportPlugin physics",
       "target": 10,
-      "current": 6,
-      "state": "PARTIAL",
+      "current": 8,
+      "state": "STRONG_PARTIAL",
       "next": [
-        "operationally accept the guarded CFB physical market set on a current live board",
+        "operationally accept the 19 CFB PRODUCTION markets on a current live board",
         "close all 24 required bindings per promoted sport"
       ]
     },
@@ -72,12 +73,11 @@
       "id": "P4",
       "name": "Probability / uncertainty / grading / portfolio",
       "target": 10,
-      "current": 8,
+      "current": 9,
       "state": "STRONG_PARTIAL",
       "next": [
         "prospective CFB settlement and calibration evidence",
-        "universal correlation/shared-world coverage",
-        "final refresh integration"
+        "universal correlation/shared-world coverage"
       ]
     },
     {
@@ -98,6 +98,7 @@
       "current": 6,
       "state": "PARTIAL_EXTERNAL_VALIDATION",
       "next": [
+        "retain FRONTIER_INTERIM checkpoints outside settlement eligibility",
         "exact platform coverage",
         "prospective CFB settlements",
         "CRPS/subgroups",
@@ -108,8 +109,8 @@
       "id": "P7",
       "name": "Host-native execution contract",
       "target": 10,
-      "current": 7,
-      "state": "PARTIAL",
+      "current": 8,
+      "state": "STRONG_PARTIAL",
       "next": [
         "forecast a current CFB HAR on a fresh wheel through the host contract",
         "no second probability engine"
@@ -119,7 +120,7 @@
       "id": "P8",
       "name": "Universal source acquisition",
       "target": 10,
-      "current": 6,
+      "current": 7,
       "state": "PARTIAL",
       "next": [
         "live adapter fetch beyond fixtures",
@@ -161,9 +162,10 @@
       "id": "P12",
       "name": "Research archive / index / reuse",
       "target": 10,
-      "current": 7,
-      "state": "PARTIAL",
+      "current": 8,
+      "state": "STRONG_PARTIAL",
       "next": [
+        "Drive credentials as PRIMARY object store",
         "high-volume queryable artifact store",
         "retention and licensing enforcement"
       ]
@@ -172,8 +174,8 @@
       "id": "P13",
       "name": "Performance / search / token optimization",
       "target": 10,
-      "current": 6,
-      "state": "PARTIAL",
+      "current": 8,
+      "state": "STRONG_PARTIAL",
       "next": [
         "measured CPU/RSS/token certification",
         "host-performance remains uncertified"
@@ -196,10 +198,10 @@
       "id": "P15",
       "name": "P380X donor signal governance",
       "target": 10,
-      "current": 7,
-      "state": "PARTIAL",
+      "current": 8,
+      "state": "STRONG_PARTIAL",
       "next": [
-        "Tranche C research-truth integration",
+        "Tranche D role/archetype, matchup, and context integration through typed signal operators",
         "compile exact donor definitions only when archive bytes are available",
         "promote operators only after real producer-consumer integration and tests"
       ]
@@ -208,11 +210,11 @@
       "id": "P16",
       "name": "Algorithmic Constitution / strategy registry",
       "target": 10,
-      "current": 8,
+      "current": 9,
       "state": "STRONG_PARTIAL",
       "next": [
-        "R1 BoardGraph MarketDemandGraph RequirementGraph AcquisitionAction live packing",
         "keep constitution CI gates green",
+        "mixed-sport Research OS remainder after CFB live CELF packing",
         "do not silently retire CORE/CONDITIONAL/CHALLENGER algorithms"
       ]
     }
@@ -231,5 +233,67 @@
     ],
     "noSilentDowngrades": true,
     "noSilentCompletionClaims": true
+  },
+  "activeBranch": "chatgpt/cfb-production-closure-v2-20260904",
+  "activePullRequest": 21,
+  "latestPass": {
+    "id": "20260904T144918Z_chatgpt_luna-max_completion-context",
+    "commit": "1d2490ceef086248a00d27866574ab7b7ad7c3bf",
+    "branchHead": "d6cebdc2a8ef4ecc738cacec452086d0f59dd5d9",
+    "pullRequest": 21,
+    "targetBranch": "integration/v6-ml-architecture-20260830",
+    "mainTouched": false,
+    "inventory": {
+      "modules": 280,
+      "symbols": 1997,
+      "contentHash": "4b338d5d7d29eea3a8b8909e55f92fc1d5a9aa87c8416df144341d0eb9f9fbad"
+    },
+    "wheelSha256": "c8b2adb426207d53d84c3e198c5a26f7084c1f21c248e0f688aa4b19ab601c5f"
+  },
+  "executionClosureGates": {
+    "G0_SESSION_TRUTH": "PASS",
+    "G1_PRIVACY_BOUNDARY": "PASS",
+    "G2_RESTARTABLE_STATE": "PASS_WITH_EXTERNAL_READBACK",
+    "G3_RUNTIME_CONSUMPTION": "PASS_FOR_DECLARED_CFB_SCOPE",
+    "G4_LINEAGE_SCHEMA": "PASS_FOR_DECLARED_CFB_SCOPE",
+    "G5_CFB_RULES": "PARTIAL_EXTERNAL_AUTHORITY",
+    "G6_EVALUATION_FIREWALL": "PASS_OFFLINE",
+    "G7_RELEASE": "PARTIAL"
+  },
+  "completionStates": {
+    "SOFTWARE_CLOSED": "PASS_DECLARED_OFFLINE_SCOPE",
+    "HAR_ACCOUNTING_ACCEPTED": "PASS",
+    "OPERATIONAL_ACCEPTED_WITH_CURRENT_HAR": "PARTIAL",
+    "PREDICTIVE_CERTIFIED": "DEFERRED",
+    "PRODUCTION_ROOT_CERTIFIED": "FAIL"
+  },
+  "latestHarAccounting": {
+    "sourceName": "2353pstCFB(1).har",
+    "sha256": "ad3a10271c511266c1a52869658362e07002aad9f453eb77108f35c82e2f96d7",
+    "entries": 31,
+    "normalizedRows": 4307,
+    "cfbRows": 4248,
+    "cfbGoblinRows": 948,
+    "cfbModelEligibleRows": 164,
+    "cfbMissingSideRows": 3122,
+    "cfbUnsupportedRows": 14,
+    "cfbEvents": 40,
+    "cfbSubjects": 824,
+    "cfbTeams": 80,
+    "rawCommitted": false,
+    "rawUploaded": false
+  },
+  "latestValidation": {
+    "focusedTests": "30 passed",
+    "broadNonHistoricalTests": "442 passed",
+    "unfilteredHistoricalFixtureFailures": 4,
+    "unfilteredFailureReason": "legacy sanitized fixture is empty but its tests require 11113 rows",
+    "syntheticRun": "PASS_TRUTHFUL_NONPRODUCTION",
+    "suppliedHarAccountOnly": "PASS_TRUTHFUL_NONPRODUCTION",
+    "suppliedHarFullFixture": "PASS_TRUTHFUL_NONPRODUCTION",
+    "predictiveClaim": "NONE",
+    "learningRevision": "LR000000",
+    "githubRequiredChecks": "PASS_RUN_250",
+    "validatedHead": "d6cebdc2a8ef4ecc738cacec452086d0f59dd5d9"
   }
 }

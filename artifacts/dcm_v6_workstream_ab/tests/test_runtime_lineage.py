@@ -133,6 +133,44 @@ def test_settlement_lineage_does_not_use_hit_to_rewrite_research():
     assert learn["futureOnly"] is True
 
 
+def test_runtime_lineage_emits_operational_nodes_and_edge_provenance():
+    graph = attach_runtime_lineage(
+        build_evidence_graph([], [], []),
+        evaluations=[{
+            "projectionId": "pp-1",
+            "row": {"projectionId": "pp-1", "eventId": "E1"},
+            "worldCount": 8,
+            "pHigher": .6,
+            "pLower": .3,
+            "pPush": .1,
+        }],
+        selections=[{"projectionId": "pp-1", "selectedSide": "MORE", "grade": "LEAN"}],
+        run_id="RUN1",
+        forecast_cutoff=CUTOFF,
+        runtime_context={
+            "codeVersion": "6.0.0-test",
+            "harSha256": "h" * 64,
+            "inputHashes": ["h" * 64],
+            "rows": [{"projectionId": "pp-1", "eventId": "E1", "market": "pass_yds", "line": 250}],
+            "requests": [{"request_id": "REQ1", "scope": "OFFER", "scope_id": "pp-1", "need": "line_sides_modifier"}],
+            "signalEvaluations": [{
+                "projectionId": "pp-1", "operatorId": "CFB_SUPPORT_CONTEXT_V1",
+                "outputHash": "s" * 64, "lifecycleState": "ACTIVE_FEATURE",
+                "consumers": ["dcm.ml.feature_store.signal_evaluation_feature_records"],
+            }],
+        },
+    )
+    types = {node["type"] for node in graph["nodes"]}
+    for needed in (
+        "Run", "Job", "InputDataset", "HAROffer", "ResearchRequirement", "AcquisitionAction",
+        "EventWorld", "ProbabilityBundle", "Decision", "Portfolio", "FrozenForecast", "SignalEvaluation",
+    ):
+        assert needed in types, needed
+    required_edge_fields = set(graph["provenanceContract"]["edgeFields"])
+    assert all(required_edge_fields <= set(edge) for edge in graph["edges"])
+    assert graph["provenanceContract"]["rawBytesIncluded"] is False
+
+
 def test_dag_line_change_preserves_subject_history():
     dag = Dag(cutoff=CUTOFF, config_hash="c", schema_version="v", source_versions={})
     hist = dag.add("SUBJECT_HISTORY", "PAIGE")

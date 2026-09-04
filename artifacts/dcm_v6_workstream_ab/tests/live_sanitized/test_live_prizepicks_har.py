@@ -75,7 +75,7 @@ def test_compact_cli_fixture_run_writes_artifacts(tmp_path: Path):
         assert (dest / name).exists(), name
     card = json.loads((dest / "strict_card.json").read_text())
     assert all(p.get("modifier") != "GOBLIN" for p in card)
-    assert all(not p.get("productionSelectable") for p in card) or True
+    assert all(not p.get("productionSelectable") for p in card)
     freeze = json.loads((dest / "freeze.json").read_text())
     assert freeze["learningRevision"] == "LR000000"
     assert freeze["predictiveClaim"] == "NONE"

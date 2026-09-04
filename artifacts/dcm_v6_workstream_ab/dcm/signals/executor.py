@@ -73,6 +73,12 @@ class SignalExecutor:
             started = time.perf_counter_ns()
             output = dict(handler(inputs, deps))
             elapsed = max(0, (time.perf_counter_ns() - started) // 1000)
+            # Metadata is part of the evaluation record but not part of the
+            # operator's exposed feature output.  Remove it before computing
+            # the semantic output hash so a consumer can reproduce the hash
+            # from the serialized ``outputs`` alone.
+            uncertainty_contribution = float(output.pop("_uncertaintyContribution", 0.0))
+            reason_codes = tuple(output.pop("_reasonCodes", ()))
             dependency_hashes = tuple(evaluations[key].output_hash for key in sorted(deps))
             semantic = {
                 "operatorId": operator_id,
@@ -89,8 +95,8 @@ class SignalExecutor:
                 dependency_evaluation_hashes=dependency_hashes,
                 outputs=output,
                 applicability_state="APPLICABLE",
-                uncertainty_contribution=float(output.pop("_uncertaintyContribution", 0.0)),
-                reason_codes=tuple(output.pop("_reasonCodes", ())),
+                uncertainty_contribution=uncertainty_contribution,
+                reason_codes=reason_codes,
                 consumers=compiled.spec.consumers,
                 execution_micros=int(elapsed),
                 output_hash=_hash(semantic),

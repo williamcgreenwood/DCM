@@ -1,8 +1,9 @@
 # DCM universal implementation matrix — 2026-08-31
 
-Baseline refreshed through PR #17 merge `cdb428f6a05406184fe265b0a1e81abec92cd1f9` and the R0 Algorithmic Constitution child branch. R0 is constitution/registry/selection/HAR-plan/CI, not a claim that Research OS or the full DCM is complete.
-This matrix is code-path status, not predictive validation. LR remains
+Baseline refreshed through PR #20 CFB semantic-closure / frontier-firewall pass on `chatgpt/cfb-semantic-closure-v3-20260904`. R0 constitution remains inherited. This matrix is code-path status, not predictive validation. LR remains
 `LR000000`; predictive superiority remains `NONE`. Constitution version: `DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903`.
+
+CFB software reference path is executable (19 ACTIVE markets, no ceremonial algorithm execution, residual EventWorlds, identity-first retrieval, source-health routing, lineage-aware MaterialFact pre-fit, L0–L6 semantic cache, and an interim frontier firewall). Final freeze requires Top25 FINAL plus request-complete research; an interim checkpoint has no frozen hash or settlement eligibility. Current-HAR acceptance is `CFB_CURRENT_HAR_OPERATIONAL_ACCEPTANCE_PENDING`.
 
 Status meanings:
 
@@ -24,8 +25,8 @@ Status meanings:
 | ChatGPT-native CORE primitives | COMPLETE for R0 | Searching/indexing/sorting/grouping/scheduling/cache/stdlib ML in `dcm.algorithms`. |
 | Weighted set-cover / submodular | COMPLETE as primitives | Registered CORE; live AcquisitionAction packing remains R1. |
 | Silent retirement CI | COMPLETE for R0 | `tests/governance/` plus registry `--check`. |
-| BoardGraph / RequirementGraph / AcquisitionAction | MISSING as live HAR OS | Next tranche (R1). Do not claim complete. |
-| Drive-first indexed retrieval | PARTIAL | Persistence law documented; existing ResearchStore/archive unchanged this pass. |
+| BoardGraph / RequirementGraph / AcquisitionAction | CFB COMPLETE for declared scope | Guarded CFB path emits graphs, live CELF packing, ResearchOSReadiness before research. Mixed-sport R1 remainder remains. |
+| Drive-first indexed retrieval | PARTIAL + BLOCKED_EXTERNAL | Local DriveObjectCatalog identifies exact objects then fail-closes `NOT_CONFIGURED`. Drive credentials are external. |
 
 ## P0 — canonical spine / integrity
 
@@ -40,7 +41,7 @@ Status meanings:
 | Offered-sides-only | COMPLETE | Unknown/unoffered side fails closed. |
 | Temporal cutoff / event-start firewall | COMPLETE | Explicit decision cutoff and final start/status hard blockers. |
 | Split certification semantics | COMPLETE | Archive/evidence/temporal/model/selection/root/predictive flags are separate; `locksCertified` is absent from canonical state and exists only as a compatibility helper function. |
-| One canonical integration line | PARTIAL → converging | PR #10 is the single current architecture integration line. The prior universal-core and SportPlugin child PRs have been folded back into it. |
+| One canonical integration line | PARTIAL → converging | PR #20 is stacked on the green PR #19 head and targets the single integration branch. The prior universal-core and SportPlugin child PRs remain folded into it. |
 | Portable clean-environment install | COMPLETE for engineering runtime | CI installs package from repo root, runs CLI from clean cwd and synthetic E2E. Production data/root certification remains closed. |
 
 ## P1 — universal entity and research layer
@@ -62,8 +63,8 @@ Status meanings:
 | EventResearchPacket | PARTIAL | Current team-sport event packet plus universal wrapper. |
 | EnvironmentResearchPacket | PARTIAL | First-class ENVIRONMENT requests and packet wrapper; sport-specific weather/surface still plugin-owned. |
 | Canonical normalization | PARTIAL | Basketball/gridiron normalized histories exist; every production sport does not yet own a complete CanonicalStatSchema/HistoricalPerformanceSchema. |
-| EvidenceGraph | COMPLETE (universal topology), PARTIAL (settlement-time freeze join) | V2 graph uses Subject/Affiliation/Counterparty. Freeze now attaches Feature, RoleState, ParticipationState, OpportunityState, EfficiencyState, ParameterSnapshot, Simulation, PropEvaluation, Selection, Forecast. Settlement/LearningObservation live in `settlement_lineage.json` so freeze bytes stay append-only. |
-| Semantic evidence coverage | PARTIAL | Real field-level gates exist for basketball/gridiron; must move under SportResearchSchema instead of legacy PLAYER/TEAM branching. |
+| EvidenceGraph | COMPLETE (universal topology), PARTIAL (settlement-time freeze join) | V2 graph uses Subject/Affiliation/Counterparty. Freeze attaches Feature, RoleState, ParticipationState, OpportunityState, EfficiencyState, ParameterSnapshot, Simulation, PropEvaluation, Selection, Forecast. Interim frontier checkpoints remain outside frozen lineage; Settlement/LearningObservation live in `settlement_lineage.json` so freeze bytes stay append-only. |
+| Semantic evidence coverage | STRONG PARTIAL for guarded CFB | Real field-level gates exist for basketball/gridiron; lineage-aware MaterialFact states and conservative conflict holds are runtime-integrated. Full universal SportResearchSchema migration remains. |
 | Research cache / temporal evidence | COMPLETE for current provider path | As-of cache and pre-cutoff claim validation are executable. |
 | Automatic host web acquisition | PARTIAL | `dcm-host next-research` + evidence-import is executable. CFB uses the same canonical ResearchStore/EvidenceGraph path with market-specific instructions and per-prop sufficiency. The host still performs the actual web fetch; Python never fabricates research. Current-live-HAR fresh ChatGPT acceptance remains open. |
 
@@ -104,7 +105,7 @@ Status meanings:
 | Subsystem | Status | Evidence / action |
 |---|---|---|
 | P(MORE)/P(LESS)/P(PUSH) | COMPLETE for current modeled markets | Push-aware probability contract exists. |
-| Raw/calibrated/evidence-safe probability separation | COMPLETE as output contract | Calibration remains unearned/limited where chronological settlements are absent. |
+| Raw/calibrated/evidence-safe probability separation | COMPLETE as output contract | Calibration remains unearned where chronological settlements are absent; conformal widening is explicitly `0.0` / inactive at `LR000000`. |
 | Aleatoric/epistemic/MC uncertainty separation | PARTIAL to strong | Current probability bundle separates uncertainty classes; universal model-specific uncertainty still expands with plugins. |
 | Reliability/DataQuality/Volatility/Fragility separation | COMPLETE as doctrine/output | Not conflated with probability. |
 | Line surface / unclamped tolerance | COMPLETE for serious current candidates | Existing line-surface logic retained. |
@@ -114,7 +115,7 @@ Status meanings:
 | 0–6 card | COMPLETE | No forced six, no Lean padding. |
 | Correlation/dependency portfolio controls | PARTIAL to strong | Existing unique-subject/event/conflict controls exist; universal simulated correlation/shared failure path coverage must expand with new sport worlds. |
 | Final status/start refresh | PARTIAL | Hard gates exist; source freshness/late lineup/weather refresh depends on host evidence acquisition completeness. |
-| Frozen forecast hash/lineage | COMPLETE for current runtime | Deterministic freeze artifacts exist. |
+| Frozen forecast hash/lineage | COMPLETE for current runtime | Deterministic final freeze artifacts exist only after Top25 FINAL plus request-complete research; `FRONTIER_INTERIM` emits a checkpoint without a frozen hash, sidecar, ledger row, or settlement eligibility. |
 
 ## P5 — audit / portability
 
@@ -131,10 +132,10 @@ Status meanings:
 
 | Subsystem | Status | Evidence / action |
 |---|---|---|
-| Full-board settlement | PARTIAL to strong | Settlement population/ledger tests exist for modeled populations; sport/platform exact rules are incomplete across universal coverage. |
+| Full-board settlement | PARTIAL to strong | Settlement population/ledger tests exist for modeled populations; interim frontier checkpoints are rejected before outcomes are read; sport/platform exact rules remain incomplete across universal coverage. |
 | PrizePicks reboot/DNP rules | PARTIAL to strong | Current rule snapshots exist; platform/market expansion remains. |
 | Learning Ledger immutability | COMPLETE as governance path | Historical forecasts are not retrospectively rewritten. |
-| Proper scoring metrics | PARTIAL | Brier/log-loss/calibration infrastructure exists; CRPS/subgroup reporting and sufficient chronological samples remain incomplete. |
+| Proper scoring metrics | PARTIAL | Brier/log-loss/calibration infrastructure exists; conformal/isotonic remain inactive until earned chronological settlements, while CRPS/subgroup reporting remains incomplete. |
 | Training dataset builder | PARTIAL | Dataset/sidecar infrastructure exists; universal feature lineage and mature settled population are not complete. |
 | Walk-forward validation | PARTIAL | Governance exists; predictive promotion is not earned. |
 | Champion/Challenger | PARTIAL | Promotion doctrine exists; no justified new Learning Revision yet. |
@@ -142,12 +143,15 @@ Status meanings:
 
 ## Highest-priority next code migrations
 
-1. Run an actual current CFB HAR through ChatGPT-native research → EvidenceGraph → ParameterSnapshots → CFB EventWorld → probability/uncertainty → grading/ranking/freeze; treat this as operational acceptance, not redesign.\n2. Begin prospective CFB settlement capture and calibration evidence without promoting LR000000 prematurely.\n3. P380X Tranche C: Research Truth Integration using the existing StatePack/EvidenceGraph/freshness path.
-2. Drive a fresh-host wheel+HAR acceptance test through `dcm-host` without a source checkout.
-3. Close remaining PLAYER/TEAM claim lookups so they exist only inside source/sport adapters.
-4. Close remaining PARTIAL SportPlugin bindings (FeatureSchema, EnvironmentModel, MarketDefinitionRegistry/minimal, ValidationSuite).
-5. Finish one reference sport end to end under the 24-component interface.
-6. Accumulate chronological settlements before any predictive or Learning Revision promotion.
+1. Run an actual current CFB HAR through ChatGPT-native research → EvidenceGraph → ParameterSnapshots → CFB EventWorld → probability/uncertainty → grading/ranking/freeze; treat this as operational acceptance, not redesign.
+2. Keep `FRONTIER_INTERIM` checkpoints outside settlement and learning until the missing frontier research is imported and a deterministic resume reaches a final freeze.
+3. Begin prospective CFB settlement capture and calibration evidence without promoting `LR000000` prematurely.
+4. P380X Tranche D: integrate role/archetype, matchup, and context operators only through typed producers, consumers, and evidence-earned activation.
+5. Compile exact donor definitions only when the supplied archive bytes are available.
+6. Drive a fresh-host wheel+HAR acceptance test through `dcm-host` without a source checkout.
+7. Close remaining PLAYER/TEAM claim lookups so they exist only inside source/sport adapters.
+8. Finish one reference sport end to end under the 24-component interface.
+9. Accumulate chronological settlements before any predictive or Learning Revision promotion.
 
 ## P7–P14 completion program
 
@@ -155,14 +159,31 @@ The detailed P0–P6 matrix remains the modeling/system audit. The following wor
 
 | Workstream | State | Required finish |
 |---|---|---|
-| P7 Host-native execution | PARTIAL | `dcm-host` / `python -m dcm.chat` / `HostSession` implemented over the existing runner: doctor, prepare, next-research, evidence-import, coverage, forecast, report, resume, audit, settle, archive. Not 10/10: fresh-wheel HAR acceptance remains. |
+| P7 Host-native execution | PARTIAL | `dcm-host` / `python -m dcm.chat` / `HostSession` implemented over the existing runner: doctor, prepare, next-research, evidence-import, coverage, forecast, report, resume, audit, settle, archive, cfb-launch. Not 10/10: fresh-wheel current-HAR acceptance remains. |
 | P8 Universal source acquisition | PARTIAL | Versioned source catalog, event-first batching, schema-driven coverage extras, host-observation import. Live fetch remains opt-in. |
 | P9 Universal-core migration | STRONG PARTIAL | Planner/provider canonical scopes are universal. PLAYER/TEAM survive as adapter aliases and compatibility projections. |
 | P10 Full sport coverage | EARLY | Every promoted sport independently satisfies all 24 SportPlugin components and plugin validation; unsupported sports fail closed. |
 | P11 Release/fresh-host acceptance | PARTIAL | Exact wheel+manifest+hash retrieval and a fresh ChatGPT HAR-only acceptance test with no source checkout/prior memory. |
 | P12 Research archive/index/reuse | PARTIAL | Content-addressed `ResearchStore` hydrates blobs (not pointers) for delta classification, entity/source/as-of indexes, append-only game-log merge, outcome memory that cannot decide reuse, and DAG invalidation by delta class. High-volume DB/object store still future. |
-| P13 Performance/search/token optimization | PARTIAL | Fan-out × importance × freshness × uncertainty / cost scheduler and event batching exist. Host performance is not certified. |
+| P13 Performance/search/token optimization | PARTIAL | Fan-out × importance × freshness × uncertainty / cost scheduler, CELF live AcquisitionAction packing on the CFB path, and event batching exist. Host performance is not certified. |
 | P14 Production operations/observability | PARTIAL | Host doctor, run_manifest, host_state, engineering-pass ledger. Full ops health/recovery remains. |
-| P15 P380X donor signal governance | PARTIAL | Tranche A/B is executable and tested: 58/58 dispositions, zero implicit activations, typed compiler/registry/executor, deterministic hashes, semantic/cross-sport/unit/cutoff gates, and FeatureStore consumer. Research-truth, matchup, decision, learning, and portfolio donor tranches are not implemented by this pass. |
+| P15 P380X donor signal governance | STRONG PARTIAL | Tranche A/B is executable and tested: 58/58 dispositions, zero implicit activations, typed compiler/registry/executor, deterministic hashes, semantic/cross-sport/unit/cutoff gates, and FeatureStore consumer. Tranche C lineage-aware MaterialFact/source-truth runtime closure is integrated; role/matchup/decision/learning/portfolio donor tranches and exact archive bytes remain future/external. |
 
 See `docs/PROGRAM_STATUS.md`, `docs/PROGRAM_STATUS.json`, `docs/CHATGPT_NATIVE_EXECUTION_SPEC.md`, and `docs/engineering_passes/`.
+
+## 2026-09-04 completion-context runtime audit
+
+The Luna Max completion-context pass adds the following verified closure bindings to the declared CFB/offline scope:
+
+| Requirement | Runtime producer | Explicit consumer / evidence | State |
+|---|---|---|---|
+| Exact-first cache integrity | `ResearchCacheCascade` L2/L4 payload verification | deterministic tamper test; invalid payload falls through to fail-closed layers | CLOSED_FOR_DECLARED_SCOPE |
+| Deterministic source health | `SourceHealthRegistry` injected clock and persisted circuit state | AcquisitionAction routing and source-health tests | CLOSED_FOR_DECLARED_SCOPE |
+| Safe sensitive ingress | `input_boundary.inspect_input_boundary` | capability/input-boundary manifests and archive scanner; raw values/path excluded | CLOSED |
+| Restartable state | `write_checkpoint` + `checkpoint_outbox` + reconciliation | fsync/publish, idempotency, crash/error and remote-ack tests | CLOSED_LOCAL / REMOTE_READBACK_RECORDED_IN_PASS |
+| Signal governance | CFB registry/compiler/executor | `signal_runtime.json`, FeatureStore records, output hashes, runner telemetry | CLOSED_FOR_DECLARED_CFB_SCOPE |
+| Temporal facts | MaterialFact succession/correction resolver | parameter/snapshot lineage and cutoff tests | CLOSED_FOR_DECLARED_CFB_SCOPE |
+| CFB settlement semantics | dated rules snapshot | all 19 active CFB MarketDefinitions map fields, identities, and outcomes; production eligibility remains gated | PARTIAL_EXTERNAL_AUTHORITY |
+| Operational lineage | EvidenceGraph runtime attachment | Run→Job→InputDataset→HAROffer→Requirement→Acquisition→Fact→Feature→World→Probability→Decision→Portfolio→Freeze nodes and provenance-bearing edges | CLOSED_FOR_DECLARED_CFB_SCOPE |
+
+Acceptance evidence for this pass: 442 broad non-historical tests passed; 30 focused closure tests passed; fresh wheel and synthetic/current-HAR fixture runs passed; generated inventory is 280 modules / 1,997 symbols with hash `4b338d5d7d29eea3a8b8909e55f92fc1d5a9aa87c8416df144341d0eb9f9fbad`. The legacy historical fixture remains externally blocked because its repository file is empty while four tests require 11,113 rows. No raw HAR is committed or uploaded. Required GitHub CI runs #248, #249, and #250 passed after the generated-inventory serialization repair.

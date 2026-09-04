@@ -6,11 +6,12 @@ replaces the season. Persist as jsonl + manifest with a content hash.
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 from typing import Any
 
 from dcm.contracts.hashes import content_hash
-from dcm.research.player_packet import WINDOW_SIZES, window_means
+from dcm.research.player_packet import WINDOW_SIZES, window_means, _is_gridiron_identity
 from dcm.research.role_epoch import RoleEpochBuilder
 from typing import TYPE_CHECKING
 
@@ -38,6 +39,38 @@ FEATURE_FAMILIES = frozenset({
     "CONTEXT",
 })
 WINDOW_STATS = ("minutes", "pts", "reb", "ast", "fga", "tpa", "fta")
+GRIDIRON_WINDOW_STATS = (
+    "snaps", "pass_att", "pass_yds", "pass_td", "interceptions",
+    "rush_att", "rush_yds", "rush_td",
+    "targets", "receptions", "rec_yds", "rec_td", "routes",
+    "fg_att", "fg_made", "xp_att", "xp_made",
+)
+WINDOW_FAMILY = {
+    "minutes": "OPPORTUNITY",
+    "fga": "OPPORTUNITY",
+    "tpa": "OPPORTUNITY",
+    "fta": "OPPORTUNITY",
+    "pts": "EFFICIENCY",
+    "reb": "EFFICIENCY",
+    "ast": "EFFICIENCY",
+    "snaps": "OPPORTUNITY",
+    "pass_att": "OPPORTUNITY",
+    "rush_att": "OPPORTUNITY",
+    "targets": "OPPORTUNITY",
+    "routes": "OPPORTUNITY",
+    "fg_att": "OPPORTUNITY",
+    "xp_att": "OPPORTUNITY",
+    "pass_yds": "EFFICIENCY",
+    "pass_td": "EFFICIENCY",
+    "interceptions": "EFFICIENCY",
+    "rush_yds": "EFFICIENCY",
+    "rush_td": "EFFICIENCY",
+    "receptions": "EFFICIENCY",
+    "rec_yds": "EFFICIENCY",
+    "rec_td": "EFFICIENCY",
+    "fg_made": "EFFICIENCY",
+    "xp_made": "EFFICIENCY",
+}
 SIGNAL_FEATURE_CONSUMER = "dcm.ml.feature_store.signal_evaluation_feature_records"
 
 
@@ -146,6 +179,9 @@ class FeatureStore:
         source_hashes = sorted(set(source_hashes))
         claim_hashes = [str(h) for h in (packet.get("claimHashes") or packet.get("evidenceHashes") or []) if h]
         logs = _logs_from_packet(packet)
+        ident = packet.get("identity") if isinstance(packet.get("identity"), dict) else {}
+        league = ident.get("league") or packet.get("league")
+        window_stats = GRIDIRON_WINDOW_STATS if _is_gridiron_identity(ident, league) else WINDOW_STATS
         features: list[dict[str, Any]] = []
 
         def add(name: str, value: Any, family: str) -> None:
@@ -166,34 +202,25 @@ class FeatureStore:
         for n in WINDOW_SIZES:
             key = f"L{n}"
             stats = packet_windows.get(key) if isinstance(packet_windows.get(key), dict) else None
-            computed = window_means(logs, n)
+            computed = window_means(logs, n, keys=window_stats)
             merged = dict(computed)
             if stats:
                 merged.update({k: v for k, v in stats.items() if v is not None})
-            family_map = {
-                "minutes": "OPPORTUNITY",
-                "fga": "OPPORTUNITY",
-                "tpa": "OPPORTUNITY",
-                "fta": "OPPORTUNITY",
-                "pts": "EFFICIENCY",
-                "reb": "EFFICIENCY",
-                "ast": "EFFICIENCY",
-            }
-            for stat in WINDOW_STATS:
+            for stat in window_stats:
                 value = merged.get(f"{stat}_mean")
-                add(f"{key}_{stat}_mean", value, family_map[stat])
+                add(f"{key}_{stat}_mean", value, WINDOW_FAMILY.get(stat, "EFFICIENCY"))
             add(f"{key}_support_n", merged.get("support_n"), "OPPORTUNITY")
             add(f"{key}_nAvailable", merged.get("nAvailable"), "CONTEXT")
 
-        season = window_means(logs, max(len(logs), 1) if logs else 1)
+        season = window_means(logs, max(len(logs), 1) if logs else 1, keys=window_stats)
         if logs:
-            season = window_means(logs, len(logs))
+            season = window_means(logs, len(logs), keys=window_stats)
         else:
-            season = {f"{s}_mean": None for s in WINDOW_STATS}
+            season = {f"{s}_mean": None for s in window_stats}
             season["support_n"] = 0
             season["nAvailable"] = 0
-        for stat in WINDOW_STATS:
-            fam = "OPPORTUNITY" if stat in {"minutes", "fga", "tpa", "fta"} else "EFFICIENCY"
+        for stat in window_stats:
+            fam = WINDOW_FAMILY.get(stat, "EFFICIENCY")
             add(f"season_{stat}_mean", season.get(f"{stat}_mean"), fam)
         add("season_support_n", season.get("support_n") if logs else 0, "OPPORTUNITY")
         add("gameLogCount", packet.get("gameLogCount") if packet.get("gameLogCount") is not None else len(logs), "CONTEXT")
@@ -348,4 +375,58 @@ def persist_feature_store(
         json.dumps(manifest_body, indent=2, sort_keys=True, ensure_ascii=True) + "\n",
         encoding="utf-8",
     )
+    return manifest_body
+
+
+def merge_feature_records(dest: Path, records: list[dict[str, Any]] | tuple[dict[str, Any], ...]) -> dict[str, Any]:
+    """Append deterministic runtime feature records and refresh the manifest."""
+    dest = Path(dest)
+    jsonl_path = dest / "feature_store.jsonl"
+    existing: list[dict[str, Any]] = []
+    if jsonl_path.is_file():
+        for line in jsonl_path.read_text(encoding="utf-8").splitlines():
+            try:
+                item = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if isinstance(item, dict):
+                existing.append(item)
+    by_hash: dict[str, dict[str, Any]] = {}
+    for item in existing:
+        digest = str(item.get("contentHash") or content_hash({k: v for k, v in item.items() if k != "contentHash"}))
+        item.setdefault("contentHash", digest)
+        by_hash[digest] = item
+    for item in records or ():
+        if not isinstance(item, dict):
+            continue
+        item = dict(item)
+        item["contentHash"] = content_hash({k: v for k, v in item.items() if k != "contentHash"})
+        by_hash[item["contentHash"]] = item
+    features = [by_hash[key] for key in sorted(by_hash)]
+    tmp = jsonl_path.with_suffix(jsonl_path.suffix + ".tmp")
+    with tmp.open("w", encoding="utf-8") as handle:
+        for item in features:
+            handle.write(json.dumps(item, sort_keys=True, ensure_ascii=True) + "\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+    tmp.replace(jsonl_path)
+    manifest_path = dest / "feature_store_manifest.json"
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        manifest = {}
+    entities = sorted({str(item.get("entity") or "") for item in features if item.get("entity")})
+    families = sorted({str(item.get("family") or "") for item in features if item.get("family")})
+    manifest_body = {
+        **{key: value for key, value in manifest.items() if key != "contentHash"},
+        "schema": manifest.get("schema") or "pillars_dcm.feature_store_manifest.v1",
+        "featureCount": len(features),
+        "entityCount": len(entities),
+        "families": families,
+        "observationsOnly": True,
+        "trainedModel": False,
+        "cutoffImmutable": True,
+    }
+    manifest_body["contentHash"] = content_hash({**manifest_body, "features": features})
+    manifest_path.write_text(json.dumps(manifest_body, indent=2, sort_keys=True, ensure_ascii=True) + "\n", encoding="utf-8")
     return manifest_body

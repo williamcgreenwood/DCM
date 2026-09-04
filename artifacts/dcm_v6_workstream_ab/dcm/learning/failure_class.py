@@ -5,21 +5,30 @@ from typing import Any
 
 FAILURE_CLASSES = (
     "normal_variance",
-    "opportunity_miss",
-    "minutes_miss",
+    "model",
+    "acquisition",
+    "stale_evidence",
+    "incorrect_evidence",
+    "identity",
+    "market_definition",
     "role_miss",
+    "opportunity_miss",
     "efficiency_miss",
+    "minutes_miss",
     "injury_status_miss",
     "lineup_miss",
     "team_context_miss",
     "opponent_matchup_miss",
     "distribution_miss",
+    "distribution_tail",
     "calibration_miss",
     "ranking_miss",
     "portfolio_miss",
+    "correlation",
+    "unavailable_pre_cutoff",
+    "line_movement_miss",
     "source_miss",
     "definition_miss",
-    "line_movement_miss",
     "unknown",
 )
 
@@ -31,6 +40,11 @@ _MATCHUP = ("MATCHUP", "OPPONENT")
 _SOURCE = ("EVIDENCE_MISSING", "SOURCE_MISSING", "THIN_OPPORTUNITY", "THIN_EFFICIENCY")
 _DEF = ("UNVERIFIED_MARKET", "DEFINITION")
 _LINE = ("LINE_MOVE", "LINE_MOVEMENT")
+_IDENTITY = ("IDENTITY", "ALIAS", "PLAYER_ID", "DUPLICATE_NAME")
+_ACQ = ("ACQUISITION", "HOST_OBSERVATION", "WEB_MISS")
+_STALE = ("STALE", "REFRESH_STALE", "EXPIRED")
+_INCORRECT = ("CONTRADICT", "INCORRECT_EVIDENCE", "MATERIAL_FACT_CONFLICT")
+_CUTOFF = ("POST_CUTOFF", "UNAVAILABLE_PRE_CUTOFF")
 
 def _f(value: Any) -> float | None:
     try:
@@ -86,6 +100,16 @@ def classify_failure(
                 reasons.append("opportunity_residual")
         if label == "unknown" and any(tok in blob for tok in _INJURY):
             label = "injury_status_miss"
+        elif label == "unknown" and any(tok in blob for tok in _IDENTITY):
+            label = "identity"
+        elif label == "unknown" and any(tok in blob for tok in _ACQ):
+            label = "acquisition"
+        elif label == "unknown" and any(tok in blob for tok in _STALE):
+            label = "stale_evidence"
+        elif label == "unknown" and any(tok in blob for tok in _INCORRECT):
+            label = "incorrect_evidence"
+        elif label == "unknown" and any(tok in blob for tok in _CUTOFF):
+            label = "unavailable_pre_cutoff"
         elif label == "unknown" and any(tok in blob for tok in _ROLE):
             label = "role_miss"
         elif label == "unknown" and any(tok in blob for tok in _LINEUP):

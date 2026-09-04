@@ -20,6 +20,13 @@ from pathlib import Path
 from typing import Any
 
 from dcm.algorithms.execution_plan import constitution_run_hashes, persist_har_algorithm_execution_plan
+from dcm.algorithms.telemetry import AlgorithmTelemetry
+from dcm.cfb.event_worlds import cfb_teammate_groups, simulate_joint_cfb_event_worlds
+from dcm.cfb.launch import emit_cfb_forecast_artifacts, persist_algorithm_telemetry, prepare_cfb_research_os
+from dcm.cfb.recompute import recompute_full_bundle
+from dcm.cfb.refresh import apply_final_refresh
+from dcm.cfb.rules import build_cfb_rules_snapshot
+from dcm.research.material_facts import apply_hold_playable, facts_to_features, hold_playable_scope_ids, resolve_material_facts
 from dcm.contracts.hashes import content_hash
 from dcm.identity.resolve import build_player_index, freeze_map, resolve_row
 from dcm.ingest.board import freeze_board, write_board
@@ -36,6 +43,13 @@ from dcm.model.line_surface import surface as line_surface
 from dcm.model.parameters import build_parameter_snapshot
 from dcm.model.ranking import rank_candidates
 from dcm.model.uncertainty import PROBABILITY_CONTRACT_KEYS, RELIABILITY_IS_NOT_PROBABILITY, probability_bundle
+from dcm.ml.feature_store import merge_feature_records
+from dcm.selection.decision_integrity import (
+    SurvivorState,
+    inverse_consistency_audit,
+    probability_sanity_diagnostic,
+)
+from dcm.signals.cfb_runtime import build_cfb_signal_registry, execute_cfb_signals
 from dcm.learning.calibration import apply_calibration, cell_key
 from dcm.learning.sidecar import append_ledger_jsonl, append_record
 from dcm.model.event_world_joint import (
@@ -54,11 +68,17 @@ from dcm.research.host_plan import build_host_research_plan
 from dcm.research.provider import BundleProvider, FileProvider, FixtureProvider, collect, write_bundle
 from dcm.research.requests import plan_research
 from dcm.runtime.checkpoint import load_checkpoint, write_checkpoint
+from dcm.runtime.capabilities import build_capability_manifest, persist_capability_manifest
 from dcm.runtime.cutoff import CutoffRequired, POLICY_DOC, resolve_forecast_cutoff
 from dcm.runtime.dag import Dag
 from dcm.runtime.freeze import compute_forecast_hash
 from dcm.runtime.github_archive import append_index, build_run_audit, certification_fields, materialize_github_pack, push_to_github
 from dcm.runtime.governor import Governor
+from dcm.runtime.input_boundary import (
+    build_input_boundary_manifest,
+    inspect_input_boundary,
+    persist_input_boundary_manifest,
+)
 from dcm.runtime.mount_v541 import mount_default
 from dcm.runtime.schema_root import SCHEMA_V2_ID, verify_schema, verify_schema_v2
 from dcm.runtime.perf import StageTimer
@@ -236,6 +256,7 @@ def run_dcm(
     archive_push: bool = False,
     repo_root: Path | None = None,
 ) -> dict[str, Any]:
+    input_boundary_records: list[dict[str, Any]] = []
     if resume:
         ck = load_checkpoint(resume)
         output_root = Path(ck["artifactRoot"])
@@ -280,6 +301,29 @@ def run_dcm(
             raise RuntimeError("MOUNT_STATE_HASH_MISMATCH_ON_RESUME")
         if str(ck.get("schemaStateHash") or "") != content_hash(schema_root):
             raise RuntimeError("SCHEMA_STATE_HASH_MISMATCH_ON_RESUME")
+        boundary_path = output_root / "input_security_boundary.json"
+        if boundary_path.is_file():
+            try:
+                boundary_manifest = json.loads(boundary_path.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError) as exc:
+                raise RuntimeError("INPUT_BOUNDARY_MANIFEST_INVALID_ON_RESUME") from exc
+            boundary_payload = {
+                key: value for key, value in boundary_manifest.items() if key != "contentHash"
+            }
+            if str(boundary_manifest.get("contentHash") or "") != content_hash(boundary_payload):
+                raise RuntimeError("INPUT_BOUNDARY_HASH_MISMATCH_ON_RESUME")
+            if str(boundary_manifest.get("runId") or "") != str(run_id):
+                raise RuntimeError("INPUT_BOUNDARY_RUN_MISMATCH_ON_RESUME")
+            if str(boundary_manifest.get("harSha256") or "") != str(har_sha):
+                raise RuntimeError("INPUT_BOUNDARY_SOURCE_MISMATCH_ON_RESUME")
+            input_boundary_records = [
+                dict(item) for item in (boundary_manifest.get("records") or []) if isinstance(item, dict)
+            ]
+        else:
+            boundary_manifest = build_input_boundary_manifest(
+                [], run_id=run_id, har_sha256=har_sha,
+            )
+            persist_input_boundary_manifest(output_root, boundary_manifest)
         stages_done = set(ck.get("completedStages") or [])
     else:
         stages_done = set()
@@ -289,6 +333,7 @@ def run_dcm(
         if synthetic:
             raw = json.loads(SYNTHETIC.read_text(encoding="utf-8"))
             raw_bytes = SYNTHETIC.read_bytes()
+            input_boundary_records.append(inspect_input_boundary(SYNTHETIC, raw_bytes=raw_bytes))
             ingests = [ingest_har(raw, raw_bytes=raw_bytes)]
         else:
             sources = list(input_paths or ([] if input_path is None else [input_path]))
@@ -297,6 +342,7 @@ def run_dcm(
             ingests = []
             for source in sources:
                 raw_bytes = source.read_bytes()
+                input_boundary_records.append(inspect_input_boundary(source, raw_bytes=raw_bytes))
                 ingests.append(ingest_har(raw_bytes, raw_bytes=raw_bytes))
         ingest = compose_ingests(ingests) if len(ingests) > 1 else ingests[0]
         cutoff_info = resolve_forecast_cutoff(
@@ -309,6 +355,10 @@ def run_dcm(
         run_id = _run_id(har_sha, forecast_cutoff)
         dest = output_root / run_id
         dest.mkdir(parents=True, exist_ok=True)
+        boundary_manifest = build_input_boundary_manifest(
+            input_boundary_records, run_id=run_id, har_sha256=har_sha,
+        )
+        persist_input_boundary_manifest(dest, boundary_manifest)
         model_config = _default_model_config()
         calibration_state = _active_calibration(workspace)
         (dest / "MODEL_CONFIG.json").write_text(
@@ -338,6 +388,7 @@ def run_dcm(
                         if ingest.get("compositeCaptureId")
                         else "CAPTURED_HAR"
                     ),
+                    "inputBoundaryHash": boundary_manifest["contentHash"],
                 },
                 indent=2,
                 sort_keys=True,
@@ -356,6 +407,34 @@ def run_dcm(
         (dest / "performance" / "har.json").write_text(json.dumps(har_perf, indent=2) + "\n", encoding="utf-8")
 
     config_hash = content_hash(model_config)
+    capability_path = dest / "capability_manifest.json"
+    if capability_path.is_file():
+        try:
+            capability_manifest = json.loads(capability_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            capability_manifest = {}
+    else:
+        capability_inputs = list(input_paths or ([] if input_path is None else [input_path]))
+        if synthetic:
+            capability_inputs = [SYNTHETIC]
+        capability_manifest = build_capability_manifest(
+            workspace=workspace,
+            run_id=run_id,
+            forecast_cutoff=forecast_cutoff,
+            input_paths=capability_inputs,
+            har_sha256=har_sha,
+        )
+        persist_capability_manifest(dest, capability_manifest)
+    capability_manifest.setdefault("inputBoundary", {})["safeRecords"] = input_boundary_records
+    capability_manifest["inputBoundary"]["boundaryManifestHash"] = str(
+        (locals().get("boundary_manifest") or {}).get("contentHash") or ""
+    )
+    capability_manifest["inputBoundary"]["rawBytesNeverEmitted"] = True
+    capability_manifest["contentHash"] = content_hash({
+        key: value for key, value in capability_manifest.items() if key != "contentHash"
+    })
+    persist_capability_manifest(dest, capability_manifest)
+    input_boundary_hash = str((locals().get("boundary_manifest") or {}).get("contentHash") or "")
     dag = Dag(
         cutoff=forecast_cutoff,
         config_hash=config_hash,
@@ -372,6 +451,17 @@ def run_dcm(
             "consumer": "dcm.runner.run_dcm",
         },
     )
+    telemetry = AlgorithmTelemetry()
+    for phase in plan_payload.get("phases") or []:
+        telemetry.record(
+            str(phase.get("algorithmId") or "ALG-SEARCH-001"),
+            problem_class=str(phase.get("problemClass") or ""),
+            producer="dcm.algorithms.execution_plan.build_har_algorithm_execution_plan",
+            consumer=f"HarAlgorithmExecutionPlan.{phase.get('phaseId')}",
+            artifact="algorithm_execution_plan.json",
+            activated=bool(phase.get("activated", True)),
+            phase="SELECTED",
+            note="plan selection is not live execution", downstream_used=True)
 
     rows = [resolve_row(r) for r in board["rows"]]
     id_map = freeze_map(rows)
@@ -398,10 +488,12 @@ def run_dcm(
         hashes = {
             "boardHash": board.get("contentHash"),
             "harSha256": har_sha,
+            "inputBoundaryHash": input_boundary_hash,
             "schemaV1Expected": "6e78dacc19843338643bdcabc7477fd3ce2dd065da1e9629646dacc21cdb1f22",
             **constitution_run_hashes(plan_payload),
         }
         (dest / "hashes.json").write_text(json.dumps(hashes, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        persist_algorithm_telemetry(dest, telemetry)
         write_card_layer_files(
             dest,
             top25_ranked=[],
@@ -414,6 +506,7 @@ def run_dcm(
             "runId": run_id, "runState": run_state, "learningRevision": LEARNING_REVISION,
             "predictiveClaim": PREDICTIVE_CLAIM, "rawRows": len(rows), "accountOnly": True,
             "classified": counts, "boardHash": board.get("contentHash"),
+            "inputBoundaryHash": input_boundary_hash,
             "cardSize": 0, "modeledCardSize": 0, "playable": 0,
             "productionCertified": False, "notProductionRootCertified": True,
             "productionRootCertification": NOT_PRODUCTION_ROOT_CERTIFIED,
@@ -425,6 +518,13 @@ def run_dcm(
         planned = plan_research(rows, forecast_cutoff, research_shadow=research_shadow)
         (dest / "research_requests.json").write_text(
             json.dumps(planned["requests"], indent=2) + "\n", encoding="utf-8"
+        )
+        prepare_cfb_research_os(
+            dest,
+            rows,
+            planned["requests"],
+            coverage=None,
+            telemetry=telemetry,
         )
         host_plan = build_host_research_plan(
             planned["requests"],
@@ -453,7 +553,19 @@ def run_dcm(
             "calibrationStateHash": calibration_state.get("contentHash"),
             "mountStateHash": content_hash(mount),
             "schemaStateHash": content_hash(schema_root),
+            "inputBoundaryHash": input_boundary_hash,
         })
+        capability_manifest["gates"] = {
+            "softwareClosed": "PASS" if capability_manifest.get("runtime", {}).get("pytestDiscoverable") else "EXTERNAL_BLOCKED",
+            "harAccountingAccepted": "PASS",
+            "operationalAcceptedWithCurrentHar": "PARTIAL",
+            "predictiveCertified": "FAIL_PREDICTIVE_CLAIM_NONE",
+            "productionRootCertified": "FAIL",
+        }
+        capability_manifest["contentHash"] = content_hash({
+            key: value for key, value in capability_manifest.items() if key != "contentHash"
+        })
+        persist_capability_manifest(dest, capability_manifest)
         return _finalize_archive(
             dest,
             {"run_id": run_id, "dest": str(dest), "runState": run_state, "checkpoint": ck, "integrity": freeze, "board": board},
@@ -467,6 +579,16 @@ def run_dcm(
     planned = plan_research(rows, forecast_cutoff, research_shadow=research_shadow)
     requests = planned["requests"]
     (dest / "research_requests.json").write_text(json.dumps(requests, indent=2) + "\n", encoding="utf-8")
+    from dcm.research.readiness import require_research_may_begin
+
+    os_art = prepare_cfb_research_os(
+        dest,
+        rows,
+        requests,
+        coverage=None,
+        telemetry=telemetry,
+    )
+    require_research_may_begin(dest)
     if research == "file":
         provider: Any = FileProvider(evidence_dir or dest / "evidence")
     elif research == "bundle":
@@ -480,6 +602,7 @@ def run_dcm(
     written = write_bundle(dest / "evidence_bundle.jsonl", bundle["claims"])
     manifest = written.manifest({
         "harSha256": har_sha,
+        "inputBoundaryHash": input_boundary_hash,
         "boardHash": board.get("contentHash"),
         "forecastCutoff": forecast_cutoff,
         "dcmVersion": SOFTWARE,
@@ -492,6 +615,14 @@ def run_dcm(
     (dest / "evidence" / "conflicts.json").write_text(
         json.dumps(bundle.get("conflicts") or [], indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
+    )
+    prepare_cfb_research_os(
+        dest,
+        rows,
+        requests,
+        claims=bundle.get("claims") or [],
+        coverage=bundle.get("coverage"),
+        telemetry=telemetry,
     )
     host_plan = build_host_research_plan(
         requests,
@@ -609,17 +740,55 @@ def run_dcm(
     conservation_failures = 0
     unsupported = excluded = unresolved = evidence_blocked = 0
     teammate_groups = basketball_teammate_groups(rows)
+    cfb_groups = cfb_teammate_groups(rows)
     joint_world_cache: dict[tuple[str, str, int], dict[str, list[dict[str, float]]]] = {}
     joint_meta_acc: list[dict[str, Any]] = []
+    material_facts_payload = resolve_material_facts(bundle.get("claims") or [], cutoff=forecast_cutoff)
+    hold_ids = hold_playable_scope_ids(material_facts_payload)
+    fact_features = facts_to_features(material_facts_payload, cutoff=forecast_cutoff)
+    signal_registry = build_cfb_signal_registry()
+    signal_evaluations: list[dict[str, Any]] = []
+    signal_feature_records: list[dict[str, Any]] = []
+    signal_rows_executed = 0
+    signal_errors: list[dict[str, Any]] = []
+    survivor_state = SurvivorState()
+    decision_integrity_records: list[dict[str, Any]] = []
+    cfb_rules_snapshot = build_cfb_rules_snapshot(
+        as_of=forecast_cutoff,
+        # The HAR is an offer/input dataset, not official statistical
+        # settlement evidence.  Only hashed MaterialFact/source evidence may
+        # populate the statistical-authority side of this contract.
+        statistical_source_hashes=tuple(
+            sorted({str(claim.get("source_hash") or "") for claim in (bundle.get("claims") or []) if claim.get("source_hash")})
+        ),
+        platform_source_hashes=(),
+        platform_rules_verified=False,
+    )
 
     def _snapshot_for(prow: dict[str, Any]) -> dict[str, Any]:
-        return build_parameter_snapshot(
+        oid = str(prow.get("projectionId") or "")
+        cached = parameter_cache.get(oid) if oid else None
+        if cached is not None:
+            return cached
+        pid = str(prow.get("playerId") or "")
+        eid = str(prow.get("eventId") or "")
+        tid = str(prow.get("teamId") or prow.get("team") or "")
+        opp = str(prow.get("opponentId") or prow.get("opponent") or "")
+        relevant = [
+            f for f in fact_features
+            if str(f.get("scopeId") or "") in {pid, eid, tid, opp, f"env:{eid}", ""}
+        ]
+        snap = build_parameter_snapshot(
             prow,
             bundle["claims"],
             team_packets=team_packet_map,
             event_packets=event_packet_map,
             opponent_packets=opponent_packet_map,
+            fact_features=relevant or None,
         )
+        if oid:
+            parameter_cache[oid] = snap
+        return snap
 
     for row in rows:
         state, blocker = _classify(row)
@@ -632,11 +801,37 @@ def run_dcm(
             unresolved += 1; classified.append(rec); continue
 
         snapshot = _snapshot_for(row)
-        parameter_cache[str(row["projectionId"])] = snapshot
         rec["forecastCutoff"] = forecast_cutoff
         rec["playerStatus"] = snapshot.get("status")
         rec["parameterSnapshot"] = snapshot
         rec["dependencyTags"] = snapshot.get("dependency_tags") or []
+        is_cfb_guarded_row = (
+            str(row.get("sportFamily") or "") == "gridiron"
+            and str(row.get("league") or "").upper() == "CFB"
+        )
+        if is_cfb_guarded_row:
+            try:
+                signal_registry, evaluations, features = execute_cfb_signals(
+                    row, snapshot, material_facts_payload, cutoff=forecast_cutoff, registry=signal_registry,
+                )
+                serialized = [evaluation.to_dict() for evaluation in evaluations]
+                signal_evaluations.extend({"projectionId": row.get("projectionId"), **item} for item in serialized)
+                signal_feature_records.extend(features)
+                signal_rows_executed += 1
+                rec["signalRegistryHash"] = signal_registry.registry_hash
+                rec["signalEvaluationHashes"] = [str(item.get("outputHash") or "") for item in serialized]
+                rec["signalFeatureHashes"] = [str(item.get("contentHash") or content_hash(item)) for item in features]
+                snapshot["signalRegistryHash"] = signal_registry.registry_hash
+                snapshot["signalEvaluationHashes"] = rec["signalEvaluationHashes"]
+                # build_parameter_snapshot hashes the semantic snapshot before
+                # this runtime annotation; recompute without self-reference.
+                snapshot["parameter_snapshot_hash"] = content_hash({
+                    key: value for key, value in snapshot.items() if key != "parameter_snapshot_hash"
+                })
+                parameter_cache[str(row.get("projectionId") or "")] = snapshot
+            except (RuntimeError, ValueError, TypeError) as exc:
+                signal_errors.append({"projectionId": row.get("projectionId"), "error": type(exc).__name__})
+                rec["blocker"] = rec.get("blocker") or "SIGNAL_EXECUTION_FAILED"
         # Status/start hard gates apply even on synthetic/fixture runs.
         snap_blocker = snapshot.get("blocker")
         if snap_blocker in STATUS_START_HARD_BLOCKERS:
@@ -644,10 +839,6 @@ def run_dcm(
         start_blk = started_event_blocker(row, forecast_cutoff)
         if start_blk:
             rec["blocker"] = rec.get("blocker") or start_blk
-        is_cfb_guarded_row = (
-            str(row.get("sportFamily") or "") == "gridiron"
-            and str(row.get("league") or "").upper() == "CFB"
-        )
         minimum_model_support = bool(snapshot.get("minimum_model_support", snapshot.get("production_eligible")))
         if is_cfb_guarded_row and not minimum_model_support:
             rec["state"] = "HELD_FOR_RESEARCH"
@@ -656,6 +847,8 @@ def run_dcm(
             rec["blocker"] = rec.get("blocker") or (blockers[0] if blockers else snapshot.get("blocker") or "MINIMUM_MODEL_SUPPORT_MISSING")
             rec["productionSelectable"] = False
             evidence_blocked += 1
+            survivor_state.reject(str(row.get("projectionId") or ""), str(rec.get("blocker") or "MINIMUM_MODEL_SUPPORT_MISSING"))
+            rec["survivorStateAccepted"] = False
             classified.append(rec)
             continue
 
@@ -676,21 +869,34 @@ def run_dcm(
                         ctx_key[0], ctx_key[1], n=gov.max_worlds, seed=har_sha
                     )
                 group_key = (str(row.get("eventId") or ""), str(row.get("teamId") or ""))
-                group = teammate_groups.get(group_key) or {}
-                use_joint = str(row.get("sportFamily") or "") == "basketball" and len(group) >= 2
-                if use_joint:
+                family = str(row.get("sportFamily") or "")
+                league = str(row.get("league") or "").upper()
+                group = (cfb_groups if family == "gridiron" and league == "CFB" else teammate_groups).get(group_key) or {}
+                use_joint_bball = family == "basketball" and len(group) >= 2
+                use_joint_cfb = family == "gridiron" and league == "CFB" and bool(str(row.get("eventId") or ""))
+                if use_joint_cfb:
+                    group = group or {str(row.get("playerId") or ""): row}
+                if use_joint_bball or use_joint_cfb:
                     jkey = (group_key[0], group_key[1], gov.max_worlds)
                     if jkey not in joint_world_cache:
                         specs = []
                         for _pid, prow in group.items():
                             psnap = _snapshot_for(prow)
                             specs.append({"row": prow, "snapshot": psnap})
-                        joint = simulate_joint_team_worlds(
-                            specs,
-                            n=gov.max_worlds,
-                            seed=har_sha,
-                            event_contexts=event_context_cache[ctx_key],
-                        )
+                        if use_joint_cfb:
+                            joint = simulate_joint_cfb_event_worlds(
+                                specs,
+                                n=gov.max_worlds,
+                                seed=har_sha,
+                                event_contexts=event_context_cache[ctx_key],
+                            )
+                        else:
+                            joint = simulate_joint_team_worlds(
+                                specs,
+                                n=gov.max_worlds,
+                                seed=har_sha,
+                                event_contexts=event_context_cache[ctx_key],
+                            )
                         joint_world_cache[jkey] = joint["worlds"]
                         joint_meta_acc.append(joint["meta"])
                     pid = str(row["playerId"])
@@ -748,21 +954,34 @@ def run_dcm(
                     seed=har_sha,
                 )
             group_key = (str(row.get("eventId") or ""), str(row.get("teamId") or ""))
-            group = teammate_groups.get(group_key) or {}
-            use_joint = str(row.get("sportFamily") or "") == "basketball" and len(group) >= 2
-            if use_joint:
+            family = str(row.get("sportFamily") or "")
+            league = str(row.get("league") or "").upper()
+            group = (cfb_groups if family == "gridiron" and league == "CFB" else teammate_groups).get(group_key) or {}
+            use_joint_bball = family == "basketball" and len(group) >= 2
+            use_joint_cfb = family == "gridiron" and league == "CFB" and bool(str(row.get("eventId") or ""))
+            if use_joint_cfb:
+                group = group or {str(row.get("playerId") or ""): row}
+            if use_joint_bball or use_joint_cfb:
                 jkey = (group_key[0], group_key[1], target_worlds)
                 if jkey not in joint_world_cache:
                     specs = []
                     for _pid, prow in group.items():
                         psnap = _snapshot_for(prow)
                         specs.append({"row": prow, "snapshot": psnap})
-                    joint = simulate_joint_team_worlds(
-                        specs,
-                        n=target_worlds,
-                        seed=har_sha,
-                        event_contexts=event_context_cache[adaptive_ctx_key],
-                    )
+                    if use_joint_cfb:
+                        joint = simulate_joint_cfb_event_worlds(
+                            specs,
+                            n=target_worlds,
+                            seed=har_sha,
+                            event_contexts=event_context_cache[adaptive_ctx_key],
+                        )
+                    else:
+                        joint = simulate_joint_team_worlds(
+                            specs,
+                            n=target_worlds,
+                            seed=har_sha,
+                            event_contexts=event_context_cache[adaptive_ctx_key],
+                        )
                     joint_world_cache[jkey] = joint["worlds"]
                     joint_meta_acc.append(joint["meta"])
                 world_cache[key] = joint_world_cache[jkey][str(row["playerId"])]
@@ -831,6 +1050,21 @@ def run_dcm(
         forced = row.get("side") if row.get("side") in evaluations else None
         chosen_side = forced or max(evaluations, key=lambda x: (evaluations[x]["evidenceSafeP"], evaluations[x]["lowerBound"]))
         ev = evaluations[chosen_side]
+        decision_audit = inverse_consistency_audit(row, evaluations, chosen_side)
+        probability_diagnostic = probability_sanity_diagnostic(
+            p_higher=dist.get("pHigher"), p_lower=dist.get("pLower"), p_push=dist.get("pPush"),
+        )
+        decision_integrity_records.append({
+            "projectionId": row.get("projectionId"),
+            "inverseConsistency": decision_audit,
+            "probabilitySanity": probability_diagnostic,
+        })
+        if not decision_audit.get("valid") or not probability_diagnostic.get("valid"):
+            reasons = list(decision_audit.get("blockers") or []) + list(probability_diagnostic.get("blockers") or [])
+            rec["blocker"] = rec.get("blocker") or "DECISION_INTEGRITY_FAILED"
+            rec["decisionIntegrityBlockers"] = sorted(set(reasons))
+            production_selectable = False
+            survivor_state.reject(str(row.get("projectionId") or ""), "DECISION_INTEGRITY_FAILED", *reasons)
         selected_line = float(row["line"])
         if chosen_side == "MORE":
             selection_outcomes = bytes(
@@ -862,6 +1096,8 @@ def run_dcm(
             "aleatoricUncertainty": ev["aleatoricUncertainty"], "monteCarloSE": ev["monteCarloSE"],
             "calibrationState": ev["calibrationState"], "parameterSnapshotHash": snapshot["parameter_snapshot_hash"],
             "evidenceHashes": snapshot["evidence_hashes"], "dependencyTags": snapshot["dependency_tags"],
+            "decisionIntegrity": decision_audit,
+            "probabilityDiagnostic": probability_diagnostic,
             "productionSelectable": production_selectable,
             "modeledPlayable": (not diagnostic_model) and is_modeled_playable(
                 {
@@ -880,20 +1116,77 @@ def run_dcm(
             "researchOnly": blocker in {"RESEARCH_ONLY_NOT_SELECTABLE", "SHADOW_SUPPORTED_NOT_SELECTABLE"},
             "worldCount": len(values),
             "_selectionOutcomes": selection_outcomes,
+            "_worldValues": list(values),
         })
+        rec = apply_hold_playable(rec, hold_ids)
         gate = status_start_hard_blocker(
             rec, cutoff=forecast_cutoff, snapshot=snapshot,
         )
         if gate:
             rec["blocker"] = rec.get("blocker") or gate
             rec["modeledPlayable"] = False
+        if rec.get("blocker"):
+            survivor_state.reject(str(row.get("projectionId") or ""), str(rec.get("blocker")))
+        rec["survivorStateAccepted"] = survivor_state.accept(str(row.get("projectionId") or ""))
         modeled.append(rec)
         classified.append(rec)
 
     (dest / "parameters").mkdir(exist_ok=True)
     (dest / "parameters" / "snapshots.json").write_text(
-        json.dumps(parameter_cache, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+        json.dumps(parameter_cache, sort_keys=True) + "\n", encoding="utf-8"
     )
+    signal_registry_payload = {
+            "schema": "pillars_dcm.signal_registry_runtime.v1",
+            "registryHash": signal_registry.registry_hash,
+            "executionOrder": list(signal_registry.execution_order),
+            "operators": [item.to_dict() for item in signal_registry.operators],
+    }
+    signal_registry_payload["contentHash"] = content_hash(signal_registry_payload)
+    (dest / "signal_registry.json").write_text(
+        json.dumps(signal_registry_payload, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    (dest / "signal_evaluations.jsonl").write_text(
+        "".join(json.dumps(item, sort_keys=True) + "\n" for item in signal_evaluations),
+        encoding="utf-8",
+    )
+    for item in signal_feature_records:
+        item.setdefault("contentHash", content_hash({k: v for k, v in item.items() if k != "contentHash"}))
+    (dest / "signal_features.jsonl").write_text(
+        "".join(json.dumps(item, sort_keys=True) + "\n" for item in signal_feature_records),
+        encoding="utf-8",
+    )
+    merge_feature_records(dest, signal_feature_records)
+    signal_runtime_payload = {
+        "schema": "pillars_dcm.signal_runtime.v1",
+        "registryHash": signal_registry.registry_hash,
+        "rowsExecuted": signal_rows_executed,
+        "evaluationCount": len(signal_evaluations),
+        "featureCount": len(signal_feature_records),
+        "errors": signal_errors,
+        "consumers": [
+            "dcm.ml.feature_store.signal_evaluation_feature_records",
+            "dcm.audit.trace.signal_evaluations",
+        ],
+        "probabilityMutation": False,
+        "hardGateOverride": False,
+    }
+    signal_runtime_payload["contentHash"] = content_hash(signal_runtime_payload)
+    (dest / "signal_runtime.json").write_text(
+        json.dumps(signal_runtime_payload, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    (dest / "cfb_rules_snapshot.json").write_text(
+        json.dumps(cfb_rules_snapshot, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    (dest / "decision_integrity.json").write_text(json.dumps({
+        "schema": "pillars_dcm.decision_integrity_runtime.v1",
+        "records": decision_integrity_records,
+        "survivorState": survivor_state.snapshot(),
+        "rejectedCount": len(survivor_state.rejected),
+        "contentHash": content_hash({
+            "records": decision_integrity_records,
+            "survivorState": survivor_state.snapshot(),
+        }),
+    }, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
     n_worlds = dag.add("EVENT_WORLDS", "board", parents=[n_res.key])
     dag.complete(n_worlds.key, content_hash({"events": len({k[0] for k in world_cache}), "n": N_WORLDS}))
@@ -914,13 +1207,210 @@ def run_dcm(
         conservation_failures += 1
     stages_done.add("MODEL")
 
+    if any(
+        ((s.get("role_epoch") or {}).get("governedChangePoints") or {}).get("executed")
+        for s in parameter_cache.values()
+    ):
+        telemetry.record("ALG-ML-TIME-001", problem_class="EWMA", producer="dcm.algorithms.ml_families.ewma", consumer="dcm.research.role_epoch.governed_change_points", artifact="parameters/snapshots.json", phase="EXECUTED", downstream_used=True)
+        telemetry.record("ALG-ML-TIME-002", problem_class="CUSUM", producer="dcm.algorithms.ml_families.cusum", consumer="dcm.research.role_epoch.governed_change_points", artifact="parameters/snapshots.json", phase="EXECUTED", downstream_used=True)
+        telemetry.record("ALG-ML-TIME-003", problem_class="PAGE_HINKLEY", producer="dcm.algorithms.ml_families.page_hinkley", consumer="dcm.research.role_epoch.governed_change_points", artifact="parameters/snapshots.json", phase="EXECUTED", downstream_used=True)
+
+    ranked_t = StageTimer("RANK")
     ranked = rank_candidates(modeled, top_k=25, seed=har_sha)
-    # Strict card is PLAYABLE-grade modeled rows. Production root is a later layer.
-    # Final pre-freeze status/start strip: late OUT / UNCERTAIN / started cannot
-    # land on qualified / strict_card even if grade is PLAYABLE.
+    telemetry.record("ALG-SORT-001", problem_class="FINAL_RANK", producer="dcm.model.ranking.rank_candidates", consumer="dcm.runner.run_dcm", artifact="top100.json", phase="EXECUTED", downstream_used=True)
+    telemetry.record("ALG-SORT-003", problem_class="TOPK_PARTIAL", producer="dcm.model.ranking.rank_candidates", consumer="dcm.runner.run_dcm", artifact="top25_qualified.json", phase="EXECUTED", downstream_used=True)
+    started_events = {
+        str(p.get("row", p).get("eventId") or "")
+        for p in modeled
+        if str((p.get("row") or p).get("gameStatus") or "").upper() in {"STARTED", "LIVE", "IN_PROGRESS"}
+    }
+
+    def _resimulate_material(rec: dict[str, Any]) -> list[float] | None:
+        # Deprecated: material rebuild happens below via snapshots + joint worlds.
+        return None
+
+    snapshot_hash_before = content_hash(sorted(str(s.get("parameter_snapshot_hash") or "") for s in parameter_cache.values()))
+    world_hash_before = content_hash(sorted(str(k) for k in world_cache))
+    feature_hash_before = content_hash([str(f.get("contentHash") or "") for f in fact_features])
+    material_fact_hash_before = str(material_facts_payload.get("contentHash") or "")
+
+    refresh = apply_final_refresh(
+        ranked,
+        claims=bundle.get("claims") or [],
+        facts=material_facts_payload,
+        cutoff=forecast_cutoff,
+        started_events=started_events,
+        grade_fn=grade_of,
+    )
+    _write_refresh = dest / "cfb_final_refresh.json"
+    ranked = refresh["modeled"]
+    rebuild_players = set(refresh["report"].get("rebuildPlayerIds") or [])
+    rebuild_events = set(refresh["report"].get("rebuildEventIds") or [])
+    rebuild_teams = set(refresh["report"].get("rebuildTeamIds") or [])
+    worlds_rebuilt = 0
+    if rebuild_players or rebuild_events or rebuild_teams:
+        material_facts_payload = resolve_material_facts(bundle.get("claims") or [], cutoff=forecast_cutoff)
+        fact_features = facts_to_features(material_facts_payload, cutoff=forecast_cutoff)
+        hold_ids = hold_playable_scope_ids(material_facts_payload)
+        affected: list[dict[str, Any]] = []
+        for rec in ranked:
+            row = rec.get("row") if isinstance(rec.get("row"), dict) else {}
+            pid = str(row.get("playerId") or "")
+            eid = str(row.get("eventId") or "")
+            tid = str(row.get("teamId") or row.get("team") or "")
+            if pid in rebuild_players or eid in rebuild_events or tid in rebuild_teams:
+                affected.append(rec)
+        # Invalidate joint worlds for affected events/teams.
+        for jkey in list(joint_world_cache):
+            if jkey[0] in rebuild_events or jkey[1] in rebuild_teams:
+                joint_world_cache.pop(jkey, None)
+        for rec in affected:
+            row = dict(rec.get("row") or {})
+            oid = str(row.get("projectionId") or "")
+            if oid:
+                parameter_cache.pop(oid, None)
+            snap = _snapshot_for(row)
+            rec["parameterSnapshot"] = snap
+            rec["parameterSnapshotHash"] = snap.get("parameter_snapshot_hash")
+        for rec in affected:
+            row = rec.get("row") if isinstance(rec.get("row"), dict) else {}
+            family = str(row.get("sportFamily") or "")
+            league = str(row.get("league") or "").upper()
+            n = len(rec.get("_worldValues") or []) or int(gov.max_worlds)
+            ctx_key = (family, str(row.get("eventId") or ""), n)
+            if ctx_key not in event_context_cache:
+                event_context_cache[ctx_key] = generate_event_contexts(
+                    ctx_key[0], ctx_key[1], n=n, seed=har_sha
+                )
+            group_key = (str(row.get("eventId") or ""), str(row.get("teamId") or ""))
+            group = (cfb_groups if family == "gridiron" and league == "CFB" else teammate_groups).get(group_key) or {}
+            use_joint_cfb = family == "gridiron" and league == "CFB" and bool(str(row.get("eventId") or ""))
+            if use_joint_cfb:
+                group = group or {str(row.get("playerId") or ""): row}
+                jkey = (group_key[0], group_key[1], n)
+                if jkey not in joint_world_cache:
+                    specs = []
+                    for _pid, prow in group.items():
+                        psnap = parameter_cache.get(str(prow.get("projectionId") or "")) or _snapshot_for(prow)
+                        specs.append({"row": prow, "snapshot": psnap})
+                    if rec not in specs and row:
+                        specs.append({"row": row, "snapshot": rec.get("parameterSnapshot") or _snapshot_for(row)})
+                    # Dedup by playerId
+                    seen_p = set()
+                    uniq = []
+                    for spec in specs:
+                        spid = str((spec.get("row") or {}).get("playerId") or "")
+                        if not spid or spid in seen_p:
+                            continue
+                        seen_p.add(spid)
+                        uniq.append(spec)
+                    joint = simulate_joint_cfb_event_worlds(
+                        uniq,
+                        n=n,
+                        seed=har_sha,
+                        event_contexts=event_context_cache[ctx_key],
+                    )
+                    joint_world_cache[jkey] = joint["worlds"]
+                    joint_meta_acc.append(joint["meta"])
+                pid = str(row.get("playerId") or "")
+                worlds = (joint_world_cache.get(jkey) or {}).get(pid) or []
+            else:
+                worlds = simulate_player_worlds(
+                    row,
+                    n=n,
+                    seed=har_sha,
+                    parameter_snapshot=rec.get("parameterSnapshot"),
+                    event_contexts=event_context_cache[ctx_key],
+                )
+            rec["_worldValues"] = [
+                value_from_stats(str(row.get("market") or ""), w, board_id=str(row.get("boardId") or "FULL_GAME"))
+                for w in worlds
+            ]
+            rec = recompute_full_bundle(rec, grade_fn=grade_of, calibration_cells=calibration_cells)
+            worlds_rebuilt += 1
+            # write back into ranked
+            oid = str(row.get("projectionId") or "")
+            for i, existing in enumerate(ranked):
+                if str((existing.get("row") or {}).get("projectionId") or "") == oid:
+                    ranked[i] = rec
+                    break
+        ranked = rank_candidates(ranked, top_k=25, seed=har_sha)
+        refresh["report"]["worldsRebuilt"] = worlds_rebuilt
+        refresh["report"]["rerankedAfterRefresh"] = True
+        refresh["report"]["contentHash"] = content_hash({k: v for k, v in refresh["report"].items() if k != "contentHash"})
+    rank_perf = ranked_t.finish(OutputRows=len(ranked))
+    (dest / "performance" / "rank.json").write_text(json.dumps(rank_perf, indent=2) + "\n", encoding="utf-8")
+    _write_refresh.write_text(json.dumps(refresh["report"], indent=2, sort_keys=True) + "\n", encoding="utf-8")
     qualified = apply_pre_freeze_status_start_gates(ranked, cutoff=forecast_cutoff)
     card = build_card(qualified)
     exposure = exposure_report(card)
+    remaining_actions = 0
+    action_doc = None
+    schedule_doc = None
+    try:
+        action_doc = json.loads((dest / "acquisition_actions.json").read_text())
+        schedule_doc = json.loads((dest / "acquisition_schedule.json").read_text())
+        selected = list((schedule_doc or {}).get("selectedActionIds") or [])
+        complete_req = set()
+        cov = bundle.get("coverage") or {}
+        for row in cov.get("requests") or []:
+            if isinstance(row, dict) and row.get("complete"):
+                complete_req.add(str(row.get("requestId") or row.get("request_id") or ""))
+        actions_by_id = {str(a.get("actionId")): a for a in (action_doc or {}).get("actions") or [] if isinstance(a, dict)}
+        unresolved_selected = 0
+        for aid in selected:
+            act = actions_by_id.get(str(aid)) or {}
+            reqs = [str(r) for r in (act.get("requirementIds") or [])]
+            if not reqs or any(r not in complete_req for r in reqs):
+                unresolved_selected += 1
+        remaining_actions = unresolved_selected
+    except Exception:
+        remaining_actions = 0
+    coverage_incomplete = not bool((bundle.get("coverage") or {}).get("complete"))
+    host_required = str(research) == "file" and coverage_incomplete
+    snapshot_hash_after = content_hash(sorted(str(s.get("parameter_snapshot_hash") or "") for s in parameter_cache.values()))
+    world_hash_after = content_hash(sorted(str(k) for k in world_cache) + sorted(str(k) for k in joint_world_cache))
+    feature_hash_after = content_hash([str(f.get("contentHash") or "") for f in fact_features])
+    material_fact_hash_after = str(material_facts_payload.get("contentHash") or "")
+    probability_hash_before = snapshot_hash_before
+    probability_hash_after = content_hash([
+        {"id": (p.get("row") or {}).get("projectionId"), "p": p.get("evidenceSafeP"), "side": p.get("selectedSide")}
+        for p in ranked[:25]
+    ])
+    ranking_hash_after = content_hash([str((p.get("row") or {}).get("projectionId") or "") for p in ranked[:25]])
+    cfb_forecast = emit_cfb_forecast_artifacts(
+        dest,
+        modeled=ranked,
+        qualified=qualified,
+        classified=classified,
+        telemetry=telemetry,
+        unresolved_actions=remaining_actions,
+        evidence_imported=bool(bundle.get("claims")),
+        material_facts=material_facts_payload,
+        actions=action_doc,
+        host_required=host_required,
+        snapshot_hash_before=snapshot_hash_before,
+        snapshot_hash_after=snapshot_hash_after,
+        world_hash_before=world_hash_before,
+        world_hash_after=world_hash_after,
+        feature_hash_before=feature_hash_before,
+        feature_hash_after=feature_hash_after,
+        material_fact_hash_before=material_fact_hash_before,
+        material_fact_hash_after=material_fact_hash_after,
+        probability_hash_before=probability_hash_before,
+        probability_hash_after=probability_hash_after,
+        ranking_hash_before=None,
+        ranking_hash_after=ranking_hash_after,
+    )
+    prepare_cfb_research_os(
+        dest,
+        rows,
+        requests,
+        claims=bundle.get("claims") or [],
+        coverage=bundle.get("coverage"),
+        telemetry=telemetry,
+        frontier_offer_ids_set=set(cfb_forecast.get("frontierOfferIds") or []),
+    )
     n_rank = dag.add("RANK", "board", parents=[n_worlds.key])
     dag.complete(n_rank.key, content_hash([p["row"]["projectionId"] for p in ranked[:25]]))
     n_port = dag.add("PORTFOLIO", "board", parents=[n_rank.key])
@@ -952,6 +1442,12 @@ def run_dcm(
             "posteriorRegret": p.get("posteriorRegret"),
             "trueLineTolerance": surf.get("true_unclamped_line_tolerance"),
             "sideEvaluations": p.get("sideEvaluations"), "dependencyTags": p.get("dependencyTags"),
+            "signalRegistryHash": p.get("signalRegistryHash"),
+            "signalEvaluationHashes": p.get("signalEvaluationHashes"),
+            "signalFeatureHashes": p.get("signalFeatureHashes"),
+            "decisionIntegrity": p.get("decisionIntegrity"),
+            "probabilityDiagnostic": p.get("probabilityDiagnostic"),
+            "survivorStateAccepted": p.get("survivorStateAccepted"),
             "projectionId": r.get("projectionId"),
             "median": p.get("median"),
         }
@@ -1015,6 +1511,26 @@ def run_dcm(
         selections=strict_card,
         run_id=str(run_id),
         forecast_cutoff=str(forecast_cutoff),
+        runtime_context={
+            "codeVersion": SOFTWARE,
+            "harSha256": har_sha,
+            "inputHashes": [har_sha, str((bundle.get("contentHash") or ""))],
+            "authority": "CFB_STATISTICAL_LEDGER_AND_PLATFORM_RULES_SEPARATED",
+            "acquisitionMethod": bundle.get("evidence_mode") or "fixture_or_file",
+            "rows": rows,
+            "requests": requests,
+            "acquiredRequestIds": [
+                str(claim.get("request_id") or "")
+                for claim in (bundle.get("claims") or [])
+                if claim.get("request_id")
+            ],
+            "materialFacts": material_facts_payload,
+            "signalEvaluations": signal_evaluations,
+            "freezeState": "PREPARED",
+            "forecastFrozen": False,
+            "portfolioHash": content_hash(strict_card),
+            "portfolioEligibilityState": "RESEARCHED_MODELED",
+        },
     )
     graph_path.write_text(json.dumps(evidence_graph, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     explain_src: list[dict[str, Any]] = []
@@ -1071,6 +1587,7 @@ def run_dcm(
         research_complete=bool(bundle.get("complete")),
     )
 
+    freeze_t = StageTimer("FREEZE")
     freeze = {
         "runId": run_id,
         "dcmVersion": SOFTWARE,
@@ -1082,6 +1599,8 @@ def run_dcm(
         "productionOperable": global_selection_gate,
         "selectionAllowed": global_selection_gate,
         "softwareE2eComplete": True,
+        "forecastFrozen": False,
+        "freezeState": "PREPARED",
         "v5Decoder": mount.get("har_decoder"),
         "v5MountState": mount.get("state"),
         "schemaId": SCHEMA,
@@ -1091,6 +1610,7 @@ def run_dcm(
         "modelConfigHash": config_hash,
         "calibrationStateHash": calibration_state.get("contentHash"),
         "harSha256": har_sha,
+        "inputBoundaryHash": input_boundary_hash,
         "forecastCutoff": forecast_cutoff,
         "boardHash": board["contentHash"],
         "rawRows": len(rows),
@@ -1118,9 +1638,18 @@ def run_dcm(
         "evidenceBlocked": evidence_blocked,
         "portfolioExposure": exposure,
         "top25QualifiedCount": len(top25_qualified),
+        "cfbTop100Count": int((cfb_forecast.get("top100") or {}).get("count") or 0),
+        "cfbTop25Count": int((cfb_forecast.get("top25") or {}).get("count") or 0),
+        "cfbPlayablesCount": int((cfb_forecast.get("playables") or {}).get("count") or 0),
         "software": SOFTWARE,
         "gitCommit": git_commit,
         "featureStoreHash": feature_store_hash,
+        "signalRegistryHash": signal_registry.registry_hash,
+        "signalRuntimeHash": signal_runtime_payload.get("contentHash"),
+        "decisionIntegrityHash": content_hash(decision_integrity_records),
+        "survivorStateHash": survivor_state.snapshot().get("contentHash"),
+        "cfbRulesSnapshotHash": cfb_rules_snapshot.get("contentHash"),
+        "cfbRulesProductionEligible": bool(cfb_rules_snapshot.get("productionEligible")),
         "evidenceGraphHash": evidence_graph.get("contentHash"),
         "parameterSnapshotHashes": parameter_snapshot_hashes,
         "forecastDecisionCutoff": forecast_cutoff,
@@ -1140,7 +1669,13 @@ def run_dcm(
         "gitCommit": git_commit,
         "schemaHash": freeze["schemaHash"],
         "featureStoreHash": feature_store_hash,
+        "signalRegistryHash": signal_registry.registry_hash,
+        "signalRuntimeHash": freeze["signalRuntimeHash"],
+        "decisionIntegrityHash": freeze["decisionIntegrityHash"],
+        "survivorStateHash": freeze["survivorStateHash"],
+        "cfbRulesSnapshotHash": freeze["cfbRulesSnapshotHash"],
         "harSha256": har_sha,
+        "inputBoundaryHash": input_boundary_hash,
         "boardHash": board["contentHash"],
         "evidenceGraphHash": evidence_graph.get("contentHash"),
         "parameterSnapshotHashes": parameter_snapshot_hashes,
@@ -1150,6 +1685,13 @@ def run_dcm(
         "top25Hash": freeze["top25Hash"],
         "cardHash": freeze["cardHash"],
         "explanationsHash": explanations_hash,
+        "frontierStopReason": freeze.get("frontierStopReason"),
+        "frontierPassCount": freeze.get("frontierPassCount"),
+        "finalRefreshHash": freeze.get("finalRefreshHash"),
+        "finalRankingHash": freeze.get("finalRankingHash"),
+        "forecastFrozen": freeze.get("forecastFrozen"),
+        "freezeState": freeze.get("freezeState"),
+        "frontierCheckpointHash": freeze.get("frontierCheckpointHash"),
     }
     readiness = build_readiness(
         mount=mount,
@@ -1169,10 +1711,15 @@ def run_dcm(
     freeze["productionSelectionReady"] = readiness["productionSelectionReady"]
     freeze["systemCertified"] = readiness["systemCertified"]
     freeze["predictiveValidationEarned"] = readiness["predictiveValidationEarned"]
+    cfb_board_present = any(
+        str(item.get("sportFamily") or "") == "gridiron"
+        and str(item.get("league") or "").upper() == "CFB"
+        for item in rows
+    )
     root_accepted = production_root_accepted(
         global_selection_gate=global_selection_gate,
         production_selection_ready=bool(readiness["productionSelectionReady"]),
-    )
+    ) and (not cfb_board_present or bool(cfb_rules_snapshot.get("productionEligible")))
     production_certified = production_certified_rows(strict_card, root_accepted=root_accepted)
     directional_passes = build_directional_passes(ranked, strict_card)
     write_card_layer_files(
@@ -1188,6 +1735,8 @@ def run_dcm(
         "PRODUCTION_ROOT_CERTIFIED" if root_accepted else NOT_PRODUCTION_ROOT_CERTIFIED
     )
     freeze["productionCertifiedCardSize"] = len(production_certified)
+    freeze["platformSettlementRulesVerified"] = bool(cfb_rules_snapshot.get("productionEligible"))
+    freeze["productionRootBlockers"] = list(cfb_rules_snapshot.get("blockers") or []) if cfb_board_present else []
     freeze["executionMode"] = "PRODUCTION" if root_accepted else "RESEARCHED_MODELED"
     run_state = layer_run_state(
         root_accepted=root_accepted,
@@ -1196,31 +1745,151 @@ def run_dcm(
         unsupported=unsupported,
     )
     freeze["runState"] = run_state
+    top25_doc = cfb_forecast.get("top25") or {}
+    loop_doc = cfb_forecast.get("frontierLoop") or {}
+    frontier_final = bool(top25_doc.get("final"))
+    stop_reason = str(loop_doc.get("stopReason") or "")
+    # Bundle completeness is the request-level terminal condition. Field-level
+    # coverage remains an audit/readiness signal and may be incomplete for a
+    # structurally complete diagnostic bundle; missing/malformed requests do not.
+    research_terminal = research == "fixture" or bool(bundle.get("complete"))
+    can_freeze = frontier_final and research_terminal and stop_reason != "EXTERNAL_HOST_REQUIRED"
+    freeze["top25Final"] = frontier_final
+    freeze["frontierStopReason"] = stop_reason
+    freeze["frontierPassCount"] = int(loop_doc.get("frontierPassCount") or 0)
+    freeze["finalRefreshHash"] = (refresh.get("report") or {}).get("contentHash")
+    freeze["finalRankingHash"] = content_hash([str((p.get("row") or {}).get("projectionId") or "") for p in ranked[:25]])
+    freeze["frontierPassStateHash"] = ((cfb_forecast.get("passState") or {}).get("contentHash"))
+    if not can_freeze:
+        freeze["forecastFrozen"] = False
+        freeze["freezeState"] = "FRONTIER_INTERIM"
+        freeze["runState"] = "AWAITING_FRONTIER_RESEARCH"
+        freeze["note"] = "Interim frontier; not a frozen forecast. Host must acquire remaining frontier actions."
+        for stale_path in (dest / "frozen_forecast.json", dest / "frozen_forecast.sha256"):
+            stale_path.unlink(missing_ok=True)
+    else:
+        freeze["forecastFrozen"] = True
+        freeze["freezeState"] = "FROZEN"
+        (dest / "frontier_checkpoint.json").unlink(missing_ok=True)
+    freeze["freezeBinds"] = {
+        **(freeze.get("freezeBinds") or {}),
+        "frontierStopReason": freeze.get("frontierStopReason"),
+        "frontierPassCount": freeze.get("frontierPassCount"),
+        "finalRefreshHash": freeze.get("finalRefreshHash"),
+        "finalRankingHash": freeze.get("finalRankingHash"),
+        "forecastFrozen": freeze.get("forecastFrozen"),
+        "top25Final": freeze.get("top25Final"),
+        "freezeState": freeze.get("freezeState"),
+        "frontierCheckpointHash": freeze.get("frontierCheckpointHash"),
+    }
     if empty_card_reason:
         freeze["emptyCardReason"] = empty_card_reason
     if not root_accepted:
         freeze["productionEmptyCardReason"] = EMPTY_ROOT_NOT_CERTIFIED
-    freeze["frozenForecastHash"] = compute_forecast_hash(
-        freeze,
-        full_population,
-        strict_card,
-        top25_ranked,
-    )
-    n_fz = dag.add("FREEZE", "board", parents=[n_port.key])
-    dag.complete(n_fz.key, freeze["frozenForecastHash"])
+    freeze["freezeBinds"]["frontierCheckpointHash"] = None
+    frontier_checkpoint_hash = None
+    if can_freeze:
+        freeze["frozenForecastHash"] = compute_forecast_hash(freeze, full_population, strict_card, top25_ranked)
+        n_fz = dag.add("FREEZE", "board", parents=[n_port.key])
+        dag.complete(n_fz.key, freeze["frozenForecastHash"])
+    else:
+        frontier_checkpoint = {
+            "schema": "pillars_dcm.frontier_checkpoint.v1",
+            "runId": run_id,
+            "freezeState": freeze.get("freezeState"),
+            "top25Final": False,
+            "forecastFrozen": False,
+            "frontierPassStateHash": freeze.get("frontierPassStateHash"),
+            "top25Hash": freeze.get("top25Hash"),
+            "nextDeterministicAction": "acquire_frontier_research_and_resume",
+        }
+        frontier_checkpoint["contentHash"] = content_hash(frontier_checkpoint)
+        frontier_checkpoint_hash = frontier_checkpoint["contentHash"]
+        freeze["frontierCheckpointHash"] = frontier_checkpoint_hash
+        freeze["freezeBinds"]["frontierCheckpointHash"] = frontier_checkpoint_hash
+        freeze.pop("frozenForecastHash", None)
+        (dest / "frontier_checkpoint.json").write_text(json.dumps(frontier_checkpoint, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        n_fz = dag.add("FRONTIER_CHECKPOINT", "board", parents=[n_port.key])
+        dag.complete(n_fz.key, frontier_checkpoint_hash)
     freeze["dag"] = dag.snapshot()
-    (dest / "frozen_forecast.json").write_text(json.dumps(freeze, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    if can_freeze:
+        (dest / "frozen_forecast.json").write_text(json.dumps(freeze, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     (dest / "freeze.json").write_text(json.dumps(freeze, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    (dest / "frozen_forecast.sha256").write_text(freeze["frozenForecastHash"] + "\n", encoding="utf-8")
+    freeze_perf = freeze_t.finish(OutputRows=len(card), Frozen=bool(freeze.get("forecastFrozen")))
+    (dest / "performance" / "freeze.json").write_text(json.dumps(freeze_perf, indent=2) + "\n", encoding="utf-8")
+    stage_rows = []
+    for rec in ((har_perf if "har_perf" in locals() else None), research_perf, model_perf, rank_perf, freeze_perf):
+        if isinstance(rec, dict):
+            stage_rows.append(rec)
+    stages_payload = {
+        "schema": "pillars_dcm.stage_telemetry.v1",
+        "stages": stage_rows,
+        "hostPerformanceCertified": False,
+    }
+    (dest / "performance" / "stages.json").write_text(json.dumps(stages_payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    if can_freeze:
+        (dest / "frozen_forecast.sha256").write_text(freeze["frozenForecastHash"] + "\n", encoding="utf-8")
     (dest / "population_full.jsonl").write_text("".join(json.dumps(p) + "\n" for p in full_population), encoding="utf-8")
     (dest / "accounting.json").write_text(json.dumps({**(board.get("accounting") or {}), "states": states_count, "playable": len(qualified), "cardSize": len(card)}, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    (dest / "hashes.json").write_text(json.dumps({"boardHash": board.get("contentHash"), "harSha256": har_sha, "frozenForecastHash": freeze["frozenForecastHash"], "evidenceGraphHash": evidence_graph.get("contentHash"), "featureStoreHash": feature_store_hash, "explanationsHash": explanations_hash, "gitCommit": git_commit, "checkpointPending": False, "schemaV1Expected": "6e78dacc19843338643bdcabc7477fd3ce2dd065da1e9629646dacc21cdb1f22", "schemaV2": (schema_root.get("v2") or {}), **constitution_run_hashes(plan_payload)}, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    hashes_payload = {
+        "boardHash": board.get("contentHash"),
+        "harSha256": har_sha,
+        "evidenceGraphHash": evidence_graph.get("contentHash"),
+        "featureStoreHash": feature_store_hash,
+        "signalRegistryHash": signal_registry.registry_hash,
+        "signalRuntimeHash": freeze["signalRuntimeHash"],
+        "decisionIntegrityHash": freeze["decisionIntegrityHash"],
+        "survivorStateHash": freeze["survivorStateHash"],
+        "cfbRulesSnapshotHash": freeze["cfbRulesSnapshotHash"],
+        "explanationsHash": explanations_hash,
+        "gitCommit": git_commit,
+        "checkpointPending": not can_freeze,
+        "schemaV1Expected": "6e78dacc19843338643bdcabc7477fd3ce2dd065da1e9629646dacc21cdb1f22",
+        "inputBoundaryHash": input_boundary_hash,
+        "schemaV2": (schema_root.get("v2") or {}),
+        **constitution_run_hashes(plan_payload),
+    }
+    if can_freeze:
+        hashes_payload["frozenForecastHash"] = freeze["frozenForecastHash"]
+    else:
+        hashes_payload["frontierCheckpointHash"] = frontier_checkpoint_hash
+    (dest / "hashes.json").write_text(json.dumps(hashes_payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    persist_algorithm_telemetry(dest, telemetry)
+    from dcm.algorithms.indexing import merkle_root
+    from dcm.runtime.archive_receipt import archive_reconcile, archive_retry, build_archive_receipt, persist_archive_receipt
+    hashes_payload = json.loads((dest / "hashes.json").read_text(encoding="utf-8"))
+    merkle_subject = str(hashes_payload.get("frozenForecastHash") or hashes_payload.get("frontierCheckpointHash") or "")
+    freeze_merkle = merkle_root([
+        str(hashes_payload.get("harSha256") or ""),
+        merkle_subject,
+        str(hashes_payload.get("evidenceGraphHash") or ""),
+        str(hashes_payload.get("featureStoreHash") or ""),
+        str(hashes_payload.get("runMerkleRoot") or ""),
+    ])
+    hashes_payload["freezeMerkleRoot" if can_freeze else "frontierCheckpointMerkleRoot"] = freeze_merkle
+    (dest / "hashes.json").write_text(json.dumps(hashes_payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    persist_archive_receipt(dest, build_archive_receipt(
+        dest,
+        merkel_root=freeze_merkle,
+        hashes=hashes_payload,
+        local_status="WRITTEN",
+        drive_status="NOT_CONFIGURED",
+        github_status="NOT_PUSHED",
+    ))
+    archive_retry(dest)
+    archive_reconcile(dest)
 
     blockers = []
     if excluded:
         blockers.append({"code": "GOBLIN_SELECTION_FORBIDDEN", "count": excluded})
     if unsupported:
         blockers.append({"code": "UNSUPPORTED_FAIL_CLOSED", "count": unsupported})
+    if signal_errors:
+        blockers.append({"code": "SIGNAL_EXECUTION_FAILED", "count": len(signal_errors)})
+    if not cfb_rules_snapshot.get("productionEligible"):
+        blockers.append({"code": "PLATFORM_RULES_SNAPSHOT_REQUIRED", "count": 1})
+    if survivor_state.rejected:
+        blockers.append({"code": "DECISION_INTEGRITY_REJECTED", "count": len(survivor_state.rejected)})
     if unresolved:
         blockers.append({"code": "UNRESOLVED", "count": unresolved})
     if conservation_failures:
@@ -1228,28 +1897,31 @@ def run_dcm(
     flags = freeze.get("jointMinuteConservation") or {}
     if flags.get("identitiesHeld") is False:
         blockers.append({"code": "PRIMITIVE_CONSERVATION_FAILURE", "count": 1, "source": "event_worlds_meta"})
+    if not can_freeze:
+        blockers.append({"code": "FRONTIER_RESEARCH_REQUIRED", "count": 1})
     (dest / "blockers.json").write_text(json.dumps(blockers, indent=2) + "\n", encoding="utf-8")
 
-    store = IndexedStore(dest / "index.sqlite")
-    append_record(
-        store,
-        "FrozenForecast",
-        forecast_cutoff,
-        run_id,
-        LEARNING_REVISION,
-        {"hash": freeze["frozenForecastHash"]},
-        source_hash=har_sha,
-    )
-    store.close()
-    append_ledger_jsonl(
-        dest,
-        "FrozenForecast",
-        {"hash": freeze["frozenForecastHash"]},
-        cutoff=forecast_cutoff,
-        run_id=run_id,
-        lr=LEARNING_REVISION,
-        source_hash=har_sha,
-    )
+    if can_freeze:
+        store = IndexedStore(dest / "index.sqlite")
+        append_record(
+            store,
+            "FrozenForecast",
+            forecast_cutoff,
+            run_id,
+            LEARNING_REVISION,
+            {"hash": freeze["frozenForecastHash"]},
+            source_hash=har_sha,
+        )
+        store.close()
+        append_ledger_jsonl(
+            dest,
+            "FrozenForecast",
+            {"hash": freeze["frozenForecastHash"]},
+            cutoff=forecast_cutoff,
+            run_id=run_id,
+            lr=LEARNING_REVISION,
+            source_hash=har_sha,
+        )
 
     integrity = {
         **freeze,
@@ -1258,32 +1930,46 @@ def run_dcm(
         "createdAtUtc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
     }
     (dest / "run_integrity.json").write_text(json.dumps(integrity, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    write_checkpoint(
-        dest / "checkpoint.json",
-        {
-            "runId": run_id,
-            "dcmVersion": SOFTWARE,
-            "learningRevision": LEARNING_REVISION,
-            "forecastCutoff": forecast_cutoff,
-            "modelConfigHash": config_hash,
-            "calibrationStateHash": calibration_state.get("contentHash"),
-            "mountStateHash": content_hash(mount),
-            "schemaStateHash": content_hash(schema_root),
-            "artifactRoot": str(dest),
-            "completedStages": ["BOARD_FREEZE", "RESEARCH", "MODEL", "RANK", "PORTFOLIO", "FREEZE"],
-            "pending": [],
-            "nextDeterministicAction": "none",
-            "rowCounts": states_count,
-            "blockers": [b["code"] for b in blockers],
-            "frozenForecastHash": freeze["frozenForecastHash"],
-        },
-    )
+    checkpoint_payload = {
+        "runId": run_id,
+        "dcmVersion": SOFTWARE,
+        "learningRevision": LEARNING_REVISION,
+        "forecastCutoff": forecast_cutoff,
+        "modelConfigHash": config_hash,
+        "calibrationStateHash": calibration_state.get("contentHash"),
+        "mountStateHash": content_hash(mount),
+        "schemaStateHash": content_hash(schema_root),
+        "inputBoundaryHash": input_boundary_hash,
+        "artifactRoot": str(dest),
+        "completedStages": ["BOARD_FREEZE", "RESEARCH", "MODEL", "RANK", "PORTFOLIO", "FREEZE"] if can_freeze else ["BOARD_FREEZE", "RESEARCH", "MODEL", "RANK", "PORTFOLIO", "FRONTIER_CHECKPOINT"],
+        "forecastFrozen": bool(can_freeze),
+        "pending": [] if can_freeze else ["FRONTIER_RESEARCH"],
+        "nextDeterministicAction": "none" if can_freeze else "acquire_frontier_research_and_resume",
+        "rowCounts": states_count,
+        "blockers": [b["code"] for b in blockers],
+    }
+    if can_freeze:
+        checkpoint_payload["frozenForecastHash"] = freeze["frozenForecastHash"]
+    else:
+        checkpoint_payload["frontierCheckpointHash"] = frontier_checkpoint_hash
+    write_checkpoint(dest / "checkpoint.json", checkpoint_payload)
+    capability_manifest["gates"] = {
+        "softwareClosed": "PASS" if capability_manifest.get("runtime", {}).get("pytestDiscoverable") else "EXTERNAL_BLOCKED",
+        "harAccountingAccepted": "PASS",
+        "operationalAcceptedWithCurrentHar": "PARTIAL" if not cfb_rules_snapshot.get("productionEligible") else "PASS",
+        "predictiveCertified": "FAIL_PREDICTIVE_CLAIM_NONE",
+        "productionRootCertified": "PASS" if root_accepted else "FAIL",
+    }
+    capability_manifest["contentHash"] = content_hash({
+        key: value for key, value in capability_manifest.items() if key != "contentHash"
+    })
+    persist_capability_manifest(dest, capability_manifest)
     return _finalize_archive(
         dest,
         {
             "run_id": run_id,
             "dest": str(dest),
-            "runState": run_state,
+            "runState": freeze.get("runState"),
             "integrity": integrity,
             "card": strict_card,
             "top25_qualified": top25_qualified,

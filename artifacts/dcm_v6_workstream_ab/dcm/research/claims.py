@@ -23,6 +23,12 @@ def claim_record(
     conflicts: list[str] | None = None,
     reliability: float,
     freshness: float,
+    valid_from: str | None = None,
+    valid_to: str | None = None,
+    supersedes: list[str] | tuple[str, ...] | None = None,
+    retracts: list[str] | tuple[str, ...] | None = None,
+    correction_of: str | None = None,
+    state: str | None = None,
 ) -> dict[str, Any]:
     assert_not_after_cutoff(observed_at, forecast_cutoff, field="observed_at")
     if str(published_at).strip():
@@ -42,6 +48,22 @@ def claim_record(
         "reliability": reliability,
         "freshness": freshness,
     }
+    # Temporal relationship fields are optional so existing EvidenceClaim
+    # producers remain source-compatible.  They are included before hashing;
+    # a correction/retraction is therefore a new immutable claim, never an
+    # in-place mutation of history.
+    if valid_from is not None:
+        body["valid_from"] = valid_from
+    if valid_to is not None:
+        body["valid_to"] = valid_to
+    if supersedes:
+        body["supersedes"] = sorted({str(value) for value in supersedes if value})
+    if retracts:
+        body["retracts"] = sorted({str(value) for value in retracts if value})
+    if correction_of:
+        body["correction_of"] = str(correction_of)
+    if state:
+        body["state"] = str(state).upper()
     body["source_hash"] = content_hash(
         {"source_id": source_id, "url": url, "published_at": published_at}
     )

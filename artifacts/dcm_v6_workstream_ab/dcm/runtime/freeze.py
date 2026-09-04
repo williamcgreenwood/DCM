@@ -15,7 +15,7 @@ _CONTEXT_FIELDS = (
     "calibrationStateHash",
     "harSha256",
     "forecastCutoff",
-    "boardHash",
+    "boardHash", "freezeBinds",
 )
 
 

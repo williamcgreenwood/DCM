@@ -48,15 +48,28 @@ def apply_calibration(raw_p: float, *, key: str, cells: dict[str, dict[str, Any]
         }
     mean_pred = float(cell.get("mean_pred", raw_p))
     empirical = float(cell.get("empirical_rate", mean_pred))
-    weight = n / (n + 50.0)
-    correction = (empirical - mean_pred) * weight
-    calibrated = max(0.001, min(0.999, raw_p + correction))
+    preds = [float(x) for x in (cell.get("preds") or [])]
+    outcomes = [float(x) for x in (cell.get("outcomes") or [])]
+    if len(preds) == len(outcomes) and len(preds) >= MIN_ACTIVE_CELL_N:
+        from dcm.algorithms.ml_families import isotonic_regression
+
+        fitted = isotonic_regression(preds, outcomes)
+        # Map raw_p onto the fitted isotonic curve via nearest-neighbor in pred space.
+        nearest = min(range(len(preds)), key=lambda i: abs(preds[i] - raw_p))
+        calibrated = max(0.001, min(0.999, fitted[nearest]))
+        method = "isotonic_regression"
+    else:
+        weight = n / (n + 50.0)
+        correction = (empirical - mean_pred) * weight
+        calibrated = max(0.001, min(0.999, raw_p + correction))
+        method = "additive_cell"
     return {
         "raw": raw_p,
         "calibrated": calibrated,
         "state": "ACTIVE_CHRONOLOGICAL_CELL",
         "cell_n": n,
         "activation_revision": activation_revision,
+        "method": method,
     }
 
 

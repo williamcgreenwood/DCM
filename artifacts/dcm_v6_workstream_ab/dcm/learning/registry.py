@@ -137,7 +137,7 @@ def propose_promotion(path: Path, challenger_id: str) -> dict[str, Any]:
     reasons: list[str] = []
     if chal is None:
         reasons.append("CHALLENGER_NOT_FOUND")
-        return {"status": "BLOCKED", "challengerId": challenger_id, "reasons": reasons, "lrUnchanged": LEARNING_REVISION, "predictiveClaimUnchanged": PREDICTIVE_CLAIM}
+        return {"status": "BLOCKED", "challengerId": challenger_id, "reasons": reasons, "lrUnchanged": LEARNING_REVISION, "predictiveClaimUnchanged": PREDICTIVE_CLAIM, "autoPromote": False, "blocked": True}
     wf = chal.get("walkforwardMetrics") if isinstance(chal.get("walkforwardMetrics"), dict) else {}
     champ_wf = (reg.get("champion") or {}).get("walkforwardMetrics") if isinstance(reg.get("champion"), dict) else {}
     n = _metric(wf, "n") or 0.0
@@ -171,7 +171,7 @@ def propose_promotion(path: Path, challenger_id: str) -> dict[str, Any]:
         and bool(subgroup.get("pass"))
     )
     return {
-        "status": "BLOCKED" if (reasons and not eligible) or True else "SHADOW_ONLY_NOT_PRODUCTION",
+        "status": "BLOCKED" if (reasons or not eligible) else "SHADOW_ONLY_NOT_PRODUCTION",
         "blocked": True,
         "numericGatesPass": eligible,
         "challengerId": challenger_id,
