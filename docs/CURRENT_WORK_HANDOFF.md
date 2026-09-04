@@ -6,7 +6,7 @@
 - **Active branch:** `chatgpt/cfb-production-closure-v2-20260904`
 - **PR:** #21 (draft; target integration only; do not merge to `main`)
 - **Pass-start HEAD:** `1d15508d5c47aa25a7ca2b8d975b8d190713deb0`
-- **Validated code HEAD:** `5bc75dced241a3081b16363b9a54b22663a00497` (fresh wheel + source/fixture validation; GitHub CI run #248 green)
+- **Validated code HEAD:** `38a6de47442839c6eff4258532b45211b2a09079` (fresh wheel + source/fixture validation; GitHub CI runs #248 and #249 green)
 - **Constitution version:** `DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903`
 - **Constitution document SHA256:** `d35da146d021f7caae959f18c4838ad3a7ac58cba2c681fdd2c6ef437766df68`
 - **Constitution lineage hash:** `bba7b082bf67e12d87e675ac58d5b6f96d9cbad9b6a487a0aa157bf7cef9e599`
@@ -17,6 +17,7 @@
 - **Predictive claim:** `NONE`
 - **Production root:** NOT CERTIFIED
 - **Host performance:** uncertified; benchmark smoke passed, but this is engineering-synthetic throughput only
+- **Final documentation head:** `38a6de47442839c6eff4258532b45211b2a09079`; required CI run #249 is green.
 
 Continue PR #21 on the integration branch. Do not merge to main.
 

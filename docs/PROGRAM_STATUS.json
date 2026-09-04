@@ -239,7 +239,7 @@
   "latestPass": {
     "id": "20260904T144918Z_chatgpt_luna-max_completion-context",
     "commit": "1d2490ceef086248a00d27866574ab7b7ad7c3bf",
-    "branchHead": "5bc75dced241a3081b16363b9a54b22663a00497",
+    "branchHead": "38a6de47442839c6eff4258532b45211b2a09079",
     "pullRequest": 21,
     "targetBranch": "integration/v6-ml-architecture-20260830",
     "mainTouched": false,
@@ -294,6 +294,6 @@
     "predictiveClaim": "NONE",
     "learningRevision": "LR000000",
     "githubRequiredChecks": "PASS_RUN_248",
-    "validatedHead": "5bc75dced241a3081b16363b9a54b22663a00497"
+    "validatedHead": "38a6de47442839c6eff4258532b45211b2a09079"
   }
 }
