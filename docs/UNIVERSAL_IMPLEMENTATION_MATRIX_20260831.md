@@ -170,3 +170,20 @@ The detailed P0–P6 matrix remains the modeling/system audit. The following wor
 | P15 P380X donor signal governance | STRONG PARTIAL | Tranche A/B is executable and tested: 58/58 dispositions, zero implicit activations, typed compiler/registry/executor, deterministic hashes, semantic/cross-sport/unit/cutoff gates, and FeatureStore consumer. Tranche C lineage-aware MaterialFact/source-truth runtime closure is integrated; role/matchup/decision/learning/portfolio donor tranches and exact archive bytes remain future/external. |
 
 See `docs/PROGRAM_STATUS.md`, `docs/PROGRAM_STATUS.json`, `docs/CHATGPT_NATIVE_EXECUTION_SPEC.md`, and `docs/engineering_passes/`.
+
+## 2026-09-04 completion-context runtime audit
+
+The Luna Max completion-context pass adds the following verified closure bindings to the declared CFB/offline scope:
+
+| Requirement | Runtime producer | Explicit consumer / evidence | State |
+|---|---|---|---|
+| Exact-first cache integrity | `ResearchCacheCascade` L2/L4 payload verification | deterministic tamper test; invalid payload falls through to fail-closed layers | CLOSED_FOR_DECLARED_SCOPE |
+| Deterministic source health | `SourceHealthRegistry` injected clock and persisted circuit state | AcquisitionAction routing and source-health tests | CLOSED_FOR_DECLARED_SCOPE |
+| Safe sensitive ingress | `input_boundary.inspect_input_boundary` | capability/input-boundary manifests and archive scanner; raw values/path excluded | CLOSED |
+| Restartable state | `write_checkpoint` + `checkpoint_outbox` + reconciliation | fsync/publish, idempotency, crash/error and remote-ack tests | CLOSED_LOCAL / REMOTE_READBACK_RECORDED_IN_PASS |
+| Signal governance | CFB registry/compiler/executor | `signal_runtime.json`, FeatureStore records, output hashes, runner telemetry | CLOSED_FOR_DECLARED_CFB_SCOPE |
+| Temporal facts | MaterialFact succession/correction resolver | parameter/snapshot lineage and cutoff tests | CLOSED_FOR_DECLARED_CFB_SCOPE |
+| CFB settlement semantics | dated rules snapshot | all 19 active CFB MarketDefinitions map fields, identities, and outcomes; production eligibility remains gated | PARTIAL_EXTERNAL_AUTHORITY |
+| Operational lineage | EvidenceGraph runtime attachment | Run→Job→InputDataset→HAROffer→Requirement→Acquisition→Fact→Feature→World→Probability→Decision→Portfolio→Freeze nodes and provenance-bearing edges | CLOSED_FOR_DECLARED_CFB_SCOPE |
+
+Acceptance evidence for this pass: 442 broad non-historical tests passed; 30 focused closure tests passed; fresh wheel and synthetic/current-HAR fixture runs passed; generated inventory is 280 modules / 1,997 symbols with hash `8838c74b78c1e127a76ce44823873a40b51f5e5b6360ade620e414b5c470df41`. The legacy historical fixture remains externally blocked because its repository file is empty while four tests require 11,113 rows. No raw HAR is committed or uploaded.

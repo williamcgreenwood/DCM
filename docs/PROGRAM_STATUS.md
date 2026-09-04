@@ -2,7 +2,7 @@
 
 Canonical integration line: `integration/v6-ml-architecture-20260830` at merge commit `59ea12487ad2e747a15427ba6bb9babd1b9f5907` (through PR #18 R0 Algorithmic Constitution).
 
-Active CFB guarded-launch Research OS semantic-closure slice: `chatgpt/cfb-semantic-closure-v3-20260904` (PR #20, stacked on PR #19) targeting integration only. No merge to `main` is authorized.
+Active CFB guarded-launch Research OS semantic-closure slice: `chatgpt/cfb-production-closure-v2-20260904` (draft PR #21) targeting integration only. No merge to `main` is authorized.
 
 This file is the human dashboard. It must be updated on every coding pass together with a new immutable pass record under `docs/engineering_passes/`.
 
@@ -168,6 +168,49 @@ Not earned:
 - exact P380X donor ZIP bytes and mixed-sport R1 completion.
 
 Verdict: `CFB_REFERENCE_IMPLEMENTATION_SOFTWARE_COMPLETE` for the declared CFB software path. Current-HAR operational acceptance remains `CFB_CURRENT_HAR_OPERATIONAL_ACCEPTANCE_PENDING`. Do not merge to `main`.
+
+## 2026-09-04 Luna Max completion-context implementation pass
+
+Continues on `chatgpt/cfb-production-closure-v2-20260904` through implementation commit `1d2490ceef086248a00d27866574ab7b7ad7c3bf`; draft PR #21 targets `integration/v6-ml-architecture-20260830`. `main` is untouched.
+
+Closed in software for the declared CFB/offline scope:
+
+- durable exact-first cache payload-hash verification with fail-closed fallback;
+- deterministic source-health and checkpoint timing, fsync/publish validation, idempotent checkpoint outbox, and local reconciliation;
+- safe HAR ingress summaries with raw bytes/path values excluded from manifests, logs, archives, GitHub, and Drive;
+- live CFB signal registry/executor/FeatureStore consumption with output hashes;
+- temporal MaterialFact succession/correction handling and runtime lineage;
+- explicit CFB statistical-versus-platform authority, field semantics, identity rules, and 19 active-market settlement mappings;
+- reject-only decision integrity and operational Run/Job/InputDataset/HAROffer/ResearchRequirement/AcquisitionAction/MaterialFact/EventWorld/ProbabilityBundle/Decision/Portfolio/FrozenForecast/SignalEvaluation lineage nodes;
+- generated code inventory and algorithm registry artifacts.
+
+Measured acceptance:
+
+- focused completion-context, lineage, and archive tests: **30 passed**;
+- broad non-historical suite: **442 passed**;
+- source compile, generated inventory check, algorithm registry check, and algorithm frontier benchmark smoke: **PASS**;
+- fresh wheel: **PASS**, SHA-256 `c8b2adb426207d53d84c3e198c5a26f7084c1f21c248e0f688aa4b19ab601c5f`;
+- fresh synthetic run: 6 rows, 2 modeled, 0 Playables, `RESEARCHED_MODELED_TOP25`, production root false;
+- fresh supplied HAR: 4,307 rows; account-only and full fixture runs completed with 0 Playables; full run emitted 19 active CFB mappings, safe boundary/checkpoint artifacts, and a 143,293-node / 283,371-edge operational EvidenceGraph;
+- supplied HAR accounting: 4,248 CFB rows, 948 Goblins excluded only after accounting, 164 model-eligible rows, 3,122 unresolved side rows, 14 unsupported CFB rows, 40 CFB events, 824 subjects, 80 teams;
+- raw supplied HAR SHA-256 `ad3a10271c511266c1a52869658362e07002aad9f453eb77108f35c82e2f96d7`; raw artifact was not committed or uploaded.
+
+Execution-closure gates:
+
+| Gate | State | Evidence / boundary |
+|---|---|---|
+| G0_SESSION_TRUTH | PASS | capability/timebox, authority, input hash, branch, and run manifests emitted |
+| G1_PRIVACY_BOUNDARY | PASS | raw ingress quarantined; fresh archive integrity passed; safe summaries only |
+| G2_RESTARTABLE_STATE | PASS_WITH_EXTERNAL_READBACK_PENDING | crash-safe local checkpoint/outbox/reconciliation tests pass; final Drive/GitHub checkpoint readback recorded separately |
+| G3_RUNTIME_CONSUMPTION | PASS_FOR_DECLARED_CFB_SCOPE | signals, rules, decisions, checkpoints, and lineage are consumed by the canonical runner |
+| G4_LINEAGE_SCHEMA | PASS_FOR_DECLARED_CFB_SCOPE | canonical content hashes and explicit edge provenance validated |
+| G5_CFB_RULES | PARTIAL | 19/19 mappings and dated snapshot emitted; platform settlement authority is not verified for production |
+| G6_EVALUATION_FIREWALL | PASS_OFFLINE | cutoff/accounting/full-population/future-only guards pass; calibration evidence is absent |
+| G7_RELEASE | PARTIAL | fresh wheel and E2E runs pass; required remote CI/host-performance/current-live research remain unverified |
+
+Unearned states remain explicit: `SOFTWARE_CLOSED=PASS` for the declared offline scope; `HAR_ACCOUNTING_ACCEPTED=PASS`; `OPERATIONAL_ACCEPTED_WITH_CURRENT_HAR=PARTIAL`; `PREDICTIVE_CERTIFIED=DEFERRED`; `PRODUCTION_ROOT_CERTIFIED=FAIL`. Learning remains `LR000000`, predictive claim `NONE`, and no production picks are issued.
+
+The unfiltered historical suite is not claimed green: four tests remain externally blocked because the repository's legacy `prizepicks_20260829.sanitized.har` is an empty fixture while its tests require 11,113 rows. No replacement rows were fabricated.
 
 ## P380X Tranche A/B status
 

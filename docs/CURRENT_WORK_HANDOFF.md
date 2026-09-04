@@ -1,18 +1,18 @@
-# CURRENT WORK HANDOFF — CFB SEMANTIC CLOSURE / FRONTIER FIREWALL
+# CURRENT WORK HANDOFF — CFB COMPLETION-CONTEXT RUNTIME CLOSURE
 
-- **Timestamp:** 2026-09-04T06:52:37Z
+- **Timestamp:** 2026-09-04T14:49:18Z
 - **Canonical integration branch:** `integration/v6-ml-architecture-20260830`
 - **Canonical integration HEAD:** `59ea12487ad2e747a15427ba6bb9babd1b9f5907` (PR #18 R0 Algorithmic Constitution)
-- **Active branch:** `chatgpt/cfb-semantic-closure-v3-20260904`
-- **PR:** #20 (stacked on PR #19; target integration only; do not merge to `main`)
-- **Pass-start HEAD:** `958d4c28cc8955b89cd4e19fe6350c2bf752af9`
-- **Validated code HEAD:** `becec83c3955623e44050464423154373e912fbc` (CI run 242)
+- **Active branch:** `chatgpt/cfb-production-closure-v2-20260904`
+- **PR:** #21 (draft; target integration only; do not merge to `main`)
+- **Pass-start HEAD:** `1d15508d5c47aa25a7ca2b8d975b8d190713deb0`
+- **Validated code HEAD:** `1d2490ceef086248a00d27866574ab7b7ad7c3bf` (fresh wheel + source/fixture validation)
 - **Constitution version:** `DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903`
 - **Constitution document SHA256:** `d35da146d021f7caae959f18c4838ad3a7ac58cba2c681fdd2c6ef437766df68`
 - **Constitution lineage hash:** `bba7b082bf67e12d87e675ac58d5b6f96d9cbad9b6a487a0aa157bf7cef9e599`
 - **Registry SHA256:** `9327ec9884e7a55a7854f27d85fd062d6b959794197670db14b7932428e885ca`
-- **Inventory:** 272 modules / 1949 symbols / hash `93bf2cba429490decfdfd89dbce57973348e121ea521e63da40b0835d0117a1c`
-- **Full pytest:** 439 passed (CI run 242)
+- **Inventory:** 280 modules / 1997 symbols / hash `8838c74b78c1e127a76ce44823873a40b51f5e5b6360ade620e414b5c470df41`
+- **Pytest:** 442 passed with the two unavailable historical-fixture files excluded; the unfiltered run has four known external-fixture failures and is not claimed green
 - **Learning revision:** `LR000000`
 - **Predictive claim:** `NONE`
 - **Production root:** NOT CERTIFIED
@@ -29,6 +29,16 @@ Continue PR #20 on the integration branch. Do not merge to main.
 5. Conformal widening remains inactive at `LR000000` until earned chronological settlement evidence.
 6. Request-complete bundle mode remains terminal; partial/malformed request bundles remain interim.
 7. Generated AST inventory matches the committed source bytes.
+
+## COMPLETION-CONTEXT PASS — 2026-09-04
+
+- Code commit `1d2490ceef086248a00d27866574ab7b7ad7c3bf` is pushed to the active child branch.
+- The canonical runner now consumes cache integrity, deterministic source health, signal execution, CFB rules, decision integrity, input-boundary, checkpoint outbox/reconciliation, and operational lineage artifacts.
+- Focused tests: 30 passed. Broad non-historical tests: 442 passed. Source compile, generated inventory, registry, and benchmark smoke: passed.
+- Fresh wheel SHA-256: `c8b2adb426207d53d84c3e198c5a26f7084c1f21c248e0f688aa4b19ab601c5f`.
+- Supplied HAR: 4,307 normalized rows; 4,248 CFB; accounting and full fixture run pass; no raw bytes entered GitHub/Drive/logs.
+- Safe run artifacts include input boundary, capability authority, checkpoint outbox/reconciliation, signal runtime, CFB rules snapshot, decision integrity, and operational EvidenceGraph.
+- Software and accounting states are accepted for the declared offline scope; operational-current-HAR is partial; predictive and production-root states remain unearned.
 
 ## NOT COMPLETE (genuine external or mixed-sport)
 
@@ -50,4 +60,3 @@ Continue PR #20 on the integration branch. Do not merge to main.
 4. Resume to a deterministic final freeze only after frontier requirements are complete.
 5. Settle only a genuinely frozen run, then accumulate prospective calibration cells.
 6. Continue remaining mixed-sport R1 after the CFB current-HAR acceptance.
-
