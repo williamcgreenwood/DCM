@@ -1,5 +1,5 @@
 {
-  "contentHash": "bc72bdce79ce731c3482aca2cd12d2d1fb36e9eac9860c0ce7616c521697a13e",
+  "contentHash": "ea5bdedf663ff36a3e5ca2241e0960cf56f12728823d0e53c836163c85654d19",
   "moduleCount": 272,
   "modules": [
     {
@@ -8516,7 +8516,7 @@
       "classes": 0,
       "functions": 14,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/material_facts.py",
-      "sha256": "c7c8716a24e2045a49b88ddb45d35975003bda29cfac73cf0f18470588b95830",
+      "sha256": "e61ce790bed7756776e3c2552a03034de73ce69d745796d3237eea88361a4e81",
       "symbols": [
         {
           "doc": null,
@@ -8560,7 +8560,7 @@
         },
         {
           "doc": null,
-          "endLine": 258,
+          "endLine": 265,
           "kind": "function",
           "line": 104,
           "name": "resolve_material_facts",
@@ -8568,65 +8568,65 @@
         },
         {
           "doc": "MaterialFactResolution \\u2192 FeatureRecords with provenance.",
-          "endLine": 364,
+          "endLine": 371,
           "kind": "function",
-          "line": 260,
+          "line": 267,
           "name": "facts_to_features",
           "qualname": "facts_to_features"
         },
         {
           "doc": "Overlay resolved facts onto a player/event parameter context. Never post-cutoff.",
-          "endLine": 376,
+          "endLine": 383,
           "kind": "function",
-          "line": 367,
+          "line": 374,
           "name": "apply_facts_to_context",
           "qualname": "apply_facts_to_context"
         },
         {
           "doc": null,
-          "endLine": 388,
+          "endLine": 395,
           "kind": "function",
-          "line": 379,
+          "line": 386,
           "name": "_feature_family",
           "qualname": "_feature_family"
         },
         {
           "doc": "Subject/event/affiliation ids whose unresolved conflicts hold PLAYABLE.",
-          "endLine": 401,
+          "endLine": 408,
           "kind": "function",
-          "line": 391,
+          "line": 398,
           "name": "hold_playable_scope_ids",
           "qualname": "hold_playable_scope_ids"
         },
         {
           "doc": "Demote PLAYABLE when a material conflict is unresolved. Never raises P.",
-          "endLine": 421,
+          "endLine": 428,
           "kind": "function",
-          "line": 404,
+          "line": 411,
           "name": "apply_hold_playable",
           "qualname": "apply_hold_playable"
         },
         {
           "doc": null,
-          "endLine": 431,
+          "endLine": 438,
           "kind": "function",
-          "line": 424,
+          "line": 431,
           "name": "json_safe_value",
           "qualname": "json_safe_value"
         },
         {
           "doc": "Overlay resolved FeatureRecords onto modeling packets BEFORE RoleEpoch/fit.",
-          "endLine": 525,
+          "endLine": 532,
           "kind": "function",
-          "line": 434,
+          "line": 441,
           "name": "apply_fact_features_to_packets",
           "qualname": "apply_fact_features_to_packets"
         },
         {
           "doc": "Index MaterialFacts by (scope, scopeId, claimType-or-field). Never latest-claim-wins across types.",
-          "endLine": 545,
+          "endLine": 552,
           "kind": "function",
-          "line": 528,
+          "line": 535,
           "name": "facts_for_refresh",
           "qualname": "facts_for_refresh"
         }
@@ -10455,7 +10455,7 @@
       "classes": 0,
       "functions": 11,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/runner.py",
-      "sha256": "178bc96d951e7bece7f25e2c813dafbf936c0ec3dadd625c08d44c1d813a60c0",
+      "sha256": "21db59ae05f738c36655404ae4b90abc475efa79e0871a71f25885f44c9f31e2",
       "symbols": [
         {
           "doc": "Always write dest/audit/. Optionally copy+commit+push a GitHub pack.",
@@ -10507,7 +10507,7 @@
         },
         {
           "doc": null,
-          "endLine": 1707,
+          "endLine": 1708,
           "kind": "function",
           "line": 226,
           "name": "run_dcm",
@@ -10539,9 +10539,9 @@
         },
         {
           "doc": null,
-          "endLine": 1825,
+          "endLine": 1826,
           "kind": "function",
-          "line": 1710,
+          "line": 1711,
           "name": "main",
           "qualname": "main"
         }

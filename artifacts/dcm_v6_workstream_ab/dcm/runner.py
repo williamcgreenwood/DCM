@@ -1500,7 +1500,8 @@ def run_dcm(
     loop_doc = cfb_forecast.get("frontierLoop") or {}
     frontier_final = bool(top25_doc.get("final"))
     stop_reason = str(loop_doc.get("stopReason") or "")
-    can_freeze = frontier_final and stop_reason != "EXTERNAL_HOST_REQUIRED"
+    research_terminal = bool(bundle.get("complete")) and bool((bundle.get("coverage") or {}).get("complete"))
+    can_freeze = frontier_final and research_terminal and stop_reason != "EXTERNAL_HOST_REQUIRED"
     freeze["top25Final"] = frontier_final
     freeze["frontierStopReason"] = stop_reason
     freeze["frontierPassCount"] = int(loop_doc.get("frontierPassCount") or 0)

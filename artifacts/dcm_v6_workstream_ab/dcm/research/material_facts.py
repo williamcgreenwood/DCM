@@ -140,9 +140,16 @@ def resolve_material_facts(
         observed = [parse_ts(c.get("observed_at") or c.get("observedAt")) for c in deduped]
         latest_observed = max((value for value in observed if value is not None), default=None)
         active = [c for c in deduped if latest_observed is None or parse_ts(c.get("observed_at") or c.get("observedAt")) == latest_observed]
+        # Stable tie-breaking: strongest evidence first, then the smallest
+        # immutable claim hash. Input order must not decide a MaterialFact winner.
+        ranked = sorted(active, key=lambda c: str(c.get("_resolvedClaimHash") or ""))
         ranked = sorted(
-            active,
-            key=lambda c: (_authority(c), _freshness(c), parse_ts(c.get("published_at") or c.get("publishedAt")) or datetime.min.replace(tzinfo=timezone.utc), str(c.get("_resolvedClaimHash") or "")),
+            ranked,
+            key=lambda c: (
+                _authority(c),
+                _freshness(c),
+                parse_ts(c.get("published_at") or c.get("publishedAt")) or datetime.min.replace(tzinfo=timezone.utc),
+            ),
             reverse=True,
         )
         if not ranked:
