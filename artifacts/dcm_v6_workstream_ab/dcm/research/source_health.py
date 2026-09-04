@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
-from typing import Any, Mapping
+from typing import Any, Callable, Mapping
 
 from dcm.contracts.hashes import content_hash
 
@@ -42,7 +42,13 @@ def _parse_ts(value: Any) -> datetime | None:
 class SourceHealthRegistry:
     """Claim-specific source routing with circuit breakers and bounded fallbacks."""
 
-    def __init__(self, catalog: Mapping[str, Any] | None = None) -> None:
+    def __init__(
+        self,
+        catalog: Mapping[str, Any] | None = None,
+        *,
+        clock: Callable[[], datetime] | None = None,
+    ) -> None:
+        self._clock = clock or _now
         self._state: dict[str, dict[str, Any]] = {}
         sources = []
         if isinstance(catalog, Mapping):
@@ -108,6 +114,12 @@ class SourceHealthRegistry:
             self._set_success_probability(row)
         return row
 
+    def _now(self) -> datetime:
+        ts = self._clock()
+        if not isinstance(ts, datetime):
+            raise TypeError("source-health clock must return datetime")
+        return ts if ts.tzinfo else ts.replace(tzinfo=timezone.utc)
+
     def _set_success_probability(self, row: dict[str, Any]) -> None:
         total = int(row.get("successes") or 0) + int(row.get("failures") or 0)
         if total <= 0:
@@ -124,7 +136,7 @@ class SourceHealthRegistry:
         return None if val is None else float(val)
 
     def _refresh_circuit(self, row: dict[str, Any], *, now: datetime | None = None) -> dict[str, Any]:
-        ts = now or _now()
+        ts = now or self._now()
         if row["circuitState"] == CIRCUIT_OPEN:
             until = _parse_ts(row.get("openUntil"))
             if until is not None and ts >= until:
@@ -133,10 +145,10 @@ class SourceHealthRegistry:
                 row["halfOpenAt"] = _iso(ts)
         return row
 
-    def record_success(self, source_id: str, *, latency_ms: float | None = None, yield_n: int = 1, freshness: float | None = None) -> dict[str, Any]:
+    def record_success(self, source_id: str, *, latency_ms: float | None = None, yield_n: int = 1, freshness: float | None = None, now: datetime | None = None) -> dict[str, Any]:
         row = self._ensure(source_id)
-        self._refresh_circuit(row)
-        now = _now()
+        now = now or self._now()
+        self._refresh_circuit(row, now=now)
         row["successes"] += 1
         row["consecutiveFailures"] = 0
         row["lastSuccess"] = "ok"
@@ -154,10 +166,10 @@ class SourceHealthRegistry:
         self._set_success_probability(row)
         return row
 
-    def record_failure(self, source_id: str, *, reason: str = "unknown") -> dict[str, Any]:
+    def record_failure(self, source_id: str, *, reason: str = "unknown", now: datetime | None = None) -> dict[str, Any]:
         row = self._ensure(source_id)
-        self._refresh_circuit(row)
-        now = _now()
+        now = now or self._now()
+        self._refresh_circuit(row, now=now)
         row["failures"] += 1
         row["consecutiveFailures"] += 1
         row["lastFailure"] = reason
@@ -171,9 +183,10 @@ class SourceHealthRegistry:
             row["halfOpenAt"] = None
         return row
 
-    def fallbacks(self, source_id: str) -> list[str]:
+    def fallbacks(self, source_id: str, *, now: datetime | None = None) -> list[str]:
         """Traverse fallbackSourceIds, skipping currently OPEN circuits."""
         out: list[str] = []
+        now = now or self._now()
         seen = {source_id}
         queue = list(self._ensure(source_id).get("fallbackSourceIds") or [])
         while queue:
@@ -182,7 +195,7 @@ class SourceHealthRegistry:
                 continue
             seen.add(sid)
             row = self._ensure(sid)
-            self._refresh_circuit(row)
+            self._refresh_circuit(row, now=now)
             if row["circuitState"] == CIRCUIT_OPEN:
                 queue.extend(row.get("fallbackSourceIds") or [])
                 continue
@@ -215,7 +228,7 @@ class SourceHealthRegistry:
         ranked.sort()
         out = [sid for _a, _c, sid in ranked]
         for sid in skipped_open:
-            for fb in self.fallbacks(sid):
+            for fb in self.fallbacks(sid, now=now):
                 if fb not in out:
                     out.append(fb)
         if not out:
@@ -223,8 +236,9 @@ class SourceHealthRegistry:
         return out
 
     def snapshot(self) -> dict[str, Any]:
+        now = self._now()
         for row in self._state.values():
-            self._refresh_circuit(row)
+            self._refresh_circuit(row, now=now)
         open_all = bool(self._state) and all(r["circuitState"] == CIRCUIT_OPEN for r in self._state.values())
         body = {
             "schema": "pillars_dcm.source_health.v1",

@@ -101,10 +101,88 @@ def _fact_key(claim: Mapping[str, Any]) -> str:
     return f"{scope}|{scope_id}|{ctype}"
 
 
+def _as_list(value: Any) -> list[str]:
+    if value is None:
+        return []
+    if isinstance(value, (list, tuple, set)):
+        return sorted({str(item) for item in value if item})
+    return [str(value)] if str(value).strip() else []
+
+
+def _claim_hash(claim: Mapping[str, Any]) -> str:
+    return str(claim.get("claim_hash") or claim.get("claimHash") or claim.get("_resolvedClaimHash") or content_hash(dict(claim)))
+
+
+def _valid_from(claim: Mapping[str, Any]) -> Any:
+    return (
+        claim.get("valid_from") or claim.get("validFrom") or
+        claim.get("valid_at") or claim.get("validAt") or
+        claim.get("validTime") or claim.get("published_at") or claim.get("publishedAt")
+    )
+
+
+def _valid_to(claim: Mapping[str, Any]) -> Any:
+    return claim.get("valid_to") or claim.get("validTo")
+
+
+def _valid_at(claim: Mapping[str, Any], point: Any | None) -> bool:
+    if point is None or not str(point).strip():
+        return True
+    target = parse_ts(point)
+    start = parse_ts(_valid_from(claim))
+    end = parse_ts(_valid_to(claim))
+    if target is None:
+        return True
+    if start is not None and target < start:
+        return False
+    if end is not None and target >= end:
+        return False
+    return True
+
+
+def _temporal_relationships(records: Iterable[Mapping[str, Any]]) -> dict[str, Any]:
+    """Index immutable succession, correction, and retraction metadata."""
+    records = list(records)
+    by_hash = {_claim_hash(rec): rec for rec in records}
+    superseded: set[str] = set()
+    retracted: set[str] = set()
+    corrections: dict[str, list[str]] = defaultdict(list)
+    successors: dict[str, list[str]] = defaultdict(list)
+    for rec in records:
+        current = _claim_hash(rec)
+        state = str(rec.get("state") or "").upper()
+        targets = _as_list(rec.get("supersedes")) + _as_list(rec.get("supersedesClaimHashes"))
+        retract_targets = (
+            _as_list(rec.get("retracts")) + _as_list(rec.get("retraction_of")) +
+            _as_list(rec.get("retractionOf"))
+        )
+        correction_targets = _as_list(rec.get("correction_of")) + _as_list(rec.get("correctionOf"))
+        if state in {"RETRACTED", "RETRACTION"} or bool(rec.get("retracted")):
+            retract_targets += _as_list(rec.get("targetClaimHash") or rec.get("claim_hash_to_retract"))
+        for target in targets + correction_targets:
+            if target in by_hash:
+                superseded.add(target)
+                successors[target].append(current)
+        for target in retract_targets:
+            if target in by_hash:
+                retracted.add(target)
+                successors[target].append(current)
+        if correction_targets:
+            corrections[current].extend(target for target in correction_targets if target in by_hash)
+    return {
+        "byHash": by_hash,
+        "superseded": superseded,
+        "retracted": retracted,
+        "corrections": {key: sorted(set(value)) for key, value in corrections.items()},
+        "successors": {key: sorted(set(value)) for key, value in successors.items()},
+    }
+
+
 def resolve_material_facts(
     claims: Iterable[Mapping[str, Any]],
     *,
     cutoff: str | None = None,
+    valid_at: str | None = None,
 ) -> dict[str, Any]:
     grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
     excluded_post_cutoff = 0
@@ -116,7 +194,12 @@ def resolve_material_facts(
             rec["excluded"] = "POST_CUTOFF"
             excluded_post_cutoff += 1
             continue
+        rec["_resolvedClaimHash"] = _claim_hash(rec)
         grouped[_fact_key(rec)].append(rec)
+
+    temporal = _temporal_relationships(
+        record for records in grouped.values() for record in records
+    )
 
     facts: list[dict[str, Any]] = []
     conflicts: list[dict[str, Any]] = []
@@ -124,7 +207,7 @@ def resolve_material_facts(
         by_lineage_value: dict[tuple[str, str], dict[str, Any]] = {}
         for raw_claim in group:
             claim = dict(raw_claim)
-            claim_hash = str(claim.get("claim_hash") or claim.get("claimHash") or content_hash(claim))
+            claim_hash = _claim_hash(claim)
             claim["_resolvedClaimHash"] = claim_hash
             lineage = claim.get("lineage_cluster_id") or claim.get("lineageClusterId") or claim.get("document_hash") or claim.get("source_hash")
             if not lineage:
@@ -137,9 +220,24 @@ def resolve_material_facts(
                 by_lineage_value[dedupe_key] = claim
 
         deduped = list(by_lineage_value.values())
-        observed = [parse_ts(c.get("observed_at") or c.get("observedAt")) for c in deduped]
+        temporal_candidates = [
+            c for c in deduped
+            if _claim_hash(c) not in temporal["retracted"]
+            and _claim_hash(c) not in temporal["superseded"]
+            and _valid_at(c, valid_at)
+        ]
+        observed = [parse_ts(c.get("observed_at") or c.get("observedAt")) for c in temporal_candidates]
         latest_observed = max((value for value in observed if value is not None), default=None)
-        active = [c for c in deduped if latest_observed is None or parse_ts(c.get("observed_at") or c.get("observedAt")) == latest_observed]
+        active = [
+            c for c in temporal_candidates
+            if latest_observed is None or parse_ts(c.get("observed_at") or c.get("observedAt")) == latest_observed
+        ]
+        # A fully retracted/superseded history remains visible as an
+        # unresolved fact, and can never silently feed a current model value.
+        all_temporally_inactive = not active and bool(deduped)
+        if all_temporally_inactive:
+            fallback = sorted(deduped, key=lambda c: _claim_hash(c))[-1]
+            active = [dict(fallback, claim_value=None, state="RETRACTED")]
         # Stable tie-breaking: strongest evidence first, then the smallest
         # immutable claim hash. Input order must not decide a MaterialFact winner.
         ranked = sorted(active, key=lambda c: str(c.get("_resolvedClaimHash") or ""))
@@ -167,7 +265,9 @@ def resolve_material_facts(
         authority_label = str(winner.get("authority") or winner.get("source_authority") or "DERIVED").upper()
         freshness_supplied = any("freshness" in c or "freshnessScore" in c for c in ranked)
         explicit_states = {str(c.get("state") or "").upper() for c in ranked}
-        if claim_type.upper() in {"NOT_APPLICABLE", "N/A"} or str(winner.get("claim_value") or "").upper() in {"NOT_APPLICABLE", "N/A"}:
+        if all_temporally_inactive:
+            state = "UNRESOLVED"
+        elif claim_type.upper() in {"NOT_APPLICABLE", "N/A"} or str(winner.get("claim_value") or "").upper() in {"NOT_APPLICABLE", "N/A"}:
             state = "NOT_APPLICABLE"
         elif conflict:
             state = "CONFLICTED"
@@ -186,6 +286,23 @@ def resolve_material_facts(
         historical_hashes = sorted(str(c.get("_resolvedClaimHash") or "") for c in deduped if c.get("_resolvedClaimHash"))
         supporting_hashes = sorted(str(c.get("_resolvedClaimHash") or "") for c in supporting if c.get("_resolvedClaimHash"))
         conflicting_hashes = sorted(str(c.get("_resolvedClaimHash") or "") for c in conflicting_claims if c.get("_resolvedClaimHash"))
+        group_hashes = set(historical_hashes)
+        superseded_hashes = sorted(group_hashes.intersection(temporal["superseded"]))
+        retracted_hashes = sorted(group_hashes.intersection(temporal["retracted"]))
+        correction_of = sorted({
+            target for current, targets in temporal["corrections"].items()
+            if current in group_hashes for target in targets
+        })
+        successor_hashes = sorted({
+            successor for current, successors in temporal["successors"].items()
+            if current in group_hashes for successor in successors
+        })
+        if all_temporally_inactive:
+            temporal_state = "RETRACTED_OR_SUPERSEDED"
+        elif correction_of or superseded_hashes or successor_hashes:
+            temporal_state = "SUCCESSION"
+        else:
+            temporal_state = "ACTIVE"
         if conflict:
             conflicts.append({
                 "factKey": key,
@@ -196,6 +313,7 @@ def resolve_material_facts(
                 "independentLineageCount": len(lineage_ids),
                 "claimHashes": sorted(supporting_hashes + conflicting_hashes),
                 "action": "HOLD_UNTIL_REVERIFIED",
+                "temporalState": temporal_state,
             })
         fact = {
             "factKey": key,
@@ -210,10 +328,23 @@ def resolve_material_facts(
             "authorityClass": authority_label,
             "authorityPolicy": {"claimType": claim_type, "sourceClass": authority_label},
             "freshness": _freshness(winner),
-            "validTime": winner.get("valid_at") or winner.get("published_at"),
+            "validTime": _valid_from(winner),
+            "validFrom": _valid_from(winner),
+            "validTo": _valid_to(winner),
             "observedTime": winner.get("observed_at"),
             "forecastCutoff": cutoff,
+            "validAt": valid_at,
             "state": state,
+            "temporalState": temporal_state,
+            "succession": {
+                "supersededClaimHashes": superseded_hashes,
+                "retractedClaimHashes": retracted_hashes,
+                "correctionOf": correction_of,
+                "successorClaimHashes": successor_hashes,
+            },
+            "supersededClaimHashes": superseded_hashes,
+            "retractedClaimHashes": retracted_hashes,
+            "correctionOf": correction_of,
             "conflict": conflict,
             "claimCount": len(ranked),
             "historicalClaimCount": len(deduped),
@@ -238,6 +369,11 @@ def resolve_material_facts(
             "historicalClaimHashes": fact["historicalClaimHashes"],
             "lineageClusterIds": fact["lineageClusterIds"],
             "activeLineageClusterIds": fact["activeLineageClusterIds"],
+            "validFrom": fact["validFrom"],
+            "validTo": fact["validTo"],
+            "validAt": fact["validAt"],
+            "temporalState": fact["temporalState"],
+            "succession": fact["succession"],
         })
         facts.append(fact)
 
@@ -250,17 +386,20 @@ def resolve_material_facts(
         "excludedPostCutoff": excluded_post_cutoff,
         "facts": sorted_facts,
         "conflicts": sorted_conflicts,
+        "validAt": valid_at,
         "lineage": [
             "SourceDocument", "EvidenceClaim", "MaterialFactResolution",
             "Feature", "ParameterSnapshot", "EventWorld", "PropEvaluation",
         ],
         "states": ["CONFIRMED", "PROBABLE", "CONFLICTED", "STALE", "UNRESOLVED", "NOT_APPLICABLE"],
+        "temporalStates": ["ACTIVE", "SUCCESSION", "RETRACTED_OR_SUPERSEDED"],
     }
     body["contentHash"] = content_hash({
         "schema": body["schema"],
         "facts": sorted_facts,
         "conflicts": sorted_conflicts,
         "excludedPostCutoff": excluded_post_cutoff,
+        "validAt": valid_at,
     })
     return body
 
@@ -309,6 +448,11 @@ def facts_to_features(
                 "conflictingClaimHashes": list(fact.get("conflictingClaimHashes") or []),
                 "lineageClusterIds": list(fact.get("lineageClusterIds") or []),
                 "activeLineageClusterIds": list(fact.get("activeLineageClusterIds") or []),
+                "validFrom": fact.get("validFrom"),
+                "validTo": fact.get("validTo"),
+                "validAt": fact.get("validAt"),
+                "temporalState": fact.get("temporalState"),
+                "succession": fact.get("succession") or {},
             }
             rec["contentHash"] = content_hash({k: v for k, v in rec.items() if k != "contentHash"})
             out.append(rec)
@@ -338,6 +482,11 @@ def facts_to_features(
                     "conflictingClaimHashes": list(fact.get("conflictingClaimHashes") or []),
                     "lineageClusterIds": list(fact.get("lineageClusterIds") or []),
                     "activeLineageClusterIds": list(fact.get("activeLineageClusterIds") or []),
+                    "validFrom": fact.get("validFrom"),
+                    "validTo": fact.get("validTo"),
+                    "validAt": fact.get("validAt"),
+                    "temporalState": fact.get("temporalState"),
+                    "succession": fact.get("succession") or {},
                 }
                 rec["contentHash"] = content_hash({k: v for k, v in rec.items() if k != "contentHash"})
                 out.append(rec)
@@ -365,6 +514,11 @@ def facts_to_features(
                 "conflictingClaimHashes": list(fact.get("conflictingClaimHashes") or []),
                 "lineageClusterIds": list(fact.get("lineageClusterIds") or []),
                 "activeLineageClusterIds": list(fact.get("activeLineageClusterIds") or []),
+                "validFrom": fact.get("validFrom"),
+                "validTo": fact.get("validTo"),
+                "validAt": fact.get("validAt"),
+                "temporalState": fact.get("temporalState"),
+                "succession": fact.get("succession") or {},
             }
             rec["contentHash"] = content_hash({k: v for k, v in rec.items() if k != "contentHash"})
             out.append(rec)
@@ -550,4 +704,3 @@ def facts_for_refresh(facts: Mapping[str, Any] | None) -> dict[tuple[str, str, s
                 if key in value and value[key] is not None:
                     out[(scope, sid, key)] = {**dict(fact), "field": key, "fieldValue": value[key]}
     return out
-

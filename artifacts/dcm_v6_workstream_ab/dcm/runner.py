@@ -25,6 +25,7 @@ from dcm.cfb.event_worlds import cfb_teammate_groups, simulate_joint_cfb_event_w
 from dcm.cfb.launch import emit_cfb_forecast_artifacts, persist_algorithm_telemetry, prepare_cfb_research_os
 from dcm.cfb.recompute import recompute_full_bundle
 from dcm.cfb.refresh import apply_final_refresh
+from dcm.cfb.rules import build_cfb_rules_snapshot
 from dcm.research.material_facts import apply_hold_playable, facts_to_features, hold_playable_scope_ids, resolve_material_facts
 from dcm.contracts.hashes import content_hash
 from dcm.identity.resolve import build_player_index, freeze_map, resolve_row
@@ -42,6 +43,13 @@ from dcm.model.line_surface import surface as line_surface
 from dcm.model.parameters import build_parameter_snapshot
 from dcm.model.ranking import rank_candidates
 from dcm.model.uncertainty import PROBABILITY_CONTRACT_KEYS, RELIABILITY_IS_NOT_PROBABILITY, probability_bundle
+from dcm.ml.feature_store import merge_feature_records
+from dcm.selection.decision_integrity import (
+    SurvivorState,
+    inverse_consistency_audit,
+    probability_sanity_diagnostic,
+)
+from dcm.signals.cfb_runtime import build_cfb_signal_registry, execute_cfb_signals
 from dcm.learning.calibration import apply_calibration, cell_key
 from dcm.learning.sidecar import append_ledger_jsonl, append_record
 from dcm.model.event_world_joint import (
@@ -60,6 +68,7 @@ from dcm.research.host_plan import build_host_research_plan
 from dcm.research.provider import BundleProvider, FileProvider, FixtureProvider, collect, write_bundle
 from dcm.research.requests import plan_research
 from dcm.runtime.checkpoint import load_checkpoint, write_checkpoint
+from dcm.runtime.capabilities import build_capability_manifest, persist_capability_manifest
 from dcm.runtime.cutoff import CutoffRequired, POLICY_DOC, resolve_forecast_cutoff
 from dcm.runtime.dag import Dag
 from dcm.runtime.freeze import compute_forecast_hash
@@ -362,6 +371,24 @@ def run_dcm(
         (dest / "performance" / "har.json").write_text(json.dumps(har_perf, indent=2) + "\n", encoding="utf-8")
 
     config_hash = content_hash(model_config)
+    capability_path = dest / "capability_manifest.json"
+    if capability_path.is_file():
+        try:
+            capability_manifest = json.loads(capability_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            capability_manifest = {}
+    else:
+        capability_inputs = list(input_paths or ([] if input_path is None else [input_path]))
+        if synthetic:
+            capability_inputs = [SYNTHETIC]
+        capability_manifest = build_capability_manifest(
+            workspace=workspace,
+            run_id=run_id,
+            forecast_cutoff=forecast_cutoff,
+            input_paths=capability_inputs,
+            har_sha256=har_sha,
+        )
+        persist_capability_manifest(dest, capability_manifest)
     dag = Dag(
         cutoff=forecast_cutoff,
         config_hash=config_hash,
@@ -658,6 +685,19 @@ def run_dcm(
     material_facts_payload = resolve_material_facts(bundle.get("claims") or [], cutoff=forecast_cutoff)
     hold_ids = hold_playable_scope_ids(material_facts_payload)
     fact_features = facts_to_features(material_facts_payload, cutoff=forecast_cutoff)
+    signal_registry = build_cfb_signal_registry()
+    signal_evaluations: list[dict[str, Any]] = []
+    signal_feature_records: list[dict[str, Any]] = []
+    signal_rows_executed = 0
+    signal_errors: list[dict[str, Any]] = []
+    survivor_state = SurvivorState()
+    decision_integrity_records: list[dict[str, Any]] = []
+    cfb_rules_snapshot = build_cfb_rules_snapshot(
+        as_of=forecast_cutoff,
+        statistical_source_hashes=(har_sha, str(material_facts_payload.get("contentHash") or "")),
+        platform_source_hashes=(),
+        platform_rules_verified=False,
+    )
 
     def _snapshot_for(prow: dict[str, Any]) -> dict[str, Any]:
         oid = str(prow.get("projectionId") or "")
@@ -699,6 +739,33 @@ def run_dcm(
         rec["playerStatus"] = snapshot.get("status")
         rec["parameterSnapshot"] = snapshot
         rec["dependencyTags"] = snapshot.get("dependency_tags") or []
+        is_cfb_guarded_row = (
+            str(row.get("sportFamily") or "") == "gridiron"
+            and str(row.get("league") or "").upper() == "CFB"
+        )
+        if is_cfb_guarded_row:
+            try:
+                signal_registry, evaluations, features = execute_cfb_signals(
+                    row, snapshot, material_facts_payload, cutoff=forecast_cutoff, registry=signal_registry,
+                )
+                serialized = [evaluation.to_dict() for evaluation in evaluations]
+                signal_evaluations.extend({"projectionId": row.get("projectionId"), **item} for item in serialized)
+                signal_feature_records.extend(features)
+                signal_rows_executed += 1
+                rec["signalRegistryHash"] = signal_registry.registry_hash
+                rec["signalEvaluationHashes"] = [str(item.get("outputHash") or "") for item in serialized]
+                rec["signalFeatureHashes"] = [str(item.get("contentHash") or content_hash(item)) for item in features]
+                snapshot["signalRegistryHash"] = signal_registry.registry_hash
+                snapshot["signalEvaluationHashes"] = rec["signalEvaluationHashes"]
+                # build_parameter_snapshot hashes the semantic snapshot before
+                # this runtime annotation; recompute without self-reference.
+                snapshot["parameter_snapshot_hash"] = content_hash({
+                    key: value for key, value in snapshot.items() if key != "parameter_snapshot_hash"
+                })
+                parameter_cache[str(row.get("projectionId") or "")] = snapshot
+            except (RuntimeError, ValueError, TypeError) as exc:
+                signal_errors.append({"projectionId": row.get("projectionId"), "error": type(exc).__name__})
+                rec["blocker"] = rec.get("blocker") or "SIGNAL_EXECUTION_FAILED"
         # Status/start hard gates apply even on synthetic/fixture runs.
         snap_blocker = snapshot.get("blocker")
         if snap_blocker in STATUS_START_HARD_BLOCKERS:
@@ -706,10 +773,6 @@ def run_dcm(
         start_blk = started_event_blocker(row, forecast_cutoff)
         if start_blk:
             rec["blocker"] = rec.get("blocker") or start_blk
-        is_cfb_guarded_row = (
-            str(row.get("sportFamily") or "") == "gridiron"
-            and str(row.get("league") or "").upper() == "CFB"
-        )
         minimum_model_support = bool(snapshot.get("minimum_model_support", snapshot.get("production_eligible")))
         if is_cfb_guarded_row and not minimum_model_support:
             rec["state"] = "HELD_FOR_RESEARCH"
@@ -718,6 +781,8 @@ def run_dcm(
             rec["blocker"] = rec.get("blocker") or (blockers[0] if blockers else snapshot.get("blocker") or "MINIMUM_MODEL_SUPPORT_MISSING")
             rec["productionSelectable"] = False
             evidence_blocked += 1
+            survivor_state.reject(str(row.get("projectionId") or ""), str(rec.get("blocker") or "MINIMUM_MODEL_SUPPORT_MISSING"))
+            rec["survivorStateAccepted"] = False
             classified.append(rec)
             continue
 
@@ -919,6 +984,21 @@ def run_dcm(
         forced = row.get("side") if row.get("side") in evaluations else None
         chosen_side = forced or max(evaluations, key=lambda x: (evaluations[x]["evidenceSafeP"], evaluations[x]["lowerBound"]))
         ev = evaluations[chosen_side]
+        decision_audit = inverse_consistency_audit(row, evaluations, chosen_side)
+        probability_diagnostic = probability_sanity_diagnostic(
+            p_higher=dist.get("pHigher"), p_lower=dist.get("pLower"), p_push=dist.get("pPush"),
+        )
+        decision_integrity_records.append({
+            "projectionId": row.get("projectionId"),
+            "inverseConsistency": decision_audit,
+            "probabilitySanity": probability_diagnostic,
+        })
+        if not decision_audit.get("valid") or not probability_diagnostic.get("valid"):
+            reasons = list(decision_audit.get("blockers") or []) + list(probability_diagnostic.get("blockers") or [])
+            rec["blocker"] = rec.get("blocker") or "DECISION_INTEGRITY_FAILED"
+            rec["decisionIntegrityBlockers"] = sorted(set(reasons))
+            production_selectable = False
+            survivor_state.reject(str(row.get("projectionId") or ""), "DECISION_INTEGRITY_FAILED", *reasons)
         selected_line = float(row["line"])
         if chosen_side == "MORE":
             selection_outcomes = bytes(
@@ -950,6 +1030,8 @@ def run_dcm(
             "aleatoricUncertainty": ev["aleatoricUncertainty"], "monteCarloSE": ev["monteCarloSE"],
             "calibrationState": ev["calibrationState"], "parameterSnapshotHash": snapshot["parameter_snapshot_hash"],
             "evidenceHashes": snapshot["evidence_hashes"], "dependencyTags": snapshot["dependency_tags"],
+            "decisionIntegrity": decision_audit,
+            "probabilityDiagnostic": probability_diagnostic,
             "productionSelectable": production_selectable,
             "modeledPlayable": (not diagnostic_model) and is_modeled_playable(
                 {
@@ -977,6 +1059,9 @@ def run_dcm(
         if gate:
             rec["blocker"] = rec.get("blocker") or gate
             rec["modeledPlayable"] = False
+        if rec.get("blocker"):
+            survivor_state.reject(str(row.get("projectionId") or ""), str(rec.get("blocker")))
+        rec["survivorStateAccepted"] = survivor_state.accept(str(row.get("projectionId") or ""))
         modeled.append(rec)
         classified.append(rec)
 
@@ -984,6 +1069,52 @@ def run_dcm(
     (dest / "parameters" / "snapshots.json").write_text(
         json.dumps(parameter_cache, sort_keys=True) + "\n", encoding="utf-8"
     )
+    (dest / "signal_registry.json").write_text(
+        json.dumps({
+            "schema": "pillars_dcm.signal_registry_runtime.v1",
+            "registryHash": signal_registry.registry_hash,
+            "executionOrder": list(signal_registry.execution_order),
+            "operators": [item.to_dict() for item in signal_registry.operators],
+        }, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    (dest / "signal_evaluations.jsonl").write_text(
+        "".join(json.dumps(item, sort_keys=True) + "\n" for item in signal_evaluations),
+        encoding="utf-8",
+    )
+    for item in signal_feature_records:
+        item.setdefault("contentHash", content_hash({k: v for k, v in item.items() if k != "contentHash"}))
+    (dest / "signal_features.jsonl").write_text(
+        "".join(json.dumps(item, sort_keys=True) + "\n" for item in signal_feature_records),
+        encoding="utf-8",
+    )
+    merge_feature_records(dest, signal_feature_records)
+    (dest / "signal_runtime.json").write_text(json.dumps({
+        "schema": "pillars_dcm.signal_runtime.v1",
+        "registryHash": signal_registry.registry_hash,
+        "rowsExecuted": signal_rows_executed,
+        "evaluationCount": len(signal_evaluations),
+        "featureCount": len(signal_feature_records),
+        "errors": signal_errors,
+        "consumers": [
+            "dcm.ml.feature_store.signal_evaluation_feature_records",
+            "dcm.audit.trace.signal_evaluations",
+        ],
+        "probabilityMutation": False,
+        "hardGateOverride": False,
+    }, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    (dest / "cfb_rules_snapshot.json").write_text(
+        json.dumps(cfb_rules_snapshot, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    (dest / "decision_integrity.json").write_text(json.dumps({
+        "schema": "pillars_dcm.decision_integrity_runtime.v1",
+        "records": decision_integrity_records,
+        "survivorState": survivor_state.snapshot(),
+        "rejectedCount": len(survivor_state.rejected),
+        "contentHash": content_hash({
+            "records": decision_integrity_records,
+            "survivorState": survivor_state.snapshot(),
+        }),
+    }, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
     n_worlds = dag.add("EVENT_WORLDS", "board", parents=[n_res.key])
     dag.complete(n_worlds.key, content_hash({"events": len({k[0] for k in world_cache}), "n": N_WORLDS}))
@@ -1239,6 +1370,12 @@ def run_dcm(
             "posteriorRegret": p.get("posteriorRegret"),
             "trueLineTolerance": surf.get("true_unclamped_line_tolerance"),
             "sideEvaluations": p.get("sideEvaluations"), "dependencyTags": p.get("dependencyTags"),
+            "signalRegistryHash": p.get("signalRegistryHash"),
+            "signalEvaluationHashes": p.get("signalEvaluationHashes"),
+            "signalFeatureHashes": p.get("signalFeatureHashes"),
+            "decisionIntegrity": p.get("decisionIntegrity"),
+            "probabilityDiagnostic": p.get("probabilityDiagnostic"),
+            "survivorStateAccepted": p.get("survivorStateAccepted"),
             "projectionId": r.get("projectionId"),
             "median": p.get("median"),
         }
@@ -1414,6 +1551,17 @@ def run_dcm(
         "software": SOFTWARE,
         "gitCommit": git_commit,
         "featureStoreHash": feature_store_hash,
+        "signalRegistryHash": signal_registry.registry_hash,
+        "signalRuntimeHash": content_hash({
+            "registryHash": signal_registry.registry_hash,
+            "evaluationCount": len(signal_evaluations),
+            "featureCount": len(signal_feature_records),
+            "errors": signal_errors,
+        }),
+        "decisionIntegrityHash": content_hash(decision_integrity_records),
+        "survivorStateHash": survivor_state.snapshot().get("contentHash"),
+        "cfbRulesSnapshotHash": cfb_rules_snapshot.get("contentHash"),
+        "cfbRulesProductionEligible": bool(cfb_rules_snapshot.get("productionEligible")),
         "evidenceGraphHash": evidence_graph.get("contentHash"),
         "parameterSnapshotHashes": parameter_snapshot_hashes,
         "forecastDecisionCutoff": forecast_cutoff,
@@ -1433,6 +1581,11 @@ def run_dcm(
         "gitCommit": git_commit,
         "schemaHash": freeze["schemaHash"],
         "featureStoreHash": feature_store_hash,
+        "signalRegistryHash": signal_registry.registry_hash,
+        "signalRuntimeHash": freeze["signalRuntimeHash"],
+        "decisionIntegrityHash": freeze["decisionIntegrityHash"],
+        "survivorStateHash": freeze["survivorStateHash"],
+        "cfbRulesSnapshotHash": freeze["cfbRulesSnapshotHash"],
         "harSha256": har_sha,
         "boardHash": board["contentHash"],
         "evidenceGraphHash": evidence_graph.get("contentHash"),
@@ -1469,10 +1622,15 @@ def run_dcm(
     freeze["productionSelectionReady"] = readiness["productionSelectionReady"]
     freeze["systemCertified"] = readiness["systemCertified"]
     freeze["predictiveValidationEarned"] = readiness["predictiveValidationEarned"]
+    cfb_board_present = any(
+        str(item.get("sportFamily") or "") == "gridiron"
+        and str(item.get("league") or "").upper() == "CFB"
+        for item in rows
+    )
     root_accepted = production_root_accepted(
         global_selection_gate=global_selection_gate,
         production_selection_ready=bool(readiness["productionSelectionReady"]),
-    )
+    ) and (not cfb_board_present or bool(cfb_rules_snapshot.get("productionEligible")))
     production_certified = production_certified_rows(strict_card, root_accepted=root_accepted)
     directional_passes = build_directional_passes(ranked, strict_card)
     write_card_layer_files(
@@ -1488,6 +1646,8 @@ def run_dcm(
         "PRODUCTION_ROOT_CERTIFIED" if root_accepted else NOT_PRODUCTION_ROOT_CERTIFIED
     )
     freeze["productionCertifiedCardSize"] = len(production_certified)
+    freeze["platformSettlementRulesVerified"] = bool(cfb_rules_snapshot.get("productionEligible"))
+    freeze["productionRootBlockers"] = list(cfb_rules_snapshot.get("blockers") or []) if cfb_board_present else []
     freeze["executionMode"] = "PRODUCTION" if root_accepted else "RESEARCHED_MODELED"
     run_state = layer_run_state(
         root_accepted=root_accepted,
@@ -1587,6 +1747,11 @@ def run_dcm(
         "harSha256": har_sha,
         "evidenceGraphHash": evidence_graph.get("contentHash"),
         "featureStoreHash": feature_store_hash,
+        "signalRegistryHash": signal_registry.registry_hash,
+        "signalRuntimeHash": freeze["signalRuntimeHash"],
+        "decisionIntegrityHash": freeze["decisionIntegrityHash"],
+        "survivorStateHash": freeze["survivorStateHash"],
+        "cfbRulesSnapshotHash": freeze["cfbRulesSnapshotHash"],
         "explanationsHash": explanations_hash,
         "gitCommit": git_commit,
         "checkpointPending": not can_freeze,
@@ -1629,6 +1794,12 @@ def run_dcm(
         blockers.append({"code": "GOBLIN_SELECTION_FORBIDDEN", "count": excluded})
     if unsupported:
         blockers.append({"code": "UNSUPPORTED_FAIL_CLOSED", "count": unsupported})
+    if signal_errors:
+        blockers.append({"code": "SIGNAL_EXECUTION_FAILED", "count": len(signal_errors)})
+    if not cfb_rules_snapshot.get("productionEligible"):
+        blockers.append({"code": "PLATFORM_RULES_SNAPSHOT_REQUIRED", "count": 1})
+    if survivor_state.rejected:
+        blockers.append({"code": "DECISION_INTEGRITY_REJECTED", "count": len(survivor_state.rejected)})
     if unresolved:
         blockers.append({"code": "UNRESOLVED", "count": unresolved})
     if conservation_failures:
@@ -1691,6 +1862,17 @@ def run_dcm(
     else:
         checkpoint_payload["frontierCheckpointHash"] = frontier_checkpoint_hash
     write_checkpoint(dest / "checkpoint.json", checkpoint_payload)
+    capability_manifest["gates"] = {
+        "softwareClosed": "PASS" if capability_manifest.get("runtime", {}).get("pytestDiscoverable") else "EXTERNAL_BLOCKED",
+        "harAccountingAccepted": "PASS",
+        "operationalAcceptedWithCurrentHar": "PARTIAL" if not cfb_rules_snapshot.get("productionEligible") else "PASS",
+        "predictiveCertified": "FAIL_PREDICTIVE_CLAIM_NONE",
+        "productionRootCertified": "PASS" if root_accepted else "FAIL",
+    }
+    capability_manifest["contentHash"] = content_hash({
+        key: value for key, value in capability_manifest.items() if key != "contentHash"
+    })
+    persist_capability_manifest(dest, capability_manifest)
     return _finalize_archive(
         dest,
         {

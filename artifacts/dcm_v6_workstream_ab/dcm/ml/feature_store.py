@@ -6,6 +6,7 @@ replaces the season. Persist as jsonl + manifest with a content hash.
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 from typing import Any
 
@@ -374,4 +375,58 @@ def persist_feature_store(
         json.dumps(manifest_body, indent=2, sort_keys=True, ensure_ascii=True) + "\n",
         encoding="utf-8",
     )
+    return manifest_body
+
+
+def merge_feature_records(dest: Path, records: list[dict[str, Any]] | tuple[dict[str, Any], ...]) -> dict[str, Any]:
+    """Append deterministic runtime feature records and refresh the manifest."""
+    dest = Path(dest)
+    jsonl_path = dest / "feature_store.jsonl"
+    existing: list[dict[str, Any]] = []
+    if jsonl_path.is_file():
+        for line in jsonl_path.read_text(encoding="utf-8").splitlines():
+            try:
+                item = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if isinstance(item, dict):
+                existing.append(item)
+    by_hash: dict[str, dict[str, Any]] = {}
+    for item in existing:
+        digest = str(item.get("contentHash") or content_hash({k: v for k, v in item.items() if k != "contentHash"}))
+        item.setdefault("contentHash", digest)
+        by_hash[digest] = item
+    for item in records or ():
+        if not isinstance(item, dict):
+            continue
+        item = dict(item)
+        item["contentHash"] = content_hash({k: v for k, v in item.items() if k != "contentHash"})
+        by_hash[item["contentHash"]] = item
+    features = [by_hash[key] for key in sorted(by_hash)]
+    tmp = jsonl_path.with_suffix(jsonl_path.suffix + ".tmp")
+    with tmp.open("w", encoding="utf-8") as handle:
+        for item in features:
+            handle.write(json.dumps(item, sort_keys=True, ensure_ascii=True) + "\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+    tmp.replace(jsonl_path)
+    manifest_path = dest / "feature_store_manifest.json"
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        manifest = {}
+    entities = sorted({str(item.get("entity") or "") for item in features if item.get("entity")})
+    families = sorted({str(item.get("family") or "") for item in features if item.get("family")})
+    manifest_body = {
+        **{key: value for key, value in manifest.items() if key != "contentHash"},
+        "schema": manifest.get("schema") or "pillars_dcm.feature_store_manifest.v1",
+        "featureCount": len(features),
+        "entityCount": len(entities),
+        "families": families,
+        "observationsOnly": True,
+        "trainedModel": False,
+        "cutoffImmutable": True,
+    }
+    manifest_body["contentHash"] = content_hash({**manifest_body, "features": features})
+    manifest_path.write_text(json.dumps(manifest_body, indent=2, sort_keys=True, ensure_ascii=True) + "\n", encoding="utf-8")
     return manifest_body

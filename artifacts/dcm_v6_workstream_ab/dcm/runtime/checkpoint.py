@@ -20,6 +20,18 @@ def atomic_write(path: Path, payload: dict[str, Any]) -> str:
         fh.flush()
         os.fsync(fh.fileno())
     tmp.replace(path)
+    # Persist the directory entry as well as the file contents so a power loss
+    # cannot acknowledge a checkpoint whose rename was still only cached.
+    try:
+        dir_fd = os.open(str(path.parent), os.O_RDONLY)
+        try:
+            os.fsync(dir_fd)
+        finally:
+            os.close(dir_fd)
+    except OSError:
+        # Filesystems that do not permit directory fsync still retain the
+        # validated checkpoint; the outbox records the remote-sync intent.
+        pass
     return digest
 
 
@@ -39,4 +51,23 @@ def write_checkpoint(dest: Path, payload: dict[str, Any]) -> dict[str, Any]:
     digest = content_hash(body)
     body["checkpointHash"] = digest
     atomic_write(dest, body)
+    # The checkpoint itself is durable before the sync intent is appended.
+    # Remote publication is intentionally a separate, idempotent action.
+    try:
+        from dcm.runtime.checkpoint_outbox import enqueue_checkpoint_sync
+
+        enqueue_checkpoint_sync(
+            dest.parent / "checkpoint_outbox.jsonl",
+            run_id=str(body.get("runId") or ""),
+            checkpoint_id=f"{body.get('runId') or ''}|{digest}",
+            checkpoint_hash=digest,
+            artifact_root=str(body.get("artifactRoot") or dest.parent),
+        )
+    except Exception as exc:  # noqa: BLE001 - preserve local checkpoint, expose status
+        error = {
+            "schema": "pillars_dcm.checkpoint_outbox_error.v1",
+            "checkpointHash": digest,
+            "error": type(exc).__name__,
+        }
+        atomic_write(dest.parent / "checkpoint_outbox_error.json", error)
     return body

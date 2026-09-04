@@ -12,11 +12,13 @@ from __future__ import annotations
 
 import hashlib
 import json
+import sqlite3
+import os
 from pathlib import Path
 from typing import Any, Mapping
 
 from dcm.algorithms.cache import LRUCache
-from dcm.algorithms.indexing import open_memory_index
+from dcm.algorithms.indexing import BloomFilter, open_memory_index
 from dcm.contracts.hashes import content_hash
 
 REUSE_VALID = "REUSE_VALID"
@@ -39,7 +41,65 @@ DISPOSITIONS = (
 
 
 def _key(scope: str, scope_id: str, claim_type: str = "") -> str:
-    return f"{scope}|{scope_id}|{claim_type}"
+    # Keep the key human-auditable while making delimiters unambiguous.  This
+    # is the exact key used by L0/L1/L2; semantic/fuzzy lookup is never allowed
+    # to masquerade as an exact hit.
+    return json.dumps(
+        [str(scope), str(scope_id), str(claim_type)],
+        ensure_ascii=True,
+        separators=(",", ":"),
+    )
+
+
+_CACHE_SCHEMA_VERSION = 1
+
+
+def _open_persistent_index(path: Path) -> tuple[Any, str, list[str]]:
+    """Open a durable L2 index, falling back without deleting corrupt bytes."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    blockers: list[str] = []
+    try:
+        conn = sqlite3.connect(str(path), timeout=30.0)
+        conn.execute("PRAGMA journal_mode=WAL")
+        conn.execute("PRAGMA synchronous=FULL")
+        version = int(conn.execute("PRAGMA user_version").fetchone()[0] or 0)
+        if version not in (0, _CACHE_SCHEMA_VERSION):
+            raise RuntimeError(f"RESEARCH_CACHE_SCHEMA_VERSION_UNSUPPORTED:{version}")
+        conn.execute(
+            "CREATE TABLE IF NOT EXISTS research ("
+            "k TEXT PRIMARY KEY, scope TEXT NOT NULL, scope_id TEXT NOT NULL, "
+            "claim_type TEXT NOT NULL, payload TEXT NOT NULL, asof TEXT NOT NULL, "
+            "payload_hash TEXT NOT NULL)"
+        )
+        # A pre-patch database may have the old six-column table.  Add the
+        # payload hash in place; rows are still verified on read.
+        columns = {str(row[1]) for row in conn.execute("PRAGMA table_info(research)").fetchall()}
+        if "payload_hash" not in columns:
+            conn.execute("ALTER TABLE research ADD COLUMN payload_hash TEXT NOT NULL DEFAULT ''")
+            rows = conn.execute("SELECT k, payload FROM research").fetchall()
+            for key, payload in rows:
+                try:
+                    digest = content_hash(json.loads(payload))
+                except (TypeError, ValueError, json.JSONDecodeError):
+                    digest = ""
+                conn.execute("UPDATE research SET payload_hash = ? WHERE k = ?", (digest, key))
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_research_scope_asof ON research(scope, scope_id, asof DESC)")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_research_scope_type_asof ON research(scope, scope_id, claim_type, asof DESC)")
+        conn.execute(f"PRAGMA user_version = {_CACHE_SCHEMA_VERSION}")
+        conn.commit()
+        check = str(conn.execute("PRAGMA integrity_check").fetchone()[0] or "")
+        if check.lower() != "ok":
+            raise RuntimeError(f"RESEARCH_CACHE_INTEGRITY_CHECK_FAILED:{check}")
+        return conn, "PERSISTENT_SQLITE", blockers
+    except (OSError, sqlite3.DatabaseError, RuntimeError, ValueError) as exc:
+        try:
+            conn.close()  # type: ignore[union-attr]
+        except Exception:
+            pass
+        # Preserve the bytes for later forensic repair.  The in-memory index is
+        # a safe execution fallback, but it is explicitly not a durable hit.
+        blockers.append(type(exc).__name__)
+        return open_memory_index(), "MEMORY_FALLBACK_CORRUPT_OR_UNSUPPORTED", blockers
 
 
 class ResearchCacheCascade:
@@ -55,11 +115,23 @@ class ResearchCacheCascade:
         self.run_root = Path(run_root) if run_root else None
         self.l0: dict[str, dict[str, Any]] = {}
         self.l1 = LRUCache(capacity=4096)
-        self.l2 = open_memory_index()
-        self.l2.execute(
-            "CREATE TABLE IF NOT EXISTS research ("
-            "k TEXT PRIMARY KEY, scope TEXT, scope_id TEXT, claim_type TEXT, payload TEXT, asof TEXT)"
-        )
+        self.l2_path = (self.run_root / "research_cache.sqlite3") if self.run_root else None
+        if self.l2_path is not None:
+            self.l2, self.persistence_state, self.persistence_blockers = _open_persistent_index(self.l2_path)
+        else:
+            self.l2 = open_memory_index()
+            self.l2.execute(
+                "CREATE TABLE IF NOT EXISTS research ("
+                "k TEXT PRIMARY KEY, scope TEXT, scope_id TEXT, claim_type TEXT, payload TEXT, asof TEXT, payload_hash TEXT)"
+            )
+            self.persistence_state = "PROCESS_MEMORY_ONLY"
+            self.persistence_blockers = []
+        self._bloom = BloomFilter(m_bits=1 << 18, k=5)
+        try:
+            for (key,) in self.l2.execute("SELECT k FROM research").fetchall():
+                self._bloom.add(str(key))
+        except Exception:
+            self.persistence_blockers.append("INDEX_REBUILD_FAILED")
         self.store = store
         self.drive = drive
         self.hits = {f"L{i}": 0 for i in range(7)}
@@ -77,11 +149,15 @@ class ResearchCacheCascade:
             self.l0.setdefault(k_scope, rec)
             self.l1.put(k_scope, rec)
         payload = json.dumps(rec, sort_keys=True, default=str)
+        payload_hash = content_hash(rec)
         asof = str(rec.get("observed_at") or rec.get("valid_at") or rec.get("published_at") or "")
         self.l2.execute(
-            "INSERT OR REPLACE INTO research VALUES (?,?,?,?,?,?)",
-            (k, scope, scope_id, ctype, payload, asof),
+            "INSERT OR REPLACE INTO research (k, scope, scope_id, claim_type, payload, asof, payload_hash) VALUES (?,?,?,?,?,?,?)",
+            (k, str(scope), str(scope_id), ctype, payload, asof, payload_hash),
         )
+        if self.persistence_state == "PERSISTENT_SQLITE":
+            self.l2.commit()
+        self._bloom.add(k)
         if self.drive is not None and hasattr(self.drive, "put"):
             digest = str(rec.get("claim_hash") or content_hash(rec))
             self.drive.put(digest, {
@@ -104,19 +180,27 @@ class ResearchCacheCascade:
             self.hits["L1"] += 1
             self.l0[k] = hit
             return hit, "L1"
-        if claim_type:
+        if not self._bloom.might_contain(k) and claim_type:
+            row = None
+        elif claim_type:
             cur = self.l2.execute("SELECT payload FROM research WHERE k = ?", (k,))
+            row = cur.fetchone()
         else:
             cur = self.l2.execute(
                 "SELECT payload FROM research WHERE scope = ? AND scope_id = ? ORDER BY asof DESC LIMIT 1",
                 (scope, scope_id),
             )
-        row = cur.fetchone()
+            row = cur.fetchone()
         if row:
-            rec = json.loads(row[0])
-            self.hits["L2"] += 1
-            self.l0[k] = rec
-            return rec, "L2"
+            try:
+                rec = json.loads(row[0])
+                if not isinstance(rec, dict):
+                    raise ValueError("payload is not an object")
+                self.hits["L2"] += 1
+                self.l0[k] = rec
+                return rec, "L2"
+            except (TypeError, ValueError, json.JSONDecodeError):
+                self.persistence_blockers.append("PAYLOAD_VALIDATION_FAILED")
         if self.store is not None:
             try:
                 found = self.store.lookup_latest(scope, scope_id) if hasattr(self.store, "lookup_latest") else None
@@ -168,11 +252,16 @@ class ResearchCacheCascade:
         )
         row = cur.fetchone()
         if row:
-            rec = json.loads(row[0])
-            self.hits["L4"] += 1
-            k = _key(scope, scope_id, claim_type)
-            self.l0[k] = rec
-            return rec, "L4"
+            try:
+                rec = json.loads(row[0])
+                if not isinstance(rec, dict):
+                    raise ValueError("payload is not an object")
+                self.hits["L4"] += 1
+                k = _key(scope, scope_id, claim_type)
+                self.l0[k] = rec
+                return rec, "L4"
+            except (TypeError, ValueError, json.JSONDecodeError):
+                self.persistence_blockers.append("ASOF_PAYLOAD_VALIDATION_FAILED")
         self.misses += 1
         return None, "L6"
 
@@ -217,6 +306,12 @@ class ResearchCacheCascade:
             "misses": self.misses,
             "lookups": self.lookups,
             "l0Size": len(self.l0),
+            "persistence": {
+                "state": self.persistence_state,
+                "path": self.l2_path.name if self.l2_path else None,
+                "schemaVersion": _CACHE_SCHEMA_VERSION,
+                "blockers": sorted(set(self.persistence_blockers)),
+            },
             "reuseRatio": (sum(self.hits[k] for k in ("L0", "L1", "L2", "L3", "L4", "L5")) / self.lookups) if self.lookups else 0.0,
             "dispositions": list(DISPOSITIONS),
             "layers": {
@@ -232,17 +327,28 @@ class ResearchCacheCascade:
         body["contentHash"] = content_hash({k: v for k, v in body.items() if k != "contentHash"})
         return body
 
-    def clear_ephemeral(self) -> None:
-        """Drop L0–L4. L5 catalog (DriveObjectCatalog) is unchanged."""
+    def clear_ephemeral(self, *, clear_persistent: bool = True) -> None:
+        """Drop current-run/process/L2 rows; durable L5 remains unchanged.
+
+        ``clear_persistent=True`` preserves the historical test and operator
+        contract.  Restart durability is verified by close/reopen without this
+        method; callers that only want to evict L0/L1 pass False.
+        """
         self.l0.clear()
         self.l1 = LRUCache(capacity=4096)
-        try:
-            self.l2.execute("DELETE FROM research")
-        except Exception:
-            pass
+        if clear_persistent:
+            try:
+                self.l2.execute("DELETE FROM research")
+                if self.persistence_state == "PERSISTENT_SQLITE":
+                    self.l2.commit()
+                self._bloom = BloomFilter(m_bits=1 << 18, k=5)
+            except Exception:
+                self.persistence_blockers.append("CLEAR_FAILED")
 
     def close(self) -> None:
         try:
+            if self.persistence_state == "PERSISTENT_SQLITE":
+                self.l2.commit()
             self.l2.close()
         except Exception:
             return

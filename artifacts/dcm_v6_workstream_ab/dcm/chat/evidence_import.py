@@ -121,6 +121,12 @@ def observation_to_claim(
         claim_value=data,
         reliability=quality["reliability"],
         freshness=quality["freshness"],
+        valid_from=obs.get("validFrom") or obs.get("valid_from") or obs.get("validAt") or obs.get("valid_at"),
+        valid_to=obs.get("validTo") or obs.get("valid_to"),
+        supersedes=obs.get("supersedes") if isinstance(obs.get("supersedes"), (list, tuple)) else ([obs.get("supersedes")] if obs.get("supersedes") else None),
+        retracts=obs.get("retracts") if isinstance(obs.get("retracts"), (list, tuple)) else ([obs.get("retracts")] if obs.get("retracts") else None),
+        correction_of=str(obs.get("correctionOf") or obs.get("correction_of") or "") or None,
+        state=str(obs.get("state") or "") or None,
     )
 
 
