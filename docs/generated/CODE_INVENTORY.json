@@ -1,4 +1,5 @@
 {
+  "contentHash": "4b338d5d7d29eea3a8b8909e55f92fc1d5a9aa87c8416df144341d0eb9f9fbad",
   "moduleCount": 280,
   "modules": [
     {
@@ -18465,6 +18466,5 @@
   "parseErrors": [],
   "root": "artifacts/dcm_v6_workstream_ab",
   "schema": "pillars_dcm.code_inventory.v1",
-  "symbolCount": 1997,
-  "contentHash": "4b338d5d7d29eea3a8b8909e55f92fc1d5a9aa87c8416df144341d0eb9f9fbad"
+  "symbolCount": 1997
 }
