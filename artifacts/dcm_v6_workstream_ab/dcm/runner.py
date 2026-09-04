@@ -24,7 +24,7 @@ from dcm.algorithms.telemetry import AlgorithmTelemetry
 from dcm.cfb.event_worlds import cfb_teammate_groups, simulate_joint_cfb_event_worlds
 from dcm.cfb.launch import emit_cfb_forecast_artifacts, persist_algorithm_telemetry, prepare_cfb_research_os
 from dcm.cfb.refresh import apply_final_refresh
-from dcm.research.material_facts import apply_hold_playable, hold_playable_scope_ids, resolve_material_facts
+from dcm.research.material_facts import apply_facts_to_context, apply_hold_playable, facts_to_features, hold_playable_scope_ids, resolve_material_facts
 from dcm.contracts.hashes import content_hash
 from dcm.identity.resolve import build_player_index, freeze_map, resolve_row
 from dcm.ingest.board import freeze_board, write_board
@@ -387,8 +387,7 @@ def run_dcm(
             artifact="algorithm_execution_plan.json",
             activated=bool(phase.get("activated", True)),
             phase="SELECTED",
-            note="plan selection is not live execution",
-        )
+            note="plan selection is not live execution", downstream_used=True)
 
     rows = [resolve_row(r) for r in board["rows"]]
     id_map = freeze_map(rows)
@@ -657,6 +656,7 @@ def run_dcm(
     joint_meta_acc: list[dict[str, Any]] = []
     material_facts_payload = resolve_material_facts(bundle.get("claims") or [], cutoff=forecast_cutoff)
     hold_ids = hold_playable_scope_ids(material_facts_payload)
+    fact_features = facts_to_features(material_facts_payload, cutoff=forecast_cutoff)
 
     def _snapshot_for(prow: dict[str, Any]) -> dict[str, Any]:
         return build_parameter_snapshot(
@@ -678,6 +678,13 @@ def run_dcm(
             unresolved += 1; classified.append(rec); continue
 
         snapshot = _snapshot_for(row)
+        pid = str(row.get("playerId") or "")
+        eid = str(row.get("eventId") or "")
+        tid = str(row.get("teamId") or row.get("team") or "")
+        relevant_facts = [f for f in fact_features if str(f.get("scopeId") or "") in {pid, eid, tid}]
+        if relevant_facts:
+            snapshot = apply_facts_to_context(dict(snapshot), relevant_facts)
+            snapshot["materialFactFeatures"] = relevant_facts
         parameter_cache[str(row["projectionId"])] = snapshot
         rec["forecastCutoff"] = forecast_cutoff
         rec["playerStatus"] = snapshot.get("status")
@@ -988,23 +995,43 @@ def run_dcm(
         ((s.get("role_epoch") or {}).get("governedChangePoints") or {}).get("executed")
         for s in parameter_cache.values()
     ):
-        telemetry.record("ALG-ML-TIME-001", problem_class="EWMA", producer="dcm.algorithms.ml_families.ewma", consumer="dcm.research.role_epoch.governed_change_points", artifact="parameters/snapshots.json", phase="EXECUTED")
-        telemetry.record("ALG-ML-TIME-002", problem_class="CUSUM", producer="dcm.algorithms.ml_families.cusum", consumer="dcm.research.role_epoch.governed_change_points", artifact="parameters/snapshots.json", phase="EXECUTED")
-        telemetry.record("ALG-ML-TIME-003", problem_class="PAGE_HINKLEY", producer="dcm.algorithms.ml_families.page_hinkley", consumer="dcm.research.role_epoch.governed_change_points", artifact="parameters/snapshots.json", phase="EXECUTED")
+        telemetry.record("ALG-ML-TIME-001", problem_class="EWMA", producer="dcm.algorithms.ml_families.ewma", consumer="dcm.research.role_epoch.governed_change_points", artifact="parameters/snapshots.json", phase="EXECUTED", downstream_used=True)
+        telemetry.record("ALG-ML-TIME-002", problem_class="CUSUM", producer="dcm.algorithms.ml_families.cusum", consumer="dcm.research.role_epoch.governed_change_points", artifact="parameters/snapshots.json", phase="EXECUTED", downstream_used=True)
+        telemetry.record("ALG-ML-TIME-003", problem_class="PAGE_HINKLEY", producer="dcm.algorithms.ml_families.page_hinkley", consumer="dcm.research.role_epoch.governed_change_points", artifact="parameters/snapshots.json", phase="EXECUTED", downstream_used=True)
 
     ranked = rank_candidates(modeled, top_k=25, seed=har_sha)
-    telemetry.record("ALG-SORT-001", problem_class="FINAL_RANK", producer="dcm.model.ranking.rank_candidates", consumer="dcm.runner.run_dcm", artifact="top100.json", phase="EXECUTED")
-    telemetry.record("ALG-SORT-003", problem_class="TOPK_PARTIAL", producer="dcm.model.ranking.rank_candidates", consumer="dcm.runner.run_dcm", artifact="top25_qualified.json", phase="EXECUTED")
+    telemetry.record("ALG-SORT-001", problem_class="FINAL_RANK", producer="dcm.model.ranking.rank_candidates", consumer="dcm.runner.run_dcm", artifact="top100.json", phase="EXECUTED", downstream_used=True)
+    telemetry.record("ALG-SORT-003", problem_class="TOPK_PARTIAL", producer="dcm.model.ranking.rank_candidates", consumer="dcm.runner.run_dcm", artifact="top25_qualified.json", phase="EXECUTED", downstream_used=True)
     started_events = {
         str(p.get("row", p).get("eventId") or "")
         for p in modeled
         if str((p.get("row") or p).get("gameStatus") or "").upper() in {"STARTED", "LIVE", "IN_PROGRESS"}
     }
+
+    def _resimulate_material(rec: dict[str, Any]) -> list[float] | None:
+        row = rec.get("row") if isinstance(rec.get("row"), dict) else {}
+        snapshot = rec.get("parameterSnapshot") if isinstance(rec.get("parameterSnapshot"), dict) else None
+        if snapshot is None:
+            snapshot = parameter_cache.get(str(row.get("projectionId") or ""))
+        n = len(rec.get("_worldValues") or []) or int(gov.max_worlds)
+        worlds = simulate_player_worlds(
+            row,
+            n=n,
+            seed=har_sha,
+            parameter_snapshot=snapshot,
+        )
+        return [
+            value_from_stats(str(row.get("market") or ""), w, board_id=str(row.get("boardId") or "FULL_GAME"))
+            for w in worlds
+        ]
+
     refresh = apply_final_refresh(
         ranked,
         claims=bundle.get("claims") or [],
         cutoff=forecast_cutoff,
         started_events=started_events,
+        resimulate=_resimulate_material,
+        grade_fn=grade_of,
     )
     _write_refresh = dest / "cfb_final_refresh.json"
     _write_refresh.write_text(json.dumps(refresh["report"], indent=2, sort_keys=True) + "\n", encoding="utf-8")
@@ -1013,8 +1040,10 @@ def run_dcm(
     card = build_card(qualified)
     exposure = exposure_report(card)
     remaining_actions = 0
+    action_doc = None
     try:
-        remaining_actions = int((json.loads((dest / "acquisition_actions.json").read_text()) or {}).get("actionCount") or 0)
+        action_doc = json.loads((dest / "acquisition_actions.json").read_text())
+        remaining_actions = int((action_doc or {}).get("actionCount") or 0)
     except Exception:
         remaining_actions = 0
     cfb_forecast = emit_cfb_forecast_artifacts(
@@ -1026,6 +1055,7 @@ def run_dcm(
         unresolved_actions=remaining_actions,
         evidence_imported=bool(bundle.get("claims")),
         material_facts=material_facts_payload,
+        actions=action_doc,
     )
     prepare_cfb_research_os(
         dest,

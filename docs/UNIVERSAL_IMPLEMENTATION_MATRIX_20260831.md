@@ -1,9 +1,9 @@
 # DCM universal implementation matrix — 2026-08-31
 
-Baseline refreshed through PR #19 CFB reference-implementation consumer pass on `grok/cfb-guarded-launch-today-20260903`. R0 constitution remains inherited. This matrix is code-path status, not predictive validation. LR remains
+Baseline refreshed through PR #19 CFB semantic-completion pass on `grok/cfb-guarded-launch-today-20260903`. R0 constitution remains inherited. This matrix is code-path status, not predictive validation. LR remains
 `LR000000`; predictive superiority remains `NONE`. Constitution version: `DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903`.
 
-CFB software reference path is executable (19 ACTIVE markets, holdPlayable consumer, retrieval cascade queried, RoleEpoch EWMA/CUSUM/Page-Hinkley, JOINT_TEAM EventWorlds, archive retry/reconcile). Current-HAR acceptance is `CURRENT_REAL_HAR_ACCEPTANCE_PENDING_EXTERNAL_INPUT`.
+CFB software reference path is executable (19 ACTIVE markets, no ceremonial algorithm execution, residual EventWorlds, identity-first retrieval, source-health routing, MaterialFact→Feature, L0–L6 cache, honest inactive conformal/isotonic). Current-HAR acceptance is `CFB_CURRENT_HAR_OPERATIONAL_ACCEPTANCE_PENDING`.
 
 Status meanings:
 

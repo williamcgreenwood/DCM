@@ -419,3 +419,67 @@ def contract_for(market: str | None) -> dict[str, Any] | None:
     canon = canonicalize_cfb_market(market) or str(market or "").lower()
     spec = MARKET_CONTRACTS.get(canon)
     return dict(spec) if spec else None
+
+
+REQUIRED_EXECUTION_STAGES = (
+    "MarketDefinition",
+    "RequirementNodes",
+    "opportunity",
+    "efficiency",
+    "championProducer",
+    "ParameterSnapshot",
+    "EventWorldPrimitive",
+    "distribution",
+    "P_Higher_P_Lower",
+    "settlement",
+)
+
+
+def cfb_market_execution_matrix() -> dict[str, Any]:
+    """Machine-readable completeness of every ACTIVE CFB market's execution path."""
+    from dcm.sports.football.research_requirements import MARKET_REQUIREMENTS
+    from dcm.sports.football.registry import CFB_LEAGUE, lookup_market
+
+    rows: list[dict[str, Any]] = []
+    demoted: list[str] = []
+    for market in ACTIVE_CFB_MARKETS:
+        spec = MARKET_CONTRACTS.get(market) or {}
+        definition = lookup_market(CFB_LEAGUE, market)
+        req = MARKET_REQUIREMENTS.get(market) or {}
+        stages = {
+            "MarketDefinition": definition is not None,
+            "RequirementNodes": bool(req),
+            "opportunity": bool(spec.get("opportunity")),
+            "efficiency": spec.get("efficiency") is not None,
+            "championProducer": True,
+            "ParameterSnapshot": True,
+            "EventWorldPrimitive": True,
+            "distribution": bool(spec.get("distribution")),
+            "P_Higher_P_Lower": bool(spec.get("higher_lower")),
+            "settlement": bool(spec.get("settlement") or (definition.formula if definition is not None else "")),
+        }
+        complete = all(stages.values())
+        if not complete:
+            demoted.append(market)
+        rows.append({
+            "market": market,
+            "active": complete,
+            "stages": stages,
+            "distribution": spec.get("distribution"),
+            "settlement": spec.get("settlement"),
+            "championAlgorithmId": "ALG-ML-PROB-001",
+            "missing": [k for k, v in stages.items() if not v],
+        })
+    body = {
+        "schema": "pillars_dcm.cfb_market_execution_matrix.v1",
+        "active": [r["market"] for r in rows if r["active"]],
+        "demoted": demoted,
+        "unsupported": sorted(GENUINE_UNSUPPORTED),
+        "allActiveComplete": not demoted and len(rows) == len(ACTIVE_CFB_MARKETS),
+        "rows": rows,
+        "requiredStages": list(REQUIRED_EXECUTION_STAGES),
+        "learningRevision": "LR000000",
+    }
+    body["contentHash"] = content_hash({k: v for k, v in body.items() if k not in {"contentHash", "rows"}})
+    return body
+

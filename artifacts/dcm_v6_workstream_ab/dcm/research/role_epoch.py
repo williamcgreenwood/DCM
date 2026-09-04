@@ -192,7 +192,45 @@ def governed_change_points(values: list[float]) -> dict[str, Any]:
         "pageHinkley": [int(i) for i in page_hinkley(series)],
         "executed": ["ALG-ML-TIME-001", "ALG-ML-TIME-002", "ALG-ML-TIME-003"],
         "peltChallengerUnused": True,
+        "disagreement": False,
+        "selectedLogic": "greedy_binary_segmentation",
     }
+
+
+def detector_disagreement(governed: dict[str, Any]) -> bool:
+    """True when CUSUM/Page-Hinkley cuts are not a subset of greedy cuts.
+
+    Detectors never silently overwrite greedy segmentation. Disagreement
+    raises priorWeight so thin/unstable role samples shrink harder.
+    """
+    greedy = {int(i) for i in (governed.get("greedy") or [])} - {0}
+    detected = {int(i) for i in (governed.get("cusum") or [])} | {int(i) for i in (governed.get("pageHinkley") or [])}
+    detected -= {0}
+    if not detected:
+        return False
+    return not detected.issubset(greedy)
+
+
+def apply_detector_disagreement(weights: dict[str, float], governed: dict[str, Any]) -> dict[str, float]:
+    disagree = detector_disagreement(governed)
+    governed["disagreement"] = disagree
+    governed["selectedLogic"] = "greedy_binary_segmentation"
+    if not disagree:
+        return weights
+    out = dict(weights)
+    bump = min(1.0, float(out.get("priorWeight") or 0.0) * 1.15 + 0.02)
+    remainder = max(0.0, 1.0 - bump)
+    role = float(out.get("roleWeight") or 0.0)
+    season = float(out.get("seasonWeight") or 0.0)
+    mass = role + season
+    if mass > 0:
+        out["roleWeight"] = remainder * (role / mass)
+        out["seasonWeight"] = remainder * (season / mass)
+    else:
+        out["roleWeight"] = 0.0
+        out["seasonWeight"] = 0.0
+    out["priorWeight"] = bump
+    return out
 
 
 def shrinkage_weights(role_n: int, season_n: int) -> dict[str, float]:
@@ -480,7 +518,7 @@ class RoleEpochBuilder:
             comparable = prepared[selected["start"]:selected["end"]]
 
         support_n = len(comparable)
-        weights = shrinkage_weights(support_n, n)
+        weights = apply_detector_disagreement(shrinkage_weights(support_n, n), governed)
         parts = partition_logs(prepared, claims=claims)
         public_logs = [_strip_internal(r) for r in comparable]
         public_epochs = epochs
@@ -612,7 +650,7 @@ class RoleEpochBuilder:
             comparable = prepared[selected["start"]:selected["end"]]
 
         support_n = len(comparable)
-        weights = shrinkage_weights(support_n, n)
+        weights = apply_detector_disagreement(shrinkage_weights(support_n, n), governed)
         public_logs = [_strip_internal(r) for r in comparable]
         return {
             "builder": BUILDER_ID,

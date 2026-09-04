@@ -23,6 +23,7 @@ from dcm.contracts.hashes import content_hash
 from dcm.research.indexes import EvidenceIndexes
 from dcm.research.os_graphs import _attach_dependents
 from dcm.research.scopes import SCOPE_RANK, canonical_scope
+from dcm.research.source_health import SourceHealthRegistry, default_cfb_source_health
 from dcm.sports.football.research_requirements import MARKET_REQUIREMENTS
 
 
@@ -55,9 +56,11 @@ def build_acquisition_actions(
     evidence: EvidenceIndexes | None = None,
     frontier_offer_ids: set[str] | None = None,
     telemetry: AlgorithmTelemetry | None = None,
+    source_health: SourceHealthRegistry | None = None,
 ) -> dict[str, Any]:
     """Group reusable-entity requests into fan-out AcquisitionActions."""
     tel = telemetry or AlgorithmTelemetry()
+    health = source_health or default_cfb_source_health()
     reqs = _attach_dependents(list(requests or []), rows)
     coverage_by_id = {
         str(row.get("requestId") or row.get("request_id") or ""): row
@@ -162,6 +165,17 @@ def build_acquisition_actions(
         act["offerIds"] = list(dict.fromkeys(act["offerIds"]))
         act["dependentOfferCount"] = len(act["offerIds"])
         act["requirementCount"] = len(act["requirementIds"])
+        candidates = health.route(claim_type=str(act.get("scope") or "SUBJECT"), sport="CFB")
+        act["sourceCandidates"] = candidates
+        act["sourceId"] = candidates[0] if candidates else None
+        act["pSuccess"] = 0.85
+        act["authority"] = 0.8
+        if act["sourceId"]:
+            row = health._state.get(str(act["sourceId"])) or {}
+            act["pSuccess"] = float(row.get("historicalSuccessProbability") or 0.85)
+            auth_map = row.get("authorityByClaimType") or {}
+            act["authority"] = float(auth_map.get(str(act.get("scope") or ""), 80)) / 100.0
+            act["freshness"] = float(row.get("observedFreshness") or row.get("expectedFreshness") or 0.5)
 
     hg = hypergraph_from_bundles({aid: act["requirementIds"] for aid, act in actions.items()})
     reverse_action_req = {aid: list(act["requirementIds"]) for aid, act in actions.items()}
@@ -171,8 +185,8 @@ def build_acquisition_actions(
         for rid in req_ids:
             reverse_req_action[rid].append(aid)
 
-    tel.record("ALG-INDEX-014", problem_class="GRAPH_TRAVERSAL", producer="dcm.research.acquisition.build_acquisition_actions", consumer="dcm.research.batch", count=len(actions))
-    tel.record("ALG-GROUP-006", problem_class="HAR_GROUPING", producer="dcm.research.acquisition.build_acquisition_actions", consumer="dcm.research.batch", count=len(actions))
+    tel.record("ALG-INDEX-014", problem_class="GRAPH_TRAVERSAL", producer="dcm.research.acquisition.build_acquisition_actions", consumer="dcm.research.batch", count=len(actions), downstream_used=True)
+    tel.record("ALG-GROUP-006", problem_class="HAR_GROUPING", producer="dcm.research.acquisition.build_acquisition_actions", consumer="dcm.research.batch", count=len(actions), downstream_used=True)
 
     payload = {
         "schema": "pillars_dcm.acquisition_actions.v1",
@@ -222,8 +236,8 @@ def schedule_acquisition_actions(
     universe = list(dict.fromkeys(universe))
     weights = {aid: float(act.get("cost") or 1.0) for aid, act in actions.items()}
     set_cover_ids = cover_actions(universe, cover_sets, weights)
-    tel.record("ALG-SEARCH-019", problem_class="SET_COVER", producer="dcm.research.acquisition.schedule_acquisition_actions", consumer="dcm.research.batch", count=len(set_cover_ids) or 1)
-    tel.record("ALG-SCHED-002", problem_class="RESEARCH_SCHEDULE", producer="dcm.research.acquisition.schedule_acquisition_actions", consumer="dcm.research.batch")
+    tel.record("ALG-SEARCH-019", problem_class="SET_COVER", producer="dcm.research.acquisition.schedule_acquisition_actions", consumer="dcm.research.batch", count=len(set_cover_ids) or 1, downstream_used=True)
+    tel.record("ALG-SCHED-002", problem_class="RESEARCH_SCHEDULE", producer="dcm.research.acquisition.schedule_acquisition_actions", consumer="dcm.research.batch", downstream_used=True)
 
     covered: set[str] = set()
 
@@ -242,8 +256,8 @@ def schedule_acquisition_actions(
 
     scheduler = LazyGreedyScheduler(gain_fn, cost_fn)
     celf_ids = scheduler.run(list(actions), k=max_actions)
-    tel.record("ALG-SCHED-001", problem_class="RESEARCH_SCHEDULE", producer="dcm.algorithms.scheduling.LazyGreedyScheduler", consumer="dcm.research.acquisition.schedule_acquisition_actions", count=len(celf_ids) or 1)
-    tel.record("ALG-SEARCH-020", problem_class="SUBMODULAR", producer="dcm.research.acquisition.schedule_acquisition_actions", consumer="dcm.research.batch")
+    tel.record("ALG-SCHED-001", problem_class="RESEARCH_SCHEDULE", producer="dcm.algorithms.scheduling.LazyGreedyScheduler", consumer="dcm.research.acquisition.schedule_acquisition_actions", count=len(celf_ids) or 1, downstream_used=True)
+    tel.record("ALG-SEARCH-020", problem_class="SUBMODULAR", producer="dcm.research.acquisition.schedule_acquisition_actions", consumer="dcm.research.batch", downstream_used=True)
 
     # Recompute covered after CELF; prefer CELF order as live selector.
     # SPORT/COMPETITION do not consume the unique-offer budget.
@@ -267,10 +281,10 @@ def schedule_acquisition_actions(
 
     values = {aid: float(actions[aid].get("expectedGain") or 0.0) for aid in selected}
     packed = greedy_value_density_pack(selected, values, weights, capacity=float(max_actions))
-    tel.record("ALG-SCHED-003", problem_class="BATCH_PACK", producer="dcm.algorithms.scheduling.greedy_value_density_pack", consumer="dcm.research.batch")
+    tel.record("ALG-SCHED-003", problem_class="BATCH_PACK", producer="dcm.algorithms.scheduling.greedy_value_density_pack", consumer="dcm.research.batch", downstream_used=True)
     sizes = {aid: float(max(1, actions[aid].get("dependentOfferCount") or 1)) for aid in packed}
     bins = first_fit_decreasing(packed, sizes, bin_capacity=float(max(1, max_dependent_offers)), max_bins=max(1, max_actions))
-    tel.record("ALG-SCHED-004", problem_class="BATCH_PACK", producer="dcm.algorithms.scheduling.first_fit_decreasing", consumer="dcm.research.batch")
+    tel.record("ALG-SCHED-004", problem_class="BATCH_PACK", producer="dcm.algorithms.scheduling.first_fit_decreasing", consumer="dcm.research.batch", downstream_used=True)
 
     by_event: dict[str, list[str]] = defaultdict(list)
     for aid in packed:

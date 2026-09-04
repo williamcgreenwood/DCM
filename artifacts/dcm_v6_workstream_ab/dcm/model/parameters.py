@@ -520,14 +520,29 @@ def build_parameter_snapshot(
         from dcm.algorithms.ml_families import zscore_ood
 
         sample_key = "pass_yds" if family == "gridiron" else "pts"
+        share_keys = ("rush_att", "targets", "pass_att", "snaps") if family == "gridiron" else ()
         pop = []
+        share_pop = []
         for log_row in logs:
-            if isinstance(log_row, dict) and log_row.get(sample_key) is not None:
+            if not isinstance(log_row, dict):
+                continue
+            if log_row.get(sample_key) is not None:
                 try:
                     pop.append(float(log_row[sample_key]))
                 except (TypeError, ValueError):
                     pass
-        if len(pop) >= 3:
+            for sk in share_keys:
+                if log_row.get(sk) is not None:
+                    try:
+                        share_pop.append(float(log_row[sk]))
+                    except (TypeError, ValueError):
+                        pass
+                    break
+        if len(share_pop) >= 3:
+            last = share_pop[-1]
+            z = zscore_ood(last, share_pop[:-1] if len(share_pop) > 3 else share_pop)
+            ood = max(0.0, min(1.0, z / 6.0))
+        elif len(pop) >= 3:
             last = pop[-1]
             z = zscore_ood(last, pop[:-1] if len(pop) > 3 else pop)
             ood = max(0.0, min(1.0, z / 6.0))

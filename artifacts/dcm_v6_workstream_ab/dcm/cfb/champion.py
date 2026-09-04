@@ -99,7 +99,19 @@ def select_champion(
         "distribution": dist,
         "challengers": [dict(c) for c in CHALLENGERS],
         "gpuRequired": False,
+        "actualProducer": "dcm.model.gridiron_models.empirical_bayes_shrink",
+        "lifecycle": "SHADOW_DIAGNOSTIC" if not benchmark else "SELECTED",
+        "note": (
+            base.get("note")
+            or "Selector is diagnostic unless a chronological benchmark actually dispatches a different producer."
+        ),
     })
+    if not benchmark:
+        base["lifecycle"] = "SHADOW_DIAGNOSTIC"
+        base["note"] = (
+            "Portable Empirical Bayes (ALG-ML-PROB-001) is the actual ParameterSnapshot producer. "
+            "This table does not dispatch a different model at LR000000."
+        )
     return base
 
 
@@ -131,7 +143,10 @@ def select_cfb_champions(
         "marketCount": len(by_market),
         "learningRevision": "LR000000",
         "predictiveClaim": "NONE",
-        "note": "Champions are portable. Challengers are recorded, never required for host execution.",
+        "selectorLifecycle": "SHADOW_DIAGNOSTIC",
+        "actualChampionProducer": "dcm.model.gridiron_models",
+        "actualChampionAlgorithmId": "ALG-ML-PROB-001",
+        "note": "Champions are portable. The selector table is SHADOW until a chronological benchmark dispatches a different producer. Empirical Bayes already runs inside ParameterSnapshots.",
     }
     body["contentHash"] = content_hash({k: v for k, v in body.items() if k not in {"contentHash", "markets"}})
     return body

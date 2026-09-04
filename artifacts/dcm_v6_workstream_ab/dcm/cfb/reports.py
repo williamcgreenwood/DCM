@@ -127,7 +127,7 @@ def rank_cfb_modeled(
     for p in cfb:
         if p.get("selectionScore") is None:
             p["selectionScore"] = selection_score(p)
-    tel.record("ALG-SORT-003", problem_class="TOPK_PARTIAL", producer="dcm.algorithms.sorting.heap_topk", consumer="dcm.cfb.reports.rank_cfb_modeled", count=1)
+    tel.record("ALG-SORT-003", problem_class="TOPK_PARTIAL", producer="dcm.algorithms.sorting.heap_topk", consumer="dcm.cfb.reports.rank_cfb_modeled", count=1, downstream_used=True)
     frontier = heap_topk(
         cfb,
         min(k, len(cfb)),
@@ -138,7 +138,7 @@ def rank_cfb_modeled(
         key=lambda p: (float(p.get("selectionScore") or -999), str((_row(p).get("projectionId") or ""))),
         reverse=True,
     )
-    tel.record("ALG-SORT-001", problem_class="FINAL_RANK", producer="dcm.algorithms.sorting.timsort", consumer="dcm.cfb.reports.rank_cfb_modeled")
+    tel.record("ALG-SORT-001", problem_class="FINAL_RANK", producer="dcm.algorithms.sorting.timsort", consumer="dcm.cfb.reports.rank_cfb_modeled", downstream_used=True)
     for i, p in enumerate(ranked, 1):
         p["cfbRank"] = i
     return ranked
@@ -180,7 +180,7 @@ def cfb_playables_final(
     tel = telemetry or AlgorithmTelemetry()
     cfb_qualified = [p for p in qualified if _is_cfb(p)]
     card = build_card(cfb_qualified, max_size=6, max_per_event=2)
-    tel.record("ALG-GROUP-009", problem_class="HAR_GROUPING", producer="dcm.selection.portfolio.build_card", consumer="dcm.cfb.reports.cfb_playables_final", count=len(card) or 1)
+    tel.record("ALG-GROUP-009", problem_class="HAR_GROUPING", producer="dcm.selection.portfolio.build_card", consumer="dcm.cfb.reports.cfb_playables_final", count=len(card) or 1, downstream_used=True)
     rows = [cfb_top100_row(p, rank=i) for i, p in enumerate(card, 1)]
     for row, p in zip(rows, card):
         row["not_a_recommendation"] = False

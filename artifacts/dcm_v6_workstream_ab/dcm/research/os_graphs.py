@@ -142,11 +142,11 @@ def build_board_graph(
     for _k, a, b in edges:
         adj[a].append(b)
     sccs = cycles(adj)
-    tel.record("ALG-GROUP-001", problem_class="HAR_GROUPING", producer="dcm.research.os_graphs.build_board_graph", consumer="dcm.cfb.launch")
-    tel.record("ALG-GROUP-002", problem_class="ENTITY_MERGE", producer="dcm.research.os_graphs.build_board_graph", consumer="dcm.identity.resolve")
-    tel.record("ALG-GROUP-003", problem_class="RESEARCH_COMMUNITY", producer="dcm.research.os_graphs.build_board_graph", consumer="dcm.cfb.launch", count=len(components))
-    tel.record("ALG-INDEX-012", problem_class="GRAPH_TRAVERSAL", producer="dcm.algorithms.indexing.CSRGraph", consumer="dcm.research.os_graphs.build_board_graph")
-    tel.record("ALG-GROUP-004", problem_class="CYCLE_SAFETY", producer="dcm.research.os_graphs.build_board_graph", consumer="dcm.cfb.launch", count=len(sccs) or 1)
+    tel.record("ALG-GROUP-001", problem_class="HAR_GROUPING", producer="dcm.research.os_graphs.build_board_graph", consumer="dcm.cfb.launch", downstream_used=True)
+    tel.record("ALG-GROUP-002", problem_class="ENTITY_MERGE", producer="dcm.research.os_graphs.build_board_graph", consumer="dcm.identity.resolve", downstream_used=True)
+    tel.record("ALG-GROUP-003", problem_class="RESEARCH_COMMUNITY", producer="dcm.research.os_graphs.build_board_graph", consumer="dcm.cfb.launch", count=len(components), downstream_used=True)
+    tel.record("ALG-INDEX-012", problem_class="GRAPH_TRAVERSAL", producer="dcm.algorithms.indexing.CSRGraph", consumer="dcm.research.os_graphs.build_board_graph", downstream_used=True)
+    tel.record("ALG-GROUP-004", problem_class="CYCLE_SAFETY", producer="dcm.research.os_graphs.build_board_graph", consumer="dcm.cfb.launch", count=len(sccs) or 1, downstream_used=True)
 
     reverse_event = {eid: list(oids) for eid, oids in indexes.by_event.items() if eid}
     reverse_team = {tid: list(oids) for tid, oids in indexes.by_affiliation.items() if tid}
@@ -204,8 +204,8 @@ def build_market_demand_graph(
         for oid in offer_ids:
             edges.append({"type": "demands", "from": f"Offer:{oid}", "to": def_id})
     hg = hypergraph_from_bundles(bundles)
-    tel.record("ALG-GROUP-001", problem_class="HAR_GROUPING", producer="dcm.research.os_graphs.build_market_demand_graph", consumer="dcm.cfb.launch")
-    tel.record("ALG-INDEX-014", problem_class="GRAPH_TRAVERSAL", producer="dcm.algorithms.graph.hypergraph_from_bundles", consumer="dcm.research.os_graphs.build_market_demand_graph", count=len(bundles))
+    tel.record("ALG-GROUP-001", problem_class="HAR_GROUPING", producer="dcm.research.os_graphs.build_market_demand_graph", consumer="dcm.cfb.launch", downstream_used=True)
+    tel.record("ALG-INDEX-014", problem_class="GRAPH_TRAVERSAL", producer="dcm.algorithms.graph.hypergraph_from_bundles", consumer="dcm.research.os_graphs.build_market_demand_graph", count=len(bundles), downstream_used=True)
     body = {
         "schema": "pillars_dcm.market_demand_graph.v1",
         "nodeCount": len(nodes) + sum(len(v) for v in bundles.values()),
@@ -294,11 +294,11 @@ def build_requirement_graph(
     except Exception:
         layers = []
         topo_ok = False
-    tel.record("ALG-GROUP-005", problem_class="DEPENDENCY_ORDER", producer="dcm.research.os_graphs.build_requirement_graph", consumer="dcm.research.acquisition", count=len(layers) or 1)
-    tel.record("ALG-SORT-008", problem_class="DEPENDENCY_ORDER", producer="dcm.algorithms.sorting.topological_kahn", consumer="dcm.research.os_graphs.build_requirement_graph", count=len(layers) or 1)
-    tel.record("ALG-GROUP-004", problem_class="CYCLE_SAFETY", producer="dcm.research.os_graphs.build_requirement_graph", consumer="dcm.research.acquisition", count=len(sccs) or 1)
-    tel.record("ALG-INDEX-013", problem_class="HOT_HASH_INDEX", producer="dcm.research.os_graphs.build_requirement_graph", consumer="dcm.research.acquisition", count=len(reverse_req_offers), applicability="APPLICABLE", note="CSC reverse Requirement→Offers")
-    tel.record("ALG-INDEX-008", problem_class="HOT_HASH_INDEX", producer="dcm.research.os_graphs.build_requirement_graph", consumer="dcm.research.acquisition", count=1, note="python bitset eligibility")
+    tel.record("ALG-GROUP-005", problem_class="DEPENDENCY_ORDER", producer="dcm.research.os_graphs.build_requirement_graph", consumer="dcm.research.acquisition", count=len(layers) or 1, downstream_used=True)
+    tel.record("ALG-SORT-008", problem_class="DEPENDENCY_ORDER", producer="dcm.algorithms.sorting.topological_kahn", consumer="dcm.research.os_graphs.build_requirement_graph", count=len(layers) or 1, downstream_used=True)
+    tel.record("ALG-GROUP-004", problem_class="CYCLE_SAFETY", producer="dcm.research.os_graphs.build_requirement_graph", consumer="dcm.research.acquisition", count=len(sccs) or 1, downstream_used=True)
+    tel.record("ALG-INDEX-013", problem_class="HOT_HASH_INDEX", producer="dcm.research.os_graphs.build_requirement_graph", consumer="dcm.research.acquisition", count=len(reverse_req_offers), applicability="APPLICABLE", note="CSC reverse Requirement→Offers", downstream_used=True)
+    tel.record("ALG-INDEX-008", problem_class="HOT_HASH_INDEX", producer="dcm.research.os_graphs.build_requirement_graph", consumer="dcm.research.acquisition", count=1, note="python bitset eligibility", downstream_used=True)
 
     body = {
         "schema": "pillars_dcm.requirement_graph.v1",

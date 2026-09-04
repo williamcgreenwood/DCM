@@ -2,10 +2,10 @@
 
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
-- Modules: **268**
-- Symbols: **1858**
+- Modules: **270**
+- Symbols: **1897**
 - Parse errors: **0**
-- Inventory hash: `0f6693681e3ed41d7abcf3a5feec2d4a758301817f0fc54d639e2ada4e669384`
+- Inventory hash: `5c6889973fc05662a469b1f912469c164775e765c6916f9e7a1f37b23c64f5de`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -27,18 +27,19 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P16 | `artifacts/dcm_v6_workstream_ab/dcm/algorithms/searching.py` | 4 | 43 |
 | P16 | `artifacts/dcm_v6_workstream_ab/dcm/algorithms/selection.py` | 1 | 3 |
 | P16 | `artifacts/dcm_v6_workstream_ab/dcm/algorithms/sorting.py` | 1 | 17 |
-| P16 | `artifacts/dcm_v6_workstream_ab/dcm/algorithms/telemetry.py` | 1 | 4 |
+| P16 | `artifacts/dcm_v6_workstream_ab/dcm/algorithms/telemetry.py` | 1 | 5 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/archive.py` | 0 | 2 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/cfb/__init__.py` | 0 | 1 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/cfb/accounting.py` | 0 | 3 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/cfb/champion.py` | 0 | 3 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/cfb/coextract.py` | 0 | 3 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/cfb/event_worlds.py` | 0 | 3 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/cfb/frontier.py` | 0 | 3 |
+| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/cfb/event_worlds.py` | 0 | 2 |
+| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/cfb/frontier.py` | 0 | 4 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/cfb/har_delta.py` | 0 | 3 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/cfb/launch.py` | 0 | 5 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/cfb/markets.py` | 0 | 5 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/cfb/refresh.py` | 0 | 1 |
+| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/cfb/markets.py` | 0 | 6 |
+| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/cfb/opportunity_ledger.py` | 0 | 4 |
+| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/cfb/refresh.py` | 0 | 2 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/cfb/reports.py` | 0 | 11 |
 | P7 | `artifacts/dcm_v6_workstream_ab/dcm/chat/__init__.py` | 0 | 0 |
 | P7 | `artifacts/dcm_v6_workstream_ab/dcm/chat/__main__.py` | 0 | 0 |
@@ -121,7 +122,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/authority.py` | 1 | 5 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/batch.py` | 0 | 4 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/cache.py` | 1 | 5 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/cache_layers.py` | 1 | 8 |
+| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/cache_layers.py` | 1 | 9 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/claims.py` | 0 | 3 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/classify.py` | 0 | 7 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/classify_runtime.py` | 0 | 2 |
@@ -136,9 +137,9 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/gridiron_gamelog.py` | 0 | 9 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/historical_gap.py` | 0 | 4 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/host_plan.py` | 0 | 1 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/indexes.py` | 2 | 18 |
+| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/indexes.py` | 2 | 19 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/lineup.py` | 0 | 3 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/material_facts.py` | 0 | 7 |
+| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/material_facts.py` | 0 | 12 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/os_graphs.py` | 0 | 8 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/player_offer_set.py` | 1 | 6 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/player_packet.py` | 0 | 13 |
@@ -147,17 +148,17 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/readiness.py` | 0 | 4 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/requests.py` | 0 | 6 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/research_store.py` | 1 | 26 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/role_epoch.py` | 1 | 25 |
+| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/role_epoch.py` | 1 | 27 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/scopes.py` | 0 | 6 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/source_catalog.py` | 0 | 5 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/source_health.py` | 1 | 7 |
+| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/source_health.py` | 1 | 12 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/staged.py` | 0 | 5 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/statepack.py` | 4 | 26 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/subject_offer_set.py` | 1 | 10 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/temporal.py` | 1 | 4 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/universal_packets.py` | 0 | 7 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/universal_plan.py` | 0 | 1 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/runner.py` | 0 | 10 |
+| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/runner.py` | 0 | 11 |
 | P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/__init__.py` | 0 | 0 |
 | P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/archive_receipt.py` | 1 | 7 |
 | P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/benchmark.py` | 0 | 4 |
@@ -224,6 +225,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_cfb_guarded_launch.py` | 0 | 5 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_cfb_reference_implementation.py` | 0 | 20 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_cfb_research_os.py` | 0 | 11 |
+| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_cfb_semantic_completion.py` | 0 | 17 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_e2e_runner.py` | 0 | 18 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_e2e_world_to_lineup.py` | 0 | 21 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_entity_packets.py` | 0 | 13 |
@@ -566,11 +568,12 @@ _No class/function symbols._
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/algorithms/telemetry.py`
 
-- `class` **AlgorithmTelemetry** L11 — Records constitution algorithm executions on the live HAR path.
-- `method` **AlgorithmTelemetry.__init__** L14
-- `method` **AlgorithmTelemetry.record** L19
-- `method` **AlgorithmTelemetry.select_and_record** L68
-- `method` **AlgorithmTelemetry.snapshot** L93
+- `class` **AlgorithmTelemetry** L20 — Records constitution algorithm executions on the live HAR path.
+- `method` **AlgorithmTelemetry.__init__** L23
+- `method` **AlgorithmTelemetry.record** L28
+- `method` **AlgorithmTelemetry.select_and_record** L86
+- `method` **AlgorithmTelemetry.snapshot** L113
+- `function` **ceremonial_violations** L139 — NO_CEREMONIAL_ALGORITHM_EXECUTION.
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/archive.py`
 
@@ -591,7 +594,7 @@ _No class/function symbols._
 
 - `function` **_metrics_ok** L52 — Prefer lower log-loss / Brier / ECE; require portable CPU.
 - `function` **select_champion** L59
-- `function` **select_cfb_champions** L106
+- `function` **select_cfb_champions** L118
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/cfb/coextract.py`
 
@@ -601,15 +604,15 @@ _No class/function symbols._
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/cfb/event_worlds.py`
 
-- `function` **cfb_teammate_groups** L15
-- `function` **_share_int** L35
-- `function` **simulate_joint_cfb_event_worlds** L51 — Shared team plays/pass-rate/rush-rate → player opportunity → efficiency.
+- `function` **cfb_teammate_groups** L17
+- `function` **simulate_joint_cfb_event_worlds** L37 — Shared team plays/pass-rate/rush-rate → residual-aware player opportunity.
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/cfb/frontier.py`
 
-- `function` **_unresolved_material** L17
-- `function` **estimate_frontier_impact** L25 — Cheap EVSI stand-in: rank displacement × unresolved materiality × uncertainty.
-- `function` **run_frontier_loop** L35
+- `function` **_unresolved_material** L20
+- `function` **estimate_frontier_impact** L28 — Offer-level materiality used when no AcquisitionAction graph is supplied.
+- `function` **estimate_action_evsi** L40 — Utility(action) = fanout × materiality × P(success) × authority / cost.
+- `function` **run_frontier_loop** L63
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/cfb/har_delta.py`
 
@@ -619,10 +622,10 @@ _No class/function symbols._
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/cfb/launch.py`
 
-- `function` **_write** L46
-- `function` **prepare_cfb_research_os** L52 — Emit graphs, indexes, and live AcquisitionActions BEFORE web acquisition.
-- `function` **attach_cfb_prop_flags** L252
-- `function` **emit_cfb_forecast_artifacts** L261
+- `function` **_write** L40
+- `function` **prepare_cfb_research_os** L46 — Emit graphs, indexes, and live AcquisitionActions BEFORE web acquisition.
+- `function` **attach_cfb_prop_flags** L244
+- `function` **emit_cfb_forecast_artifacts** L253
 - `function` **persist_algorithm_telemetry** L419
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/cfb/markets.py`
@@ -632,10 +635,19 @@ _No class/function symbols._
 - `function` **inventory_raw_labels** L393
 - `function` **is_active_cfb_market** L413
 - `function` **contract_for** L418
+- `function` **cfb_market_execution_matrix** L438 — Machine-readable completeness of every ACTIVE CFB market's execution path.
+
+### `artifacts/dcm_v6_workstream_ab/dcm/cfb/opportunity_ledger.py`
+
+- `function` **_role** L23
+- `function` **_mean** L27
+- `function` **allocate_counts** L37 — Absolute means, capped, never renormalized to 100% of the team pool.
+- `function` **allocate_team_opportunity** L64 — Return per-player counts plus residual buckets.
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/cfb/refresh.py`
 
-- `function` **apply_final_refresh** L30
+- `function` **_regrade** L40
+- `function` **apply_final_refresh** L64
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/cfb/reports.py`
 
@@ -1267,11 +1279,11 @@ _No class/function symbols._
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/acquisition.py`
 
-- `function` **_req_id** L46
-- `function` **build_acquisition_actions** L50 — Group reusable-entity requests into fan-out AcquisitionActions.
-- `function` **schedule_acquisition_actions** L196 — Live CELF selector with set-cover + constrained batch packing.
-- `method` **schedule_acquisition_actions.gain_fn** L230
-- `method` **schedule_acquisition_actions.cost_fn** L240
+- `function` **_req_id** L47
+- `function` **build_acquisition_actions** L51 — Group reusable-entity requests into fan-out AcquisitionActions.
+- `function` **schedule_acquisition_actions** L210 — Live CELF selector with set-cover + constrained batch packing.
+- `method` **schedule_acquisition_actions.gain_fn** L244
+- `method` **schedule_acquisition_actions.cost_fn** L254
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/adapters/__init__.py`
 
@@ -1409,12 +1421,13 @@ _No class/function symbols._
 - `function` **_key** L41
 - `class` **ResearchCacheCascade** L45 — Exact-first reuse. Web acquisition is L6 and never the first lookup.
 - `method` **ResearchCacheCascade.__init__** L48
-- `method` **ResearchCacheCascade.put** L61
-- `method` **ResearchCacheCascade.get** L73
-- `method` **ResearchCacheCascade.disposition** L103
-- `method` **ResearchCacheCascade.snapshot** L137
-- `method` **ResearchCacheCascade.close** L148
-- `function` **content_address_bytes** L155
+- `method` **ResearchCacheCascade.put** L69
+- `method` **ResearchCacheCascade.get** L90
+- `method` **ResearchCacheCascade.get_asof** L139 — L4 bitemporal catalog: latest payload with asof <= as_of.
+- `method` **ResearchCacheCascade.disposition** L164
+- `method` **ResearchCacheCascade.snapshot** L198
+- `method` **ResearchCacheCascade.close** L220
+- `function` **content_address_bytes** L227
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/claims.py`
 
@@ -1563,23 +1576,24 @@ _No class/function symbols._
 - `class` **BoardIndexes** L30 — Exact indexes over a frozen board. No repeated full-board linear scans.
 - `method` **BoardIndexes.__init__** L33
 - `method` **BoardIndexes.exact_offer** L104
-- `method` **BoardIndexes.lookup_composite** L108
-- `method` **BoardIndexes.sqlite_event_offers** L121
-- `method` **BoardIndexes.might_have_offer** L126
-- `method` **BoardIndexes.alias_hits** L130
-- `method` **BoardIndexes.fts_rank** L134 — BM25 over player names. Never used to rediscover known offer IDs.
-- `method` **BoardIndexes.fuzzy_player** L156
-- `method` **BoardIndexes.near_duplicate_names** L177
-- `method` **BoardIndexes.requirement_bitmaps** L202
-- `method` **BoardIndexes.query_retrieval_cascade** L214 — Exact-first then lexical/fuzzy/near-dup fusion. Never embeddings for known IDs.
-- `method` **BoardIndexes.close** L282
-- `class` **EvidenceIndexes** L289 — Exact reusable-evidence lookup. Web acquisition is last.
-- `method` **EvidenceIndexes.__init__** L292
-- `method` **EvidenceIndexes.add** L302
-- `method` **EvidenceIndexes.lookup_scope** L318
-- `method` **EvidenceIndexes.has_hash** L323
-- `method` **EvidenceIndexes.close** L329
-- `function` **requirement_offer_bitmaps** L336 — Reverse index Requirement → Offers as Python bitsets plus id lists.
+- `method` **BoardIndexes.lookup_composite** L115
+- `method` **BoardIndexes.sqlite_event_offers** L128
+- `method` **BoardIndexes.might_have_offer** L133
+- `method` **BoardIndexes.alias_hits** L137
+- `method` **BoardIndexes.fts_rank** L141 — BM25 over player names. Never used to rediscover known offer IDs.
+- `method` **BoardIndexes.fuzzy_player** L163
+- `method` **BoardIndexes.near_duplicate_names** L184
+- `method` **BoardIndexes.requirement_bitmaps** L209
+- `method` **BoardIndexes.query_retrieval_cascade** L222 — Exact-first then lexical/fuzzy/near-dup fusion. Never embeddings for known IDs.
+- `method` **BoardIndexes.resolve_identities** L290 — Exact-first identity. Fuzzy/FTS/cascade only when projectionId misses.
+- `method` **BoardIndexes.close** L391
+- `class` **EvidenceIndexes** L398 — Exact reusable-evidence lookup. Web acquisition is last.
+- `method` **EvidenceIndexes.__init__** L401
+- `method` **EvidenceIndexes.add** L411
+- `method` **EvidenceIndexes.lookup_scope** L427
+- `method` **EvidenceIndexes.has_hash** L432
+- `method` **EvidenceIndexes.close** L438
+- `function` **requirement_offer_bitmaps** L445 — Reverse index Requirement → Offers as Python bitsets plus id lists.
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/lineup.py`
 
@@ -1589,13 +1603,18 @@ _No class/function symbols._
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/material_facts.py`
 
-- `function` **_authority** L23
-- `function` **_freshness** L31
-- `function` **_fact_key** L38
-- `function` **resolve_material_facts** L45
-- `function` **hold_playable_scope_ids** L107 — Subject/event/affiliation ids whose unresolved conflicts hold PLAYABLE.
-- `function` **apply_hold_playable** L120 — Demote PLAYABLE when a material conflict is unresolved. Never raises P.
-- `function` **json_safe_value** L140
+- `function` **_authority** L30
+- `function` **_freshness** L38
+- `function` **parse_ts** L45
+- `function` **is_after_cutoff** L63 — True when observed is strictly after cutoff. ISO-normalized, not naive strings.
+- `function` **_fact_key** L74
+- `function` **resolve_material_facts** L81
+- `function` **facts_to_features** L179 — MaterialFactResolution → FeatureRecords with provenance.
+- `function` **apply_facts_to_context** L243 — Overlay resolved facts onto a player/event parameter context. Never post-cutoff.
+- `function` **_feature_family** L255
+- `function` **hold_playable_scope_ids** L267 — Subject/event/affiliation ids whose unresolved conflicts hold PLAYABLE.
+- `function` **apply_hold_playable** L280 — Demote PLAYABLE when a material conflict is unresolved. Never raises P.
+- `function` **json_safe_value** L300
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/os_graphs.py`
 
@@ -1726,20 +1745,22 @@ _No class/function symbols._
 - `function` **detect_change_points** L132 — Greedy binary segmentation. Returns sorted start indices of segments (always includes 0).
 - `method` **detect_change_points.best_split** L138
 - `function` **governed_change_points** L169 — Execute cataloged RoleEpoch detectors. Does not silently rewrite greedy cuts.
-- `function` **shrinkage_weights** L198 — role_sample → player_season → archetype/league prior. Sums to 1.
-- `function` **partition_logs** L218
-- `function` **_projected_label** L253
-- `function` **_epoch_record** L273
-- `function` **_strip_internal** L294
-- `function` **_is_gridiron** L299
-- `function` **_share_value** L311 — Primary share series: snaps, else routes, else targets, else pass_att, else rush_att.
-- `function` **_qb_id_of** L323
-- `function` **_gridiron_appearance** L332
-- `function` **_gridiron_label_from_share** L361
-- `function` **_projected_gridiron_label** L371
-- `class` **RoleEpochBuilder** L386 — Production role-epoch constructor. Builder id never contains 'stub'.
-- `method` **RoleEpochBuilder.build** L391
-- `method` **RoleEpochBuilder._build_gridiron** L507
+- `function` **detector_disagreement** L200 — True when CUSUM/Page-Hinkley cuts are not a subset of greedy cuts.
+- `function` **apply_detector_disagreement** L214
+- `function` **shrinkage_weights** L236 — role_sample → player_season → archetype/league prior. Sums to 1.
+- `function` **partition_logs** L256
+- `function` **_projected_label** L291
+- `function` **_epoch_record** L311
+- `function` **_strip_internal** L332
+- `function` **_is_gridiron** L337
+- `function` **_share_value** L349 — Primary share series: snaps, else routes, else targets, else pass_att, else rush_att.
+- `function` **_qb_id_of** L361
+- `function` **_gridiron_appearance** L370
+- `function` **_gridiron_label_from_share** L399
+- `function` **_projected_gridiron_label** L409
+- `class` **RoleEpochBuilder** L424 — Production role-epoch constructor. Builder id never contains 'stub'.
+- `method` **RoleEpochBuilder.build** L429
+- `method` **RoleEpochBuilder._build_gridiron** L545
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/scopes.py`
 
@@ -1760,14 +1781,19 @@ _No class/function symbols._
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/source_health.py`
 
-- `class` **SourceHealthRegistry** L14 — Claim-specific source routing with circuit breakers and bounded fallbacks.
-- `method` **SourceHealthRegistry.__init__** L17
-- `method` **SourceHealthRegistry._ensure** L31
-- `method` **SourceHealthRegistry.record_success** L62
-- `method` **SourceHealthRegistry.record_failure** L78
-- `method` **SourceHealthRegistry.route** L90 — Prefer official/structured, then stats, then reporting, search last.
-- `method` **SourceHealthRegistry.snapshot** L109
-- `function` **default_cfb_source_health** L126
+- `function` **_now** L16
+- `function` **_iso** L20
+- `function` **_parse_ts** L24
+- `class` **SourceHealthRegistry** L42 — Claim-specific source routing with circuit breakers and bounded fallbacks.
+- `method` **SourceHealthRegistry.__init__** L45
+- `method` **SourceHealthRegistry._ensure** L59
+- `method` **SourceHealthRegistry._refresh_circuit** L95
+- `method` **SourceHealthRegistry.record_success** L105
+- `method` **SourceHealthRegistry.record_failure** L127
+- `method` **SourceHealthRegistry.fallbacks** L145 — Traverse fallbackSourceIds, skipping currently OPEN circuits.
+- `method` **SourceHealthRegistry.route** L163 — Prefer official/structured, then stats, then reporting, search last.
+- `method` **SourceHealthRegistry.snapshot** L191
+- `function` **default_cfb_source_health** L211 — CFB catalog. Never routes college football through a pro-football adapter.
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/staged.py`
 
@@ -1856,8 +1882,9 @@ _No class/function symbols._
 - `function` **_active_calibration** L216
 - `function` **run_dcm** L225
 - `method` **run_dcm._snapshot_for** L661
-- `method` **run_dcm.slim** L1044
-- `function` **main** L1442
+- `method` **run_dcm._resimulate_material** L1011
+- `method` **run_dcm.slim** L1074
+- `function` **main** L1472
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/runtime/__init__.py`
 
@@ -2403,6 +2430,26 @@ _No class/function symbols._
 - `function` **test_cfb_fixture_end_to_end_top100_top25_playables_freeze** L138
 - `function` **test_offered_side_only_and_goblin_after_accounting** L230
 - `function` **test_partial_bundle_still_emits_graphs_and_per_prop_states** L238
+
+### `artifacts/dcm_v6_workstream_ab/tests/test_cfb_semantic_completion.py`
+
+- `function` **test_ceremonial_violations_detect_sample_queries** L17
+- `function` **test_launch_source_does_not_sample_query_indexes** L43
+- `function` **test_exact_identity_skips_fuzzy** L54
+- `function` **test_lone_rb_does_not_absorb_team_rush** L73
+- `function` **test_kicker_gets_zero_rush_and_targets** L81
+- `function` **test_two_rbs_share_and_leave_residual** L93
+- `function` **test_joint_worlds_residual_and_kicker_isolation** L104
+- `function` **test_material_fact_hash_includes_values** L118
+- `function` **test_source_health_open_skipped_half_open_and_cfb_adapter** L137
+- `function` **test_cache_does_not_self_put_get_requests** L159
+- `function` **test_line_only_refresh_does_not_rebuild_worlds** L176
+- `method` **test_line_only_refresh_does_not_rebuild_worlds.resim** L190
+- `function` **test_material_refresh_rebuilds_worlds** L206
+- `method` **test_material_refresh_rebuilds_worlds.resim** L220
+- `function` **test_frontier_does_not_increment_on_generic_evidence** L236
+- `function` **test_isotonic_conformal_inactive_at_lr000000** L247
+- `function` **test_prepare_has_no_ceremonial_violations** L267
 
 ### `artifacts/dcm_v6_workstream_ab/tests/test_e2e_runner.py`
 

@@ -27,12 +27,12 @@ This file is the human dashboard. It must be updated on every coding pass togeth
 | P5 Audit / portability / ChatGPT-native execution | 10 | 8 | STRONG PARTIAL | current-HAR fresh ChatGPT acceptance; immutable release retrieval |
 | P6 Settlement / calibration / learning | 10 | 6 | PARTIAL + EXTERNAL VALIDATION | exact platform coverage; CFB prospective settlements; CRPS/subgroups; chronological unseen settlements before promotion |
 | P7 Host-native execution contract | 10 | 8 | STRONG PARTIAL | current CFB HAR forecast through `dcm-host cfb-launch` on a fresh wheel; no second engine |
-| P8 Universal source acquisition | 10 | 6 | PARTIAL | live adapter fetch beyond fixtures; conflict policy + licensed providers |
+| P8 Universal source acquisition | 10 | 7 | PARTIAL | live adapter fetch beyond fixtures; licensed providers remain optional |
 | P9 Universal core migration | 10 | 9 | STRONG PARTIAL | retire remaining PLAYER/TEAM claim lookups at packet/parameter adapters |
 | P10 Full sport coverage | 10 | 3 | EARLY | each supported sport reaches 24/24 plugin components + validation suite |
 | P11 Release + fresh-environment acceptance | 10 | 7 | PARTIAL | wheel/release + exact hash + current HAR-only fresh ChatGPT acceptance |
 | P12 Research archive / index / reuse | 10 | 8 | STRONG PARTIAL | Drive credentials; high-volume queryable store; retention/licensing enforcement beyond local blobs |
-| P13 Performance / search / token optimization | 10 | 7 | PARTIAL | measured CPU/RSS/token certification; host-performance remains uncertified |
+| P13 Performance / search / token optimization | 10 | 8 | STRONG PARTIAL | measured CPU/RSS/token certification; host-performance remains uncertified |
 | P14 Production operations / observability | 10 | 5 | PARTIAL | run health/readiness, failure taxonomy, deterministic recovery, release gates |
 | P15 P380X donor signal governance | 10 | 7 | PARTIAL | Tranche C research truth; exact donor definition compilation only from available archive bytes; evidence-earned activation only |
 | P16 Algorithmic Constitution / strategy registry | 10 | 9 | STRONG PARTIAL | CFB live CELF + telemetry done; remaining mixed-sport R1; keep CI gates; no silent algorithm retirement |
@@ -94,7 +94,27 @@ Measured: 397 pytest passed; inventory 268/1858 hash `0f6693681e3ed41d7abcf3a5fe
 
 Not earned: current 2026-09-03 HAR (`CURRENT_REAL_HAR_ACCEPTANCE_PENDING_EXTERNAL_INPUT`); LR promotion; production-root certification; Drive credentials.
 
-Verdict: `CFB_REFERENCE_IMPLEMENTATION_NOT_COMPLETE` only because current real HAR acceptance is pending external input.
+## 2026-09-04 CFB semantic-completion pass
+
+Continues PR #19 from `7c961075ed2f6a1d938f20c2b7ffb294cb4d7d1c`. Makes algorithms ACTIVE only when they change the forecast.
+
+Closed this pass:
+
+- `NO_CEREMONIAL_ALGORITHM_EXECUTION` telemetry gate (`downstream_used` + CI). Launch no longer sample-queries FTS/fuzzy/RRF/MMR/LSH.
+- Identity-first `BoardIndexes.resolve_identities`: exact/composite/SQLite/Bloom always; fuzzy/FTS/cascade only on projectionId miss.
+- Residual EventWorlds: board membership is not 100% of team opportunity; unmodeled rush/target/pass buckets; kickers isolated.
+- Source-health routes AcquisitionActions; `CFB_SPORTS_REFERENCE` (`college_football_reference`) replaces `CFB_PFR`; OPEN → cooldown → HALF_OPEN with real timestamps; fallbacks traversed.
+- Cache cascade L0–L6: claims stored, requests looked up (no self-put-get); L4 as-of; L5 Drive identify of evidence hashes.
+- Co-extraction of host-acquired structured pages only (`NO_ACQUIRED_STRUCTURED_PAGE` when none).
+- MaterialFact contentHash includes fact values; `facts_to_features` consumed by ParameterSnapshots; ISO temporal cutoff.
+- Frontier EVSI from AcquisitionAction fanout/cost/authority; pass count increments only on material state change.
+- Line-only refresh reuses worlds; material-state refresh resimulates.
+- Isotonic/conformal INACTIVE at LR000000. Champion selector SHADOW_DIAGNOSTIC; actual producer is Empirical Bayes in snapshots.
+- CFB Market Execution Matrix for 19 ACTIVE markets.
+
+Measured: 412 pytest passed; inventory 270/1897 hash `5c6889973fc05662a469b1f912469c164775e765c6916f9e7a1f37b23c64f5de`.
+
+Verdict: `CFB_REFERENCE_IMPLEMENTATION_SOFTWARE_COMPLETE`. Current-HAR operational acceptance remains `CFB_CURRENT_HAR_OPERATIONAL_ACCEPTANCE_PENDING`. Do not merge to main.
 
 ## P380X Tranche A/B status
 

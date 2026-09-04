@@ -101,8 +101,15 @@ class BoardIndexes:
         self.telemetry.record("ALG-SEARCH-008", problem_class="MULTI_ALIAS_SCAN", producer="dcm.identity.resolve", consumer="dcm.research.indexes.BoardIndexes", count=len(names), phase="BUILT")
         self.telemetry.record("ALG-INDEX-016", problem_class="CONTENT_ADDRESS", producer="dcm.research.indexes.BoardIndexes", consumer="dcm.cfb.launch", count=len(self.content), phase="BUILT")
 
-    def exact_offer(self, offer_id: str) -> dict[str, Any] | None:
-        self.telemetry.record("ALG-INDEX-001", problem_class="HOT_HASH_INDEX", producer="dcm.research.indexes.BoardIndexes.exact_offer", consumer="dcm.cfb.launch", phase="QUERIED")
+    def exact_offer(self, offer_id: str, *, downstream_used: bool = False) -> dict[str, Any] | None:
+        self.telemetry.record(
+            "ALG-INDEX-001",
+            problem_class="HOT_HASH_INDEX",
+            producer="dcm.research.indexes.BoardIndexes.exact_offer",
+            consumer="dcm.cfb.launch",
+            phase="QUERIED",
+            downstream_used=downstream_used,
+        )
         return self.offer_by_id.get(str(offer_id))
 
     def lookup_composite(
@@ -115,27 +122,27 @@ class BoardIndexes:
         subject: str,
         market: str,
     ) -> list[str]:
-        self.telemetry.record("ALG-SEARCH-002", problem_class="COMPOSITE_KEY", producer="dcm.research.indexes.BoardIndexes.lookup_composite", consumer="dcm.research.os_graphs", phase="QUERIED")
+        self.telemetry.record("ALG-SEARCH-002", problem_class="COMPOSITE_KEY", producer="dcm.research.indexes.BoardIndexes.lookup_composite", consumer="dcm.research.os_graphs", phase="QUERIED", downstream_used=True)
         return list(self.composite.get((sport, str(league).upper(), event, team, subject, str(market).lower()), ()))
 
     def sqlite_event_offers(self, event_id: str) -> list[str]:
-        self.telemetry.record("ALG-INDEX-002", problem_class="SQLITE_INDEX", producer="dcm.research.indexes.BoardIndexes.sqlite_event_offers", consumer="dcm.research.os_graphs", phase="QUERIED")
+        self.telemetry.record("ALG-INDEX-002", problem_class="SQLITE_INDEX", producer="dcm.research.indexes.BoardIndexes.sqlite_event_offers", consumer="dcm.research.os_graphs", phase="QUERIED", downstream_used=True)
         cur = self.sqlite.execute("SELECT offer_id FROM offers WHERE event_id = ?", (event_id,))
         return [str(r[0]) for r in cur.fetchall()]
 
     def might_have_offer(self, offer_id: str) -> bool:
-        self.telemetry.record("ALG-INDEX-009", problem_class="BLOOM_REJECT", producer="dcm.research.indexes.BoardIndexes.might_have_offer", consumer="dcm.cfb.launch", phase="QUERIED")
+        self.telemetry.record("ALG-INDEX-009", problem_class="BLOOM_REJECT", producer="dcm.research.indexes.BoardIndexes.might_have_offer", consumer="dcm.cfb.launch", phase="QUERIED", downstream_used=True)
         return self.bloom.might_contain(offer_id)
 
     def alias_hits(self, text: str) -> list[str]:
-        self.telemetry.record("ALG-SEARCH-008", problem_class="MULTI_ALIAS_SCAN", producer="dcm.research.indexes.BoardIndexes.alias_hits", consumer="dcm.identity.resolve", phase="QUERIED")
+        self.telemetry.record("ALG-SEARCH-008", problem_class="MULTI_ALIAS_SCAN", producer="dcm.research.indexes.BoardIndexes.alias_hits", consumer="dcm.identity.resolve", phase="QUERIED", downstream_used=True)
         return [pat for _i, pat in self.alias.find(text.lower())]
 
     def fts_rank(self, query: str) -> list[tuple[str, float]]:
         """BM25 over player names. Never used to rediscover known offer IDs."""
         from dcm.algorithms.searching import bm25
 
-        self.telemetry.record("ALG-SEARCH-005", problem_class="LEXICAL_RETRIEVAL", producer="dcm.algorithms.searching.bm25", consumer="dcm.research.indexes.BoardIndexes.fts_rank", phase="QUERIED")
+        self.telemetry.record("ALG-SEARCH-005", problem_class="LEXICAL_RETRIEVAL", producer="dcm.algorithms.searching.bm25", consumer="dcm.research.indexes.BoardIndexes.fts_rank", phase="QUERIED", downstream_used=True)
         docs: list[list[str]] = []
         oids: list[str] = []
         for oid in self.offer_ids:
@@ -156,7 +163,7 @@ class BoardIndexes:
     def fuzzy_player(self, name: str, *, max_dist: int = 2) -> list[str]:
         from dcm.algorithms.searching import fuzzy_retrieve
 
-        self.telemetry.record("ALG-SEARCH-010", problem_class="FUZZY_MATCH", producer="dcm.algorithms.searching.fuzzy_retrieve", consumer="dcm.research.indexes.BoardIndexes.fuzzy_player", phase="QUERIED")
+        self.telemetry.record("ALG-SEARCH-010", problem_class="FUZZY_MATCH", producer="dcm.algorithms.searching.fuzzy_retrieve", consumer="dcm.research.indexes.BoardIndexes.fuzzy_player", phase="QUERIED", downstream_used=True)
         needle = str(name or "").lower().strip()
         if not needle:
             return []
@@ -177,8 +184,8 @@ class BoardIndexes:
     def near_duplicate_names(self) -> list[tuple[str, str, float]]:
         from dcm.algorithms.searching import minhash_jaccard, minhash_signature, simhash
 
-        self.telemetry.record("ALG-SEARCH-011", problem_class="NEAR_DUPLICATE", producer="dcm.algorithms.searching.minhash_signature", consumer="dcm.research.indexes.BoardIndexes.near_duplicate_names", phase="QUERIED")
-        self.telemetry.record("ALG-SEARCH-012", problem_class="NEAR_DUPLICATE", producer="dcm.algorithms.searching.simhash", consumer="dcm.research.indexes.BoardIndexes.near_duplicate_names", phase="QUERIED")
+        self.telemetry.record("ALG-SEARCH-011", problem_class="NEAR_DUPLICATE", producer="dcm.algorithms.searching.minhash_signature", consumer="dcm.research.indexes.BoardIndexes.near_duplicate_names", phase="QUERIED", downstream_used=True)
+        self.telemetry.record("ALG-SEARCH-012", problem_class="NEAR_DUPLICATE", producer="dcm.algorithms.searching.simhash", consumer="dcm.research.indexes.BoardIndexes.near_duplicate_names", phase="QUERIED", downstream_used=True)
         sigs: list[tuple[str, tuple[int, ...], int]] = []
         seen_names: set[str] = set()
         for oid in self.offer_ids:
@@ -208,6 +215,7 @@ class BoardIndexes:
             consumer="dcm.research.indexes.BoardIndexes.requirement_bitmaps",
             count=len(ids),
             phase="QUERIED",
+            downstream_used=True,
         )
         return {rid: len(oids) for rid, oids in ids.items()}
 
@@ -246,21 +254,21 @@ class BoardIndexes:
             lsh.add(oid, minhash_signature(tokens))
             sim_idx.add(oid, simhash(tokens))
         prefix = trie.prefix(needle[: max(1, min(3, len(needle)))]) if needle else []
-        self.telemetry.record("ALG-SEARCH-009", problem_class="TRIE_PREFIX", producer="dcm.algorithms.searching.Trie", consumer="dcm.research.indexes.BoardIndexes.query_retrieval_cascade", phase="QUERIED")
+        self.telemetry.record("ALG-SEARCH-009", problem_class="TRIE_PREFIX", producer="dcm.algorithms.searching.Trie", consumer="dcm.research.indexes.BoardIndexes.query_retrieval_cascade", phase="QUERIED", downstream_used=True)
         terms = needle.split() or ["x"]
         and_hits = self.inverted.boolean_and(terms)
-        self.telemetry.record("ALG-SEARCH-007", problem_class="BOOLEAN_AND", producer="dcm.algorithms.searching.InvertedIndex.boolean_and", consumer="dcm.research.indexes.BoardIndexes.query_retrieval_cascade", phase="QUERIED")
+        self.telemetry.record("ALG-SEARCH-007", problem_class="BOOLEAN_AND", producer="dcm.algorithms.searching.InvertedIndex.boolean_and", consumer="dcm.research.indexes.BoardIndexes.query_retrieval_cascade", phase="QUERIED", downstream_used=True)
         bm25f_scores = bm25f(terms, field_docs, field_weights={"name": 3.0, "team": 1.0, "market": 1.0}) if field_docs else []
-        self.telemetry.record("ALG-SEARCH-006", problem_class="BM25F", producer="dcm.algorithms.searching.bm25f", consumer="dcm.research.indexes.BoardIndexes.query_retrieval_cascade", phase="QUERIED")
-        self.telemetry.record("ALG-INDEX-010", problem_class="MINHASH_LSH", producer="dcm.algorithms.indexing.MinHashLSHIndex", consumer="dcm.research.indexes.BoardIndexes.query_retrieval_cascade", phase="QUERIED")
-        self.telemetry.record("ALG-INDEX-011", problem_class="SIMHASH_INDEX", producer="dcm.algorithms.indexing.SimHashIndex", consumer="dcm.research.indexes.BoardIndexes.query_retrieval_cascade", phase="QUERIED")
+        self.telemetry.record("ALG-SEARCH-006", problem_class="BM25F", producer="dcm.algorithms.searching.bm25f", consumer="dcm.research.indexes.BoardIndexes.query_retrieval_cascade", phase="QUERIED", downstream_used=True)
+        self.telemetry.record("ALG-INDEX-010", problem_class="MINHASH_LSH", producer="dcm.algorithms.indexing.MinHashLSHIndex", consumer="dcm.research.indexes.BoardIndexes.query_retrieval_cascade", phase="QUERIED", downstream_used=True)
+        self.telemetry.record("ALG-INDEX-011", problem_class="SIMHASH_INDEX", producer="dcm.algorithms.indexing.SimHashIndex", consumer="dcm.research.indexes.BoardIndexes.query_retrieval_cascade", phase="QUERIED", downstream_used=True)
         lsh_hits = lsh.query(minhash_signature(terms)) if needle else []
-        self.telemetry.record("ALG-SEARCH-013", problem_class="LSH", producer="dcm.algorithms.searching.LSHIndex", consumer="dcm.research.indexes.BoardIndexes.query_retrieval_cascade", count=len(lsh_hits), phase="QUERIED")
+        self.telemetry.record("ALG-SEARCH-013", problem_class="LSH", producer="dcm.algorithms.searching.LSHIndex", consumer="dcm.research.indexes.BoardIndexes.query_retrieval_cascade", count=len(lsh_hits), phase="QUERIED", downstream_used=True)
         sim_hits = sim_idx.nearest(simhash(terms), max_distance=12) if needle else []
         fts = [oid for oid, _s in self.fts_rank(needle)]
         fuzz = self.fuzzy_player(needle)
         fused = reciprocal_rank_fusion(fts, fuzz, lsh_hits)
-        self.telemetry.record("ALG-SEARCH-014", problem_class="RRF", producer="dcm.algorithms.searching.reciprocal_rank_fusion", consumer="dcm.research.indexes.BoardIndexes.query_retrieval_cascade", phase="QUERIED")
+        self.telemetry.record("ALG-SEARCH-014", problem_class="RRF", producer="dcm.algorithms.searching.reciprocal_rank_fusion", consumer="dcm.research.indexes.BoardIndexes.query_retrieval_cascade", phase="QUERIED", downstream_used=True)
         rel = {item: score for item, score in fused}
         mmr = maximal_marginal_relevance(
             [item for item, _s in fused[:12]],
@@ -268,7 +276,7 @@ class BoardIndexes:
             lambda a, b: 1.0 if a == b else 0.0,
             k=5,
         )
-        self.telemetry.record("ALG-SEARCH-015", problem_class="MMR", producer="dcm.algorithms.searching.maximal_marginal_relevance", consumer="dcm.research.indexes.BoardIndexes.query_retrieval_cascade", phase="QUERIED")
+        self.telemetry.record("ALG-SEARCH-015", problem_class="MMR", producer="dcm.algorithms.searching.maximal_marginal_relevance", consumer="dcm.research.indexes.BoardIndexes.query_retrieval_cascade", phase="QUERIED", downstream_used=True)
         return {
             "triePrefix": prefix[:8],
             "booleanAnd": and_hits[:8],
@@ -277,6 +285,107 @@ class BoardIndexes:
             "simHits": sim_hits[:8],
             "rrf": fused[:8],
             "mmr": mmr,
+        }
+
+    def resolve_identities(self) -> dict[str, Any]:
+        """Exact-first identity. Fuzzy/FTS/cascade only when projectionId misses.
+
+        Canonical IDs never trigger fuzzy or semantic retrieval.
+        Near-duplicate MinHash/SimHash only run when the same display name
+        collides across more than one offer id.
+        """
+        resolved: list[dict[str, Any]] = []
+        exact_n = 0
+        skipped_fuzzy = 0
+        fuzzy_n = 0
+        cascade_n = 0
+        events_seen: set[str] = set()
+        by_name: dict[str, list[str]] = {}
+        last_cascade: dict[str, Any] = {}
+        for oid, row in self.offer_by_id.items():
+            bloom_ok = self.might_have_offer(oid)
+            hit = self.exact_offer(oid, downstream_used=True) if bloom_ok else None
+            sport = str(row.get("sportFamily") or "")
+            league = str(row.get("league") or "")
+            event = str(row.get("eventId") or "")
+            team = str(row.get("teamId") or row.get("team") or "")
+            subject = str(row.get("playerId") or row.get("subjectId") or "")
+            market = str(row.get("market") or "")
+            self.lookup_composite(
+                sport=sport, league=league, event=event, team=team, subject=subject, market=market,
+            )
+            if event and event not in events_seen:
+                self.sqlite_event_offers(event)
+                events_seen.add(event)
+            name = str(row.get("playerName") or "").strip()
+            if name:
+                by_name.setdefault(name.lower(), []).append(oid)
+            if hit is not None:
+                exact_n += 1
+                skipped_fuzzy += 1
+                resolved.append({"offerId": oid, "method": "EXACT_ID", "playerId": subject})
+                continue
+            method = "UNRESOLVED"
+            if name:
+                aliases = self.alias_hits(name)
+                if aliases:
+                    method = "ALIAS"
+                else:
+                    fuzzy = self.fuzzy_player(name)
+                    if fuzzy:
+                        method = "FUZZY"
+                        fuzzy_n += 1
+                    else:
+                        fts = self.fts_rank(name)
+                        if fts:
+                            method = "FTS"
+                        else:
+                            last_cascade = self.query_retrieval_cascade(name)
+                            method = "CASCADE"
+                            cascade_n += 1
+            resolved.append({"offerId": oid, "method": method, "playerId": subject})
+        if skipped_fuzzy:
+            for alg, cls, producer in (
+                ("ALG-SEARCH-010", "FUZZY_MATCH", "dcm.algorithms.searching.fuzzy_retrieve"),
+                ("ALG-SEARCH-005", "LEXICAL_RETRIEVAL", "dcm.algorithms.searching.bm25"),
+                ("ALG-SEARCH-014", "RRF", "dcm.algorithms.searching.reciprocal_rank_fusion"),
+            ):
+                self.telemetry.record(
+                    alg,
+                    problem_class=cls,
+                    producer=producer,
+                    consumer="dcm.research.indexes.BoardIndexes.resolve_identities",
+                    phase="SKIPPED_NOT_APPLICABLE",
+                    activated=False,
+                    count=skipped_fuzzy,
+                    lifecycle_state="SKIPPED_NOT_APPLICABLE",
+                    note="exact projectionId resolved; fuzzy/lexical/semantic not applicable",
+                )
+        collisions = {n: ids for n, ids in by_name.items() if len(ids) > 1}
+        if collisions:
+            near_dups = self.near_duplicate_names()
+        else:
+            near_dups = []
+            self.telemetry.record(
+                "ALG-SEARCH-011",
+                problem_class="NEAR_DUPLICATE",
+                producer="dcm.algorithms.searching.minhash_signature",
+                consumer="dcm.research.indexes.BoardIndexes.resolve_identities",
+                phase="SKIPPED_NOT_APPLICABLE",
+                activated=False,
+                lifecycle_state="SKIPPED_NOT_APPLICABLE",
+                note="no display-name collisions; MinHash/SimHash not applicable",
+            )
+        return {
+            "resolved": resolved,
+            "exactCount": exact_n,
+            "skippedFuzzy": skipped_fuzzy,
+            "fuzzyCount": fuzzy_n,
+            "cascadeCount": cascade_n,
+            "nameCollisions": len(collisions),
+            "nearDuplicatePairs": len(near_dups),
+            "queriedEvents": len(events_seen),
+            "retrievalCascade": {k: v for k, v in last_cascade.items() if k != "booleanAnd"} if last_cascade else {},
         }
 
     def close(self) -> None:
@@ -316,12 +425,12 @@ class EvidenceIndexes:
         return digest
 
     def lookup_scope(self, scope: str, scope_id: str) -> list[dict[str, Any]]:
-        self.telemetry.record("ALG-SEARCH-001", problem_class="EXACT_IDENTITY", producer="dcm.research.indexes.EvidenceIndexes.lookup_scope", consumer="dcm.research.acquisition", phase="QUERIED")
+        self.telemetry.record("ALG-SEARCH-001", problem_class="EXACT_IDENTITY", producer="dcm.research.indexes.EvidenceIndexes.lookup_scope", consumer="dcm.research.acquisition", phase="QUERIED", downstream_used=True)
         hashes = self.by_scope.get((str(scope), str(scope_id))) or []
         return [self.by_hash[h] for h in hashes if h in self.by_hash]
 
     def has_hash(self, digest: str) -> bool:
-        self.telemetry.record("ALG-INDEX-009", problem_class="BLOOM_REJECT", producer="dcm.research.indexes.EvidenceIndexes.has_hash", consumer="dcm.research.acquisition", phase="QUERIED")
+        self.telemetry.record("ALG-INDEX-009", problem_class="BLOOM_REJECT", producer="dcm.research.indexes.EvidenceIndexes.has_hash", consumer="dcm.research.acquisition", phase="QUERIED", downstream_used=True)
         if digest not in self.bloom:
             return False
         return digest in self.by_hash

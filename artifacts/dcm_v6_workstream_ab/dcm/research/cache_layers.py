@@ -1,11 +1,11 @@
 """Research reuse cascade L0–L6. Cheapest exact layer first.
 
 L0 current-run exact cache
-L1 process-local cache
+L1 process-local LRU
 L2 SQLite structured research index
 L3 content-addressed ResearchStore
-L4 bitemporal catalog
-L5 durable object lookup
+L4 bitemporal evidence/material-fact catalog
+L5 durable object lookup (local promoted + Drive catalog when configured)
 L6 web acquisition (last)
 """
 from __future__ import annotations
@@ -45,7 +45,13 @@ def _key(scope: str, scope_id: str, claim_type: str = "") -> str:
 class ResearchCacheCascade:
     """Exact-first reuse. Web acquisition is L6 and never the first lookup."""
 
-    def __init__(self, run_root: Path | None = None, *, store: Any | None = None) -> None:
+    def __init__(
+        self,
+        run_root: Path | None = None,
+        *,
+        store: Any | None = None,
+        drive: Any | None = None,
+    ) -> None:
         self.run_root = Path(run_root) if run_root else None
         self.l0: dict[str, dict[str, Any]] = {}
         self.l1 = LRUCache(capacity=4096)
@@ -55,22 +61,34 @@ class ResearchCacheCascade:
             "k TEXT PRIMARY KEY, scope TEXT, scope_id TEXT, claim_type TEXT, payload TEXT, asof TEXT)"
         )
         self.store = store
+        self.drive = drive
         self.hits = {f"L{i}": 0 for i in range(7)}
         self.misses = 0
+        self.lookups = 0
 
     def put(self, scope: str, scope_id: str, claim: Mapping[str, Any], *, claim_type: str = "") -> str:
         rec = dict(claim)
-        k = _key(scope, scope_id, claim_type or str(rec.get("claim_type") or ""))
+        ctype = claim_type or str(rec.get("claim_type") or "")
+        k = _key(scope, scope_id, ctype)
         self.l0[k] = rec
         self.l1.put(k, rec)
+        if ctype:
+            k_scope = _key(scope, scope_id, "")
+            self.l0.setdefault(k_scope, rec)
+            self.l1.put(k_scope, rec)
         payload = json.dumps(rec, sort_keys=True, default=str)
+        asof = str(rec.get("observed_at") or rec.get("valid_at") or rec.get("published_at") or "")
         self.l2.execute(
             "INSERT OR REPLACE INTO research VALUES (?,?,?,?,?,?)",
-            (k, scope, scope_id, claim_type, payload, str(rec.get("observed_at") or "")),
+            (k, scope, scope_id, ctype, payload, asof),
         )
+        if self.drive is not None and hasattr(self.drive, "put"):
+            digest = str(rec.get("claim_hash") or content_hash(rec))
+            self.drive.put(digest, {"kind": "EVIDENCE_CLAIM", "scope": scope, "scopeId": scope_id, "key": k})
         return k
 
     def get(self, scope: str, scope_id: str, *, claim_type: str = "") -> tuple[dict[str, Any] | None, str]:
+        self.lookups += 1
         k = _key(scope, scope_id, claim_type)
         if k in self.l0:
             self.hits["L0"] += 1
@@ -80,7 +98,13 @@ class ResearchCacheCascade:
             self.hits["L1"] += 1
             self.l0[k] = hit
             return hit, "L1"
-        cur = self.l2.execute("SELECT payload FROM research WHERE k = ?", (k,))
+        if claim_type:
+            cur = self.l2.execute("SELECT payload FROM research WHERE k = ?", (k,))
+        else:
+            cur = self.l2.execute(
+                "SELECT payload FROM research WHERE scope = ? AND scope_id = ? ORDER BY asof DESC LIMIT 1",
+                (scope, scope_id),
+            )
         row = cur.fetchone()
         if row:
             rec = json.loads(row[0])
@@ -97,6 +121,43 @@ class ResearchCacheCascade:
                 rec = dict(found) if isinstance(found, Mapping) else {"claim_value": found}
                 self.l0[k] = rec
                 return rec, "L3"
+        if self.drive is not None and hasattr(self.drive, "identify"):
+            digest = content_hash({"scope": scope, "scope_id": scope_id, "claim_type": claim_type})
+            try:
+                ident = self.drive.identify(digest)
+            except Exception:
+                ident = None
+            if isinstance(ident, Mapping) and ident.get("present"):
+                self.hits["L5"] += 1
+                rec = dict(ident.get("meta") or {"digest": digest})
+                self.l0[k] = rec
+                return rec, "L5"
+        self.misses += 1
+        self.hits["L6"] += 0
+        return None, "L6"
+
+    def get_asof(
+        self,
+        scope: str,
+        scope_id: str,
+        as_of: str,
+        *,
+        claim_type: str = "",
+    ) -> tuple[dict[str, Any] | None, str]:
+        """L4 bitemporal catalog: latest payload with asof <= as_of."""
+        self.lookups += 1
+        cur = self.l2.execute(
+            "SELECT payload, asof FROM research WHERE scope = ? AND scope_id = ? AND asof <= ? "
+            "AND (? = '' OR claim_type = ?) ORDER BY asof DESC LIMIT 1",
+            (scope, scope_id, str(as_of), claim_type, claim_type),
+        )
+        row = cur.fetchone()
+        if row:
+            rec = json.loads(row[0])
+            self.hits["L4"] += 1
+            k = _key(scope, scope_id, claim_type)
+            self.l0[k] = rec
+            return rec, "L4"
         self.misses += 1
         return None, "L6"
 
@@ -139,10 +200,21 @@ class ResearchCacheCascade:
             "schema": "pillars_dcm.research_cache_cascade.v1",
             "hits": dict(self.hits),
             "misses": self.misses,
+            "lookups": self.lookups,
             "l0Size": len(self.l0),
+            "reuseRatio": (sum(self.hits[k] for k in ("L0", "L1", "L2", "L3", "L4", "L5")) / self.lookups) if self.lookups else 0.0,
             "dispositions": list(DISPOSITIONS),
+            "layers": {
+                "L0": "current-run exact",
+                "L1": "process-local LRU",
+                "L2": "sqlite structured",
+                "L3": "content-addressed ResearchStore",
+                "L4": "bitemporal as-of catalog",
+                "L5": "durable object / Drive catalog",
+                "L6": "external acquisition",
+            },
         }
-        body["contentHash"] = content_hash(body)
+        body["contentHash"] = content_hash({k: v for k, v in body.items() if k != "contentHash"})
         return body
 
     def close(self) -> None:
