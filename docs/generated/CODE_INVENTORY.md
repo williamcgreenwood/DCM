@@ -5,7 +5,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 - Modules: **272**
 - Symbols: **1949**
 - Parse errors: **0**
-- Inventory hash: `ea5bdedf663ff36a3e5ca2241e0960cf56f12728823d0e53c836163c85654d19`
+- Inventory hash: `d1f5f349e138bf2c6eb5b8d4727d39e2bee1d0e258c49ace9ab7fc6faed8e2d2`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -607,13 +607,13 @@ _No class/function symbols._
 ### `artifacts/dcm_v6_workstream_ab/dcm/cfb/event_worlds.py`
 
 - `function` **cfb_teammate_groups** L17
-- `function` **simulate_joint_cfb_event_worlds** L37 — Shared team plays/pass-rate/rush-rate → residual-aware player opportunity.
+- `function` **simulate_joint_cfb_event_worlds** L37 — Shared team plays/pass-rate/rush-rate \u2192 residual-aware player opportunity.
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/cfb/frontier.py`
 
 - `function` **_unresolved_material** L20
 - `function` **estimate_frontier_impact** L28 — Offer-level materiality used when no AcquisitionAction graph is supplied.
-- `function` **estimate_action_evsi** L40 — Utility(action) = fanout × materiality × P(success) × authority / cost.
+- `function` **estimate_action_evsi** L40 — Utility(action) = fanout \u00d7 materiality \u00d7 P(success) \u00d7 authority / cost.
 - `function` **run_frontier_loop** L64
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/cfb/har_delta.py`
@@ -672,7 +672,7 @@ _No class/function symbols._
 - `function` **_support** L31
 - `function` **cfb_prop_flags** L37
 - `function` **cfb_top100_row** L68
-- `function` **rank_cfb_modeled** L118 — Filter CFB → heap partial Top-K → deterministic Timsort of the frontier.
+- `function` **rank_cfb_modeled** L118 — Filter CFB \u2192 heap partial Top-K \u2192 deterministic Timsort of the frontier.
 - `function` **cfb_top100_preliminary** L147
 - `function` **cfb_top25_final** L161
 - `function` **cfb_playables_final** L175
@@ -854,7 +854,7 @@ _No class/function symbols._
 - `function` **looks_like_platform_id** L26
 - `function` **resolve_row** L39
 - `function` **freeze_map** L59
-- `function` **build_player_index** L69 — Group every HAR player by playerId. Name ≠ platform id.
+- `function` **build_player_index** L69 — Group every HAR player by playerId. Name \u2260 platform id.
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/ingest/__init__.py`
 
@@ -897,7 +897,7 @@ _No class/function symbols._
 ### `artifacts/dcm_v6_workstream_ab/dcm/ingest/markets.py`
 
 - `function` **_norm** L254
-- `function` **map_stat** L258 — Return (market_key, market_label). Unknown keys stay as a slug — fail closed later.
+- `function` **map_stat** L258 — Return (market_key, market_label). Unknown keys stay as a slug \u2014 fail closed later.
 - `function` **map_league** L269
 - `function` **market_label** L281
 
@@ -1104,7 +1104,7 @@ _No class/function symbols._
 - `function` **_projected_efficiency** L282
 - `function` **build_prop_explanation** L294 — Build a machine-readable explanation. Drivers are encoded diffs, never prose.
 - `function` **render_prop_explanation_text** L381 — Optional human text generated FROM the explanation object only. Never invents drivers.
-- `function` **load_feature_hash_index** L402 — entity+eventId → content hashes of FeatureStore records (and their sourceHashes).
+- `function` **load_feature_hash_index** L402 — entity+eventId \u2192 content hashes of FeatureStore records (and their sourceHashes).
 - `function` **persist_prop_explanations** L424
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/model/grade.py`
@@ -1140,7 +1140,7 @@ _No class/function symbols._
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/model/market_derive.py`
 
-- `class` **UnknownMarketError** L164 — Unknown or unverified market. Fail closed — never nearest-match.
+- `class` **UnknownMarketError** L164 — Unknown or unverified market. Fail closed \u2014 never nearest-match.
 - `method` **UnknownMarketError.__init__** L167
 - `function` **canonicalize_market** L173 — Exact alias lookup. Returns None when the key is not registered.
 - `function` **is_registered** L189
@@ -1441,7 +1441,7 @@ _No class/function symbols._
 - `method` **ResearchCacheCascade.get_asof** L154 — L4 bitemporal catalog: latest payload with asof <= as_of.
 - `method` **ResearchCacheCascade.disposition** L179
 - `method` **ResearchCacheCascade.snapshot** L213
-- `method` **ResearchCacheCascade.clear_ephemeral** L235 — Drop L0–L4. L5 catalog (DriveObjectCatalog) is unchanged.
+- `method` **ResearchCacheCascade.clear_ephemeral** L235 — Drop L0\u2013L4. L5 catalog (DriveObjectCatalog) is unchanged.
 - `method` **ResearchCacheCascade.close** L244
 - `function` **content_address_bytes** L251
 
@@ -1527,13 +1527,13 @@ _No class/function symbols._
 - `function` **_offer_period** L110
 - `function` **build_evidence_graph** L114
 - `method` **build_evidence_graph.add_node** L123
-- `function` **trace_selection** L365 — Resolve Selection/Offer → Subject → EvidenceClaim → SourceDocument.
+- `function` **trace_selection** L365 — Resolve Selection/Offer \u2192 Subject \u2192 EvidenceClaim \u2192 SourceDocument.
 - `method` **trace_selection.neighbors** L380
 - `function` **_unique_edges** L444
-- `function` **attach_runtime_lineage** L457 — Populate Feature → State → Parameter → Simulation → Selection → Settlement.
+- `function` **attach_runtime_lineage** L457 — Populate Feature \u2192 State \u2192 Parameter \u2192 Simulation \u2192 Selection \u2192 Settlement.
 - `method` **attach_runtime_lineage.add_node** L482
 - `method` **attach_runtime_lineage.add_edge** L494
-- `function` **trace_runtime_lineage** L704 — Selection → PropEvaluation → Simulation → ParameterSnapshot → Feature/Claim.
+- `function` **trace_runtime_lineage** L704 — Selection \u2192 PropEvaluation \u2192 Simulation \u2192 ParameterSnapshot \u2192 Feature/Claim.
 - `method` **trace_runtime_lineage.neighbors** L711
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/freshness.py`
@@ -1601,7 +1601,7 @@ _No class/function symbols._
 - `method` **BoardIndexes.near_duplicate_names** L184
 - `method` **BoardIndexes.requirement_bitmaps** L209
 - `method` **BoardIndexes.query_retrieval_cascade** L222 — Exact-first then lexical/fuzzy/near-dup fusion. Never embeddings for known IDs.
-- `method` **BoardIndexes.resolve_identities** L290 — Exact-first identity. Known projectionId → hash lookup → done.
+- `method` **BoardIndexes.resolve_identities** L290 — Exact-first identity. Known projectionId \u2192 hash lookup \u2192 done.
 - `method` **BoardIndexes.close** L377
 - `class` **EvidenceIndexes** L384 — Exact reusable-evidence lookup. Web acquisition is last.
 - `method` **EvidenceIndexes.__init__** L387
@@ -1609,7 +1609,7 @@ _No class/function symbols._
 - `method` **EvidenceIndexes.lookup_scope** L413
 - `method` **EvidenceIndexes.has_hash** L418
 - `method` **EvidenceIndexes.close** L424
-- `function` **requirement_offer_bitmaps** L431 — Reverse index Requirement → Offers as Python bitsets plus id lists.
+- `function` **requirement_offer_bitmaps** L431 — Reverse index Requirement \u2192 Offers as Python bitsets plus id lists.
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/lineup.py`
 
@@ -1625,7 +1625,7 @@ _No class/function symbols._
 - `function` **is_after_cutoff** L86 — True when observed is strictly after cutoff. ISO-normalized, not naive strings.
 - `function` **_fact_key** L97
 - `function` **resolve_material_facts** L104
-- `function` **facts_to_features** L267 — MaterialFactResolution → FeatureRecords with provenance.
+- `function` **facts_to_features** L267 — MaterialFactResolution \u2192 FeatureRecords with provenance.
 - `function` **apply_facts_to_context** L374 — Overlay resolved facts onto a player/event parameter context. Never post-cutoff.
 - `function` **_feature_family** L386
 - `function` **hold_playable_scope_ids** L398 — Subject/event/affiliation ids whose unresolved conflicts hold PLAYABLE.
@@ -1765,7 +1765,7 @@ _No class/function symbols._
 - `function` **governed_change_points** L169 — Execute cataloged RoleEpoch detectors. Does not silently rewrite greedy cuts.
 - `function` **detector_disagreement** L200 — True when CUSUM/Page-Hinkley cuts are not a subset of greedy cuts.
 - `function` **apply_detector_disagreement** L214
-- `function` **shrinkage_weights** L236 — role_sample → player_season → archetype/league prior. Sums to 1.
+- `function` **shrinkage_weights** L236 — role_sample \u2192 player_season \u2192 archetype/league prior. Sums to 1.
 - `function` **partition_logs** L256
 - `function` **_projected_label** L291
 - `function` **_epoch_record** L311
@@ -1815,7 +1815,7 @@ _No class/function symbols._
 - `method` **SourceHealthRegistry.snapshot** L225
 - `method` **SourceHealthRegistry.load_snapshot** L244 — Overlay persisted counters/circuits onto the live catalog. Never invent 0.85.
 - `function` **persist_cfb_source_health** L268 — Write the live source-health snapshot so later research passes restore it.
-- `function` **load_cfb_source_health** L283 — Restore persisted source-health counters/circuits. Missing file → default catalog.
+- `function` **load_cfb_source_health** L283 — Restore persisted source-health counters/circuits. Missing file \u2192 default catalog.
 - `function` **default_cfb_source_health** L304 — CFB catalog. Never routes college football through a pro-football adapter.
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/staged.py`
@@ -1907,7 +1907,7 @@ _No class/function symbols._
 - `method` **run_dcm._snapshot_for** L662
 - `method` **run_dcm._resimulate_material** L1025
 - `method` **run_dcm.slim** L1216
-- `function` **main** L1711
+- `function` **main** L1713
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/runtime/__init__.py`
 
@@ -2290,7 +2290,7 @@ _No class/function symbols._
 ### `artifacts/dcm_v6_workstream_ab/dcm/sports/football/efficiency.py`
 
 - `function` **player_efficiency** L12
-- `function` **apply_efficiency** L17 — Map opportunity × rates to primitive outcomes. Bounds are applied here so
+- `function` **apply_efficiency** L17 — Map opportunity \u00d7 rates to primitive outcomes. Bounds are applied here so
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/sports/football/ledger.py`
 
@@ -2339,7 +2339,7 @@ _No class/function symbols._
 
 - `function` **canonicalize_prizepicks_football_market** L89
 - `function` **settle_football_market** L102 — Map a primitive ledger + PrizePicks football market to a scalar identity.
-- `function` **settle_football_player** L118 — World-projection settlement from a PrimitiveStatLedger. Unknown → fail closed.
+- `function` **settle_football_player** L118 — World-projection settlement from a PrimitiveStatLedger. Unknown \u2192 fail closed.
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/validation/__init__.py`
 
