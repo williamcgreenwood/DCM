@@ -5,7 +5,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 - Modules: **280**
 - Symbols: **1997**
 - Parse errors: **0**
-- Inventory hash: `8838c74b78c1e127a76ce44823873a40b51f5e5b6360ade620e414b5c470df41`
+- Inventory hash: `4b338d5d7d29eea3a8b8909e55f92fc1d5a9aa87c8416df144341d0eb9f9fbad`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
