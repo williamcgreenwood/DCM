@@ -10,6 +10,8 @@ from dcm.selection.card_layers import is_modeled_playable
 COMPONENTS = {
     "pra": {"pts", "reb", "ast"}, "pr": {"pts", "reb"}, "pa": {"pts", "ast"}, "ra": {"reb", "ast"},
     "pass_rush_yds": {"pass_yds", "rush_yds"}, "rush_rec_yds": {"rush_yds", "rec_yds"},
+    "rush_rec_td": {"rush_td", "rec_td"}, "pass_rush_td": {"pass_td", "rush_td"},
+    "kicking_pts": {"fg_made", "xp_made"},
     "hits_runs_rbi": {"h"},
 }
 HARD_TAG_PREFIXES = ("INJURY:", "QBUNIT:")

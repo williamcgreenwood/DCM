@@ -89,6 +89,15 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--card-only", action="store_true")
     s.add_argument("--workspace", type=Path, default=None)
 
+    cfl = sub.add_parser("cfb-launch", help="Guarded CFB HAR vertical slice (account → graphs → research OS → forecast)")
+    cfl.add_argument("--har", type=Path, required=True)
+    cfl.add_argument("--run-root", type=Path, required=True)
+    cfl.add_argument("--cutoff", default=None)
+    cfl.add_argument("--cutoff-from-capture", action="store_true")
+    cfl.add_argument("--research", choices=["fixture", "bundle", "file"], default="file")
+    cfl.add_argument("--bundle", type=Path, default=None)
+    cfl.add_argument("--workspace", type=Path, default=None)
+
     return parser
 
 
@@ -115,6 +124,18 @@ def main(argv: list[str] | None = None) -> int:
                 "runId": session.dest.name,
                 "hostState": str(session.dest / "host_state.json"),
             })
+            return 0
+        if args.command == "cfb-launch":
+            from dcm.chat.session import cfb_launch
+            _print(cfb_launch(
+                har=args.har,
+                run_root=args.run_root,
+                cutoff=args.cutoff,
+                cutoff_from_capture=args.cutoff_from_capture,
+                research=args.research,
+                bundle_path=args.bundle,
+                workspace=args.workspace,
+            ))
             return 0
         session = HostSession.open(args.run, workspace=getattr(args, "workspace", None))
         if args.command == "next-research":

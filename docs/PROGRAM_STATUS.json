@@ -1,8 +1,8 @@
 {
   "schema": "pillars_dcm.program_status.v1",
-  "updatedAtUtc": "2026-09-03T19:50:00Z",
+  "updatedAtUtc": "2026-09-04T06:52:37Z",
   "canonicalIntegrationBranch": "integration/v6-ml-architecture-20260830",
-  "canonicalIntegrationPr": 17,
+  "canonicalIntegrationPr": 18,
   "scoreScale": {
     "0": "MISSING",
     "10": "COMPLETE_EXECUTABLE_INTEGRATED_TESTED_AUDITABLE_PORTABLE",
@@ -39,10 +39,11 @@
       "id": "P1",
       "name": "Universal research / evidence",
       "target": 10,
-      "current": 8,
+      "current": 9,
       "state": "STRONG_PARTIAL",
       "next": [
         "execute a current CFB HAR through host web research and close market-specific evidence gaps without blanket board rejection",
+        "finish mixed-sport R1 remainder after today's CFB slice",
         "retire remaining PLAYER/TEAM lookup aliases at adapters"
       ]
     },
@@ -61,10 +62,10 @@
       "id": "P3",
       "name": "SportPlugin physics",
       "target": 10,
-      "current": 6,
-      "state": "PARTIAL",
+      "current": 8,
+      "state": "STRONG_PARTIAL",
       "next": [
-        "operationally accept the guarded CFB physical market set on a current live board",
+        "operationally accept the 19 CFB PRODUCTION markets on a current live board",
         "close all 24 required bindings per promoted sport"
       ]
     },
@@ -72,12 +73,11 @@
       "id": "P4",
       "name": "Probability / uncertainty / grading / portfolio",
       "target": 10,
-      "current": 8,
+      "current": 9,
       "state": "STRONG_PARTIAL",
       "next": [
         "prospective CFB settlement and calibration evidence",
-        "universal correlation/shared-world coverage",
-        "final refresh integration"
+        "universal correlation/shared-world coverage"
       ]
     },
     {
@@ -98,6 +98,7 @@
       "current": 6,
       "state": "PARTIAL_EXTERNAL_VALIDATION",
       "next": [
+        "retain FRONTIER_INTERIM checkpoints outside settlement eligibility",
         "exact platform coverage",
         "prospective CFB settlements",
         "CRPS/subgroups",
@@ -108,8 +109,8 @@
       "id": "P7",
       "name": "Host-native execution contract",
       "target": 10,
-      "current": 7,
-      "state": "PARTIAL",
+      "current": 8,
+      "state": "STRONG_PARTIAL",
       "next": [
         "forecast a current CFB HAR on a fresh wheel through the host contract",
         "no second probability engine"
@@ -119,7 +120,7 @@
       "id": "P8",
       "name": "Universal source acquisition",
       "target": 10,
-      "current": 6,
+      "current": 7,
       "state": "PARTIAL",
       "next": [
         "live adapter fetch beyond fixtures",
@@ -161,9 +162,10 @@
       "id": "P12",
       "name": "Research archive / index / reuse",
       "target": 10,
-      "current": 7,
-      "state": "PARTIAL",
+      "current": 8,
+      "state": "STRONG_PARTIAL",
       "next": [
+        "Drive credentials as PRIMARY object store",
         "high-volume queryable artifact store",
         "retention and licensing enforcement"
       ]
@@ -172,8 +174,8 @@
       "id": "P13",
       "name": "Performance / search / token optimization",
       "target": 10,
-      "current": 6,
-      "state": "PARTIAL",
+      "current": 8,
+      "state": "STRONG_PARTIAL",
       "next": [
         "measured CPU/RSS/token certification",
         "host-performance remains uncertified"
@@ -196,10 +198,10 @@
       "id": "P15",
       "name": "P380X donor signal governance",
       "target": 10,
-      "current": 7,
-      "state": "PARTIAL",
+      "current": 8,
+      "state": "STRONG_PARTIAL",
       "next": [
-        "Tranche C research-truth integration",
+        "Tranche D role/archetype, matchup, and context integration through typed signal operators",
         "compile exact donor definitions only when archive bytes are available",
         "promote operators only after real producer-consumer integration and tests"
       ]
@@ -208,11 +210,11 @@
       "id": "P16",
       "name": "Algorithmic Constitution / strategy registry",
       "target": 10,
-      "current": 8,
+      "current": 9,
       "state": "STRONG_PARTIAL",
       "next": [
-        "R1 BoardGraph MarketDemandGraph RequirementGraph AcquisitionAction live packing",
         "keep constitution CI gates green",
+        "mixed-sport Research OS remainder after CFB live CELF packing",
         "do not silently retire CORE/CONDITIONAL/CHALLENGER algorithms"
       ]
     }

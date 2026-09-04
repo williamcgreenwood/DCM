@@ -23,8 +23,10 @@ WINDOW_SIZES = (3, 5, 10, 15, 20)
 WINDOW_KEYS = {n: f"L{n}" for n in WINDOW_SIZES}
 WINDOW_STAT_KEYS = ("minutes", "pts", "reb", "ast", "fga", "tpa", "fta")
 GRIDIRON_WINDOW_STAT_KEYS = (
-    "snaps", "pass_att", "pass_yds", "rush_att", "rush_yds",
-    "targets", "receptions", "rec_yds", "routes",
+    "snaps", "pass_att", "pass_yds", "pass_td", "interceptions",
+    "rush_att", "rush_yds", "rush_td",
+    "targets", "receptions", "rec_yds", "rec_td", "routes",
+    "fg_att", "fg_made", "xp_att", "xp_made",
 )
 GRIDIRON_LEAGUES = frozenset({"NFL", "CFB", "NFLP", "CFL", "UFL"})
 

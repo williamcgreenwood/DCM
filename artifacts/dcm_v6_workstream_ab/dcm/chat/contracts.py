@@ -13,6 +13,7 @@ HOST_COMMANDS = (
     "audit",
     "archive",
     "settle",
+    "cfb-launch",
 )
 
 REQUIRED_PREPARE_ARTIFACTS = (
@@ -26,6 +27,10 @@ REQUIRED_PREPARE_ARTIFACTS = (
     "evidence_coverage.json",
     "host_state.json",
     "algorithm_execution_plan.json",
+    "board_graph.json",
+    "market_demand_graph.json",
+    "requirement_graph.json",
+    "acquisition_actions.json",
 )
 
 HOST_STATE_SCHEMA = "pillars_dcm.host_state.v1"

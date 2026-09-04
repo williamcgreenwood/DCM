@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 from dcm.ingest.har import ingest_har
 from dcm.model.distributions import from_worlds
 from dcm.model.parameters import build_parameter_snapshot
@@ -12,6 +14,7 @@ from dcm.research.classify import market_definition_id
 from dcm.research.population import build_research_population_manifest
 from dcm.research.requests import plan_research
 from dcm.research.provider import write_bundle
+from dcm.learning.postgame import settle_run
 from dcm.runner import run_dcm
 
 FIXTURE = Path(__file__).resolve().parents[1] / "fixtures" / "cfb_guarded_launch_har.json"
@@ -184,3 +187,39 @@ def test_real_cfb_partial_global_bundle_does_not_checkpoint_supported_rows(tmp_p
     partial = json.loads((Path(result["dest"]) / "research_partial.json").read_text())
     assert partial["state"] == "PARTIAL_RESEARCH_CONTINUE_CFB_PER_PROP"
     assert partial["missingRequestIds"], "test bundle must remain globally incomplete"
+
+
+def test_interim_frontier_has_no_frozen_semantics_or_settlement_eligibility(tmp_path: Path):
+    raw = json.loads(FIXTURE.read_text(encoding="utf-8"))
+    raw.pop("_pillars", None)
+    har_path = tmp_path / "cfb-interim.har.json"
+    har_path.write_text(json.dumps(raw), encoding="utf-8")
+    rows = ingest_har(raw)["rows"]
+    bundle_path = tmp_path / "cfb-interim-evidence.jsonl"
+    write_bundle(bundle_path, _web_claims(rows))
+
+    result = run_dcm(
+        input_path=har_path,
+        forecast_cutoff=CUTOFF,
+        output_root=tmp_path / "runs",
+        research="bundle",
+        bundle_path=bundle_path,
+        workspace=tmp_path,
+    )
+    dest = Path(result["dest"])
+    freeze = json.loads((dest / "freeze.json").read_text(encoding="utf-8"))
+    checkpoint = json.loads((dest / "checkpoint.json").read_text(encoding="utf-8"))
+    hashes = json.loads((dest / "hashes.json").read_text(encoding="utf-8"))
+    assert freeze["forecastFrozen"] is False
+    assert freeze["freezeState"] == "FRONTIER_INTERIM"
+    assert result["runState"] == "AWAITING_FRONTIER_RESEARCH"
+    assert (dest / "frontier_checkpoint.json").is_file()
+    assert not (dest / "frozen_forecast.json").exists()
+    assert not (dest / "frozen_forecast.sha256").exists()
+    assert "frozenForecastHash" not in hashes
+    assert "frozenForecastHash" not in checkpoint
+    assert checkpoint["pending"] == ["FRONTIER_RESEARCH"]
+    outcomes = tmp_path / "outcomes.json"
+    outcomes.write_text('{"outcomes": []}\n', encoding="utf-8")
+    with pytest.raises(RuntimeError, match="FORECAST_NOT_FROZEN"):
+        settle_run(dest, outcomes)

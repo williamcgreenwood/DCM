@@ -8,6 +8,7 @@ from __future__ import annotations
 from typing import Any
 
 from dcm.model.worlds import MARKET_FROM_STATS
+from dcm.cfb.markets import ACTIVE_CFB_MARKETS
 from dcm.sports.common.plugin import selection_state
 
 SUPPORTED_FAMILIES = {"basketball", "gridiron", "baseball"}
@@ -21,8 +22,10 @@ BASKETBALL_MARKETS = {
     "ftm", "fta", "tov", "to", "oreb", "stl", "blk", "blk_stl",
     "qtrs_w_3plus_pts",
 }
-GRIDIRON_MARKETS = set(MARKET_FROM_STATS) | {
+GRIDIRON_MARKETS = set(MARKET_FROM_STATS) | set(ACTIVE_CFB_MARKETS) | {
     "pass_yds", "rush_yds", "rec_yds", "receptions", "pass_rush_yds", "rush_rec_yds",
+    "pass_att", "pass_cmp", "pass_td", "interceptions", "rush_att", "rush_td",
+    "rec_td", "targets", "rush_rec_td", "pass_rush_td", "fg_made", "xp_made", "kicking_pts",
 }
 BASEBALL_MARKETS = {"h", "tb", "k", "hits_runs_rbi"}
 

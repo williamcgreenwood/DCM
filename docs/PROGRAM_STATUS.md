@@ -1,8 +1,8 @@
 # DCM Program Status
 
-Canonical integration line: `integration/v6-ml-architecture-20260830` at merge commit `cdb428f6a05406184fe265b0a1e81abec92cd1f9` (through PR #17 CFB guarded launch).
+Canonical integration line: `integration/v6-ml-architecture-20260830` at merge commit `59ea12487ad2e747a15427ba6bb9babd1b9f5907` (through PR #18 R0 Algorithmic Constitution).
 
-Active R0 delivery: `grok/r0-algorithmic-constitution-20260903` targeting integration only. No merge to `main` is authorized.
+Active CFB guarded-launch Research OS semantic-closure slice: `chatgpt/cfb-semantic-closure-v3-20260904` (PR #20, stacked on PR #19) targeting integration only. No merge to `main` is authorized.
 
 This file is the human dashboard. It must be updated on every coding pass together with a new immutable pass record under `docs/engineering_passes/`.
 
@@ -20,78 +20,154 @@ This file is the human dashboard. It must be updated on every coding pass togeth
 | Workstream | Target | Current | State | Next acceptance gate |
 |---|---:|---:|---|---|
 | P0 Canonical spine / HAR / integrity | 10 | 9 | STRONG PARTIAL | preserve authenticated v5.4.1 roots in release retrieval; production root remains independently gated |
-| P1 Universal research / evidence | 10 | 8 | STRONG PARTIAL | R1 BoardGraph / MarketDemandGraph / RequirementGraph / live AcquisitionAction packing; current CFB HAR host research |
+| P1 Universal research / evidence | 10 | 9 | STRONG PARTIAL | current CFB HAR host research → imported evidence → modeled Top100/Top25/0–6 Playables; mixed-sport R1 remainder |
 | P2 Feature / state / parameter layer | 10 | 9 | STRONG PARTIAL | validate CFB role-comparable/current/prior support on real boards; activate only evidence-backed signal operators |
-| P3 SportPlugin physics | 10 | 6 | PARTIAL | operationally accept the guarded CFB market set on a current board; continue remaining 24-component plugin bindings sport by sport |
-| P4 Probability / uncertainty / grading / portfolio | 10 | 8 | STRONG PARTIAL | prospective CFB settlement/calibration evidence; universal shared-world/correlation coverage; final-refresh integration |
+| P3 SportPlugin physics | 10 | 8 | STRONG PARTIAL | 19 CFB PRODUCTION markets executable; remaining 24-component plugin bindings sport by sport; current-board operational acceptance |
+| P4 Probability / uncertainty / grading / portfolio | 10 | 9 | STRONG PARTIAL | prospective CFB settlement/calibration evidence; mixed-sport shared-world coverage |
 | P5 Audit / portability / ChatGPT-native execution | 10 | 8 | STRONG PARTIAL | current-HAR fresh ChatGPT acceptance; immutable release retrieval |
-| P6 Settlement / calibration / learning | 10 | 6 | PARTIAL + EXTERNAL VALIDATION | exact platform coverage; CFB prospective settlements; CRPS/subgroups; chronological unseen settlements before promotion |
-| P7 Host-native execution contract | 10 | 7 | PARTIAL | current CFB HAR forecast through host CLI on a fresh wheel; no second engine |
-| P8 Universal source acquisition | 10 | 6 | PARTIAL | live adapter fetch beyond fixtures; conflict policy + licensed providers |
+| P6 Settlement / calibration / learning | 10 | 6 | PARTIAL + EXTERNAL VALIDATION | retain FRONTIER_INTERIM checkpoints outside settlement eligibility; exact platform coverage; CFB prospective settlements; CRPS/subgroups; chronological unseen settlements before promotion |
+| P7 Host-native execution contract | 10 | 8 | STRONG PARTIAL | current CFB HAR forecast through `dcm-host cfb-launch` on a fresh wheel; no second engine |
+| P8 Universal source acquisition | 10 | 7 | PARTIAL | live adapter fetch beyond fixtures; licensed providers remain optional |
 | P9 Universal core migration | 10 | 9 | STRONG PARTIAL | retire remaining PLAYER/TEAM claim lookups at packet/parameter adapters |
 | P10 Full sport coverage | 10 | 3 | EARLY | each supported sport reaches 24/24 plugin components + validation suite |
 | P11 Release + fresh-environment acceptance | 10 | 7 | PARTIAL | wheel/release + exact hash + current HAR-only fresh ChatGPT acceptance |
-| P12 Research archive / index / reuse | 10 | 7 | PARTIAL | high-volume queryable store; retention/licensing enforcement beyond local blobs |
-| P13 Performance / search / token optimization | 10 | 6 | PARTIAL | measured CPU/RSS/token certification; host-performance remains uncertified |
+| P12 Research archive / index / reuse | 10 | 8 | STRONG PARTIAL | Drive credentials; high-volume queryable store; retention/licensing enforcement beyond local blobs |
+| P13 Performance / search / token optimization | 10 | 8 | STRONG PARTIAL | measured CPU/RSS/token certification; host-performance remains uncertified |
 | P14 Production operations / observability | 10 | 5 | PARTIAL | run health/readiness, failure taxonomy, deterministic recovery, release gates |
-| P15 P380X donor signal governance | 10 | 7 | PARTIAL | Tranche C research truth; exact donor definition compilation only from available archive bytes; evidence-earned activation only |
-| P16 Algorithmic Constitution / strategy registry | 10 | 8 | STRONG PARTIAL | R0 complete in software: constitution, registry, selection engine, HAR plan, CI gates. R1 live Research OS graphs remain |
+| P15 P380X donor signal governance | 10 | 8 | STRONG PARTIAL | Tranche C MaterialFact/source-truth runtime closure; next typed role/matchup/context operators; exact donor archive bytes and later tranches remain external/future |
+| P16 Algorithmic Constitution / strategy registry | 10 | 9 | STRONG PARTIAL | CFB live CELF + telemetry done; remaining mixed-sport R1; keep CI gates; no silent algorithm retirement |
 
 Constitution version `DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903` is inherited. Learning revision remains `LR000000`; predictive superiority remains `NONE`; production-root certification remains false.
 
 ## R0 Algorithmic Constitution status
 
-Implemented and tested on this branch:
+Merged to integration via PR #18 at `59ea12487ad2e747a15427ba6bb9babd1b9f5907`.
 
-- Permanent constitution document, schema, catalog-generated registry, and SHA-256 of exact committed registry bytes.
-- `AlgorithmSelectionEngine` prefers cheapest exact deterministic strategies; HNSW/Leiden/CP-SAT conditionals emit evaluation telemetry when not activated.
-- HAR `algorithm_execution_plan.json` is persisted by the canonical runner before research.
-- Ranking uses Timsort for the full modeled population and heap partial Top-K for frontier isolation.
-- Research batching consumes weighted set-cover as coverage telemetry and heap Top-K for event ordering without replacing EvidenceGraph/ResearchStore.
-- Release manifests and `hashes.json` carry constitution/registry hashes; those hashes are excluded from `_CONTEXT_FIELDS` forecast identity.
-- Governance tests under `tests/governance/` and CI `--check` gates prevent silent algorithm omission.
+## 2026-09-03 CFB guarded-launch Research OS slice
 
-Not claimed by R0:
-
-- BoardGraph / MarketDemandGraph / RequirementGraph / live AcquisitionAction packing (R1);
-- Drive-first indexed retrieval as the primary query engine (storage law remains documented; existing ResearchStore/archive path is unchanged);
-- live mixed-sport HAR research OS acceptance;
-- production-root certification;
-- predictive superiority.
-
-## 2026 CFB guarded-launch status — merged via PR #17
-
-The PR #17 branch established a bounded College Football guarded-launch path without claiming universal football completion or predictive validation. It is now on the integration HEAD above.
+This slice makes BoardGraph / RequirementGraph / live AcquisitionAction packing executable on the canonical CFB path. It does **not** complete mixed-sport R1 or claim a current live forecast.
 
 Implemented and tested:
 
-- HAR accounting remains first; platform modifiers are handled after extraction and existing fail-closed integrity rules remain intact.
-- CFB research completeness is evaluated per prop for modeling instead of using unrelated global missing evidence as a blanket board veto.
-- Zero real evidence still preserves the existing `RESEARCH_REQUIRED / INCOMPLETE_CHECKPOINTED` fail-closed path.
-- Minimum model support is separate from strict PLAYABLE support.
-- Thin but defensibly parameterized rows may be `MODELED_DIAGNOSTIC`; diagnostic state cannot bypass the PLAYABLE firewall.
-- Supported guarded-launch physical markets are `pass_yds`, `pass_att`, `pass_cmp`, `rush_yds`, `rush_att`, `rec_yds`, `receptions`, `pass_rush_yds`, and `rush_rec_yds`.
-- Opportunity-only markets do not require irrelevant yardage-efficiency evidence; markets that depend on efficiency still require relevant efficiency support.
-- ParameterSnapshots expose current-season, prior-season and role-comparable support plus explicit CFB role state.
-- Explicit early-season role states include returning starter/rotation, promoted starter, transfer starter/rotation, true freshman, new QB, new coordinator/system, injury return and role uncertain.
-- Transfer history is retained as evidence but prior-school opportunity share is not carried over 1:1.
-- CFB EventWorld context includes competitive, controlled-lead and blowout/starter-curtailment workload regimes; these affect opportunity rather than directly forcing Higher/Lower.
-- ChatGPT-native CFB research instructions request current 2026 and prior 2025 history, current team/opponent/event/venue/weather, depth/availability/transfer/system changes, team tendencies and opponent defense where market-relevant.
-- Dedicated acceptance tests prove 8/8 fixture offers reach probability evaluation and that real-shaped partial evidence can continue per supported CFB prop while the overall bundle remains incomplete.
+- HAR accounting first; Goblins excluded from selection only after accounting.
+- AlgorithmExecutionPlan before research; algorithm telemetry with producer/consumer/count.
+- BoardGraph, MarketDemandGraph, RequirementGraph persist before `collect()`.
+- AcquisitionActions grouped by EVENT/TEAM/SUBJECT; live selector is `ALG-SCHED-001` (CELF), not a static queue.
+- SPORT/COMPETITION mass cannot consume the unique-offer budget and starve EVENT/TEAM batches.
+- Per-prop modelable ≠ playable flags independent of global research completion.
+- Ranking: filter CFB → heap Top-K → Timsort; Top100/Top25/0–6 Playables never padded.
+- `dcm-host cfb-launch` host workflow. Host does not compute probabilities.
+- No new markets. Aug 29 supported population is 308 ≥ 100.
 
-Not earned by the guarded launch:
+Measured:
 
-- prospective CFB calibration;
-- learned reliability thresholds;
-- historical settlement validation sufficient for promotion;
-- expanded exotic football markets;
-- full 24/24 SportPlugin coverage;
-- complete universal Research OS;
-- production-root certification;
-- host performance certification;
-- predictive superiority.
+- Fixture + web-claim bundle: 8 modeled diagnostic, Top100=8, Top25=8, Playables=0, freeze LR000000/NONE.
+- Compact live HAR: 20 CFB / 6 Goblin / 9 supported non-Goblin.
+- Aug 29 sanitized HAR: 1568 CFB / 229 Goblin / 308 supported; 994 actions; first packed batch EVENT+ENVIRONMENT+AFFILIATION.
+- No 2026-09-03 live CFB HAR was supplied.
 
-A current September 2026 live CFB HAR has not been supplied. The existing sanitized August 29, 2026 HAR remains historical accounting evidence, not a current forecast acceptance.
+Not earned:
+
+- production PLAYABLEs from a current board
+- prospective CFB calibration
+- LR promotion
+- production-root certification
+- host performance certification
+- predictive superiority
+- full mixed-sport Research OS
+
+## 2026-09-03 CFB reference-implementation consumer pass
+
+Continues PR #19 from `ec1865e`. Does **not** complete mixed-sport R1 or claim a current live forecast.
+
+Software consumers closed this pass:
+
+- `holdPlayable` demotes PLAYABLE in MODEL + frontier recompute
+- RoleEpoch executes EWMA/CUSUM/Page-Hinkley
+- Retrieval cascade queried (BM25/BM25F/Trie/fuzzy/MinHash/SimHash/LSH/RRF/MMR/bitmaps) with registry-correct telemetry IDs
+- Source-health success recording; Drive catalog fail-closed; archive retry/reconcile; freeze merkle
+- Joint CFB EventWorlds `JOINT_TEAM` conservation meta; refresh re-grades on line change
+- Settlement of MODELED_DIAGNOSTIC; expanded failure taxonomy
+- 19 ACTIVE CFB MarketDefinitions already in tree (aliases + genuine unsupported)
+
+Measured: 397 pytest passed; inventory 268/1858 hash `0f6693681e3ed41d7abcf3a5feec2d4a758301817f0fc54d639e2ada4e669384`.
+
+Not earned: current 2026-09-03 HAR (`CURRENT_REAL_HAR_ACCEPTANCE_PENDING_EXTERNAL_INPUT`); LR promotion; production-root certification; Drive credentials.
+
+## 2026-09-04 CFB semantic-completion pass
+
+Continues PR #19 from `7c961075ed2f6a1d938f20c2b7ffb294cb4d7d1c`. Makes algorithms ACTIVE only when they change the forecast.
+
+Closed this pass:
+
+- `NO_CEREMONIAL_ALGORITHM_EXECUTION` telemetry gate (`downstream_used` + CI). Launch no longer sample-queries FTS/fuzzy/RRF/MMR/LSH.
+- Identity-first `BoardIndexes.resolve_identities`: exact/composite/SQLite/Bloom always; fuzzy/FTS/cascade only on projectionId miss.
+- Residual EventWorlds: board membership is not 100% of team opportunity; unmodeled rush/target/pass buckets; kickers isolated.
+- Source-health routes AcquisitionActions; `CFB_SPORTS_REFERENCE` (`college_football_reference`) replaces `CFB_PFR`; OPEN → cooldown → HALF_OPEN with real timestamps; fallbacks traversed.
+- Cache cascade L0–L6: claims stored, requests looked up (no self-put-get); L4 as-of; L5 Drive identify of evidence hashes.
+- Co-extraction of host-acquired structured pages only (`NO_ACQUIRED_STRUCTURED_PAGE` when none).
+- MaterialFact contentHash includes fact values; `facts_to_features` consumed by ParameterSnapshots; ISO temporal cutoff.
+- Frontier EVSI from AcquisitionAction fanout/cost/authority; pass count increments only on material state change.
+- Line-only refresh reuses worlds; material-state refresh resimulates.
+- Isotonic/conformal INACTIVE at LR000000. Champion selector SHADOW_DIAGNOSTIC; actual producer is Empirical Bayes in snapshots.
+- CFB Market Execution Matrix for 19 ACTIVE markets.
+
+Measured: 412 pytest passed; inventory 270/1897 hash `5c6889973fc05662a469b1f912469c164775e765c6916f9e7a1f37b23c64f5de`.
+
+Verdict: `CFB_REFERENCE_IMPLEMENTATION_SOFTWARE_COMPLETE`. Current-HAR operational acceptance remains `CFB_CURRENT_HAR_OPERATIONAL_ACCEPTANCE_PENDING`. Do not merge to main.
+
+## 2026-09-04 CFB freeze-gate / incremental-runtime pass
+
+Continues PR #19 from `0e5e2275742246211cb20ba4e5d17b7908106ab2`. Closes remaining ChatGPT-audit semantic defects. Not an expansion.
+
+Closed this pass:
+
+- MaterialFacts overlay packets before RoleEpoch/opportunity/efficiency fit; snapshot hash includes fact hashes.
+- Material refresh rebuilds ParameterSnapshots + shared joint EventWorlds, then full probability/risk bundle + rerank. Line-only reuses worlds.
+- Shared CFB EventWorlds for a lone board player; `OpportunityShareEstimate` is evidence-driven; starter QB is not capped at 92%; kickers isolated.
+- Freeze blocked when Top25 is not FINAL or stop reason is `EXTERNAL_HOST_REQUIRED` (`forecastFrozen=false`, `AWAITING_FRONTIER_RESEARCH`).
+- `FrontierPassState` binds before/after snapshot/world/feature/fact/probability/ranking/Top25 hashes.
+- Requirement completion is semantic (`evaluate_request`); STATUS evidence does not complete GAME_HISTORY.
+- Exact projectionId path does not Bloom/composite/SQLite-query known IDs.
+- L5 semantic key `(scope, scope_id, claim_type)` → content hashes → exact fetch. No false L5 without catalog.
+- Source health persists; 0.0 success stays 0.0; HALF_OPEN is one trial; CELF expectedGain uses routed health.
+- Market execution matrix stages are proven from runtime contracts; 19/19 ACTIVE complete.
+- Incremental Research OS: static graphs reused when the HAR fingerprint matches; facts/catalog/cache reused when claims fingerprint matches; acquisition rebuilt only when frontier fingerprint changes; requirement bitmaps cover the full request set.
+- ParameterSnapshot cache by projectionId, invalidated on material refresh. Stage telemetry HAR/RESEARCH/MODEL/RANK/FREEZE.
+
+Measured: 435 pytest passed; inventory 272/1945 hash `d25db58371c5acd9cb85d377373ff71c08616f20e91dea82ab77c31193375686`.
+Engineering synthetic throughput (not certified): 100 rows 8.05s / 170MB; 1000 rows 131.6s / 1446MB. Improved vs the prior freeze-gate snapshot, still above the original ~96s/932MB 1000-row engineering baseline because semantic work is now real.
+
+Verdict: `CFB_REFERENCE_IMPLEMENTATION_SOFTWARE_COMPLETE` for the declared CFB software path. Current-HAR operational acceptance remains pending external input. Host-performance uncertified. Do not merge to main.
+
+## 2026-09-04 CFB semantic-closure / frontier-firewall pass
+
+Continues from the green PR #19 head at `958d4c28cc8955b89cd4e19fe6350c2bf752af9` on `chatgpt/cfb-semantic-closure-v3-20260904` through PR #20. The canonical integration branch remains `integration/v6-ml-architecture-20260830`; `main` is untouched.
+
+Closed this pass:
+
+- interim frontier state is explicit: `FRONTIER_INTERIM` / `AWAITING_FRONTIER_RESEARCH`;
+- interim runs emit `frontier_checkpoint.json` without a frozen forecast hash, hash sidecar, FrozenForecast ledger row, or settlement eligibility;
+- postgame verification and GitHub archive certification fail closed when the frozen artifact is absent or interim;
+- final freeze binds state and frontier checkpoint hashes, and only request-complete bundles or the established engineering fixture mode can reach the final freeze artifact;
+- MaterialFact resolution deduplicates same-lineage claims, resolves latest-as-of claims, records explicit states, and holds unresolved contradictions conservatively;
+- conformal widening remains inactive at `LR000000` until chronological unseen settlement evidence earns calibration;
+- bootstrap, reference-architecture, dynamic-control, and universal-trace documents make the ChatGPT-native and post-freeze boundaries explicit.
+
+Measured:
+
+- CI run 242 passed: pytest stage, algorithm constitution check, generated inventory check, and benchmark smoke;
+- pytest coverage is 439 tests; generated inventory is 272 modules / 1,949 symbols with hash `93bf2cba429490decfdfd89dbce57973348e121ea521e63da40b0835d0117a1c`;
+- benchmark smoke remains engineering-synthetic throughput only; host-performance certification is not earned.
+
+Not earned:
+
+- current live CFB HAR and host-acquired evidence;
+- prospective settlements, calibration promotion, or any LR/predictive claim;
+- production-root or host-performance certification;
+- exact P380X donor ZIP bytes and mixed-sport R1 completion.
+
+Verdict: `CFB_REFERENCE_IMPLEMENTATION_SOFTWARE_COMPLETE` for the declared CFB software path. Current-HAR operational acceptance remains `CFB_CURRENT_HAR_OPERATIONAL_ACCEPTANCE_PENDING`. Do not merge to `main`.
 
 ## P380X Tranche A/B status
 

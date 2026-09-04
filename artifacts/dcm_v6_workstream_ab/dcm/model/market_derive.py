@@ -86,6 +86,7 @@ _GRIDIRON_ALIASES: dict[str, str] = {
     "pass_cmp": "pass_cmp",
     "completions": "pass_cmp",
     "passing_completions": "pass_cmp",
+    "pass_completions": "pass_cmp",
     "rush_yds": "rush_yds",
     "rush_att": "rush_att",
     "rush_attempts": "rush_att",
@@ -97,12 +98,37 @@ _GRIDIRON_ALIASES: dict[str, str] = {
     "rec_yards": "rec_yds",
     "receptions": "receptions",
     "rec": "receptions",
+    "recs": "receptions",
+    "pass_comp": "pass_cmp",
+    "pass_comps": "pass_cmp",
+    "rush_atts": "rush_att",
     "pass_rush_yds": "pass_rush_yds",
     "pass_rush_yards": "pass_rush_yds",
     "passing_rushing_yards": "pass_rush_yds",
     "rush_rec_yds": "rush_rec_yds",
     "rush_rec_yards": "rush_rec_yds",
     "rushing_receiving_yards": "rush_rec_yds",
+    "pass_td": "pass_td",
+    "pass_tds": "pass_td",
+    "passing_touchdowns": "pass_td",
+    "interceptions": "interceptions",
+    "int": "interceptions",
+    "ints": "interceptions",
+    "rush_td": "rush_td",
+    "rush_tds": "rush_td",
+    "rec_td": "rec_td",
+    "rec_tds": "rec_td",
+    "player_td": "rush_rec_td",
+    "player_tds": "rush_rec_td",
+    "player_touchdowns": "rush_rec_td",
+    "rush_rec_td": "rush_rec_td",
+    "pass_rush_td": "pass_rush_td",
+    "targets": "targets",
+    "fg_made": "fg_made",
+    "xp_made": "xp_made",
+    "pat_made": "xp_made",
+    "kicking_pts": "kicking_pts",
+    "kicking_points": "kicking_pts",
 }
 
 MARKET_DISPLAY = {
@@ -144,13 +170,19 @@ class UnknownMarketError(KeyError):
         self.blocker = blocker
 
 
-def canonicalize_market(market_key: str) -> str | None:
-    """Exact alias lookup. Returns None when the key is not registered."""
+def canonicalize_market(market_key: str, *, ledger: dict[str, Any] | None = None) -> str | None:
+    """Exact alias lookup. Returns None when the key is not registered.
+
+    Gridiron ledgers prefer football aliases so CFB fg_made is not remapped to
+    basketball FGM.
+    """
     raw = str(market_key or "").strip()
     if not raw:
         return None
     key = raw.lower().replace("+", "_").replace("-", "_").replace(" ", "_")
     key = "_".join(p for p in key.split("_") if p)
+    if ledger is not None and looks_like_gridiron_ledger(ledger) and not looks_like_basketball_ledger(ledger):
+        return _GRIDIRON_ALIASES.get(key) or _GRIDIRON_ALIASES.get(raw) or _ALIASES.get(key) or _ALIASES.get(raw)
     return _ALIASES.get(key) or _ALIASES.get(raw) or _GRIDIRON_ALIASES.get(key) or _GRIDIRON_ALIASES.get(raw)
 
 
@@ -205,26 +237,40 @@ def _formulas() -> dict[str, Callable[[dict[str, Any]], float]]:
         "pass_yds": lambda L: _num(L, "pass_yds"),
         "pass_att": lambda L: _num(L, "pass_att"),
         "pass_cmp": lambda L: _num(L, "pass_cmp"),
+        "pass_td": lambda L: _num(L, "pass_td"),
+        "interceptions": lambda L: _num(L, "interceptions"),
         "rush_yds": lambda L: _num(L, "rush_yds"),
         "rush_att": lambda L: _num(L, "rush_att"),
+        "rush_td": lambda L: _num(L, "rush_td"),
         "rec_yds": lambda L: _num(L, "rec_yds"),
         "receptions": lambda L: _num(L, "receptions"),
+        "rec_td": lambda L: _num(L, "rec_td"),
+        "targets": lambda L: _num(L, "targets"),
         "pass_rush_yds": lambda L: _num(L, "pass_yds") + _num(L, "rush_yds"),
         "rush_rec_yds": lambda L: _num(L, "rush_yds") + _num(L, "rec_yds"),
+        "rush_rec_td": lambda L: _num(L, "rush_td") + _num(L, "rec_td"),
+        "pass_rush_td": lambda L: _num(L, "pass_td") + _num(L, "rush_td"),
+        "fg_made": lambda L: _num(L, "fg_made"),
+        "xp_made": lambda L: _num(L, "xp_made"),
+        "kicking_pts": lambda L: 3.0 * _num(L, "fg_made") + _num(L, "xp_made"),
     }
 
 
 FORMULAS = _formulas()
 
 GRIDIRON_MARKET_KEYS = frozenset({
-    "pass_yds", "pass_att", "pass_cmp", "rush_yds", "rush_att", "rec_yds", "receptions", "pass_rush_yds", "rush_rec_yds",
+    "pass_yds", "pass_att", "pass_cmp", "pass_td", "interceptions",
+    "rush_yds", "rush_att", "rush_td",
+    "rec_yds", "receptions", "rec_td", "targets",
+    "pass_rush_yds", "rush_rec_yds", "rush_rec_td", "pass_rush_td",
+    "fg_made", "xp_made", "kicking_pts",
 })
 BASKETBALL_MARKET_KEYS = (frozenset(k for k in FORMULAS) | frozenset({"qtrs_w_3plus_pts"})) - GRIDIRON_MARKET_KEYS
 
 
 def derive_market(ledger: dict[str, Any], market_key: str, board_id: str = "FULL_GAME") -> float:
     """Map a ledger + market key to a scalar. Never independently samples."""
-    canon = canonicalize_market(market_key)
+    canon = canonicalize_market(market_key, ledger=ledger)
     if canon is None:
         raise UnknownMarketError(market_key)
     if canon == "fantasy":
