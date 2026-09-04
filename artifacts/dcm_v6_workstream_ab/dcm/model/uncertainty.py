@@ -50,11 +50,11 @@ def probability_bundle(
         ood_risk=ood_risk, synthetic=synthetic,
     )
     mc_se = math.sqrt(max(0.0, raw_selected_p * (1.0 - raw_selected_p)) / max(1, n_worlds))
-    from dcm.algorithms.ml_families import split_conformal
-
-    conformal_q = split_conformal([mc_se, epistemic_proxy := min(0.45, (1.0 - min(1.0, support_n / 12.0)) * 0.20 + (1.0 - data_quality) * 0.15 + ood_risk * 0.15), aleatoric := min(1.0, max(0.0, volatility))])
-    epistemic = epistemic_proxy
-    aleatoric = aleatoric
+    epistemic = min(0.45, (1.0 - min(1.0, support_n / 12.0)) * 0.20 + (1.0 - data_quality) * 0.15 + ood_risk * 0.15)
+    aleatoric = min(1.0, max(0.0, volatility))
+    # Split-conformal is a challenger until chronological unseen settlement data
+    # earns calibration. It must not widen a production lower bound at LR000000.
+    conformal_q = 0.0
     successes = safe * max(1, n_worlds)
     lcb = wilson_lower_bound(successes, max(1, n_worlds))
     lcb = max(0.01, lcb - max(epistemic * 0.35, conformal_q))

@@ -1370,7 +1370,8 @@ def run_dcm(
         "productionOperable": global_selection_gate,
         "selectionAllowed": global_selection_gate,
         "softwareE2eComplete": True,
-        "forecastFrozen": True,
+        "forecastFrozen": False,
+        "freezeState": "PREPARED",
         "v5Decoder": mount.get("har_decoder"),
         "v5MountState": mount.get("state"),
         "schemaId": SCHEMA,
@@ -1447,6 +1448,8 @@ def run_dcm(
         "finalRefreshHash": freeze.get("finalRefreshHash"),
         "finalRankingHash": freeze.get("finalRankingHash"),
         "forecastFrozen": freeze.get("forecastFrozen"),
+        "freezeState": freeze.get("freezeState"),
+        "frontierCheckpointHash": freeze.get("frontierCheckpointHash"),
     }
     readiness = build_readiness(
         mount=mount,
@@ -1506,10 +1509,15 @@ def run_dcm(
     freeze["frontierPassStateHash"] = ((cfb_forecast.get("passState") or {}).get("contentHash"))
     if not can_freeze:
         freeze["forecastFrozen"] = False
+        freeze["freezeState"] = "FRONTIER_INTERIM"
         freeze["runState"] = "AWAITING_FRONTIER_RESEARCH"
         freeze["note"] = "Interim frontier; not a frozen forecast. Host must acquire remaining frontier actions."
+        for stale_path in (dest / "frozen_forecast.json", dest / "frozen_forecast.sha256"):
+            stale_path.unlink(missing_ok=True)
     else:
         freeze["forecastFrozen"] = True
+        freeze["freezeState"] = "FROZEN"
+        (dest / "frontier_checkpoint.json").unlink(missing_ok=True)
     freeze["freezeBinds"] = {
         **(freeze.get("freezeBinds") or {}),
         "frontierStopReason": freeze.get("frontierStopReason"),
@@ -1518,21 +1526,41 @@ def run_dcm(
         "finalRankingHash": freeze.get("finalRankingHash"),
         "forecastFrozen": freeze.get("forecastFrozen"),
         "top25Final": freeze.get("top25Final"),
+        "freezeState": freeze.get("freezeState"),
+        "frontierCheckpointHash": freeze.get("frontierCheckpointHash"),
     }
     if empty_card_reason:
         freeze["emptyCardReason"] = empty_card_reason
     if not root_accepted:
         freeze["productionEmptyCardReason"] = EMPTY_ROOT_NOT_CERTIFIED
-    freeze["frozenForecastHash"] = compute_forecast_hash(
-        freeze,
-        full_population,
-        strict_card,
-        top25_ranked,
-    )
-    n_fz = dag.add("FREEZE", "board", parents=[n_port.key])
-    dag.complete(n_fz.key, freeze["frozenForecastHash"])
+    freeze["freezeBinds"]["frontierCheckpointHash"] = None
+    frontier_checkpoint_hash = None
+    if can_freeze:
+        freeze["frozenForecastHash"] = compute_forecast_hash(freeze, full_population, strict_card, top25_ranked)
+        n_fz = dag.add("FREEZE", "board", parents=[n_port.key])
+        dag.complete(n_fz.key, freeze["frozenForecastHash"])
+    else:
+        frontier_checkpoint = {
+            "schema": "pillars_dcm.frontier_checkpoint.v1",
+            "runId": run_id,
+            "freezeState": freeze.get("freezeState"),
+            "top25Final": False,
+            "forecastFrozen": False,
+            "frontierPassStateHash": freeze.get("frontierPassStateHash"),
+            "top25Hash": freeze.get("top25Hash"),
+            "nextDeterministicAction": "acquire_frontier_research_and_resume",
+        }
+        frontier_checkpoint["contentHash"] = content_hash(frontier_checkpoint)
+        frontier_checkpoint_hash = frontier_checkpoint["contentHash"]
+        freeze["frontierCheckpointHash"] = frontier_checkpoint_hash
+        freeze["freezeBinds"]["frontierCheckpointHash"] = frontier_checkpoint_hash
+        freeze.pop("frozenForecastHash", None)
+        (dest / "frontier_checkpoint.json").write_text(json.dumps(frontier_checkpoint, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        n_fz = dag.add("FRONTIER_CHECKPOINT", "board", parents=[n_port.key])
+        dag.complete(n_fz.key, frontier_checkpoint_hash)
     freeze["dag"] = dag.snapshot()
-    (dest / "frozen_forecast.json").write_text(json.dumps(freeze, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    if can_freeze:
+        (dest / "frozen_forecast.json").write_text(json.dumps(freeze, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     (dest / "freeze.json").write_text(json.dumps(freeze, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     freeze_perf = freeze_t.finish(OutputRows=len(card), Frozen=bool(freeze.get("forecastFrozen")))
     (dest / "performance" / "freeze.json").write_text(json.dumps(freeze_perf, indent=2) + "\n", encoding="utf-8")
@@ -1546,22 +1574,40 @@ def run_dcm(
         "hostPerformanceCertified": False,
     }
     (dest / "performance" / "stages.json").write_text(json.dumps(stages_payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    (dest / "frozen_forecast.sha256").write_text(freeze["frozenForecastHash"] + "\n", encoding="utf-8")
+    if can_freeze:
+        (dest / "frozen_forecast.sha256").write_text(freeze["frozenForecastHash"] + "\n", encoding="utf-8")
     (dest / "population_full.jsonl").write_text("".join(json.dumps(p) + "\n" for p in full_population), encoding="utf-8")
     (dest / "accounting.json").write_text(json.dumps({**(board.get("accounting") or {}), "states": states_count, "playable": len(qualified), "cardSize": len(card)}, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    (dest / "hashes.json").write_text(json.dumps({"boardHash": board.get("contentHash"), "harSha256": har_sha, "frozenForecastHash": freeze["frozenForecastHash"], "evidenceGraphHash": evidence_graph.get("contentHash"), "featureStoreHash": feature_store_hash, "explanationsHash": explanations_hash, "gitCommit": git_commit, "checkpointPending": False, "schemaV1Expected": "6e78dacc19843338643bdcabc7477fd3ce2dd065da1e9629646dacc21cdb1f22", "schemaV2": (schema_root.get("v2") or {}), **constitution_run_hashes(plan_payload)}, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    hashes_payload = {
+        "boardHash": board.get("contentHash"),
+        "harSha256": har_sha,
+        "evidenceGraphHash": evidence_graph.get("contentHash"),
+        "featureStoreHash": feature_store_hash,
+        "explanationsHash": explanations_hash,
+        "gitCommit": git_commit,
+        "checkpointPending": not can_freeze,
+        "schemaV1Expected": "6e78dacc19843338643bdcabc7477fd3ce2dd065da1e9629646dacc21cdb1f22",
+        "schemaV2": (schema_root.get("v2") or {}),
+        **constitution_run_hashes(plan_payload),
+    }
+    if can_freeze:
+        hashes_payload["frozenForecastHash"] = freeze["frozenForecastHash"]
+    else:
+        hashes_payload["frontierCheckpointHash"] = frontier_checkpoint_hash
+    (dest / "hashes.json").write_text(json.dumps(hashes_payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     persist_algorithm_telemetry(dest, telemetry)
     from dcm.algorithms.indexing import merkle_root
     from dcm.runtime.archive_receipt import archive_reconcile, archive_retry, build_archive_receipt, persist_archive_receipt
     hashes_payload = json.loads((dest / "hashes.json").read_text(encoding="utf-8"))
+    merkle_subject = str(hashes_payload.get("frozenForecastHash") or hashes_payload.get("frontierCheckpointHash") or "")
     freeze_merkle = merkle_root([
         str(hashes_payload.get("harSha256") or ""),
-        str(freeze.get("frozenForecastHash") or ""),
+        merkle_subject,
         str(hashes_payload.get("evidenceGraphHash") or ""),
         str(hashes_payload.get("featureStoreHash") or ""),
         str(hashes_payload.get("runMerkleRoot") or ""),
     ])
-    hashes_payload["freezeMerkleRoot"] = freeze_merkle
+    hashes_payload["freezeMerkleRoot" if can_freeze else "frontierCheckpointMerkleRoot"] = freeze_merkle
     (dest / "hashes.json").write_text(json.dumps(hashes_payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     persist_archive_receipt(dest, build_archive_receipt(
         dest,
@@ -1586,28 +1632,31 @@ def run_dcm(
     flags = freeze.get("jointMinuteConservation") or {}
     if flags.get("identitiesHeld") is False:
         blockers.append({"code": "PRIMITIVE_CONSERVATION_FAILURE", "count": 1, "source": "event_worlds_meta"})
+    if not can_freeze:
+        blockers.append({"code": "FRONTIER_RESEARCH_REQUIRED", "count": 1})
     (dest / "blockers.json").write_text(json.dumps(blockers, indent=2) + "\n", encoding="utf-8")
 
-    store = IndexedStore(dest / "index.sqlite")
-    append_record(
-        store,
-        "FrozenForecast",
-        forecast_cutoff,
-        run_id,
-        LEARNING_REVISION,
-        {"hash": freeze["frozenForecastHash"]},
-        source_hash=har_sha,
-    )
-    store.close()
-    append_ledger_jsonl(
-        dest,
-        "FrozenForecast",
-        {"hash": freeze["frozenForecastHash"]},
-        cutoff=forecast_cutoff,
-        run_id=run_id,
-        lr=LEARNING_REVISION,
-        source_hash=har_sha,
-    )
+    if can_freeze:
+        store = IndexedStore(dest / "index.sqlite")
+        append_record(
+            store,
+            "FrozenForecast",
+            forecast_cutoff,
+            run_id,
+            LEARNING_REVISION,
+            {"hash": freeze["frozenForecastHash"]},
+            source_hash=har_sha,
+        )
+        store.close()
+        append_ledger_jsonl(
+            dest,
+            "FrozenForecast",
+            {"hash": freeze["frozenForecastHash"]},
+            cutoff=forecast_cutoff,
+            run_id=run_id,
+            lr=LEARNING_REVISION,
+            source_hash=har_sha,
+        )
 
     integrity = {
         **freeze,
@@ -1616,32 +1665,34 @@ def run_dcm(
         "createdAtUtc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
     }
     (dest / "run_integrity.json").write_text(json.dumps(integrity, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    write_checkpoint(
-        dest / "checkpoint.json",
-        {
-            "runId": run_id,
-            "dcmVersion": SOFTWARE,
-            "learningRevision": LEARNING_REVISION,
-            "forecastCutoff": forecast_cutoff,
-            "modelConfigHash": config_hash,
-            "calibrationStateHash": calibration_state.get("contentHash"),
-            "mountStateHash": content_hash(mount),
-            "schemaStateHash": content_hash(schema_root),
-            "artifactRoot": str(dest),
-            "completedStages": ["BOARD_FREEZE", "RESEARCH", "MODEL", "RANK", "PORTFOLIO", "FREEZE"],
-            "pending": [],
-            "nextDeterministicAction": "none",
-            "rowCounts": states_count,
-            "blockers": [b["code"] for b in blockers],
-            "frozenForecastHash": freeze["frozenForecastHash"],
-        },
-    )
+    checkpoint_payload = {
+        "runId": run_id,
+        "dcmVersion": SOFTWARE,
+        "learningRevision": LEARNING_REVISION,
+        "forecastCutoff": forecast_cutoff,
+        "modelConfigHash": config_hash,
+        "calibrationStateHash": calibration_state.get("contentHash"),
+        "mountStateHash": content_hash(mount),
+        "schemaStateHash": content_hash(schema_root),
+        "artifactRoot": str(dest),
+        "completedStages": ["BOARD_FREEZE", "RESEARCH", "MODEL", "RANK", "PORTFOLIO", "FREEZE"] if can_freeze else ["BOARD_FREEZE", "RESEARCH", "MODEL", "RANK", "PORTFOLIO", "FRONTIER_CHECKPOINT"],
+        "forecastFrozen": bool(can_freeze),
+        "pending": [] if can_freeze else ["FRONTIER_RESEARCH"],
+        "nextDeterministicAction": "none" if can_freeze else "acquire_frontier_research_and_resume",
+        "rowCounts": states_count,
+        "blockers": [b["code"] for b in blockers],
+    }
+    if can_freeze:
+        checkpoint_payload["frozenForecastHash"] = freeze["frozenForecastHash"]
+    else:
+        checkpoint_payload["frontierCheckpointHash"] = frontier_checkpoint_hash
+    write_checkpoint(dest / "checkpoint.json", checkpoint_payload)
     return _finalize_archive(
         dest,
         {
             "run_id": run_id,
             "dest": str(dest),
-            "runState": run_state,
+            "runState": freeze.get("runState"),
             "integrity": integrity,
             "card": strict_card,
             "top25_qualified": top25_qualified,

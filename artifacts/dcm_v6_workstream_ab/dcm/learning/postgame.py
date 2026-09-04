@@ -135,12 +135,24 @@ def _sha256_file(path: Path) -> str:
 
 
 def _verify_frozen_run(run_dir: Path) -> tuple[dict[str, Any], dict[str, Any], list[dict[str, Any]]]:
-    freeze = json.loads((run_dir / "frozen_forecast.json").read_text(encoding="utf-8"))
+    freeze_path = run_dir / "frozen_forecast.json"
+    if not freeze_path.is_file():
+        raise RuntimeError("FORECAST_NOT_FROZEN")
+    freeze = json.loads(freeze_path.read_text(encoding="utf-8"))
     integrity = json.loads((run_dir / "run_integrity.json").read_text(encoding="utf-8"))
+    if (
+        freeze.get("forecastFrozen") is False
+        or not freeze.get("frozenForecastHash")
+        or freeze.get("freezeState") not in (None, "FROZEN")
+        or freeze.get("runState") == "AWAITING_FRONTIER_RESEARCH"
+        or integrity.get("forecastFrozen") is False
+    ):
+        raise RuntimeError("FORECAST_NOT_FROZEN")
     checkpoint = json.loads((run_dir / "checkpoint.json").read_text(encoding="utf-8"))
+    if checkpoint.get("forecastFrozen") is False:
+        raise RuntimeError("FORECAST_NOT_FROZEN")
     population = _population(run_dir)
-    strict_card = json.loads((run_dir / "strict_card.json").read_text(encoding="utf-8"))
-    top25_ranked = json.loads((run_dir / "top25_ranked.json").read_text(encoding="utf-8"))
+    strict_card = json.loads((run_dir / "strict_card.json").read_text(encoding="utf-8")); top25_ranked = json.loads((run_dir / "top25_ranked.json").read_text(encoding="utf-8"))
     hash_sidecar = (run_dir / "frozen_forecast.sha256").read_text(encoding="utf-8").strip()
 
     recomputed = compute_forecast_hash(freeze, population, strict_card, top25_ranked)
@@ -341,7 +353,8 @@ def _summarize(freeze: dict[str, Any], integrity: dict[str, Any], settlements: l
 def settle_run(run_dir: Path, outcomes_path: Path, *, card_only: bool = False) -> dict[str, Any]:
     run_dir = Path(run_dir)
     outcomes_path = Path(outcomes_path)
-    freeze_bytes = (run_dir / "frozen_forecast.json").read_bytes()
+    freeze_path = run_dir / "frozen_forecast.json"
+    freeze_bytes = freeze_path.read_bytes() if freeze_path.is_file() else b""
     freeze, integrity, population = _verify_frozen_run(run_dir)
     outcomes_sha256 = _sha256_file(outcomes_path)
     outcomes = _outcomes(outcomes_path)

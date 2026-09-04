@@ -47,16 +47,20 @@ CLAIM_TYPE_TO_FEATURE = {
 
 
 def _authority(claim: Mapping[str, Any]) -> int:
-    raw = str(claim.get("authority") or claim.get("source_authority") or "").upper()
-    if raw in AUTHORITY_RANK:
-        return AUTHORITY_RANK[raw]
+    raw = claim.get("authority") or claim.get("source_authority") or ""
+    ctype = str(claim.get("claim_type") or "FACT").upper().split("_", 1)[0]; weight = {"STATUS": 1.0, "INJURY": 1.0, "ROLE": 0.98, "STARTER": 0.98, "WEATHER": 0.90, "HISTORY": 0.85}.get(ctype, 1.0)
+    if isinstance(raw, (int, float)): return int(round((float(raw) * 100.0 if float(raw) <= 1.0 else float(raw)) * weight))
+    token = str(raw).upper()
+    aliases = {"OFFICIAL_LEAGUE": 100, "OFFICIAL_PLATFORM": 100, "OFFICIAL_TEAM": 98, "STRUCTURED_STAT": 80, "BOX_SCORE_VENDOR": 80, "REPUTABLE_REPORTING": 50, "SEARCH_FALLBACK": 20, "FIXTURE": 0}
+    if token in AUTHORITY_RANK: return int(round(AUTHORITY_RANK[token] * weight))
+    if token in aliases: return int(round(aliases[token] * weight))
     rel = float(claim.get("reliability") or 0.0)
-    return int(round(rel * 80))
+    return int(round(max(0.0, min(1.0, rel)) * 80 * weight))
 
 
 def _freshness(claim: Mapping[str, Any]) -> float:
     try:
-        return float(claim.get("freshness") or 0.0)
+        return float(claim.get("freshness") if claim.get("freshness") is not None else claim.get("freshnessScore") or 0.0)
     except (TypeError, ValueError):
         return 0.0
 
@@ -106,7 +110,9 @@ def resolve_material_facts(
     excluded_post_cutoff = 0
     for raw in claims:
         rec = dict(raw)
-        if cutoff and is_after_cutoff(rec.get("observed_at") or rec.get("observedAt"), cutoff):
+        observed_at = rec.get("observed_at") or rec.get("observedAt")
+        published_at = rec.get("published_at") or rec.get("publishedAt")
+        if cutoff and (is_after_cutoff(observed_at, cutoff) or is_after_cutoff(published_at, cutoff)):
             rec["excluded"] = "POST_CUTOFF"
             excluded_post_cutoff += 1
             continue
@@ -115,29 +121,74 @@ def resolve_material_facts(
     facts: list[dict[str, Any]] = []
     conflicts: list[dict[str, Any]] = []
     for key, group in grouped.items():
+        by_lineage_value: dict[tuple[str, str], dict[str, Any]] = {}
+        for raw_claim in group:
+            claim = dict(raw_claim)
+            claim_hash = str(claim.get("claim_hash") or claim.get("claimHash") or content_hash(claim))
+            claim["_resolvedClaimHash"] = claim_hash
+            lineage = claim.get("lineage_cluster_id") or claim.get("lineageClusterId") or claim.get("document_hash") or claim.get("source_hash")
+            if not lineage:
+                lineage = content_hash({"sourceId": claim.get("source_id"), "url": claim.get("url")})
+            claim["_lineageId"] = str(lineage)
+            value_hash = content_hash(json_safe_value(claim.get("claim_value")))
+            dedupe_key = (claim["_lineageId"], value_hash)
+            prior = by_lineage_value.get(dedupe_key)
+            if prior is None or (_authority(claim), _freshness(claim), str(claim.get("published_at") or "")) > (_authority(prior), _freshness(prior), str(prior.get("published_at") or "")):
+                by_lineage_value[dedupe_key] = claim
+
+        deduped = list(by_lineage_value.values())
+        observed = [parse_ts(c.get("observed_at") or c.get("observedAt")) for c in deduped]
+        latest_observed = max((value for value in observed if value is not None), default=None)
+        active = [c for c in deduped if latest_observed is None or parse_ts(c.get("observed_at") or c.get("observedAt")) == latest_observed]
         ranked = sorted(
-            group,
-            key=lambda c: (
-                _authority(c),
-                _freshness(c),
-                parse_ts(c.get("published_at") or c.get("publishedAt")) or datetime.min.replace(tzinfo=timezone.utc),
-            ),
+            active,
+            key=lambda c: (_authority(c), _freshness(c), parse_ts(c.get("published_at") or c.get("publishedAt")) or datetime.min.replace(tzinfo=timezone.utc), str(c.get("_resolvedClaimHash") or "")),
             reverse=True,
         )
+        if not ranked:
+            continue
         winner = ranked[0]
-        values = [json_safe_value(c.get("claim_value")) for c in ranked]
-        unique_values = []
-        for v in values:
-            if v not in unique_values:
-                unique_values.append(v)
-        conflict = len(unique_values) > 1
+        by_value: dict[str, list[dict[str, Any]]] = defaultdict(list)
+        for claim in ranked:
+            by_value[content_hash(json_safe_value(claim.get("claim_value")))].append(claim)
+        unique_values = [json_safe_value(by_value[value_hash][0].get("claim_value")) for value_hash in sorted(by_value)]
+        winner_value_hash = content_hash(json_safe_value(winner.get("claim_value")))
+        supporting = [c for c in ranked if content_hash(json_safe_value(c.get("claim_value"))) == winner_value_hash]
+        conflicting_claims = [c for c in ranked if content_hash(json_safe_value(c.get("claim_value"))) != winner_value_hash]
+        conflict = bool(conflicting_claims)
+        claim_type = str(winner.get("claim_type") or "FACT")
+        authority_label = str(winner.get("authority") or winner.get("source_authority") or "DERIVED").upper()
+        freshness_supplied = any("freshness" in c or "freshnessScore" in c for c in ranked)
+        explicit_states = {str(c.get("state") or "").upper() for c in ranked}
+        if claim_type.upper() in {"NOT_APPLICABLE", "N/A"} or str(winner.get("claim_value") or "").upper() in {"NOT_APPLICABLE", "N/A"}:
+            state = "NOT_APPLICABLE"
+        elif conflict:
+            state = "CONFLICTED"
+        elif winner.get("claim_value") is None:
+            state = "UNRESOLVED"
+        elif "UNRESOLVED" in explicit_states:
+            state = "UNRESOLVED"
+        elif "STALE" in explicit_states or (freshness_supplied and max(_freshness(c) for c in ranked) <= 0.0):
+            state = "STALE"
+        elif _authority(winner) >= 80:
+            state = "CONFIRMED"
+        else:
+            state = "PROBABLE"
+        lineage_ids = sorted({str(c.get("_lineageId") or "") for c in deduped if c.get("_lineageId")})
+        active_lineage_ids = sorted({str(c.get("_lineageId") or "") for c in ranked if c.get("_lineageId")})
+        historical_hashes = sorted(str(c.get("_resolvedClaimHash") or "") for c in deduped if c.get("_resolvedClaimHash"))
+        supporting_hashes = sorted(str(c.get("_resolvedClaimHash") or "") for c in supporting if c.get("_resolvedClaimHash"))
+        conflicting_hashes = sorted(str(c.get("_resolvedClaimHash") or "") for c in conflicting_claims if c.get("_resolvedClaimHash"))
         if conflict:
             conflicts.append({
                 "factKey": key,
                 "values": unique_values,
                 "winnerSource": winner.get("source_id"),
                 "winnerAuthority": _authority(winner),
-                "action": "REVERIFY_OR_HOLD" if _authority(winner) < 80 else "AUTHORITY_WINS",
+                "state": "CONFLICTED",
+                "independentLineageCount": len(lineage_ids),
+                "claimHashes": sorted(supporting_hashes + conflicting_hashes),
+                "action": "HOLD_UNTIL_REVERIFIED",
             })
         fact = {
             "factKey": key,
@@ -146,22 +197,40 @@ def resolve_material_facts(
             "claimType": winner.get("claim_type"),
             "value": winner.get("claim_value"),
             "sourceId": winner.get("source_id"),
-            "claimHash": winner.get("claim_hash"),
+            "claimHash": str(winner.get("_resolvedClaimHash") or ""),
             "sourceHash": winner.get("source_hash") or winner.get("document_hash"),
             "authority": _authority(winner),
+            "authorityClass": authority_label,
+            "authorityPolicy": {"claimType": claim_type, "sourceClass": authority_label},
             "freshness": _freshness(winner),
             "validTime": winner.get("valid_at") or winner.get("published_at"),
             "observedTime": winner.get("observed_at"),
             "forecastCutoff": cutoff,
+            "state": state,
             "conflict": conflict,
             "claimCount": len(ranked),
-            "holdPlayable": bool(conflict and _authority(winner) < 80),
+            "historicalClaimCount": len(deduped),
+            "historicalClaimHashes": historical_hashes,
+            "supportingClaimHashes": supporting_hashes,
+            "conflictingClaimHashes": conflicting_hashes,
+            "lineageClusterIds": lineage_ids,
+            "activeLineageClusterIds": active_lineage_ids,
+            "independentLineageCount": len(lineage_ids),
+            "activeIndependentLineageCount": len(active_lineage_ids),
+            "holdPlayable": state in {"CONFLICTED", "UNRESOLVED", "STALE"},
+            "resolutionReason": {"CONFIRMED": "single_or_consistent_high_authority_lineage", "PROBABLE": "single_or_consistent_lower_authority_lineage", "CONFLICTED": "latest_claims_disagree_after_lineage_deduplication", "STALE": "source_marked_stale_or_freshness_exhausted", "UNRESOLVED": "no_usable_claim_value_or_resolution", "NOT_APPLICABLE": "claim_explicitly_not_applicable"}.get(state, "UNRESOLVED"),
         }
         fact["contentHash"] = content_hash({
             "factKey": fact["factKey"],
             "value": json_safe_value(fact["value"]),
             "claimType": fact["claimType"],
             "authority": fact["authority"],
+            "state": fact["state"],
+            "supportingClaimHashes": fact["supportingClaimHashes"],
+            "conflictingClaimHashes": fact["conflictingClaimHashes"],
+            "historicalClaimHashes": fact["historicalClaimHashes"],
+            "lineageClusterIds": fact["lineageClusterIds"],
+            "activeLineageClusterIds": fact["activeLineageClusterIds"],
         })
         facts.append(fact)
 
@@ -178,28 +247,15 @@ def resolve_material_facts(
             "SourceDocument", "EvidenceClaim", "MaterialFactResolution",
             "Feature", "ParameterSnapshot", "EventWorld", "PropEvaluation",
         ],
+        "states": ["CONFIRMED", "PROBABLE", "CONFLICTED", "STALE", "UNRESOLVED", "NOT_APPLICABLE"],
     }
     body["contentHash"] = content_hash({
         "schema": body["schema"],
-        "facts": [
-            {
-                "factKey": f.get("factKey"),
-                "value": json_safe_value(f.get("value")),
-                "authority": f.get("authority"),
-                "conflict": f.get("conflict"),
-                "claimHash": f.get("claimHash"),
-                "sourceId": f.get("sourceId"),
-            }
-            for f in sorted_facts
-        ],
-        "conflicts": [
-            {"factKey": c.get("factKey"), "values": json_safe_value(c.get("values"))}
-            for c in sorted_conflicts
-        ],
+        "facts": sorted_facts,
+        "conflicts": sorted_conflicts,
         "excludedPostCutoff": excluded_post_cutoff,
     })
     return body
-
 
 def facts_to_features(
     facts: Mapping[str, Any] | None,
@@ -240,7 +296,12 @@ def facts_to_features(
                 "forecastCutoff": fact.get("forecastCutoff") or cutoff,
                 "authority": fact.get("authority"),
                 "freshness": fact.get("freshness"),
-                "contradictionState": "CONFLICT" if fact.get("conflict") else "CLEAR",
+                "contradictionState": str(fact.get("state") or ("CONFLICTED" if fact.get("conflict") else "CLEAR")),
+                "resolutionState": str(fact.get("state") or "UNRESOLVED"),
+                "supportingClaimHashes": list(fact.get("supportingClaimHashes") or []),
+                "conflictingClaimHashes": list(fact.get("conflictingClaimHashes") or []),
+                "lineageClusterIds": list(fact.get("lineageClusterIds") or []),
+                "activeLineageClusterIds": list(fact.get("activeLineageClusterIds") or []),
             }
             rec["contentHash"] = content_hash({k: v for k, v in rec.items() if k != "contentHash"})
             out.append(rec)
@@ -264,7 +325,12 @@ def facts_to_features(
                     "forecastCutoff": fact.get("forecastCutoff") or cutoff,
                     "authority": fact.get("authority"),
                     "freshness": fact.get("freshness"),
-                    "contradictionState": "CONFLICT" if fact.get("conflict") else "CLEAR",
+                    "contradictionState": str(fact.get("state") or ("CONFLICTED" if fact.get("conflict") else "CLEAR")),
+                    "resolutionState": str(fact.get("state") or "UNRESOLVED"),
+                    "supportingClaimHashes": list(fact.get("supportingClaimHashes") or []),
+                    "conflictingClaimHashes": list(fact.get("conflictingClaimHashes") or []),
+                    "lineageClusterIds": list(fact.get("lineageClusterIds") or []),
+                    "activeLineageClusterIds": list(fact.get("activeLineageClusterIds") or []),
                 }
                 rec["contentHash"] = content_hash({k: v for k, v in rec.items() if k != "contentHash"})
                 out.append(rec)
@@ -286,7 +352,12 @@ def facts_to_features(
                 "forecastCutoff": fact.get("forecastCutoff") or cutoff,
                 "authority": fact.get("authority"),
                 "freshness": fact.get("freshness"),
-                "contradictionState": "CONFLICT" if fact.get("conflict") else "CLEAR",
+                "contradictionState": str(fact.get("state") or ("CONFLICTED" if fact.get("conflict") else "CLEAR")),
+                "resolutionState": str(fact.get("state") or "UNRESOLVED"),
+                "supportingClaimHashes": list(fact.get("supportingClaimHashes") or []),
+                "conflictingClaimHashes": list(fact.get("conflictingClaimHashes") or []),
+                "lineageClusterIds": list(fact.get("lineageClusterIds") or []),
+                "activeLineageClusterIds": list(fact.get("activeLineageClusterIds") or []),
             }
             rec["contentHash"] = content_hash({k: v for k, v in rec.items() if k != "contentHash"})
             out.append(rec)

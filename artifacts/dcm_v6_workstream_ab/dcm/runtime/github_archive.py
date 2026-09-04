@@ -491,9 +491,9 @@ def _hash_certified_python_freeze(audit: dict[str, Any]) -> bool:
     frozen = _s(audit.get("frozenForecastHash"))
     if not frozen:
         return False
-    if run_state in MANUAL_STATES:
+    if audit.get("forecastFrozen") is False or run_state in MANUAL_STATES:
         return False
-    if run_state not in PYTHON_FREEZE_STATES:
+    if audit.get("freezeState") not in (None, "FROZEN") or run_state not in PYTHON_FREEZE_STATES:
         return False
     if audit.get("softwareFreeze") is False:
         return False
@@ -767,6 +767,8 @@ def build_run_audit(dest: Path) -> dict[str, Any]:
         "boardHash": freeze.get("boardHash") or hashes.get("boardHash"),
         "frozenForecastHash": freeze.get("frozenForecastHash") or hashes.get("frozenForecastHash"),
         "runState": freeze.get("runState") or integrity.get("runState") or checkpoint.get("runState"),
+        "forecastFrozen": freeze.get("forecastFrozen"),
+        "freezeState": freeze.get("freezeState"),
         "researchComplete": freeze.get("researchComplete"),
         "evidenceMode": freeze.get("evidenceMode") or freeze.get("evidence_mode"),
         "productionResearchComplete": freeze.get("productionResearchComplete"),

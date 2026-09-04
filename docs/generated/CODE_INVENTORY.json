@@ -1,5 +1,5 @@
 {
-  "contentHash": "d25db58371c5acd9cb85d377373ff71c08616f20e91dea82ab77c31193375686",
+  "contentHash": "bc72bdce79ce731c3482aca2cd12d2d1fb36e9eac9860c0ce7616c521697a13e",
   "moduleCount": 272,
   "modules": [
     {
@@ -2190,7 +2190,7 @@
           "qualname": "cfb_teammate_groups"
         },
         {
-          "doc": "Shared team plays/pass-rate/rush-rate \u2192 residual-aware player opportunity.",
+          "doc": "Shared team plays/pass-rate/rush-rate \\u2192 residual-aware player opportunity.",
           "endLine": 190,
           "kind": "function",
           "line": 37,
@@ -2223,7 +2223,7 @@
           "qualname": "estimate_frontier_impact"
         },
         {
-          "doc": "Utility(action) = fanout \u00d7 materiality \u00d7 P(success) \u00d7 authority / cost.",
+          "doc": "Utility(action) = fanout \\u00d7 materiality \\u00d7 P(success) \\u00d7 authority / cost.",
           "endLine": 61,
           "kind": "function",
           "line": 40,
@@ -2590,7 +2590,7 @@
           "qualname": "cfb_top100_row"
         },
         {
-          "doc": "Filter CFB \u2192 heap partial Top-K \u2192 deterministic Timsort of the frontier.",
+          "doc": "Filter CFB \\u2192 heap partial Top-K \\u2192 deterministic Timsort of the frontier.",
           "endLine": 144,
           "kind": "function",
           "line": 118,
@@ -3659,7 +3659,7 @@
           "qualname": "freeze_map"
         },
         {
-          "doc": "Group every HAR player by playerId. Name \u2260 platform id.",
+          "doc": "Group every HAR player by playerId. Name \\u2260 platform id.",
           "endLine": 122,
           "kind": "function",
           "line": 69,
@@ -3919,7 +3919,7 @@
           "qualname": "_norm"
         },
         {
-          "doc": "Return (market_key, market_label). Unknown keys stay as a slug \u2014 fail closed later.",
+          "doc": "Return (market_key, market_label). Unknown keys stay as a slug \\u2014 fail closed later.",
           "endLine": 266,
           "kind": "function",
           "line": 258,
@@ -4388,7 +4388,7 @@
       "classes": 0,
       "functions": 13,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/learning/postgame.py",
-      "sha256": "0fa2f33c6dbf241bc5bd780c098c482770eb6d42bfe3f8ce3106ff95d2b94e2a",
+      "sha256": "75c28bc96b743cbfb4e8a3e027de083434b162974e462bfe6799ea5919ad4e64",
       "symbols": [
         {
           "doc": null,
@@ -4440,7 +4440,7 @@
         },
         {
           "doc": null,
-          "endLine": 164,
+          "endLine": 176,
           "kind": "function",
           "line": 137,
           "name": "_verify_frozen_run",
@@ -4448,49 +4448,49 @@
         },
         {
           "doc": "PrizePicks sporting compare: MORE wins above the line, LESS below, exact is PUSH.",
-          "endLine": 173,
+          "endLine": 185,
           "kind": "function",
-          "line": 167,
+          "line": 179,
           "name": "_result",
           "qualname": "_result"
         },
         {
           "doc": null,
-          "endLine": 186,
+          "endLine": 198,
           "kind": "function",
-          "line": 176,
+          "line": 188,
           "name": "_normalize_result",
           "qualname": "_normalize_result"
         },
         {
           "doc": null,
-          "endLine": 294,
+          "endLine": 306,
           "kind": "function",
-          "line": 189,
+          "line": 201,
           "name": "_settle_row",
           "qualname": "_settle_row"
         },
         {
           "doc": null,
-          "endLine": 305,
+          "endLine": 317,
           "kind": "function",
-          "line": 297,
+          "line": 309,
           "name": "_attach_scores",
           "qualname": "_attach_scores"
         },
         {
           "doc": null,
-          "endLine": 338,
+          "endLine": 350,
           "kind": "function",
-          "line": 308,
+          "line": 320,
           "name": "_summarize",
           "qualname": "_summarize"
         },
         {
           "doc": null,
-          "endLine": 500,
+          "endLine": 513,
           "kind": "function",
-          "line": 341,
+          "line": 353,
           "name": "settle_run",
           "qualname": "settle_run"
         }
@@ -5233,7 +5233,7 @@
           "qualname": "render_prop_explanation_text"
         },
         {
-          "doc": "entity+eventId \u2192 content hashes of FeatureStore records (and their sourceHashes).",
+          "doc": "entity+eventId \\u2192 content hashes of FeatureStore records (and their sourceHashes).",
           "endLine": 421,
           "kind": "function",
           "line": 402,
@@ -5461,7 +5461,7 @@
       "sha256": "46bc71050d504effbbd715751187736e7768afcfbbe53c36cedabbc20bd844b9",
       "symbols": [
         {
-          "doc": "Unknown or unverified market. Fail closed \u2014 never nearest-match.",
+          "doc": "Unknown or unverified market. Fail closed \\u2014 never nearest-match.",
           "endLine": 170,
           "kind": "class",
           "line": 164,
@@ -5791,7 +5791,7 @@
       "classes": 0,
       "functions": 3,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/model/uncertainty.py",
-      "sha256": "b17065b2eafc8be70720456cafc7bbd46b0bab9aa05f9386ae417fd2ad638789",
+      "sha256": "366e62d74e7a244f993b52268229b1ead0c294e8a3bb2ec997f292eb107b1bac",
       "symbols": [
         {
           "doc": null,
@@ -7350,7 +7350,7 @@
           "qualname": "ResearchCacheCascade.snapshot"
         },
         {
-          "doc": "Drop L0\u2013L4. L5 catalog (DriveObjectCatalog) is unchanged.",
+          "doc": "Drop L0\\u2013L4. L5 catalog (DriveObjectCatalog) is unchanged.",
           "endLine": 242,
           "kind": "method",
           "line": 235,
@@ -7903,7 +7903,7 @@
           "qualname": "build_evidence_graph.add_node"
         },
         {
-          "doc": "Resolve Selection/Offer \u2192 Subject \u2192 EvidenceClaim \u2192 SourceDocument.",
+          "doc": "Resolve Selection/Offer \\u2192 Subject \\u2192 EvidenceClaim \\u2192 SourceDocument.",
           "endLine": 441,
           "kind": "function",
           "line": 365,
@@ -7927,7 +7927,7 @@
           "qualname": "_unique_edges"
         },
         {
-          "doc": "Populate Feature \u2192 State \u2192 Parameter \u2192 Simulation \u2192 Selection \u2192 Settlement.",
+          "doc": "Populate Feature \\u2192 State \\u2192 Parameter \\u2192 Simulation \\u2192 Selection \\u2192 Settlement.",
           "endLine": 701,
           "kind": "function",
           "line": 457,
@@ -7951,7 +7951,7 @@
           "qualname": "attach_runtime_lineage.add_edge"
         },
         {
-          "doc": "Selection \u2192 PropEvaluation \u2192 Simulation \u2192 ParameterSnapshot \u2192 Feature/Claim.",
+          "doc": "Selection \\u2192 PropEvaluation \\u2192 Simulation \\u2192 ParameterSnapshot \\u2192 Feature/Claim.",
           "endLine": 745,
           "kind": "function",
           "line": 704,
@@ -8405,7 +8405,7 @@
           "qualname": "BoardIndexes.query_retrieval_cascade"
         },
         {
-          "doc": "Exact-first identity. Known projectionId \u2192 hash lookup \u2192 done.",
+          "doc": "Exact-first identity. Known projectionId \\u2192 hash lookup \\u2192 done.",
           "endLine": 375,
           "kind": "method",
           "line": 290,
@@ -8469,7 +8469,7 @@
           "qualname": "EvidenceIndexes.close"
         },
         {
-          "doc": "Reverse index Requirement \u2192 Offers as Python bitsets plus id lists.",
+          "doc": "Reverse index Requirement \\u2192 Offers as Python bitsets plus id lists.",
           "endLine": 455,
           "kind": "function",
           "line": 431,
@@ -8516,11 +8516,11 @@
       "classes": 0,
       "functions": 14,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/material_facts.py",
-      "sha256": "3616076156a5554d75e0b19e0c8979149ff6a08bef43957852f5af71ab698590",
+      "sha256": "c7c8716a24e2045a49b88ddb45d35975003bda29cfac73cf0f18470588b95830",
       "symbols": [
         {
           "doc": null,
-          "endLine": 54,
+          "endLine": 58,
           "kind": "function",
           "line": 49,
           "name": "_authority",
@@ -8528,105 +8528,105 @@
         },
         {
           "doc": null,
-          "endLine": 61,
+          "endLine": 65,
           "kind": "function",
-          "line": 57,
+          "line": 61,
           "name": "_freshness",
           "qualname": "_freshness"
         },
         {
           "doc": null,
-          "endLine": 79,
+          "endLine": 83,
           "kind": "function",
-          "line": 64,
+          "line": 68,
           "name": "parse_ts",
           "qualname": "parse_ts"
         },
         {
           "doc": "True when observed is strictly after cutoff. ISO-normalized, not naive strings.",
-          "endLine": 90,
+          "endLine": 94,
           "kind": "function",
-          "line": 82,
+          "line": 86,
           "name": "is_after_cutoff",
           "qualname": "is_after_cutoff"
         },
         {
           "doc": null,
-          "endLine": 97,
+          "endLine": 101,
           "kind": "function",
-          "line": 93,
+          "line": 97,
           "name": "_fact_key",
           "qualname": "_fact_key"
         },
         {
           "doc": null,
-          "endLine": 201,
+          "endLine": 258,
           "kind": "function",
-          "line": 100,
+          "line": 104,
           "name": "resolve_material_facts",
           "qualname": "resolve_material_facts"
         },
         {
-          "doc": "MaterialFactResolution \u2192 FeatureRecords with provenance.",
-          "endLine": 293,
+          "doc": "MaterialFactResolution \\u2192 FeatureRecords with provenance.",
+          "endLine": 364,
           "kind": "function",
-          "line": 204,
+          "line": 260,
           "name": "facts_to_features",
           "qualname": "facts_to_features"
         },
         {
           "doc": "Overlay resolved facts onto a player/event parameter context. Never post-cutoff.",
-          "endLine": 305,
+          "endLine": 376,
           "kind": "function",
-          "line": 296,
+          "line": 367,
           "name": "apply_facts_to_context",
           "qualname": "apply_facts_to_context"
         },
         {
           "doc": null,
-          "endLine": 317,
+          "endLine": 388,
           "kind": "function",
-          "line": 308,
+          "line": 379,
           "name": "_feature_family",
           "qualname": "_feature_family"
         },
         {
           "doc": "Subject/event/affiliation ids whose unresolved conflicts hold PLAYABLE.",
-          "endLine": 330,
+          "endLine": 401,
           "kind": "function",
-          "line": 320,
+          "line": 391,
           "name": "hold_playable_scope_ids",
           "qualname": "hold_playable_scope_ids"
         },
         {
           "doc": "Demote PLAYABLE when a material conflict is unresolved. Never raises P.",
-          "endLine": 350,
+          "endLine": 421,
           "kind": "function",
-          "line": 333,
+          "line": 404,
           "name": "apply_hold_playable",
           "qualname": "apply_hold_playable"
         },
         {
           "doc": null,
-          "endLine": 360,
+          "endLine": 431,
           "kind": "function",
-          "line": 353,
+          "line": 424,
           "name": "json_safe_value",
           "qualname": "json_safe_value"
         },
         {
           "doc": "Overlay resolved FeatureRecords onto modeling packets BEFORE RoleEpoch/fit.",
-          "endLine": 454,
+          "endLine": 525,
           "kind": "function",
-          "line": 363,
+          "line": 434,
           "name": "apply_fact_features_to_packets",
           "qualname": "apply_fact_features_to_packets"
         },
         {
           "doc": "Index MaterialFacts by (scope, scopeId, claimType-or-field). Never latest-claim-wins across types.",
-          "endLine": 474,
+          "endLine": 545,
           "kind": "function",
-          "line": 457,
+          "line": 528,
           "name": "facts_for_refresh",
           "qualname": "facts_for_refresh"
         }
@@ -9552,7 +9552,7 @@
           "qualname": "apply_detector_disagreement"
         },
         {
-          "doc": "role_sample \u2192 player_season \u2192 archetype/league prior. Sums to 1.",
+          "doc": "role_sample \\u2192 player_season \\u2192 archetype/league prior. Sums to 1.",
           "endLine": 253,
           "kind": "function",
           "line": 236,
@@ -9907,7 +9907,7 @@
           "qualname": "persist_cfb_source_health"
         },
         {
-          "doc": "Restore persisted source-health counters/circuits. Missing file \u2192 default catalog.",
+          "doc": "Restore persisted source-health counters/circuits. Missing file \\u2192 default catalog.",
           "endLine": 301,
           "kind": "function",
           "line": 283,
@@ -10455,7 +10455,7 @@
       "classes": 0,
       "functions": 11,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/runner.py",
-      "sha256": "f4f53a3a44cc567a6ba09e3253827b5bec1840bc1c3c9d3063c2fa5397245806",
+      "sha256": "178bc96d951e7bece7f25e2c813dafbf936c0ec3dadd625c08d44c1d813a60c0",
       "symbols": [
         {
           "doc": "Always write dest/audit/. Optionally copy+commit+push a GitHub pack.",
@@ -10507,7 +10507,7 @@
         },
         {
           "doc": null,
-          "endLine": 1656,
+          "endLine": 1707,
           "kind": "function",
           "line": 226,
           "name": "run_dcm",
@@ -10539,9 +10539,9 @@
         },
         {
           "doc": null,
-          "endLine": 1774,
+          "endLine": 1825,
           "kind": "function",
-          "line": 1659,
+          "line": 1710,
           "name": "main",
           "qualname": "main"
         }
@@ -10982,7 +10982,7 @@
       "classes": 0,
       "functions": 2,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/runtime/freeze.py",
-      "sha256": "b7f0aec3187e33ac63c426c5386ca137038fb5128c75b4b3f37fd45534217c8e",
+      "sha256": "86bab5c7429d64b5b9670113ba94a89cb7664e52c1f2659efe275b80e161c329",
       "symbols": [
         {
           "doc": null,
@@ -11007,7 +11007,7 @@
       "classes": 0,
       "functions": 38,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/runtime/github_archive.py",
-      "sha256": "ff3ca7840b62264f7c22c6f1923a23d740f117de7b3cec9077cd1d5c26200c5a",
+      "sha256": "93a014e1f76423f3f0d168e50b9f3fe53868acfa2dd170cc226e13b3024a0969",
       "symbols": [
         {
           "doc": "Return secret-like tokens found in file text. Empty list means clean.",
@@ -11243,7 +11243,7 @@
         },
         {
           "doc": null,
-          "endLine": 857,
+          "endLine": 859,
           "kind": "function",
           "line": 699,
           "name": "build_run_audit",
@@ -11251,65 +11251,65 @@
         },
         {
           "doc": null,
-          "endLine": 873,
+          "endLine": 875,
           "kind": "function",
-          "line": 860,
+          "line": 862,
           "name": "_is_forbidden",
           "qualname": "_is_forbidden"
         },
         {
           "doc": null,
-          "endLine": 883,
+          "endLine": 885,
           "kind": "function",
-          "line": 876,
+          "line": 878,
           "name": "_copy_file",
           "qualname": "_copy_file"
         },
         {
           "doc": null,
-          "endLine": 893,
+          "endLine": 895,
           "kind": "function",
-          "line": 886,
+          "line": 888,
           "name": "_file_sha256",
           "qualname": "_file_sha256"
         },
         {
           "doc": null,
-          "endLine": 976,
+          "endLine": 978,
           "kind": "function",
-          "line": 896,
+          "line": 898,
           "name": "materialize_github_pack",
           "qualname": "materialize_github_pack"
         },
         {
           "doc": null,
-          "endLine": 986,
+          "endLine": 988,
           "kind": "function",
-          "line": 979,
+          "line": 981,
           "name": "append_index",
           "qualname": "append_index"
         },
         {
           "doc": null,
-          "endLine": 997,
+          "endLine": 999,
           "kind": "function",
-          "line": 989,
+          "line": 991,
           "name": "_git",
           "qualname": "_git"
         },
         {
           "doc": null,
-          "endLine": 1009,
+          "endLine": 1011,
           "kind": "function",
-          "line": 1000,
+          "line": 1002,
           "name": "_sanitize_git_error",
           "qualname": "_sanitize_git_error"
         },
         {
           "doc": null,
-          "endLine": 1083,
+          "endLine": 1085,
           "kind": "function",
-          "line": 1012,
+          "line": 1014,
           "name": "push_to_github",
           "qualname": "push_to_github"
         }
@@ -12870,7 +12870,7 @@
           "qualname": "player_efficiency"
         },
         {
-          "doc": "Map opportunity \u00d7 rates to primitive outcomes. Bounds are applied here so",
+          "doc": "Map opportunity \\u00d7 rates to primitive outcomes. Bounds are applied here so",
           "endLine": 81,
           "kind": "function",
           "line": 17,
@@ -13172,7 +13172,7 @@
           "qualname": "settle_football_market"
         },
         {
-          "doc": "World-projection settlement from a PrimitiveStatLedger. Unknown \u2192 fail closed.",
+          "doc": "World-projection settlement from a PrimitiveStatLedger. Unknown \\u2192 fail closed.",
           "endLine": 126,
           "kind": "function",
           "line": 118,
@@ -13719,49 +13719,57 @@
     },
     {
       "classes": 0,
-      "functions": 5,
+      "functions": 6,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_cfb_guarded_launch.py",
-      "sha256": "9941457bc4c2872c631a9636b07e673bd1b45e3e54af3f0bb995770fe7ea12a8",
+      "sha256": "49ff0405f18fec9d7d48080e5bb0337f9711a0cfc7f98e270aa5a82b06d975ee",
       "symbols": [
         {
           "doc": null,
-          "endLine": 34,
+          "endLine": 37,
           "kind": "function",
-          "line": 21,
+          "line": 24,
           "name": "_claim",
           "qualname": "_claim"
         },
         {
           "doc": null,
-          "endLine": 104,
+          "endLine": 107,
           "kind": "function",
-          "line": 57,
+          "line": 60,
           "name": "_claims",
           "qualname": "_claims"
         },
         {
           "doc": null,
-          "endLine": 139,
+          "endLine": 142,
           "kind": "function",
-          "line": 107,
+          "line": 110,
           "name": "test_cfb_guarded_launch_har_to_probability_fixture",
           "qualname": "test_cfb_guarded_launch_har_to_probability_fixture"
         },
         {
           "doc": null,
-          "endLine": 158,
+          "endLine": 161,
           "kind": "function",
-          "line": 142,
+          "line": 145,
           "name": "_web_claims",
           "qualname": "_web_claims"
         },
         {
           "doc": null,
-          "endLine": 186,
+          "endLine": 189,
           "kind": "function",
-          "line": 161,
+          "line": 164,
           "name": "test_real_cfb_partial_global_bundle_does_not_checkpoint_supported_rows",
           "qualname": "test_real_cfb_partial_global_bundle_does_not_checkpoint_supported_rows"
+        },
+        {
+          "doc": null,
+          "endLine": 225,
+          "kind": "function",
+          "line": 192,
+          "name": "test_interim_frontier_has_no_frozen_semantics_or_settlement_eligibility",
+          "qualname": "test_interim_frontier_has_no_frozen_semantics_or_settlement_eligibility"
         }
       ],
       "workstream": "UNMAPPED"
@@ -14034,9 +14042,9 @@
     },
     {
       "classes": 0,
-      "functions": 17,
+      "functions": 20,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_cfb_semantic_completion.py",
-      "sha256": "c9d94f42206f4e64f8c1b426fbb8e63f7a0c8aa8de6ef73ca0fb706a7ba588b0",
+      "sha256": "ec7614659a27f0c74ee415bdca635e4c9fca4d4d6e6aebe9159683f757658f71",
       "symbols": [
         {
           "doc": null,
@@ -14173,6 +14181,30 @@
           "line": 274,
           "name": "test_prepare_has_no_ceremonial_violations",
           "qualname": "test_prepare_has_no_ceremonial_violations"
+        },
+        {
+          "doc": null,
+          "endLine": 332,
+          "kind": "function",
+          "line": 300,
+          "name": "test_material_fact_resolution_is_lineage_aware_and_conservative",
+          "qualname": "test_material_fact_resolution_is_lineage_aware_and_conservative"
+        },
+        {
+          "doc": null,
+          "endLine": 348,
+          "kind": "function",
+          "line": 335,
+          "name": "test_probability_bundle_keeps_conformal_inactive_without_earned_calibration",
+          "qualname": "test_probability_bundle_keeps_conformal_inactive_without_earned_calibration"
+        },
+        {
+          "doc": null,
+          "endLine": 361,
+          "kind": "function",
+          "line": 351,
+          "name": "test_archive_certification_rejects_interim_frontier",
+          "qualname": "test_archive_certification_rejects_interim_frontier"
         }
       ],
       "workstream": "UNMAPPED"
@@ -17978,5 +18010,5 @@
   "parseErrors": [],
   "root": "artifacts/dcm_v6_workstream_ab",
   "schema": "pillars_dcm.code_inventory.v1",
-  "symbolCount": 1945
+  "symbolCount": 1949
 }

@@ -295,3 +295,67 @@ def test_prepare_has_no_ceremonial_violations(tmp_path: Path):
     actions = json.loads((dest / "acquisition_actions.json").read_text())
     assert actions["actions"]
     assert actions["actions"][0].get("sourceCandidates")
+
+
+def test_material_fact_resolution_is_lineage_aware_and_conservative():
+    claims = [
+        {
+            "semantic_scope": "SUBJECT", "scope_id": "QB1", "claim_type": "STATUS",
+            "claim_value": "ACTIVE", "authority": "OFFICIAL",
+            "observed_at": "2026-09-01T00:00:00Z", "lineage_cluster_id": "doc-a",
+            "claim_hash": "claim-a",
+        },
+        {
+            "semantic_scope": "SUBJECT", "scope_id": "QB1", "claim_type": "STATUS",
+            "claim_value": "ACTIVE", "authority": "OFFICIAL",
+            "observed_at": "2026-09-01T00:00:00Z", "lineage_cluster_id": "doc-a",
+            "claim_hash": "claim-a-syndicated",
+        },
+        {
+            "semantic_scope": "SUBJECT", "scope_id": "QB1", "claim_type": "STATUS",
+            "claim_value": "OUT", "authority": "OFFICIAL",
+            "observed_at": "2026-09-01T00:00:00Z", "lineage_cluster_id": "doc-b",
+            "claim_hash": "claim-b",
+        },
+    ]
+    resolved = resolve_material_facts(claims, cutoff="2026-09-02T00:00:00Z")
+    fact = resolved["facts"][0]
+    assert fact["state"] == "CONFLICTED"
+    assert fact["holdPlayable"] is True
+    assert fact["independentLineageCount"] == 2
+    assert fact["claimCount"] == 2
+    assert fact["historicalClaimCount"] == 2
+    assert fact["supportingClaimHashes"] == ["claim-a"]
+    assert fact["conflictingClaimHashes"] == ["claim-b"]
+    feature = facts_to_features(resolved)[0]
+    assert feature["resolutionState"] == "CONFLICTED"
+    assert feature["lineageClusterIds"] == ["doc-a", "doc-b"]
+
+
+def test_probability_bundle_keeps_conformal_inactive_without_earned_calibration():
+    from dcm.model.uncertainty import probability_bundle
+
+    bundle = probability_bundle(
+        raw_selected_p=0.64,
+        n_worlds=256,
+        support_n=6,
+        data_quality=0.8,
+        ood_risk=0.1,
+        volatility=0.2,
+        synthetic=False,
+    )
+    assert bundle["calibration_state"] == "INACTIVE_ZERO_ELIGIBLE_SETTLEMENTS"
+    assert bundle["conformal_q"] == 0.0
+
+
+def test_archive_certification_rejects_interim_frontier():
+    from dcm.runtime.github_archive import _hash_certified_python_freeze
+
+    audit = {
+        "runState": "AWAITING_FRONTIER_RESEARCH",
+        "freezeState": "FRONTIER_INTERIM",
+        "forecastFrozen": False,
+        "frozenForecastHash": "interim-hash",
+        "softwareFreeze": True,
+    }
+    assert _hash_certified_python_freeze(audit) is False
