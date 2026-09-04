@@ -1,4 +1,4 @@
-"""Market-specific guarded-launch evidence support for NFL/CFB.
+"""Market-specific evidence support for NFL/CFB.
 
 Model support and PLAYABLE support are deliberately distinct. A market may be
 simulated with a small, real player sample plus shrinkage while remaining
@@ -8,19 +8,20 @@ from __future__ import annotations
 
 from typing import Any
 
+from dcm.cfb.markets import ACTIVE_CFB_MARKETS, MARKET_CONTRACTS
+
 ACTIVE = {"ACTIVE", "AVAILABLE", "PROBABLE", "EXPECTED_ACTIVE"}
 INACTIVE = {"OUT", "DNP", "INACTIVE", "SUSPENDED", "IR", "PUP"}
 
 MARKET_REQUIREMENTS: dict[str, dict[str, tuple[str, ...] | bool]] = {
-    "pass_att": {"opportunity": ("pass_att",), "efficiency": (), "needs_pass_defense": False, "needs_rush_defense": False},
-    "pass_cmp": {"opportunity": ("pass_att",), "efficiency": ("pass_cmp", "pass_att"), "needs_pass_defense": True, "needs_rush_defense": False},
-    "pass_yds": {"opportunity": ("pass_att",), "efficiency": ("pass_yds", "pass_att"), "needs_pass_defense": True, "needs_rush_defense": False},
-    "rush_att": {"opportunity": ("rush_att",), "efficiency": (), "needs_pass_defense": False, "needs_rush_defense": False},
-    "rush_yds": {"opportunity": ("rush_att",), "efficiency": ("rush_yds", "rush_att"), "needs_pass_defense": False, "needs_rush_defense": True},
-    "receptions": {"opportunity": ("targets",), "efficiency": ("receptions", "targets"), "needs_pass_defense": True, "needs_rush_defense": False},
-    "rec_yds": {"opportunity": ("targets",), "efficiency": ("rec_yds", "receptions"), "needs_pass_defense": True, "needs_rush_defense": False},
-    "pass_rush_yds": {"opportunity": ("pass_att", "rush_att"), "efficiency": ("pass_yds", "pass_att", "rush_yds", "rush_att"), "needs_pass_defense": True, "needs_rush_defense": True},
-    "rush_rec_yds": {"opportunity": ("rush_att", "targets"), "efficiency": ("rush_yds", "rush_att", "rec_yds", "receptions"), "needs_pass_defense": True, "needs_rush_defense": True},
+    key: {
+        "opportunity": spec["opportunity"],
+        "efficiency": spec["efficiency"],
+        "needs_pass_defense": spec["needs_pass_defense"],
+        "needs_rush_defense": spec["needs_rush_defense"],
+    }
+    for key, spec in MARKET_CONTRACTS.items()
+    if key in ACTIVE_CFB_MARKETS
 }
 
 

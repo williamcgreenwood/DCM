@@ -1,8 +1,9 @@
 # DCM universal implementation matrix — 2026-08-31
 
-Baseline refreshed through PR #17 merge `cdb428f6a05406184fe265b0a1e81abec92cd1f9` and the R0 Algorithmic Constitution child branch. R0 is constitution/registry/selection/HAR-plan/CI, not a claim that Research OS or the full DCM is complete.
-This matrix is code-path status, not predictive validation. LR remains
+Baseline refreshed through PR #19 CFB freeze-gate / incremental-runtime pass on `grok/cfb-guarded-launch-today-20260903`. R0 constitution remains inherited. This matrix is code-path status, not predictive validation. LR remains
 `LR000000`; predictive superiority remains `NONE`. Constitution version: `DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903`.
+
+CFB software reference path is executable (19 ACTIVE markets, no ceremonial algorithm execution, residual EventWorlds, identity-first retrieval, source-health routing, MaterialFact pre-fit, L0–L6 semantic cache, freeze only after Top25 FINAL, incremental Research OS). Current-HAR acceptance is `CFB_CURRENT_HAR_OPERATIONAL_ACCEPTANCE_PENDING`.
 
 Status meanings:
 
@@ -24,8 +25,8 @@ Status meanings:
 | ChatGPT-native CORE primitives | COMPLETE for R0 | Searching/indexing/sorting/grouping/scheduling/cache/stdlib ML in `dcm.algorithms`. |
 | Weighted set-cover / submodular | COMPLETE as primitives | Registered CORE; live AcquisitionAction packing remains R1. |
 | Silent retirement CI | COMPLETE for R0 | `tests/governance/` plus registry `--check`. |
-| BoardGraph / RequirementGraph / AcquisitionAction | MISSING as live HAR OS | Next tranche (R1). Do not claim complete. |
-| Drive-first indexed retrieval | PARTIAL | Persistence law documented; existing ResearchStore/archive unchanged this pass. |
+| BoardGraph / RequirementGraph / AcquisitionAction | CFB COMPLETE for declared scope | Guarded CFB path emits graphs, live CELF packing, ResearchOSReadiness before research. Mixed-sport R1 remainder remains. |
+| Drive-first indexed retrieval | PARTIAL + BLOCKED_EXTERNAL | Local DriveObjectCatalog identifies exact objects then fail-closes `NOT_CONFIGURED`. Drive credentials are external. |
 
 ## P0 — canonical spine / integrity
 
@@ -155,13 +156,13 @@ The detailed P0–P6 matrix remains the modeling/system audit. The following wor
 
 | Workstream | State | Required finish |
 |---|---|---|
-| P7 Host-native execution | PARTIAL | `dcm-host` / `python -m dcm.chat` / `HostSession` implemented over the existing runner: doctor, prepare, next-research, evidence-import, coverage, forecast, report, resume, audit, settle, archive. Not 10/10: fresh-wheel HAR acceptance remains. |
+| P7 Host-native execution | PARTIAL | `dcm-host` / `python -m dcm.chat` / `HostSession` implemented over the existing runner: doctor, prepare, next-research, evidence-import, coverage, forecast, report, resume, audit, settle, archive, cfb-launch. Not 10/10: fresh-wheel current-HAR acceptance remains. |
 | P8 Universal source acquisition | PARTIAL | Versioned source catalog, event-first batching, schema-driven coverage extras, host-observation import. Live fetch remains opt-in. |
 | P9 Universal-core migration | STRONG PARTIAL | Planner/provider canonical scopes are universal. PLAYER/TEAM survive as adapter aliases and compatibility projections. |
 | P10 Full sport coverage | EARLY | Every promoted sport independently satisfies all 24 SportPlugin components and plugin validation; unsupported sports fail closed. |
 | P11 Release/fresh-host acceptance | PARTIAL | Exact wheel+manifest+hash retrieval and a fresh ChatGPT HAR-only acceptance test with no source checkout/prior memory. |
 | P12 Research archive/index/reuse | PARTIAL | Content-addressed `ResearchStore` hydrates blobs (not pointers) for delta classification, entity/source/as-of indexes, append-only game-log merge, outcome memory that cannot decide reuse, and DAG invalidation by delta class. High-volume DB/object store still future. |
-| P13 Performance/search/token optimization | PARTIAL | Fan-out × importance × freshness × uncertainty / cost scheduler and event batching exist. Host performance is not certified. |
+| P13 Performance/search/token optimization | PARTIAL | Fan-out × importance × freshness × uncertainty / cost scheduler, CELF live AcquisitionAction packing on the CFB path, and event batching exist. Host performance is not certified. |
 | P14 Production operations/observability | PARTIAL | Host doctor, run_manifest, host_state, engineering-pass ledger. Full ops health/recovery remains. |
 | P15 P380X donor signal governance | PARTIAL | Tranche A/B is executable and tested: 58/58 dispositions, zero implicit activations, typed compiler/registry/executor, deterministic hashes, semantic/cross-sport/unit/cutoff gates, and FeatureStore consumer. Research-truth, matchup, decision, learning, and portfolio donor tranches are not implemented by this pass. |
 

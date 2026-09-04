@@ -29,6 +29,7 @@ from dcm.research.gamelog import normalize_basketball_logs
 from dcm.research.gridiron_gamelog import normalize_gridiron_logs
 from dcm.research.role_epoch import RoleEpochBuilder
 from dcm.research.scopes import claims_for
+from dcm.research.material_facts import apply_fact_features_to_packets
 from dcm.sports.football.research_requirements import assess_football_support
 from dcm.sports.football.cfb_role import resolve_cfb_role_state
 
@@ -79,9 +80,11 @@ def _sd(logs: list[dict], key: str, fallback: float) -> float:
 
 
 def _shrink(sample: float | None, n: int, prior: float, prior_n: float = 5.0) -> float:
+    from dcm.algorithms.ml_families import empirical_bayes_shrink
+
     if sample is None or n <= 0:
         return prior
-    return (sample * n + prior * prior_n) / (n + prior_n)
+    return empirical_bayes_shrink(float(sample), float(n), float(prior), float(prior_n))
 
 
 def build_parameter_snapshot(
@@ -91,6 +94,7 @@ def build_parameter_snapshot(
     team_packets: dict[str, dict[str, Any]] | None = None,
     event_packets: dict[str, dict[str, Any]] | None = None,
     opponent_packets: dict[str, dict[str, Any]] | None = None,
+    fact_features: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     player_pairs = _pairs(claims, "SUBJECT", str(row.get("playerId") or row.get("subjectId") or ""))
     team_pairs = _pairs(claims, "AFFILIATION", str(row.get("teamId") or row.get("affiliationId") or ""))
@@ -158,6 +162,27 @@ def build_parameter_snapshot(
         if ep and ep.get("evidenceUsed"):
             event = {**event, **dict(ep.get("parameterFields") or {})}
             event["eventPacketHash"] = ep.get("contentHash")
+
+    material_fact_hashes: list[str] = []
+    if fact_features:
+        overlaid = apply_fact_features_to_packets(
+            player=player,
+            team=team,
+            event=event,
+            environment=environment,
+            counterparty=counterparty,
+            row=row,
+            features=fact_features,
+        )
+        player = overlaid["player"]
+        team = overlaid["team"]
+        event = overlaid["event"]
+        environment = overlaid["environment"]
+        counterparty = overlaid["counterparty"]
+        material_fact_hashes = list(overlaid.get("materialFactHashes") or [])
+        if overlaid.get("applied") and player.get("role"):
+            row = dict(row)
+            row["role"] = player.get("role") or row.get("role")
 
     claim_pairs = list(
         player_pairs + team_pairs + opp_pairs + event_pairs + env_pairs + sport_pairs + competition_pairs + def_pairs + offer_pairs
@@ -324,6 +349,7 @@ def build_parameter_snapshot(
             "invented": False,
             "epochCount": len(role_epoch.get("epochs") or []),
             "projectedRole": role_epoch.get("projectedRole"),
+            "governedChangePoints": role_epoch.get("governedChangePoints"),
         }
         logs = comparable
         eff_n = max(eff_n, fn, rn, an, int(eff_fit.get("support_n") or 0))
@@ -348,6 +374,9 @@ def build_parameter_snapshot(
             "qb_id": player.get("qb_id"),
         }
         role_epoch = RoleEpochBuilder().build(player, claims=all_claims, today_context=today_context)
+        if role_epoch.get("qb_id") and not player.get("qb_id"):
+            player = dict(player)
+            player["qb_id"] = role_epoch.get("qb_id")
         comparable_raw = role_epoch.get("comparable_logs") or []
         if comparable_raw:
             comp_norm = normalize_gridiron_logs(comparable_raw, league=league)
@@ -448,6 +477,7 @@ def build_parameter_snapshot(
             "projectedRole": role_epoch.get("projectedRole"),
             "mode": "gridiron",
             "qbIdentity": role_epoch.get("qbIdentity"),
+            "governedChangePoints": role_epoch.get("governedChangePoints"),
         }
         logs = comparable
         eff_n = max(eff_n, int(eff_fit.get("support_n") or 0), opportunity_support_from_logs)
@@ -506,7 +536,41 @@ def build_parameter_snapshot(
         and gridiron_defense_ok
     )
     data_quality = max(0.0, min(1.0, rel * 0.65 + fresh * 0.20 + min(1.0, min(opp_n, eff_n) / 10.0) * 0.15))
-    ood = max(0.0, min(1.0, _f(player.get("ood_risk"), 0.15 if min(opp_n, eff_n) >= 5 else 0.45)))
+    claimed_ood = player.get("ood_risk")
+    if claimed_ood is not None:
+        ood = max(0.0, min(1.0, _f(claimed_ood, 0.45)))
+    else:
+        from dcm.algorithms.ml_families import zscore_ood
+
+        sample_key = "pass_yds" if family == "gridiron" else "pts"
+        share_keys = ("rush_att", "targets", "pass_att", "snaps") if family == "gridiron" else ()
+        pop = []
+        share_pop = []
+        for log_row in logs:
+            if not isinstance(log_row, dict):
+                continue
+            if log_row.get(sample_key) is not None:
+                try:
+                    pop.append(float(log_row[sample_key]))
+                except (TypeError, ValueError):
+                    pass
+            for sk in share_keys:
+                if log_row.get(sk) is not None:
+                    try:
+                        share_pop.append(float(log_row[sk]))
+                    except (TypeError, ValueError):
+                        pass
+                    break
+        if len(share_pop) >= 3:
+            last = share_pop[-1]
+            z = zscore_ood(last, share_pop[:-1] if len(share_pop) > 3 else share_pop)
+            ood = max(0.0, min(1.0, z / 6.0))
+        elif len(pop) >= 3:
+            last = pop[-1]
+            z = zscore_ood(last, pop[:-1] if len(pop) > 3 else pop)
+            ood = max(0.0, min(1.0, z / 6.0))
+        else:
+            ood = 0.15 if min(opp_n, eff_n) >= 5 else 0.45
     blocker = None
     if synthetic: blocker = "SYNTHETIC_EVIDENCE_NOT_SELECTABLE"
     elif not definition_verified: blocker = "UNVERIFIED_MARKET_DEFINITION"
@@ -554,6 +618,7 @@ def build_parameter_snapshot(
         "roleWeight": shrinkage_out.get("roleWeight"),
         "teamEvidenceUsed": bool(team_evidence_used),
         "teamPriorUsedAsResearch": False,
+        "materialFactHashes": sorted(set(material_fact_hashes)),
         "availabilityMixture": availability_mixture(status),
         "layers": {
             "subject": {

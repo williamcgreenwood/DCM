@@ -84,7 +84,7 @@ def doctor(*, release_manifest: Path | None = None, workspace: Path | None = Non
         "releaseManifest": release or None,
         "commands": [
             "doctor", "prepare", "next-research", "evidence-import", "coverage",
-            "forecast", "report", "resume", "audit", "archive", "settle",
+            "forecast", "report", "resume", "audit", "archive", "settle", "cfb-launch",
         ],
     }
 
@@ -218,7 +218,7 @@ class HostSession:
             self.dest,
             store_root=self.workspace / "dcm_v6" / "research_store",
         )
-        modeling_permitted = True
+        modeling_permitted = bool(coverage.get("complete")) or bool(coverage.get("completeRequests"))
         mount = mount_default(self.workspace)
         production_selection_permitted = bool(coverage.get("complete")) and mount.get("state") == "HASH_VERIFIED_EXTRACTED"
         payload = {
@@ -313,3 +313,85 @@ class HostSession:
         result = settle_run(self.dest, Path(outcomes), card_only=card_only)
         self._save_host_state(lastCommand="settle")
         return result
+
+
+def cfb_launch(
+    *,
+    har: Path,
+    run_root: Path,
+    cutoff: str | None = None,
+    cutoff_from_capture: bool = False,
+    research: str = "file",
+    bundle_path: Path | None = None,
+    workspace: Path | None = None,
+) -> dict[str, Any]:
+    """Guarded CFB vertical slice. Fixture/bundle can freeze; file research returns the host loop."""
+    workspace = Path(workspace) if workspace is not None else DEFAULT_WORKSPACE
+    if research in {"fixture", "bundle"}:
+        result = run_dcm(
+            input_path=Path(har),
+            forecast_cutoff=cutoff,
+            output_root=Path(run_root),
+            research=research,
+            bundle_path=bundle_path,
+            workspace=workspace,
+            cutoff_from_capture=bool(cutoff_from_capture),
+        )
+        dest = Path(result["dest"])
+        return {
+            "schema": "pillars_dcm.cfb_launch.v1",
+            "runId": result.get("run_id"),
+            "dest": str(dest),
+            "runState": result.get("runState"),
+            "mode": research,
+            "artifacts": {
+                "accounting": str(dest / "CFB_HAR_ACCOUNTING.json"),
+                "algorithmPlan": str(dest / "algorithm_execution_plan.json"),
+                "boardGraph": str(dest / "board_graph.json"),
+                "requirementGraph": str(dest / "requirement_graph.json"),
+                "acquisitionActions": str(dest / "acquisition_actions.json"),
+                "top100": str(dest / "CFB_TOP100_PRELIMINARY.json"),
+                "top25": str(dest / "CFB_TOP25_FINAL.json"),
+                "playables": str(dest / "CFB_PLAYABLES_FINAL.json"),
+                "telemetry": str(dest / "algorithm_execution_telemetry.json"),
+                "freeze": str(dest / "freeze.json"),
+            },
+            "hostComputesProbabilities": False,
+            "learningRevision": LEARNING_REVISION,
+            "predictiveClaim": PREDICTIVE_CLAIM,
+            "next": "none" if result.get("runState") not in {"INCOMPLETE_CHECKPOINTED"} else "execute host_research_plan / next-research, evidence-import, coverage, forecast",
+        }
+    session = HostSession.prepare(
+        har=Path(har),
+        run_root=Path(run_root),
+        cutoff=cutoff,
+        cutoff_from_capture=bool(cutoff_from_capture),
+        workspace=workspace,
+    )
+    batch = session.next_research_batch()
+    return {
+        "schema": "pillars_dcm.cfb_launch.v1",
+        "runId": session.dest.name,
+        "dest": str(session.dest),
+        "mode": "file",
+        "runState": "AWAITING_HOST_RESEARCH",
+        "nextResearch": {
+            "selectedCount": batch.get("selectedCount"),
+            "unresolvedCount": batch.get("unresolvedCount"),
+            "liveSelector": batch.get("liveSelector"),
+            "batchPath": str(session.dest / "host_research_batch.json"),
+        },
+        "hostWorkflow": [
+            "python -m dcm.chat next-research --run <run>",
+            "host web research by EVENT/TEAM before PLAYER (do not one-search-per-prop)",
+            "python -m dcm.chat evidence-import --run <run> --input host_observations.jsonl",
+            "python -m dcm.chat coverage --run <run>",
+            "repeat until per-prop modelable flags are explicit",
+            "python -m dcm.chat forecast --run <run> --research bundle",
+            "python -m dcm.chat report --run <run>",
+        ],
+        "hostComputesProbabilities": False,
+        "learningRevision": LEARNING_REVISION,
+        "predictiveClaim": PREDICTIVE_CLAIM,
+    }
+

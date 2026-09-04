@@ -201,12 +201,18 @@ class HarAlgorithmExecutionPlan:
     plan_hash: str
     research_may_begin: bool
     notes: tuple[str, ...] = field(default_factory=tuple)
+    constitution_document_sha256: str = ""
+    constitution_lineage_hash: str = ""
 
     def to_dict(self) -> dict[str, Any]:
+        document = self.constitution_document_sha256 or self.constitution_sha256
+        lineage = self.constitution_lineage_hash
         return {
             "schema": self.schema,
             "constitutionVersion": self.constitution_version,
-            "constitutionSha256": self.constitution_sha256,
+            "constitutionDocumentSha256": document,
+            "constitutionLineageHash": lineage,
+            "constitutionSha256": document,
             "algorithmRegistrySha256": self.registry_sha256,
             "phases": [dict(p) for p in self.phases],
             "selections": [s.to_dict() for s in self.selections],

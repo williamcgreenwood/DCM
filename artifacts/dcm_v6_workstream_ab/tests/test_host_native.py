@@ -72,6 +72,10 @@ def test_host_session_prepare_next_research_import_coverage_report(tmp_path: Pat
         "universal_host_research_plan.json",
         "universal_research_packets.json",
         "algorithm_execution_plan.json",
+        "board_graph.json",
+        "market_demand_graph.json",
+        "requirement_graph.json",
+        "acquisition_actions.json",
     ):
         assert (dest / name).is_file(), name
     plan = json.loads((dest / "algorithm_execution_plan.json").read_text())
@@ -87,7 +91,7 @@ def test_host_session_prepare_next_research_import_coverage_report(tmp_path: Pat
 
     batch = session.next_research_batch(max_entities=10)
     assert batch["schema"] == "pillars_dcm.host_research_batch.v1"
-    assert batch["batching"] == "event_first"
+    assert batch["batching"] == "celf_acquisition_action_then_event_pack"
     assert "fanout" in batch["priorityFormula"]
     assert (dest / "host_research_batch.json").is_file()
     assert batch["selectedCount"] >= 1

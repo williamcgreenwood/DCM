@@ -8,6 +8,7 @@ from dcm.algorithms.selection import AlgorithmSelectionEngine
 from dcm.chat.state import read_json, write_json
 from dcm.research.batch import build_next_research_batch
 from dcm.research.provider import BundleProvider
+from dcm.research.readiness import require_research_may_begin
 from dcm.research.research_store import ResearchStore, hydrate_reused_claims
 
 
@@ -19,8 +20,11 @@ def next_research_batch(
     store_root: Path | None = None,
 ) -> dict[str, Any]:
     dest = Path(dest)
+    require_research_may_begin(dest)
     requests = read_json(dest / "research_requests.json") or []
     coverage = read_json(dest / "evidence_coverage.json") or read_json(dest / "evidence" / "coverage.json") or {}
+    board = read_json(dest / "board.json") or {}
+    rows = board.get("rows") if isinstance(board, dict) else []
     store = ResearchStore(store_root or dest / "research_store")
     batch = build_next_research_batch(
         requests if isinstance(requests, list) else [],
@@ -28,6 +32,7 @@ def next_research_batch(
         store=store,
         max_entities=max_entities,
         max_dependent_offers=max_dependent_offers,
+        rows=rows if isinstance(rows, list) else [],
     )
     reused_claims = hydrate_reused_claims(
         store,

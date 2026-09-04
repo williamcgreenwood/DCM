@@ -11,6 +11,7 @@ from typing import Any
 
 from dcm.algorithms.searching import weighted_set_cover
 from dcm.algorithms.sorting import heap_topk
+from dcm.research.acquisition import build_acquisition_actions, schedule_acquisition_actions
 from dcm.research.requests import FRESHNESS_NEED, INFO_IMPORTANCE
 from dcm.research.classify_runtime import classify_requests
 from dcm.research.research_store import ResearchStore
@@ -72,6 +73,7 @@ def build_next_research_batch(
     max_entities: int = 25,
     max_dependent_offers: int = 500,
     catalog_source_id: str = "generic_web_search",
+    rows: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     classified = classify_requests(list(requests or []), store)
     coverage_by_id = {
@@ -185,16 +187,67 @@ def build_next_research_batch(
             selected.append(rec)
 
     reused = [r for r in scored if not r.get("acquire")]
+    action_doc = build_acquisition_actions(list(rows or []), acquire, coverage=coverage)
+    schedule = schedule_acquisition_actions(
+        action_doc,
+        max_actions=max_entities,
+        max_dependent_offers=max_dependent_offers,
+    )
+    selected_ids = set(schedule.get("selectedActionIds") or [])
+    if selected_ids:
+        live_selected: list[dict[str, Any]] = []
+        live_batches: list[dict[str, Any]] = []
+        for batch in schedule.get("packedBatches") or []:
+            tasks = []
+            for task in batch.get("tasks") or []:
+                matching = [
+                    r for r in acquire
+                    if canonical_scope(str(r.get("scope") or "")) == str(task.get("scope"))
+                    and str(r.get("scope_id") or "") == str(task.get("scopeId") or "")
+                ]
+                live_selected.extend(matching)
+                for r in matching:
+                    tasks.append(
+                        {
+                            "requestId": r.get("request_id"),
+                            "actionId": task.get("actionId"),
+                            "scope": canonical_scope(str(r.get("scope") or "")),
+                            "scopeId": r.get("scope_id"),
+                            "need": r.get("need"),
+                            "deltaClass": r.get("deltaClass"),
+                            "schedulerScore": r.get("schedulerScore"),
+                            "dependentPropCount": r.get("dependent_prop_count"),
+                            "knownMissing": r.get("knownMissing") or [],
+                            "researchOnce": True,
+                        }
+                    )
+            live_batches.append(
+                {
+                    "eventId": batch.get("eventId"),
+                    "entityCount": len(tasks),
+                    "dependentOfferCount": batch.get("dependentOfferCount"),
+                    "actionIds": batch.get("actionIds"),
+                    "tasks": tasks,
+                }
+            )
+        if live_selected:
+            selected = live_selected
+            batches = live_batches
+            offer_budget = int(schedule.get("dependentOfferBudgetUsed") or offer_budget)
+
     return {
         "schema": "pillars_dcm.host_research_batch.v1",
         "priorityFormula": (
             "fanout × information_importance × freshness_need × "
             "uncertainty_reduction / estimated_acquisition_cost"
         ),
-        "batching": "event_first",
-        "algorithmIds": ["ALG-SCHED-001", "ALG-SCHED-002", "ALG-SEARCH-019", "ALG-SORT-002"],
+        "batching": "celf_acquisition_action_then_event_pack",
+        "liveSelector": "ALG-SCHED-001",
+        "algorithmIds": ["ALG-SCHED-001", "ALG-SCHED-002", "ALG-SCHED-003", "ALG-SCHED-004", "ALG-SEARCH-019", "ALG-SORT-002"],
         "setCoverEventIds": list(cover_ids),
+        "setCoverActionIds": list(schedule.get("setCoverActionIds") or []),
         "setCoverUncoveredCount": len(leftover),
+        "celfActionIds": list(schedule.get("celfActionIds") or []),
         "maxEntities": int(max_entities),
         "maxDependentOffers": int(max_dependent_offers),
         "unresolvedCount": len(acquire),
@@ -205,7 +258,8 @@ def build_next_research_batch(
         "stopWhen": "coverage closed or additional research cannot change production eligibility enough to justify cost",
         "hostInstruction": (
             "Research reusable entities once. Do not invent hashes, reliability, "
-            "or internal request IDs. Return simple host observations."
+            "or internal request IDs. Return simple host observations. "
+            "Event/team before player. One acquisition populates every board-relevant entity from that source."
         ),
         "batches": batches,
         "tasks": [
