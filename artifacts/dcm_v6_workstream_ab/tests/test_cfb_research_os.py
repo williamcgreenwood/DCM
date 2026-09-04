@@ -135,7 +135,7 @@ def test_fixture_provider_cannot_create_production_playables(tmp_path: Path):
         assert freeze.get("predictiveClaim", "NONE") == "NONE"
 
 
-def test_cfb_fixture_end_to_end_top100_top25_playables_freeze(tmp_path: Path):
+def test_cfb_fixture_end_to_end_top100_top25_playables_interim(tmp_path: Path):
     har_path = _real_shape_har(tmp_path)
     rows = ingest_har(json.loads(har_path.read_text(encoding="utf-8")))["rows"]
     bundle_path = tmp_path / "cfb-acceptance.jsonl"
@@ -222,9 +222,17 @@ def test_cfb_fixture_end_to_end_top100_top25_playables_freeze(tmp_path: Path):
     h1 = json.loads((dest / "CFB_TOP100_PRELIMINARY.json").read_text())["contentHash"]
     h2 = json.loads((dest2 / "CFB_TOP100_PRELIMINARY.json").read_text())["contentHash"]
     assert h1 == h2
-    f1 = json.loads((dest / "freeze.json").read_text())["frozenForecastHash"]
-    f2 = json.loads((dest2 / "freeze.json").read_text())["frozenForecastHash"]
-    assert f1 == f2
+    # The real-shape bundle intentionally omits required requests. It must
+    # remain an interim frontier, even though the per-prop rows are modeled.
+    freeze1 = json.loads((dest / "freeze.json").read_text())
+    freeze2 = json.loads((dest2 / "freeze.json").read_text())
+    assert freeze1["forecastFrozen"] is False
+    assert freeze1["freezeState"] == "FRONTIER_INTERIM"
+    assert freeze1["runState"] == "AWAITING_FRONTIER_RESEARCH"
+    assert "frozenForecastHash" not in freeze1
+    assert freeze2["forecastFrozen"] is False
+    assert freeze2["freezeState"] == "FRONTIER_INTERIM"
+    assert "frozenForecastHash" not in freeze2
 
 
 def test_offered_side_only_and_goblin_after_accounting():

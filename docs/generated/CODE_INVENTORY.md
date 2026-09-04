@@ -5,7 +5,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 - Modules: **272**
 - Symbols: **1949**
 - Parse errors: **0**
-- Inventory hash: `49e11799a384e825e8bf12207d98d8cb13d171be7076824e84edd432fe34acde`
+- Inventory hash: `8ef7fb89e36055ac2a258853c603920554c2f2ec1e28e7aca1017192b3717eea`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -2484,9 +2484,9 @@ _No class/function symbols._
 - `function` **test_live_batch_uses_celf_not_one_prop_one_search** L84
 - `function` **test_large_board_celf_does_not_starve_on_sport_mass** L96 — SPORT/COMPETITION fanout must not consume the unique-offer budget alone.
 - `function` **test_fixture_provider_cannot_create_production_playables** L114 — FixtureProvider is engineering-only. Graphs still emit; playables stay 0.
-- `function` **test_cfb_fixture_end_to_end_top100_top25_playables_freeze** L138
-- `function` **test_offered_side_only_and_goblin_after_accounting** L230
-- `function` **test_partial_bundle_still_emits_graphs_and_per_prop_states** L238
+- `function` **test_cfb_fixture_end_to_end_top100_top25_playables_interim** L138
+- `function` **test_offered_side_only_and_goblin_after_accounting** L238
+- `function` **test_partial_bundle_still_emits_graphs_and_per_prop_states** L246
 
 ### `artifacts/dcm_v6_workstream_ab/tests/test_cfb_semantic_completion.py`
 

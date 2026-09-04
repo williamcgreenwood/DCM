@@ -1,5 +1,5 @@
 {
-  "contentHash": "49e11799a384e825e8bf12207d98d8cb13d171be7076824e84edd432fe34acde",
+  "contentHash": "8ef7fb89e36055ac2a258853c603920554c2f2ec1e28e7aca1017192b3717eea",
   "moduleCount": 272,
   "modules": [
     {
@@ -13947,7 +13947,7 @@
       "classes": 0,
       "functions": 11,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_cfb_research_os.py",
-      "sha256": "05331610c5c0df681dac37f41c583a4d87de9a419cf81d2b0c0e9c588a28a8cc",
+      "sha256": "7a0334878a5ca0f2370944c705101a3a5f73e1b5d693b30fd9a06c4ad7f8277e",
       "symbols": [
         {
           "doc": null,
@@ -14015,25 +14015,25 @@
         },
         {
           "doc": null,
-          "endLine": 227,
+          "endLine": 235,
           "kind": "function",
           "line": 138,
-          "name": "test_cfb_fixture_end_to_end_top100_top25_playables_freeze",
-          "qualname": "test_cfb_fixture_end_to_end_top100_top25_playables_freeze"
+          "name": "test_cfb_fixture_end_to_end_top100_top25_playables_interim",
+          "qualname": "test_cfb_fixture_end_to_end_top100_top25_playables_interim"
         },
         {
           "doc": null,
-          "endLine": 235,
+          "endLine": 243,
           "kind": "function",
-          "line": 230,
+          "line": 238,
           "name": "test_offered_side_only_and_goblin_after_accounting",
           "qualname": "test_offered_side_only_and_goblin_after_accounting"
         },
         {
           "doc": null,
-          "endLine": 265,
+          "endLine": 273,
           "kind": "function",
-          "line": 238,
+          "line": 246,
           "name": "test_partial_bundle_still_emits_graphs_and_per_prop_states",
           "qualname": "test_partial_bundle_still_emits_graphs_and_per_prop_states"
         }
