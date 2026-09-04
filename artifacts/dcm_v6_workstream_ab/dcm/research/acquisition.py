@@ -24,6 +24,7 @@ from dcm.research.indexes import EvidenceIndexes
 from dcm.research.os_graphs import _attach_dependents
 from dcm.research.scopes import SCOPE_RANK, canonical_scope
 from dcm.research.source_health import SourceHealthRegistry, default_cfb_source_health
+from dcm.research.coverage import evaluate_request
 from dcm.sports.football.research_requirements import MARKET_REQUIREMENTS
 
 
@@ -68,15 +69,22 @@ def build_acquisition_actions(
         if isinstance(row, dict)
     }
     complete_ids: set[str] = set()
+    candidate_evidence: dict[str, list[dict[str, Any]]] = {}
     for rec in reqs:
         rid = _req_id(rec)
         cov = coverage_by_id.get(rid) or {}
         if cov.get("complete"):
+            # Coverage evaluator already ran the semantic check.
             complete_ids.add(rid)
+            continue
+        claims_for_req: list[dict[str, Any]] = []
         if evidence is not None:
             hits = evidence.lookup_scope(str(rec.get("scope") or ""), str(rec.get("scope_id") or ""))
-            if hits:
-                complete_ids.add(rid)
+            claims_for_req = [h for h in hits if isinstance(h, dict)]
+            candidate_evidence[rid] = claims_for_req
+        verdict = evaluate_request(rec, claims_for_req)
+        if verdict.get("complete"):
+            complete_ids.add(rid)
 
     actions: dict[str, dict[str, Any]] = {}
     for rec in reqs:
@@ -151,16 +159,6 @@ def build_acquisition_actions(
             ),
             6,
         )
-        uncovered = [act["weight"] / max(1, len(act["requirementIds"]))] * len(act["requirementIds"])
-        act["expectedGain"] = round(
-            expected_marginal_gain(
-                p_success=0.85,
-                authority_quality=0.8,
-                novelty=1.0,
-                uncovered_weights=uncovered,
-            ),
-            6,
-        )
         act["requirementIds"] = list(dict.fromkeys(act["requirementIds"]))
         act["offerIds"] = list(dict.fromkeys(act["offerIds"]))
         act["dependentOfferCount"] = len(act["offerIds"])
@@ -168,14 +166,32 @@ def build_acquisition_actions(
         candidates = health.route(claim_type=str(act.get("scope") or "SUBJECT"), sport="CFB")
         act["sourceCandidates"] = candidates
         act["sourceId"] = candidates[0] if candidates else None
-        act["pSuccess"] = 0.85
-        act["authority"] = 0.8
+        p_success: float | None = None
+        authority = 0.8
+        freshness = 0.5
+        source_cost = 1.0
         if act["sourceId"]:
+            p_success = health.success_probability(str(act["sourceId"]))
             row = health._state.get(str(act["sourceId"])) or {}
-            act["pSuccess"] = float(row.get("historicalSuccessProbability") or 0.85)
             auth_map = row.get("authorityByClaimType") or {}
-            act["authority"] = float(auth_map.get(str(act.get("scope") or ""), 80)) / 100.0
-            act["freshness"] = float(row.get("observedFreshness") or row.get("expectedFreshness") or 0.5)
+            authority = float(auth_map.get(str(act.get("scope") or ""), 80)) / 100.0
+            freshness = float(row.get("observedFreshness") or row.get("expectedFreshness") or 0.5)
+            source_cost = float(row.get("cost") or 1.0)
+        # None (no history) → 0.85 prior. A measured 0.0 stays 0.0.
+        act["pSuccess"] = 0.85 if p_success is None else float(p_success)
+        act["authority"] = authority
+        act["freshness"] = freshness
+        act["cost"] = round(float(act["cost"]) * max(0.25, source_cost), 6)
+        uncovered = [act["weight"] / max(1, len(act["requirementIds"]))] * len(act["requirementIds"])
+        act["expectedGain"] = round(
+            expected_marginal_gain(
+                p_success=float(act["pSuccess"]),
+                authority_quality=float(act["authority"]),
+                novelty=max(0.2, float(freshness)),
+                uncovered_weights=uncovered,
+            ),
+            6,
+        )
 
     hg = hypergraph_from_bundles({aid: act["requirementIds"] for aid, act in actions.items()})
     reverse_action_req = {aid: list(act["requirementIds"]) for aid, act in actions.items()}
@@ -201,6 +217,8 @@ def build_acquisition_actions(
             "actionToOffers": reverse_action_offer,
         },
         "reusedEvidenceLookup": bool(evidence is not None),
+        "semanticCompletionOnly": True,
+        "candidateEvidenceCount": len(candidate_evidence),
         "cfbFanoutLaw": "event/team before player; one action populates every board-relevant entity from that source",
     }
     payload["contentHash"] = content_hash({k: v for k, v in payload.items() if k != "contentHash"})

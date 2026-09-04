@@ -53,7 +53,8 @@ def estimate_action_evsi(
             rank = int(rank_by_offer.get(oid) or 99)
             proximity = max(proximity, max(0.0, (26 - min(rank, 26)) / 26.0))
     materiality = max(0.05, (frontier_n / fanout) if fanout else 0.05)
-    p_success = float(action.get("pSuccess") or 0.85)
+    raw_p = action.get("pSuccess")
+    p_success = 0.85 if raw_p is None else float(raw_p)
     authority = float(action.get("authority") or 0.8)
     freshness = float(action.get("freshness") or 0.7)
     cost = max(1e-6, float(action.get("cost") or 1.0))
@@ -74,6 +75,12 @@ def run_frontier_loop(
     world_hash_after: str | None = None,
     feature_hash_before: str | None = None,
     feature_hash_after: str | None = None,
+    material_fact_hash_before: str | None = None,
+    material_fact_hash_after: str | None = None,
+    probability_hash_before: str | None = None,
+    probability_hash_after: str | None = None,
+    ranking_hash_before: str | None = None,
+    ranking_hash_after: str | None = None,
     host_required: bool = False,
 ) -> dict[str, Any]:
     tel = telemetry or AlgorithmTelemetry()
@@ -129,13 +136,18 @@ def run_frontier_loop(
     snapshot_changed = bool(snapshot_hash_before and snapshot_hash_after and snapshot_hash_before != snapshot_hash_after)
     world_changed = bool(world_hash_before and world_hash_after and world_hash_before != world_hash_after)
     feature_changed = bool(feature_hash_before and feature_hash_after and feature_hash_before != feature_hash_after)
-    fact_changed = bool(hold_ids) or grades_changed
+    fact_hash_changed = bool(material_fact_hash_before and material_fact_hash_after and material_fact_hash_before != material_fact_hash_after)
+    probability_changed = bool(probability_hash_before and probability_hash_after and probability_hash_before != probability_hash_after)
+    ranking_changed = bool(ranking_hash_before and ranking_hash_after and ranking_hash_before != ranking_hash_after)
+    fact_changed = bool(hold_ids) or grades_changed or fact_hash_changed
     material_state_changed = bool(
         (pre_hash != post_hash)
         or snapshot_changed
         or world_changed
         or feature_changed
         or fact_changed
+        or probability_changed
+        or ranking_changed
     )
     # Evidence import alone is not a pass. A pass requires downstream state change.
     if material_state_changed:
@@ -177,6 +189,35 @@ def run_frontier_loop(
     top25["final"] = final_ok
     top25["contentHash"] = content_hash({k: v for k, v in top25.items() if k != "contentHash"})
 
+    pass_state = {
+        "schema": "pillars_dcm.frontier_pass_state.v1",
+        "passId": f"FP{passes:04d}",
+        "frontierOfferIdsBefore": sorted(frontier_ids),
+        "actionIds": [x.get("actionId") for x in action_evsi[:50]],
+        "evidenceHashesBefore": None,
+        "evidenceHashesAfter": None,
+        "MaterialFactHashBefore": material_fact_hash_before,
+        "MaterialFactHashAfter": material_fact_hash_after,
+        "FeatureStoreHashBefore": feature_hash_before,
+        "FeatureStoreHashAfter": feature_hash_after,
+        "ParameterSnapshotHashBefore": snapshot_hash_before,
+        "ParameterSnapshotHashAfter": snapshot_hash_after,
+        "EventWorldHashBefore": world_hash_before,
+        "EventWorldHashAfter": world_hash_after,
+        "probabilityHashBefore": probability_hash_before,
+        "probabilityHashAfter": probability_hash_after,
+        "rankingHashBefore": ranking_hash_before,
+        "rankingHashAfter": ranking_hash_after,
+        "Top25HashBefore": preliminary.get("contentHash"),
+        "Top25HashAfter": top25.get("contentHash"),
+        "gradeChanges": grades_changed,
+        "directionChanges": 0,
+        "lineToleranceChanges": 0,
+        "stopReason": stop_reason,
+        "passIncremented": bool(passes),
+        "materialStateChanged": material_state_changed,
+    }
+    pass_state["contentHash"] = content_hash({k: v for k, v in pass_state.items() if k != "contentHash"})
     body = {
         "schema": "pillars_dcm.cfb_frontier_loop.v1",
         "frontierPassCount": passes,
@@ -200,6 +241,7 @@ def run_frontier_loop(
         "actionEvsi": action_evsi[:25],
         "preliminaryHash": preliminary.get("contentHash"),
         "top25Hash": top25.get("contentHash"),
+        "passStateHash": pass_state["contentHash"],
     }
     body["contentHash"] = content_hash({k: v for k, v in body.items() if k not in {"contentHash", "impacts", "actionEvsi"}})
     tel.record(
@@ -219,5 +261,6 @@ def run_frontier_loop(
         "top25": top25,
         "frontierOfferIds": frontier_ids,
         "loop": body,
+        "passState": pass_state,
         "telemetry": tel,
     }

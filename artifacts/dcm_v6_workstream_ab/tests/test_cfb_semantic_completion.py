@@ -203,9 +203,9 @@ def test_line_only_refresh_does_not_rebuild_worlds():
     assert out["modeled"][0]["needsWorldRebuild"] is False
 
 
-def test_material_refresh_rebuilds_worlds():
+def test_material_refresh_flags_rebuild_keys_without_resimulate():
     modeled = [{
-        "row": {"playerId": "QB1", "eventId": "E1", "line": 220.0, "market": "pass_yds", "injury": "ACTIVE"},
+        "row": {"playerId": "QB1", "eventId": "E1", "teamId": "T1", "line": 220.0, "market": "pass_yds", "injury": "ACTIVE"},
         "selectedSide": "MORE",
         "selectedP": 0.6,
         "grade": "LEAN",
@@ -221,16 +221,23 @@ def test_material_refresh_rebuilds_worlds():
         rebuilt["n"] += 1
         return [100.0] * 8
 
+    facts = resolve_material_facts([
+        {"semantic_scope": "SUBJECT", "scope_id": "QB1", "claim_type": "INJURY",
+         "claim_value": {"injury": "QUESTIONABLE"}, "authority": "OFFICIAL",
+         "observed_at": "2026-09-01T00:00:00Z"},
+    ])
     out = apply_final_refresh(
         modeled,
         claims=[{"semantic_scope": "SUBJECT", "scope_id": "QB1", "claim_value": {"injury": "QUESTIONABLE"}, "observed_at": "2026-09-01T00:00:00Z"}],
+        facts=facts,
         cutoff="2026-09-03T00:00:00Z",
         resimulate=resim,
     )
     assert out["report"]["materialStateCount"] == 1
     assert out["modeled"][0]["needsWorldRebuild"] is True
-    assert rebuilt["n"] == 1
-    assert out["modeled"][0]["_worldValues"][0] == 100.0
+    assert rebuilt["n"] == 0
+    assert "QB1" in out["report"]["rebuildPlayerIds"]
+    assert "E1" in out["report"]["rebuildEventIds"]
 
 
 def test_frontier_does_not_increment_on_generic_evidence():

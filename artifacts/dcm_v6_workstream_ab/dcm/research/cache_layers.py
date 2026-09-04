@@ -84,7 +84,13 @@ class ResearchCacheCascade:
         )
         if self.drive is not None and hasattr(self.drive, "put"):
             digest = str(rec.get("claim_hash") or content_hash(rec))
-            self.drive.put(digest, {"kind": "EVIDENCE_CLAIM", "scope": scope, "scopeId": scope_id, "key": k})
+            self.drive.put(digest, {
+                "kind": "EVIDENCE_CLAIM",
+                "scope": scope,
+                "scopeId": scope_id,
+                "claimType": ctype,
+                "payload": rec,
+            })
         return k
 
     def get(self, scope: str, scope_id: str, *, claim_type: str = "") -> tuple[dict[str, Any] | None, str]:
@@ -121,15 +127,24 @@ class ResearchCacheCascade:
                 rec = dict(found) if isinstance(found, Mapping) else {"claim_value": found}
                 self.l0[k] = rec
                 return rec, "L3"
-        if self.drive is not None and hasattr(self.drive, "identify"):
-            digest = content_hash({"scope": scope, "scope_id": scope_id, "claim_type": claim_type})
-            try:
-                ident = self.drive.identify(digest)
-            except Exception:
-                ident = None
-            if isinstance(ident, Mapping) and ident.get("present"):
+        if self.drive is not None:
+            hashes: list[str] = []
+            if hasattr(self.drive, "lookup_semantic"):
+                try:
+                    hashes = list(self.drive.lookup_semantic(scope, scope_id, claim_type) or [])
+                except Exception:
+                    hashes = []
+            for digest in reversed(hashes):
+                try:
+                    ident = self.drive.identify(digest) if hasattr(self.drive, "identify") else None
+                except Exception:
+                    ident = None
+                if not isinstance(ident, Mapping) or not ident.get("present"):
+                    continue
+                meta = ident.get("meta") if isinstance(ident.get("meta"), Mapping) else {}
+                payload = meta.get("payload") if isinstance(meta, Mapping) else None
+                rec = dict(payload) if isinstance(payload, Mapping) else dict(meta or {"digest": digest})
                 self.hits["L5"] += 1
-                rec = dict(ident.get("meta") or {"digest": digest})
                 self.l0[k] = rec
                 return rec, "L5"
         self.misses += 1
@@ -216,6 +231,15 @@ class ResearchCacheCascade:
         }
         body["contentHash"] = content_hash({k: v for k, v in body.items() if k != "contentHash"})
         return body
+
+    def clear_ephemeral(self) -> None:
+        """Drop L0–L4. L5 catalog (DriveObjectCatalog) is unchanged."""
+        self.l0.clear()
+        self.l1 = LRUCache(capacity=4096)
+        try:
+            self.l2.execute("DELETE FROM research")
+        except Exception:
+            pass
 
     def close(self) -> None:
         try:

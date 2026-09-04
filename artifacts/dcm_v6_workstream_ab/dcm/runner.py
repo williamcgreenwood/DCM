@@ -23,8 +23,9 @@ from dcm.algorithms.execution_plan import constitution_run_hashes, persist_har_a
 from dcm.algorithms.telemetry import AlgorithmTelemetry
 from dcm.cfb.event_worlds import cfb_teammate_groups, simulate_joint_cfb_event_worlds
 from dcm.cfb.launch import emit_cfb_forecast_artifacts, persist_algorithm_telemetry, prepare_cfb_research_os
+from dcm.cfb.recompute import recompute_full_bundle
 from dcm.cfb.refresh import apply_final_refresh
-from dcm.research.material_facts import apply_facts_to_context, apply_hold_playable, facts_to_features, hold_playable_scope_ids, resolve_material_facts
+from dcm.research.material_facts import apply_hold_playable, facts_to_features, hold_playable_scope_ids, resolve_material_facts
 from dcm.contracts.hashes import content_hash
 from dcm.identity.resolve import build_player_index, freeze_map, resolve_row
 from dcm.ingest.board import freeze_board, write_board
@@ -659,13 +660,29 @@ def run_dcm(
     fact_features = facts_to_features(material_facts_payload, cutoff=forecast_cutoff)
 
     def _snapshot_for(prow: dict[str, Any]) -> dict[str, Any]:
-        return build_parameter_snapshot(
+        oid = str(prow.get("projectionId") or "")
+        cached = parameter_cache.get(oid) if oid else None
+        if cached is not None:
+            return cached
+        pid = str(prow.get("playerId") or "")
+        eid = str(prow.get("eventId") or "")
+        tid = str(prow.get("teamId") or prow.get("team") or "")
+        opp = str(prow.get("opponentId") or prow.get("opponent") or "")
+        relevant = [
+            f for f in fact_features
+            if str(f.get("scopeId") or "") in {pid, eid, tid, opp, f"env:{eid}", ""}
+        ]
+        snap = build_parameter_snapshot(
             prow,
             bundle["claims"],
             team_packets=team_packet_map,
             event_packets=event_packet_map,
             opponent_packets=opponent_packet_map,
+            fact_features=relevant or None,
         )
+        if oid:
+            parameter_cache[oid] = snap
+        return snap
 
     for row in rows:
         state, blocker = _classify(row)
@@ -678,14 +695,6 @@ def run_dcm(
             unresolved += 1; classified.append(rec); continue
 
         snapshot = _snapshot_for(row)
-        pid = str(row.get("playerId") or "")
-        eid = str(row.get("eventId") or "")
-        tid = str(row.get("teamId") or row.get("team") or "")
-        relevant_facts = [f for f in fact_features if str(f.get("scopeId") or "") in {pid, eid, tid}]
-        if relevant_facts:
-            snapshot = apply_facts_to_context(dict(snapshot), relevant_facts)
-            snapshot["materialFactFeatures"] = relevant_facts
-        parameter_cache[str(row["projectionId"])] = snapshot
         rec["forecastCutoff"] = forecast_cutoff
         rec["playerStatus"] = snapshot.get("status")
         rec["parameterSnapshot"] = snapshot
@@ -733,7 +742,9 @@ def run_dcm(
                 league = str(row.get("league") or "").upper()
                 group = (cfb_groups if family == "gridiron" and league == "CFB" else teammate_groups).get(group_key) or {}
                 use_joint_bball = family == "basketball" and len(group) >= 2
-                use_joint_cfb = family == "gridiron" and league == "CFB" and len(group) >= 2
+                use_joint_cfb = family == "gridiron" and league == "CFB" and bool(str(row.get("eventId") or ""))
+                if use_joint_cfb:
+                    group = group or {str(row.get("playerId") or ""): row}
                 if use_joint_bball or use_joint_cfb:
                     jkey = (group_key[0], group_key[1], gov.max_worlds)
                     if jkey not in joint_world_cache:
@@ -816,7 +827,9 @@ def run_dcm(
             league = str(row.get("league") or "").upper()
             group = (cfb_groups if family == "gridiron" and league == "CFB" else teammate_groups).get(group_key) or {}
             use_joint_bball = family == "basketball" and len(group) >= 2
-            use_joint_cfb = family == "gridiron" and league == "CFB" and len(group) >= 2
+            use_joint_cfb = family == "gridiron" and league == "CFB" and bool(str(row.get("eventId") or ""))
+            if use_joint_cfb:
+                group = group or {str(row.get("playerId") or ""): row}
             if use_joint_bball or use_joint_cfb:
                 jkey = (group_key[0], group_key[1], target_worlds)
                 if jkey not in joint_world_cache:
@@ -969,7 +982,7 @@ def run_dcm(
 
     (dest / "parameters").mkdir(exist_ok=True)
     (dest / "parameters" / "snapshots.json").write_text(
-        json.dumps(parameter_cache, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+        json.dumps(parameter_cache, sort_keys=True) + "\n", encoding="utf-8"
     )
 
     n_worlds = dag.add("EVENT_WORLDS", "board", parents=[n_res.key])
@@ -999,6 +1012,7 @@ def run_dcm(
         telemetry.record("ALG-ML-TIME-002", problem_class="CUSUM", producer="dcm.algorithms.ml_families.cusum", consumer="dcm.research.role_epoch.governed_change_points", artifact="parameters/snapshots.json", phase="EXECUTED", downstream_used=True)
         telemetry.record("ALG-ML-TIME-003", problem_class="PAGE_HINKLEY", producer="dcm.algorithms.ml_families.page_hinkley", consumer="dcm.research.role_epoch.governed_change_points", artifact="parameters/snapshots.json", phase="EXECUTED", downstream_used=True)
 
+    ranked_t = StageTimer("RANK")
     ranked = rank_candidates(modeled, top_k=25, seed=har_sha)
     telemetry.record("ALG-SORT-001", problem_class="FINAL_RANK", producer="dcm.model.ranking.rank_candidates", consumer="dcm.runner.run_dcm", artifact="top100.json", phase="EXECUTED", downstream_used=True)
     telemetry.record("ALG-SORT-003", problem_class="TOPK_PARTIAL", producer="dcm.model.ranking.rank_candidates", consumer="dcm.runner.run_dcm", artifact="top25_qualified.json", phase="EXECUTED", downstream_used=True)
@@ -1009,43 +1023,158 @@ def run_dcm(
     }
 
     def _resimulate_material(rec: dict[str, Any]) -> list[float] | None:
-        row = rec.get("row") if isinstance(rec.get("row"), dict) else {}
-        snapshot = rec.get("parameterSnapshot") if isinstance(rec.get("parameterSnapshot"), dict) else None
-        if snapshot is None:
-            snapshot = parameter_cache.get(str(row.get("projectionId") or ""))
-        n = len(rec.get("_worldValues") or []) or int(gov.max_worlds)
-        worlds = simulate_player_worlds(
-            row,
-            n=n,
-            seed=har_sha,
-            parameter_snapshot=snapshot,
-        )
-        return [
-            value_from_stats(str(row.get("market") or ""), w, board_id=str(row.get("boardId") or "FULL_GAME"))
-            for w in worlds
-        ]
+        # Deprecated: material rebuild happens below via snapshots + joint worlds.
+        return None
+
+    snapshot_hash_before = content_hash(sorted(str(s.get("parameter_snapshot_hash") or "") for s in parameter_cache.values()))
+    world_hash_before = content_hash(sorted(str(k) for k in world_cache))
+    feature_hash_before = content_hash([str(f.get("contentHash") or "") for f in fact_features])
+    material_fact_hash_before = str(material_facts_payload.get("contentHash") or "")
 
     refresh = apply_final_refresh(
         ranked,
         claims=bundle.get("claims") or [],
+        facts=material_facts_payload,
         cutoff=forecast_cutoff,
         started_events=started_events,
-        resimulate=_resimulate_material,
         grade_fn=grade_of,
     )
     _write_refresh = dest / "cfb_final_refresh.json"
-    _write_refresh.write_text(json.dumps(refresh["report"], indent=2, sort_keys=True) + "\n", encoding="utf-8")
     ranked = refresh["modeled"]
+    rebuild_players = set(refresh["report"].get("rebuildPlayerIds") or [])
+    rebuild_events = set(refresh["report"].get("rebuildEventIds") or [])
+    rebuild_teams = set(refresh["report"].get("rebuildTeamIds") or [])
+    worlds_rebuilt = 0
+    if rebuild_players or rebuild_events or rebuild_teams:
+        material_facts_payload = resolve_material_facts(bundle.get("claims") or [], cutoff=forecast_cutoff)
+        fact_features = facts_to_features(material_facts_payload, cutoff=forecast_cutoff)
+        hold_ids = hold_playable_scope_ids(material_facts_payload)
+        affected: list[dict[str, Any]] = []
+        for rec in ranked:
+            row = rec.get("row") if isinstance(rec.get("row"), dict) else {}
+            pid = str(row.get("playerId") or "")
+            eid = str(row.get("eventId") or "")
+            tid = str(row.get("teamId") or row.get("team") or "")
+            if pid in rebuild_players or eid in rebuild_events or tid in rebuild_teams:
+                affected.append(rec)
+        # Invalidate joint worlds for affected events/teams.
+        for jkey in list(joint_world_cache):
+            if jkey[0] in rebuild_events or jkey[1] in rebuild_teams:
+                joint_world_cache.pop(jkey, None)
+        for rec in affected:
+            row = dict(rec.get("row") or {})
+            oid = str(row.get("projectionId") or "")
+            if oid:
+                parameter_cache.pop(oid, None)
+            snap = _snapshot_for(row)
+            rec["parameterSnapshot"] = snap
+            rec["parameterSnapshotHash"] = snap.get("parameter_snapshot_hash")
+        for rec in affected:
+            row = rec.get("row") if isinstance(rec.get("row"), dict) else {}
+            family = str(row.get("sportFamily") or "")
+            league = str(row.get("league") or "").upper()
+            n = len(rec.get("_worldValues") or []) or int(gov.max_worlds)
+            ctx_key = (family, str(row.get("eventId") or ""), n)
+            if ctx_key not in event_context_cache:
+                event_context_cache[ctx_key] = generate_event_contexts(
+                    ctx_key[0], ctx_key[1], n=n, seed=har_sha
+                )
+            group_key = (str(row.get("eventId") or ""), str(row.get("teamId") or ""))
+            group = (cfb_groups if family == "gridiron" and league == "CFB" else teammate_groups).get(group_key) or {}
+            use_joint_cfb = family == "gridiron" and league == "CFB" and bool(str(row.get("eventId") or ""))
+            if use_joint_cfb:
+                group = group or {str(row.get("playerId") or ""): row}
+                jkey = (group_key[0], group_key[1], n)
+                if jkey not in joint_world_cache:
+                    specs = []
+                    for _pid, prow in group.items():
+                        psnap = parameter_cache.get(str(prow.get("projectionId") or "")) or _snapshot_for(prow)
+                        specs.append({"row": prow, "snapshot": psnap})
+                    if rec not in specs and row:
+                        specs.append({"row": row, "snapshot": rec.get("parameterSnapshot") or _snapshot_for(row)})
+                    # Dedup by playerId
+                    seen_p = set()
+                    uniq = []
+                    for spec in specs:
+                        spid = str((spec.get("row") or {}).get("playerId") or "")
+                        if not spid or spid in seen_p:
+                            continue
+                        seen_p.add(spid)
+                        uniq.append(spec)
+                    joint = simulate_joint_cfb_event_worlds(
+                        uniq,
+                        n=n,
+                        seed=har_sha,
+                        event_contexts=event_context_cache[ctx_key],
+                    )
+                    joint_world_cache[jkey] = joint["worlds"]
+                    joint_meta_acc.append(joint["meta"])
+                pid = str(row.get("playerId") or "")
+                worlds = (joint_world_cache.get(jkey) or {}).get(pid) or []
+            else:
+                worlds = simulate_player_worlds(
+                    row,
+                    n=n,
+                    seed=har_sha,
+                    parameter_snapshot=rec.get("parameterSnapshot"),
+                    event_contexts=event_context_cache[ctx_key],
+                )
+            rec["_worldValues"] = [
+                value_from_stats(str(row.get("market") or ""), w, board_id=str(row.get("boardId") or "FULL_GAME"))
+                for w in worlds
+            ]
+            rec = recompute_full_bundle(rec, grade_fn=grade_of, calibration_cells=calibration_cells)
+            worlds_rebuilt += 1
+            # write back into ranked
+            oid = str(row.get("projectionId") or "")
+            for i, existing in enumerate(ranked):
+                if str((existing.get("row") or {}).get("projectionId") or "") == oid:
+                    ranked[i] = rec
+                    break
+        ranked = rank_candidates(ranked, top_k=25, seed=har_sha)
+        refresh["report"]["worldsRebuilt"] = worlds_rebuilt
+        refresh["report"]["rerankedAfterRefresh"] = True
+        refresh["report"]["contentHash"] = content_hash({k: v for k, v in refresh["report"].items() if k != "contentHash"})
+    rank_perf = ranked_t.finish(OutputRows=len(ranked))
+    (dest / "performance" / "rank.json").write_text(json.dumps(rank_perf, indent=2) + "\n", encoding="utf-8")
+    _write_refresh.write_text(json.dumps(refresh["report"], indent=2, sort_keys=True) + "\n", encoding="utf-8")
     qualified = apply_pre_freeze_status_start_gates(ranked, cutoff=forecast_cutoff)
     card = build_card(qualified)
     exposure = exposure_report(card)
     remaining_actions = 0
     action_doc = None
+    schedule_doc = None
     try:
         action_doc = json.loads((dest / "acquisition_actions.json").read_text())
-        remaining_actions = int((action_doc or {}).get("actionCount") or 0)
+        schedule_doc = json.loads((dest / "acquisition_schedule.json").read_text())
+        selected = list((schedule_doc or {}).get("selectedActionIds") or [])
+        complete_req = set()
+        cov = bundle.get("coverage") or {}
+        for row in cov.get("requests") or []:
+            if isinstance(row, dict) and row.get("complete"):
+                complete_req.add(str(row.get("requestId") or row.get("request_id") or ""))
+        actions_by_id = {str(a.get("actionId")): a for a in (action_doc or {}).get("actions") or [] if isinstance(a, dict)}
+        unresolved_selected = 0
+        for aid in selected:
+            act = actions_by_id.get(str(aid)) or {}
+            reqs = [str(r) for r in (act.get("requirementIds") or [])]
+            if not reqs or any(r not in complete_req for r in reqs):
+                unresolved_selected += 1
+        remaining_actions = unresolved_selected
     except Exception:
         remaining_actions = 0
+    coverage_incomplete = not bool((bundle.get("coverage") or {}).get("complete"))
+    host_required = str(research) == "file" and coverage_incomplete
+    snapshot_hash_after = content_hash(sorted(str(s.get("parameter_snapshot_hash") or "") for s in parameter_cache.values()))
+    world_hash_after = content_hash(sorted(str(k) for k in world_cache) + sorted(str(k) for k in joint_world_cache))
+    feature_hash_after = content_hash([str(f.get("contentHash") or "") for f in fact_features])
+    material_fact_hash_after = str(material_facts_payload.get("contentHash") or "")
+    probability_hash_before = snapshot_hash_before
+    probability_hash_after = content_hash([
+        {"id": (p.get("row") or {}).get("projectionId"), "p": p.get("evidenceSafeP"), "side": p.get("selectedSide")}
+        for p in ranked[:25]
+    ])
+    ranking_hash_after = content_hash([str((p.get("row") or {}).get("projectionId") or "") for p in ranked[:25]])
     cfb_forecast = emit_cfb_forecast_artifacts(
         dest,
         modeled=ranked,
@@ -1056,6 +1185,19 @@ def run_dcm(
         evidence_imported=bool(bundle.get("claims")),
         material_facts=material_facts_payload,
         actions=action_doc,
+        host_required=host_required,
+        snapshot_hash_before=snapshot_hash_before,
+        snapshot_hash_after=snapshot_hash_after,
+        world_hash_before=world_hash_before,
+        world_hash_after=world_hash_after,
+        feature_hash_before=feature_hash_before,
+        feature_hash_after=feature_hash_after,
+        material_fact_hash_before=material_fact_hash_before,
+        material_fact_hash_after=material_fact_hash_after,
+        probability_hash_before=probability_hash_before,
+        probability_hash_after=probability_hash_after,
+        ranking_hash_before=None,
+        ranking_hash_after=ranking_hash_after,
     )
     prepare_cfb_research_os(
         dest,
@@ -1216,6 +1358,7 @@ def run_dcm(
         research_complete=bool(bundle.get("complete")),
     )
 
+    freeze_t = StageTimer("FREEZE")
     freeze = {
         "runId": run_id,
         "dcmVersion": SOFTWARE,
@@ -1227,6 +1370,7 @@ def run_dcm(
         "productionOperable": global_selection_gate,
         "selectionAllowed": global_selection_gate,
         "softwareE2eComplete": True,
+        "forecastFrozen": True,
         "v5Decoder": mount.get("har_decoder"),
         "v5MountState": mount.get("state"),
         "schemaId": SCHEMA,
@@ -1298,6 +1442,11 @@ def run_dcm(
         "top25Hash": freeze["top25Hash"],
         "cardHash": freeze["cardHash"],
         "explanationsHash": explanations_hash,
+        "frontierStopReason": freeze.get("frontierStopReason"),
+        "frontierPassCount": freeze.get("frontierPassCount"),
+        "finalRefreshHash": freeze.get("finalRefreshHash"),
+        "finalRankingHash": freeze.get("finalRankingHash"),
+        "forecastFrozen": freeze.get("forecastFrozen"),
     }
     readiness = build_readiness(
         mount=mount,
@@ -1344,6 +1493,32 @@ def run_dcm(
         unsupported=unsupported,
     )
     freeze["runState"] = run_state
+    top25_doc = cfb_forecast.get("top25") or {}
+    loop_doc = cfb_forecast.get("frontierLoop") or {}
+    frontier_final = bool(top25_doc.get("final"))
+    stop_reason = str(loop_doc.get("stopReason") or "")
+    can_freeze = frontier_final and stop_reason != "EXTERNAL_HOST_REQUIRED"
+    freeze["top25Final"] = frontier_final
+    freeze["frontierStopReason"] = stop_reason
+    freeze["frontierPassCount"] = int(loop_doc.get("frontierPassCount") or 0)
+    freeze["finalRefreshHash"] = (refresh.get("report") or {}).get("contentHash")
+    freeze["finalRankingHash"] = content_hash([str((p.get("row") or {}).get("projectionId") or "") for p in ranked[:25]])
+    freeze["frontierPassStateHash"] = ((cfb_forecast.get("passState") or {}).get("contentHash"))
+    if not can_freeze:
+        freeze["forecastFrozen"] = False
+        freeze["runState"] = "AWAITING_FRONTIER_RESEARCH"
+        freeze["note"] = "Interim frontier; not a frozen forecast. Host must acquire remaining frontier actions."
+    else:
+        freeze["forecastFrozen"] = True
+    freeze["freezeBinds"] = {
+        **(freeze.get("freezeBinds") or {}),
+        "frontierStopReason": freeze.get("frontierStopReason"),
+        "frontierPassCount": freeze.get("frontierPassCount"),
+        "finalRefreshHash": freeze.get("finalRefreshHash"),
+        "finalRankingHash": freeze.get("finalRankingHash"),
+        "forecastFrozen": freeze.get("forecastFrozen"),
+        "top25Final": freeze.get("top25Final"),
+    }
     if empty_card_reason:
         freeze["emptyCardReason"] = empty_card_reason
     if not root_accepted:
@@ -1359,6 +1534,18 @@ def run_dcm(
     freeze["dag"] = dag.snapshot()
     (dest / "frozen_forecast.json").write_text(json.dumps(freeze, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     (dest / "freeze.json").write_text(json.dumps(freeze, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    freeze_perf = freeze_t.finish(OutputRows=len(card), Frozen=bool(freeze.get("forecastFrozen")))
+    (dest / "performance" / "freeze.json").write_text(json.dumps(freeze_perf, indent=2) + "\n", encoding="utf-8")
+    stage_rows = []
+    for rec in ((har_perf if "har_perf" in locals() else None), research_perf, model_perf, rank_perf, freeze_perf):
+        if isinstance(rec, dict):
+            stage_rows.append(rec)
+    stages_payload = {
+        "schema": "pillars_dcm.stage_telemetry.v1",
+        "stages": stage_rows,
+        "hostPerformanceCertified": False,
+    }
+    (dest / "performance" / "stages.json").write_text(json.dumps(stages_payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     (dest / "frozen_forecast.sha256").write_text(freeze["frozenForecastHash"] + "\n", encoding="utf-8")
     (dest / "population_full.jsonl").write_text("".join(json.dumps(p) + "\n" for p in full_population), encoding="utf-8")
     (dest / "accounting.json").write_text(json.dumps({**(board.get("accounting") or {}), "states": states_count, "playable": len(qualified), "cardSize": len(card)}, indent=2, sort_keys=True) + "\n", encoding="utf-8")

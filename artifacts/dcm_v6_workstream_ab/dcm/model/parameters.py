@@ -29,6 +29,7 @@ from dcm.research.gamelog import normalize_basketball_logs
 from dcm.research.gridiron_gamelog import normalize_gridiron_logs
 from dcm.research.role_epoch import RoleEpochBuilder
 from dcm.research.scopes import claims_for
+from dcm.research.material_facts import apply_fact_features_to_packets
 from dcm.sports.football.research_requirements import assess_football_support
 from dcm.sports.football.cfb_role import resolve_cfb_role_state
 
@@ -93,6 +94,7 @@ def build_parameter_snapshot(
     team_packets: dict[str, dict[str, Any]] | None = None,
     event_packets: dict[str, dict[str, Any]] | None = None,
     opponent_packets: dict[str, dict[str, Any]] | None = None,
+    fact_features: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     player_pairs = _pairs(claims, "SUBJECT", str(row.get("playerId") or row.get("subjectId") or ""))
     team_pairs = _pairs(claims, "AFFILIATION", str(row.get("teamId") or row.get("affiliationId") or ""))
@@ -160,6 +162,27 @@ def build_parameter_snapshot(
         if ep and ep.get("evidenceUsed"):
             event = {**event, **dict(ep.get("parameterFields") or {})}
             event["eventPacketHash"] = ep.get("contentHash")
+
+    material_fact_hashes: list[str] = []
+    if fact_features:
+        overlaid = apply_fact_features_to_packets(
+            player=player,
+            team=team,
+            event=event,
+            environment=environment,
+            counterparty=counterparty,
+            row=row,
+            features=fact_features,
+        )
+        player = overlaid["player"]
+        team = overlaid["team"]
+        event = overlaid["event"]
+        environment = overlaid["environment"]
+        counterparty = overlaid["counterparty"]
+        material_fact_hashes = list(overlaid.get("materialFactHashes") or [])
+        if overlaid.get("applied") and player.get("role"):
+            row = dict(row)
+            row["role"] = player.get("role") or row.get("role")
 
     claim_pairs = list(
         player_pairs + team_pairs + opp_pairs + event_pairs + env_pairs + sport_pairs + competition_pairs + def_pairs + offer_pairs
@@ -595,6 +618,7 @@ def build_parameter_snapshot(
         "roleWeight": shrinkage_out.get("roleWeight"),
         "teamEvidenceUsed": bool(team_evidence_used),
         "teamPriorUsedAsResearch": False,
+        "materialFactHashes": sorted(set(material_fact_hashes)),
         "availabilityMixture": availability_mixture(status),
         "layers": {
             "subject": {

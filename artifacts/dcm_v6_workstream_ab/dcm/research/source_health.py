@@ -87,10 +87,41 @@ class SourceHealthRegistry:
                 "circuitState": CIRCUIT_CLOSED,
                 "retryEligible": True,
                 "fallbackSourceIds": list(seed.get("fallbackSourceIds") or []),
-                "historicalSuccessProbability": 1.0,
+                "historicalSuccessProbability": seed.get("historicalSuccessProbability"),
             }
+            if seed.get("successes") is not None:
+                row["successes"] = int(seed.get("successes") or 0)
+            if seed.get("failures") is not None:
+                row["failures"] = int(seed.get("failures") or 0)
+            if seed.get("consecutiveFailures") is not None:
+                row["consecutiveFailures"] = int(seed.get("consecutiveFailures") or 0)
+            if seed.get("circuitState"):
+                row["circuitState"] = str(seed.get("circuitState"))
+            if seed.get("yield") is not None:
+                row["yield"] = int(seed.get("yield") or 0)
+            if seed.get("latencyMs"):
+                row["latencyMs"] = list(seed.get("latencyMs") or [])
+            for k in ("lastSuccess", "lastFailure", "lastSuccessAt", "lastFailureAt", "openedAt", "openUntil", "halfOpenAt", "observedFreshness"):
+                if seed.get(k) is not None:
+                    row[k] = seed.get(k)
             self._state[source_id] = row
+            self._set_success_probability(row)
         return row
+
+    def _set_success_probability(self, row: dict[str, Any]) -> None:
+        total = int(row.get("successes") or 0) + int(row.get("failures") or 0)
+        if total <= 0:
+            row["historicalSuccessProbability"] = None
+        else:
+            row["historicalSuccessProbability"] = int(row["successes"]) / total
+
+    def success_probability(self, source_id: str) -> float | None:
+        row = self._state.get(source_id)
+        if row is None:
+            return None
+        self._set_success_probability(row)
+        val = row.get("historicalSuccessProbability")
+        return None if val is None else float(val)
 
     def _refresh_circuit(self, row: dict[str, Any], *, now: datetime | None = None) -> dict[str, Any]:
         ts = now or _now()
@@ -120,8 +151,7 @@ class SourceHealthRegistry:
         row["openUntil"] = None
         row["openedAt"] = None
         row["halfOpenAt"] = None
-        total = row["successes"] + row["failures"]
-        row["historicalSuccessProbability"] = row["successes"] / total if total else 1.0
+        self._set_success_probability(row)
         return row
 
     def record_failure(self, source_id: str, *, reason: str = "unknown") -> dict[str, Any]:
@@ -132,8 +162,7 @@ class SourceHealthRegistry:
         row["consecutiveFailures"] += 1
         row["lastFailure"] = reason
         row["lastFailureAt"] = _iso(now)
-        total = row["successes"] + row["failures"]
-        row["historicalSuccessProbability"] = row["successes"] / total if total else 0.0
+        self._set_success_probability(row)
         if row["circuitState"] == CIRCUIT_HALF_OPEN or row["consecutiveFailures"] >= FAILURE_THRESHOLD:
             row["circuitState"] = CIRCUIT_OPEN
             row["retryEligible"] = False
@@ -169,6 +198,7 @@ class SourceHealthRegistry:
         now = _now()
         ranked: list[tuple[int, float, str]] = []
         skipped_open: list[str] = []
+        half_open_used = False
         for sid, row in self._state.items():
             self._refresh_circuit(row, now=now)
             if sport and row["sports"] and sport not in row["sports"] and "CFB" not in row["sports"]:
@@ -176,6 +206,10 @@ class SourceHealthRegistry:
             if row["circuitState"] == CIRCUIT_OPEN:
                 skipped_open.append(sid)
                 continue
+            if row["circuitState"] == CIRCUIT_HALF_OPEN:
+                if half_open_used:
+                    continue
+                half_open_used = True
             auth = int((row["authorityByClaimType"] or {}).get(claim_type) or 50)
             ranked.append((-auth, row["cost"], sid))
         ranked.sort()
@@ -206,6 +240,65 @@ class SourceHealthRegistry:
             "circuits": body["circuits"],
         })
         return body
+
+    def load_snapshot(self, body: Mapping[str, Any] | None) -> None:
+        """Overlay persisted counters/circuits onto the live catalog. Never invent 0.85."""
+        if not isinstance(body, Mapping):
+            return
+        sources = body.get("sources") or []
+        if isinstance(sources, Mapping):
+            sources = [{"sourceId": k, **(v if isinstance(v, dict) else {})} for k, v in sources.items()]
+        for src in sources:
+            if not isinstance(src, Mapping):
+                continue
+            sid = str(src.get("sourceId") or src.get("id") or "")
+            if not sid:
+                continue
+            if sid in self._state:
+                row = self._state[sid]
+                for k, v in src.items():
+                    if k == "sourceId":
+                        continue
+                    row[k] = v
+                self._set_success_probability(row)
+            else:
+                self._ensure(sid, src)
+
+
+def persist_cfb_source_health(health: SourceHealthRegistry, dest) -> dict[str, Any]:
+    """Write the live source-health snapshot so later research passes restore it."""
+    import json
+    from pathlib import Path
+
+    dest = Path(dest)
+    dest.mkdir(parents=True, exist_ok=True)
+    snap = health.snapshot()
+    (dest / "source_health.json").write_text(
+        json.dumps(snap, indent=2, sort_keys=True, default=str) + "\n",
+        encoding="utf-8",
+    )
+    return snap
+
+
+def load_cfb_source_health(path=None) -> SourceHealthRegistry:
+    """Restore persisted source-health counters/circuits. Missing file → default catalog."""
+    import json
+    from pathlib import Path
+
+    health = default_cfb_source_health()
+    if path is None:
+        return health
+    p = Path(path)
+    if p.is_dir():
+        p = p / "source_health.json"
+    if not p.is_file():
+        return health
+    try:
+        body = json.loads(p.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError, TypeError):
+        return health
+    health.load_snapshot(body if isinstance(body, Mapping) else {})
+    return health
 
 
 def default_cfb_source_health() -> SourceHealthRegistry:

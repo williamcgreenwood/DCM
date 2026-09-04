@@ -170,13 +170,19 @@ class UnknownMarketError(KeyError):
         self.blocker = blocker
 
 
-def canonicalize_market(market_key: str) -> str | None:
-    """Exact alias lookup. Returns None when the key is not registered."""
+def canonicalize_market(market_key: str, *, ledger: dict[str, Any] | None = None) -> str | None:
+    """Exact alias lookup. Returns None when the key is not registered.
+
+    Gridiron ledgers prefer football aliases so CFB fg_made is not remapped to
+    basketball FGM.
+    """
     raw = str(market_key or "").strip()
     if not raw:
         return None
     key = raw.lower().replace("+", "_").replace("-", "_").replace(" ", "_")
     key = "_".join(p for p in key.split("_") if p)
+    if ledger is not None and looks_like_gridiron_ledger(ledger) and not looks_like_basketball_ledger(ledger):
+        return _GRIDIRON_ALIASES.get(key) or _GRIDIRON_ALIASES.get(raw) or _ALIASES.get(key) or _ALIASES.get(raw)
     return _ALIASES.get(key) or _ALIASES.get(raw) or _GRIDIRON_ALIASES.get(key) or _GRIDIRON_ALIASES.get(raw)
 
 
@@ -264,7 +270,7 @@ BASKETBALL_MARKET_KEYS = (frozenset(k for k in FORMULAS) | frozenset({"qtrs_w_3p
 
 def derive_market(ledger: dict[str, Any], market_key: str, board_id: str = "FULL_GAME") -> float:
     """Map a ledger + market key to a scalar. Never independently samples."""
-    canon = canonicalize_market(market_key)
+    canon = canonicalize_market(market_key, ledger=ledger)
     if canon is None:
         raise UnknownMarketError(market_key)
     if canon == "fantasy":

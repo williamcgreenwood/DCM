@@ -288,35 +288,21 @@ class BoardIndexes:
         }
 
     def resolve_identities(self) -> dict[str, Any]:
-        """Exact-first identity. Fuzzy/FTS/cascade only when projectionId misses.
+        """Exact-first identity. Known projectionId → hash lookup → done.
 
-        Canonical IDs never trigger fuzzy or semantic retrieval.
-        Near-duplicate MinHash/SimHash only run when the same display name
-        collides across more than one offer id.
+        Bloom/composite/SQLite are not queried for IDs already in the hash table.
+        Fuzzy/FTS/cascade run only when the canonical projectionId is missing.
         """
         resolved: list[dict[str, Any]] = []
         exact_n = 0
         skipped_fuzzy = 0
         fuzzy_n = 0
         cascade_n = 0
-        events_seen: set[str] = set()
         by_name: dict[str, list[str]] = {}
         last_cascade: dict[str, Any] = {}
         for oid, row in self.offer_by_id.items():
-            bloom_ok = self.might_have_offer(oid)
-            hit = self.exact_offer(oid, downstream_used=True) if bloom_ok else None
-            sport = str(row.get("sportFamily") or "")
-            league = str(row.get("league") or "")
-            event = str(row.get("eventId") or "")
-            team = str(row.get("teamId") or row.get("team") or "")
+            hit = self.exact_offer(oid, downstream_used=True)
             subject = str(row.get("playerId") or row.get("subjectId") or "")
-            market = str(row.get("market") or "")
-            self.lookup_composite(
-                sport=sport, league=league, event=event, team=team, subject=subject, market=market,
-            )
-            if event and event not in events_seen:
-                self.sqlite_event_offers(event)
-                events_seen.add(event)
             name = str(row.get("playerName") or "").strip()
             if name:
                 by_name.setdefault(name.lower(), []).append(oid)
@@ -384,7 +370,7 @@ class BoardIndexes:
             "cascadeCount": cascade_n,
             "nameCollisions": len(collisions),
             "nearDuplicatePairs": len(near_dups),
-            "queriedEvents": len(events_seen),
+            "queriedEvents": 0,
             "retrievalCascade": {k: v for k, v in last_cascade.items() if k != "booleanAnd"} if last_cascade else {},
         }
 

@@ -116,6 +116,30 @@ Measured: 412 pytest passed; inventory 270/1897 hash `5c6889973fc05662a469b1f912
 
 Verdict: `CFB_REFERENCE_IMPLEMENTATION_SOFTWARE_COMPLETE`. Current-HAR operational acceptance remains `CFB_CURRENT_HAR_OPERATIONAL_ACCEPTANCE_PENDING`. Do not merge to main.
 
+## 2026-09-04 CFB freeze-gate / incremental-runtime pass
+
+Continues PR #19 from `0e5e2275742246211cb20ba4e5d17b7908106ab2`. Closes remaining ChatGPT-audit semantic defects. Not an expansion.
+
+Closed this pass:
+
+- MaterialFacts overlay packets before RoleEpoch/opportunity/efficiency fit; snapshot hash includes fact hashes.
+- Material refresh rebuilds ParameterSnapshots + shared joint EventWorlds, then full probability/risk bundle + rerank. Line-only reuses worlds.
+- Shared CFB EventWorlds for a lone board player; `OpportunityShareEstimate` is evidence-driven; starter QB is not capped at 92%; kickers isolated.
+- Freeze blocked when Top25 is not FINAL or stop reason is `EXTERNAL_HOST_REQUIRED` (`forecastFrozen=false`, `AWAITING_FRONTIER_RESEARCH`).
+- `FrontierPassState` binds before/after snapshot/world/feature/fact/probability/ranking/Top25 hashes.
+- Requirement completion is semantic (`evaluate_request`); STATUS evidence does not complete GAME_HISTORY.
+- Exact projectionId path does not Bloom/composite/SQLite-query known IDs.
+- L5 semantic key `(scope, scope_id, claim_type)` → content hashes → exact fetch. No false L5 without catalog.
+- Source health persists; 0.0 success stays 0.0; HALF_OPEN is one trial; CELF expectedGain uses routed health.
+- Market execution matrix stages are proven from runtime contracts; 19/19 ACTIVE complete.
+- Incremental Research OS: static graphs reused when the HAR fingerprint matches; facts/catalog/cache reused when claims fingerprint matches; acquisition rebuilt only when frontier fingerprint changes; requirement bitmaps cover the full request set.
+- ParameterSnapshot cache by projectionId, invalidated on material refresh. Stage telemetry HAR/RESEARCH/MODEL/RANK/FREEZE.
+
+Measured: 435 pytest passed; inventory 272/1945 hash `d25db58371c5acd9cb85d377373ff71c08616f20e91dea82ab77c31193375686`.
+Engineering synthetic throughput (not certified): 100 rows 8.05s / 170MB; 1000 rows 131.6s / 1446MB. Improved vs the prior freeze-gate snapshot, still above the original ~96s/932MB 1000-row engineering baseline because semantic work is now real.
+
+Verdict: `CFB_REFERENCE_IMPLEMENTATION_SOFTWARE_COMPLETE` for the declared CFB software path. Current-HAR operational acceptance remains pending external input. Host-performance uncertified. Do not merge to main.
+
 ## P380X Tranche A/B status
 
 Tranche A accounts for all 58 principal donor components without activating any of them. Exact donor ZIP bytes were not available, so the recorded archive state is `EXACT_ARCHIVE_BYTES_UNAVAILABLE`; the disposition matrix is doctrine/reference data outside the runtime package.

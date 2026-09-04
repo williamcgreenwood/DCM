@@ -1,6 +1,6 @@
 {
-  "contentHash": "5c6889973fc05662a469b1f912469c164775e765c6916f9e7a1f37b23c64f5de",
-  "moduleCount": 270,
+  "contentHash": "d25db58371c5acd9cb85d377373ff71c08616f20e91dea82ab77c31193375686",
+  "moduleCount": 272,
   "modules": [
     {
       "classes": 0,
@@ -2204,7 +2204,7 @@
       "classes": 0,
       "functions": 4,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/cfb/frontier.py",
-      "sha256": "018b54706c19389e383b092de6b97ef669494b346e1fc543db5a86064b685b54",
+      "sha256": "9b786402e825762917d806e3b21a8f3b53507433f5432858a891b29ad3984501",
       "symbols": [
         {
           "doc": null,
@@ -2224,7 +2224,7 @@
         },
         {
           "doc": "Utility(action) = fanout \u00d7 materiality \u00d7 P(success) \u00d7 authority / cost.",
-          "endLine": 60,
+          "endLine": 61,
           "kind": "function",
           "line": 40,
           "name": "estimate_action_evsi",
@@ -2232,9 +2232,9 @@
         },
         {
           "doc": null,
-          "endLine": 223,
+          "endLine": 266,
           "kind": "function",
-          "line": 63,
+          "line": 64,
           "name": "run_frontier_loop",
           "qualname": "run_frontier_loop"
         }
@@ -2276,9 +2276,9 @@
     },
     {
       "classes": 0,
-      "functions": 5,
+      "functions": 9,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/cfb/launch.py",
-      "sha256": "bd2667ede35ce94a10f24e710902592a7b16b1566dc2e68537c0c6589cf6a6ac",
+      "sha256": "e7395dd040cf8526d51580f46c2b3d3eb2f019a331378aa60d3a972cd4bbcc82",
       "symbols": [
         {
           "doc": null,
@@ -2289,34 +2289,66 @@
           "qualname": "_write"
         },
         {
-          "doc": "Emit graphs, indexes, and live AcquisitionActions BEFORE web acquisition.",
-          "endLine": 241,
+          "doc": null,
+          "endLine": 50,
           "kind": "function",
           "line": 46,
+          "name": "_board_fingerprint",
+          "qualname": "_board_fingerprint"
+        },
+        {
+          "doc": null,
+          "endLine": 58,
+          "kind": "function",
+          "line": 53,
+          "name": "_claims_fingerprint",
+          "qualname": "_claims_fingerprint"
+        },
+        {
+          "doc": null,
+          "endLine": 62,
+          "kind": "function",
+          "line": 61,
+          "name": "_frontier_fingerprint",
+          "qualname": "_frontier_fingerprint"
+        },
+        {
+          "doc": null,
+          "endLine": 72,
+          "kind": "function",
+          "line": 65,
+          "name": "_load_json",
+          "qualname": "_load_json"
+        },
+        {
+          "doc": "Emit graphs, indexes, and live AcquisitionActions BEFORE web acquisition.",
+          "endLine": 387,
+          "kind": "function",
+          "line": 75,
           "name": "prepare_cfb_research_os",
           "qualname": "prepare_cfb_research_os"
         },
         {
           "doc": null,
-          "endLine": 250,
+          "endLine": 396,
           "kind": "function",
-          "line": 244,
+          "line": 390,
           "name": "attach_cfb_prop_flags",
           "qualname": "attach_cfb_prop_flags"
         },
         {
           "doc": null,
-          "endLine": 416,
+          "endLine": 589,
           "kind": "function",
-          "line": 253,
+          "line": 399,
           "name": "emit_cfb_forecast_artifacts",
           "qualname": "emit_cfb_forecast_artifacts"
         },
         {
           "doc": null,
-          "endLine": 425,
+          "endLine": 598,
           "kind": "function",
-          "line": 419,
+          "line": 592,
           "name": "persist_algorithm_telemetry",
           "qualname": "persist_algorithm_telemetry"
         }
@@ -2325,9 +2357,9 @@
     },
     {
       "classes": 0,
-      "functions": 6,
+      "functions": 9,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/cfb/markets.py",
-      "sha256": "e2fc66bb4a67a106b113ef98ed1351ffe22dd3b574c6bb4722e3c93c9a4b8842",
+      "sha256": "97db3f934ad7008d5ec69cdfd7d28f81a2c4a4a05f3c00a740d15be9520c9572",
       "symbols": [
         {
           "doc": null,
@@ -2370,10 +2402,34 @@
           "qualname": "contract_for"
         },
         {
-          "doc": "Machine-readable completeness of every ACTIVE CFB market's execution path.",
-          "endLine": 484,
+          "doc": null,
+          "endLine": 444,
           "kind": "function",
           "line": 438,
+          "name": "_prove_champion_producer",
+          "qualname": "_prove_champion_producer"
+        },
+        {
+          "doc": null,
+          "endLine": 453,
+          "kind": "function",
+          "line": 447,
+          "name": "_prove_parameter_snapshot",
+          "qualname": "_prove_parameter_snapshot"
+        },
+        {
+          "doc": null,
+          "endLine": 469,
+          "kind": "function",
+          "line": 456,
+          "name": "_prove_event_world_primitive",
+          "qualname": "_prove_event_world_primitive"
+        },
+        {
+          "doc": "Machine-readable completeness of every ACTIVE CFB market's execution path.",
+          "endLine": 526,
+          "kind": "function",
+          "line": 472,
           "name": "cfb_market_execution_matrix",
           "qualname": "cfb_market_execution_matrix"
         }
@@ -2382,39 +2438,55 @@
     },
     {
       "classes": 0,
-      "functions": 4,
+      "functions": 6,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/cfb/opportunity_ledger.py",
-      "sha256": "ccfce17ef7c26772fb6defa3907f0576d56ff036d7e6f91c71fb0ae88eeeaa08",
+      "sha256": "d8bf452f8e66a38bce19e4da5dad5981b796af921c8faca11d4dc462cc5cc485",
       "symbols": [
         {
           "doc": null,
-          "endLine": 24,
+          "endLine": 25,
           "kind": "function",
-          "line": 23,
+          "line": 24,
           "name": "_role",
           "qualname": "_role"
         },
         {
           "doc": null,
-          "endLine": 34,
+          "endLine": 35,
           "kind": "function",
-          "line": 27,
+          "line": 28,
           "name": "_mean",
           "qualname": "_mean"
         },
         {
-          "doc": "Absolute means, capped, never renormalized to 100% of the team pool.",
-          "endLine": 61,
+          "doc": null,
+          "endLine": 49,
           "kind": "function",
-          "line": 37,
+          "line": 38,
+          "name": "_support_n",
+          "qualname": "_support_n"
+        },
+        {
+          "doc": "Evidence-driven share of a team opportunity pool.",
+          "endLine": 141,
+          "kind": "function",
+          "line": 52,
+          "name": "estimate_opportunity_share",
+          "qualname": "estimate_opportunity_share"
+        },
+        {
+          "doc": "Absolute means, capped, never renormalized to 100% of the team pool.",
+          "endLine": 172,
+          "kind": "function",
+          "line": 144,
           "name": "allocate_counts",
           "qualname": "allocate_counts"
         },
         {
           "doc": "Return per-player counts plus residual buckets.",
-          "endLine": 124,
+          "endLine": 240,
           "kind": "function",
-          "line": 64,
+          "line": 175,
           "name": "allocate_team_opportunity",
           "qualname": "allocate_team_opportunity"
         }
@@ -2423,23 +2495,40 @@
     },
     {
       "classes": 0,
-      "functions": 2,
-      "path": "artifacts/dcm_v6_workstream_ab/dcm/cfb/refresh.py",
-      "sha256": "6c47d783389ba005ba2a29ef2b5ee6c9d93f2607445730c4f5f72c1897b6bba9",
+      "functions": 1,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/cfb/recompute.py",
+      "sha256": "c461caafeffaa3d3df714c9e0bed066f0cf5023e178de3cce318926a3f3f623c",
       "symbols": [
         {
           "doc": null,
-          "endLine": 61,
+          "endLine": 134,
           "kind": "function",
-          "line": 40,
-          "name": "_regrade",
-          "qualname": "_regrade"
-        },
+          "line": 19,
+          "name": "recompute_full_bundle",
+          "qualname": "recompute_full_bundle"
+        }
+      ],
+      "workstream": "UNMAPPED"
+    },
+    {
+      "classes": 0,
+      "functions": 2,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/cfb/refresh.py",
+      "sha256": "fb575a40af7f6d2ecf407cf744c2f68ae8f60c446d396e8ee80c0b2e31928851",
+      "symbols": [
         {
           "doc": null,
-          "endLine": 170,
+          "endLine": 54,
           "kind": "function",
-          "line": 64,
+          "line": 44,
+          "name": "_fact_field_value",
+          "qualname": "_fact_field_value"
+        },
+        {
+          "doc": "Classify line-only vs material. Never independently resimulate worlds.",
+          "endLine": 190,
+          "kind": "function",
+          "line": 57,
           "name": "apply_final_refresh",
           "qualname": "apply_final_refresh"
         }
@@ -5369,7 +5458,7 @@
       "classes": 1,
       "functions": 8,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/model/market_derive.py",
-      "sha256": "928e7e24516d4dba8397e4a219f8c961d739814dc80fa647336dbba389d66737",
+      "sha256": "46bc71050d504effbbd715751187736e7768afcfbbe53c36cedabbc20bd844b9",
       "symbols": [
         {
           "doc": "Unknown or unverified market. Fail closed \u2014 never nearest-match.",
@@ -5389,7 +5478,7 @@
         },
         {
           "doc": "Exact alias lookup. Returns None when the key is not registered.",
-          "endLine": 180,
+          "endLine": 186,
           "kind": "function",
           "line": 173,
           "name": "canonicalize_market",
@@ -5397,49 +5486,49 @@
         },
         {
           "doc": null,
-          "endLine": 184,
+          "endLine": 190,
           "kind": "function",
-          "line": 183,
+          "line": 189,
           "name": "is_registered",
           "qualname": "is_registered"
         },
         {
           "doc": null,
-          "endLine": 192,
+          "endLine": 198,
           "kind": "function",
-          "line": 187,
+          "line": 193,
           "name": "looks_like_basketball_ledger",
           "qualname": "looks_like_basketball_ledger"
         },
         {
           "doc": null,
-          "endLine": 199,
+          "endLine": 205,
           "kind": "function",
-          "line": 195,
+          "line": 201,
           "name": "looks_like_gridiron_ledger",
           "qualname": "looks_like_gridiron_ledger"
         },
         {
           "doc": null,
-          "endLine": 206,
+          "endLine": 212,
           "kind": "function",
-          "line": 202,
+          "line": 208,
           "name": "_num",
           "qualname": "_num"
         },
         {
           "doc": null,
-          "endLine": 250,
+          "endLine": 256,
           "kind": "function",
-          "line": 209,
+          "line": 215,
           "name": "_formulas",
           "qualname": "_formulas"
         },
         {
           "doc": "Map a ledger + market key to a scalar. Never independently samples.",
-          "endLine": 289,
+          "endLine": 295,
           "kind": "function",
-          "line": 265,
+          "line": 271,
           "name": "derive_market",
           "qualname": "derive_market"
         }
@@ -5450,69 +5539,69 @@
       "classes": 0,
       "functions": 8,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/model/parameters.py",
-      "sha256": "636cef73fa46857e69cc694f29bfd75cba3a8eeb28e0a5edfc38608460dd1321",
+      "sha256": "4495ef7f3a100116354ac749fd542ae816375158fac1b389738cecca8c5650e4",
       "symbols": [
         {
           "doc": null,
-          "endLine": 41,
+          "endLine": 42,
           "kind": "function",
-          "line": 36,
+          "line": 37,
           "name": "_f",
           "qualname": "_f"
         },
         {
           "doc": null,
-          "endLine": 49,
+          "endLine": 50,
           "kind": "function",
-          "line": 44,
+          "line": 45,
           "name": "_pairs",
           "qualname": "_pairs"
         },
         {
           "doc": null,
-          "endLine": 56,
+          "endLine": 57,
           "kind": "function",
-          "line": 52,
+          "line": 53,
           "name": "_merge",
           "qualname": "_merge"
         },
         {
           "doc": null,
-          "endLine": 68,
+          "endLine": 69,
           "kind": "function",
-          "line": 59,
+          "line": 60,
           "name": "_avg",
           "qualname": "_avg"
         },
         {
           "doc": null,
-          "endLine": 78,
+          "endLine": 79,
           "kind": "function",
-          "line": 71,
+          "line": 72,
           "name": "_sd",
           "qualname": "_sd"
         },
         {
           "doc": null,
-          "endLine": 86,
+          "endLine": 87,
           "kind": "function",
-          "line": 81,
+          "line": 82,
           "name": "_shrink",
           "qualname": "_shrink"
         },
         {
           "doc": null,
-          "endLine": 651,
+          "endLine": 675,
           "kind": "function",
-          "line": 89,
+          "line": 90,
           "name": "build_parameter_snapshot",
           "qualname": "build_parameter_snapshot"
         },
         {
           "doc": null,
-          "endLine": 289,
+          "endLine": 312,
           "kind": "method",
-          "line": 286,
+          "line": 309,
           "name": "_rate_claimed",
           "qualname": "build_parameter_snapshot._rate_claimed"
         }
@@ -6271,45 +6360,45 @@
       "classes": 0,
       "functions": 5,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/acquisition.py",
-      "sha256": "59a3142d44d4e73de258a423bffecdcdf98471d9536c2d623b72d9407df58cc7",
+      "sha256": "b7a98b622f8d348c36e88b85ac474768b0dcd3d6770eb9cfc0289cc904319f6e",
       "symbols": [
         {
           "doc": null,
-          "endLine": 48,
+          "endLine": 49,
           "kind": "function",
-          "line": 47,
+          "line": 48,
           "name": "_req_id",
           "qualname": "_req_id"
         },
         {
           "doc": "Group reusable-entity requests into fan-out AcquisitionActions.",
-          "endLine": 207,
+          "endLine": 225,
           "kind": "function",
-          "line": 51,
+          "line": 52,
           "name": "build_acquisition_actions",
           "qualname": "build_acquisition_actions"
         },
         {
           "doc": "Live CELF selector with set-cover + constrained batch packing.",
-          "endLine": 334,
+          "endLine": 352,
           "kind": "function",
-          "line": 210,
+          "line": 228,
           "name": "schedule_acquisition_actions",
           "qualname": "schedule_acquisition_actions"
         },
         {
           "doc": null,
-          "endLine": 252,
+          "endLine": 270,
           "kind": "method",
-          "line": 244,
+          "line": 262,
           "name": "gain_fn",
           "qualname": "schedule_acquisition_actions.gain_fn"
         },
         {
           "doc": null,
-          "endLine": 255,
+          "endLine": 273,
           "kind": "method",
-          "line": 254,
+          "line": 272,
           "name": "cost_fn",
           "qualname": "schedule_acquisition_actions.cost_fn"
         }
@@ -7192,9 +7281,9 @@
     },
     {
       "classes": 1,
-      "functions": 9,
+      "functions": 10,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/cache_layers.py",
-      "sha256": "e399e26644aa5ef165b9c1059c9142f3f2bf8b51ceaecccfa2843e47894ffb34",
+      "sha256": "cd4dd4f21a79fb0562c075bbafbb45230a2edb0abf62832e5414febe69ba3de3",
       "symbols": [
         {
           "doc": null,
@@ -7206,7 +7295,7 @@
         },
         {
           "doc": "Exact-first reuse. Web acquisition is L6 and never the first lookup.",
-          "endLine": 224,
+          "endLine": 248,
           "kind": "class",
           "line": 45,
           "name": "ResearchCacheCascade",
@@ -7222,7 +7311,7 @@
         },
         {
           "doc": null,
-          "endLine": 88,
+          "endLine": 94,
           "kind": "method",
           "line": 69,
           "name": "put",
@@ -7230,49 +7319,57 @@
         },
         {
           "doc": null,
-          "endLine": 137,
+          "endLine": 152,
           "kind": "method",
-          "line": 90,
+          "line": 96,
           "name": "get",
           "qualname": "ResearchCacheCascade.get"
         },
         {
           "doc": "L4 bitemporal catalog: latest payload with asof <= as_of.",
-          "endLine": 162,
+          "endLine": 177,
           "kind": "method",
-          "line": 139,
+          "line": 154,
           "name": "get_asof",
           "qualname": "ResearchCacheCascade.get_asof"
         },
         {
           "doc": null,
-          "endLine": 196,
+          "endLine": 211,
           "kind": "method",
-          "line": 164,
+          "line": 179,
           "name": "disposition",
           "qualname": "ResearchCacheCascade.disposition"
         },
         {
           "doc": null,
-          "endLine": 218,
+          "endLine": 233,
           "kind": "method",
-          "line": 198,
+          "line": 213,
           "name": "snapshot",
           "qualname": "ResearchCacheCascade.snapshot"
         },
         {
-          "doc": null,
-          "endLine": 224,
+          "doc": "Drop L0\u2013L4. L5 catalog (DriveObjectCatalog) is unchanged.",
+          "endLine": 242,
           "kind": "method",
-          "line": 220,
+          "line": 235,
+          "name": "clear_ephemeral",
+          "qualname": "ResearchCacheCascade.clear_ephemeral"
+        },
+        {
+          "doc": null,
+          "endLine": 248,
+          "kind": "method",
+          "line": 244,
           "name": "close",
           "qualname": "ResearchCacheCascade.close"
         },
         {
           "doc": null,
-          "endLine": 230,
+          "endLine": 254,
           "kind": "function",
-          "line": 227,
+          "line": 251,
           "name": "content_address_bytes",
           "qualname": "content_address_bytes"
         }
@@ -8209,11 +8306,11 @@
       "classes": 2,
       "functions": 19,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/indexes.py",
-      "sha256": "6df534acb8a26efad42a8794f155b6bbe8a0447326336300349c7e1d77c634d8",
+      "sha256": "de0365734bd5131ffa17e84dab999fe53f62c4535b47be3fc2245f3010eeff8b",
       "symbols": [
         {
           "doc": "Exact indexes over a frozen board. No repeated full-board linear scans.",
-          "endLine": 395,
+          "endLine": 381,
           "kind": "class",
           "line": 30,
           "name": "BoardIndexes",
@@ -8308,8 +8405,8 @@
           "qualname": "BoardIndexes.query_retrieval_cascade"
         },
         {
-          "doc": "Exact-first identity. Fuzzy/FTS/cascade only when projectionId misses.",
-          "endLine": 389,
+          "doc": "Exact-first identity. Known projectionId \u2192 hash lookup \u2192 done.",
+          "endLine": 375,
           "kind": "method",
           "line": 290,
           "name": "resolve_identities",
@@ -8317,65 +8414,65 @@
         },
         {
           "doc": null,
-          "endLine": 395,
+          "endLine": 381,
           "kind": "method",
-          "line": 391,
+          "line": 377,
           "name": "close",
           "qualname": "BoardIndexes.close"
         },
         {
           "doc": "Exact reusable-evidence lookup. Web acquisition is last.",
-          "endLine": 442,
+          "endLine": 428,
           "kind": "class",
-          "line": 398,
+          "line": 384,
           "name": "EvidenceIndexes",
           "qualname": "EvidenceIndexes"
         },
         {
           "doc": null,
-          "endLine": 409,
+          "endLine": 395,
           "kind": "method",
-          "line": 401,
+          "line": 387,
           "name": "__init__",
           "qualname": "EvidenceIndexes.__init__"
         },
         {
           "doc": null,
-          "endLine": 425,
+          "endLine": 411,
           "kind": "method",
-          "line": 411,
+          "line": 397,
           "name": "add",
           "qualname": "EvidenceIndexes.add"
         },
         {
           "doc": null,
-          "endLine": 430,
+          "endLine": 416,
           "kind": "method",
-          "line": 427,
+          "line": 413,
           "name": "lookup_scope",
           "qualname": "EvidenceIndexes.lookup_scope"
         },
         {
           "doc": null,
-          "endLine": 436,
+          "endLine": 422,
           "kind": "method",
-          "line": 432,
+          "line": 418,
           "name": "has_hash",
           "qualname": "EvidenceIndexes.has_hash"
         },
         {
           "doc": null,
-          "endLine": 442,
+          "endLine": 428,
           "kind": "method",
-          "line": 438,
+          "line": 424,
           "name": "close",
           "qualname": "EvidenceIndexes.close"
         },
         {
           "doc": "Reverse index Requirement \u2192 Offers as Python bitsets plus id lists.",
-          "endLine": 469,
+          "endLine": 455,
           "kind": "function",
-          "line": 445,
+          "line": 431,
           "name": "requirement_offer_bitmaps",
           "qualname": "requirement_offer_bitmaps"
         }
@@ -8417,105 +8514,121 @@
     },
     {
       "classes": 0,
-      "functions": 12,
+      "functions": 14,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/material_facts.py",
-      "sha256": "d1160466d2b4cee2c8bff311556c26e09ae4ec0f62c488132e941b89e492071b",
+      "sha256": "3616076156a5554d75e0b19e0c8979149ff6a08bef43957852f5af71ab698590",
       "symbols": [
         {
           "doc": null,
-          "endLine": 35,
+          "endLine": 54,
           "kind": "function",
-          "line": 30,
+          "line": 49,
           "name": "_authority",
           "qualname": "_authority"
         },
         {
           "doc": null,
-          "endLine": 42,
+          "endLine": 61,
           "kind": "function",
-          "line": 38,
+          "line": 57,
           "name": "_freshness",
           "qualname": "_freshness"
         },
         {
           "doc": null,
-          "endLine": 60,
+          "endLine": 79,
           "kind": "function",
-          "line": 45,
+          "line": 64,
           "name": "parse_ts",
           "qualname": "parse_ts"
         },
         {
           "doc": "True when observed is strictly after cutoff. ISO-normalized, not naive strings.",
-          "endLine": 71,
+          "endLine": 90,
           "kind": "function",
-          "line": 63,
+          "line": 82,
           "name": "is_after_cutoff",
           "qualname": "is_after_cutoff"
         },
         {
           "doc": null,
-          "endLine": 78,
+          "endLine": 97,
           "kind": "function",
-          "line": 74,
+          "line": 93,
           "name": "_fact_key",
           "qualname": "_fact_key"
         },
         {
           "doc": null,
-          "endLine": 176,
+          "endLine": 201,
           "kind": "function",
-          "line": 81,
+          "line": 100,
           "name": "resolve_material_facts",
           "qualname": "resolve_material_facts"
         },
         {
           "doc": "MaterialFactResolution \u2192 FeatureRecords with provenance.",
-          "endLine": 240,
+          "endLine": 293,
           "kind": "function",
-          "line": 179,
+          "line": 204,
           "name": "facts_to_features",
           "qualname": "facts_to_features"
         },
         {
           "doc": "Overlay resolved facts onto a player/event parameter context. Never post-cutoff.",
-          "endLine": 252,
+          "endLine": 305,
           "kind": "function",
-          "line": 243,
+          "line": 296,
           "name": "apply_facts_to_context",
           "qualname": "apply_facts_to_context"
         },
         {
           "doc": null,
-          "endLine": 264,
+          "endLine": 317,
           "kind": "function",
-          "line": 255,
+          "line": 308,
           "name": "_feature_family",
           "qualname": "_feature_family"
         },
         {
           "doc": "Subject/event/affiliation ids whose unresolved conflicts hold PLAYABLE.",
-          "endLine": 277,
+          "endLine": 330,
           "kind": "function",
-          "line": 267,
+          "line": 320,
           "name": "hold_playable_scope_ids",
           "qualname": "hold_playable_scope_ids"
         },
         {
           "doc": "Demote PLAYABLE when a material conflict is unresolved. Never raises P.",
-          "endLine": 297,
+          "endLine": 350,
           "kind": "function",
-          "line": 280,
+          "line": 333,
           "name": "apply_hold_playable",
           "qualname": "apply_hold_playable"
         },
         {
           "doc": null,
-          "endLine": 307,
+          "endLine": 360,
           "kind": "function",
-          "line": 300,
+          "line": 353,
           "name": "json_safe_value",
           "qualname": "json_safe_value"
+        },
+        {
+          "doc": "Overlay resolved FeatureRecords onto modeling packets BEFORE RoleEpoch/fit.",
+          "endLine": 454,
+          "kind": "function",
+          "line": 363,
+          "name": "apply_fact_features_to_packets",
+          "qualname": "apply_fact_features_to_packets"
+        },
+        {
+          "doc": "Index MaterialFacts by (scope, scopeId, claimType-or-field). Never latest-claim-wins across types.",
+          "endLine": 474,
+          "kind": "function",
+          "line": 457,
+          "name": "facts_for_refresh",
+          "qualname": "facts_for_refresh"
         }
       ],
       "workstream": "P1"
@@ -9661,9 +9774,9 @@
     },
     {
       "classes": 1,
-      "functions": 12,
+      "functions": 17,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/source_health.py",
-      "sha256": "80d1ad5a95ceee9efceecf49f3f625a75e0f66cd7e9fa57006a5386c0c0d8c57",
+      "sha256": "1abbf374969b5c7952113dcf9cbbec1ed0dd47997fe2bb3ef51f1f78b3a974ad",
       "symbols": [
         {
           "doc": null,
@@ -9691,7 +9804,7 @@
         },
         {
           "doc": "Claim-specific source routing with circuit breakers and bounded fallbacks.",
-          "endLine": 208,
+          "endLine": 265,
           "kind": "class",
           "line": 42,
           "name": "SourceHealthRegistry",
@@ -9707,7 +9820,7 @@
         },
         {
           "doc": null,
-          "endLine": 93,
+          "endLine": 109,
           "kind": "method",
           "line": 59,
           "name": "_ensure",
@@ -9715,57 +9828,97 @@
         },
         {
           "doc": null,
-          "endLine": 103,
+          "endLine": 116,
           "kind": "method",
-          "line": 95,
+          "line": 111,
+          "name": "_set_success_probability",
+          "qualname": "SourceHealthRegistry._set_success_probability"
+        },
+        {
+          "doc": null,
+          "endLine": 124,
+          "kind": "method",
+          "line": 118,
+          "name": "success_probability",
+          "qualname": "SourceHealthRegistry.success_probability"
+        },
+        {
+          "doc": null,
+          "endLine": 134,
+          "kind": "method",
+          "line": 126,
           "name": "_refresh_circuit",
           "qualname": "SourceHealthRegistry._refresh_circuit"
         },
         {
           "doc": null,
-          "endLine": 125,
+          "endLine": 155,
           "kind": "method",
-          "line": 105,
+          "line": 136,
           "name": "record_success",
           "qualname": "SourceHealthRegistry.record_success"
         },
         {
           "doc": null,
-          "endLine": 143,
+          "endLine": 172,
           "kind": "method",
-          "line": 127,
+          "line": 157,
           "name": "record_failure",
           "qualname": "SourceHealthRegistry.record_failure"
         },
         {
           "doc": "Traverse fallbackSourceIds, skipping currently OPEN circuits.",
-          "endLine": 161,
+          "endLine": 190,
           "kind": "method",
-          "line": 145,
+          "line": 174,
           "name": "fallbacks",
           "qualname": "SourceHealthRegistry.fallbacks"
         },
         {
           "doc": "Prefer official/structured, then stats, then reporting, search last.",
-          "endLine": 189,
+          "endLine": 223,
           "kind": "method",
-          "line": 163,
+          "line": 192,
           "name": "route",
           "qualname": "SourceHealthRegistry.route"
         },
         {
           "doc": null,
-          "endLine": 208,
+          "endLine": 242,
           "kind": "method",
-          "line": 191,
+          "line": 225,
           "name": "snapshot",
           "qualname": "SourceHealthRegistry.snapshot"
         },
         {
-          "doc": "CFB catalog. Never routes college football through a pro-football adapter.",
-          "endLine": 251,
+          "doc": "Overlay persisted counters/circuits onto the live catalog. Never invent 0.85.",
+          "endLine": 265,
+          "kind": "method",
+          "line": 244,
+          "name": "load_snapshot",
+          "qualname": "SourceHealthRegistry.load_snapshot"
+        },
+        {
+          "doc": "Write the live source-health snapshot so later research passes restore it.",
+          "endLine": 280,
           "kind": "function",
-          "line": 211,
+          "line": 268,
+          "name": "persist_cfb_source_health",
+          "qualname": "persist_cfb_source_health"
+        },
+        {
+          "doc": "Restore persisted source-health counters/circuits. Missing file \u2192 default catalog.",
+          "endLine": 301,
+          "kind": "function",
+          "line": 283,
+          "name": "load_cfb_source_health",
+          "qualname": "load_cfb_source_health"
+        },
+        {
+          "doc": "CFB catalog. Never routes college football through a pro-football adapter.",
+          "endLine": 344,
+          "kind": "function",
+          "line": 304,
           "name": "default_cfb_source_health",
           "qualname": "default_cfb_source_health"
         }
@@ -10302,93 +10455,93 @@
       "classes": 0,
       "functions": 11,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/runner.py",
-      "sha256": "f5170eb9f9e797c53fd03156c8c953a88e1c1eb9fb2b6fb2b2fffa80342375bc",
+      "sha256": "f4f53a3a44cc567a6ba09e3253827b5bec1840bc1c3c9d3063c2fa5397245806",
       "symbols": [
         {
           "doc": "Always write dest/audit/. Optionally copy+commit+push a GitHub pack.",
-          "endLine": 164,
+          "endLine": 165,
           "kind": "function",
-          "line": 108,
+          "line": 109,
           "name": "_finalize_archive",
           "qualname": "_finalize_archive"
         },
         {
           "doc": null,
-          "endLine": 177,
+          "endLine": 178,
           "kind": "function",
-          "line": 168,
+          "line": 169,
           "name": "_synthetic_path",
           "qualname": "_synthetic_path"
         },
         {
           "doc": null,
-          "endLine": 182,
+          "endLine": 183,
           "kind": "function",
-          "line": 181,
+          "line": 182,
           "name": "_run_id",
           "qualname": "_run_id"
         },
         {
           "doc": "Best-effort git HEAD. Never writes git config. Missing git is None, not a crash.",
-          "endLine": 202,
+          "endLine": 203,
           "kind": "function",
-          "line": 185,
+          "line": 186,
           "name": "_git_commit_sha",
           "qualname": "_git_commit_sha"
         },
         {
           "doc": null,
-          "endLine": 213,
+          "endLine": 214,
           "kind": "function",
-          "line": 205,
+          "line": 206,
           "name": "_default_model_config",
           "qualname": "_default_model_config"
         },
         {
           "doc": null,
-          "endLine": 222,
+          "endLine": 223,
           "kind": "function",
-          "line": 216,
+          "line": 217,
           "name": "_active_calibration",
           "qualname": "_active_calibration"
         },
         {
           "doc": null,
-          "endLine": 1469,
+          "endLine": 1656,
           "kind": "function",
-          "line": 225,
+          "line": 226,
           "name": "run_dcm",
           "qualname": "run_dcm"
         },
         {
           "doc": null,
-          "endLine": 668,
+          "endLine": 685,
           "kind": "method",
-          "line": 661,
+          "line": 662,
           "name": "_snapshot_for",
           "qualname": "run_dcm._snapshot_for"
         },
         {
           "doc": null,
-          "endLine": 1026,
+          "endLine": 1027,
           "kind": "method",
-          "line": 1011,
+          "line": 1025,
           "name": "_resimulate_material",
           "qualname": "run_dcm._resimulate_material"
         },
         {
           "doc": null,
-          "endLine": 1112,
+          "endLine": 1254,
           "kind": "method",
-          "line": 1074,
+          "line": 1216,
           "name": "slim",
           "qualname": "run_dcm.slim"
         },
         {
           "doc": null,
-          "endLine": 1587,
+          "endLine": 1774,
           "kind": "function",
-          "line": 1472,
+          "line": 1659,
           "name": "main",
           "qualname": "main"
         }
@@ -10730,13 +10883,13 @@
     },
     {
       "classes": 1,
-      "functions": 6,
+      "functions": 10,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/runtime/drive_catalog.py",
-      "sha256": "d63a886b8e72afd13ea29fa250eea46fdd7fec6ff9eb7c35d12c2d0dad294653",
+      "sha256": "7b5c6e83f78c6534850f3bdaa23bf1779f5da8f38b715b6c00caef332befd4d1",
       "symbols": [
         {
           "doc": "Content-addressed local catalog of objects that *would* live on Drive.",
-          "endLine": 77,
+          "endLine": 158,
           "kind": "class",
           "line": 21,
           "name": "DriveObjectCatalog",
@@ -10744,51 +10897,83 @@
         },
         {
           "doc": null,
-          "endLine": 28,
+          "endLine": 35,
           "kind": "method",
-          "line": 24,
+          "line": 28,
           "name": "__init__",
           "qualname": "DriveObjectCatalog.__init__"
         },
         {
           "doc": null,
-          "endLine": 34,
+          "endLine": 38,
           "kind": "method",
-          "line": 30,
+          "line": 37,
+          "name": "_semantic_key",
+          "qualname": "DriveObjectCatalog._semantic_key"
+        },
+        {
+          "doc": null,
+          "endLine": 54,
+          "kind": "method",
+          "line": 40,
+          "name": "_index_semantic",
+          "qualname": "DriveObjectCatalog._index_semantic"
+        },
+        {
+          "doc": null,
+          "endLine": 61,
+          "kind": "method",
+          "line": 56,
           "name": "put",
           "qualname": "DriveObjectCatalog.put"
         },
         {
-          "doc": "Exact local identification. Does not fetch Drive.",
-          "endLine": 44,
+          "doc": "Ordered content hashes for a semantic key. Empty if unknown.",
+          "endLine": 65,
           "kind": "method",
-          "line": 36,
+          "line": 63,
+          "name": "lookup_semantic",
+          "qualname": "DriveObjectCatalog.lookup_semantic"
+        },
+        {
+          "doc": "Exact local identification. Does not fetch Drive.",
+          "endLine": 75,
+          "kind": "method",
+          "line": 67,
           "name": "identify",
           "qualname": "DriveObjectCatalog.identify"
         },
         {
           "doc": null,
-          "endLine": 58,
+          "endLine": 89,
           "kind": "method",
-          "line": 46,
+          "line": 77,
           "name": "fetch",
           "qualname": "DriveObjectCatalog.fetch"
         },
         {
           "doc": null,
-          "endLine": 70,
+          "endLine": 102,
           "kind": "method",
-          "line": 60,
+          "line": 91,
           "name": "snapshot",
           "qualname": "DriveObjectCatalog.snapshot"
         },
         {
           "doc": null,
-          "endLine": 77,
+          "endLine": 131,
           "kind": "method",
-          "line": 72,
+          "line": 104,
           "name": "persist",
           "qualname": "DriveObjectCatalog.persist"
+        },
+        {
+          "doc": null,
+          "endLine": 158,
+          "kind": "method",
+          "line": 133,
+          "name": "_load",
+          "qualname": "DriveObjectCatalog._load"
         }
       ],
       "workstream": "P5-P14"
@@ -13317,6 +13502,223 @@
     },
     {
       "classes": 0,
+      "functions": 26,
+      "path": "artifacts/dcm_v6_workstream_ab/tests/test_cfb_freeze_gate.py",
+      "sha256": "950745fc4147c98a8eef57a06b4cef558bd10f86180cd611e63ed031b1bad323",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 47,
+          "kind": "function",
+          "line": 29,
+          "name": "_logs",
+          "qualname": "_logs"
+        },
+        {
+          "doc": null,
+          "endLine": 56,
+          "kind": "function",
+          "line": 50,
+          "name": "_cfb_row",
+          "qualname": "_cfb_row"
+        },
+        {
+          "doc": null,
+          "endLine": 80,
+          "kind": "function",
+          "line": 59,
+          "name": "_claims",
+          "qualname": "_claims"
+        },
+        {
+          "doc": null,
+          "endLine": 96,
+          "kind": "function",
+          "line": 83,
+          "name": "test_material_fact_changes_fitted_snapshot_hash_and_role",
+          "qualname": "test_material_fact_changes_fitted_snapshot_hash_and_role"
+        },
+        {
+          "doc": null,
+          "endLine": 109,
+          "kind": "function",
+          "line": 99,
+          "name": "test_material_status_changes_snapshot_and_availability",
+          "qualname": "test_material_status_changes_snapshot_and_availability"
+        },
+        {
+          "doc": null,
+          "endLine": 120,
+          "kind": "function",
+          "line": 112,
+          "name": "test_lone_rb_uses_shared_residual_event_world",
+          "qualname": "test_lone_rb_uses_shared_residual_event_world"
+        },
+        {
+          "doc": null,
+          "endLine": 129,
+          "kind": "function",
+          "line": 123,
+          "name": "test_lone_qb_uses_shared_event_world",
+          "qualname": "test_lone_qb_uses_shared_event_world"
+        },
+        {
+          "doc": null,
+          "endLine": 141,
+          "kind": "function",
+          "line": 132,
+          "name": "test_kicker_remains_isolated",
+          "qualname": "test_kicker_remains_isolated"
+        },
+        {
+          "doc": null,
+          "endLine": 153,
+          "kind": "function",
+          "line": 144,
+          "name": "test_starter_qb_not_blindly_capped_at_92",
+          "qualname": "test_starter_qb_not_blindly_capped_at_92"
+        },
+        {
+          "doc": null,
+          "endLine": 163,
+          "kind": "function",
+          "line": 156,
+          "name": "test_conservation_holds_with_residuals",
+          "qualname": "test_conservation_holds_with_residuals"
+        },
+        {
+          "doc": null,
+          "endLine": 194,
+          "kind": "function",
+          "line": 166,
+          "name": "test_material_refresh_rebuild_keys_and_full_bundle_can_flip_direction",
+          "qualname": "test_material_refresh_rebuild_keys_and_full_bundle_can_flip_direction"
+        },
+        {
+          "doc": null,
+          "endLine": 220,
+          "kind": "function",
+          "line": 197,
+          "name": "test_material_refresh_can_change_ranking",
+          "qualname": "test_material_refresh_can_change_ranking"
+        },
+        {
+          "doc": null,
+          "endLine": 236,
+          "kind": "function",
+          "line": 223,
+          "name": "test_frontier_required_cannot_freeze",
+          "qualname": "test_frontier_required_cannot_freeze"
+        },
+        {
+          "doc": null,
+          "endLine": 246,
+          "kind": "function",
+          "line": 239,
+          "name": "test_frontier_hash_change_increments_pass",
+          "qualname": "test_frontier_hash_change_increments_pass"
+        },
+        {
+          "doc": null,
+          "endLine": 262,
+          "kind": "function",
+          "line": 249,
+          "name": "test_unrelated_evidence_does_not_increment_pass",
+          "qualname": "test_unrelated_evidence_does_not_increment_pass"
+        },
+        {
+          "doc": null,
+          "endLine": 288,
+          "kind": "function",
+          "line": 265,
+          "name": "test_status_evidence_does_not_satisfy_game_history",
+          "qualname": "test_status_evidence_does_not_satisfy_game_history"
+        },
+        {
+          "doc": null,
+          "endLine": 304,
+          "kind": "function",
+          "line": 291,
+          "name": "test_exact_id_does_not_query_bloom_composite_sqlite",
+          "qualname": "test_exact_id_does_not_query_bloom_composite_sqlite"
+        },
+        {
+          "doc": null,
+          "endLine": 324,
+          "kind": "function",
+          "line": 307,
+          "name": "test_l5_semantic_to_content_address",
+          "qualname": "test_l5_semantic_to_content_address"
+        },
+        {
+          "doc": null,
+          "endLine": 335,
+          "kind": "function",
+          "line": 327,
+          "name": "test_source_health_zero_success_stays_zero",
+          "qualname": "test_source_health_zero_success_stays_zero"
+        },
+        {
+          "doc": null,
+          "endLine": 357,
+          "kind": "function",
+          "line": 338,
+          "name": "test_open_source_changes_routing_and_celf_gain",
+          "qualname": "test_open_source_changes_routing_and_celf_gain"
+        },
+        {
+          "doc": null,
+          "endLine": 370,
+          "kind": "function",
+          "line": 360,
+          "name": "test_half_open_is_one_trial",
+          "qualname": "test_half_open_is_one_trial"
+        },
+        {
+          "doc": null,
+          "endLine": 386,
+          "kind": "function",
+          "line": 373,
+          "name": "test_market_execution_matrix_not_hardcoded_and_all_active",
+          "qualname": "test_market_execution_matrix_not_hardcoded_and_all_active"
+        },
+        {
+          "doc": null,
+          "endLine": 393,
+          "kind": "function",
+          "line": 389,
+          "name": "test_runner_uses_joint_cfb_for_one_player",
+          "qualname": "test_runner_uses_joint_cfb_for_one_player"
+        },
+        {
+          "doc": null,
+          "endLine": 413,
+          "kind": "function",
+          "line": 396,
+          "name": "test_incremental_research_os_skips_static_rebuild",
+          "qualname": "test_incremental_research_os_skips_static_rebuild"
+        },
+        {
+          "doc": null,
+          "endLine": 428,
+          "kind": "function",
+          "line": 416,
+          "name": "test_warm_reuse_hits_l5_after_ephemeral_clear",
+          "qualname": "test_warm_reuse_hits_l5_after_ephemeral_clear"
+        },
+        {
+          "doc": null,
+          "endLine": 443,
+          "kind": "function",
+          "line": 431,
+          "name": "test_facts_hash_to_feature_hash_chain",
+          "qualname": "test_facts_hash_to_feature_hash_chain"
+        }
+      ],
+      "workstream": "UNMAPPED"
+    },
+    {
+      "classes": 0,
       "functions": 5,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_cfb_guarded_launch.py",
       "sha256": "9941457bc4c2872c631a9636b07e673bd1b45e3e54af3f0bb995770fe7ea12a8",
@@ -13634,7 +14036,7 @@
       "classes": 0,
       "functions": 17,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_cfb_semantic_completion.py",
-      "sha256": "cc1c9d053594ee2e7e9a1b9126fa10e7dfd825766a4ced968be4d122e9450540",
+      "sha256": "c9d94f42206f4e64f8c1b426fbb8e63f7a0c8aa8de6ef73ca0fb706a7ba588b0",
       "symbols": [
         {
           "doc": null,
@@ -13734,11 +14136,11 @@
         },
         {
           "doc": null,
-          "endLine": 233,
+          "endLine": 240,
           "kind": "function",
           "line": 206,
-          "name": "test_material_refresh_rebuilds_worlds",
-          "qualname": "test_material_refresh_rebuilds_worlds"
+          "name": "test_material_refresh_flags_rebuild_keys_without_resimulate",
+          "qualname": "test_material_refresh_flags_rebuild_keys_without_resimulate"
         },
         {
           "doc": null,
@@ -13746,29 +14148,29 @@
           "kind": "method",
           "line": 220,
           "name": "resim",
-          "qualname": "test_material_refresh_rebuilds_worlds.resim"
+          "qualname": "test_material_refresh_flags_rebuild_keys_without_resimulate.resim"
         },
         {
           "doc": null,
-          "endLine": 244,
+          "endLine": 251,
           "kind": "function",
-          "line": 236,
+          "line": 243,
           "name": "test_frontier_does_not_increment_on_generic_evidence",
           "qualname": "test_frontier_does_not_increment_on_generic_evidence"
         },
         {
           "doc": null,
-          "endLine": 264,
+          "endLine": 271,
           "kind": "function",
-          "line": 247,
+          "line": 254,
           "name": "test_isotonic_conformal_inactive_at_lr000000",
           "qualname": "test_isotonic_conformal_inactive_at_lr000000"
         },
         {
           "doc": null,
-          "endLine": 290,
+          "endLine": 297,
           "kind": "function",
-          "line": 267,
+          "line": 274,
           "name": "test_prepare_has_no_ceremonial_violations",
           "qualname": "test_prepare_has_no_ceremonial_violations"
         }
@@ -17576,5 +17978,5 @@
   "parseErrors": [],
   "root": "artifacts/dcm_v6_workstream_ab",
   "schema": "pillars_dcm.code_inventory.v1",
-  "symbolCount": 1897
+  "symbolCount": 1945
 }
