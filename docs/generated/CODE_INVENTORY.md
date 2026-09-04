@@ -2,10 +2,10 @@
 
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
-- Modules: **272**
-- Symbols: **1949**
+- Modules: **280**
+- Symbols: **1997**
 - Parse errors: **0**
-- Inventory hash: `93bf2cba429490decfdfd89dbce57973348e121ea521e63da40b0835d0117a1c`
+- Inventory hash: `8838c74b78c1e127a76ce44823873a40b51f5e5b6360ade620e414b5c470df41`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -42,6 +42,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/cfb/recompute.py` | 0 | 1 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/cfb/refresh.py` | 0 | 2 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/cfb/reports.py` | 0 | 11 |
+| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/cfb/rules.py` | 0 | 1 |
 | P7 | `artifacts/dcm_v6_workstream_ab/dcm/chat/__init__.py` | 0 | 0 |
 | P7 | `artifacts/dcm_v6_workstream_ab/dcm/chat/__main__.py` | 0 | 0 |
 | P7 | `artifacts/dcm_v6_workstream_ab/dcm/chat/archive.py` | 0 | 2 |
@@ -81,7 +82,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P6 | `artifacts/dcm_v6_workstream_ab/dcm/learning/sidecar.py` | 0 | 5 |
 | P6 | `artifacts/dcm_v6_workstream_ab/dcm/learning/walkforward.py` | 1 | 15 |
 | P2 | `artifacts/dcm_v6_workstream_ab/dcm/ml/__init__.py` | 0 | 0 |
-| P2 | `artifacts/dcm_v6_workstream_ab/dcm/ml/feature_store.py` | 1 | 8 |
+| P2 | `artifacts/dcm_v6_workstream_ab/dcm/ml/feature_store.py` | 1 | 9 |
 | P2-P4 | `artifacts/dcm_v6_workstream_ab/dcm/model/__init__.py` | 0 | 0 |
 | P2-P4 | `artifacts/dcm_v6_workstream_ab/dcm/model/availability.py` | 0 | 2 |
 | P2-P4 | `artifacts/dcm_v6_workstream_ab/dcm/model/basketball_efficiency.py` | 1 | 6 |
@@ -123,7 +124,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/authority.py` | 1 | 5 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/batch.py` | 0 | 4 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/cache.py` | 1 | 5 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/cache_layers.py` | 1 | 10 |
+| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/cache_layers.py` | 1 | 12 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/claims.py` | 0 | 3 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/classify.py` | 0 | 7 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/classify_runtime.py` | 0 | 2 |
@@ -140,7 +141,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/host_plan.py` | 0 | 1 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/indexes.py` | 2 | 19 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/lineup.py` | 0 | 3 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/material_facts.py` | 0 | 14 |
+| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/material_facts.py` | 0 | 20 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/os_graphs.py` | 0 | 8 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/player_offer_set.py` | 1 | 6 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/player_packet.py` | 0 | 13 |
@@ -152,7 +153,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/role_epoch.py` | 1 | 27 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/scopes.py` | 0 | 6 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/source_catalog.py` | 0 | 5 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/source_health.py` | 1 | 17 |
+| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/source_health.py` | 1 | 18 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/staged.py` | 0 | 5 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/statepack.py` | 4 | 26 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/subject_offer_set.py` | 1 | 10 |
@@ -163,7 +164,10 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/__init__.py` | 0 | 0 |
 | P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/archive_receipt.py` | 1 | 7 |
 | P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/benchmark.py` | 0 | 4 |
+| P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/capabilities.py` | 0 | 4 |
 | P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/checkpoint.py` | 0 | 3 |
+| P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/checkpoint_outbox.py` | 0 | 4 |
+| P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/checkpoint_reconciliation.py` | 0 | 2 |
 | P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/cutoff.py` | 1 | 4 |
 | P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/dag.py` | 2 | 13 |
 | P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/drive_catalog.py` | 1 | 10 |
@@ -171,6 +175,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/github_archive.py` | 0 | 38 |
 | P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/governor.py` | 1 | 4 |
 | P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/har_run.py` | 0 | 3 |
+| P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/input_boundary.py` | 0 | 7 |
 | P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/mount_v541.py` | 0 | 10 |
 | P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/perf.py` | 1 | 2 |
 | P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/pipeline.py` | 0 | 2 |
@@ -179,10 +184,12 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/store.py` | 1 | 4 |
 | P4 | `artifacts/dcm_v6_workstream_ab/dcm/selection/__init__.py` | 0 | 0 |
 | P4 | `artifacts/dcm_v6_workstream_ab/dcm/selection/card_layers.py` | 0 | 17 |
+| P4 | `artifacts/dcm_v6_workstream_ab/dcm/selection/decision_integrity.py` | 1 | 6 |
 | P4 | `artifacts/dcm_v6_workstream_ab/dcm/selection/eligibility.py` | 1 | 3 |
 | P4 | `artifacts/dcm_v6_workstream_ab/dcm/selection/portfolio.py` | 0 | 5 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/settle.py` | 0 | 1 |
 | P15 | `artifacts/dcm_v6_workstream_ab/dcm/signals/__init__.py` | 0 | 0 |
+| P15 | `artifacts/dcm_v6_workstream_ab/dcm/signals/cfb_runtime.py` | 0 | 3 |
 | P15 | `artifacts/dcm_v6_workstream_ab/dcm/signals/compiler.py` | 2 | 5 |
 | P15 | `artifacts/dcm_v6_workstream_ab/dcm/signals/contracts.py` | 5 | 8 |
 | P15 | `artifacts/dcm_v6_workstream_ab/dcm/signals/donor_accounting.py` | 1 | 2 |
@@ -228,6 +235,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_cfb_reference_implementation.py` | 0 | 20 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_cfb_research_os.py` | 0 | 11 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_cfb_semantic_completion.py` | 0 | 20 |
+| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_completion_context_runtime.py` | 0 | 9 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_e2e_runner.py` | 0 | 18 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_e2e_world_to_lineup.py` | 0 | 21 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_entity_packets.py` | 0 | 13 |
@@ -267,7 +275,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_research_population.py` | 0 | 3 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_research_store.py` | 0 | 9 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_role_epoch.py` | 0 | 9 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_runtime_lineage.py` | 0 | 5 |
+| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_runtime_lineage.py` | 0 | 6 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_schema_v2_fields.py` | 0 | 4 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_settlement_population.py` | 0 | 6 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_signal_governance.py` | 0 | 21 |
@@ -678,6 +686,10 @@ _No class/function symbols._
 - `function` **cfb_playables_final** L175
 - `function` **frontier_offer_ids** L211
 
+### `artifacts/dcm_v6_workstream_ab/dcm/cfb/rules.py`
+
+- `function` **build_cfb_rules_snapshot** L127
+
 ### `artifacts/dcm_v6_workstream_ab/dcm/chat/__init__.py`
 
 _No class/function symbols._
@@ -707,7 +719,7 @@ _No class/function symbols._
 - `function` **_load_observations** L23
 - `function` **_match_request** L53
 - `function` **observation_to_claim** L66
-- `function` **import_observations** L127
+- `function` **import_observations** L133
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/chat/report.py`
 
@@ -1034,15 +1046,16 @@ _No class/function symbols._
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/ml/feature_store.py`
 
-- `function` **signal_evaluation_feature_records** L76 — Canonical consumer for ACTIVE_FEATURE signal outputs.
-- `function` **_s** L112
-- `function` **feature_record** L116
-- `function` **_identity** L145
-- `function` **_logs_from_packet** L153
-- `class` **FeatureStore** L158 — Build cutoff-immutable feature records from a PlayerResearchPacket.
-- `method` **FeatureStore.build_from_packet** L165
-- `method` **FeatureStore.build_from_packet.add** L186
-- `function` **persist_feature_store** L260 — Write feature_store.jsonl + feature_store_manifest.json. Observations only.
+- `function` **signal_evaluation_feature_records** L77 — Canonical consumer for ACTIVE_FEATURE signal outputs.
+- `function` **_s** L113
+- `function` **feature_record** L117
+- `function` **_identity** L146
+- `function` **_logs_from_packet** L154
+- `class` **FeatureStore** L159 — Build cutoff-immutable feature records from a PlayerResearchPacket.
+- `method` **FeatureStore.build_from_packet** L166
+- `method` **FeatureStore.build_from_packet.add** L187
+- `function` **persist_feature_store** L261 — Write feature_store.jsonl + feature_store_manifest.json. Observations only.
+- `function` **merge_feature_records** L381 — Append deterministic runtime feature records and refresh the manifest.
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/model/__init__.py`
 
@@ -1433,23 +1446,25 @@ _No class/function symbols._
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/cache_layers.py`
 
-- `function` **_key** L41
-- `class` **ResearchCacheCascade** L45 — Exact-first reuse. Web acquisition is L6 and never the first lookup.
-- `method` **ResearchCacheCascade.__init__** L48
-- `method` **ResearchCacheCascade.put** L69
-- `method` **ResearchCacheCascade.get** L96
-- `method` **ResearchCacheCascade.get_asof** L154 — L4 bitemporal catalog: latest payload with asof <= as_of.
-- `method` **ResearchCacheCascade.disposition** L179
-- `method` **ResearchCacheCascade.snapshot** L213
-- `method` **ResearchCacheCascade.clear_ephemeral** L235 — Drop L0–L4. L5 catalog (DriveObjectCatalog) is unchanged.
-- `method` **ResearchCacheCascade.close** L244
-- `function` **content_address_bytes** L251
+- `function` **_key** L43
+- `function` **_decode_cached_row** L57 — Decode and verify a durable cache row before it becomes a reuse hit.
+- `function` **_open_persistent_index** L74 — Open a durable L2 index, falling back without deleting corrupt bytes.
+- `class` **ResearchCacheCascade** L122 — Exact-first reuse. Web acquisition is L6 and never the first lookup.
+- `method` **ResearchCacheCascade.__init__** L125
+- `method` **ResearchCacheCascade.put** L158
+- `method` **ResearchCacheCascade.get** L189
+- `method` **ResearchCacheCascade.get_asof** L253 — L4 bitemporal catalog: latest payload with asof <= as_of.
+- `method` **ResearchCacheCascade.disposition** L281
+- `method` **ResearchCacheCascade.snapshot** L315
+- `method` **ResearchCacheCascade.clear_ephemeral** L343 — Drop current-run/process/L2 rows; durable L5 remains unchanged.
+- `method` **ResearchCacheCascade.close** L361
+- `function` **content_address_bytes** L370
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/claims.py`
 
 - `function` **claim_record** L11
-- `function` **dedupe** L52 — Remove byte-logically identical claims without mutating hashed content.
-- `function` **conflict_ledger** L62 — Record divergent values separately from immutable EvidenceClaims.
+- `function` **dedupe** L74 — Remove byte-logically identical claims without mutating hashed content.
+- `function` **conflict_ledger** L84 — Record divergent values separately from immutable EvidenceClaims.
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/classify.py`
 
@@ -1519,22 +1534,22 @@ _No class/function symbols._
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/evidence_graph.py`
 
-- `function` **_nid** L57
-- `function` **_node** L62
-- `function` **_edge** L66
-- `function` **_canonical_set** L72 — Accept canonical SubjectOfferSet or legacy PlayerOfferSet.
-- `function` **_offer_market** L106
-- `function` **_offer_period** L110
-- `function` **build_evidence_graph** L114
-- `method` **build_evidence_graph.add_node** L123
-- `function` **trace_selection** L365 — Resolve Selection/Offer → Subject → EvidenceClaim → SourceDocument.
-- `method` **trace_selection.neighbors** L380
-- `function` **_unique_edges** L444
-- `function` **attach_runtime_lineage** L457 — Populate Feature → State → Parameter → Simulation → Selection → Settlement.
-- `method` **attach_runtime_lineage.add_node** L482
-- `method` **attach_runtime_lineage.add_edge** L494
-- `function` **trace_runtime_lineage** L704 — Selection → PropEvaluation → Simulation → ParameterSnapshot → Feature/Claim.
-- `method` **trace_runtime_lineage.neighbors** L711
+- `function` **_nid** L71
+- `function` **_node** L76
+- `function` **_edge** L80
+- `function` **_canonical_set** L105 — Accept canonical SubjectOfferSet or legacy PlayerOfferSet.
+- `function` **_offer_market** L139
+- `function` **_offer_period** L143
+- `function` **build_evidence_graph** L147
+- `method` **build_evidence_graph.add_node** L156
+- `function` **trace_selection** L410 — Resolve Selection/Offer → Subject → EvidenceClaim → SourceDocument.
+- `method` **trace_selection.neighbors** L425
+- `function` **_unique_edges** L489
+- `function` **attach_runtime_lineage** L502 — Populate Feature → State → Parameter → Simulation → Selection → Settlement.
+- `method` **attach_runtime_lineage.add_node** L531
+- `method` **attach_runtime_lineage.add_edge** L543
+- `function` **trace_runtime_lineage** L968 — Selection → PropEvaluation → Simulation → ParameterSnapshot → Feature/Claim.
+- `method` **trace_runtime_lineage.neighbors** L975
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/freshness.py`
 
@@ -1624,15 +1639,21 @@ _No class/function symbols._
 - `function` **parse_ts** L68
 - `function` **is_after_cutoff** L86 — True when observed is strictly after cutoff. ISO-normalized, not naive strings.
 - `function` **_fact_key** L97
-- `function` **resolve_material_facts** L104
-- `function` **facts_to_features** L267 — MaterialFactResolution → FeatureRecords with provenance.
-- `function` **apply_facts_to_context** L374 — Overlay resolved facts onto a player/event parameter context. Never post-cutoff.
-- `function` **_feature_family** L386
-- `function` **hold_playable_scope_ids** L398 — Subject/event/affiliation ids whose unresolved conflicts hold PLAYABLE.
-- `function` **apply_hold_playable** L411 — Demote PLAYABLE when a material conflict is unresolved. Never raises P.
-- `function` **json_safe_value** L431
-- `function` **apply_fact_features_to_packets** L441 — Overlay resolved FeatureRecords onto modeling packets BEFORE RoleEpoch/fit.
-- `function` **facts_for_refresh** L535 — Index MaterialFacts by (scope, scopeId, claimType-or-field). Never latest-claim-wins across types.
+- `function` **_as_list** L104
+- `function` **_claim_hash** L112
+- `function` **_valid_from** L116
+- `function` **_valid_to** L124
+- `function` **_valid_at** L128
+- `function` **_temporal_relationships** L143 — Index immutable succession, correction, and retraction metadata.
+- `function` **resolve_material_facts** L181
+- `function` **facts_to_features** L406 — MaterialFactResolution → FeatureRecords with provenance.
+- `function` **apply_facts_to_context** L528 — Overlay resolved facts onto a player/event parameter context. Never post-cutoff.
+- `function` **_feature_family** L540
+- `function` **hold_playable_scope_ids** L552 — Subject/event/affiliation ids whose unresolved conflicts hold PLAYABLE.
+- `function` **apply_hold_playable** L565 — Demote PLAYABLE when a material conflict is unresolved. Never raises P.
+- `function` **json_safe_value** L585
+- `function` **apply_fact_features_to_packets** L595 — Overlay resolved FeatureRecords onto modeling packets BEFORE RoleEpoch/fit.
+- `function` **facts_for_refresh** L689 — Index MaterialFacts by (scope, scopeId, claimType-or-field). Never latest-claim-wins across types.
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/os_graphs.py`
 
@@ -1804,19 +1825,20 @@ _No class/function symbols._
 - `function` **_parse_ts** L24
 - `class` **SourceHealthRegistry** L42 — Claim-specific source routing with circuit breakers and bounded fallbacks.
 - `method` **SourceHealthRegistry.__init__** L45
-- `method` **SourceHealthRegistry._ensure** L59
-- `method` **SourceHealthRegistry._set_success_probability** L111
-- `method` **SourceHealthRegistry.success_probability** L118
-- `method` **SourceHealthRegistry._refresh_circuit** L126
-- `method` **SourceHealthRegistry.record_success** L136
-- `method` **SourceHealthRegistry.record_failure** L157
-- `method` **SourceHealthRegistry.fallbacks** L174 — Traverse fallbackSourceIds, skipping currently OPEN circuits.
-- `method` **SourceHealthRegistry.route** L192 — Prefer official/structured, then stats, then reporting, search last.
-- `method` **SourceHealthRegistry.snapshot** L225
-- `method` **SourceHealthRegistry.load_snapshot** L244 — Overlay persisted counters/circuits onto the live catalog. Never invent 0.85.
-- `function` **persist_cfb_source_health** L268 — Write the live source-health snapshot so later research passes restore it.
-- `function` **load_cfb_source_health** L283 — Restore persisted source-health counters/circuits. Missing file → default catalog.
-- `function` **default_cfb_source_health** L304 — CFB catalog. Never routes college football through a pro-football adapter.
+- `method` **SourceHealthRegistry._ensure** L65
+- `method` **SourceHealthRegistry._now** L117
+- `method` **SourceHealthRegistry._set_success_probability** L123
+- `method` **SourceHealthRegistry.success_probability** L130
+- `method` **SourceHealthRegistry._refresh_circuit** L138
+- `method` **SourceHealthRegistry.record_success** L148
+- `method` **SourceHealthRegistry.record_failure** L169
+- `method` **SourceHealthRegistry.fallbacks** L186 — Traverse fallbackSourceIds, skipping currently OPEN circuits.
+- `method` **SourceHealthRegistry.route** L205 — Prefer official/structured, then stats, then reporting, search last.
+- `method` **SourceHealthRegistry.snapshot** L238
+- `method` **SourceHealthRegistry.load_snapshot** L258 — Overlay persisted counters/circuits onto the live catalog. Never invent 0.85.
+- `function` **persist_cfb_source_health** L282 — Write the live source-health snapshot so later research passes restore it.
+- `function` **load_cfb_source_health** L297 — Restore persisted source-health counters/circuits. Missing file → default catalog.
+- `function` **default_cfb_source_health** L318 — CFB catalog. Never routes college football through a pro-football adapter.
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/staged.py`
 
@@ -1897,17 +1919,17 @@ _No class/function symbols._
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/runner.py`
 
-- `function` **_finalize_archive** L109 — Always write dest/audit/. Optionally copy+commit+push a GitHub pack.
-- `function` **_synthetic_path** L169
-- `function` **_run_id** L182
-- `function` **_git_commit_sha** L186 — Best-effort git HEAD. Never writes git config. Missing git is None, not a crash.
-- `function` **_default_model_config** L206
-- `function` **_active_calibration** L217
-- `function` **run_dcm** L226
-- `method` **run_dcm._snapshot_for** L662
-- `method` **run_dcm._resimulate_material** L1025
-- `method` **run_dcm.slim** L1216
-- `function` **main** L1714
+- `function` **_finalize_archive** L123 — Always write dest/audit/. Optionally copy+commit+push a GitHub pack.
+- `function` **_synthetic_path** L183
+- `function` **_run_id** L196
+- `function` **_git_commit_sha** L200 — Best-effort git HEAD. Never writes git config. Missing git is None, not a crash.
+- `function` **_default_model_config** L220
+- `function` **_active_calibration** L231
+- `function` **run_dcm** L240
+- `method` **run_dcm._snapshot_for** L768
+- `method` **run_dcm._resimulate_material** L1228
+- `method` **run_dcm.slim** L1419
+- `function` **main** L1987
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/runtime/__init__.py`
 
@@ -1931,11 +1953,30 @@ _No class/function symbols._
 - `function` **benchmark_board** L97
 - `function` **main** L128
 
+### `artifacts/dcm_v6_workstream_ab/dcm/runtime/capabilities.py`
+
+- `function` **_git** L17
+- `function` **_file_descriptor** L28
+- `function` **build_capability_manifest** L44
+- `function` **persist_capability_manifest** L104
+
 ### `artifacts/dcm_v6_workstream_ab/dcm/runtime/checkpoint.py`
 
 - `function` **atomic_write** L13
-- `function` **load_checkpoint** L26
-- `function` **write_checkpoint** L36
+- `function` **load_checkpoint** L38
+- `function` **write_checkpoint** L48
+
+### `artifacts/dcm_v6_workstream_ab/dcm/runtime/checkpoint_outbox.py`
+
+- `function` **_without_hash** L20
+- `function` **_validated_entries** L24
+- `function` **load_outbox** L46 — Read and validate every outbox record; partial/corrupt logs fail closed.
+- `function` **enqueue_checkpoint_sync** L51 — Append one checkpoint intent, or return the identical existing intent.
+
+### `artifacts/dcm_v6_workstream_ab/dcm/runtime/checkpoint_reconciliation.py`
+
+- `function` **_remote_state** L14
+- `function` **reconcile_checkpoint_outbox** L25
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/runtime/cutoff.py`
 
@@ -1984,44 +2025,44 @@ _No class/function symbols._
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/runtime/github_archive.py`
 
-- `function` **scan_for_secrets** L119 — Return secret-like tokens found in file text. Empty list means clean.
-- `function` **git_identity** L149 — Author/committer identity for archive commits. Never requires git config.
-- `function` **_git_env** L156
-- `function` **certification_fields** L166 — Subset of audit flags for runner stdout, INDEX.jsonl, and manifests.
-- `function` **_now_utc** L178
-- `function` **_s** L182
-- `function` **_load_json** L188
-- `function` **_load_jsonl** L197
-- `function` **_write_json** L218
-- `function` **_looks_like_claim** L223
-- `function` **_read_claims** L229
-- `function` **_read_requests** L255
-- `function` **_read_card** L276
-- `function` **pick_to_requests** L288 — Match a slim() pick (or full row) onto planned research requests.
-- `function` **_covering_claims** L350
-- `function` **_player_logs_or_status_missing** L369
-- `function` **evaluate_pick_evidence** L390
-- `function` **_is_fixture_mode** L442
-- `function` **_is_manual_evidence** L451
-- `function` **_parse_iso** L455
-- `function` **_picks_coverage_complete** L467
-- `function` **_hash_certified_python_freeze** L489
-- `function` **_model_run_certified** L503
-- `function` **_evidence_coverage_certified** L526
-- `function` **_evidence_temporal** L533
-- `function` **_empty_card_reason** L565
-- `function` **compute_certification** L582 — Compute split canonical certification flags; no combined lock state.
-- `function` **locks_certified** L634 — Compatibility helper only; the combined value is not stored canonically.
-- `function` **_render_run_audit_md** L644
-- `function` **build_run_audit** L699
-- `function` **_is_forbidden** L862
-- `function` **_copy_file** L878
-- `function` **_file_sha256** L888
-- `function` **materialize_github_pack** L898
-- `function` **append_index** L981
-- `function` **_git** L991
-- `function` **_sanitize_git_error** L1002
-- `function` **push_to_github** L1014
+- `function` **scan_for_secrets** L129 — Return secret-like tokens found in file text. Empty list means clean.
+- `function` **git_identity** L173 — Author/committer identity for archive commits. Never requires git config.
+- `function` **_git_env** L180
+- `function` **certification_fields** L190 — Subset of audit flags for runner stdout, INDEX.jsonl, and manifests.
+- `function` **_now_utc** L202
+- `function` **_s** L206
+- `function` **_load_json** L212
+- `function` **_load_jsonl** L221
+- `function` **_write_json** L242
+- `function` **_looks_like_claim** L247
+- `function` **_read_claims** L253
+- `function` **_read_requests** L279
+- `function` **_read_card** L300
+- `function` **pick_to_requests** L312 — Match a slim() pick (or full row) onto planned research requests.
+- `function` **_covering_claims** L374
+- `function` **_player_logs_or_status_missing** L393
+- `function` **evaluate_pick_evidence** L414
+- `function` **_is_fixture_mode** L466
+- `function` **_is_manual_evidence** L475
+- `function` **_parse_iso** L479
+- `function` **_picks_coverage_complete** L491
+- `function` **_hash_certified_python_freeze** L513
+- `function` **_model_run_certified** L527
+- `function` **_evidence_coverage_certified** L550
+- `function` **_evidence_temporal** L557
+- `function` **_empty_card_reason** L589
+- `function` **compute_certification** L606 — Compute split canonical certification flags; no combined lock state.
+- `function` **locks_certified** L658 — Compatibility helper only; the combined value is not stored canonically.
+- `function` **_render_run_audit_md** L668
+- `function` **build_run_audit** L723
+- `function` **_is_forbidden** L886
+- `function` **_copy_file** L902
+- `function` **_file_sha256** L912
+- `function` **materialize_github_pack** L922
+- `function` **append_index** L1005
+- `function` **_git** L1015
+- `function` **_sanitize_git_error** L1026
+- `function` **push_to_github** L1038
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/runtime/governor.py`
 
@@ -2036,6 +2077,16 @@ _No class/function symbols._
 - `function` **_run_id** L26
 - `function` **run_har** L30
 - `function` **main** L75
+
+### `artifacts/dcm_v6_workstream_ab/dcm/runtime/input_boundary.py`
+
+- `function` **_sha256** L33
+- `function` **_header_marker** L37
+- `function` **_iter_headers** L46
+- `function` **_har_shape** L58 — Inspect only structure/marker classes; never return sensitive values.
+- `function` **inspect_input_boundary** L81 — Return a redacted, content-addressed input summary.
+- `function` **build_input_boundary_manifest** L120
+- `function` **persist_input_boundary_manifest** L144
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/runtime/mount_v541.py`
 
@@ -2105,6 +2156,16 @@ _No class/function symbols._
 - `function` **build_directional_passes** L297 — Strongest side for modeled non-PLAYABLE candidates not on the strict card.
 - `function` **write_card_layer_files** L324
 
+### `artifacts/dcm_v6_workstream_ab/dcm/selection/decision_integrity.py`
+
+- `function` **_hashed** L15
+- `function` **probability_sanity_diagnostic** L20
+- `function` **inverse_consistency_audit** L51
+- `class` **SurvivorState** L94 — One-way survivor ledger; a rejected projection cannot re-enter ranking.
+- `method` **SurvivorState.reject** L99
+- `method` **SurvivorState.accept** L107
+- `method` **SurvivorState.snapshot** L110
+
 ### `artifacts/dcm_v6_workstream_ab/dcm/selection/eligibility.py`
 
 - `class` **SelectionForbidden** L9
@@ -2127,6 +2188,12 @@ _No class/function symbols._
 ### `artifacts/dcm_v6_workstream_ab/dcm/signals/__init__.py`
 
 _No class/function symbols._
+
+### `artifacts/dcm_v6_workstream_ab/dcm/signals/cfb_runtime.py`
+
+- `function` **build_cfb_signal_registry** L22
+- `function` **_support_context** L54
+- `function` **execute_cfb_signals** L75
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/signals/compiler.py`
 
@@ -2510,6 +2577,18 @@ _No class/function symbols._
 - `function` **test_material_fact_resolution_is_lineage_aware_and_conservative** L300
 - `function` **test_probability_bundle_keeps_conformal_inactive_without_earned_calibration** L335
 - `function` **test_archive_certification_rejects_interim_frontier** L351
+
+### `artifacts/dcm_v6_workstream_ab/tests/test_completion_context_runtime.py`
+
+- `function` **test_research_cache_reopens_from_durable_sqlite** L29
+- `function` **test_research_cache_rejects_tampered_payload_hash** L43
+- `function` **test_input_boundary_only_emits_safe_hashes_and_marker_classes** L58
+- `function` **test_capability_boundary_summary_is_archive_safe** L85
+- `function` **test_source_health_clock_is_deterministic** L99
+- `function` **test_temporal_correction_replaces_without_false_conflict** L111
+- `function` **test_cfb_signal_runtime_has_real_consumers_and_no_probability_override** L132
+- `function` **test_decision_integrity_is_reject_only_and_rules_are_separate** L145
+- `function` **test_checkpoint_outbox_is_idempotent** L164
 
 ### `artifacts/dcm_v6_workstream_ab/tests/test_e2e_runner.py`
 
@@ -2962,8 +3041,9 @@ _No class/function symbols._
 - `function` **_claim** L21
 - `function` **test_runtime_lineage_attaches_feature_parameter_simulation_selection** L43
 - `function` **test_settlement_lineage_does_not_use_hit_to_rewrite_research** L115
-- `function` **test_dag_line_change_preserves_subject_history** L136
-- `function` **test_participation_is_independent_of_efficiency** L150
+- `function` **test_runtime_lineage_emits_operational_nodes_and_edge_provenance** L136
+- `function` **test_dag_line_change_preserves_subject_history** L174
+- `function` **test_participation_is_independent_of_efficiency** L188
 
 ### `artifacts/dcm_v6_workstream_ab/tests/test_schema_v2_fields.py`
 

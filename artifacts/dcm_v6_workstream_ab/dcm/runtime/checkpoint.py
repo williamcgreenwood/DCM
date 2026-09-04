@@ -56,10 +56,15 @@ def write_checkpoint(dest: Path, payload: dict[str, Any]) -> dict[str, Any]:
     try:
         from dcm.runtime.checkpoint_outbox import enqueue_checkpoint_sync
 
+        completed_stages = body.get("completedStages") or []
+        checkpoint_id = str(
+            body.get("checkpointId")
+            or (completed_stages[-1] if isinstance(completed_stages, list) and completed_stages else "checkpoint")
+        )
         enqueue_checkpoint_sync(
             dest.parent / "checkpoint_outbox.jsonl",
             run_id=str(body.get("runId") or ""),
-            checkpoint_id=f"{body.get('runId') or ''}|{digest}",
+            checkpoint_id=checkpoint_id,
             checkpoint_hash=digest,
             artifact_root=str(body.get("artifactRoot") or dest.parent),
         )
@@ -70,4 +75,17 @@ def write_checkpoint(dest: Path, payload: dict[str, Any]) -> dict[str, Any]:
             "error": type(exc).__name__,
         }
         atomic_write(dest.parent / "checkpoint_outbox_error.json", error)
+    try:
+        from dcm.runtime.checkpoint_reconciliation import reconcile_checkpoint_outbox
+
+        reconciliation = reconcile_checkpoint_outbox(
+            body, dest.parent / "checkpoint_outbox.jsonl",
+        )
+        atomic_write(dest.parent / "checkpoint_reconciliation.json", reconciliation)
+    except Exception as exc:  # noqa: BLE001 - local checkpoint remains authoritative
+        atomic_write(dest.parent / "checkpoint_reconciliation_error.json", {
+            "schema": "pillars_dcm.checkpoint_reconciliation_error.v1",
+            "checkpointHash": digest,
+            "error": type(exc).__name__,
+        })
     return body

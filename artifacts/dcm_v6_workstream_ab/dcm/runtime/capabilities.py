@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any, Iterable
 
 from dcm.contracts.hashes import content_hash
+from dcm.runtime.input_boundary import inspect_input_boundary
 
 
 def _git(workspace: Path, *args: str) -> str | None:
@@ -49,8 +50,10 @@ def build_capability_manifest(
     har_sha256: str = "",
     timebox_minutes: int = 45,
 ) -> dict[str, Any]:
+    input_paths = [Path(path) for path in input_paths]
     started = datetime.now(timezone.utc)
     deadline = started + timedelta(minutes=max(1, int(timebox_minutes)))
+    safe_inputs = [inspect_input_boundary(path) for path in input_paths if path.is_file()]
     body: dict[str, Any] = {
         "schema": "pillars_dcm.capability_authority_manifest.v1",
         "runId": str(run_id),
@@ -74,9 +77,11 @@ def build_capability_manifest(
         },
         "inputBoundary": {
             "harSha256": str(har_sha256),
-            "files": [_file_descriptor(Path(path)) for path in input_paths],
+            "files": [_file_descriptor(path) for path in input_paths],
+            "safeRecords": safe_inputs,
             "rawArtifactsCommitted": False,
             "rawArtifactsUploaded": False,
+            "rawBytesNeverEmitted": True,
         },
         "authority": {
             "statisticalFacts": "CFB_STATISTICAL_LEDGER",

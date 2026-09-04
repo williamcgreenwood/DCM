@@ -54,6 +54,23 @@ def _key(scope: str, scope_id: str, claim_type: str = "") -> str:
 _CACHE_SCHEMA_VERSION = 1
 
 
+def _decode_cached_row(row: tuple[Any, ...], *, label: str) -> dict[str, Any]:
+    """Decode and verify a durable cache row before it becomes a reuse hit."""
+    if not row:
+        raise ValueError(f"{label}_EMPTY")
+    try:
+        rec = json.loads(row[0])
+    except (TypeError, ValueError, json.JSONDecodeError) as exc:
+        raise ValueError(f"{label}_JSON_INVALID") from exc
+    if not isinstance(rec, dict):
+        raise ValueError(f"{label}_OBJECT_REQUIRED")
+    expected = str(row[1] or "") if len(row) > 1 else ""
+    actual = content_hash(rec)
+    if not expected or expected != actual:
+        raise ValueError(f"{label}_HASH_MISMATCH")
+    return rec
+
+
 def _open_persistent_index(path: Path) -> tuple[Any, str, list[str]]:
     """Open a durable L2 index, falling back without deleting corrupt bytes."""
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -183,24 +200,22 @@ class ResearchCacheCascade:
         if not self._bloom.might_contain(k) and claim_type:
             row = None
         elif claim_type:
-            cur = self.l2.execute("SELECT payload FROM research WHERE k = ?", (k,))
+            cur = self.l2.execute("SELECT payload, payload_hash FROM research WHERE k = ?", (k,))
             row = cur.fetchone()
         else:
             cur = self.l2.execute(
-                "SELECT payload FROM research WHERE scope = ? AND scope_id = ? ORDER BY asof DESC LIMIT 1",
+                "SELECT payload, payload_hash FROM research WHERE scope = ? AND scope_id = ? ORDER BY asof DESC LIMIT 1",
                 (scope, scope_id),
             )
             row = cur.fetchone()
         if row:
             try:
-                rec = json.loads(row[0])
-                if not isinstance(rec, dict):
-                    raise ValueError("payload is not an object")
+                rec = _decode_cached_row(row, label="CACHE_PAYLOAD")
                 self.hits["L2"] += 1
                 self.l0[k] = rec
                 return rec, "L2"
-            except (TypeError, ValueError, json.JSONDecodeError):
-                self.persistence_blockers.append("PAYLOAD_VALIDATION_FAILED")
+            except ValueError as exc:
+                self.persistence_blockers.append(str(exc))
         if self.store is not None:
             try:
                 found = self.store.lookup_latest(scope, scope_id) if hasattr(self.store, "lookup_latest") else None
@@ -246,22 +261,20 @@ class ResearchCacheCascade:
         """L4 bitemporal catalog: latest payload with asof <= as_of."""
         self.lookups += 1
         cur = self.l2.execute(
-            "SELECT payload, asof FROM research WHERE scope = ? AND scope_id = ? AND asof <= ? "
+            "SELECT payload, payload_hash, asof FROM research WHERE scope = ? AND scope_id = ? AND asof <= ? "
             "AND (? = '' OR claim_type = ?) ORDER BY asof DESC LIMIT 1",
             (scope, scope_id, str(as_of), claim_type, claim_type),
         )
         row = cur.fetchone()
         if row:
             try:
-                rec = json.loads(row[0])
-                if not isinstance(rec, dict):
-                    raise ValueError("payload is not an object")
+                rec = _decode_cached_row((row[0], row[1]), label="ASOF_CACHE_PAYLOAD")
                 self.hits["L4"] += 1
                 k = _key(scope, scope_id, claim_type)
                 self.l0[k] = rec
                 return rec, "L4"
-            except (TypeError, ValueError, json.JSONDecodeError):
-                self.persistence_blockers.append("ASOF_PAYLOAD_VALIDATION_FAILED")
+            except ValueError as exc:
+                self.persistence_blockers.append(str(exc))
         self.misses += 1
         return None, "L6"
 

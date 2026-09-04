@@ -113,6 +113,16 @@ PACK_FILES = (
     "RUN_AUDIT.md",
     "pick_evidence.json",
     "archive_manifest.json",
+    "capability_manifest.json",
+    "input_security_boundary.json",
+    "checkpoint_outbox.jsonl",
+    "checkpoint_reconciliation.json",
+    "signal_registry.json",
+    "signal_evaluations.jsonl",
+    "signal_features.jsonl",
+    "signal_runtime.json",
+    "cfb_rules_snapshot.json",
+    "decision_integrity.json",
 )
 
 
@@ -128,6 +138,20 @@ def scan_for_secrets(path: Path) -> list[str]:
         return []
     if b"\x00" in raw[:8192]:
         return []
+    # Boundary manifests intentionally contain marker *classes* such as
+    # COOKIE/AUTHORIZATION.  They are safe summaries, not credentials.  Only
+    # exempt the exact generated schemas after validating their fail-closed
+    # flags; arbitrary files containing these words remain blocked.
+    if Path(path).name in {"input_security_boundary.json", "capability_manifest.json"}:
+        try:
+            metadata = json.loads(raw.decode("utf-8"))
+        except (UnicodeDecodeError, json.JSONDecodeError):
+            metadata = None
+        if isinstance(metadata, dict):
+            boundary = metadata if metadata.get("schema") == "pillars_dcm.input_security_boundary.v1" else metadata.get("inputBoundary")
+            if isinstance(boundary, dict) and boundary.get("rawBytesNeverEmitted") is True:
+                if boundary.get("rawArtifactsCommitted") is False and boundary.get("rawArtifactsUploaded") is False:
+                    return []
     try:
         text_body = raw.decode("utf-8")
     except UnicodeDecodeError:

@@ -74,6 +74,11 @@ from dcm.runtime.dag import Dag
 from dcm.runtime.freeze import compute_forecast_hash
 from dcm.runtime.github_archive import append_index, build_run_audit, certification_fields, materialize_github_pack, push_to_github
 from dcm.runtime.governor import Governor
+from dcm.runtime.input_boundary import (
+    build_input_boundary_manifest,
+    inspect_input_boundary,
+    persist_input_boundary_manifest,
+)
 from dcm.runtime.mount_v541 import mount_default
 from dcm.runtime.schema_root import SCHEMA_V2_ID, verify_schema, verify_schema_v2
 from dcm.runtime.perf import StageTimer
@@ -251,6 +256,7 @@ def run_dcm(
     archive_push: bool = False,
     repo_root: Path | None = None,
 ) -> dict[str, Any]:
+    input_boundary_records: list[dict[str, Any]] = []
     if resume:
         ck = load_checkpoint(resume)
         output_root = Path(ck["artifactRoot"])
@@ -295,6 +301,29 @@ def run_dcm(
             raise RuntimeError("MOUNT_STATE_HASH_MISMATCH_ON_RESUME")
         if str(ck.get("schemaStateHash") or "") != content_hash(schema_root):
             raise RuntimeError("SCHEMA_STATE_HASH_MISMATCH_ON_RESUME")
+        boundary_path = output_root / "input_security_boundary.json"
+        if boundary_path.is_file():
+            try:
+                boundary_manifest = json.loads(boundary_path.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError) as exc:
+                raise RuntimeError("INPUT_BOUNDARY_MANIFEST_INVALID_ON_RESUME") from exc
+            boundary_payload = {
+                key: value for key, value in boundary_manifest.items() if key != "contentHash"
+            }
+            if str(boundary_manifest.get("contentHash") or "") != content_hash(boundary_payload):
+                raise RuntimeError("INPUT_BOUNDARY_HASH_MISMATCH_ON_RESUME")
+            if str(boundary_manifest.get("runId") or "") != str(run_id):
+                raise RuntimeError("INPUT_BOUNDARY_RUN_MISMATCH_ON_RESUME")
+            if str(boundary_manifest.get("harSha256") or "") != str(har_sha):
+                raise RuntimeError("INPUT_BOUNDARY_SOURCE_MISMATCH_ON_RESUME")
+            input_boundary_records = [
+                dict(item) for item in (boundary_manifest.get("records") or []) if isinstance(item, dict)
+            ]
+        else:
+            boundary_manifest = build_input_boundary_manifest(
+                [], run_id=run_id, har_sha256=har_sha,
+            )
+            persist_input_boundary_manifest(output_root, boundary_manifest)
         stages_done = set(ck.get("completedStages") or [])
     else:
         stages_done = set()
@@ -304,6 +333,7 @@ def run_dcm(
         if synthetic:
             raw = json.loads(SYNTHETIC.read_text(encoding="utf-8"))
             raw_bytes = SYNTHETIC.read_bytes()
+            input_boundary_records.append(inspect_input_boundary(SYNTHETIC, raw_bytes=raw_bytes))
             ingests = [ingest_har(raw, raw_bytes=raw_bytes)]
         else:
             sources = list(input_paths or ([] if input_path is None else [input_path]))
@@ -312,6 +342,7 @@ def run_dcm(
             ingests = []
             for source in sources:
                 raw_bytes = source.read_bytes()
+                input_boundary_records.append(inspect_input_boundary(source, raw_bytes=raw_bytes))
                 ingests.append(ingest_har(raw_bytes, raw_bytes=raw_bytes))
         ingest = compose_ingests(ingests) if len(ingests) > 1 else ingests[0]
         cutoff_info = resolve_forecast_cutoff(
@@ -324,6 +355,10 @@ def run_dcm(
         run_id = _run_id(har_sha, forecast_cutoff)
         dest = output_root / run_id
         dest.mkdir(parents=True, exist_ok=True)
+        boundary_manifest = build_input_boundary_manifest(
+            input_boundary_records, run_id=run_id, har_sha256=har_sha,
+        )
+        persist_input_boundary_manifest(dest, boundary_manifest)
         model_config = _default_model_config()
         calibration_state = _active_calibration(workspace)
         (dest / "MODEL_CONFIG.json").write_text(
@@ -353,6 +388,7 @@ def run_dcm(
                         if ingest.get("compositeCaptureId")
                         else "CAPTURED_HAR"
                     ),
+                    "inputBoundaryHash": boundary_manifest["contentHash"],
                 },
                 indent=2,
                 sort_keys=True,
@@ -389,6 +425,16 @@ def run_dcm(
             har_sha256=har_sha,
         )
         persist_capability_manifest(dest, capability_manifest)
+    capability_manifest.setdefault("inputBoundary", {})["safeRecords"] = input_boundary_records
+    capability_manifest["inputBoundary"]["boundaryManifestHash"] = str(
+        (locals().get("boundary_manifest") or {}).get("contentHash") or ""
+    )
+    capability_manifest["inputBoundary"]["rawBytesNeverEmitted"] = True
+    capability_manifest["contentHash"] = content_hash({
+        key: value for key, value in capability_manifest.items() if key != "contentHash"
+    })
+    persist_capability_manifest(dest, capability_manifest)
+    input_boundary_hash = str((locals().get("boundary_manifest") or {}).get("contentHash") or "")
     dag = Dag(
         cutoff=forecast_cutoff,
         config_hash=config_hash,
@@ -442,6 +488,7 @@ def run_dcm(
         hashes = {
             "boardHash": board.get("contentHash"),
             "harSha256": har_sha,
+            "inputBoundaryHash": input_boundary_hash,
             "schemaV1Expected": "6e78dacc19843338643bdcabc7477fd3ce2dd065da1e9629646dacc21cdb1f22",
             **constitution_run_hashes(plan_payload),
         }
@@ -459,6 +506,7 @@ def run_dcm(
             "runId": run_id, "runState": run_state, "learningRevision": LEARNING_REVISION,
             "predictiveClaim": PREDICTIVE_CLAIM, "rawRows": len(rows), "accountOnly": True,
             "classified": counts, "boardHash": board.get("contentHash"),
+            "inputBoundaryHash": input_boundary_hash,
             "cardSize": 0, "modeledCardSize": 0, "playable": 0,
             "productionCertified": False, "notProductionRootCertified": True,
             "productionRootCertification": NOT_PRODUCTION_ROOT_CERTIFIED,
@@ -505,7 +553,19 @@ def run_dcm(
             "calibrationStateHash": calibration_state.get("contentHash"),
             "mountStateHash": content_hash(mount),
             "schemaStateHash": content_hash(schema_root),
+            "inputBoundaryHash": input_boundary_hash,
         })
+        capability_manifest["gates"] = {
+            "softwareClosed": "PASS" if capability_manifest.get("runtime", {}).get("pytestDiscoverable") else "EXTERNAL_BLOCKED",
+            "harAccountingAccepted": "PASS",
+            "operationalAcceptedWithCurrentHar": "PARTIAL",
+            "predictiveCertified": "FAIL_PREDICTIVE_CLAIM_NONE",
+            "productionRootCertified": "FAIL",
+        }
+        capability_manifest["contentHash"] = content_hash({
+            key: value for key, value in capability_manifest.items() if key != "contentHash"
+        })
+        persist_capability_manifest(dest, capability_manifest)
         return _finalize_archive(
             dest,
             {"run_id": run_id, "dest": str(dest), "runState": run_state, "checkpoint": ck, "integrity": freeze, "board": board},
@@ -542,6 +602,7 @@ def run_dcm(
     written = write_bundle(dest / "evidence_bundle.jsonl", bundle["claims"])
     manifest = written.manifest({
         "harSha256": har_sha,
+        "inputBoundaryHash": input_boundary_hash,
         "boardHash": board.get("contentHash"),
         "forecastCutoff": forecast_cutoff,
         "dcmVersion": SOFTWARE,
@@ -694,7 +755,12 @@ def run_dcm(
     decision_integrity_records: list[dict[str, Any]] = []
     cfb_rules_snapshot = build_cfb_rules_snapshot(
         as_of=forecast_cutoff,
-        statistical_source_hashes=(har_sha, str(material_facts_payload.get("contentHash") or "")),
+        # The HAR is an offer/input dataset, not official statistical
+        # settlement evidence.  Only hashed MaterialFact/source evidence may
+        # populate the statistical-authority side of this contract.
+        statistical_source_hashes=tuple(
+            sorted({str(claim.get("source_hash") or "") for claim in (bundle.get("claims") or []) if claim.get("source_hash")})
+        ),
         platform_source_hashes=(),
         platform_rules_verified=False,
     )
@@ -1069,13 +1135,15 @@ def run_dcm(
     (dest / "parameters" / "snapshots.json").write_text(
         json.dumps(parameter_cache, sort_keys=True) + "\n", encoding="utf-8"
     )
-    (dest / "signal_registry.json").write_text(
-        json.dumps({
+    signal_registry_payload = {
             "schema": "pillars_dcm.signal_registry_runtime.v1",
             "registryHash": signal_registry.registry_hash,
             "executionOrder": list(signal_registry.execution_order),
             "operators": [item.to_dict() for item in signal_registry.operators],
-        }, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    }
+    signal_registry_payload["contentHash"] = content_hash(signal_registry_payload)
+    (dest / "signal_registry.json").write_text(
+        json.dumps(signal_registry_payload, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
     (dest / "signal_evaluations.jsonl").write_text(
         "".join(json.dumps(item, sort_keys=True) + "\n" for item in signal_evaluations),
@@ -1088,7 +1156,7 @@ def run_dcm(
         encoding="utf-8",
     )
     merge_feature_records(dest, signal_feature_records)
-    (dest / "signal_runtime.json").write_text(json.dumps({
+    signal_runtime_payload = {
         "schema": "pillars_dcm.signal_runtime.v1",
         "registryHash": signal_registry.registry_hash,
         "rowsExecuted": signal_rows_executed,
@@ -1101,7 +1169,11 @@ def run_dcm(
         ],
         "probabilityMutation": False,
         "hardGateOverride": False,
-    }, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    }
+    signal_runtime_payload["contentHash"] = content_hash(signal_runtime_payload)
+    (dest / "signal_runtime.json").write_text(
+        json.dumps(signal_runtime_payload, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
     (dest / "cfb_rules_snapshot.json").write_text(
         json.dumps(cfb_rules_snapshot, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
@@ -1439,6 +1511,26 @@ def run_dcm(
         selections=strict_card,
         run_id=str(run_id),
         forecast_cutoff=str(forecast_cutoff),
+        runtime_context={
+            "codeVersion": SOFTWARE,
+            "harSha256": har_sha,
+            "inputHashes": [har_sha, str((bundle.get("contentHash") or ""))],
+            "authority": "CFB_STATISTICAL_LEDGER_AND_PLATFORM_RULES_SEPARATED",
+            "acquisitionMethod": bundle.get("evidence_mode") or "fixture_or_file",
+            "rows": rows,
+            "requests": requests,
+            "acquiredRequestIds": [
+                str(claim.get("request_id") or "")
+                for claim in (bundle.get("claims") or [])
+                if claim.get("request_id")
+            ],
+            "materialFacts": material_facts_payload,
+            "signalEvaluations": signal_evaluations,
+            "freezeState": "PREPARED",
+            "forecastFrozen": False,
+            "portfolioHash": content_hash(strict_card),
+            "portfolioEligibilityState": "RESEARCHED_MODELED",
+        },
     )
     graph_path.write_text(json.dumps(evidence_graph, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     explain_src: list[dict[str, Any]] = []
@@ -1518,6 +1610,7 @@ def run_dcm(
         "modelConfigHash": config_hash,
         "calibrationStateHash": calibration_state.get("contentHash"),
         "harSha256": har_sha,
+        "inputBoundaryHash": input_boundary_hash,
         "forecastCutoff": forecast_cutoff,
         "boardHash": board["contentHash"],
         "rawRows": len(rows),
@@ -1552,12 +1645,7 @@ def run_dcm(
         "gitCommit": git_commit,
         "featureStoreHash": feature_store_hash,
         "signalRegistryHash": signal_registry.registry_hash,
-        "signalRuntimeHash": content_hash({
-            "registryHash": signal_registry.registry_hash,
-            "evaluationCount": len(signal_evaluations),
-            "featureCount": len(signal_feature_records),
-            "errors": signal_errors,
-        }),
+        "signalRuntimeHash": signal_runtime_payload.get("contentHash"),
         "decisionIntegrityHash": content_hash(decision_integrity_records),
         "survivorStateHash": survivor_state.snapshot().get("contentHash"),
         "cfbRulesSnapshotHash": cfb_rules_snapshot.get("contentHash"),
@@ -1587,6 +1675,7 @@ def run_dcm(
         "survivorStateHash": freeze["survivorStateHash"],
         "cfbRulesSnapshotHash": freeze["cfbRulesSnapshotHash"],
         "harSha256": har_sha,
+        "inputBoundaryHash": input_boundary_hash,
         "boardHash": board["contentHash"],
         "evidenceGraphHash": evidence_graph.get("contentHash"),
         "parameterSnapshotHashes": parameter_snapshot_hashes,
@@ -1756,6 +1845,7 @@ def run_dcm(
         "gitCommit": git_commit,
         "checkpointPending": not can_freeze,
         "schemaV1Expected": "6e78dacc19843338643bdcabc7477fd3ce2dd065da1e9629646dacc21cdb1f22",
+        "inputBoundaryHash": input_boundary_hash,
         "schemaV2": (schema_root.get("v2") or {}),
         **constitution_run_hashes(plan_payload),
     }
@@ -1849,6 +1939,7 @@ def run_dcm(
         "calibrationStateHash": calibration_state.get("contentHash"),
         "mountStateHash": content_hash(mount),
         "schemaStateHash": content_hash(schema_root),
+        "inputBoundaryHash": input_boundary_hash,
         "artifactRoot": str(dest),
         "completedStages": ["BOARD_FREEZE", "RESEARCH", "MODEL", "RANK", "PORTFOLIO", "FREEZE"] if can_freeze else ["BOARD_FREEZE", "RESEARCH", "MODEL", "RANK", "PORTFOLIO", "FRONTIER_CHECKPOINT"],
         "forecastFrozen": bool(can_freeze),

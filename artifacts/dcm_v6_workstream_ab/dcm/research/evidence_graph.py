@@ -7,7 +7,7 @@ Player/Team nodes.
 """
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Mapping
 from urllib.parse import urlsplit
 
 from dcm.contracts.hashes import content_hash
@@ -15,8 +15,15 @@ from dcm.research.classify import market_definition_id
 
 
 NODE_TYPES = (
+    "Run",
+    "Job",
+    "InputDataset",
+    "HAROffer",
+    "ResearchRequirement",
+    "AcquisitionAction",
     "SourceDocument",
     "EvidenceClaim",
+    "MaterialFact",
     "Sport",
     "Competition",
     "Event",
@@ -33,12 +40,19 @@ NODE_TYPES = (
     "OpportunityState",
     "EfficiencyState",
     "ParameterSnapshot",
+    "EventWorld",
     "Simulation",
+    "ProbabilityBundle",
     "PropEvaluation",
+    "Decision",
+    "Portfolio",
     "Selection",
     "Forecast",
+    "FrozenForecast",
     "Settlement",
+    "LearningRecord",
     "LearningObservation",
+    "SignalEvaluation",
 )
 EDGE_TYPES = (
     "supports",
@@ -66,7 +80,26 @@ def _node(node_id: str, node_type: str, **attrs: Any) -> dict[str, Any]:
 def _edge(edge_type: str, src: str, dst: str, **attrs: Any) -> dict[str, Any]:
     if edge_type not in EDGE_TYPES:
         raise ValueError(f"UNKNOWN_EDGE_TYPE:{edge_type}")
-    return {"type": edge_type, "from": src, "to": dst, **attrs}
+    # Keep provenance fields present on every edge, even when a source does
+    # not provide one (the value is then explicit null/empty rather than an
+    # implicit omission).  Runtime edges fill these with the exact hashes and
+    # authority available to that run.
+    defaults = {
+        "sourceId": None,
+        "sourceUrl": None,
+        "observationTime": None,
+        "publishedTime": None,
+        "validTime": None,
+        "settledTime": None,
+        "acquisitionMethod": None,
+        "transform": None,
+        "codeVersion": None,
+        "inputHashes": [],
+        "outputHash": None,
+        "authority": None,
+    }
+    defaults.update(attrs)
+    return {"type": edge_type, "from": src, "to": dst, **defaults}
 
 
 def _canonical_set(offer_set: dict[str, Any]) -> dict[str, Any]:
@@ -262,8 +295,20 @@ def build_evidence_graph(
             scopeId=claim.get("scope_id"),
             url=url,
         ))
-        edges.append(_edge("derived_from", claim_nid, src_nid))
-        edges.append(_edge("supports", src_nid, claim_nid, via="source_document"))
+        claim_provenance = {
+            "sourceId": source_id or claim.get("source_hash"),
+            "sourceUrl": url or None,
+            "observationTime": claim.get("observed_at") or claim.get("observedAt"),
+            "publishedTime": claim.get("published_at") or claim.get("publishedAt"),
+            "validTime": claim.get("valid_from") or claim.get("validFrom") or claim.get("valid_at") or claim.get("validAt"),
+            "acquisitionMethod": claim.get("acquisition_method") or claim.get("acquisitionMethod"),
+            "transform": "evidence_claim_to_source_document",
+            "codeVersion": claim.get("parser_version") or claim.get("parserVersion"),
+            "outputHash": claim.get("claim_hash") or claim.get("claimHash"),
+            "authority": claim.get("authority") or claim.get("source_authority"),
+        }
+        edges.append(_edge("derived_from", claim_nid, src_nid, **claim_provenance))
+        edges.append(_edge("supports", src_nid, claim_nid, via="source_document", **claim_provenance))
 
         scope = str(claim.get("semantic_scope") or "").upper()
         scope_id = str(claim.get("scope_id") or "")
@@ -293,7 +338,7 @@ def build_evidence_graph(
             kind = "Sport" if scope == "SPORT" else "Competition"
             targets.append(add_node(_node(_nid(kind, scope_id), kind, scopeId=scope_id)))
         for target in targets:
-            edges.append(_edge("supports", claim_nid, target))
+            edges.append(_edge("supports", claim_nid, target, **claim_provenance))
 
         for other in claim.get("conflicts") or []:
             other_nid = _nid("EvidenceClaim", other)
@@ -465,12 +510,16 @@ def attach_runtime_lineage(
     forecast_cutoff: str = "",
     frozen_forecast_hash: str = "",
     settlements: list[dict[str, Any]] | None = None,
+    runtime_context: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Populate Feature → State → Parameter → Simulation → Selection → Settlement.
 
     Additive. Research-only graphs remain valid if runtime artifacts are empty.
     Settlement nodes are intended for a sidecar after freeze; passing them here
-    does not rewrite frozen forecast bytes by itself.
+    does not rewrite frozen forecast bytes by itself.  ``runtime_context`` is a
+    safe manifest assembled by the canonical runner.  It adds the operational
+    Run/Job/Input/Requirement/Decision/Portfolio nodes without copying raw
+    HAR or full world bytes into the graph.
     """
     graph = dict(graph or {})
     nodes: dict[str, dict[str, Any]] = {}
@@ -492,7 +541,116 @@ def attach_runtime_lineage(
         return nid
 
     def add_edge(edge_type: str, src: str, dst: str, **attrs: Any) -> None:
+        attrs.setdefault("codeVersion", runtime_context.get("codeVersion") if runtime_context else None)
+        attrs.setdefault("acquisitionMethod", runtime_context.get("acquisitionMethod") if runtime_context else None)
+        attrs.setdefault("authority", runtime_context.get("authority") if runtime_context else None)
+        attrs.setdefault(
+            "inputHashes",
+            list(runtime_context.get("inputHashes") or []) if runtime_context else [],
+        )
         edges.append(_edge(edge_type, src, dst, **attrs))
+
+    runtime_context = dict(runtime_context or {})
+    runtime_code_version = str(runtime_context.get("codeVersion") or "")
+    runtime_input_hashes = [str(value) for value in (runtime_context.get("inputHashes") or []) if value]
+
+    # Operational envelope.  Values are hashes/counts/identifiers only; the
+    # raw ingress remains outside this graph.
+    if run_id:
+        run_nid = add_node(_node(
+            _nid("Run", run_id),
+            "Run",
+            runId=run_id,
+            forecastCutoff=forecast_cutoff,
+            codeVersion=runtime_code_version,
+            inputHashes=runtime_input_hashes,
+        ))
+        job_nid = add_node(_node(
+            _nid("Job", run_id),
+            "Job",
+            runId=run_id,
+            jobType="CANONICAL_DCM_RUN",
+            codeVersion=runtime_code_version,
+        ))
+        add_edge("produces", run_nid, job_nid, transform="run_to_job")
+        har_hash = str(runtime_context.get("harSha256") or "")
+        if har_hash:
+            input_nid = add_node(_node(
+                _nid("InputDataset", har_hash),
+                "InputDataset",
+                contentHash=har_hash,
+                kind="HAR_OFFER_DATASET",
+                rawSensitive=True,
+                rawArtifactCommitted=False,
+                rawArtifactUploaded=False,
+            ))
+            add_edge("derived_from", job_nid, input_nid, transform="har_ingest", outputHash=har_hash)
+            for row in runtime_context.get("rows") or []:
+                if not isinstance(row, Mapping):
+                    continue
+                pid = str(row.get("projectionId") or "")
+                if not pid:
+                    continue
+                har_offer_nid = add_node(_node(
+                    _nid("HAROffer", pid),
+                    "HAROffer",
+                    projectionId=pid,
+                    eventId=row.get("eventId"),
+                    subjectId=row.get("playerId") or row.get("subjectId"),
+                    market=row.get("market"),
+                    line=row.get("line"),
+                    rawSourceHash=har_hash,
+                ))
+                add_edge("feeds", input_nid, har_offer_nid, outputHash=content_hash(dict(row)))
+                add_edge("derived_from", _nid("Offer", pid), har_offer_nid, inputHashes=[har_hash])
+
+        for request in runtime_context.get("requests") or []:
+            if not isinstance(request, Mapping):
+                continue
+            request_id = str(request.get("request_id") or request.get("requestId") or "")
+            if not request_id:
+                continue
+            req_nid = add_node(_node(
+                _nid("ResearchRequirement", request_id),
+                "ResearchRequirement",
+                requestId=request_id,
+                scope=request.get("scope"),
+                scopeId=request.get("scope_id") or request.get("scopeId"),
+                need=request.get("need"),
+                forecastCutoff=request.get("forecast_cutoff") or request.get("forecastCutoff"),
+            ))
+            action_nid = add_node(_node(
+                _nid("AcquisitionAction", request_id),
+                "AcquisitionAction",
+                requestId=request_id,
+                actionState="ACQUIRED" if request_id in set(runtime_context.get("acquiredRequestIds") or []) else "PLANNED",
+                acquisitionMethod=runtime_context.get("acquisitionMethod"),
+            ))
+            add_edge("derived_from", action_nid, req_nid, transform="requirement_to_action")
+            add_edge("feeds", job_nid, action_nid, inputHashes=runtime_input_hashes)
+
+        material_facts = runtime_context.get("materialFacts")
+        for fact in (material_facts.get("facts") if isinstance(material_facts, Mapping) else []) or []:
+            if not isinstance(fact, Mapping):
+                continue
+            fact_hash = str(fact.get("contentHash") or "")
+            if not fact_hash:
+                continue
+            fact_nid = add_node(_node(
+                _nid("MaterialFact", fact_hash),
+                "MaterialFact",
+                contentHash=fact_hash,
+                factKey=fact.get("factKey"),
+                state=fact.get("state"),
+                temporalState=fact.get("temporalState"),
+                validFrom=fact.get("validFrom"),
+                validTo=fact.get("validTo"),
+                observedTime=fact.get("observedTime"),
+                authority=fact.get("authorityClass") or fact.get("authority"),
+            ))
+            for claim_hash in fact.get("historicalClaimHashes") or []:
+                claim_nid = add_node(_node(_nid("EvidenceClaim", claim_hash), "EvidenceClaim", claimHash=claim_hash))
+                add_edge("derived_from", fact_nid, claim_nid, outputHash=fact_hash)
 
     for feat in features or []:
         if not isinstance(feat, dict):
@@ -519,6 +677,33 @@ def attach_runtime_lineage(
         for h in feat.get("claimHashes") or []:
             claim_nid = add_node(_node(_nid("EvidenceClaim", h), "EvidenceClaim", claimHash=h))
             add_edge("feeds", claim_nid, feat_nid, via="claim_hash")
+
+    for signal in runtime_context.get("signalEvaluations") or []:
+        if not isinstance(signal, Mapping):
+            continue
+        signal_hash = str(signal.get("outputHash") or "")
+        operator_id = str(signal.get("operatorId") or "")
+        if not signal_hash or not operator_id:
+            continue
+        signal_nid = add_node(_node(
+            _nid("SignalEvaluation", signal_hash),
+            "SignalEvaluation",
+            outputHash=signal_hash,
+            operatorId=operator_id,
+            lifecycleState=signal.get("lifecycleState"),
+            consumers=list(signal.get("consumers") or []),
+            uncertaintyContribution=signal.get("uncertaintyContribution"),
+            reasonCodes=list(signal.get("reasonCodes") or []),
+            canChangeProbabilityDirectly=False,
+            canOverrideHardGate=False,
+        ))
+        pid = str(signal.get("projectionId") or "")
+        if pid:
+            add_edge("feeds", signal_nid, _nid("Offer", pid), outputHash=signal_hash)
+        for feat in features or []:
+            if str(feat.get("signalEvaluationHash") or "") == signal_hash:
+                feat_id = _nid("Feature", feat.get("entity"), feat.get("featureName"), feat.get("eventId"))
+                add_edge("produces", signal_nid, feat_id, outputHash=signal_hash, transform="signal_to_feature")
 
     for snap in snapshots or []:
         if not isinstance(snap, dict):
@@ -625,6 +810,41 @@ def attach_runtime_lineage(
                 parameterSnapshotHash=snap_hash,
             ))
             add_edge("feeds", snap_nid, sim_nid)
+        event_id = str(row.get("eventId") or "")
+        if event_id:
+            event_world_nid = add_node(_node(
+                _nid("EventWorld", event_id),
+                "EventWorld",
+                eventId=event_id,
+                worldCount=ev.get("worldCount") or ev.get("nWorlds"),
+                shared=True,
+            ))
+            add_edge("feeds", event_world_nid, sim_nid, transform="event_world_to_simulation")
+        probability_hash = str(ev.get("probabilityBundleHash") or content_hash({
+            "projectionId": pid,
+            "pHigher": ev.get("pHigher"),
+            "pLower": ev.get("pLower"),
+            "pPush": ev.get("pPush"),
+        }))
+        probability_nid = add_node(_node(
+            _nid("ProbabilityBundle", probability_hash),
+            "ProbabilityBundle",
+            outputHash=probability_hash,
+            projectionId=pid,
+            pHigher=ev.get("pHigher"),
+            pLower=ev.get("pLower"),
+            pPush=ev.get("pPush"),
+        ))
+        add_edge("produces", sim_nid, probability_nid, outputHash=probability_hash)
+        decision_nid = add_node(_node(
+            _nid("Decision", pid),
+            "Decision",
+            projectionId=pid,
+            selectedSide=ev.get("selectedSide") or ev.get("direction"),
+            grade=ev.get("grade"),
+            survivorStateAccepted=ev.get("survivorStateAccepted"),
+        ))
+        add_edge("produces", probability_nid, decision_nid, transform="decision_integrity_audit")
 
     forecast_nid = None
     if run_id:
@@ -635,6 +855,16 @@ def attach_runtime_lineage(
             forecastCutoff=forecast_cutoff,
             frozenForecastHash=frozen_forecast_hash or None,
         ))
+        freeze_state = str(runtime_context.get("freezeState") or "PREPARED")
+        frozen_nid = add_node(_node(
+            _nid("FrozenForecast", run_id),
+            "FrozenForecast",
+            runId=run_id,
+            frozenForecastHash=frozen_forecast_hash or runtime_context.get("frozenForecastHash"),
+            freezeState=freeze_state,
+            forecastFrozen=bool(runtime_context.get("forecastFrozen", False)),
+        ))
+        add_edge("produces", forecast_nid, frozen_nid, outputHash=frozen_forecast_hash or None)
 
     for sel in selections or []:
         if not isinstance(sel, dict):
@@ -653,6 +883,19 @@ def attach_runtime_lineage(
         add_edge("derived_from", sel_nid, _nid("PropEvaluation", pid))
         if forecast_nid:
             add_edge("produces", forecast_nid, sel_nid)
+
+    if forecast_nid:
+        portfolio_hash = str(runtime_context.get("portfolioHash") or content_hash({
+            "selectionIds": sorted(str(sel.get("projectionId") or "") for sel in (selections or []) if isinstance(sel, Mapping)),
+        }))
+        portfolio_nid = add_node(_node(
+            _nid("Portfolio", portfolio_hash),
+            "Portfolio",
+            outputHash=portfolio_hash,
+            selectionCount=len([sel for sel in (selections or []) if isinstance(sel, Mapping)]),
+            eligibilityState=runtime_context.get("portfolioEligibilityState"),
+        ))
+        add_edge("produces", forecast_nid, portfolio_nid, outputHash=portfolio_hash)
 
     for rec in settlements or []:
         if not isinstance(rec, dict):
@@ -680,6 +923,15 @@ def attach_runtime_lineage(
             doesNotDecideResearchReuse=True,
         ))
         add_edge("derived_from", learn_nid, set_nid)
+        learning_nid = add_node(_node(
+            _nid("LearningRecord", pid, rec.get("settlement") or rec.get("result")),
+            "LearningRecord",
+            projectionId=pid,
+            futureOnly=True,
+            sourceSettlementHash=content_hash(rec),
+            doesNotRewriteForecast=True,
+        ))
+        add_edge("derived_from", learning_nid, set_nid, outputHash=content_hash(rec))
 
     unique_edges = _unique_edges(edges)
     node_list = [nodes[k] for k in sorted(nodes)]
@@ -696,6 +948,18 @@ def attach_runtime_lineage(
         "edges": unique_edges,
         "runId": run_id or graph.get("runId"),
         "forecastCutoff": forecast_cutoff or graph.get("forecastCutoff"),
+        "runtimeContextHash": content_hash({
+            key: value for key, value in runtime_context.items()
+            if key not in {"rows", "requests", "signalEvaluations", "materialFacts"}
+        }) if runtime_context else None,
+        "provenanceContract": {
+            "edgeFields": [
+                "sourceId", "sourceUrl", "observationTime", "publishedTime", "validTime",
+                "settledTime", "acquisitionMethod", "transform", "codeVersion",
+                "inputHashes", "outputHash", "authority",
+            ],
+            "rawBytesIncluded": False,
+        },
     }
     body["contentHash"] = content_hash({k: v for k, v in body.items() if k != "contentHash"})
     return body
@@ -743,4 +1007,3 @@ def trace_runtime_lineage(graph: dict[str, Any], selection: dict[str, Any]) -> d
         "hasParameterSnapshot": "ParameterSnapshot" in types,
         "hasSimulation": "Simulation" in types,
     }
-
