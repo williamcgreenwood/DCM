@@ -1,6 +1,6 @@
 {
   "schema": "pillars_dcm.program_status.v1",
-  "updatedAtUtc": "2026-09-04T02:41:00Z",
+  "updatedAtUtc": "2026-09-04T06:52:37Z",
   "canonicalIntegrationBranch": "integration/v6-ml-architecture-20260830",
   "canonicalIntegrationPr": 18,
   "scoreScale": {
@@ -98,6 +98,7 @@
       "current": 6,
       "state": "PARTIAL_EXTERNAL_VALIDATION",
       "next": [
+        "retain FRONTIER_INTERIM checkpoints outside settlement eligibility",
         "exact platform coverage",
         "prospective CFB settlements",
         "CRPS/subgroups",
@@ -197,10 +198,10 @@
       "id": "P15",
       "name": "P380X donor signal governance",
       "target": 10,
-      "current": 7,
-      "state": "PARTIAL",
+      "current": 8,
+      "state": "STRONG_PARTIAL",
       "next": [
-        "Tranche C research-truth integration",
+        "Tranche D role/archetype, matchup, and context integration through typed signal operators",
         "compile exact donor definitions only when archive bytes are available",
         "promote operators only after real producer-consumer integration and tests"
       ]

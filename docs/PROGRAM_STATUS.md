@@ -2,7 +2,7 @@
 
 Canonical integration line: `integration/v6-ml-architecture-20260830` at merge commit `59ea12487ad2e747a15427ba6bb9babd1b9f5907` (through PR #18 R0 Algorithmic Constitution).
 
-Active CFB guarded-launch Research OS slice: `grok/cfb-guarded-launch-today-20260903` targeting integration only. No merge to `main` is authorized.
+Active CFB guarded-launch Research OS semantic-closure slice: `chatgpt/cfb-semantic-closure-v3-20260904` (PR #20, stacked on PR #19) targeting integration only. No merge to `main` is authorized.
 
 This file is the human dashboard. It must be updated on every coding pass together with a new immutable pass record under `docs/engineering_passes/`.
 
@@ -25,7 +25,7 @@ This file is the human dashboard. It must be updated on every coding pass togeth
 | P3 SportPlugin physics | 10 | 8 | STRONG PARTIAL | 19 CFB PRODUCTION markets executable; remaining 24-component plugin bindings sport by sport; current-board operational acceptance |
 | P4 Probability / uncertainty / grading / portfolio | 10 | 9 | STRONG PARTIAL | prospective CFB settlement/calibration evidence; mixed-sport shared-world coverage |
 | P5 Audit / portability / ChatGPT-native execution | 10 | 8 | STRONG PARTIAL | current-HAR fresh ChatGPT acceptance; immutable release retrieval |
-| P6 Settlement / calibration / learning | 10 | 6 | PARTIAL + EXTERNAL VALIDATION | exact platform coverage; CFB prospective settlements; CRPS/subgroups; chronological unseen settlements before promotion |
+| P6 Settlement / calibration / learning | 10 | 6 | PARTIAL + EXTERNAL VALIDATION | retain FRONTIER_INTERIM checkpoints outside settlement eligibility; exact platform coverage; CFB prospective settlements; CRPS/subgroups; chronological unseen settlements before promotion |
 | P7 Host-native execution contract | 10 | 8 | STRONG PARTIAL | current CFB HAR forecast through `dcm-host cfb-launch` on a fresh wheel; no second engine |
 | P8 Universal source acquisition | 10 | 7 | PARTIAL | live adapter fetch beyond fixtures; licensed providers remain optional |
 | P9 Universal core migration | 10 | 9 | STRONG PARTIAL | retire remaining PLAYER/TEAM claim lookups at packet/parameter adapters |
@@ -34,7 +34,7 @@ This file is the human dashboard. It must be updated on every coding pass togeth
 | P12 Research archive / index / reuse | 10 | 8 | STRONG PARTIAL | Drive credentials; high-volume queryable store; retention/licensing enforcement beyond local blobs |
 | P13 Performance / search / token optimization | 10 | 8 | STRONG PARTIAL | measured CPU/RSS/token certification; host-performance remains uncertified |
 | P14 Production operations / observability | 10 | 5 | PARTIAL | run health/readiness, failure taxonomy, deterministic recovery, release gates |
-| P15 P380X donor signal governance | 10 | 7 | PARTIAL | Tranche C research truth; exact donor definition compilation only from available archive bytes; evidence-earned activation only |
+| P15 P380X donor signal governance | 10 | 8 | STRONG PARTIAL | Tranche C MaterialFact/source-truth runtime closure; next typed role/matchup/context operators; exact donor archive bytes and later tranches remain external/future |
 | P16 Algorithmic Constitution / strategy registry | 10 | 9 | STRONG PARTIAL | CFB live CELF + telemetry done; remaining mixed-sport R1; keep CI gates; no silent algorithm retirement |
 
 Constitution version `DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903` is inherited. Learning revision remains `LR000000`; predictive superiority remains `NONE`; production-root certification remains false.
@@ -139,6 +139,35 @@ Measured: 435 pytest passed; inventory 272/1945 hash `d25db58371c5acd9cb85d37737
 Engineering synthetic throughput (not certified): 100 rows 8.05s / 170MB; 1000 rows 131.6s / 1446MB. Improved vs the prior freeze-gate snapshot, still above the original ~96s/932MB 1000-row engineering baseline because semantic work is now real.
 
 Verdict: `CFB_REFERENCE_IMPLEMENTATION_SOFTWARE_COMPLETE` for the declared CFB software path. Current-HAR operational acceptance remains pending external input. Host-performance uncertified. Do not merge to main.
+
+## 2026-09-04 CFB semantic-closure / frontier-firewall pass
+
+Continues from the green PR #19 head at `958d4c28cc8955b89cd4e19fe6350c2bf752af9` on `chatgpt/cfb-semantic-closure-v3-20260904` through PR #20. The canonical integration branch remains `integration/v6-ml-architecture-20260830`; `main` is untouched.
+
+Closed this pass:
+
+- interim frontier state is explicit: `FRONTIER_INTERIM` / `AWAITING_FRONTIER_RESEARCH`;
+- interim runs emit `frontier_checkpoint.json` without a frozen forecast hash, hash sidecar, FrozenForecast ledger row, or settlement eligibility;
+- postgame verification and GitHub archive certification fail closed when the frozen artifact is absent or interim;
+- final freeze binds state and frontier checkpoint hashes, and only request-complete bundles or the established engineering fixture mode can reach the final freeze artifact;
+- MaterialFact resolution deduplicates same-lineage claims, resolves latest-as-of claims, records explicit states, and holds unresolved contradictions conservatively;
+- conformal widening remains inactive at `LR000000` until chronological unseen settlement evidence earns calibration;
+- bootstrap, reference-architecture, dynamic-control, and universal-trace documents make the ChatGPT-native and post-freeze boundaries explicit.
+
+Measured:
+
+- CI run 242 passed: pytest stage, algorithm constitution check, generated inventory check, and benchmark smoke;
+- pytest coverage is 439 tests; generated inventory is 272 modules / 1,949 symbols with hash `93bf2cba429490decfdfd89dbce57973348e121ea521e63da40b0835d0117a1c`;
+- benchmark smoke remains engineering-synthetic throughput only; host-performance certification is not earned.
+
+Not earned:
+
+- current live CFB HAR and host-acquired evidence;
+- prospective settlements, calibration promotion, or any LR/predictive claim;
+- production-root or host-performance certification;
+- exact P380X donor ZIP bytes and mixed-sport R1 completion.
+
+Verdict: `CFB_REFERENCE_IMPLEMENTATION_SOFTWARE_COMPLETE` for the declared CFB software path. Current-HAR operational acceptance remains `CFB_CURRENT_HAR_OPERATIONAL_ACCEPTANCE_PENDING`. Do not merge to `main`.
 
 ## P380X Tranche A/B status
 
