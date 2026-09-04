@@ -1,3 +1,0 @@
-PRIZEPICKS_PLAYER_PICKS_2026-08-25_V1
-verification_state: SNAPSHOT_ID_ONLY
-official pages outrank this folder

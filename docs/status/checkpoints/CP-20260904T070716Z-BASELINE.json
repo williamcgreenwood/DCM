@@ -1,0 +1,60 @@
+{
+  "schema": "pillars_dcm.checkpoint_manifest.v1",
+  "checkpointId": "CP-20260904T070716Z-BASELINE",
+  "parentCheckpointId": null,
+  "timestampUtc": "2026-09-04T07:07:16Z",
+  "localDeadlineContext": "2026-09-04 implementation timebox; stabilize after the current coherent tranche",
+  "repositoryUrl": "https://github.com/williamcgreenwood/DCM",
+  "branch": "chatgpt/cfb-production-closure-20260904",
+  "baseBranch": "chatgpt/cfb-semantic-closure-v3-20260904",
+  "baseSha": "1d15508d5c47aa25a7ca2b8d975b8d190713deb0",
+  "startSha": "1d15508d5c47aa25a7ca2b8d975b8d190713deb0",
+  "checkpointCommitSha": null,
+  "dirtyTreeInventory": {
+    "fileCount": 531,
+    "sourceTreeContentHash": "08661575d218002f2898432ec7a91e0366886e76313946fad3c86f8d46099656",
+    "rawHarExcluded": true,
+    "harSha256": "ad3a10271c511266c1a52869658362e07002aad9f453eb77108f35c82e2f96d7"
+  },
+  "completedTranches": ["baseline truth capture", "remote branch selection", "safe HAR structural scan"],
+  "activeAtomicTask": "Implement remaining master-prompt runtime consumers and verify the supplied CFB HAR path.",
+  "nextExactAction": "Run focused failing probes for cache, signal, decision, and source-health consumers.",
+  "requirements": {
+    "completed": ["child-branch policy", "raw-HAR exclusion", "remote branch truth", "compile baseline"],
+    "partial": ["persistent exact-first reuse", "CFB residual/shared worlds", "temporal facts", "algorithm registry/telemetry", "freeze guards"],
+    "blocked": ["current-HAR host research", "production root certification", "prospective settlement learning", "full pytest in this runtime"],
+    "untouched": ["fresh wheel acceptance", "host-performance certification", "mixed-sport R1 acceptance"]
+  },
+  "files": {
+    "added": ["docs/status/WORK_STATE.json", "docs/status/checkpoints/CP-20260904T070716Z-BASELINE.json", "docs/status/passes/20260904T070716Z_baseline.md"],
+    "modified": [],
+    "deleted": [],
+    "reason": "Create the required repository-native resumable save-state surfaces before implementation edits."
+  },
+  "commands": [
+    {"command": "python -m compileall -q artifacts/dcm_v6_workstream_ab", "exitCode": 0},
+    {"command": "python scripts/build_code_inventory.py --check", "exitCode": null, "status": "PENDING_BASELINE_RECHECK"},
+    {"command": "pytest -q", "exitCode": null, "status": "EXTERNAL_BLOCKED_PYTEST_NOT_INSTALLED"}
+  ],
+  "tests": {
+    "targeted": {"status": "PENDING", "passed": 0, "failed": 0, "skipped": 0},
+    "full": {"status": "EXTERNAL_BLOCKED", "passed": null, "failed": null, "skipped": null},
+    "failureNotes": ["pytest executable and module are absent from the available runtime"]
+  },
+  "generatedInventory": {"status": "REMOTE_BASELINE_PRESENT", "regenerateAfterEdits": true},
+  "benchmarks": {"status": "PENDING", "baseline": null, "comparison": null},
+  "identities": {
+    "algorithmConstitutionVersion": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+    "algorithmRegistrySha256": "9327ec9884e7a55a7854f27d85fd062d6b959794197670db14b7932428e885ca",
+    "requirementRegistryHash": "RESOLVE_FROM_GENERATED_TRACE",
+    "learningRevision": "LR000000",
+    "predictiveClaim": "NONE"
+  },
+  "researchHashes": {"harSha256": "ad3a10271c511266c1a52869658362e07002aad9f453eb77108f35c82e2f96d7"},
+  "externalDependencies": ["GitHub connector", "Google Drive connector optional", "pytest package for full suite"],
+  "blockers": ["current-HAR host-side evidence", "canonical v5.4.1 bytes", "prospective outcomes", "pytest unavailable"],
+  "pullRequest": {"number": null, "url": null, "target": "chatgpt/cfb-semantic-closure-v3-20260904", "head": "chatgpt/cfb-production-closure-20260904", "status": "NOT_CREATED"},
+  "recoveryCommand": "cd DCM && python -m dcm.runner --resume <run>/checkpoint.json",
+  "validationCommand": "python -m compileall -q artifacts/dcm_v6_workstream_ab && python scripts/build_code_inventory.py --check",
+  "honestCompletionState": "BASELINE_ONLY; IMPLEMENTATION_NOT_COMPLETE"
+}

@@ -1,0 +1,54 @@
+{
+  "schema": "pillars_dcm.work_state.v1",
+  "checkpointId": "CP-20260904T070716Z-BASELINE",
+  "lastGreenCheckpointId": "CP-20260904T070716Z-BASELINE",
+  "currentState": "BASELINE_RECORDED",
+  "honestCompletionState": "PARTIAL_RUNTIME_CLOSURE_IN_PROGRESS",
+  "repository": "https://github.com/williamcgreenwood/DCM",
+  "branch": "chatgpt/cfb-production-closure-20260904",
+  "baseBranch": "chatgpt/cfb-semantic-closure-v3-20260904",
+  "baseSha": "1d15508d5c47aa25a7ca2b8d975b8d190713deb0",
+  "startSha": "1d15508d5c47aa25a7ca2b8d975b8d190713deb0",
+  "checkpointCommitSha": null,
+  "updatedAtUtc": "2026-09-04T07:07:16Z",
+  "activeAtomicTask": "Implement remaining master-prompt runtime consumers and verify the supplied CFB HAR path.",
+  "nextExactAction": "Run targeted reproductions, then patch the first failing runtime seam.",
+  "lastValidation": {
+    "command": "python -m compileall -q artifacts/dcm_v6_workstream_ab",
+    "exitCode": 0,
+    "pytest": "EXTERNAL_BLOCKED_PYTEST_NOT_INSTALLED"
+  },
+  "har": {
+    "sourceName": "2353pstCFB.har",
+    "sha256": "ad3a10271c511266c1a52869658362e07002aad9f453eb77108f35c82e2f96d7",
+    "entries": 31,
+    "prizePicksApiEntries": 15,
+    "projectionResponses": 2,
+    "rawCommitted": false
+  },
+  "inventory": {
+    "sourceBranchFileCount": 531,
+    "sourceTreeContentHash": "08661575d218002f2898432ec7a91e0366886e76313946fad3c86f8d46099656",
+    "generatedInventory": "REMOTE_BASELINE_PRESENT"
+  },
+  "tranches": {
+    "baseline": "COMPLETED",
+    "identityCacheEvidence": "PARTIAL_REMOTE_BASELINE",
+    "signalGovernance": "PARTIAL_RUNTIME_WIRING",
+    "materialFactsSourceRouting": "PARTIAL_REMOTE_BASELINE",
+    "cfbOpportunityEfficiency": "PARTIAL_REMOTE_BASELINE",
+    "sharedEventWorldProbability": "PARTIAL_REMOTE_BASELINE",
+    "decisionPortfolio": "PARTIAL_AUDIT_REQUIRED",
+    "freezeSettlementLearning": "PARTIAL_EXTERNAL_EVIDENCE_REQUIRED",
+    "performancePortabilityRelease": "NOT_STARTED_THIS_PASS"
+  },
+  "externalBlockers": [
+    "pytest is not installed in the available runtime",
+    "current-HAR host-side evidence acquisition is not available",
+    "v5.4.1 canonical source/ledger bytes are not mounted",
+    "prospective settlement/calibration evidence is not yet earned",
+    "production root and host-performance certification remain false"
+  ],
+  "recoveryCommand": "cd DCM && python -m dcm.runner --resume <run>/checkpoint.json",
+  "validationCommand": "python -m compileall -q artifacts/dcm_v6_workstream_ab && python scripts/build_code_inventory.py --check"
+}
