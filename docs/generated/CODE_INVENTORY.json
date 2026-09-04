@@ -1,5 +1,5 @@
 {
-  "contentHash": "8ef7fb89e36055ac2a258853c603920554c2f2ec1e28e7aca1017192b3717eea",
+  "contentHash": "ea869a91b08521ccf6cfa165ec920afe9265de9cad63cf0f4d0094b13beb5213",
   "moduleCount": 272,
   "modules": [
     {
@@ -4388,7 +4388,7 @@
       "classes": 0,
       "functions": 13,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/learning/postgame.py",
-      "sha256": "75c28bc96b743cbfb4e8a3e027de083434b162974e462bfe6799ea5919ad4e64",
+      "sha256": "5dbe5252edd59318b195c384d87315de1938fcfa734953ba78fa0cbc477a140a",
       "symbols": [
         {
           "doc": null,
@@ -5791,7 +5791,7 @@
       "classes": 0,
       "functions": 3,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/model/uncertainty.py",
-      "sha256": "366e62d74e7a244f993b52268229b1ead0c294e8a3bb2ec997f292eb107b1bac",
+      "sha256": "8abdbd7388f647faa9b8fa6caf8031c032b67fb380f1bfc28d9e13d2cfaa7b96",
       "symbols": [
         {
           "doc": null,
@@ -8516,7 +8516,7 @@
       "classes": 0,
       "functions": 14,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/material_facts.py",
-      "sha256": "e61ce790bed7756776e3c2552a03034de73ce69d745796d3237eea88361a4e81",
+      "sha256": "06a56feaa4c7049c5ee1a460885585ca993df7f1b26e1509949366e2c1a3b0ef",
       "symbols": [
         {
           "doc": null,
@@ -10455,7 +10455,7 @@
       "classes": 0,
       "functions": 11,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/runner.py",
-      "sha256": "0d85ce97ae67bc91916b96f9cb88f1ebc296392a561331dc94752a574de93226",
+      "sha256": "1c3ef330fb1b75a1ca0510a3d9fb9ea30d4745ed88d3398f973eb3bbbb60b2ed",
       "symbols": [
         {
           "doc": "Always write dest/audit/. Optionally copy+commit+push a GitHub pack.",
@@ -10982,7 +10982,7 @@
       "classes": 0,
       "functions": 2,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/runtime/freeze.py",
-      "sha256": "86bab5c7429d64b5b9670113ba94a89cb7664e52c1f2659efe275b80e161c329",
+      "sha256": "1d75c6fae6a636dd1d1dcca28ee4db668623de6fc22099fb57349a01c98edebc",
       "symbols": [
         {
           "doc": null,
@@ -11007,7 +11007,7 @@
       "classes": 0,
       "functions": 38,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/runtime/github_archive.py",
-      "sha256": "93a014e1f76423f3f0d168e50b9f3fe53868acfa2dd170cc226e13b3024a0969",
+      "sha256": "789515bec12fdec5e2e8ed3de27a01f992799a4870fa5acc69ee7246313aec27",
       "symbols": [
         {
           "doc": "Return secret-like tokens found in file text. Empty list means clean.",
@@ -13721,7 +13721,7 @@
       "classes": 0,
       "functions": 6,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_cfb_guarded_launch.py",
-      "sha256": "49ff0405f18fec9d7d48080e5bb0337f9711a0cfc7f98e270aa5a82b06d975ee",
+      "sha256": "5b20be22e634de2da814879efbb8252b871bfde1c4c53245de285885c5ae70e8",
       "symbols": [
         {
           "doc": null,
@@ -14044,7 +14044,7 @@
       "classes": 0,
       "functions": 20,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_cfb_semantic_completion.py",
-      "sha256": "ec7614659a27f0c74ee415bdca635e4c9fca4d4d6e6aebe9159683f757658f71",
+      "sha256": "726077b44cd97c71d65811dd31b3ffa8108f8ed473d0b9b72c9ffa9dc8997511",
       "symbols": [
         {
           "doc": null,
