@@ -5,7 +5,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 - Modules: **272**
 - Symbols: **1949**
 - Parse errors: **0**
-- Inventory hash: `d1f5f349e138bf2c6eb5b8d4727d39e2bee1d0e258c49ace9ab7fc6faed8e2d2`
+- Inventory hash: `49e11799a384e825e8bf12207d98d8cb13d171be7076824e84edd432fe34acde`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -1907,7 +1907,7 @@ _No class/function symbols._
 - `method` **run_dcm._snapshot_for** L662
 - `method` **run_dcm._resimulate_material** L1025
 - `method` **run_dcm.slim** L1216
-- `function` **main** L1713
+- `function` **main** L1714
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/runtime/__init__.py`
 

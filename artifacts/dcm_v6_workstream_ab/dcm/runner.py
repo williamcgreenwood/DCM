@@ -1500,9 +1500,10 @@ def run_dcm(
     loop_doc = cfb_forecast.get("frontierLoop") or {}
     frontier_final = bool(top25_doc.get("final"))
     stop_reason = str(loop_doc.get("stopReason") or "")
-    research_terminal = research == "fixture" or (
-        bool(bundle.get("complete")) and bool((bundle.get("coverage") or {}).get("complete"))
-    )
+    # Bundle completeness is the request-level terminal condition. Field-level
+    # coverage remains an audit/readiness signal and may be incomplete for a
+    # structurally complete diagnostic bundle; missing/malformed requests do not.
+    research_terminal = research == "fixture" or bool(bundle.get("complete"))
     can_freeze = frontier_final and research_terminal and stop_reason != "EXTERNAL_HOST_REQUIRED"
     freeze["top25Final"] = frontier_final
     freeze["frontierStopReason"] = stop_reason

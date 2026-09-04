@@ -1,5 +1,5 @@
 {
-  "contentHash": "d1f5f349e138bf2c6eb5b8d4727d39e2bee1d0e258c49ace9ab7fc6faed8e2d2",
+  "contentHash": "49e11799a384e825e8bf12207d98d8cb13d171be7076824e84edd432fe34acde",
   "moduleCount": 272,
   "modules": [
     {
@@ -10455,7 +10455,7 @@
       "classes": 0,
       "functions": 11,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/runner.py",
-      "sha256": "0d5e7b7cb96ff8b0820bfe37bdd18ed983e21e47bfbc2a5037e028933262f38f",
+      "sha256": "0d85ce97ae67bc91916b96f9cb88f1ebc296392a561331dc94752a574de93226",
       "symbols": [
         {
           "doc": "Always write dest/audit/. Optionally copy+commit+push a GitHub pack.",
@@ -10507,7 +10507,7 @@
         },
         {
           "doc": null,
-          "endLine": 1710,
+          "endLine": 1711,
           "kind": "function",
           "line": 226,
           "name": "run_dcm",
@@ -10539,9 +10539,9 @@
         },
         {
           "doc": null,
-          "endLine": 1828,
+          "endLine": 1829,
           "kind": "function",
-          "line": 1713,
+          "line": 1714,
           "name": "main",
           "qualname": "main"
         }
