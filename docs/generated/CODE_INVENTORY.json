@@ -1,5 +1,5 @@
 {
-  "contentHash": "456979a0ee3ff4c7bdb67c4c29b9946e060adb3a32fb267cd373bfc687ddcfc5",
+  "contentHash": "677c3b7349b08750952e142a4d678ef64f57acef1c91e055e4ae763b5be7ce08",
   "moduleCount": 281,
   "modules": [
     {
@@ -9848,9 +9848,9 @@
     },
     {
       "classes": 0,
-      "functions": 5,
+      "functions": 6,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/source_catalog.py",
-      "sha256": "be994a1845f3352ab710aa63e3498c2839d92bc9cf874f911783e5ec539d0a1c",
+      "sha256": "0e86b09c5b53281e46b766ea7039ece9066884aeb662589cbe471383de6cc67c",
       "symbols": [
         {
           "doc": null,
@@ -9891,6 +9891,14 @@
           "line": 96,
           "name": "catalog_summary",
           "qualname": "catalog_summary"
+        },
+        {
+          "doc": "Derive health-router seeds from the versioned capability catalog.",
+          "endLine": 149,
+          "kind": "function",
+          "line": 110,
+          "name": "source_health_seeds",
+          "qualname": "source_health_seeds"
         }
       ],
       "workstream": "P1"
@@ -9899,157 +9907,157 @@
       "classes": 1,
       "functions": 18,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/source_health.py",
-      "sha256": "76d4f63d7c6afde34256ecbaab2cd51cd78f908f4895c026953e7acca9deca4c",
+      "sha256": "40779a86430030f14207eafca3f0b0565c3d913b5e5e85ed4185de52e0d82eac",
       "symbols": [
         {
           "doc": null,
-          "endLine": 17,
+          "endLine": 18,
           "kind": "function",
-          "line": 16,
+          "line": 17,
           "name": "_now",
           "qualname": "_now"
         },
         {
           "doc": null,
-          "endLine": 21,
+          "endLine": 22,
           "kind": "function",
-          "line": 20,
+          "line": 21,
           "name": "_iso",
           "qualname": "_iso"
         },
         {
           "doc": null,
-          "endLine": 39,
+          "endLine": 40,
           "kind": "function",
-          "line": 24,
+          "line": 25,
           "name": "_parse_ts",
           "qualname": "_parse_ts"
         },
         {
           "doc": "Claim-specific source routing with circuit breakers and bounded fallbacks.",
-          "endLine": 279,
+          "endLine": 281,
           "kind": "class",
-          "line": 42,
+          "line": 43,
           "name": "SourceHealthRegistry",
           "qualname": "SourceHealthRegistry"
         },
         {
           "doc": null,
-          "endLine": 63,
+          "endLine": 64,
           "kind": "method",
-          "line": 45,
+          "line": 46,
           "name": "__init__",
           "qualname": "SourceHealthRegistry.__init__"
         },
         {
           "doc": null,
-          "endLine": 115,
+          "endLine": 117,
           "kind": "method",
-          "line": 65,
+          "line": 66,
           "name": "_ensure",
           "qualname": "SourceHealthRegistry._ensure"
         },
         {
           "doc": null,
-          "endLine": 121,
+          "endLine": 123,
           "kind": "method",
-          "line": 117,
+          "line": 119,
           "name": "_now",
           "qualname": "SourceHealthRegistry._now"
         },
         {
           "doc": null,
-          "endLine": 128,
+          "endLine": 130,
           "kind": "method",
-          "line": 123,
+          "line": 125,
           "name": "_set_success_probability",
           "qualname": "SourceHealthRegistry._set_success_probability"
         },
         {
           "doc": null,
-          "endLine": 136,
+          "endLine": 138,
           "kind": "method",
-          "line": 130,
+          "line": 132,
           "name": "success_probability",
           "qualname": "SourceHealthRegistry.success_probability"
         },
         {
           "doc": null,
-          "endLine": 146,
+          "endLine": 148,
           "kind": "method",
-          "line": 138,
+          "line": 140,
           "name": "_refresh_circuit",
           "qualname": "SourceHealthRegistry._refresh_circuit"
         },
         {
           "doc": null,
-          "endLine": 167,
+          "endLine": 169,
           "kind": "method",
-          "line": 148,
+          "line": 150,
           "name": "record_success",
           "qualname": "SourceHealthRegistry.record_success"
         },
         {
           "doc": null,
-          "endLine": 184,
+          "endLine": 186,
           "kind": "method",
-          "line": 169,
+          "line": 171,
           "name": "record_failure",
           "qualname": "SourceHealthRegistry.record_failure"
         },
         {
           "doc": "Traverse fallbackSourceIds, skipping currently OPEN circuits.",
-          "endLine": 203,
+          "endLine": 205,
           "kind": "method",
-          "line": 186,
+          "line": 188,
           "name": "fallbacks",
           "qualname": "SourceHealthRegistry.fallbacks"
         },
         {
           "doc": "Prefer official/structured, then stats, then reporting, search last.",
-          "endLine": 236,
+          "endLine": 238,
           "kind": "method",
-          "line": 205,
+          "line": 207,
           "name": "route",
           "qualname": "SourceHealthRegistry.route"
         },
         {
           "doc": null,
-          "endLine": 256,
+          "endLine": 258,
           "kind": "method",
-          "line": 238,
+          "line": 240,
           "name": "snapshot",
           "qualname": "SourceHealthRegistry.snapshot"
         },
         {
           "doc": "Overlay persisted counters/circuits onto the live catalog. Never invent 0.85.",
-          "endLine": 279,
+          "endLine": 281,
           "kind": "method",
-          "line": 258,
+          "line": 260,
           "name": "load_snapshot",
           "qualname": "SourceHealthRegistry.load_snapshot"
         },
         {
           "doc": "Write the live source-health snapshot so later research passes restore it.",
-          "endLine": 294,
+          "endLine": 296,
           "kind": "function",
-          "line": 282,
+          "line": 284,
           "name": "persist_cfb_source_health",
           "qualname": "persist_cfb_source_health"
         },
         {
           "doc": "Restore persisted source-health counters/circuits. Missing file \u2192 default catalog.",
-          "endLine": 315,
+          "endLine": 317,
           "kind": "function",
-          "line": 297,
+          "line": 299,
           "name": "load_cfb_source_health",
           "qualname": "load_cfb_source_health"
         },
         {
-          "doc": "CFB catalog. Never routes college football through a pro-football adapter.",
-          "endLine": 358,
+          "doc": "CFB router derived from the versioned source-capability catalog.",
+          "endLine": 340,
           "kind": "function",
-          "line": 318,
+          "line": 320,
           "name": "default_cfb_source_health",
           "qualname": "default_cfb_source_health"
         }
@@ -18145,33 +18153,41 @@
     },
     {
       "classes": 0,
-      "functions": 3,
+      "functions": 4,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_source_catalog.py",
-      "sha256": "eb1fddededda4e160ce54831653aa81ddcd724aee26bc6121a185fdd8385694c",
+      "sha256": "a1515fb548341cb5010d7add2a64dd6bae8471a19f9bce66e9f0dcae9ab11bea",
       "symbols": [
         {
           "doc": null,
-          "endLine": 16,
+          "endLine": 17,
           "kind": "function",
-          "line": 7,
+          "line": 8,
           "name": "test_catalog_loads_and_is_hashed",
           "qualname": "test_catalog_loads_and_is_hashed"
         },
         {
           "doc": null,
-          "endLine": 25,
+          "endLine": 26,
           "kind": "function",
-          "line": 19,
+          "line": 20,
           "name": "test_catalog_priority_official_before_search",
           "qualname": "test_catalog_priority_official_before_search"
         },
         {
           "doc": null,
-          "endLine": 30,
+          "endLine": 31,
           "kind": "function",
-          "line": 28,
+          "line": 29,
           "name": "test_catalog_counterparty_basketball",
           "qualname": "test_catalog_counterparty_basketball"
+        },
+        {
+          "doc": null,
+          "endLine": 44,
+          "kind": "function",
+          "line": 34,
+          "name": "test_cfb_health_router_is_derived_from_cfb_catalog_capabilities",
+          "qualname": "test_cfb_health_router_is_derived_from_cfb_catalog_capabilities"
         }
       ],
       "workstream": "UNMAPPED"
@@ -18637,5 +18653,5 @@
   "parseErrors": [],
   "root": "artifacts/dcm_v6_workstream_ab",
   "schema": "pillars_dcm.code_inventory.v1",
-  "symbolCount": 2017
+  "symbolCount": 2019
 }

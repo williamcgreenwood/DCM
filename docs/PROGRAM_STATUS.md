@@ -6,7 +6,7 @@ Active canonical-main CFB closure slice: `chatgpt/canonical-main-cfb-standard-20
 
 This file is the human dashboard. It must be updated on every coding pass together with a new immutable pass record under `docs/engineering_passes/`.
 
-Current bounded execution increment: `P0-CFB-COVERAGE-COMPLETION-20260905` repairs a live-HAR host-loop defect discovered on the public-main release: a valid current-run evidence import closed coverage but could still be reissued until the cross-run cache classified it `REUSE_VALID`. The scheduler now treats semantic coverage completion as authoritative. A fresh wheel and quarantined 09/05 CFB HAR proved `552 → 551` unresolved requests after one official event observation, with the completed request absent from the next batch. This is partial operational evidence only: 551 requests remain, no final forecast/freeze or Top100/Top25 is claimed, and predictive/production-root gates remain unchanged.
+Current bounded execution increment: `P0-CFB-SOURCE-CATALOG-CAPABILITIES-20260905` removes drift between the versioned SourceCatalog and CFB source-health router. Catalog changes now feed stable CFB runtime routing IDs with explicit authority, fallback, circuit-breaker, and parser-change metadata; official-athletics and weather capabilities are available to the host planning path. This does not yet make an unrestricted background web scraper possible in a ChatGPT run: host-acquired evidence still requires permitted host tools and each adapter’s own runtime parser. No final forecast/freeze or Top100/Top25 is claimed.
 `docs/engineering/DCM_CODING_AND_PROMPT_STANDARD.md`; Drive writes follow
 `docs/engineering/DCM_DRIVE_HIERARCHY.md` and `dcm.runtime.storage_router`.
 

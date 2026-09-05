@@ -3,9 +3,9 @@
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
 - Modules: **281**
-- Symbols: **2017**
+- Symbols: **2019**
 - Parse errors: **0**
-- Inventory hash: `456979a0ee3ff4c7bdb67c4c29b9946e060adb3a32fb267cd373bfc687ddcfc5`
+- Inventory hash: `677c3b7349b08750952e142a4d678ef64f57acef1c91e055e4ae763b5be7ce08`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -152,7 +152,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/research_store.py` | 1 | 26 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/role_epoch.py` | 1 | 27 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/scopes.py` | 0 | 6 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/source_catalog.py` | 0 | 5 |
+| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/source_catalog.py` | 0 | 6 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/source_health.py` | 1 | 18 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/staged.py` | 0 | 5 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/statepack.py` | 4 | 26 |
@@ -280,7 +280,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_schema_v2_fields.py` | 0 | 4 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_settlement_population.py` | 0 | 6 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_signal_governance.py` | 0 | 21 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_source_catalog.py` | 0 | 3 |
+| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_source_catalog.py` | 0 | 4 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_sport_plugin_full_contract.py` | 0 | 3 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_sport_research_schema.py` | 0 | 3 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_statepack.py` | 0 | 5 |
@@ -1820,28 +1820,29 @@ _No class/function symbols._
 - `function` **sources_for** L46
 - `function` **estimated_cost** L85
 - `function` **catalog_summary** L96
+- `function` **source_health_seeds** L110 — Derive health-router seeds from the versioned capability catalog.
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/source_health.py`
 
-- `function` **_now** L16
-- `function` **_iso** L20
-- `function` **_parse_ts** L24
-- `class` **SourceHealthRegistry** L42 — Claim-specific source routing with circuit breakers and bounded fallbacks.
-- `method` **SourceHealthRegistry.__init__** L45
-- `method` **SourceHealthRegistry._ensure** L65
-- `method` **SourceHealthRegistry._now** L117
-- `method` **SourceHealthRegistry._set_success_probability** L123
-- `method` **SourceHealthRegistry.success_probability** L130
-- `method` **SourceHealthRegistry._refresh_circuit** L138
-- `method` **SourceHealthRegistry.record_success** L148
-- `method` **SourceHealthRegistry.record_failure** L169
-- `method` **SourceHealthRegistry.fallbacks** L186 — Traverse fallbackSourceIds, skipping currently OPEN circuits.
-- `method` **SourceHealthRegistry.route** L205 — Prefer official/structured, then stats, then reporting, search last.
-- `method` **SourceHealthRegistry.snapshot** L238
-- `method` **SourceHealthRegistry.load_snapshot** L258 — Overlay persisted counters/circuits onto the live catalog. Never invent 0.85.
-- `function` **persist_cfb_source_health** L282 — Write the live source-health snapshot so later research passes restore it.
-- `function` **load_cfb_source_health** L297 — Restore persisted source-health counters/circuits. Missing file → default catalog.
-- `function` **default_cfb_source_health** L318 — CFB catalog. Never routes college football through a pro-football adapter.
+- `function` **_now** L17
+- `function` **_iso** L21
+- `function` **_parse_ts** L25
+- `class` **SourceHealthRegistry** L43 — Claim-specific source routing with circuit breakers and bounded fallbacks.
+- `method` **SourceHealthRegistry.__init__** L46
+- `method` **SourceHealthRegistry._ensure** L66
+- `method` **SourceHealthRegistry._now** L119
+- `method` **SourceHealthRegistry._set_success_probability** L125
+- `method` **SourceHealthRegistry.success_probability** L132
+- `method` **SourceHealthRegistry._refresh_circuit** L140
+- `method` **SourceHealthRegistry.record_success** L150
+- `method` **SourceHealthRegistry.record_failure** L171
+- `method` **SourceHealthRegistry.fallbacks** L188 — Traverse fallbackSourceIds, skipping currently OPEN circuits.
+- `method` **SourceHealthRegistry.route** L207 — Prefer official/structured, then stats, then reporting, search last.
+- `method` **SourceHealthRegistry.snapshot** L240
+- `method` **SourceHealthRegistry.load_snapshot** L260 — Overlay persisted counters/circuits onto the live catalog. Never invent 0.85.
+- `function` **persist_cfb_source_health** L284 — Write the live source-health snapshot so later research passes restore it.
+- `function` **load_cfb_source_health** L299 — Restore persisted source-health counters/circuits. Missing file → default catalog.
+- `function` **default_cfb_source_health** L320 — CFB router derived from the versioned source-capability catalog.
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/staged.py`
 
@@ -3109,9 +3110,10 @@ _No class/function symbols._
 
 ### `artifacts/dcm_v6_workstream_ab/tests/test_source_catalog.py`
 
-- `function` **test_catalog_loads_and_is_hashed** L7
-- `function` **test_catalog_priority_official_before_search** L19
-- `function` **test_catalog_counterparty_basketball** L28
+- `function` **test_catalog_loads_and_is_hashed** L8
+- `function` **test_catalog_priority_official_before_search** L20
+- `function` **test_catalog_counterparty_basketball** L29
+- `function` **test_cfb_health_router_is_derived_from_cfb_catalog_capabilities** L34
 
 ### `artifacts/dcm_v6_workstream_ab/tests/test_sport_plugin_full_contract.py`
 

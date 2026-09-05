@@ -302,6 +302,7 @@
     "validatedHead": "384a149102fa343d95f8642d9dd9a90590c3d65b",
     "targetedHostScopeBoundary": "IMPLEMENTED_MERGED_VERIFIED",
     "semanticCoverageScheduler": "IMPLEMENTED_PENDING_PROMOTION; fresh-wheel current-HAR readback 552->551 after one valid official observation",
+    "cfbSourceCatalogCapabilityRouting": "IMPLEMENTED_PENDING_PROMOTION; catalog-derived stable CFB routes and 45 targeted tests green",
     "mergeCommit": "1b4e91b17b78f3d9323c7c126042a06ed4bcb59e"
   }
 }

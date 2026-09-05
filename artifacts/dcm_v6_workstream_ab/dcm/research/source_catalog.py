@@ -105,3 +105,45 @@ def catalog_summary(catalog: dict[str, Any] | None = None) -> dict[str, Any]:
         "secretsInRepo": False,
         "liveFetchDefault": False,
     }
+
+
+def source_health_seeds(
+    *,
+    sport: str,
+    competition: str,
+    catalog: dict[str, Any] | None = None,
+) -> list[dict[str, Any]]:
+    """Derive health-router seeds from the versioned capability catalog.
+
+    The catalog is the single source for source IDs, adapters, costs, and
+    fallbacks. Claim authority is deliberately conservative and explicit here:
+    source availability does not turn a discovery page into an authoritative
+    injury, depth-chart, or statistical claim.
+    """
+    authority = {
+        "cfb_official_athletics": {"EVENT": 100, "AFFILIATION": 90, "SUBJECT": 80, "COUNTERPARTY": 80},
+        "college_football_reference": {"SUBJECT": 85, "AFFILIATION": 80, "EVENT": 60},
+        "open_meteo_weather": {"ENVIRONMENT": 90, "EVENT": 50},
+        "espn_status": {"SUBJECT": 70, "EVENT": 75, "ENVIRONMENT": 40},
+        "generic_web_search": {"SUBJECT": 20, "EVENT": 20, "AFFILIATION": 20, "COUNTERPARTY": 20, "ENVIRONMENT": 20},
+    }
+    seeds: list[dict[str, Any]] = []
+    for source in sources_for(sport=sport, competition=competition, catalog=catalog):
+        sid = str(source.get("sourceId") or "")
+        if not sid or sid == "prizepicks_offer":
+            continue
+        seeds.append({
+            "sourceId": sid,
+            "catalogSourceId": sid,
+            "adapter": source.get("adapterId") or sid,
+            "domain": source.get("domain") or "",
+            "authorityByClaimType": authority.get(sid, {}),
+            "sports": [competition],
+            "fields": list(source.get("fields") or []),
+            "cost": source.get("cost") or 1.0,
+            "expectedFreshness": 0.9 if str(source.get("expectedFreshness") or "").startswith("same_event") else 0.7,
+            "rateLimit": source.get("rateLimit"),
+            "knownFailureModes": list(source.get("knownFailureModes") or []),
+            "fallbackSourceIds": list(source.get("fallbackSourceIds") or []),
+        })
+    return seeds
