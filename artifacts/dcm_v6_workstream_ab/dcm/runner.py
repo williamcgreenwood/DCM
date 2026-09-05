@@ -64,9 +64,11 @@ from dcm.research.cache import ResearchCache
 from dcm.research.classify import accounting_classify as _classify
 from dcm.research.emit import emit_offer_sets_and_manifest, emit_packets_and_graph
 from dcm.research.evidence_graph import attach_runtime_lineage
+from dcm.research.coverage import coverage_report
 from dcm.research.host_plan import build_host_research_plan
 from dcm.research.provider import BundleProvider, FileProvider, FixtureProvider, collect, write_bundle
 from dcm.research.requests import plan_research
+from dcm.research.offer_metadata import recover_offer_metadata
 from dcm.runtime.checkpoint import load_checkpoint, write_checkpoint
 from dcm.runtime.capabilities import build_capability_manifest, persist_capability_manifest
 from dcm.runtime.cutoff import CutoffRequired, POLICY_DOC, resolve_forecast_cutoff
@@ -537,6 +539,27 @@ def run_dcm(
         planned = plan_research(rows, forecast_cutoff, research_shadow=research_shadow)
         (dest / "research_requests.json").write_text(
             json.dumps(planned["requests"], indent=2) + "\n", encoding="utf-8"
+        )
+        offer_recovery = (
+            recover_offer_metadata(rows, planned["requests"], cutoff=forecast_cutoff)
+            if not synthetic
+            else {"claims": [], "recovered": 0, "unresolved": [], "requested": 0, "recoveryComplete": True, "source": "SYNTHETIC_DISABLED"}
+        )
+        (dest / "evidence").mkdir(exist_ok=True)
+        (dest / "offer_metadata_recovery.json").write_text(
+            json.dumps({k: v for k, v in offer_recovery.items() if k != "claims"}, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        (dest / "evidence" / "claims.json").write_text(
+            json.dumps(offer_recovery["claims"], indent=2) + "\n", encoding="utf-8"
+        )
+        (dest / "evidence_bundle.jsonl").write_text(
+            "".join(json.dumps(claim, ensure_ascii=True, separators=(",", ":")) + "\n" for claim in offer_recovery["claims"]),
+            encoding="utf-8",
+        )
+        (dest / "evidence" / "coverage.json").write_text(
+            json.dumps(coverage_report(planned["requests"], offer_recovery["claims"]), indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
         )
         prepare_cfb_research_os(
             dest,

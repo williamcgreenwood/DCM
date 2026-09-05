@@ -1,6 +1,6 @@
 {
-  "contentHash": "677c3b7349b08750952e142a4d678ef64f57acef1c91e055e4ae763b5be7ce08",
-  "moduleCount": 281,
+  "contentHash": "2023e3ef0d862a29999d17e3386b4ba10a5deea2eec7625a357eb4768f44af57",
+  "moduleCount": 283,
   "modules": [
     {
       "classes": 0,
@@ -8758,6 +8758,23 @@
     },
     {
       "classes": 0,
+      "functions": 1,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/research/offer_metadata.py",
+      "sha256": "26aa395575581d0b19bd53ee6a782bc35ab0d07a230ab62a7da7ec7bd5555f31",
+      "symbols": [
+        {
+          "doc": "Return HAR-backed claims, counts, and exact unresolved reasons.",
+          "endLine": 86,
+          "kind": "function",
+          "line": 19,
+          "name": "recover_offer_metadata",
+          "qualname": "recover_offer_metadata"
+        }
+      ],
+      "workstream": "P1"
+    },
+    {
+      "classes": 0,
       "functions": 8,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/os_graphs.py",
       "sha256": "15019101791ffd21bb1085e6ad64f9c0ad022cf23bbf7782fdf1ffb2b7160d99",
@@ -10594,93 +10611,93 @@
       "classes": 0,
       "functions": 11,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/runner.py",
-      "sha256": "f05f7c0de4a5afd47ce9b5ab20f3d1c9dbb254842a9d0496cd9d86cdce172762",
+      "sha256": "5c317d64c682d87a93b2771e64d212569a4749bc3a9b80f3e97e01ac8debc72f",
       "symbols": [
         {
           "doc": "Always write dest/audit/. Optionally copy+commit+push a GitHub pack.",
-          "endLine": 198,
+          "endLine": 200,
           "kind": "function",
-          "line": 124,
+          "line": 126,
           "name": "_finalize_archive",
           "qualname": "_finalize_archive"
         },
         {
           "doc": null,
-          "endLine": 211,
+          "endLine": 213,
           "kind": "function",
-          "line": 202,
+          "line": 204,
           "name": "_synthetic_path",
           "qualname": "_synthetic_path"
         },
         {
           "doc": null,
-          "endLine": 216,
+          "endLine": 218,
           "kind": "function",
-          "line": 215,
+          "line": 217,
           "name": "_run_id",
           "qualname": "_run_id"
         },
         {
           "doc": "Best-effort git HEAD. Never writes git config. Missing git is None, not a crash.",
-          "endLine": 236,
+          "endLine": 238,
           "kind": "function",
-          "line": 219,
+          "line": 221,
           "name": "_git_commit_sha",
           "qualname": "_git_commit_sha"
         },
         {
           "doc": null,
-          "endLine": 247,
+          "endLine": 249,
           "kind": "function",
-          "line": 239,
+          "line": 241,
           "name": "_default_model_config",
           "qualname": "_default_model_config"
         },
         {
           "doc": null,
-          "endLine": 256,
+          "endLine": 258,
           "kind": "function",
-          "line": 250,
+          "line": 252,
           "name": "_active_calibration",
           "qualname": "_active_calibration"
         },
         {
           "doc": null,
-          "endLine": 2013,
+          "endLine": 2036,
           "kind": "function",
-          "line": 259,
+          "line": 261,
           "name": "run_dcm",
           "qualname": "run_dcm"
         },
         {
           "doc": null,
-          "endLine": 820,
+          "endLine": 843,
           "kind": "method",
-          "line": 797,
+          "line": 820,
           "name": "_snapshot_for",
           "qualname": "run_dcm._snapshot_for"
         },
         {
           "doc": null,
-          "endLine": 1259,
+          "endLine": 1282,
           "kind": "method",
-          "line": 1257,
+          "line": 1280,
           "name": "_resimulate_material",
           "qualname": "run_dcm._resimulate_material"
         },
         {
           "doc": null,
-          "endLine": 1492,
+          "endLine": 1515,
           "kind": "method",
-          "line": 1448,
+          "line": 1471,
           "name": "slim",
           "qualname": "run_dcm.slim"
         },
         {
           "doc": null,
-          "endLine": 2131,
+          "endLine": 2154,
           "kind": "function",
-          "line": 2016,
+          "line": 2039,
           "name": "main",
           "qualname": "main"
         }
@@ -16771,6 +16788,39 @@
     },
     {
       "classes": 0,
+      "functions": 3,
+      "path": "artifacts/dcm_v6_workstream_ab/tests/test_offer_metadata.py",
+      "sha256": "ac97e9f15bc86fb96207dcc7fd0ec049ee6a2d4c919ee95d8b470060eb8d52f5",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 6,
+          "kind": "function",
+          "line": 5,
+          "name": "_request",
+          "qualname": "_request"
+        },
+        {
+          "doc": null,
+          "endLine": 22,
+          "kind": "function",
+          "line": 9,
+          "name": "test_recovery_uses_har_row_and_never_infers_inverse_side",
+          "qualname": "test_recovery_uses_har_row_and_never_infers_inverse_side"
+        },
+        {
+          "doc": null,
+          "endLine": 32,
+          "kind": "function",
+          "line": 25,
+          "name": "test_recovery_marks_missing_sides_explicitly",
+          "qualname": "test_recovery_marks_missing_sides_explicitly"
+        }
+      ],
+      "workstream": "UNMAPPED"
+    },
+    {
+      "classes": 0,
       "functions": 6,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_official_predicates.py",
       "sha256": "ae979dc275f273694a2288bcc12419cfb293838fc9a5201e8db06bdb2ea038e5",
@@ -18653,5 +18703,5 @@
   "parseErrors": [],
   "root": "artifacts/dcm_v6_workstream_ab",
   "schema": "pillars_dcm.code_inventory.v1",
-  "symbolCount": 2019
+  "symbolCount": 2023
 }

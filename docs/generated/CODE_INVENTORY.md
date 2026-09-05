@@ -2,10 +2,10 @@
 
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
-- Modules: **281**
-- Symbols: **2019**
+- Modules: **283**
+- Symbols: **2023**
 - Parse errors: **0**
-- Inventory hash: `677c3b7349b08750952e142a4d678ef64f57acef1c91e055e4ae763b5be7ce08`
+- Inventory hash: `2023e3ef0d862a29999d17e3386b4ba10a5deea2eec7625a357eb4768f44af57`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -142,6 +142,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/indexes.py` | 2 | 19 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/lineup.py` | 0 | 3 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/material_facts.py` | 0 | 20 |
+| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/offer_metadata.py` | 0 | 1 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/os_graphs.py` | 0 | 8 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/player_offer_set.py` | 1 | 6 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/player_packet.py` | 0 | 13 |
@@ -258,6 +259,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_lineage_and_schema.py` | 0 | 5 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_market_derive.py` | 0 | 7 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_multi_har.py` | 0 | 10 |
+| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_offer_metadata.py` | 0 | 3 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_official_predicates.py` | 0 | 6 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_p1_authority_role.py` | 0 | 3 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_p4_freeze_contract.py` | 0 | 8 |
@@ -1658,6 +1660,10 @@ _No class/function symbols._
 - `function` **apply_fact_features_to_packets** L595 — Overlay resolved FeatureRecords onto modeling packets BEFORE RoleEpoch/fit.
 - `function` **facts_for_refresh** L689 — Index MaterialFacts by (scope, scopeId, claimType-or-field). Never latest-claim-wins across types.
 
+### `artifacts/dcm_v6_workstream_ab/dcm/research/offer_metadata.py`
+
+- `function` **recover_offer_metadata** L19 — Return HAR-backed claims, counts, and exact unresolved reasons.
+
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/os_graphs.py`
 
 - `function` **_is_cfb** L34
@@ -1923,17 +1929,17 @@ _No class/function symbols._
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/runner.py`
 
-- `function` **_finalize_archive** L124 — Always write dest/audit/. Optionally copy+commit+push a GitHub pack.
-- `function` **_synthetic_path** L202
-- `function` **_run_id** L215
-- `function` **_git_commit_sha** L219 — Best-effort git HEAD. Never writes git config. Missing git is None, not a crash.
-- `function` **_default_model_config** L239
-- `function` **_active_calibration** L250
-- `function` **run_dcm** L259
-- `method` **run_dcm._snapshot_for** L797
-- `method` **run_dcm._resimulate_material** L1257
-- `method` **run_dcm.slim** L1448
-- `function` **main** L2016
+- `function` **_finalize_archive** L126 — Always write dest/audit/. Optionally copy+commit+push a GitHub pack.
+- `function` **_synthetic_path** L204
+- `function` **_run_id** L217
+- `function` **_git_commit_sha** L221 — Best-effort git HEAD. Never writes git config. Missing git is None, not a crash.
+- `function` **_default_model_config** L241
+- `function` **_active_calibration** L252
+- `function` **run_dcm** L261
+- `method` **run_dcm._snapshot_for** L820
+- `method` **run_dcm._resimulate_material** L1280
+- `method` **run_dcm.slim** L1471
+- `function` **main** L2039
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/runtime/__init__.py`
 
@@ -2893,6 +2899,12 @@ _No class/function symbols._
 - `function` **test_failed_identical_scope_refresh_retains_prior_valid_state** L141
 - `function` **test_asof_scope_state_uses_last_success_before_cutoff** L155
 - `function` **test_successful_empty_after_cutoff_does_not_clear_pre_cutoff_board** L166
+
+### `artifacts/dcm_v6_workstream_ab/tests/test_offer_metadata.py`
+
+- `function` **_request** L5
+- `function` **test_recovery_uses_har_row_and_never_infers_inverse_side** L9
+- `function` **test_recovery_marks_missing_sides_explicitly** L25
 
 ### `artifacts/dcm_v6_workstream_ab/tests/test_official_predicates.py`
 
