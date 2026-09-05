@@ -5,6 +5,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Any, Callable, Mapping
 
 from dcm.contracts.hashes import content_hash
+from dcm.research.source_catalog import source_health_seeds
 
 CIRCUIT_CLOSED = "CLOSED"
 CIRCUIT_OPEN = "OPEN"
@@ -68,6 +69,7 @@ class SourceHealthRegistry:
             seed = dict(seed or {})
             row = {
                 "sourceId": source_id,
+                "catalogSourceId": seed.get("catalogSourceId") or source_id,
                 "domain": seed.get("domain") or "",
                 "adapter": seed.get("adapter") or source_id,
                 "authorityByClaimType": dict(seed.get("authorityByClaimType") or {}),
@@ -316,43 +318,23 @@ def load_cfb_source_health(path=None) -> SourceHealthRegistry:
 
 
 def default_cfb_source_health() -> SourceHealthRegistry:
-    """CFB catalog. Never routes college football through a pro-football adapter."""
-    return SourceHealthRegistry({
-        "sources": [
-            {
-                "sourceId": "CFB_OFFICIAL_GAMEBOOK",
-                "adapter": "official_league",
-                "domain": "official",
-                "authorityByClaimType": {"EVENT": 100, "AFFILIATION": 90, "SUBJECT": 80},
-                "sports": ["CFB"],
-                "cost": 1.0,
-                "fallbackSourceIds": ["CFB_SPORTS_REFERENCE", "WEB_SEARCH"],
-            },
-            {
-                "sourceId": "CFB_SPORTS_REFERENCE",
-                "adapter": "college_football_reference",
-                "domain": "sports-reference.com",
-                "authorityByClaimType": {"SUBJECT": 85, "AFFILIATION": 80, "EVENT": 60},
-                "sports": ["CFB"],
-                "cost": 1.2,
-                "fallbackSourceIds": ["CFB_STATUS", "WEB_SEARCH"],
-            },
-            {
-                "sourceId": "CFB_STATUS",
-                "adapter": "espn_status",
-                "domain": "espn.com",
-                "authorityByClaimType": {"SUBJECT": 70, "EVENT": 75, "ENVIRONMENT": 60},
-                "sports": ["CFB"],
-                "cost": 0.8,
-                "fallbackSourceIds": ["WEB_SEARCH"],
-            },
-            {
-                "sourceId": "WEB_SEARCH",
-                "adapter": "host_web",
-                "authorityByClaimType": {"SUBJECT": 20, "EVENT": 20},
-                "sports": ["CFB"],
-                "cost": 5.0,
-                "fallbackSourceIds": [],
-            },
+    """CFB router derived from the versioned source-capability catalog."""
+    stable_ids = {
+        "cfb_official_athletics": "CFB_OFFICIAL_GAMEBOOK",
+        "college_football_reference": "CFB_SPORTS_REFERENCE",
+        "open_meteo_weather": "CFB_WEATHER",
+        "espn_status": "CFB_STATUS",
+        "generic_web_search": "WEB_SEARCH",
+    }
+    seeds: list[dict[str, Any]] = []
+    for source in source_health_seeds(sport="gridiron", competition="CFB"):
+        row = dict(source)
+        catalog_id = str(row.get("sourceId") or "")
+        row["catalogSourceId"] = catalog_id
+        row["sourceId"] = stable_ids.get(catalog_id, catalog_id)
+        row["fallbackSourceIds"] = [
+            stable_ids.get(str(fallback), str(fallback))
+            for fallback in (row.get("fallbackSourceIds") or [])
         ]
-    })
+        seeds.append(row)
+    return SourceHealthRegistry({"sources": seeds})
