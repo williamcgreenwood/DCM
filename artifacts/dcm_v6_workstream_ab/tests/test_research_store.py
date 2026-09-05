@@ -104,6 +104,26 @@ def test_batch_skips_reuse_valid_and_groups_by_event():
     assert all(r["deltaClass"] == "NEW_ENTITY_FULL_RESEARCH" or r["acquire"] for r in classified if r["scope"] == "SUBJECT")
 
 
+def test_batch_does_not_reacquire_semantically_complete_request_without_cache_reuse():
+    """Fresh host imports close the current run before cache hydration occurs."""
+    request = {
+        "request_id": "R-COMPLETE",
+        "scope": "EVENT",
+        "scope_id": "E1",
+        "need": "start_venue_starters_environment",
+        "forecast_cutoff": CUTOFF,
+        "dependent_prop_count": 10,
+        "eventId": "E1",
+    }
+    coverage = {
+        "requests": [{"requestId": "R-COMPLETE", "complete": True, "missing": []}],
+    }
+    batch = build_next_research_batch([request], coverage=coverage, store=None)
+    assert batch["unresolvedCount"] == 0
+    assert batch["selectedCount"] == 0
+    assert batch["reusedCount"] == 1
+
+
 def test_classify_requests_hydrates_blob_not_pointer(tmp_path: Path):
     store = ResearchStore(tmp_path / "research_store")
     claim = _claim()
@@ -172,4 +192,3 @@ def test_source_and_time_indexes_exist(tmp_path: Path):
     assert (tmp_path / "research_store" / "indexes" / "by_entity.json").is_file()
     assert (tmp_path / "research_store" / "indexes" / "by_source.json").is_file()
     assert (tmp_path / "research_store" / "indexes" / "by_asof.json").is_file()
-

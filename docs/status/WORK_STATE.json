@@ -1,39 +1,39 @@
 {
   "schema": "pillars_dcm.work_state.v1",
-  "checkpointId": "CP-20260905T072000Z-CFB-HOST-SCOPE-BOUNDARY-MERGED",
+  "checkpointId": "CP-20260905T103541Z-CFB-SEMANTIC-COVERAGE-SCHEDULER",
   "lastGreenCheckpointId": "CP-20260905T072000Z-CFB-HOST-SCOPE-BOUNDARY-MERGED",
-  "currentState": "CFB_HOST_SCOPE_BOUNDARY_MERGED_MAIN",
-  "honestCompletionState": "CFB_HOST_SCOPE_BOUNDARY_MERGED_VERIFIED",
+  "currentState": "CFB_CURRENT_HAR_SEMANTIC_COVERAGE_SCHEDULER_IMPLEMENTED",
+  "honestCompletionState": "CFB_CURRENT_HAR_PARTIAL_EVIDENCE_NO_FINAL_FORECAST",
   "repository": "https://github.com/williamcgreenwood/DCM",
-  "branch": "main",
+  "branch": "codex/cfb-coverage-complete-scheduler-20260905",
   "baseBranch": "main",
-  "baseSha": "1b4e91b17b78f3d9323c7c126042a06ed4bcb59e",
-  "startSha": "1b4e91b17b78f3d9323c7c126042a06ed4bcb59e",
+  "baseSha": "3267c6312dbac0844203b48abf81e1733025b7c0",
+  "startSha": "3267c6312dbac0844203b48abf81e1733025b7c0",
   "checkpointCommitSha": null,
-  "updatedAtUtc": "2026-09-05T07:20:00Z",
-  "activeAtomicTask": "P0-CFB-HOST-SCOPE-BOUNDARY-20260905: canonicalize adapter scopes at the host research producer boundary (merged and verified).",
-  "nextExactAction": "Obtain a permitted current CFB HAR and host-acquired evidence; then run the fresh prepare -> next-research -> evidence-import -> coverage -> forecast loop.",
+  "updatedAtUtc": "2026-09-05T10:35:41Z",
+  "activeAtomicTask": "P0-CFB-COVERAGE-COMPLETION-20260905: make semantic current-run coverage authoritative in host research scheduling (implemented; promotion pending).",
+  "nextExactAction": "Complete exact-head validation and promotion of the semantic-coverage scheduler repair. Then acquire/import permitted evidence for the remaining 551 current-HAR requests and rerun coverage -> forecast; do not emit Top100/Top25 without final run artifacts.",
   "lastValidation": {
-    "command": "PR #24 exact-head repository CI and GitHub merge/readback",
+    "command": "targeted research/host/CFB suite, fresh-wheel current-HAR evidence import/readback, compileall, and generated inventory check",
     "exitCode": 0,
-    "pytest": "REMOTE_CI_RUN_261_GREEN",
-    "pullRequest": 24,
-    "validatedHead": "384a149102fa343d95f8642d9dd9a90590c3d65b",
-    "mergeCommit": "1b4e91b17b78f3d9323c7c126042a06ed4bcb59e",
-    "inventory": "281 modules / 2016 symbols / 1445f85564d95fbdf1aa1019add2ca9125e14e0a6170a374de3ba50a285f070b"
+    "pytest": "24_TARGETED_TESTS_GREEN",
+    "pullRequest": null,
+    "validatedHead": null,
+    "mergeCommit": null,
+    "inventory": "281 modules / 2017 symbols / 456979a0ee3ff4c7bdb67c4c29b9946e060adb3a32fb267cd373bfc687ddcfc5"
   },
   "har": {
-    "sourceName": "2353pstCFB.har",
-    "sha256": "ad3a10271c511266c1a52869658362e07002aad9f453eb77108f35c82e2f96d7",
-    "entries": 31,
-    "prizePicksApiEntries": 15,
+    "sourceName": "CFB0905260254pst(3).har",
+    "sha256": "64a4929db9fc9209a6a65cc23bcd3db8b07e0a6bf138787e6792ce1b48281111",
+    "entries": 33,
+    "prizePicksApiEntries": 16,
     "projectionResponses": 2,
     "rawCommitted": false
   },
   "inventory": {
     "inventoryModules": 281,
-    "inventorySymbols": 2016,
-    "generatedInventory": "1445f85564d95fbdf1aa1019add2ca9125e14e0a6170a374de3ba50a285f070b"
+    "inventorySymbols": 2017,
+    "generatedInventory": "456979a0ee3ff4c7bdb67c4c29b9946e060adb3a32fb267cd373bfc687ddcfc5"
   },
   "tranches": {
     "baseline": "COMPLETED",
@@ -45,11 +45,12 @@
     "decisionPortfolio": "REJECT_ONLY_RUNTIME_INTEGRATED",
     "freezeSettlementLearning": "PARTIAL_EXTERNAL_EVIDENCE_REQUIRED",
     "performancePortabilityRelease": "ENGINEERING_BENCHMARKED_HOST_UNCERTIFIED",
-    "hostScopeBoundary": "MERGED_VERIFIED"
+    "hostScopeBoundary": "MERGED_VERIFIED",
+    "semanticCoverageScheduler": "IMPLEMENTED_PENDING_PROMOTION"
   },
   "externalBlockers": [
     "remote sanitized 11113-row fixture is not present in the API-backed scratch mirror",
-    "current-HAR host-side evidence acquisition is not available",
+    "551 current-HAR evidence requests remain after one permitted official event observation was imported",
     "v5.4.1 canonical source/ledger bytes are not mounted",
     "prospective settlement/calibration evidence is not yet earned",
     "production root and host-performance certification remain false"
@@ -59,6 +60,6 @@
     "folderRegistryFileId": "12xxCKT_-_LnkTj1jfOB7PidH2t1ZHw5k",
     "engineeringRunFolderId": "1JU33tTvbsEnE815BZF606czikeF4Ak2F"
   },
-  "recoveryCommand": "cd DCM && python -m dcm.runner --resume <run>/checkpoint.json",
+  "recoveryCommand": "cd DCM && dcm-host resume --run-root <run-root> --run-id <run-id>",
   "validationCommand": "python -m compileall -q artifacts/dcm_v6_workstream_ab && python scripts/build_code_inventory.py --check"
 }

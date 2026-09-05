@@ -1,0 +1,46 @@
+{
+  "schema": "pillars_dcm.checkpoint_manifest.v1",
+  "checkpointId": "CP-20260905T103541Z-CFB-SEMANTIC-COVERAGE-SCHEDULER",
+  "parentCheckpointId": "CP-20260905T072000Z-CFB-HOST-SCOPE-BOUNDARY-MERGED",
+  "timestampUtc": "2026-09-05T10:35:41Z",
+  "repositoryUrl": "https://github.com/williamcgreenwood/DCM",
+  "branch": "codex/cfb-coverage-complete-scheduler-20260905",
+  "targetBranch": "main",
+  "baseSha": "3267c6312dbac0844203b48abf81e1733025b7c0",
+  "activeAtomicTask": "P0-CFB-COVERAGE-COMPLETION-20260905",
+  "completedWork": [
+    "reproduced coverage-complete request reissuance on the supplied quarantined current CFB HAR",
+    "corrected the scheduler completion predicate",
+    "added a no-cache-hydration regression",
+    "proved import-to-next-batch behavior on a freshly installed wheel",
+    "regenerated the official code inventory"
+  ],
+  "validation": {
+    "targetedPytest": "24_PASS",
+    "compileall": "PASS",
+    "inventory": "281 modules / 2017 symbols / 456979a0ee3ff4c7bdb67c4c29b9946e060adb3a32fb267cd373bfc687ddcfc5",
+    "currentHarReadback": {
+      "rawCfb": 3886,
+      "initialUnresolved": 552,
+      "imported": 1,
+      "rejected": 0,
+      "nextUnresolved": 551,
+      "completedRequestReissued": false
+    }
+  },
+  "privacy": {
+    "rawHarCommitted": false,
+    "rawHarUploaded": false,
+    "sqliteCommitted": false
+  },
+  "honestCompletionState": "IMPLEMENTED_PENDING_EXACT_HEAD_CI_AND_REVIEW",
+  "gatesUnchanged": [
+    "no final current-HAR forecast/freeze",
+    "no Top100 or Top25",
+    "LR000000",
+    "predictiveClaim=NONE",
+    "productionRootCertified=false",
+    "hostPerformanceCertified=false"
+  ],
+  "recoveryAction": "Run exact-head CI after PR creation. After promotion, import permitted temporal evidence for the 551 remaining requests and re-run coverage and forecast."
+}

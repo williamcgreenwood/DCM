@@ -6,7 +6,7 @@ Active canonical-main CFB closure slice: `chatgpt/canonical-main-cfb-standard-20
 
 This file is the human dashboard. It must be updated on every coding pass together with a new immutable pass record under `docs/engineering_passes/`.
 
-Current bounded execution increment: `P0-CFB-HOST-SCOPE-BOUNDARY-20260905` is merged and verified on `main` at `1b4e91b17b78f3d9323c7c126042a06ed4bcb59e` from PR #24 exact head `384a149102fa343d95f8642d9dd9a90590c3d65b`; run #261 passed tests, constitution, policy, inventory, and benchmark gates. The canonical host research producer now normalizes legacy adapter scopes to universal scopes, while current-HAR operational acceptance remains externally gated. Next deterministic task: obtain permitted current CFB HAR and host-acquired evidence, then run the fresh host research loop.
+Current bounded execution increment: `P0-CFB-COVERAGE-COMPLETION-20260905` repairs a live-HAR host-loop defect discovered on the public-main release: a valid current-run evidence import closed coverage but could still be reissued until the cross-run cache classified it `REUSE_VALID`. The scheduler now treats semantic coverage completion as authoritative. A fresh wheel and quarantined 09/05 CFB HAR proved `552 → 551` unresolved requests after one official event observation, with the completed request absent from the next batch. This is partial operational evidence only: 551 requests remain, no final forecast/freeze or Top100/Top25 is claimed, and predictive/production-root gates remain unchanged.
 `docs/engineering/DCM_CODING_AND_PROMPT_STANDARD.md`; Drive writes follow
 `docs/engineering/DCM_DRIVE_HIERARCHY.md` and `dcm.runtime.storage_router`.
 

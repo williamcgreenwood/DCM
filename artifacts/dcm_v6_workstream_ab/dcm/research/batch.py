@@ -86,7 +86,11 @@ def build_next_research_batch(
     for rec in classified:
         req_id = _request_id_of(rec)
         cov = coverage_by_id.get(req_id) or {}
-        complete = bool(cov.get("complete")) and rec.get("deltaClass") == "REUSE_VALID"
+        # Coverage is the canonical semantic completion signal for this run.
+        # A just-imported valid claim may not yet be represented by the
+        # cross-run cache classifier, so requiring REUSE_VALID here causes the
+        # host to re-acquire an already-complete request indefinitely.
+        complete = bool(cov.get("complete"))
         if complete or rec.get("deltaClass") == "REUSE_VALID":
             rec = dict(rec)
             rec["acquire"] = False

@@ -242,18 +242,18 @@
   "activeBranch": "main",
   "activePullRequest": null,
   "latestPass": {
-    "id": "20260905T072000Z_cfb-host-scope-boundary-merged",
-    "commit": "1b4e91b17b78f3d9323c7c126042a06ed4bcb59e",
-    "branch": "main",
+    "id": "20260905T103541Z_cfb-semantic-coverage-scheduler",
+    "commit": null,
+    "branch": "codex/cfb-coverage-complete-scheduler-20260905",
     "targetBranch": "main",
-    "pullRequest": 24,
-    "mainTouched": true,
+    "pullRequest": null,
+    "mainTouched": false,
     "inventory": {
       "modules": 281,
       "symbols": 2016,
       "contentHash": "1445f85564d95fbdf1aa1019add2ca9125e14e0a6170a374de3ba50a285f070b"
     },
-    "wheelSha256": null
+    "wheelSha256": "253e3f3d20d77266398e32ca0e360e2f6b6424bad86f21f31d7c81d6c8a9d3fe"
   },
   "executionClosureGates": {
     "G0_SESSION_TRUTH": "PASS",
@@ -273,17 +273,17 @@
     "PRODUCTION_ROOT_CERTIFIED": "FAIL"
   },
   "latestHarAccounting": {
-    "sourceName": "2353pstCFB(1).har",
-    "sha256": "ad3a10271c511266c1a52869658362e07002aad9f453eb77108f35c82e2f96d7",
-    "entries": 31,
-    "normalizedRows": 4307,
-    "cfbRows": 4248,
-    "cfbGoblinRows": 948,
-    "cfbModelEligibleRows": 164,
-    "cfbMissingSideRows": 3122,
-    "cfbUnsupportedRows": 14,
-    "cfbEvents": 40,
-    "cfbSubjects": 824,
+    "sourceName": "CFB0905260254pst(3).har",
+    "sha256": "64a4929db9fc9209a6a65cc23bcd3db8b07e0a6bf138787e6792ce1b48281111",
+    "entries": 33,
+    "normalizedRows": 3886,
+    "cfbRows": 3886,
+    "cfbGoblinRows": 855,
+    "cfbModelEligibleRows": 250,
+    "cfbMissingSideRows": 2745,
+    "cfbUnsupportedRows": 343,
+    "cfbEvents": 35,
+    "cfbSubjects": 726,
     "cfbTeams": 80,
     "rawCommitted": false,
     "rawUploaded": false
@@ -294,13 +294,14 @@
     "unfilteredHistoricalFixtureFailures": 6,
     "unfilteredFailureReason": "local API-backed checkout lacks the remote 11113-row sanitized fixture; release tests also require checkout Git metadata",
     "syntheticRun": "PASS_TRUTHFUL_NONPRODUCTION",
-    "suppliedHarAccountOnly": "PASS_TRUTHFUL_NONPRODUCTION",
-    "suppliedHarFullFixture": "PASS_TRUTHFUL_NONPRODUCTION",
+    "suppliedHarAccountOnly": "PASS_QUARANTINED_CURRENT_HAR",
+    "suppliedHarFullFixture": "PARTIAL_CURRENT_HAR_EVIDENCE_IMPORTED",
     "predictiveClaim": "NONE",
     "learningRevision": "LR000000",
     "githubRequiredChecks": "RUN_261_GREEN",
     "validatedHead": "384a149102fa343d95f8642d9dd9a90590c3d65b",
     "targetedHostScopeBoundary": "IMPLEMENTED_MERGED_VERIFIED",
+    "semanticCoverageScheduler": "IMPLEMENTED_PENDING_PROMOTION; fresh-wheel current-HAR readback 552->551 after one valid official observation",
     "mergeCommit": "1b4e91b17b78f3d9323c7c126042a06ed4bcb59e"
   }
 }
