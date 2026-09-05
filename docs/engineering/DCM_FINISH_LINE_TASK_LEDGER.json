@@ -79,7 +79,7 @@
     "taskId": "P0-CFB-HOST-SCOPE-BOUNDARY-20260905",
     "stage": "S5",
     "name": "canonicalize adapter scopes at the host research producer boundary",
-    "state": "pr_open_ci_retry_pending",
+    "state": "pr_open_ci_retry_2_pending",
     "requirementIds": [
       "ROS-HOST-SCOPE-001"
     ],
@@ -99,11 +99,11 @@
     "acceptance": {
       "targetedTest": "test_host_session_prepare_next_research_import_coverage_report",
       "invariant": "host plan task scopes and uniqueScopes contain only canonical scopes",
-      "remoteSuite": "PR #24 exact-head retry pending after run #257 test-contract correction",
+      "remoteSuite": "PR #24 exact-head retry 2 pending after run #259 inventory serialization correction",
       "pr": 24,
-      "head": "74d2737884ba31ec270687b0c391dcf7f68dadfd"
+      "head": "6ec832774d72877ef46f3635b9a6d17681cb2b48"
     },
     "externalGateRemaining": "Current HAR and permitted host-acquired evidence are still required for operational acceptance."
   },
-  "nextDeterministicTask": "Read PR #24 exact-head retry CI and review state; merge normally only if all required checks pass, then read back main and write the merged checkpoint."
+  "nextDeterministicTask": "Read PR #24 exact-head retry-2 CI and review state; merge normally only if all required checks pass, then read back main and write the merged checkpoint."
 }
