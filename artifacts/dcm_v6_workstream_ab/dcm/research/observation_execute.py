@@ -1,1 +1,1 @@
-@file:///workspace/obs_content_only.txt
+PLACEHOLDER
