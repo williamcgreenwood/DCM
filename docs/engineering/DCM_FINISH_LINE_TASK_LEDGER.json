@@ -79,7 +79,7 @@
     "taskId": "P0-CFB-HOST-SCOPE-BOUNDARY-20260905",
     "stage": "S5",
     "name": "canonicalize adapter scopes at the host research producer boundary",
-    "state": "implemented_pending_validation",
+    "state": "pr_open_ci_pending",
     "requirementIds": [
       "ROS-HOST-SCOPE-001"
     ],
@@ -99,9 +99,11 @@
     "acceptance": {
       "targetedTest": "test_host_session_prepare_next_research_import_coverage_report",
       "invariant": "host plan task scopes and uniqueScopes contain only canonical scopes",
-      "remoteSuite": "pending PR CI"
+      "remoteSuite": "PR #24 exact-head CI pending",
+      "pr": 24,
+      "head": "5f13dc3286d1edae3dcd2521ffc18f47f7401464"
     },
     "externalGateRemaining": "Current HAR and permitted host-acquired evidence are still required for operational acceptance."
   },
-  "nextDeterministicTask": "Supply a current CFB HAR and permitted host-acquired evidence, then run prepare -> next-research -> evidence-import -> coverage -> forecast on a fresh release."
+  "nextDeterministicTask": "Read PR #24 exact-head CI and review state; merge normally only if all required checks pass, then read back main and write the merged checkpoint."
 }

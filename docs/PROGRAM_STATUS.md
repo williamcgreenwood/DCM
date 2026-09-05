@@ -6,7 +6,7 @@ Active canonical-main CFB closure slice: `chatgpt/canonical-main-cfb-standard-20
 
 This file is the human dashboard. It must be updated on every coding pass together with a new immutable pass record under `docs/engineering_passes/`.
 
-Current bounded execution increment: `P0-CFB-HOST-SCOPE-BOUNDARY-20260905` starts from main `07cd18c750cd5399b67d6abe3c146b3d50ae8809` on `chatgpt/cfb-host-scope-boundary-20260905`. It canonicalizes legacy adapter scopes at the host research producer boundary; current-HAR operational acceptance remains externally gated.\n\nThe permanent inheritance contract for every future prompt or code change is
+Current bounded execution increment: `P0-CFB-HOST-SCOPE-BOUNDARY-20260905` is open in PR #24 from `chatgpt/cfb-host-scope-boundary-20260905` at head `5f13dc3286d1edae3dcd2521ffc18f47f7401464`, based on main `07cd18c750cd5399b67d6abe3c146b3d50ae8809`. It canonicalizes legacy adapter scopes at the host research producer boundary; remote CI and current-HAR operational acceptance remain separately gated.\n\nThe permanent inheritance contract for every future prompt or code change is
 `docs/engineering/DCM_CODING_AND_PROMPT_STANDARD.md`; Drive writes follow
 `docs/engineering/DCM_DRIVE_HIERARCHY.md` and `dcm.runtime.storage_router`.
 

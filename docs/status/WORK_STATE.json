@@ -1,26 +1,25 @@
 {
   "schema": "pillars_dcm.work_state.v1",
-  "checkpointId": "CP-20260905T004200Z-MAIN-MERGED",
+  "checkpointId": "CP-20260905T063645Z-CFB-HOST-SCOPE-BOUNDARY",
   "lastGreenCheckpointId": "CP-20260905T004200Z-MAIN-MERGED",
-  "currentState": "STANDARD_RUNTIME_TRANCHE_MERGED_MAIN_CI_GREEN",
-  "honestCompletionState": "SOFTWARE_STANDARD_TRANCHE_MERGED_MAIN",
+  "currentState": "CFB_HOST_SCOPE_BOUNDARY_PR_OPEN_CI_PENDING",
+  "honestCompletionState": "CFB_HOST_SCOPE_BOUNDARY_IMPLEMENTED_REMOTE_CI_PENDING",
   "repository": "https://github.com/williamcgreenwood/DCM",
-  "branch": "main",
+  "branch": "chatgpt/cfb-host-scope-boundary-20260905",
   "baseBranch": "main",
-  "baseSha": "dd49206419c5e7de7650e75a6f3fe6fd5bc01104",
-  "startSha": "ebf636e947647010a91bcd973b314465f0b236b1",
-  "checkpointCommitSha": "dd49206419c5e7de7650e75a6f3fe6fd5bc01104",
-  "updatedAtUtc": "2026-09-05T00:42:00Z",
-  "activeAtomicTask": "Preserve the verified main merge and continue only with separately gated current-data and predictive work.",
-  "nextExactAction": "Use the merged main tree for the next current-CFB research acceptance pass; do not promote predictive claims without prospective settlement evidence.",
+  "baseSha": "07cd18c750cd5399b67d6abe3c146b3d50ae8809",
+  "startSha": "07cd18c750cd5399b67d6abe3c146b3d50ae8809",
+  "checkpointCommitSha": null,
+  "updatedAtUtc": "2026-09-05T06:36:45Z",
+  "activeAtomicTask": "P0-CFB-HOST-SCOPE-BOUNDARY-20260905: canonicalize adapter scopes at the host research producer boundary.",
+  "nextExactAction": "Read PR #24 exact-head CI/review state; merge through normal checks if green, then read back main and finalize the checkpoint.",
   "lastValidation": {
-    "command": "python -m compileall -q artifacts/dcm_v6_workstream_ab",
+    "command": "isolated compile of changed host planner and host-native test",
     "exitCode": 0,
-    "pytest": "REMOTE_CI_RUN_253_GREEN_ON_COMPLETE_FIXTURE",
-    "remoteCiRun": 253,
-    "remoteCiCommit": "1462fefa8abfebaf5f3e19ddcce5195d367d40eb",
-    "pullRequest": 22,
-    "mergeCommit": "dd49206419c5e7de7650e75a6f3fe6fd5bc01104"
+    "pytest": "REMOTE_CI_PENDING",
+    "pullRequest": 24,
+    "validatedHead": "5f13dc3286d1edae3dcd2521ffc18f47f7401464",
+    "inventory": "281 modules / 2016 symbols / ea34cecb0094aa7d04b1da739d5e2cc07e824b22b25c7a81aeb17005a6817d82"
   },
   "har": {
     "sourceName": "2353pstCFB.har",
@@ -33,7 +32,7 @@
   "inventory": {
     "inventoryModules": 281,
     "inventorySymbols": 2016,
-    "generatedInventory": "b2e9907254f13e22eb2c1ad6c31f3a3bbfd463b6cc455f8e0daf6df3a1f819b9"
+    "generatedInventory": "ea34cecb0094aa7d04b1da739d5e2cc07e824b22b25c7a81aeb17005a6817d82"
   },
   "tranches": {
     "baseline": "COMPLETED",
@@ -44,7 +43,8 @@
     "sharedEventWorldProbability": "CONSERVATION_RUNTIME_INTEGRATED",
     "decisionPortfolio": "REJECT_ONLY_RUNTIME_INTEGRATED",
     "freezeSettlementLearning": "PARTIAL_EXTERNAL_EVIDENCE_REQUIRED",
-    "performancePortabilityRelease": "ENGINEERING_BENCHMARKED_HOST_UNCERTIFIED"
+    "performancePortabilityRelease": "ENGINEERING_BENCHMARKED_HOST_UNCERTIFIED",
+    "hostScopeBoundary": "IMPLEMENTED_PR_PENDING"
   },
   "externalBlockers": [
     "remote sanitized 11113-row fixture is not present in the API-backed scratch mirror",
@@ -53,7 +53,11 @@
     "prospective settlement/calibration evidence is not yet earned",
     "production root and host-performance certification remain false"
   ],
-  "drive": {"rootId": "1qKs9cIy9ta5ioOerej7IeVWloTQf8yvh", "folderRegistryFileId": "12xxCKT_-_LnkTj1jfOB7PidH2t1ZHw5k", "engineeringRunFolderId": "1JU33tTvbsEnE815BZF606czikeF4Ak2F"},
+  "drive": {
+    "rootId": "1qKs9cIy9ta5ioOerej7IeVWloTQf8yvh",
+    "folderRegistryFileId": "12xxCKT_-_LnkTj1jfOB7PidH2t1ZHw5k",
+    "engineeringRunFolderId": "1JU33tTvbsEnE815BZF606czikeF4Ak2F"
+  },
   "recoveryCommand": "cd DCM && python -m dcm.runner --resume <run>/checkpoint.json",
   "validationCommand": "python -m compileall -q artifacts/dcm_v6_workstream_ab && python scripts/build_code_inventory.py --check"
 }
