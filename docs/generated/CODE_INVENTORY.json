@@ -1,5 +1,5 @@
 {
-  "contentHash": "a8457f4a474580b50e33681f70267d0cfc013b38a2166bb24ac1f8be08dd395e",
+  "contentHash": "51e152b5dbe0c091cb6837c71782c44b708ac86db4f5baa77ac9a94994eb9256",
   "moduleCount": 283,
   "modules": [
     {
@@ -10611,7 +10611,7 @@
       "classes": 0,
       "functions": 11,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/runner.py",
-      "sha256": "0025183f864685cc03ad8b903a9a6f8b5c2604c79f0ef151a9a75c7dddbe25d5",
+      "sha256": "0a7f438eafc04d33a42f467bf9c2a1205fcc36d2e06588845516ca6f8a1747a1",
       "symbols": [
         {
           "doc": "Always write dest/audit/. Optionally copy+commit+push a GitHub pack.",
@@ -10663,7 +10663,7 @@
         },
         {
           "doc": null,
-          "endLine": 2069,
+          "endLine": 2072,
           "kind": "function",
           "line": 262,
           "name": "run_dcm",
@@ -10671,33 +10671,33 @@
         },
         {
           "doc": null,
-          "endLine": 876,
+          "endLine": 879,
           "kind": "method",
-          "line": 853,
+          "line": 856,
           "name": "_snapshot_for",
           "qualname": "run_dcm._snapshot_for"
         },
         {
           "doc": null,
-          "endLine": 1315,
+          "endLine": 1318,
           "kind": "method",
-          "line": 1313,
+          "line": 1316,
           "name": "_resimulate_material",
           "qualname": "run_dcm._resimulate_material"
         },
         {
           "doc": null,
-          "endLine": 1548,
+          "endLine": 1551,
           "kind": "method",
-          "line": 1504,
+          "line": 1507,
           "name": "slim",
           "qualname": "run_dcm.slim"
         },
         {
           "doc": null,
-          "endLine": 2187,
+          "endLine": 2190,
           "kind": "function",
-          "line": 2072,
+          "line": 2075,
           "name": "main",
           "qualname": "main"
         }
