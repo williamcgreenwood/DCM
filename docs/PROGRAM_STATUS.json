@@ -1,6 +1,6 @@
 {
   "schema": "pillars_dcm.program_status.v1",
-  "updatedAtUtc": "2026-09-05T06:40:00Z",
+  "updatedAtUtc": "2026-09-05T06:50:00Z",
   "activePromotionBranch": "chatgpt/cfb-host-scope-boundary-20260905",
   "targetPromotionBranch": "main",
   "lastMergedPullRequest": 22,
@@ -242,8 +242,8 @@
   "activeBranch": "chatgpt/cfb-host-scope-boundary-20260905",
   "activePullRequest": 24,
   "latestPass": {
-    "id": "20260905T063645Z_cfb-host-scope-boundary",
-    "commit": "5f13dc3286d1edae3dcd2521ffc18f47f7401464",
+    "id": "20260905T065000Z_cfb-host-scope-boundary-regression-fix",
+    "commit": "74d2737884ba31ec270687b0c391dcf7f68dadfd",
     "branch": "chatgpt/cfb-host-scope-boundary-20260905",
     "targetBranch": "main",
     "pullRequest": 24,
@@ -251,7 +251,7 @@
     "inventory": {
       "modules": 281,
       "symbols": 2016,
-      "contentHash": "ea34cecb0094aa7d04b1da739d5e2cc07e824b22b25c7a81aeb17005a6817d82"
+      "contentHash": "1445f85564d95fbdf1aa1019add2ca9125e14e0a6170a374de3ba50a285f070b"
     },
     "wheelSha256": null
   },
@@ -298,8 +298,8 @@
     "suppliedHarFullFixture": "PASS_TRUTHFUL_NONPRODUCTION",
     "predictiveClaim": "NONE",
     "learningRevision": "LR000000",
-    "githubRequiredChecks": "PENDING_PR_24",
-    "validatedHead": "db64c0ad0e81596ab2dfb89c086ba3f16c483007",
-    "targetedHostScopeBoundary": "IMPLEMENTED_REMOTE_CI_PENDING"
+    "githubRequiredChecks": "PENDING_PR_24_RETRY",
+    "validatedHead": "74d2737884ba31ec270687b0c391dcf7f68dadfd",
+    "targetedHostScopeBoundary": "IMPLEMENTED_REMOTE_CI_RETRY_PENDING"
   }
 }

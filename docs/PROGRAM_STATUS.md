@@ -6,7 +6,7 @@ Active canonical-main CFB closure slice: `chatgpt/canonical-main-cfb-standard-20
 
 This file is the human dashboard. It must be updated on every coding pass together with a new immutable pass record under `docs/engineering_passes/`.
 
-Current bounded execution increment: `P0-CFB-HOST-SCOPE-BOUNDARY-20260905` is open in PR #24 from `chatgpt/cfb-host-scope-boundary-20260905` at exact PR head `db64c0ad0e81596ab2dfb89c086ba3f16c483007` (implementation commit `5f13dc3286d1edae3dcd2521ffc18f47f7401464`), based on main `07cd18c750cd5399b67d6abe3c146b3d50ae8809`. It canonicalizes legacy adapter scopes at the host research producer boundary; remote CI and current-HAR operational acceptance remain separately gated.\n\nThe permanent inheritance contract for every future prompt or code change is
+Current bounded execution increment: `P0-CFB-HOST-SCOPE-BOUNDARY-20260905` remains open in PR #24 from `chatgpt/cfb-host-scope-boundary-20260905` at exact head `74d2737884ba31ec270687b0c391dcf7f68dadfd` (implementation commit `5f13dc3286d1edae3dcd2521ffc18f47f7401464`; regression correction commit `74d2737884ba31ec270687b0c391dcf7f68dadfd`), based on main `07cd18c750cd5399b67d6abe3c146b3d50ae8809`. Exact-head run #257 failed only because the new regression expected `uniqueScopes.SUBJECT=1` instead of the established combined count `2`; the assertion and generated inventory are corrected and the retry is pending. Current-HAR operational acceptance remains externally gated.
 `docs/engineering/DCM_CODING_AND_PROMPT_STANDARD.md`; Drive writes follow
 `docs/engineering/DCM_DRIVE_HIERARCHY.md` and `dcm.runtime.storage_router`.
 
