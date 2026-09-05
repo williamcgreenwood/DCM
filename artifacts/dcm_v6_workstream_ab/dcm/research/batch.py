@@ -65,6 +65,51 @@ def _request_id_of(request: dict[str, Any]) -> str:
     return str(request.get("request_id") or request.get("requestId") or "")
 
 
+_HOST_CONTEXT_EXCLUDED = frozenset({
+    "request_id", "scope", "scope_id", "need", "forecast_cutoff",
+    "priority_score", "dependent_prop_count", "hierarchy_rank",
+    "dependent_offer_ids", "acquire", "uncertaintyReduction",
+    "estimatedCost", "schedulerScore", "deltaClass", "knownMissing",
+    "coverageComplete",
+})
+
+
+def _host_task(request: dict[str, Any], *, action: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Expose the minimum actionable context for a host acquisition.
+
+    The host must receive entity/event context and permitted source capability
+    hints, not only opaque scope IDs.  This is runtime-only plan data; the
+    host still owns public fetch/search and supplies simple observations back
+    to the canonical importer.
+    """
+    context = {
+        key: value for key, value in request.items()
+        if key not in _HOST_CONTEXT_EXCLUDED and value not in (None, "", [], {})
+    }
+    scope = canonical_scope(str(request.get("scope") or ""))
+    action = action or {}
+    return {
+        "requestId": request.get("request_id"),
+        "actionId": action.get("actionId"),
+        "scope": scope,
+        "scopeId": request.get("scope_id"),
+        "need": request.get("need"),
+        "deltaClass": request.get("deltaClass"),
+        "schedulerScore": request.get("schedulerScore"),
+        "dependentPropCount": request.get("dependent_prop_count"),
+        "eventId": request.get("eventId"),
+        "knownMissing": request.get("knownMissing") or [],
+        "context": context,
+        "sourceFamily": action.get("sourceFamily"),
+        "sourceCandidates": list(action.get("sourceCandidates") or []),
+        "sourceId": action.get("sourceId"),
+        "acquisitionInstruction": (
+            "Acquire one permitted public-source observation for this reusable "
+            f"{scope} context; reuse it across every dependent offer."
+        ),
+    }
+
+
 def build_next_research_batch(
     requests: list[dict[str, Any]],
     *,
@@ -192,6 +237,11 @@ def build_next_research_batch(
 
     reused = [r for r in scored if not r.get("acquire")]
     action_doc = build_acquisition_actions(list(rows or []), acquire, coverage=coverage)
+    actions_by_id = {
+        str(action.get("actionId") or ""): dict(action)
+        for action in (action_doc.get("actions") or [])
+        if isinstance(action, dict)
+    }
     schedule = schedule_acquisition_actions(
         action_doc,
         max_actions=max_entities,
@@ -211,20 +261,9 @@ def build_next_research_batch(
                 ]
                 live_selected.extend(matching)
                 for r in matching:
-                    tasks.append(
-                        {
-                            "requestId": r.get("request_id"),
-                            "actionId": task.get("actionId"),
-                            "scope": canonical_scope(str(r.get("scope") or "")),
-                            "scopeId": r.get("scope_id"),
-                            "need": r.get("need"),
-                            "deltaClass": r.get("deltaClass"),
-                            "schedulerScore": r.get("schedulerScore"),
-                            "dependentPropCount": r.get("dependent_prop_count"),
-                            "knownMissing": r.get("knownMissing") or [],
-                            "researchOnce": True,
-                        }
-                    )
+                    item = _host_task(r, action=actions_by_id.get(str(task.get("actionId") or "")))
+                    item["researchOnce"] = True
+                    tasks.append(item)
             live_batches.append(
                 {
                     "eventId": batch.get("eventId"),
@@ -267,17 +306,12 @@ def build_next_research_batch(
         ),
         "batches": batches,
         "tasks": [
-            {
-                "requestId": r.get("request_id"),
-                "scope": canonical_scope(str(r.get("scope") or "")),
-                "scopeId": r.get("scope_id"),
-                "need": r.get("need"),
-                "deltaClass": r.get("deltaClass"),
-                "schedulerScore": r.get("schedulerScore"),
-                "dependentPropCount": r.get("dependent_prop_count"),
-                "eventId": r.get("eventId"),
-                "knownMissing": r.get("knownMissing") or [],
-            }
+            _host_task(
+                r,
+                action=actions_by_id.get(
+                    f"AA_{canonical_scope(str(r.get('scope') or ''))}_{str(r.get('scope_id') or '')}"
+                ),
+            )
             for r in selected
         ],
         "reused": [

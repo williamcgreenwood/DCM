@@ -1,11 +1,11 @@
 {
   "schema": "pillars_dcm.program_status.v1",
-  "updatedAtUtc": "2026-09-05T21:30:00Z",
+  "updatedAtUtc": "2026-09-05T21:42:00Z",
   "activePromotionBranch": "main",
   "targetPromotionBranch": "main",
-  "lastMergedPullRequest": 31,
-  "lastMergedCommit": "70dea4a23b74fd927b8ea3a922d9feeb1ed5b2c7",
-  "lastGreenCiRun": 271,
+  "lastMergedPullRequest": 32,
+  "lastMergedCommit": "ce69ffeda1cfdcff6415e0cba9999fdb1e22c00d",
+  "lastGreenCiRun": 273,
   "canonicalIntegrationBranch": "integration/v6-ml-architecture-20260830",
   "canonicalIntegrationPr": 18,
   "scoreScale": {
@@ -48,7 +48,7 @@
       "current": 9,
       "state": "STRONG_PARTIAL",
       "next": [
-        "import permitted host-acquired shared CFB evidence for the current HAR after metadata recovery",
+        "use action context and permitted source candidates to import grouped CFB shared evidence",
         "finish mixed-sport R1 remainder after today's CFB slice",
         "retire remaining PLAYER/TEAM lookup aliases at adapters"
       ]
@@ -118,7 +118,7 @@
       "current": 8,
       "state": "STRONG_PARTIAL",
       "next": [
-        "rerun the current CFB HAR on a fresh wheel after fractional-capture cutoff repair",
+        "validate source-aware host-action batches on the current CFB HAR",
         "no second probability engine"
       ]
     },
