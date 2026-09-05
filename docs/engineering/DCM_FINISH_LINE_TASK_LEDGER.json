@@ -72,14 +72,14 @@
       "id": "S11",
       "name": "main promotion",
       "state": "implemented",
-      "proof": "PR #22 merged to main at 07cd18c; exact-head/CI readback recorded"
+      "proof": "PR #24 merged to main at 1b4e91b17b78f3d9323c7c126042a06ed4bcb59e from exact head 384a149102fa343d95f8642d9dd9a90590c3d65b; run #261 green; merge/readback recorded."
     }
   ],
   "activeExecution": {
     "taskId": "P0-CFB-HOST-SCOPE-BOUNDARY-20260905",
     "stage": "S5",
     "name": "canonicalize adapter scopes at the host research producer boundary",
-    "state": "pr_open_ci_retry_2_pending",
+    "state": "merged_verified",
     "requirementIds": [
       "ROS-HOST-SCOPE-001"
     ],
@@ -91,7 +91,7 @@
     "risk": "low",
     "cfbUnlockValue": "prevents legacy PLAYER/TEAM/MARKET requests from escaping into the CFB host research loop",
     "baseSha": "07cd18c750cd5399b67d6abe3c146b3d50ae8809",
-    "branch": "chatgpt/cfb-host-scope-boundary-20260905",
+    "branch": "main",
     "producer": "artifacts/dcm_v6_workstream_ab/dcm/research/host_plan.py:build_host_research_plan",
     "consumer": "dcm.chat.research_bridge.next_research_batch -> host_research_batch.json -> dcm-host next-research",
     "reproduction": "A resumed or adapter-supplied PLAYER/TEAM/MARKET request was emitted with its legacy scope in host tasks, bundle keys, CFB instructions, and counts.",
@@ -99,11 +99,12 @@
     "acceptance": {
       "targetedTest": "test_host_session_prepare_next_research_import_coverage_report",
       "invariant": "host plan task scopes and uniqueScopes contain only canonical scopes",
-      "remoteSuite": "PR #24 exact-head retry 2 pending after run #259 inventory serialization correction",
+      "remoteSuite": "PR #24 exact-head run #261 GREEN",
       "pr": 24,
-      "head": "6ec832774d72877ef46f3635b9a6d17681cb2b48"
+      "head": "384a149102fa343d95f8642d9dd9a90590c3d65b",
+      "mergeCommit": "1b4e91b17b78f3d9323c7c126042a06ed4bcb59e"
     },
     "externalGateRemaining": "Current HAR and permitted host-acquired evidence are still required for operational acceptance."
   },
-  "nextDeterministicTask": "Read PR #24 exact-head retry-2 CI and review state; merge normally only if all required checks pass, then read back main and write the merged checkpoint."
+  "nextDeterministicTask": "Obtain a permitted current CFB HAR and host-acquired evidence, then run prepare -> next-research -> evidence-import -> coverage -> forecast on a fresh release; do not claim operational acceptance without those readbacks."
 }
