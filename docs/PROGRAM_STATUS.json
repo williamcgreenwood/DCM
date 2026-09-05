@@ -1,6 +1,6 @@
 {
   "schema": "pillars_dcm.program_status.v1",
-  "updatedAtUtc": "2026-09-05T21:42:00Z",
+  "updatedAtUtc": "2026-09-05T22:18:54Z",
   "activePromotionBranch": "main",
   "targetPromotionBranch": "main",
   "lastMergedPullRequest": 32,
@@ -48,7 +48,7 @@
       "current": 9,
       "state": "STRONG_PARTIAL",
       "next": [
-        "use action context and permitted source candidates to import grouped CFB shared evidence",
+        "run source-aware import on a current CFB HAR to close remaining shared requirements",
         "finish mixed-sport R1 remainder after today's CFB slice",
         "retire remaining PLAYER/TEAM lookup aliases at adapters"
       ]
@@ -118,8 +118,9 @@
       "current": 8,
       "state": "STRONG_PARTIAL",
       "next": [
-        "validate source-aware host-action batches on the current CFB HAR",
-        "no second probability engine"
+        "execute source-aware evidence-import on the current CFB HAR",
+        "keep host web-fetch outside the Python probability engine",
+        "no second evidence or probability runtime"
       ]
     },
     {
