@@ -1,0 +1,64 @@
+{
+  "schema": "pillars_dcm.checkpoint_manifest.v1",
+  "checkpointId": "CP-20260905T063645Z-CFB-HOST-SCOPE-BOUNDARY",
+  "parentCheckpointId": "CP-20260905T004200Z-MAIN-MERGED",
+  "timestampUtc": "2026-09-05T06:36:45Z",
+  "repositoryUrl": "https://github.com/williamcgreenwood/DCM",
+  "branch": "chatgpt/cfb-host-scope-boundary-20260905",
+  "targetBranch": "main",
+  "baseBranch": "main",
+  "baseSha": "07cd18c750cd5399b67d6abe3c146b3d50ae8809",
+  "startSha": "07cd18c750cd5399b67d6abe3c146b3d50ae8809",
+  "implementationCommitSha": "5f13dc3286d1edae3dcd2521ffc18f47f7401464",
+  "checkpointCommitSha": "db64c0ad0e81596ab2dfb89c086ba3f16c483007",
+  "dirtyTreeInventory": {
+    "inventoryModules": 281,
+    "inventorySymbols": 2016,
+    "inventoryHash": "ea34cecb0094aa7d04b1da739d5e2cc07e824b22b25c7a81aeb17005a6817d82",
+    "rawHarExcluded": true
+  },
+  "activeAtomicTask": "P0-CFB-HOST-SCOPE-BOUNDARY-20260905",
+  "completedWork": [
+    "live main/open-PR/checkpoint reconciliation",
+    "host-facing PLAYER/TEAM/MARKET scope canonicalization",
+    "existing host-native regression extension",
+    "official inventory and requirement-trace update"
+  ],
+  "requirements": {
+    "implementedPendingValidation": [
+      "ROS-HOST-SCOPE-001"
+    ],
+    "unchangedGates": [
+      "LR000000",
+      "predictiveClaim=NONE",
+      "productionRootCertified=false",
+      "hostPerformanceCertified=false"
+    ],
+    "externalBlocked": [
+      "current authoritative CFB HAR",
+      "permitted host-acquired evidence",
+      "prospective settlements/calibration"
+    ]
+  },
+  "validation": {
+    "changedPythonCompile": "PASS",
+    "localFullSuite": "NOT_AVAILABLE_WITHOUT_REPOSITORY_CHECKOUT",
+    "remoteCi": "PENDING",
+    "exactHead": "db64c0ad0e81596ab2dfb89c086ba3f16c483007"
+  },
+  "pullRequest": {
+    "number": 24,
+    "url": "https://github.com/williamcgreenwood/DCM/pull/24",
+    "status": "OPEN_CI_PENDING",
+    "target": "main",
+    "head": "chatgpt/cfb-host-scope-boundary-20260905",
+    "headSha": "db64c0ad0e81596ab2dfb89c086ba3f16c483007"
+  },
+  "drive": {
+    "rootId": "1qKs9cIy9ta5ioOerej7IeVWloTQf8yvh",
+    "rawArtifactsUploaded": false,
+    "sqliteUploaded": false
+  },
+  "honestCompletionState": "CFB_HOST_SCOPE_BOUNDARY_IMPLEMENTED_REMOTE_CI_PENDING",
+  "recoveryAction": "Resume from main 07cd18c750cd5399b67d6abe3c146b3d50ae8809; read PR #24 and this checkpoint before any new task."
+}

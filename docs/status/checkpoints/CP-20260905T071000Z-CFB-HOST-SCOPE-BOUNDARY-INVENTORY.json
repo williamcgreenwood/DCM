@@ -1,0 +1,69 @@
+{
+  "schema": "pillars_dcm.checkpoint_manifest.v1",
+  "checkpointId": "CP-20260905T071000Z-CFB-HOST-SCOPE-BOUNDARY-INVENTORY",
+  "parentCheckpointId": "CP-20260905T065000Z-CFB-HOST-SCOPE-BOUNDARY-RETRY",
+  "timestampUtc": "2026-09-05T07:10:00Z",
+  "repositoryUrl": "https://github.com/williamcgreenwood/DCM",
+  "branch": "chatgpt/cfb-host-scope-boundary-20260905",
+  "targetBranch": "main",
+  "baseBranch": "main",
+  "baseSha": "07cd18c750cd5399b67d6abe3c146b3d50ae8809",
+  "startSha": "07cd18c750cd5399b67d6abe3c146b3d50ae8809",
+  "implementationCommitSha": "5f13dc3286d1edae3dcd2521ffc18f47f7401464",
+  "regressionCorrectionCommitSha": "74d2737884ba31ec270687b0c391dcf7f68dadfd",
+  "inventoryCorrectionCommitSha": "6ec832774d72877ef46f3635b9a6d17681cb2b48",
+  "checkpointCommitSha": null,
+  "dirtyTreeInventory": {
+    "inventoryModules": 281,
+    "inventorySymbols": 2016,
+    "inventoryHash": "1445f85564d95fbdf1aa1019add2ca9125e14e0a6170a374de3ba50a285f070b",
+    "rawHarExcluded": true
+  },
+  "activeAtomicTask": "P0-CFB-HOST-SCOPE-BOUNDARY-20260905",
+  "completedWork": [
+    "live main/open-PR/checkpoint reconciliation",
+    "host-facing PLAYER/TEAM/MARKET scope canonicalization",
+    "existing host-native regression extension",
+    "official inventory and requirement-trace update",
+    "exact-head CI failure reproduction and test-contract correction",
+    "run #259 inventory serialization failure reproduction and canonical JSON regeneration"
+  ],
+  "requirements": {
+    "implementedPendingValidation": [
+      "ROS-HOST-SCOPE-001"
+    ],
+    "unchangedGates": [
+      "LR000000",
+      "predictiveClaim=NONE",
+      "productionRootCertified=false",
+      "hostPerformanceCertified=false"
+    ],
+    "externalBlocked": [
+      "current authoritative CFB HAR",
+      "permitted host-acquired evidence",
+      "prospective settlements/calibration"
+    ]
+  },
+  "validation": {
+    "changedPythonCompile": "PASS",
+    "localFullSuite": "REMOTE_CI_RUN_259_TESTS_PASS",
+    "remoteCi": "RETRY_2_PENDING",
+    "exactHead": "6ec832774d72877ef46f3635b9a6d17681cb2b48",
+    "failure": "CODE_INVENTORY_STALE:docs/generated/CODE_INVENTORY.json; Markdown hash already matched, JSON was regenerated with Python ASCII escaping."
+  },
+  "pullRequest": {
+    "number": 24,
+    "url": "https://github.com/williamcgreenwood/DCM/pull/24",
+    "status": "OPEN_RETRY_2_CI_PENDING",
+    "target": "main",
+    "head": "chatgpt/cfb-host-scope-boundary-20260905",
+    "headSha": "6ec832774d72877ef46f3635b9a6d17681cb2b48"
+  },
+  "drive": {
+    "rootId": "1qKs9cIy9ta5ioOerej7IeVWloTQf8yvh",
+    "rawArtifactsUploaded": false,
+    "sqliteUploaded": false
+  },
+  "honestCompletionState": "CFB_HOST_SCOPE_BOUNDARY_IMPLEMENTED_REMOTE_CI_RETRY_2_PENDING",
+  "recoveryAction": "Resume from main 07cd18c750cd5399b67d6abe3c146b3d50ae8809; read PR #24, CP-20260905T065000Z-CFB-HOST-SCOPE-BOUNDARY-RETRY, and CP-20260905T071000Z-CFB-HOST-SCOPE-BOUNDARY-INVENTORY before any new task."
+}

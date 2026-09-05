@@ -2,17 +2,108 @@
   "schema": "pillars_dcm.finish_line_task_ledger.v1",
   "policy": "docs/engineering/DCM_CODING_AND_PROMPT_STANDARD.md",
   "tasks": [
-    {"id": "S0", "name": "repository truth and recovery", "state": "implemented", "proof": "checkpoint + branch/CI readback"},
-    {"id": "S1", "name": "coding and prompt inheritance", "state": "implemented", "proof": "policy validator + CI"},
-    {"id": "S2", "name": "Drive routing and privacy", "state": "implemented", "proof": "storage router unit and privacy tests"},
-    {"id": "S3", "name": "canonical research cache", "state": "implemented", "proof": "SQLite restart round trip"},
-    {"id": "S4", "name": "temporal facts and source health", "state": "implemented", "proof": "cutoff, succession, injected-clock tests"},
-    {"id": "S5", "name": "conserved CFB opportunity and worlds", "state": "implemented", "proof": "conservation and residual-pool tests"},
-    {"id": "S6", "name": "signals, decisions, portfolio and freeze", "state": "implemented", "proof": "positive and fail-closed runtime tests"},
-    {"id": "S7", "name": "supplied HAR accounting and routing", "state": "validated_offline", "proof": "quarantined HAR summary"},
-    {"id": "S8", "name": "current authoritative research and settlement", "state": "external_gate", "proof": "requires permitted live evidence and platform rules"},
-    {"id": "S9", "name": "chronological predictive certification", "state": "external_gate", "proof": "requires unseen settled forecasts"},
-    {"id": "S10", "name": "host performance certification", "state": "external_gate", "proof": "requires representative host benchmark"},
-    {"id": "S11", "name": "main promotion", "state": "pending_remote_validation", "proof": "PR checks and merge readback"}
-  ]
+    {
+      "id": "S0",
+      "name": "repository truth and recovery",
+      "state": "implemented",
+      "proof": "checkpoint + branch/CI readback"
+    },
+    {
+      "id": "S1",
+      "name": "coding and prompt inheritance",
+      "state": "implemented",
+      "proof": "policy validator + CI"
+    },
+    {
+      "id": "S2",
+      "name": "Drive routing and privacy",
+      "state": "implemented",
+      "proof": "storage router unit and privacy tests"
+    },
+    {
+      "id": "S3",
+      "name": "canonical research cache",
+      "state": "implemented",
+      "proof": "SQLite restart round trip"
+    },
+    {
+      "id": "S4",
+      "name": "temporal facts and source health",
+      "state": "implemented",
+      "proof": "cutoff, succession, injected-clock tests"
+    },
+    {
+      "id": "S5",
+      "name": "conserved CFB opportunity and worlds",
+      "state": "implemented",
+      "proof": "conservation and residual-pool tests"
+    },
+    {
+      "id": "S6",
+      "name": "signals, decisions, portfolio and freeze",
+      "state": "implemented",
+      "proof": "positive and fail-closed runtime tests"
+    },
+    {
+      "id": "S7",
+      "name": "supplied HAR accounting and routing",
+      "state": "validated_offline",
+      "proof": "quarantined HAR summary"
+    },
+    {
+      "id": "S8",
+      "name": "current authoritative research and settlement",
+      "state": "external_gate",
+      "proof": "requires permitted live evidence and platform rules"
+    },
+    {
+      "id": "S9",
+      "name": "chronological predictive certification",
+      "state": "external_gate",
+      "proof": "requires unseen settled forecasts"
+    },
+    {
+      "id": "S10",
+      "name": "host performance certification",
+      "state": "external_gate",
+      "proof": "requires representative host benchmark"
+    },
+    {
+      "id": "S11",
+      "name": "main promotion",
+      "state": "implemented",
+      "proof": "PR #22 merged to main at 07cd18c; exact-head/CI readback recorded"
+    }
+  ],
+  "activeExecution": {
+    "taskId": "P0-CFB-HOST-SCOPE-BOUNDARY-20260905",
+    "stage": "S5",
+    "name": "canonicalize adapter scopes at the host research producer boundary",
+    "state": "pr_open_ci_retry_2_pending",
+    "requirementIds": [
+      "ROS-HOST-SCOPE-001"
+    ],
+    "dependencies": [
+      "S0",
+      "S1",
+      "S4"
+    ],
+    "risk": "low",
+    "cfbUnlockValue": "prevents legacy PLAYER/TEAM/MARKET requests from escaping into the CFB host research loop",
+    "baseSha": "07cd18c750cd5399b67d6abe3c146b3d50ae8809",
+    "branch": "chatgpt/cfb-host-scope-boundary-20260905",
+    "producer": "artifacts/dcm_v6_workstream_ab/dcm/research/host_plan.py:build_host_research_plan",
+    "consumer": "dcm.chat.research_bridge.next_research_batch -> host_research_batch.json -> dcm-host next-research",
+    "reproduction": "A resumed or adapter-supplied PLAYER/TEAM/MARKET request was emitted with its legacy scope in host tasks, bundle keys, CFB instructions, and counts.",
+    "patch": "Canonicalize request and unique-scope keys with dcm.research.scopes.canonical_scope at the host-facing boundary.",
+    "acceptance": {
+      "targetedTest": "test_host_session_prepare_next_research_import_coverage_report",
+      "invariant": "host plan task scopes and uniqueScopes contain only canonical scopes",
+      "remoteSuite": "PR #24 exact-head retry 2 pending after run #259 inventory serialization correction",
+      "pr": 24,
+      "head": "6ec832774d72877ef46f3635b9a6d17681cb2b48"
+    },
+    "externalGateRemaining": "Current HAR and permitted host-acquired evidence are still required for operational acceptance."
+  },
+  "nextDeterministicTask": "Read PR #24 exact-head retry-2 CI and review state; merge normally only if all required checks pass, then read back main and write the merged checkpoint."
 }

@@ -96,7 +96,7 @@ def test_host_session_prepare_next_research_import_coverage_report(tmp_path: Pat
     assert (dest / "host_research_batch.json").is_file()
     assert batch["selectedCount"] >= 1
     assert batch.get("algorithmSelection", {}).get("selectedAlgorithmId") == "ALG-SCHED-001"
-    assert "ALG-SEARCH-019" in (batch.get("algorithmIds") or []) or batch.get("algorithmSelection")
+    assert "ALG-SEARCH-019" in (batch.get("algorithmIds") or []) or batch.get("algorithmSelection"); legacy_plan = __import__("dcm.research.host_plan", fromlist=["build_host_research_plan"]).build_host_research_plan([{"scope": "PLAYER", "scope_id": "P_ALIAS", "need": "status_role_logs_opportunity_efficiency", "forecast_cutoff": CUTOFF, "league": "CFB", "request_id": "REQ_ALIAS", "priority_score": 1.0, "dependent_prop_count": 1}], unique_scopes={"PLAYER": 1}); assert {task["scope"] for task in legacy_plan["tasks"]} == {"SUBJECT"}; assert legacy_plan["uniqueScopes"]["SUBJECT"] == 2
 
     subject = next(r for r in reqs if r["scope"] == "SUBJECT")
     obs = {

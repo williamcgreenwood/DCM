@@ -1,7 +1,7 @@
 {
   "schema": "pillars_dcm.program_status.v1",
-  "updatedAtUtc": "2026-09-05T00:42:00Z",
-  "activePromotionBranch": "main",
+  "updatedAtUtc": "2026-09-05T07:10:00Z",
+  "activePromotionBranch": "chatgpt/cfb-host-scope-boundary-20260905",
   "targetPromotionBranch": "main",
   "lastMergedPullRequest": 22,
   "lastMergedCommit": "dd49206419c5e7de7650e75a6f3fe6fd5bc01104",
@@ -47,7 +47,7 @@
       "current": 9,
       "state": "STRONG_PARTIAL",
       "next": [
-        "execute a current CFB HAR through host web research and close market-specific evidence gaps without blanket board rejection",
+        "complete the host-scope boundary increment and then execute a current CFB HAR through permitted host research",
         "finish mixed-sport R1 remainder after today's CFB slice",
         "retire remaining PLAYER/TEAM lookup aliases at adapters"
       ]
@@ -239,19 +239,19 @@
     "noSilentDowngrades": true,
     "noSilentCompletionClaims": true
   },
-  "activeBranch": "chatgpt/canonical-main-cfb-standard-20260905",
-  "activePullRequest": null,
+  "activeBranch": "chatgpt/cfb-host-scope-boundary-20260905",
+  "activePullRequest": 24,
   "latestPass": {
-    "id": "20260905T021500Z_chatgpt_canonical-main-standard",
-    "commit": null,
-    "branchHead": null,
-    "pullRequest": null,
+    "id": "20260905T071000Z_cfb-host-scope-boundary-inventory-regeneration",
+    "commit": "6ec832774d72877ef46f3635b9a6d17681cb2b48",
+    "branch": "chatgpt/cfb-host-scope-boundary-20260905",
     "targetBranch": "main",
+    "pullRequest": 24,
     "mainTouched": false,
     "inventory": {
       "modules": 281,
       "symbols": 2016,
-      "contentHash": "b2e9907254f13e22eb2c1ad6c31f3a3bbfd463b6cc455f8e0daf6df3a1f819b9"
+      "contentHash": "1445f85564d95fbdf1aa1019add2ca9125e14e0a6170a374de3ba50a285f070b"
     },
     "wheelSha256": null
   },
@@ -298,7 +298,8 @@
     "suppliedHarFullFixture": "PASS_TRUTHFUL_NONPRODUCTION",
     "predictiveClaim": "NONE",
     "learningRevision": "LR000000",
-    "githubRequiredChecks": "PENDING_NEW_PR",
-    "validatedHead": null
+    "githubRequiredChecks": "PENDING_PR_24_RETRY_2",
+    "validatedHead": "6ec832774d72877ef46f3635b9a6d17681cb2b48",
+    "targetedHostScopeBoundary": "IMPLEMENTED_REMOTE_CI_RETRY_2_PENDING"
   }
 }
