@@ -3,9 +3,9 @@
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
 - Modules: **283**
-- Symbols: **2024**
+- Symbols: **2025**
 - Parse errors: **0**
-- Inventory hash: `78150a840d20e9d6c581ef91382e3e085c6219b3f0a1286f1de49edcf6cd4d74`
+- Inventory hash: `c46cc8c0956456426bdecb17d8ab9efa3c8c24d2fe3c74b3669f94e0a7cee49f`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -122,7 +122,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/adapters/prizepicks.py` | 1 | 5 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/adapters/pro_football_reference.py` | 2 | 7 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/authority.py` | 1 | 5 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/batch.py` | 0 | 4 |
+| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/batch.py` | 0 | 5 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/cache.py` | 1 | 7 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/cache_layers.py` | 1 | 12 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/claims.py` | 0 | 3 |
@@ -1436,7 +1436,8 @@ _No class/function symbols._
 - `function` **scheduler_score** L40
 - `function` **_event_id_of** L53
 - `function` **_request_id_of** L64
-- `function` **build_next_research_batch** L68
+- `function` **_host_task** L77 — Expose the minimum actionable context for a host acquisition.
+- `function` **build_next_research_batch** L113
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/cache.py`
 
@@ -3052,12 +3053,12 @@ _No class/function symbols._
 - `function` **test_store_is_content_addressed_and_latest_pointer** L34
 - `function` **test_delta_new_entity_then_reuse** L47
 - `function` **test_batch_skips_reuse_valid_and_groups_by_event** L65
-- `function` **test_batch_does_not_reacquire_semantically_complete_request_without_cache_reuse** L107 — Fresh host imports close the current run before cache hydration occurs.
-- `function` **test_classify_requests_hydrates_blob_not_pointer** L127
-- `function` **test_append_missing_history_from_stored_logs** L144
-- `function` **test_game_log_append_is_deduped_and_does_not_replace_history** L158
-- `function` **test_outcome_memory_does_not_change_research_delta** L173
-- `function` **test_source_and_time_indexes_exist** L189
+- `function` **test_batch_does_not_reacquire_semantically_complete_request_without_cache_reuse** L112 — Fresh host imports close the current run before cache hydration occurs.
+- `function` **test_classify_requests_hydrates_blob_not_pointer** L132
+- `function` **test_append_missing_history_from_stored_logs** L149
+- `function` **test_game_log_append_is_deduped_and_does_not_replace_history** L163
+- `function` **test_outcome_memory_does_not_change_research_delta** L178
+- `function` **test_source_and_time_indexes_exist** L194
 
 ### `artifacts/dcm_v6_workstream_ab/tests/test_role_epoch.py`
 

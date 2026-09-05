@@ -100,6 +100,11 @@ def test_batch_skips_reuse_valid_and_groups_by_event():
     assert batch["selectedCount"] >= 1
     score = scheduler_score(requests[1], uncertainty_reduction=1.0, cost=1.0)
     assert score > 0
+    selected = batch["tasks"][0]
+    assert selected["context"]["eventId"] == "E1"
+    assert selected["sourceFamily"]
+    assert selected["sourceCandidates"]
+    assert "Acquire one permitted public-source observation" in selected["acquisitionInstruction"]
     classified = classify_requests(requests, store=None)
     assert all(r["deltaClass"] == "NEW_ENTITY_FULL_RESEARCH" or r["acquire"] for r in classified if r["scope"] == "SUBJECT")
 
