@@ -9,8 +9,8 @@
   "baseBranch": "main",
   "baseSha": "07cd18c750cd5399b67d6abe3c146b3d50ae8809",
   "startSha": "07cd18c750cd5399b67d6abe3c146b3d50ae8809",
-  "checkpointCommitSha": null,
-  "updatedAtUtc": "2026-09-05T06:36:45Z",
+  "checkpointCommitSha": "db64c0ad0e81596ab2dfb89c086ba3f16c483007",
+  "updatedAtUtc": "2026-09-05T06:40:00Z",
   "activeAtomicTask": "P0-CFB-HOST-SCOPE-BOUNDARY-20260905: canonicalize adapter scopes at the host research producer boundary.",
   "nextExactAction": "Read PR #24 exact-head CI/review state; merge through normal checks if green, then read back main and finalize the checkpoint.",
   "lastValidation": {
@@ -18,7 +18,7 @@
     "exitCode": 0,
     "pytest": "REMOTE_CI_PENDING",
     "pullRequest": 24,
-    "validatedHead": "5f13dc3286d1edae3dcd2521ffc18f47f7401464",
+    "validatedHead": "db64c0ad0e81596ab2dfb89c086ba3f16c483007",
     "inventory": "281 modules / 2016 symbols / ea34cecb0094aa7d04b1da739d5e2cc07e824b22b25c7a81aeb17005a6817d82"
   },
   "har": {

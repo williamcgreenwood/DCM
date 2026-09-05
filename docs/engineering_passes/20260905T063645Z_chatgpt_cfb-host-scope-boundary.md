@@ -4,6 +4,7 @@
 - **Base:** `main` @ `07cd18c750cd5399b67d6abe3c146b3d50ae8809`
 - **Task branch:** `chatgpt/cfb-host-scope-boundary-20260905`
 - **Implementation commit:** `5f13dc3286d1edae3dcd2521ffc18f47f7401464`
+- **Checkpoint commit:** `db64c0ad0e81596ab2dfb89c086ba3f16c483007`
 - **Target:** `main` through PR #24
 
 ## Defect reproduced
@@ -34,5 +35,5 @@ CFB research instructions, and scope counts.
 
 ## Promotion state
 
-PR #24 is open against `main`. This pass is not MERGED_VERIFIED until exact
+PR #24 is open against `main` at exact head `db64c0ad0e81596ab2dfb89c086ba3f16c483007`. This pass is not MERGED_VERIFIED until exact
 head checks/review and main readback pass.

@@ -10,7 +10,7 @@
   "baseSha": "07cd18c750cd5399b67d6abe3c146b3d50ae8809",
   "startSha": "07cd18c750cd5399b67d6abe3c146b3d50ae8809",
   "implementationCommitSha": "5f13dc3286d1edae3dcd2521ffc18f47f7401464",
-  "checkpointCommitSha": null,
+  "checkpointCommitSha": "db64c0ad0e81596ab2dfb89c086ba3f16c483007",
   "dirtyTreeInventory": {
     "inventoryModules": 281,
     "inventorySymbols": 2016,
@@ -44,7 +44,7 @@
     "changedPythonCompile": "PASS",
     "localFullSuite": "NOT_AVAILABLE_WITHOUT_REPOSITORY_CHECKOUT",
     "remoteCi": "PENDING",
-    "exactHead": "5f13dc3286d1edae3dcd2521ffc18f47f7401464"
+    "exactHead": "db64c0ad0e81596ab2dfb89c086ba3f16c483007"
   },
   "pullRequest": {
     "number": 24,
@@ -52,7 +52,7 @@
     "status": "OPEN_CI_PENDING",
     "target": "main",
     "head": "chatgpt/cfb-host-scope-boundary-20260905",
-    "headSha": "5f13dc3286d1edae3dcd2521ffc18f47f7401464"
+    "headSha": "db64c0ad0e81596ab2dfb89c086ba3f16c483007"
   },
   "drive": {
     "rootId": "1qKs9cIy9ta5ioOerej7IeVWloTQf8yvh",

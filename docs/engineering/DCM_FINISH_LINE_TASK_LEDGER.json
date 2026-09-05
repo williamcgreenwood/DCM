@@ -101,7 +101,7 @@
       "invariant": "host plan task scopes and uniqueScopes contain only canonical scopes",
       "remoteSuite": "PR #24 exact-head CI pending",
       "pr": 24,
-      "head": "5f13dc3286d1edae3dcd2521ffc18f47f7401464"
+      "head": "db64c0ad0e81596ab2dfb89c086ba3f16c483007"
     },
     "externalGateRemaining": "Current HAR and permitted host-acquired evidence are still required for operational acceptance."
   },
