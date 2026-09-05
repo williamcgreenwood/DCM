@@ -3,9 +3,9 @@
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
 - Modules: **281**
-- Symbols: **2016**
+- Symbols: **2017**
 - Parse errors: **0**
-- Inventory hash: `1445f85564d95fbdf1aa1019add2ca9125e14e0a6170a374de3ba50a285f070b`
+- Inventory hash: `456979a0ee3ff4c7bdb67c4c29b9946e060adb3a32fb267cd373bfc687ddcfc5`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -274,7 +274,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_release_freshness.py` | 0 | 5 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_research_efficiency.py` | 0 | 4 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_research_population.py` | 0 | 3 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_research_store.py` | 0 | 9 |
+| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_research_store.py` | 0 | 10 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_role_epoch.py` | 0 | 9 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_runtime_lineage.py` | 0 | 6 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_schema_v2_fields.py` | 0 | 4 |
@@ -3039,11 +3039,12 @@ _No class/function symbols._
 - `function` **test_store_is_content_addressed_and_latest_pointer** L34
 - `function` **test_delta_new_entity_then_reuse** L47
 - `function` **test_batch_skips_reuse_valid_and_groups_by_event** L65
-- `function` **test_classify_requests_hydrates_blob_not_pointer** L107
-- `function` **test_append_missing_history_from_stored_logs** L124
-- `function` **test_game_log_append_is_deduped_and_does_not_replace_history** L138
-- `function` **test_outcome_memory_does_not_change_research_delta** L153
-- `function` **test_source_and_time_indexes_exist** L169
+- `function` **test_batch_does_not_reacquire_semantically_complete_request_without_cache_reuse** L107 — Fresh host imports close the current run before cache hydration occurs.
+- `function` **test_classify_requests_hydrates_blob_not_pointer** L127
+- `function` **test_append_missing_history_from_stored_logs** L144
+- `function` **test_game_log_append_is_deduped_and_does_not_replace_history** L158
+- `function` **test_outcome_memory_does_not_change_research_delta** L173
+- `function` **test_source_and_time_indexes_exist** L189
 
 ### `artifacts/dcm_v6_workstream_ab/tests/test_role_epoch.py`
 

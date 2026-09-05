@@ -1,5 +1,5 @@
 {
-  "contentHash": "1445f85564d95fbdf1aa1019add2ca9125e14e0a6170a374de3ba50a285f070b",
+  "contentHash": "456979a0ee3ff4c7bdb67c4c29b9946e060adb3a32fb267cd373bfc687ddcfc5",
   "moduleCount": 281,
   "modules": [
     {
@@ -7228,7 +7228,7 @@
       "classes": 0,
       "functions": 4,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/batch.py",
-      "sha256": "b3365c835d0721135c0ee7448435b04e28bf66f01e5bd4e5d8a3fef606b0ce9e",
+      "sha256": "abc3f1bef23a134618603d2beebb71866c645061ec0ccd0c4c91fef3b05e4e95",
       "symbols": [
         {
           "doc": null,
@@ -7256,7 +7256,7 @@
         },
         {
           "doc": null,
-          "endLine": 288,
+          "endLine": 292,
           "kind": "function",
           "line": 68,
           "name": "build_next_research_batch",
@@ -17643,9 +17643,9 @@
     },
     {
       "classes": 0,
-      "functions": 9,
+      "functions": 10,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_research_store.py",
-      "sha256": "f61ee54261a81737e6da59b57cec396dd94974c0f9a1f4ec8d3c4ac8cdf6727f",
+      "sha256": "6155cd50c69ed9431c980b2996561110e30637657d88ed06c3ca32277794fb1d",
       "symbols": [
         {
           "doc": null,
@@ -17680,42 +17680,50 @@
           "qualname": "test_batch_skips_reuse_valid_and_groups_by_event"
         },
         {
-          "doc": null,
-          "endLine": 121,
+          "doc": "Fresh host imports close the current run before cache hydration occurs.",
+          "endLine": 124,
           "kind": "function",
           "line": 107,
+          "name": "test_batch_does_not_reacquire_semantically_complete_request_without_cache_reuse",
+          "qualname": "test_batch_does_not_reacquire_semantically_complete_request_without_cache_reuse"
+        },
+        {
+          "doc": null,
+          "endLine": 141,
+          "kind": "function",
+          "line": 127,
           "name": "test_classify_requests_hydrates_blob_not_pointer",
           "qualname": "test_classify_requests_hydrates_blob_not_pointer"
         },
         {
           "doc": null,
-          "endLine": 135,
+          "endLine": 155,
           "kind": "function",
-          "line": 124,
+          "line": 144,
           "name": "test_append_missing_history_from_stored_logs",
           "qualname": "test_append_missing_history_from_stored_logs"
         },
         {
           "doc": null,
-          "endLine": 150,
+          "endLine": 170,
           "kind": "function",
-          "line": 138,
+          "line": 158,
           "name": "test_game_log_append_is_deduped_and_does_not_replace_history",
           "qualname": "test_game_log_append_is_deduped_and_does_not_replace_history"
         },
         {
           "doc": null,
-          "endLine": 166,
+          "endLine": 186,
           "kind": "function",
-          "line": 153,
+          "line": 173,
           "name": "test_outcome_memory_does_not_change_research_delta",
           "qualname": "test_outcome_memory_does_not_change_research_delta"
         },
         {
           "doc": null,
-          "endLine": 174,
+          "endLine": 194,
           "kind": "function",
-          "line": 169,
+          "line": 189,
           "name": "test_source_and_time_indexes_exist",
           "qualname": "test_source_and_time_indexes_exist"
         }
@@ -18629,5 +18637,5 @@
   "parseErrors": [],
   "root": "artifacts/dcm_v6_workstream_ab",
   "schema": "pillars_dcm.code_inventory.v1",
-  "symbolCount": 2016
+  "symbolCount": 2017
 }
