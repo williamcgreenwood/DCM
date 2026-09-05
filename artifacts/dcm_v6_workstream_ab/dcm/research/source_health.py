@@ -208,7 +208,7 @@ class SourceHealthRegistry:
         OPEN circuits are skipped and replaced by live fallbacks.
         HALF_OPEN circuits are eligible for a single trial request.
         """
-        now = _now()
+        now = self._now()
         ranked: list[tuple[int, float, str]] = []
         skipped_open: list[str] = []
         half_open_used = False

@@ -55,10 +55,20 @@ def cache_identity(
 
 
 class ResearchCache:
-    """In-process as-of keyed store. Caller persists if needed."""
+    """Compatibility cache with optional durable SQLite backing.
 
-    def __init__(self) -> None:
+    Existing providers use the small identity/get/put interface in this
+    module.  When ``run_root`` is supplied, those same calls are backed by the
+    exact-first ``ResearchCacheCascade`` so a restart can reuse validated
+    claims.  The no-argument form remains process-local for small unit tests.
+    """
+
+    def __init__(self, run_root: Any | None = None) -> None:
         self._store: dict[str, dict[str, Any]] = {}
+        self._cascade = None
+        if run_root is not None:
+            from dcm.research.cache_layers import ResearchCacheCascade
+            self._cascade = ResearchCacheCascade(run_root)
 
     def put(self, identity: dict[str, Any], value: Any, *, published_at: str = "") -> dict[str, Any]:
         key = str(identity.get("cacheKey") or cache_identity(**{
@@ -76,11 +86,35 @@ class ResearchCache:
             "longevity": identity.get("longevity"),
         }
         self._store[key] = rec
+        if self._cascade is not None:
+            self._cascade.put(
+                "IDENTITY",
+                key,
+                {
+                    "cacheIdentity": dict(identity),
+                    "value": value,
+                    "published_at": rec["publishedAt"],
+                },
+                claim_type="COLLECT",
+            )
         return rec
 
     def get(self, identity: dict[str, Any], *, as_of: str | None = None) -> Any | None:
         key = str(identity.get("cacheKey") or "")
         rec = self._store.get(key)
+        if rec is None and self._cascade is not None:
+            persisted, _layer = self._cascade.get("IDENTITY", key, claim_type="COLLECT")
+            if isinstance(persisted, dict):
+                cached_identity = persisted.get("cacheIdentity")
+                if isinstance(cached_identity, dict):
+                    rec = {
+                        "identity": cached_identity,
+                        "publishedAt": persisted.get("published_at") or "",
+                        "value": persisted.get("value"),
+                        "kind": cached_identity.get("kind"),
+                        "longevity": cached_identity.get("longevity"),
+                    }
+                    self._store[key] = rec
         if rec is None:
             return None
         cutoff = str(as_of or identity.get("asOf") or "")
@@ -91,3 +125,16 @@ class ResearchCache:
 
     def hits(self) -> int:
         return len(self._store)
+
+    def snapshot(self) -> dict[str, Any]:
+        if self._cascade is not None:
+            return self._cascade.snapshot()
+        return {
+            "schema": "pillars_dcm.research_cache.v1",
+            "persistence": {"state": "PROCESS_MEMORY_ONLY"},
+            "entries": len(self._store),
+        }
+
+    def close(self) -> None:
+        if self._cascade is not None:
+            self._cascade.close()

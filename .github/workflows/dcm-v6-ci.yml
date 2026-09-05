@@ -54,6 +54,8 @@ jobs:
         run: |
           python scripts/export_algorithm_registry.py --check
           python benchmarks/algorithm_frontier/core_smoke.py
+      - name: Permanent coding and prompt policy
+        run: python scripts/validate_dcm_policy.py
       - name: Code inventory stale-check
         run: python scripts/build_code_inventory.py --check
       - name: Benchmark smoke

@@ -1,12 +1,12 @@
-# CURRENT WORK HANDOFF — CFB COMPLETION-CONTEXT RUNTIME CLOSURE
+# CURRENT WORK HANDOFF — CANONICAL MAIN CFB CLOSURE
 
-- **Timestamp:** 2026-09-04T15:34:18Z
+- **Timestamp:** `2026-09-05T02:15:00Z`
 - **Canonical integration branch:** `integration/v6-ml-architecture-20260830`
-- **Canonical integration HEAD:** `59ea12487ad2e747a15427ba6bb9babd1b9f5907` (PR #18 R0 Algorithmic Constitution)
-- **Active branch:** `chatgpt/cfb-production-closure-v2-20260904`
-- **PR:** #21 (draft; target integration only; do not merge to `main`)
-- **Pass-start HEAD:** `1d15508d5c47aa25a7ca2b8d975b8d190713deb0`
-- **Validated code HEAD:** `d6cebdc2a8ef4ecc738cacec452086d0f59dd5d9` (fresh wheel + source/fixture validation; GitHub CI runs #248, #249, and #250 green)
+- **Canonical integration HEAD:** `59ea12487ad2e747a15427ba6bb9babd1b9f5907` (historical R0 Constitution line)
+- **Active branch:** `chatgpt/canonical-main-cfb-standard-20260905`
+- **Target promotion:** `main`, through a reviewable PR and required checks
+- **Pass-start HEAD:** `ebf636e947647010a91bcd973b314465f0b236b1` (verified v2 closure head)
+- **Validated code HEAD:** pending remote commit/readback
 - **Constitution version:** `DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903`
 - **Constitution document SHA256:** `d35da146d021f7caae959f18c4838ad3a7ac58cba2c681fdd2c6ef437766df68`
 - **Constitution lineage hash:** `bba7b082bf67e12d87e675ac58d5b6f96d9cbad9b6a487a0aa157bf7cef9e599`
@@ -17,9 +17,33 @@
 - **Predictive claim:** `NONE`
 - **Production root:** NOT CERTIFIED
 - **Host performance:** uncertified; benchmark smoke passed, but this is engineering-synthetic throughput only
-- **Final documentation head:** `d6cebdc2a8ef4ecc738cacec452086d0f59dd5d9`; required CI run #250 is green.
+- **Final documentation head:** pending remote commit/readback; local policy and runtime gates are passing.
 
-Continue PR #21 on the integration branch. Do not merge to main.
+## 2026-09-05 canonical-main execution pass
+
+This pass applies the permanent coding/prompt and storage policy to the
+verified v2 closure head. The runner now uses restart-persistent exact-first
+SQLite cache storage, the injected source-health clock, lazy package exports
+that are clean-install safe, and deterministic privacy-aware Drive routing.
+The policy validator is CI-gated. Direct pushes remain prohibited; the current
+owner has authorized promotion through the normal PR/check/merge mechanism.
+
+Local validation: targeted runtime/governance tests pass; 447 tests pass in the
+unfiltered local suite and 7 remain blocked by the intentionally absent local
+copy of the remote 11,113-row sanitized fixture or by the API-backed checkout
+having no `.git` metadata. Release tests pass with temporary Git metadata.
+The supplied quarantined HAR remains 4,307 normalized rows (4,248 CFB), with
+948 Goblins excluded after accounting, 3,122 missing-side rows unresolved, and
+14 unsupported CFB rows. Fixture research produced no production selections;
+LR remains `LR000000` and predictive claim remains `NONE`.
+
+Drive control root: `1qKs9cIy9ta5ioOerej7IeVWloTQf8yvh`; the current folder
+registry is stored in its `00_control/2026-09` child. Raw HAR, SQLite, cookies,
+tokens, and credentials were not uploaded.
+
+Continue the new PR against `main`. Merge only after remote CI, reviewability,
+privacy, inventory, release, and required status checks pass. Do not force or
+directly update `main`.
 
 ## COMPLETE NOW — semantic closure
 

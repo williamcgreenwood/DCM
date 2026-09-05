@@ -178,7 +178,11 @@ Never set `hostPerformanceCertified=true` without measured evidence.
 
 ## Development workflow
 
-- Never push implementation directly to `main`.
+- Direct implementation pushes and force-updates to `main` are prohibited.
+  Validated implementation is expected to reach `main` through a reviewable
+  PR, required checks, and the repository's normal merge mechanism when the
+  current project owner authorizes promotion. A draft PR or a green local
+  test is not itself a merge authorization.
 - Work on a branch and PR.
 - Inspect current HEAD before editing; another agent may have changed the branch.
 - Use small coherent commits.
@@ -188,6 +192,13 @@ Never set `hostPerformanceCertified=true` without measured evidence.
   in commits.
 - Do not merge merely because code compiles.
 - Do not mark v6 production-complete while a required acceptance gate is false.
+- Every new prompt or coding request that touches DCM inherits
+  `docs/engineering/DCM_CODING_AND_PROMPT_STANDARD.md`. The prompt must state
+  scope, inputs, cutoff, privacy boundary, algorithm IDs, producer/consumer,
+  tests, checkpoint, and release gates before implementation begins.
+- Drive writes must follow `dcm.runtime.storage_router` and the documented
+  folder registry. The engine may emit a route, but only a host connector may
+  upload and must read back the exact object hash.
 
 Primary Python package:
 `artifacts/dcm_v6_workstream_ab/dcm`

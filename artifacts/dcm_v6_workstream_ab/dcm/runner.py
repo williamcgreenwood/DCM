@@ -83,6 +83,7 @@ from dcm.runtime.mount_v541 import mount_default
 from dcm.runtime.schema_root import SCHEMA_V2_ID, verify_schema, verify_schema_v2
 from dcm.runtime.perf import StageTimer
 from dcm.runtime.readiness import build_readiness
+from dcm.runtime.storage_router import StorageRouter
 from dcm.runtime.store import IndexedStore
 from dcm.selection.card_layers import (
     EMPTY_ACCOUNT_ONLY,
@@ -129,6 +130,24 @@ def _finalize_archive(
     repo_root: Path | None = None,
 ) -> dict[str, Any]:
     """Always write dest/audit/. Optionally copy+commit+push a GitHub pack."""
+    try:
+        run_id = str(result.get("run_id") or result.get("runId") or dest.name)
+        storage = StorageRouter(dest)
+        route = storage.persist_run_route(
+            run_id=run_id,
+            sport="CFB" if "cfb" in str(result).lower() or (dest / "cfb_rules_snapshot.json").exists() else "MIXED",
+            period=str(result.get("forecastCutoff") or "current")[:10],
+            # Route the run's top-level safe projections.  Nested audit and
+            # query-store files have their own local retention rules; walking
+            # and re-hashing the entire graph on every finalize would turn a
+            # bookkeeping step into an avoidable O(run-artifact-bytes) tax.
+            artifact_paths=(p for p in dest.iterdir() if p.is_file()) if dest.is_dir() else (),
+        )
+        result["storageRouteHash"] = route.get("contentHash")
+        result["storageRouteState"] = "LOCAL_ROUTE_ONLY"
+    except Exception as exc:  # noqa: BLE001 — storage routing cannot lose a run
+        result["storageRouteState"] = "ROUTE_FAILED_FAIL_CLOSED"
+        result["storageRouteError"] = type(exc).__name__
     try:
         audit = build_run_audit(dest)
     except Exception as exc:  # noqa: BLE001 — never lose a finished run to archive I/O
@@ -595,8 +614,18 @@ def run_dcm(
         provider = BundleProvider(bundle_path or dest / "evidence_bundle.jsonl")
     else:
         provider = FixtureProvider(forecast_cutoff)
-    research_cache = ResearchCache()
-    bundle = collect(requests, provider, cache=research_cache)
+    # Every canonical run gets a restart-persistent exact-first cache.  The
+    # provider-facing compatibility API remains stable, while the run root
+    # supplies durable SQLite L2 storage and integrity verification.
+    research_cache = ResearchCache(dest)
+    try:
+        bundle = collect(requests, provider, cache=research_cache)
+    finally:
+        (dest / "research_cache.json").write_text(
+            json.dumps(research_cache.snapshot(), indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        research_cache.close()
     (dest / "evidence").mkdir(exist_ok=True)
     (dest / "evidence" / "claims.json").write_text(json.dumps(bundle["claims"], indent=2) + "\n", encoding="utf-8")
     written = write_bundle(dest / "evidence_bundle.jsonl", bundle["claims"])

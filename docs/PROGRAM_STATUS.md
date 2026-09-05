@@ -2,9 +2,13 @@
 
 Canonical integration line: `integration/v6-ml-architecture-20260830` at merge commit `59ea12487ad2e747a15427ba6bb9babd1b9f5907` (through PR #18 R0 Algorithmic Constitution).
 
-Active CFB guarded-launch Research OS semantic-closure slice: `chatgpt/cfb-production-closure-v2-20260904` (draft PR #21) targeting integration only. No merge to `main` is authorized.
+Active canonical-main CFB closure slice: `chatgpt/canonical-main-cfb-standard-20260905`, based on verified v2 closure head `ebf636e947647010a91bcd973b314465f0b236b1`. The current project owner authorizes promotion to `main` only through a reviewable PR and required checks; direct and force pushes remain prohibited.
 
 This file is the human dashboard. It must be updated on every coding pass together with a new immutable pass record under `docs/engineering_passes/`.
+
+The permanent inheritance contract for every future prompt or code change is
+`docs/engineering/DCM_CODING_AND_PROMPT_STANDARD.md`; Drive writes follow
+`docs/engineering/DCM_DRIVE_HIERARCHY.md` and `dcm.runtime.storage_router`.
 
 ## Status scale
 

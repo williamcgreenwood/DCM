@@ -1,6 +1,8 @@
 {
   "schema": "pillars_dcm.program_status.v1",
-  "updatedAtUtc": "2026-09-04T15:34:18Z",
+  "updatedAtUtc": "2026-09-05T02:15:00Z",
+  "activePromotionBranch": "chatgpt/canonical-main-cfb-standard-20260905",
+  "targetPromotionBranch": "main",
   "canonicalIntegrationBranch": "integration/v6-ml-architecture-20260830",
   "canonicalIntegrationPr": 18,
   "scoreScale": {
@@ -234,21 +236,21 @@
     "noSilentDowngrades": true,
     "noSilentCompletionClaims": true
   },
-  "activeBranch": "chatgpt/cfb-production-closure-v2-20260904",
-  "activePullRequest": 21,
+  "activeBranch": "chatgpt/canonical-main-cfb-standard-20260905",
+  "activePullRequest": null,
   "latestPass": {
-    "id": "20260904T144918Z_chatgpt_luna-max_completion-context",
-    "commit": "1d2490ceef086248a00d27866574ab7b7ad7c3bf",
-    "branchHead": "d6cebdc2a8ef4ecc738cacec452086d0f59dd5d9",
-    "pullRequest": 21,
-    "targetBranch": "integration/v6-ml-architecture-20260830",
+    "id": "20260905T021500Z_chatgpt_canonical-main-standard",
+    "commit": null,
+    "branchHead": null,
+    "pullRequest": null,
+    "targetBranch": "main",
     "mainTouched": false,
     "inventory": {
-      "modules": 280,
-      "symbols": 1997,
-      "contentHash": "4b338d5d7d29eea3a8b8909e55f92fc1d5a9aa87c8416df144341d0eb9f9fbad"
+      "modules": 281,
+      "symbols": 2016,
+      "contentHash": "b2e9907254f13e22eb2c1ad6c31f3a3bbfd463b6cc455f8e0daf6df3a1f819b9"
     },
-    "wheelSha256": "c8b2adb426207d53d84c3e198c5a26f7084c1f21c248e0f688aa4b19ab601c5f"
+    "wheelSha256": null
   },
   "executionClosureGates": {
     "G0_SESSION_TRUTH": "PASS",
@@ -284,16 +286,16 @@
     "rawUploaded": false
   },
   "latestValidation": {
-    "focusedTests": "30 passed",
-    "broadNonHistoricalTests": "442 passed",
-    "unfilteredHistoricalFixtureFailures": 4,
-    "unfilteredFailureReason": "legacy sanitized fixture is empty but its tests require 11113 rows",
+    "focusedTests": "targeted runtime/governance/storage tests passed",
+    "broadNonHistoricalTests": "pending final local rerun",
+    "unfilteredHistoricalFixtureFailures": 6,
+    "unfilteredFailureReason": "local API-backed checkout lacks the remote 11113-row sanitized fixture; release tests also require checkout Git metadata",
     "syntheticRun": "PASS_TRUTHFUL_NONPRODUCTION",
     "suppliedHarAccountOnly": "PASS_TRUTHFUL_NONPRODUCTION",
     "suppliedHarFullFixture": "PASS_TRUTHFUL_NONPRODUCTION",
     "predictiveClaim": "NONE",
     "learningRevision": "LR000000",
-    "githubRequiredChecks": "PASS_RUN_250",
-    "validatedHead": "d6cebdc2a8ef4ecc738cacec452086d0f59dd5d9"
+    "githubRequiredChecks": "PENDING_NEW_PR",
+    "validatedHead": null
   }
 }

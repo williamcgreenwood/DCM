@@ -1,6 +1,6 @@
 {
-  "contentHash": "4b338d5d7d29eea3a8b8909e55f92fc1d5a9aa87c8416df144341d0eb9f9fbad",
-  "moduleCount": 280,
+  "contentHash": "b2e9907254f13e22eb2c1ad6c31f3a3bbfd463b6cc455f8e0daf6df3a1f819b9",
+  "moduleCount": 281,
   "modules": [
     {
       "classes": 0,
@@ -2818,7 +2818,7 @@
       "classes": 1,
       "functions": 18,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/chat/session.py",
-      "sha256": "e2b8f9dc48cbf24347357f2c51601c65980930cb29777be366ae89cc35841cd3",
+      "sha256": "ba0a9332f9e2d0fbb52c9f7d830d744e2ef7d5cf1eddb211710439247025256d",
       "symbols": [
         {
           "doc": null,
@@ -4888,10 +4888,19 @@
     },
     {
       "classes": 0,
-      "functions": 0,
+      "functions": 1,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/model/__init__.py",
-      "sha256": "60de170d90026f5de041860042d500435b9b48905985bec28c90efec22bf391e",
-      "symbols": [],
+      "sha256": "b3599fb415ecfcd1265239ca0ca307ba724958e0ef92cf5408ba57602a65cf53",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 34,
+          "kind": "function",
+          "line": 27,
+          "name": "__getattr__",
+          "qualname": "__getattr__"
+        }
+      ],
       "workstream": "P2-P4"
     },
     {
@@ -5986,7 +5995,7 @@
       "classes": 0,
       "functions": 0,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/platform/__init__.py",
-      "sha256": "677f46a00d506aad9baddf3c85eb89ab8acfc09b98b6cc30cde693b7293c3255",
+      "sha256": "619943cb8295bb42186e328976ec65b1652a37029ea53614a4df7f9d5ad1a82c",
       "symbols": [],
       "workstream": "UNMAPPED"
     },
@@ -6375,10 +6384,19 @@
     },
     {
       "classes": 0,
-      "functions": 0,
+      "functions": 1,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/__init__.py",
-      "sha256": "6d2fa50781050da21d02f5af4316f242dbe34dbcfbfbf69d3adfa33fa71405a2",
-      "symbols": [],
+      "sha256": "2974fce22c46f8201d9721c2a381bffdd2933265364ce0e8cc1407e6eb0f5fbe",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 48,
+          "kind": "function",
+          "line": 41,
+          "name": "__getattr__",
+          "qualname": "__getattr__"
+        }
+      ],
       "workstream": "P1"
     },
     {
@@ -7249,9 +7267,9 @@
     },
     {
       "classes": 1,
-      "functions": 5,
+      "functions": 7,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/cache.py",
-      "sha256": "30f0ce9ea7ae133f706696d0a7b79717ac7aa3d8f1bebdd847b0e456f162298a",
+      "sha256": "edbdc8115fbf38ca8ca299f67fa09f816bf847e3561d913d8ea6ca89157471e6",
       "symbols": [
         {
           "doc": null,
@@ -7262,8 +7280,8 @@
           "qualname": "cache_identity"
         },
         {
-          "doc": "In-process as-of keyed store. Caller persists if needed.",
-          "endLine": 93,
+          "doc": "Compatibility cache with optional durable SQLite backing.",
+          "endLine": 140,
           "kind": "class",
           "line": 57,
           "name": "ResearchCache",
@@ -7271,35 +7289,51 @@
         },
         {
           "doc": null,
-          "endLine": 61,
+          "endLine": 71,
           "kind": "method",
-          "line": 60,
+          "line": 66,
           "name": "__init__",
           "qualname": "ResearchCache.__init__"
         },
         {
           "doc": null,
-          "endLine": 79,
+          "endLine": 100,
           "kind": "method",
-          "line": 63,
+          "line": 73,
           "name": "put",
           "qualname": "ResearchCache.put"
         },
         {
           "doc": null,
-          "endLine": 90,
+          "endLine": 124,
           "kind": "method",
-          "line": 81,
+          "line": 102,
           "name": "get",
           "qualname": "ResearchCache.get"
         },
         {
           "doc": null,
-          "endLine": 93,
+          "endLine": 127,
           "kind": "method",
-          "line": 92,
+          "line": 126,
           "name": "hits",
           "qualname": "ResearchCache.hits"
+        },
+        {
+          "doc": null,
+          "endLine": 136,
+          "kind": "method",
+          "line": 129,
+          "name": "snapshot",
+          "qualname": "ResearchCache.snapshot"
+        },
+        {
+          "doc": null,
+          "endLine": 140,
+          "kind": "method",
+          "line": 138,
+          "name": "close",
+          "qualname": "ResearchCache.close"
         }
       ],
       "workstream": "P1"
@@ -9865,7 +9899,7 @@
       "classes": 1,
       "functions": 18,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/source_health.py",
-      "sha256": "63ce391c9584de9dbe846e41c6999781423a1569cc1f61f3f5e2c785186f8a6b",
+      "sha256": "76d4f63d7c6afde34256ecbaab2cd51cd78f908f4895c026953e7acca9deca4c",
       "symbols": [
         {
           "doc": null,
@@ -10552,93 +10586,93 @@
       "classes": 0,
       "functions": 11,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/runner.py",
-      "sha256": "a4af44de2c8a12c61586710107d6be645d6faf34203594a39d0f90c696c98c93",
+      "sha256": "f05f7c0de4a5afd47ce9b5ab20f3d1c9dbb254842a9d0496cd9d86cdce172762",
       "symbols": [
         {
           "doc": "Always write dest/audit/. Optionally copy+commit+push a GitHub pack.",
-          "endLine": 179,
+          "endLine": 198,
           "kind": "function",
-          "line": 123,
+          "line": 124,
           "name": "_finalize_archive",
           "qualname": "_finalize_archive"
         },
         {
           "doc": null,
-          "endLine": 192,
+          "endLine": 211,
           "kind": "function",
-          "line": 183,
+          "line": 202,
           "name": "_synthetic_path",
           "qualname": "_synthetic_path"
         },
         {
           "doc": null,
-          "endLine": 197,
+          "endLine": 216,
           "kind": "function",
-          "line": 196,
+          "line": 215,
           "name": "_run_id",
           "qualname": "_run_id"
         },
         {
           "doc": "Best-effort git HEAD. Never writes git config. Missing git is None, not a crash.",
-          "endLine": 217,
+          "endLine": 236,
           "kind": "function",
-          "line": 200,
+          "line": 219,
           "name": "_git_commit_sha",
           "qualname": "_git_commit_sha"
         },
         {
           "doc": null,
-          "endLine": 228,
+          "endLine": 247,
           "kind": "function",
-          "line": 220,
+          "line": 239,
           "name": "_default_model_config",
           "qualname": "_default_model_config"
         },
         {
           "doc": null,
-          "endLine": 237,
+          "endLine": 256,
           "kind": "function",
-          "line": 231,
+          "line": 250,
           "name": "_active_calibration",
           "qualname": "_active_calibration"
         },
         {
           "doc": null,
-          "endLine": 1984,
+          "endLine": 2013,
           "kind": "function",
-          "line": 240,
+          "line": 259,
           "name": "run_dcm",
           "qualname": "run_dcm"
         },
         {
           "doc": null,
-          "endLine": 791,
+          "endLine": 820,
           "kind": "method",
-          "line": 768,
+          "line": 797,
           "name": "_snapshot_for",
           "qualname": "run_dcm._snapshot_for"
         },
         {
           "doc": null,
-          "endLine": 1230,
+          "endLine": 1259,
           "kind": "method",
-          "line": 1228,
+          "line": 1257,
           "name": "_resimulate_material",
           "qualname": "run_dcm._resimulate_material"
         },
         {
           "doc": null,
-          "endLine": 1463,
+          "endLine": 1492,
           "kind": "method",
-          "line": 1419,
+          "line": 1448,
           "name": "slim",
           "qualname": "run_dcm.slim"
         },
         {
           "doc": null,
-          "endLine": 2102,
+          "endLine": 2131,
           "kind": "function",
-          "line": 1987,
+          "line": 2016,
           "name": "main",
           "qualname": "main"
         }
@@ -11876,6 +11910,135 @@
           "line": 98,
           "name": "verify_schema_v2",
           "qualname": "verify_schema_v2"
+        }
+      ],
+      "workstream": "P5-P14"
+    },
+    {
+      "classes": 3,
+      "functions": 12,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/runtime/storage_router.py",
+      "sha256": "9612744757f949c8d7fe0726d7a079e6bb34dfe5763ac7769b48cd8852a6cc2c",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 81,
+          "kind": "function",
+          "line": 78,
+          "name": "_slug",
+          "qualname": "_slug"
+        },
+        {
+          "doc": null,
+          "endLine": 85,
+          "kind": "function",
+          "line": 84,
+          "name": "_sha256_bytes",
+          "qualname": "_sha256_bytes"
+        },
+        {
+          "doc": null,
+          "endLine": 92,
+          "kind": "function",
+          "line": 88,
+          "name": "_safe_filename",
+          "qualname": "_safe_filename"
+        },
+        {
+          "doc": "Validated environment-specific Drive folder IDs.",
+          "endLine": 158,
+          "kind": "class",
+          "line": 96,
+          "name": "FolderRegistry",
+          "qualname": "FolderRegistry"
+        },
+        {
+          "doc": null,
+          "endLine": 137,
+          "kind": "method",
+          "line": 110,
+          "name": "from_mapping",
+          "qualname": "FolderRegistry.from_mapping"
+        },
+        {
+          "doc": null,
+          "endLine": 146,
+          "kind": "method",
+          "line": 139,
+          "name": "validate",
+          "qualname": "FolderRegistry.validate"
+        },
+        {
+          "doc": null,
+          "endLine": 158,
+          "kind": "method",
+          "line": 148,
+          "name": "snapshot",
+          "qualname": "FolderRegistry.snapshot"
+        },
+        {
+          "doc": null,
+          "endLine": 182,
+          "kind": "class",
+          "line": 162,
+          "name": "StorageRoute",
+          "qualname": "StorageRoute"
+        },
+        {
+          "doc": null,
+          "endLine": 182,
+          "kind": "method",
+          "line": 172,
+          "name": "to_dict",
+          "qualname": "StorageRoute.to_dict"
+        },
+        {
+          "doc": "Build and persist deterministic local/Drive routes for one run.",
+          "endLine": 308,
+          "kind": "class",
+          "line": 185,
+          "name": "StorageRouter",
+          "qualname": "StorageRouter"
+        },
+        {
+          "doc": null,
+          "endLine": 190,
+          "kind": "method",
+          "line": 188,
+          "name": "__init__",
+          "qualname": "StorageRouter.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 198,
+          "kind": "method",
+          "line": 193,
+          "name": "folder_for",
+          "qualname": "StorageRouter.folder_for"
+        },
+        {
+          "doc": null,
+          "endLine": 223,
+          "kind": "method",
+          "line": 200,
+          "name": "route",
+          "qualname": "StorageRouter.route"
+        },
+        {
+          "doc": "Stage an immutable safe object and return its verified manifest.",
+          "endLine": 257,
+          "kind": "method",
+          "line": 225,
+          "name": "stage_bytes",
+          "qualname": "StorageRouter.stage_bytes"
+        },
+        {
+          "doc": null,
+          "endLine": 308,
+          "kind": "method",
+          "line": 259,
+          "name": "persist_run_route",
+          "qualname": "StorageRouter.persist_run_route"
         }
       ],
       "workstream": "P5-P14"
@@ -13772,7 +13935,7 @@
       "classes": 0,
       "functions": 0,
       "path": "artifacts/dcm_v6_workstream_ab/tests/live_sanitized/__init__.py",
-      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
       "symbols": [],
       "workstream": "UNMAPPED"
     },
@@ -18466,5 +18629,5 @@
   "parseErrors": [],
   "root": "artifacts/dcm_v6_workstream_ab",
   "schema": "pillars_dcm.code_inventory.v1",
-  "symbolCount": 1997
+  "symbolCount": 2016
 }

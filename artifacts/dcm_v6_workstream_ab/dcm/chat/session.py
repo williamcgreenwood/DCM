@@ -77,7 +77,7 @@ def doctor(*, release_manifest: Path | None = None, workspace: Path | None = Non
         "sourceCatalog": catalog,
         "sourceCatalogHash": load_source_catalog().get("contentHash"),
         "mountState": mount.get("state"),
-        "cacheStatus": "process_local_research_cache",
+        "cacheStatus": "run_root_sqlite_research_cache_with_integrity_fallback",
         "hostPerformanceCertified": False,
         "productionRootCertified": False,
         "blockers": blockers,
@@ -394,4 +394,3 @@ def cfb_launch(
         "learningRevision": LEARNING_REVISION,
         "predictiveClaim": PREDICTIVE_CLAIM,
     }
-

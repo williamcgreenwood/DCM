@@ -2,10 +2,10 @@
 
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
-- Modules: **280**
-- Symbols: **1997**
+- Modules: **281**
+- Symbols: **2016**
 - Parse errors: **0**
-- Inventory hash: `4b338d5d7d29eea3a8b8909e55f92fc1d5a9aa87c8416df144341d0eb9f9fbad`
+- Inventory hash: `b2e9907254f13e22eb2c1ad6c31f3a3bbfd463b6cc455f8e0daf6df3a1f819b9`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -83,7 +83,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P6 | `artifacts/dcm_v6_workstream_ab/dcm/learning/walkforward.py` | 1 | 15 |
 | P2 | `artifacts/dcm_v6_workstream_ab/dcm/ml/__init__.py` | 0 | 0 |
 | P2 | `artifacts/dcm_v6_workstream_ab/dcm/ml/feature_store.py` | 1 | 9 |
-| P2-P4 | `artifacts/dcm_v6_workstream_ab/dcm/model/__init__.py` | 0 | 0 |
+| P2-P4 | `artifacts/dcm_v6_workstream_ab/dcm/model/__init__.py` | 0 | 1 |
 | P2-P4 | `artifacts/dcm_v6_workstream_ab/dcm/model/availability.py` | 0 | 2 |
 | P2-P4 | `artifacts/dcm_v6_workstream_ab/dcm/model/basketball_efficiency.py` | 1 | 6 |
 | P2-P4 | `artifacts/dcm_v6_workstream_ab/dcm/model/basketball_opportunity.py` | 1 | 8 |
@@ -111,7 +111,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/platform/prizepicks/settlement.py` | 2 | 6 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/postgame.py` | 0 | 1 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/release.py` | 0 | 14 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/__init__.py` | 0 | 0 |
+| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/__init__.py` | 0 | 1 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/acquisition.py` | 0 | 5 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/adapters/__init__.py` | 0 | 0 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/adapters/base.py` | 1 | 7 |
@@ -123,7 +123,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/adapters/pro_football_reference.py` | 2 | 7 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/authority.py` | 1 | 5 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/batch.py` | 0 | 4 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/cache.py` | 1 | 5 |
+| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/cache.py` | 1 | 7 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/cache_layers.py` | 1 | 12 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/claims.py` | 0 | 3 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/classify.py` | 0 | 7 |
@@ -181,6 +181,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/pipeline.py` | 0 | 2 |
 | P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/readiness.py` | 0 | 1 |
 | P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/schema_root.py` | 0 | 5 |
+| P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/storage_router.py` | 3 | 12 |
 | P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/store.py` | 1 | 4 |
 | P4 | `artifacts/dcm_v6_workstream_ab/dcm/selection/__init__.py` | 0 | 0 |
 | P4 | `artifacts/dcm_v6_workstream_ab/dcm/selection/card_layers.py` | 0 | 17 |
@@ -1059,7 +1060,7 @@ _No class/function symbols._
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/model/__init__.py`
 
-_No class/function symbols._
+- `function` **__getattr__** L27
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/model/availability.py`
 
@@ -1303,7 +1304,7 @@ _No class/function symbols._
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/__init__.py`
 
-_No class/function symbols._
+- `function` **__getattr__** L41
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/acquisition.py`
 
@@ -1438,11 +1439,13 @@ _No class/function symbols._
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/cache.py`
 
 - `function` **cache_identity** L34
-- `class` **ResearchCache** L57 — In-process as-of keyed store. Caller persists if needed.
-- `method` **ResearchCache.__init__** L60
-- `method` **ResearchCache.put** L63
-- `method` **ResearchCache.get** L81
-- `method` **ResearchCache.hits** L92
+- `class` **ResearchCache** L57 — Compatibility cache with optional durable SQLite backing.
+- `method` **ResearchCache.__init__** L66
+- `method` **ResearchCache.put** L73
+- `method` **ResearchCache.get** L102
+- `method` **ResearchCache.hits** L126
+- `method` **ResearchCache.snapshot** L129
+- `method` **ResearchCache.close** L138
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/cache_layers.py`
 
@@ -1919,17 +1922,17 @@ _No class/function symbols._
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/runner.py`
 
-- `function` **_finalize_archive** L123 — Always write dest/audit/. Optionally copy+commit+push a GitHub pack.
-- `function` **_synthetic_path** L183
-- `function` **_run_id** L196
-- `function` **_git_commit_sha** L200 — Best-effort git HEAD. Never writes git config. Missing git is None, not a crash.
-- `function` **_default_model_config** L220
-- `function` **_active_calibration** L231
-- `function` **run_dcm** L240
-- `method` **run_dcm._snapshot_for** L768
-- `method` **run_dcm._resimulate_material** L1228
-- `method` **run_dcm.slim** L1419
-- `function` **main** L1987
+- `function` **_finalize_archive** L124 — Always write dest/audit/. Optionally copy+commit+push a GitHub pack.
+- `function` **_synthetic_path** L202
+- `function` **_run_id** L215
+- `function` **_git_commit_sha** L219 — Best-effort git HEAD. Never writes git config. Missing git is None, not a crash.
+- `function` **_default_model_config** L239
+- `function` **_active_calibration** L250
+- `function` **run_dcm** L259
+- `method` **run_dcm._snapshot_for** L797
+- `method` **run_dcm._resimulate_material** L1257
+- `method` **run_dcm.slim** L1448
+- `function` **main** L2016
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/runtime/__init__.py`
 
@@ -2123,6 +2126,24 @@ _No class/function symbols._
 - `function` **verify_schema** L39
 - `function` **v2_schema_path** L85
 - `function` **verify_schema_v2** L98
+
+### `artifacts/dcm_v6_workstream_ab/dcm/runtime/storage_router.py`
+
+- `function` **_slug** L78
+- `function` **_sha256_bytes** L84
+- `function` **_safe_filename** L88
+- `class` **FolderRegistry** L96 — Validated environment-specific Drive folder IDs.
+- `method` **FolderRegistry.from_mapping** L110
+- `method` **FolderRegistry.validate** L139
+- `method` **FolderRegistry.snapshot** L148
+- `class` **StorageRoute** L162
+- `method` **StorageRoute.to_dict** L172
+- `class` **StorageRouter** L185 — Build and persist deterministic local/Drive routes for one run.
+- `method` **StorageRouter.__init__** L188
+- `method` **StorageRouter.folder_for** L193
+- `method` **StorageRouter.route** L200
+- `method` **StorageRouter.stage_bytes** L225 — Stage an immutable safe object and return its verified manifest.
+- `method` **StorageRouter.persist_run_route** L259
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/runtime/store.py`
 
