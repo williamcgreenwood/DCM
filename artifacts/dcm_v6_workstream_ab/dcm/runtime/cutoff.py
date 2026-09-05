@@ -51,7 +51,18 @@ def _parse(value: Any) -> datetime | None:
 
 
 def _fmt(dt: datetime) -> str:
-    return dt.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    """Format an RFC3339 timestamp without discarding capture precision.
+
+    ``--cutoff-from-capture`` is a self-contained temporal boundary.  Rounding
+    a capture end down to whole seconds can make the final records from that
+    very capture appear post-cutoff, so retain a fractional component whenever
+    the source supplied one.  Explicit operator cutoffs remain untouched.
+    """
+    utc = dt.astimezone(timezone.utc)
+    base = utc.strftime("%Y-%m-%dT%H:%M:%S")
+    if not utc.microsecond:
+        return base + "Z"
+    return f"{base}.{utc.microsecond:06d}".rstrip("0") + "Z"
 
 
 def derive_cutoff_from_capture(ingest: dict[str, Any]) -> str:
