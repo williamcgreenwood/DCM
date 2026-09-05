@@ -29,6 +29,9 @@ def claim_record(
     retracts: list[str] | tuple[str, ...] | None = None,
     correction_of: str | None = None,
     state: str | None = None,
+    parser_version: str | None = None,
+    action_id: str | None = None,
+    source_family: str | None = None,
 ) -> dict[str, Any]:
     assert_not_after_cutoff(observed_at, forecast_cutoff, field="observed_at")
     if str(published_at).strip():
@@ -64,6 +67,12 @@ def claim_record(
         body["correction_of"] = str(correction_of)
     if state:
         body["state"] = str(state).upper()
+    if parser_version:
+        body["parser_version"] = str(parser_version)
+    if action_id:
+        body["actionId"] = str(action_id)
+    if source_family:
+        body["sourceFamily"] = str(source_family)
     body["source_hash"] = content_hash(
         {"source_id": source_id, "url": url, "published_at": published_at}
     )
