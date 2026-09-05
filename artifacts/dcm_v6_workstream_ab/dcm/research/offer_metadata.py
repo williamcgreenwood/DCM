@@ -45,6 +45,20 @@ def recover_offer_metadata(
             })
             continue
         observed = str(row.get("sourceSnapshotTime") or cutoff)
+        # A board row captured after the forecast cutoff is still counted in
+        # the accounting receipt, but it is not admissible evidence for that
+        # forecast.  Keep the terminal reason explicit instead of allowing the
+        # claim constructor to raise and abort the whole run.
+        try:
+            from dcm.research.temporal import assert_not_after_cutoff, TemporalLeakError
+            assert_not_after_cutoff(observed, cutoff, field="observed_at")
+        except TemporalLeakError:
+            unresolved.append({
+                "requestId": request.get("request_id"),
+                "projectionId": projection_id,
+                "reason": "UNRESOLVED_PLATFORM_METADATA:CAPTURE_AFTER_CUTOFF",
+            })
+            continue
         # The source hash/body hash are HAR lineage, not host-supplied hashes.
         value = {
             "offer_recorded": True,

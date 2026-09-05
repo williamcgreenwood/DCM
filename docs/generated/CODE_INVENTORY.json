@@ -1,5 +1,5 @@
 {
-  "contentHash": "c6f8b5ccbae2bdb339caed4a72553fef82a456efbd7036207c09a1bb9666374c",
+  "contentHash": "a8457f4a474580b50e33681f70267d0cfc013b38a2166bb24ac1f8be08dd395e",
   "moduleCount": 283,
   "modules": [
     {
@@ -8760,11 +8760,11 @@
       "classes": 0,
       "functions": 1,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/offer_metadata.py",
-      "sha256": "26aa395575581d0b19bd53ee6a782bc35ab0d07a230ab62a7da7ec7bd5555f31",
+      "sha256": "543f39636cd839dd74e32f5621ca4ebf5bdbe1808972ab76e895adeb0b332f9f",
       "symbols": [
         {
           "doc": "Return HAR-backed claims, counts, and exact unresolved reasons.",
-          "endLine": 86,
+          "endLine": 100,
           "kind": "function",
           "line": 19,
           "name": "recover_offer_metadata",
@@ -10611,7 +10611,7 @@
       "classes": 0,
       "functions": 11,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/runner.py",
-      "sha256": "14f562c88431dfc14395c68577dba1c1ab0f2084b9a2769edb47c1bf70cc6525",
+      "sha256": "0025183f864685cc03ad8b903a9a6f8b5c2604c79f0ef151a9a75c7dddbe25d5",
       "symbols": [
         {
           "doc": "Always write dest/audit/. Optionally copy+commit+push a GitHub pack.",
@@ -10663,7 +10663,7 @@
         },
         {
           "doc": null,
-          "endLine": 2054,
+          "endLine": 2069,
           "kind": "function",
           "line": 262,
           "name": "run_dcm",
@@ -10671,33 +10671,33 @@
         },
         {
           "doc": null,
-          "endLine": 861,
+          "endLine": 876,
           "kind": "method",
-          "line": 838,
+          "line": 853,
           "name": "_snapshot_for",
           "qualname": "run_dcm._snapshot_for"
         },
         {
           "doc": null,
-          "endLine": 1300,
+          "endLine": 1315,
           "kind": "method",
-          "line": 1298,
+          "line": 1313,
           "name": "_resimulate_material",
           "qualname": "run_dcm._resimulate_material"
         },
         {
           "doc": null,
-          "endLine": 1533,
+          "endLine": 1548,
           "kind": "method",
-          "line": 1489,
+          "line": 1504,
           "name": "slim",
           "qualname": "run_dcm.slim"
         },
         {
           "doc": null,
-          "endLine": 2172,
+          "endLine": 2187,
           "kind": "function",
-          "line": 2057,
+          "line": 2072,
           "name": "main",
           "qualname": "main"
         }
