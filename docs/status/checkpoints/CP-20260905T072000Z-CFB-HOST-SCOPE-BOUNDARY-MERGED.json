@@ -1,0 +1,71 @@
+{
+  "schema": "pillars_dcm.checkpoint_manifest.v1",
+  "checkpointId": "CP-20260905T072000Z-CFB-HOST-SCOPE-BOUNDARY-MERGED",
+  "parentCheckpointId": "CP-20260905T071000Z-CFB-HOST-SCOPE-BOUNDARY-INVENTORY",
+  "timestampUtc": "2026-09-05T07:20:00Z",
+  "repositoryUrl": "https://github.com/williamcgreenwood/DCM",
+  "branch": "main",
+  "targetBranch": "main",
+  "baseBranch": "main",
+  "baseSha": "1b4e91b17b78f3d9323c7c126042a06ed4bcb59e",
+  "startSha": "1b4e91b17b78f3d9323c7c126042a06ed4bcb59e",
+  "implementationCommitSha": "5f13dc3286d1edae3dcd2521ffc18f47f7401464",
+  "inventoryCorrectionCommitSha": "6ec832774d72877ef46f3635b9a6d17681cb2b48",
+  "mergeCommitSha": "1b4e91b17b78f3d9323c7c126042a06ed4bcb59e",
+  "checkpointCommitSha": null,
+  "dirtyTreeInventory": {
+    "inventoryModules": 281,
+    "inventorySymbols": 2016,
+    "inventoryHash": "1445f85564d95fbdf1aa1019add2ca9125e14e0a6170a374de3ba50a285f070b",
+    "rawHarExcluded": true
+  },
+  "activeAtomicTask": "P0-CFB-HOST-SCOPE-BOUNDARY-20260905",
+  "completedWork": [
+    "live main/open-PR/checkpoint reconciliation",
+    "host-facing PLAYER/TEAM/MARKET scope canonicalization",
+    "existing host-native regression extension",
+    "official inventory and requirement-trace update",
+    "exact-head CI failure reproduction and test-contract correction",
+    "canonical generated-inventory JSON regeneration",
+    "PR #24 normal merge and main readback"
+  ],
+  "requirements": {
+    "implemented": [
+      "ROS-HOST-SCOPE-001"
+    ],
+    "unchangedGates": [
+      "LR000000",
+      "predictiveClaim=NONE",
+      "productionRootCertified=false",
+      "hostPerformanceCertified=false"
+    ],
+    "externalBlocked": [
+      "current authoritative CFB HAR",
+      "permitted host-acquired evidence",
+      "prospective settlements/calibration"
+    ]
+  },
+  "validation": {
+    "changedPythonCompile": "PASS",
+    "remoteCi": "RUN_261_GREEN",
+    "exactPrHead": "384a149102fa343d95f8642d9dd9a90590c3d65b",
+    "mainReadback": "1b4e91b17b78f3d9323c7c126042a06ed4bcb59e",
+    "inventoryHash": "1445f85564d95fbdf1aa1019add2ca9125e14e0a6170a374de3ba50a285f070b"
+  },
+  "pullRequest": {
+    "number": 24,
+    "url": "https://github.com/williamcgreenwood/DCM/pull/24",
+    "status": "MERGED",
+    "target": "main",
+    "head": "chatgpt/cfb-host-scope-boundary-20260905",
+    "headSha": "384a149102fa343d95f8642d9dd9a90590c3d65b",
+    "mergeCommit": "1b4e91b17b78f3d9323c7c126042a06ed4bcb59e"
+  },
+  "drive": {
+    "rootId": "1qKs9cIy9ta5ioOerej7IeVWloTQf8yvh",
+    "rawArtifactsUploaded": false,
+    "sqliteUploaded": false
+  },
+  "honestCompletionState": "CFB_HOST_SCOPE_BOUNDARY_MERGED_VERIFIED",
+  "recoveryAction": "Resume from main 1b4e91b17b78f3d9323c7c126042a06ed4bcb59e; read this merged checkpoint before the current-HAR host evidence task."
+}

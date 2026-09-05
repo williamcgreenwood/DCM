@@ -1,11 +1,11 @@
 {
   "schema": "pillars_dcm.program_status.v1",
-  "updatedAtUtc": "2026-09-05T07:10:00Z",
-  "activePromotionBranch": "chatgpt/cfb-host-scope-boundary-20260905",
+  "updatedAtUtc": "2026-09-05T07:20:00Z",
+  "activePromotionBranch": "main",
   "targetPromotionBranch": "main",
-  "lastMergedPullRequest": 22,
-  "lastMergedCommit": "dd49206419c5e7de7650e75a6f3fe6fd5bc01104",
-  "lastGreenCiRun": 253,
+  "lastMergedPullRequest": 24,
+  "lastMergedCommit": "1b4e91b17b78f3d9323c7c126042a06ed4bcb59e",
+  "lastGreenCiRun": 261,
   "canonicalIntegrationBranch": "integration/v6-ml-architecture-20260830",
   "canonicalIntegrationPr": 18,
   "scoreScale": {
@@ -239,15 +239,15 @@
     "noSilentDowngrades": true,
     "noSilentCompletionClaims": true
   },
-  "activeBranch": "chatgpt/cfb-host-scope-boundary-20260905",
-  "activePullRequest": 24,
+  "activeBranch": "main",
+  "activePullRequest": null,
   "latestPass": {
-    "id": "20260905T071000Z_cfb-host-scope-boundary-inventory-regeneration",
-    "commit": "6ec832774d72877ef46f3635b9a6d17681cb2b48",
-    "branch": "chatgpt/cfb-host-scope-boundary-20260905",
+    "id": "20260905T072000Z_cfb-host-scope-boundary-merged",
+    "commit": "1b4e91b17b78f3d9323c7c126042a06ed4bcb59e",
+    "branch": "main",
     "targetBranch": "main",
     "pullRequest": 24,
-    "mainTouched": false,
+    "mainTouched": true,
     "inventory": {
       "modules": 281,
       "symbols": 2016,
@@ -290,7 +290,7 @@
   },
   "latestValidation": {
     "focusedTests": "targeted runtime/governance/storage tests passed",
-    "broadNonHistoricalTests": "pending final local rerun",
+    "broadNonHistoricalTests": "REMOTE_CI_RUN_261_GREEN",
     "unfilteredHistoricalFixtureFailures": 6,
     "unfilteredFailureReason": "local API-backed checkout lacks the remote 11113-row sanitized fixture; release tests also require checkout Git metadata",
     "syntheticRun": "PASS_TRUTHFUL_NONPRODUCTION",
@@ -298,8 +298,9 @@
     "suppliedHarFullFixture": "PASS_TRUTHFUL_NONPRODUCTION",
     "predictiveClaim": "NONE",
     "learningRevision": "LR000000",
-    "githubRequiredChecks": "PENDING_PR_24_RETRY_2",
-    "validatedHead": "6ec832774d72877ef46f3635b9a6d17681cb2b48",
-    "targetedHostScopeBoundary": "IMPLEMENTED_REMOTE_CI_RETRY_2_PENDING"
+    "githubRequiredChecks": "RUN_261_GREEN",
+    "validatedHead": "384a149102fa343d95f8642d9dd9a90590c3d65b",
+    "targetedHostScopeBoundary": "IMPLEMENTED_MERGED_VERIFIED",
+    "mergeCommit": "1b4e91b17b78f3d9323c7c126042a06ed4bcb59e"
   }
 }

@@ -1,25 +1,25 @@
 {
   "schema": "pillars_dcm.work_state.v1",
-  "checkpointId": "CP-20260905T071000Z-CFB-HOST-SCOPE-BOUNDARY-INVENTORY",
-  "lastGreenCheckpointId": "CP-20260905T004200Z-MAIN-MERGED",
-  "currentState": "CFB_HOST_SCOPE_BOUNDARY_PR_RETRY_2_CI_PENDING",
-  "honestCompletionState": "CFB_HOST_SCOPE_BOUNDARY_IMPLEMENTED_REMOTE_CI_RETRY_2_PENDING",
+  "checkpointId": "CP-20260905T072000Z-CFB-HOST-SCOPE-BOUNDARY-MERGED",
+  "lastGreenCheckpointId": "CP-20260905T072000Z-CFB-HOST-SCOPE-BOUNDARY-MERGED",
+  "currentState": "CFB_HOST_SCOPE_BOUNDARY_MERGED_MAIN",
+  "honestCompletionState": "CFB_HOST_SCOPE_BOUNDARY_MERGED_VERIFIED",
   "repository": "https://github.com/williamcgreenwood/DCM",
-  "branch": "chatgpt/cfb-host-scope-boundary-20260905",
+  "branch": "main",
   "baseBranch": "main",
-  "baseSha": "07cd18c750cd5399b67d6abe3c146b3d50ae8809",
-  "startSha": "07cd18c750cd5399b67d6abe3c146b3d50ae8809",
+  "baseSha": "1b4e91b17b78f3d9323c7c126042a06ed4bcb59e",
+  "startSha": "1b4e91b17b78f3d9323c7c126042a06ed4bcb59e",
   "checkpointCommitSha": null,
-  "updatedAtUtc": "2026-09-05T07:10:00Z",
-  "activeAtomicTask": "P0-CFB-HOST-SCOPE-BOUNDARY-20260905: canonicalize adapter scopes at the host research producer boundary.",
-  "nextExactAction": "Read PR #24 exact-head retry-2 CI/review state; merge only if all required checks pass, then read back main and finalize the checkpoint.",
+  "updatedAtUtc": "2026-09-05T07:20:00Z",
+  "activeAtomicTask": "P0-CFB-HOST-SCOPE-BOUNDARY-20260905: canonicalize adapter scopes at the host research producer boundary (merged and verified).",
+  "nextExactAction": "Obtain a permitted current CFB HAR and host-acquired evidence; then run the fresh prepare -> next-research -> evidence-import -> coverage -> forecast loop.",
   "lastValidation": {
-    "command": "remote PR test, policy gates, and generated-inventory check",
+    "command": "PR #24 exact-head repository CI and GitHub merge/readback",
     "exitCode": 0,
-    "pytest": "REMOTE_CI_RUN_259_TESTS_AND_POLICY_PASS_INVENTORY_SERIALIZATION_FAIL",
-    "failure": "Run #259 passed full tests and policy gates, then inventory check rejected literal-Unicode JSON; regenerated JSON now uses Python's ASCII-escaped serialization.",
+    "pytest": "REMOTE_CI_RUN_261_GREEN",
     "pullRequest": 24,
-    "validatedHead": "6ec832774d72877ef46f3635b9a6d17681cb2b48",
+    "validatedHead": "384a149102fa343d95f8642d9dd9a90590c3d65b",
+    "mergeCommit": "1b4e91b17b78f3d9323c7c126042a06ed4bcb59e",
     "inventory": "281 modules / 2016 symbols / 1445f85564d95fbdf1aa1019add2ca9125e14e0a6170a374de3ba50a285f070b"
   },
   "har": {
@@ -45,7 +45,7 @@
     "decisionPortfolio": "REJECT_ONLY_RUNTIME_INTEGRATED",
     "freezeSettlementLearning": "PARTIAL_EXTERNAL_EVIDENCE_REQUIRED",
     "performancePortabilityRelease": "ENGINEERING_BENCHMARKED_HOST_UNCERTIFIED",
-    "hostScopeBoundary": "IMPLEMENTED_PR_RETRY_2_PENDING"
+    "hostScopeBoundary": "MERGED_VERIFIED"
   },
   "externalBlockers": [
     "remote sanitized 11113-row fixture is not present in the API-backed scratch mirror",
