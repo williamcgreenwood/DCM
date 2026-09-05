@@ -4,7 +4,9 @@
 - **Base:** `chatgpt/cfb-production-closure-v2-20260904` / `ebf636e947647010a91bcd973b314465f0b236b1`
 - **Target:** `main`, through a reviewable PR and required checks
 - **Active branch:** `chatgpt/canonical-main-cfb-standard-20260905`
-- **Remote commit:** pending at pass creation; updated after GitHub read-back
+- **Remote commit:** `bf3846255c952a5d9240f67d000b84a9e9e7cc20` → follow-up
+  `1462fefa8abfebaf5f3e19ddcce5195d367d40eb`; merged as
+  `dd49206419c5e7de7650e75a6f3fe6fd5bc01104` through PR #22
 
 ## Implementation
 
@@ -31,9 +33,10 @@
 
 - Targeted runtime, signal, temporal, decision, lineage, cache, storage, and
   governance tests: pass.
-- Local unfiltered suite before final rerun: 447 passed, 7 blocked by the
-  absent local copy of the remote 11,113-row sanitized fixture and absent Git
-  metadata. The `.gitignore` blocker is fixed and will be rechecked.
+- Remote CI run #253: full pytest, Constitution, policy, inventory, and
+  benchmark steps all passed on the complete repository fixture.
+- Local scratch validation remains supportive only because the API-backed
+  mirror lacks the remote 11,113-row fixture.
 - Release freshness tests: pass with temporary Git metadata, with no source
   repository mutation.
 - Supplied quarantined HAR: 4,307 normalized rows, 4,248 CFB, 948 Goblins,
@@ -58,6 +61,7 @@ committed or uploaded.
 
 ## Next exact action
 
-Push the coherent branch delta, create the PR against `main`, run remote CI
-against the complete repository fixture and release environment, verify exact
-head/checks/blob read-back, then merge only if the normal required checks pass.
+The coherent branch delta was pushed, PR #22 was checked by CI run #253,
+exact head and key blob bytes were read back, and the PR was merged normally
+to `main`. Continue from the merged main tree with the separately gated
+current-HAR, settlement, calibration, and production-root work.

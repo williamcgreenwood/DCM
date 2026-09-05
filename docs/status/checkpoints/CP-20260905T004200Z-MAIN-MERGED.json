@@ -1,0 +1,67 @@
+{
+  "schema": "pillars_dcm.checkpoint_manifest.v1",
+  "checkpointId": "CP-20260905T004200Z-MAIN-MERGED",
+  "parentCheckpointId": "CP-20260905T021500Z-CANONICAL-MAIN",
+  "timestampUtc": "2026-09-05T00:42:00Z",
+  "repositoryUrl": "https://github.com/williamcgreenwood/DCM",
+  "branch": "main",
+  "targetBranch": "main",
+  "mergeCommitSha": "dd49206419c5e7de7650e75a6f3fe6fd5bc01104",
+  "sourceBranch": "chatgpt/canonical-main-cfb-standard-20260905",
+  "sourceCommitSha": "1462fefa8abfebaf5f3e19ddcce5195d367d40eb",
+  "pullRequest": {
+    "number": 22,
+    "url": "https://github.com/williamcgreenwood/DCM/pull/22",
+    "merged": true,
+    "mergeMethod": "squash"
+  },
+  "ci": {
+    "workflow": "DCM v6 branch CI",
+    "runNumber": 253,
+    "runId": 33933476309,
+    "conclusion": "success",
+    "passedStages": [
+      "clean install",
+      "CLI smoke",
+      "synthetic smoke",
+      "full pytest",
+      "Algorithmic Constitution",
+      "permanent coding and prompt policy",
+      "code inventory",
+      "benchmark smoke"
+    ]
+  },
+  "inventory": {
+    "modules": 281,
+    "symbols": 2016,
+    "contentHash": "b2e9907254f13e22eb2c1ad6c31f3a3bbfd463b6cc455f8e0daf6df3a1f819b9"
+  },
+  "har": {
+    "sourceName": "2353pstCFB.har",
+    "sha256": "ad3a10271c511266c1a52869658362e07002aad9f453eb77108f35c82e2f96d7",
+    "entries": 31,
+    "normalizedRows": 4307,
+    "cfbRows": 4248,
+    "rawCommitted": false,
+    "rawUploaded": false
+  },
+  "drive": {
+    "rootId": "1qKs9cIy9ta5ioOerej7IeVWloTQf8yvh",
+    "folderRegistryFileId": "12xxCKT_-_LnkTj1jfOB7PidH2t1ZHw5k",
+    "engineeringRunFolderId": "1JU33tTvbsEnE815BZF606czikeF4Ak2F",
+    "rawHarUploaded": false,
+    "sqliteUploaded": false
+  },
+  "honestCompletionState": "SOFTWARE_STANDARD_TRANCHE_MERGED_MAIN",
+  "learningRevision": "LR000000",
+  "predictiveClaim": "NONE",
+  "remainingGates": [
+    "current authoritative CFB research and host acceptance",
+    "platform settlement authority snapshot",
+    "prospective chronological settlements and calibration",
+    "host-performance certification",
+    "production-root certification",
+    "mixed-sport parity and remaining donor archive bytes"
+  ],
+  "recoveryAction": "Start from main at mergeCommitSha; read this checkpoint and the Drive folder registry before any new run or write."
+}

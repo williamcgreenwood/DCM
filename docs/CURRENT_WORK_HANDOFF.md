@@ -1,23 +1,35 @@
 # CURRENT WORK HANDOFF — CANONICAL MAIN CFB CLOSURE
 
-- **Timestamp:** `2026-09-05T02:15:00Z`
+- **Timestamp:** `2026-09-05T00:42:00Z`
 - **Canonical integration branch:** `integration/v6-ml-architecture-20260830`
 - **Canonical integration HEAD:** `59ea12487ad2e747a15427ba6bb9babd1b9f5907` (historical R0 Constitution line)
-- **Active branch:** `chatgpt/canonical-main-cfb-standard-20260905`
-- **Target promotion:** `main`, through a reviewable PR and required checks
+- **Active branch:** `main`
+- **Target promotion:** merged through PR #22 after required checks
 - **Pass-start HEAD:** `ebf636e947647010a91bcd973b314465f0b236b1` (verified v2 closure head)
-- **Validated code HEAD:** pending remote commit/readback
+- **Validated code HEAD:** `dd49206419c5e7de7650e75a6f3fe6fd5bc01104` (PR #22 merged)
 - **Constitution version:** `DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903`
 - **Constitution document SHA256:** `d35da146d021f7caae959f18c4838ad3a7ac58cba2c681fdd2c6ef437766df68`
 - **Constitution lineage hash:** `bba7b082bf67e12d87e675ac58d5b6f96d9cbad9b6a487a0aa157bf7cef9e599`
 - **Registry SHA256:** `9327ec9884e7a55a7854f27d85fd062d6b959794197670db14b7932428e885ca`
-- **Inventory:** 280 modules / 1997 symbols / hash `4b338d5d7d29eea3a8b8909e55f92fc1d5a9aa87c8416df144341d0eb9f9fbad`
-- **Pytest:** 442 passed with the two unavailable historical-fixture files excluded; the unfiltered run has four known external-fixture failures and is not claimed green
+- **Inventory:** 281 modules / 2016 symbols / hash `b2e9907254f13e22eb2c1ad6c31f3a3bbfd463b6cc455f8e0daf6df3a1f819b9`
+- **Pytest:** remote CI run #253 passed on the complete repository fixture; local scratch remains incomplete and is not the authoritative suite
 - **Learning revision:** `LR000000`
 - **Predictive claim:** `NONE`
 - **Production root:** NOT CERTIFIED
 - **Host performance:** uncertified; benchmark smoke passed, but this is engineering-synthetic throughput only
-- **Final documentation head:** pending remote commit/readback; local policy and runtime gates are passing.
+- **Final documentation head:** merged to `main`; GitHub read-back confirmed policy, router, and inventory bytes.
+
+## 2026-09-05 main merge checkpoint
+
+PR #22 (`chatgpt/canonical-main-cfb-standard-20260905` → `main`) was merged
+normally after remote CI run #253 passed. The merge commit is
+`dd49206419c5e7de7650e75a6f3fe6fd5bc01104`. The branch commit tested by CI was
+`1462fefa8abfebaf5f3e19ddcce5195d367d40eb`; the generated inventory and key
+policy/runtime files were read back from `main` after merge.
+
+The merged scope is software/runtime standards and recovery organization. It
+does not certify live research, current platform settlement rules, predictive
+calibration, host performance, production-root status, or mixed-sport parity.
 
 ## 2026-09-05 canonical-main execution pass
 

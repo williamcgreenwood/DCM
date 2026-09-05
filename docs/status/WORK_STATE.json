@@ -1,22 +1,26 @@
 {
   "schema": "pillars_dcm.work_state.v1",
-  "checkpointId": "CP-20260905T021500Z-CANONICAL-MAIN",
-  "lastGreenCheckpointId": "CP-20260904T070716Z-BASELINE",
-  "currentState": "STANDARD_RUNTIME_TRANCHE_VALIDATED_REMOTE_CI_PENDING",
-  "honestCompletionState": "SOFTWARE_STANDARD_TRANCHE_VALIDATED_REMOTE_CI_PENDING",
+  "checkpointId": "CP-20260905T004200Z-MAIN-MERGED",
+  "lastGreenCheckpointId": "CP-20260905T004200Z-MAIN-MERGED",
+  "currentState": "STANDARD_RUNTIME_TRANCHE_MERGED_MAIN_CI_GREEN",
+  "honestCompletionState": "SOFTWARE_STANDARD_TRANCHE_MERGED_MAIN",
   "repository": "https://github.com/williamcgreenwood/DCM",
-  "branch": "chatgpt/canonical-main-cfb-standard-20260905",
-  "baseBranch": "chatgpt/cfb-production-closure-v2-20260904",
-  "baseSha": "ebf636e947647010a91bcd973b314465f0b236b1",
+  "branch": "main",
+  "baseBranch": "main",
+  "baseSha": "dd49206419c5e7de7650e75a6f3fe6fd5bc01104",
   "startSha": "ebf636e947647010a91bcd973b314465f0b236b1",
-  "checkpointCommitSha": null,
-  "updatedAtUtc": "2026-09-05T02:15:00Z",
-  "activeAtomicTask": "Publish the validated standard/runtime tranche and obtain remote CI evidence.",
-  "nextExactAction": "Create PR against main, verify complete-fixture CI and exact head read-back, then merge only through normal checks.",
+  "checkpointCommitSha": "dd49206419c5e7de7650e75a6f3fe6fd5bc01104",
+  "updatedAtUtc": "2026-09-05T00:42:00Z",
+  "activeAtomicTask": "Preserve the verified main merge and continue only with separately gated current-data and predictive work.",
+  "nextExactAction": "Use the merged main tree for the next current-CFB research acceptance pass; do not promote predictive claims without prospective settlement evidence.",
   "lastValidation": {
     "command": "python -m compileall -q artifacts/dcm_v6_workstream_ab",
     "exitCode": 0,
-    "pytest": "TEMPORARY_RUNTIME_DEPENDENCY_AVAILABLE; REMOTE_FIXTURE_IS_AUTHORITATIVE"
+    "pytest": "REMOTE_CI_RUN_253_GREEN_ON_COMPLETE_FIXTURE",
+    "remoteCiRun": 253,
+    "remoteCiCommit": "1462fefa8abfebaf5f3e19ddcce5195d367d40eb",
+    "pullRequest": 22,
+    "mergeCommit": "dd49206419c5e7de7650e75a6f3fe6fd5bc01104"
   },
   "har": {
     "sourceName": "2353pstCFB.har",
@@ -49,7 +53,7 @@
     "prospective settlement/calibration evidence is not yet earned",
     "production root and host-performance certification remain false"
   ],
-  "drive": {"rootId": "1qKs9cIy9ta5ioOerej7IeVWloTQf8yvh", "folderRegistryFileId": "12xxCKT_-_LnkTj1jfOB7PidH2t1ZHw5k"},
+  "drive": {"rootId": "1qKs9cIy9ta5ioOerej7IeVWloTQf8yvh", "folderRegistryFileId": "12xxCKT_-_LnkTj1jfOB7PidH2t1ZHw5k", "engineeringRunFolderId": "1JU33tTvbsEnE815BZF606czikeF4Ak2F"},
   "recoveryCommand": "cd DCM && python -m dcm.runner --resume <run>/checkpoint.json",
   "validationCommand": "python -m compileall -q artifacts/dcm_v6_workstream_ab && python scripts/build_code_inventory.py --check"
 }
