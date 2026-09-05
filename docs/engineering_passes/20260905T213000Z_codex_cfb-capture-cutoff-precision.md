@@ -35,3 +35,13 @@ permitted, timestamped shared research evidence through the host contract.
 Do not claim a final Top100/Top25/freeze until coverage and final gates pass.
 Root-of-trust, learning revision, predictive claim, and host-performance
 certification are unchanged.
+
+## Post-implementation private-run receipt
+
+A second clean-wheel private-HAR run derived its cutoff with fractional
+precision and recovered all 82 requested authorized offer-side metadata
+records. It produced 202 requests, with 82 complete and 120 incomplete before
+shared web evidence. A single pre-cutoff official event observation imported
+through `dcm-host evidence-import` increased complete coverage to 83 and
+reduced incomplete requests to 119. This record intentionally contains no raw
+HAR URL, body, headers, cookies, subject identifiers, or source-page archive.
