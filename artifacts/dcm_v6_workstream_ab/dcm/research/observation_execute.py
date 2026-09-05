@@ -1,1 +1,1 @@
-PLACEHOLDER_WILL_FAIL
+@file:///workspace/obs_content_only.txt
