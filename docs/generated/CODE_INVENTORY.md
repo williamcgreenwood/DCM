@@ -3,9 +3,9 @@
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
 - Modules: **283**
-- Symbols: **2023**
+- Symbols: **2024**
 - Parse errors: **0**
-- Inventory hash: `80486290c5a4d13ae8b1855b7acd9e6446b8ba8333628a441f621f1c65090888`
+- Inventory hash: `78150a840d20e9d6c581ef91382e3e085c6219b3f0a1286f1de49edcf6cd4d74`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -291,7 +291,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_three_layer_card.py` | 0 | 9 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_universal_scopes.py` | 0 | 6 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_v541_mount.py` | 0 | 1 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_version_cutoff.py` | 0 | 6 |
+| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_version_cutoff.py` | 0 | 7 |
 
 ## Symbols
 
@@ -1992,9 +1992,9 @@ _No class/function symbols._
 
 - `class` **CutoffRequired** L8 — --cutoff omitted and --cutoff-from-capture was not set (or capture times absent).
 - `function` **_parse** L40
-- `function` **_fmt** L53
-- `function` **derive_cutoff_from_capture** L57 — Return the latest capture timestamp under CAPTURE_MAX_STARTED_DATETIME.
-- `function` **resolve_forecast_cutoff** L82
+- `function` **_fmt** L53 — Format an RFC3339 timestamp without discarding capture precision.
+- `function` **derive_cutoff_from_capture** L68 — Return the latest capture timestamp under CAPTURE_MAX_STARTED_DATETIME.
+- `function` **resolve_forecast_cutoff** L93
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/runtime/dag.py`
 
@@ -3198,5 +3198,6 @@ _No class/function symbols._
 - `function` **test_version_exact_software_and_short_alias** L31
 - `function` **test_missing_cutoff_without_derive_flag_fails** L42
 - `function` **test_cutoff_from_capture_uses_har_started** L52
-- `function` **test_explicit_cutoff_used** L73
-- `function` **test_stale_hardcoded_cutoff_gone_from_cli** L89
+- `function` **test_cutoff_from_capture_preserves_fractional_capture_end** L73 — The captured board must not be rejected by its own derived cutoff.
+- `function` **test_explicit_cutoff_used** L83
+- `function` **test_stale_hardcoded_cutoff_gone_from_cli** L99

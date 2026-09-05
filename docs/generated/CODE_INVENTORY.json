@@ -1,5 +1,5 @@
 {
-  "contentHash": "80486290c5a4d13ae8b1855b7acd9e6446b8ba8333628a441f621f1c65090888",
+  "contentHash": "78150a840d20e9d6c581ef91382e3e085c6219b3f0a1286f1de49edcf6cd4d74",
   "moduleCount": 283,
   "modules": [
     {
@@ -10970,7 +10970,7 @@
       "classes": 1,
       "functions": 4,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/runtime/cutoff.py",
-      "sha256": "883f39580ba1b9a90fc54d7888c2a0c2cdced5d068e97b50ff24e113ee472141",
+      "sha256": "036dcd8976d14b119fd8a2b61dad117130db8a3fd7fc5241b65a020763b6c0f3",
       "symbols": [
         {
           "doc": "--cutoff omitted and --cutoff-from-capture was not set (or capture times absent).",
@@ -10989,8 +10989,8 @@
           "qualname": "_parse"
         },
         {
-          "doc": null,
-          "endLine": 54,
+          "doc": "Format an RFC3339 timestamp without discarding capture precision.",
+          "endLine": 65,
           "kind": "function",
           "line": 53,
           "name": "_fmt",
@@ -10998,17 +10998,17 @@
         },
         {
           "doc": "Return the latest capture timestamp under CAPTURE_MAX_STARTED_DATETIME.",
-          "endLine": 79,
+          "endLine": 90,
           "kind": "function",
-          "line": 57,
+          "line": 68,
           "name": "derive_cutoff_from_capture",
           "qualname": "derive_cutoff_from_capture"
         },
         {
           "doc": null,
-          "endLine": 119,
+          "endLine": 130,
           "kind": "function",
-          "line": 82,
+          "line": 93,
           "name": "resolve_forecast_cutoff",
           "qualname": "resolve_forecast_cutoff"
         }
@@ -18644,9 +18644,9 @@
     },
     {
       "classes": 0,
-      "functions": 6,
+      "functions": 7,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_version_cutoff.py",
-      "sha256": "12ab852aaebe037ca5f40d40e00b667e63c764b3bbc8806e99081c266e4dec0d",
+      "sha256": "9f15aa983203cd37777e9847051b413062b80f91ee833042aa22eac4a2f34f07",
       "symbols": [
         {
           "doc": null,
@@ -18681,18 +18681,26 @@
           "qualname": "test_cutoff_from_capture_uses_har_started"
         },
         {
-          "doc": null,
-          "endLine": 86,
+          "doc": "The captured board must not be rejected by its own derived cutoff.",
+          "endLine": 80,
           "kind": "function",
           "line": 73,
+          "name": "test_cutoff_from_capture_preserves_fractional_capture_end",
+          "qualname": "test_cutoff_from_capture_preserves_fractional_capture_end"
+        },
+        {
+          "doc": null,
+          "endLine": 96,
+          "kind": "function",
+          "line": 83,
           "name": "test_explicit_cutoff_used",
           "qualname": "test_explicit_cutoff_used"
         },
         {
           "doc": null,
-          "endLine": 103,
+          "endLine": 113,
           "kind": "function",
-          "line": 89,
+          "line": 99,
           "name": "test_stale_hardcoded_cutoff_gone_from_cli",
           "qualname": "test_stale_hardcoded_cutoff_gone_from_cli"
         }
@@ -18703,5 +18711,5 @@
   "parseErrors": [],
   "root": "artifacts/dcm_v6_workstream_ab",
   "schema": "pillars_dcm.code_inventory.v1",
-  "symbolCount": 2023
+  "symbolCount": 2024
 }

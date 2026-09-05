@@ -70,6 +70,16 @@ def test_cutoff_from_capture_uses_har_started(tmp_path: Path):
     assert board["forecastCutoff"] == derived
 
 
+def test_cutoff_from_capture_preserves_fractional_capture_end():
+    """The captured board must not be rejected by its own derived cutoff."""
+    ingest = {
+        "captureStart": "2026-09-05T21:23:38.615Z",
+        "captureEnd": "2026-09-05T21:24:07.344Z",
+        "rows": [],
+    }
+    assert derive_cutoff_from_capture(ingest) == "2026-09-05T21:24:07.344Z"
+
+
 def test_explicit_cutoff_used(tmp_path: Path):
     explicit = "2026-08-29T16:00:00Z"
     result = run_dcm(

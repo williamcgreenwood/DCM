@@ -6,7 +6,7 @@ Active canonical-main CFB closure slice: `chatgpt/canonical-main-cfb-standard-20
 
 This file is the human dashboard. It must be updated on every coding pass together with a new immutable pass record under `docs/engineering_passes/`.
 
-Current bounded execution increment: `P0-CFB-SOURCE-CATALOG-CAPABILITIES-20260905` removes drift between the versioned SourceCatalog and CFB source-health router. Catalog changes now feed stable CFB runtime routing IDs with explicit authority, fallback, circuit-breaker, and parser-change metadata; official-athletics and weather capabilities are available to the host planning path. This does not yet make an unrestricted background web scraper possible in a ChatGPT run: host-acquired evidence still requires permitted host tools and each adapter’s own runtime parser. No final forecast/freeze or Top100/Top25 is claimed.
+Current bounded execution increment: `P0-CFB-CAPTURE-CUTOFF-PRECISION-20260905` preserves the fractional precision of a HAR-derived cutoff. A capture ending at fractional seconds can no longer reject its own final board record as post-cutoff. This is a temporal-integrity repair, not a claim that shared CFB research, a final forecast, or Top100/Top25 is complete.
 `docs/engineering/DCM_CODING_AND_PROMPT_STANDARD.md`; Drive writes follow
 `docs/engineering/DCM_DRIVE_HIERARCHY.md` and `dcm.runtime.storage_router`.
 
@@ -23,14 +23,14 @@ Current bounded execution increment: `P0-CFB-SOURCE-CATALOG-CAPABILITIES-2026090
 
 | Workstream | Target | Current | State | Next acceptance gate |
 |---|---:|---:|---|---|
-| P0 Canonical spine / HAR / integrity | 10 | 9 | STRONG PARTIAL | preserve authenticated v5.4.1 roots in release retrieval; production root remains independently gated |
-| P1 Universal research / evidence | 10 | 9 | STRONG PARTIAL | current CFB HAR host research → imported evidence → modeled Top100/Top25/0–6 Playables; mixed-sport R1 remainder |
+| P0 Canonical spine / HAR / integrity | 10 | 9 | STRONG PARTIAL | preserve fractional capture precision for `--cutoff-from-capture`; authenticated v5.4.1 root remains independently gated |
+| P1 Universal research / evidence | 10 | 9 | STRONG PARTIAL | import permitted shared CFB evidence for the current HAR → modeled Top100/Top25/0–6 Playables; mixed-sport R1 remainder |
 | P2 Feature / state / parameter layer | 10 | 9 | STRONG PARTIAL | validate CFB role-comparable/current/prior support on real boards; activate only evidence-backed signal operators |
 | P3 SportPlugin physics | 10 | 8 | STRONG PARTIAL | 19 CFB PRODUCTION markets executable; remaining 24-component plugin bindings sport by sport; current-board operational acceptance |
 | P4 Probability / uncertainty / grading / portfolio | 10 | 9 | STRONG PARTIAL | prospective CFB settlement/calibration evidence; mixed-sport shared-world coverage |
 | P5 Audit / portability / ChatGPT-native execution | 10 | 8 | STRONG PARTIAL | current-HAR fresh ChatGPT acceptance; immutable release retrieval |
 | P6 Settlement / calibration / learning | 10 | 6 | PARTIAL + EXTERNAL VALIDATION | retain FRONTIER_INTERIM checkpoints outside settlement eligibility; exact platform coverage; CFB prospective settlements; CRPS/subgroups; chronological unseen settlements before promotion |
-| P7 Host-native execution contract | 10 | 8 | STRONG PARTIAL | current CFB HAR forecast through `dcm-host cfb-launch` on a fresh wheel; no second engine |
+| P7 Host-native execution contract | 10 | 8 | STRONG PARTIAL | rerun current CFB HAR on a fresh wheel after fractional-capture cutoff repair; no second engine |
 | P8 Universal source acquisition | 10 | 7 | PARTIAL | live adapter fetch beyond fixtures; licensed providers remain optional |
 | P9 Universal core migration | 10 | 9 | STRONG PARTIAL | retire remaining PLAYER/TEAM claim lookups at packet/parameter adapters |
 | P10 Full sport coverage | 10 | 3 | EARLY | each supported sport reaches 24/24 plugin components + validation suite |
