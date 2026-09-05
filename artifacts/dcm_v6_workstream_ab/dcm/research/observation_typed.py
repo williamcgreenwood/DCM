@@ -228,3 +228,5 @@ def observation_to_typed_claim(
         action_id=str(obs.get("actionId") or (action or {}).get("actionId") or "") or None,
         source_family=str(obs.get("sourceFamily") or (action or {}).get("sourceFamily") or "") or None,
     )
+
+
