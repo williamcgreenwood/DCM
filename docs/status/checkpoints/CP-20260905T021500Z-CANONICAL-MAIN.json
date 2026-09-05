@@ -1,0 +1,57 @@
+{
+  "schema": "pillars_dcm.checkpoint_manifest.v1",
+  "checkpointId": "CP-20260905T021500Z-CANONICAL-MAIN",
+  "parentCheckpointId": "CP-20260904T070716Z-BASELINE",
+  "timestampUtc": "2026-09-05T02:15:00Z",
+  "repositoryUrl": "https://github.com/williamcgreenwood/DCM",
+  "branch": "chatgpt/canonical-main-cfb-standard-20260905",
+  "targetBranch": "main",
+  "baseBranch": "chatgpt/cfb-production-closure-v2-20260904",
+  "baseSha": "ebf636e947647010a91bcd973b314465f0b236b1",
+  "startSha": "ebf636e947647010a91bcd973b314465f0b236b1",
+  "checkpointCommitSha": null,
+  "dirtyTreeInventory": {
+    "inventoryModules": 281,
+    "inventorySymbols": 2016,
+    "inventoryHash": "b2e9907254f13e22eb2c1ad6c31f3a3bbfd463b6cc455f8e0daf6df3a1f819b9",
+    "rawHarExcluded": true,
+    "harSha256": "ad3a10271c511266c1a52869658362e07002aad9f453eb77108f35c82e2f96d7"
+  },
+  "completedTranches": [
+    "remote source truth and repaired v2 base",
+    "lazy clean-install package exports",
+    "restart-persistent research cache",
+    "injected source-health clock",
+    "coding/prompt inheritance standard",
+    "privacy-aware Drive hierarchy/router",
+    "quarantined supplied HAR accounting and offline run"
+  ],
+  "activeAtomicTask": "Publish the validated standard/runtime tranche and obtain remote CI evidence.",
+  "nextExactAction": "Create PR against main, verify complete-fixture CI and exact head read-back, then merge only through normal checks.",
+  "requirements": {
+    "completed": ["typed runtime boundaries", "Algorithmic Constitution inheritance", "safe storage routing", "fail-closed CFB accounting", "deterministic tests"],
+    "partial": ["current authoritative research", "platform settlement authority", "host performance certification", "full sport coverage"],
+    "blocked": ["prospective outcomes and predictive certification", "canonical v5.4.1 mount", "current host research evidence"],
+    "untouched": ["speculative native rewrite without measured bottleneck"]
+  },
+  "validation": {
+    "targetedRuntimeGovernance": "PASS",
+    "releaseWithTemporaryGitMetadata": "PASS",
+    "fullLocalSuite": "447 passed, 7 blocked by missing remote fixture/Git context before final rerun",
+    "policyValidator": "PASS",
+    "inventoryCheck": "PASS",
+    "benchmark": "PASS_ENGINEERING_ONLY_HOST_UNCERTIFIED",
+    "suppliedHar": "PASS_ACCOUNTING_TRUTHFUL_NONPRODUCTION"
+  },
+  "drive": {
+    "rootId": "1qKs9cIy9ta5ioOerej7IeVWloTQf8yvh",
+    "folderRegistryFileId": "12xxCKT_-_LnkTj1jfOB7PidH2t1ZHw5k",
+    "rawArtifactsUploaded": false,
+    "sqliteUploaded": false
+  },
+  "pullRequest": {"number": null, "url": null, "status": "PENDING_CREATION", "target": "main", "head": "chatgpt/canonical-main-cfb-standard-20260905"},
+  "externalDependencies": ["remote sanitized 11113-row fixture", "GitHub Actions", "permitted host research", "platform rules snapshot", "prospective settlements"],
+  "learningRevision": "LR000000",
+  "predictiveClaim": "NONE",
+  "honestCompletionState": "SOFTWARE_STANDARD_TRANCHE_VALIDATED_REMOTE_CI_PENDING"
+}

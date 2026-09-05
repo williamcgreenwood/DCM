@@ -100,6 +100,12 @@ DERIVED_SPECS: dict[str, dict] = {
         "sources": ("receptions", "rush_att"),
         "semantic": StatSemanticType.COMPOSITE,
     },
+    "kicking_pts": {
+        "unit": "points",
+        "formula": "3 * fg_made + xp_made",
+        "sources": ("fg_made", "xp_made"),
+        "semantic": StatSemanticType.COMPOSITE,
+    },
 }
 
 # Verified PrizePicks MORE reboot eligibility under snapshot V1.
@@ -188,7 +194,7 @@ def football_market_definitions(*leagues: str) -> tuple[MarketDefinition, ...]:
         "pass_yds", "pass_att", "pass_cmp", "pass_td", "interceptions",
         "rush_yds", "rush_att", "rush_td",
         "receptions", "rec_yds", "rec_td", "targets",
-        "fg_made", "def_tackles",
+        "fg_made", "xp_made", "def_tackles",
     ]
     for league in leagues:
         for key in primitive_markets:

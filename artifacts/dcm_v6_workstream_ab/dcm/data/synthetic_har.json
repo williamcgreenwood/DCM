@@ -1,0 +1,44 @@
+{
+  "_pillars": {
+    "kind": "SYNTHETIC_HAR",
+    "note": "Contract fixture. Passing this does not prove live PrizePicks compatibility or v5.4.1 decoder fidelity."
+  },
+  "log": {
+    "version": "1.2",
+    "creator": { "name": "pillars-synthetic", "version": "1" },
+    "entries": [
+      {
+        "startedDateTime": "2026-08-28T16:00:00.000Z",
+        "request": {
+          "method": "GET",
+          "url": "https://api.prizepicks.com/projections",
+          "headers": [{ "name": "Accept", "value": "application/json" }]
+        },
+        "response": {
+          "status": 200,
+          "headers": [{ "name": "Content-Type", "value": "application/json" }],
+          "content": {
+            "mimeType": "application/json",
+            "text": "{\"data\":[{\"projectionId\":\"n1\",\"sportFamily\":\"basketball\",\"league\":\"NBA\",\"eventId\":\"NBA_BOS_NYK\",\"eventLabel\":\"BOS @ NYK\",\"playerId\":\"TATUM\",\"playerName\":\"Jayson Tatum\",\"teamId\":\"BOS\",\"team\":\"BOS\",\"opponent\":\"NYK\",\"market\":\"pts\",\"marketLabel\":\"Points\",\"line\":27.5,\"side\":\"MORE\",\"offeredHigher\":true,\"offeredLower\":true,\"modifier\":\"STANDARD\",\"boardId\":\"FULL_GAME\",\"productType\":\"PLAYER_PICKS\",\"role\":\"F\"},{\"projectionId\":\"n6\",\"sportFamily\":\"basketball\",\"league\":\"NBA\",\"eventId\":\"NBA_BOS_NYK\",\"eventLabel\":\"BOS @ NYK\",\"playerId\":\"HOLIDAY\",\"playerName\":\"Jrue Holiday\",\"teamId\":\"BOS\",\"team\":\"BOS\",\"opponent\":\"NYK\",\"market\":\"pts\",\"marketLabel\":\"Points\",\"line\":12.5,\"side\":\"MORE\",\"offeredHigher\":true,\"offeredLower\":false,\"modifier\":\"GOBLIN\",\"boardId\":\"FULL_GAME\",\"productType\":\"PLAYER_PICKS\",\"role\":\"G\"},{\"projectionId\":\"f1\",\"sportFamily\":\"gridiron\",\"league\":\"NFL\",\"eventId\":\"NFL_KC_BUF\",\"eventLabel\":\"KC @ BUF\",\"playerId\":\"MAHOMES\",\"playerName\":\"Patrick Mahomes\",\"teamId\":\"KC\",\"team\":\"KC\",\"opponent\":\"BUF\",\"market\":\"pass_yds\",\"marketLabel\":\"Passing Yards\",\"line\":268.5,\"side\":\"LESS\",\"offeredHigher\":true,\"offeredLower\":true,\"modifier\":\"STANDARD\",\"boardId\":\"FULL_GAME\",\"productType\":\"PLAYER_PICKS\",\"role\":\"QB\"},{\"projectionId\":\"c1\",\"sportFamily\":\"gridiron\",\"league\":\"CFB\",\"eventId\":\"CFB_CFP_1\",\"eventLabel\":\"CFP Semifinal\",\"playerId\":\"SAYIN_SRC\",\"playerName\":\"Julian Sayin\",\"teamId\":\"OHIO\",\"team\":\"OHIO\",\"opponent\":\"MIAMI\",\"market\":\"pass_yds\",\"marketLabel\":\"Passing Yards\",\"line\":241.5,\"side\":\"MORE\",\"offeredHigher\":true,\"offeredLower\":true,\"modifier\":\"STANDARD\",\"boardId\":\"FULL_GAME\",\"productType\":\"PLAYER_PICKS\",\"role\":\"QB\"},{\"projectionId\":\"m3\",\"sportFamily\":\"baseball\",\"league\":\"MLB\",\"eventId\":\"MLB_NYY_BOS\",\"eventLabel\":\"NYY @ BOS\",\"playerId\":\"SOTO\",\"playerName\":\"Juan Soto\",\"teamId\":\"NYY\",\"team\":\"NYY\",\"opponent\":\"BOS\",\"market\":\"hits_runs_rbi\",\"marketLabel\":\"Hits+Runs+RBIs\",\"line\":0.5,\"side\":\"MORE\",\"offeredHigher\":true,\"offeredLower\":false,\"modifier\":\"STANDARD\",\"boardId\":\"FULL_GAME\",\"productType\":\"PLAYER_PICKS\",\"role\":\"BAT\"},{\"projectionId\":\"s1\",\"sportFamily\":\"soccer\",\"league\":\"EPL\",\"eventId\":\"EPL_1\",\"eventLabel\":\"ARS v MCI\",\"playerId\":\"SAKA\",\"playerName\":\"Bukayo Saka\",\"teamId\":\"ARS\",\"team\":\"ARS\",\"opponent\":\"MCI\",\"market\":\"shots\",\"marketLabel\":\"Shots\",\"line\":2.5,\"side\":\"MORE\",\"offeredHigher\":true,\"offeredLower\":true,\"modifier\":\"STANDARD\",\"boardId\":\"FULL_GAME\",\"productType\":\"PLAYER_PICKS\",\"role\":\"W\"}]}"
+          }
+        }
+      },
+      {
+        "startedDateTime": "2026-08-28T16:00:01.000Z",
+        "request": {
+          "method": "GET",
+          "url": "https://api.prizepicks.com/users/me",
+          "headers": [
+            { "name": "Authorization", "value": "Bearer FAKESECRET_c3d4e5f6g7h8i9j0k1l2" },
+            { "name": "Cookie", "value": "session=drop-me" }
+          ]
+        },
+        "response": {
+          "status": 200,
+          "headers": [{ "name": "Set-Cookie", "value": "session=drop-me" }],
+          "content": { "mimeType": "application/json", "text": "{\"account_id\":\"nope\"}" }
+        }
+      }
+    ]
+  }
+}

@@ -1,18 +1,12 @@
 {
-  "package": "6.0.0+WSAB.HARSPINE.LR000000",
+  "package": "6.0.0+WSAB.E2E.PRODUCTION_PIPELINE.LR000000",
   "learning_revision": "LR000000",
   "predictive_superiority": "NONE",
   "optimized_dcm_60_claim": false,
   "lifecycle": "INTEGRATED_DEVELOPMENT",
-  "workstreams": ["A", "B", "HAR_SPINE"],
-  "test_command": "PYTHONPATH=. python3 -m pytest tests -q",
-  "historical_slice": "46",
-  "current_files": [
-    "test_football_registry.py",
-    "test_e2e_world_to_lineup.py",
-    "test_lineage_and_schema.py",
-    "test_official_predicates.py",
-    "test_har_ingest.py",
-    "test_v541_mount.py"
-  ]
+  "workstreams": ["A", "B", "HAR_SPINE", "P0_AUDIT"],
+  "test_command": "pip install . && pytest -q",
+  "reported_test_count": 233,
+  "historical_slice": "46_frozen_baseline_not_a_ceiling",
+  "stale_zip": "forbidden; build with python -m pillars_dcm.release"
 }

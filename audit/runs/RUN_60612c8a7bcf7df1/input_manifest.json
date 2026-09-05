@@ -1,0 +1,11 @@
+{
+  "adapter": "PRIZEPICKS_JSONAPI",
+  "compositeCaptureId": null,
+  "harSha256": "cd4c8c7c32427bcf5763ba88620a99c56c90c0a3b73cc67a7faf134cd42e7467",
+  "parserVersion": "HAR_ADAPTER_V6_SCOPE_STATE_2026-08-29",
+  "sourceHarSha256s": [
+    "cd4c8c7c32427bcf5763ba88620a99c56c90c0a3b73cc67a7faf134cd42e7467"
+  ],
+  "sourceMode": "CAPTURED_HAR",
+  "synthetic": false
+}

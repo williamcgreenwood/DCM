@@ -1,0 +1,8 @@
+{
+  "ceilingWorlds": 8192,
+  "fastWorlds": 256,
+  "learningRevision": "LR000000",
+  "mcSeTarget": 0.008,
+  "seriousWorlds": 2048,
+  "software": "6.0.0+WSAB.E2E.PRODUCTION_PIPELINE.LR000000"
+}

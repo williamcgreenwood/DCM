@@ -20,21 +20,53 @@ class ProjectionError(RuntimeError):
         self.code = code
 
 
+def _factor(tok: str, allowed: dict[str, float]) -> float:
+    if tok in allowed:
+        return allowed[tok]
+    try:
+        return float(tok)
+    except ValueError as exc:
+        raise ProjectionError(FailureCode.UNVERIFIED_MARKET_DEFINITION, f"unknown component {tok}") from exc
+
+
 def _eval_formula(formula: str, values: dict[str, float]) -> float:
+    """Restricted arithmetic: + - * with * binding tighter. No division, no parentheses.
+
+    Required so kicking_pts = 3 * fg_made + xp_made is an identity, not a stub.
+    """
     allowed = {k: float(v) for k, v in values.items()}
-    # Restricted arithmetic only.
-    tokens = formula.replace("+", " + ").replace("-", " - ").split()
+    tokens = (
+        formula.replace("+", " + ")
+        .replace("-", " - ")
+        .replace("*", " * ")
+        .split()
+    )
     total = 0.0
     sign = 1.0
+    factors: list[str] = []
+
+    def flush() -> None:
+        nonlocal total, factors
+        if not factors:
+            return
+        prod = 1.0
+        for tok in factors:
+            prod *= _factor(tok, allowed)
+        total += sign * prod
+        factors = []
+
     for tok in tokens:
         if tok == "+":
+            flush()
             sign = 1.0
         elif tok == "-":
+            flush()
             sign = -1.0
+        elif tok == "*":
+            continue
         else:
-            if tok not in allowed:
-                raise ProjectionError(FailureCode.UNVERIFIED_MARKET_DEFINITION, f"unknown component {tok}")
-            total += sign * allowed[tok]
+            factors.append(tok)
+    flush()
     return total
 
 

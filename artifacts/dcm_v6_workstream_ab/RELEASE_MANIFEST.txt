@@ -1,42 +1,18 @@
-DCM v6 Workstream A/B release manifest
-Document: DCM-WSAB-MANIFEST-2026-08-27
-ADR: DCM-ADR-V6-001-2026-08-27
-Software: 6.0.0+WSAB.LR000000
+DCM v6 release manifest (regenerated from VERSION.json)
+Software: 6.0.0+WSAB.E2E.PRODUCTION_PIPELINE.LR000000
 Learning revision: LR000000
 Predictive superiority: NONE
+Optimized DCM 6.0 claim: FALSE
 
-BASELINE STATUS
-Canonical v5.4.1 source was NOT present in this environment.
-Expected canonical source SHA-256 (unpublished here, from doctrine):
-  bd1fb433d5f82d3812e453c30edcbb67db11b20f60e43cf50424c45a7c2ff474
-This package is a standalone forward-development implementation.
-It is NOT a patch applied onto a verified v5.4.1 tree.
-It does NOT modify a canonical installation.
+Build releases with python -m pillars_dcm.release or scripts/build_portable.py.
+Committed archive blobs are forbidden.
 
-SCHEMA STATUS
-Published freeze id: PHASE_BC_SCHEMA_V1_2026-08-25
-Published freeze SHA-256 (doctrine, original JSON bytes absent):
+SCHEMA
+V1 expected SHA-256 (immutable, bytes absent):
   6e78dacc19843338643bdcabc7477fd3ce2dd065da1e9629646dacc21cdb1f22
-This package's reconstruction inventory SHA-256:
-  08be9307caaa2bff6ca0e705650e47869d52aa79fd47e60aa35a371b4e95b02f
-New common schema types added: NONE
-Claim of byte-identity with the missing canonical JSON: FALSE
-
-RULE SNAPSHOT
-PRIZEPICKS_PLAYER_PICKS_2026-08-25_V1
+V2 freeze id: PHASE_BC_SCHEMA_V2_2026-08-29
+V2 is field-level JSON Schema, productionEligible=false, not auto-promoted.
 
 TESTS
-41 passed, 0 failed, 0 skipped
-Command: PYTHONPATH=. python3 -m pytest tests -q
-External HAR fixtures: not applicable (not present; not fabricated)
-
-ARTIFACT SHA-256
-ccd70f9b17f90d5546b92e15097c89555aa08e2f5ba48490080b8df2ae59c315  configs/cfb_player_reboot_eligible.json
-456515cf7b2b02a088d749fdf9c48a82abab490baf5e15fc7686a9804124e0d5  configs/football_primitive_registry.json
-08be9307caaa2bff6ca0e705650e47869d52aa79fd47e60aa35a371b4e95b02f  schemas/Phase_BC_Immutable_Contracts.json
-7ca175ae5255449c43262b6d57c8d13080064b04179e0592141cc2b65d7e8e4f  dcm/sports/football/registry.py
-efb80c3a3356cd88b6d0ca0d017175cc32b270a6cceaf003c31bb6ef0b89d2d8  dcm/sports/football/conservation.py
-c630a7495a02123ddd6b751c279c0d25613b1fd8ec82242d69bd0f3d2b35341f  dcm/platform/prizepicks/settlement.py
-7c716b299e379fb675b0c7c2e420872217663191ae3d424a52cc034159db4676  dcm/platform/prizepicks/reboot.py
-eecd3364333eba393b49841d258e1a404f33b0b7c11b801946098b524f75a1d4  tests/test_e2e_world_to_lineup.py
-c4675b86b475cb133fedc7481023e053adb067ceeae6f74ac8224b942fbe8236  tests/test_football_registry.py
+233 pytest functions (not 41).
+Command: pip install . && pytest -q

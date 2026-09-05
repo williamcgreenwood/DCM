@@ -1,0 +1,55 @@
+{
+  "schema": "pillars_dcm.work_state.v1",
+  "checkpointId": "CP-20260905T021500Z-CANONICAL-MAIN",
+  "lastGreenCheckpointId": "CP-20260904T070716Z-BASELINE",
+  "currentState": "STANDARD_RUNTIME_TRANCHE_VALIDATED_REMOTE_CI_PENDING",
+  "honestCompletionState": "SOFTWARE_STANDARD_TRANCHE_VALIDATED_REMOTE_CI_PENDING",
+  "repository": "https://github.com/williamcgreenwood/DCM",
+  "branch": "chatgpt/canonical-main-cfb-standard-20260905",
+  "baseBranch": "chatgpt/cfb-production-closure-v2-20260904",
+  "baseSha": "ebf636e947647010a91bcd973b314465f0b236b1",
+  "startSha": "ebf636e947647010a91bcd973b314465f0b236b1",
+  "checkpointCommitSha": null,
+  "updatedAtUtc": "2026-09-05T02:15:00Z",
+  "activeAtomicTask": "Publish the validated standard/runtime tranche and obtain remote CI evidence.",
+  "nextExactAction": "Create PR against main, verify complete-fixture CI and exact head read-back, then merge only through normal checks.",
+  "lastValidation": {
+    "command": "python -m compileall -q artifacts/dcm_v6_workstream_ab",
+    "exitCode": 0,
+    "pytest": "TEMPORARY_RUNTIME_DEPENDENCY_AVAILABLE; REMOTE_FIXTURE_IS_AUTHORITATIVE"
+  },
+  "har": {
+    "sourceName": "2353pstCFB.har",
+    "sha256": "ad3a10271c511266c1a52869658362e07002aad9f453eb77108f35c82e2f96d7",
+    "entries": 31,
+    "prizePicksApiEntries": 15,
+    "projectionResponses": 2,
+    "rawCommitted": false
+  },
+  "inventory": {
+    "inventoryModules": 281,
+    "inventorySymbols": 2016,
+    "generatedInventory": "b2e9907254f13e22eb2c1ad6c31f3a3bbfd463b6cc455f8e0daf6df3a1f819b9"
+  },
+  "tranches": {
+    "baseline": "COMPLETED",
+    "identityCacheEvidence": "DURABLE_SQLITE_RUNTIME_INTEGRATED",
+    "signalGovernance": "RUNTIME_WIRED_REMOTE_BASELINE",
+    "materialFactsSourceRouting": "TEMPORAL_RUNTIME_INTEGRATED",
+    "cfbOpportunityEfficiency": "RESIDUAL_SHARED_WORLD_RUNTIME_INTEGRATED",
+    "sharedEventWorldProbability": "CONSERVATION_RUNTIME_INTEGRATED",
+    "decisionPortfolio": "REJECT_ONLY_RUNTIME_INTEGRATED",
+    "freezeSettlementLearning": "PARTIAL_EXTERNAL_EVIDENCE_REQUIRED",
+    "performancePortabilityRelease": "ENGINEERING_BENCHMARKED_HOST_UNCERTIFIED"
+  },
+  "externalBlockers": [
+    "remote sanitized 11113-row fixture is not present in the API-backed scratch mirror",
+    "current-HAR host-side evidence acquisition is not available",
+    "v5.4.1 canonical source/ledger bytes are not mounted",
+    "prospective settlement/calibration evidence is not yet earned",
+    "production root and host-performance certification remain false"
+  ],
+  "drive": {"rootId": "1qKs9cIy9ta5ioOerej7IeVWloTQf8yvh", "folderRegistryFileId": "12xxCKT_-_LnkTj1jfOB7PidH2t1ZHw5k"},
+  "recoveryCommand": "cd DCM && python -m dcm.runner --resume <run>/checkpoint.json",
+  "validationCommand": "python -m compileall -q artifacts/dcm_v6_workstream_ab && python scripts/build_code_inventory.py --check"
+}

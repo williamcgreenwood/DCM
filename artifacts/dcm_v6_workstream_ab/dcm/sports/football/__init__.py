@@ -9,6 +9,11 @@ from dcm.sports.football.registry import (
 from dcm.sports.football.conservation import evaluate_football_conservation, football_conservation_rules
 from dcm.sports.football.ledger import build_football_world
 from dcm.sports.football.projection import project_football_market
+from dcm.sports.football.settlement_map import (
+    settle_football_market,
+    settle_football_player,
+    canonicalize_prizepicks_football_market,
+)
 
 __all__ = [
     "NFL_LEAGUE",
@@ -21,4 +26,7 @@ __all__ = [
     "evaluate_football_conservation",
     "build_football_world",
     "project_football_market",
+    "settle_football_market",
+    "settle_football_player",
+    "canonicalize_prizepicks_football_market",
 ]
