@@ -551,7 +551,14 @@ def run_dcm(
             if str(r.get("sportFamily") or "") == "gridiron"
             and str(r.get("league") or "").upper() in {"CFB", "CFB1H"}
         )
-        cfb_execution = cfb_row_count >= 1000
+        cfb_execution = cfb_row_count >= 1000 or (
+            cfb_row_count > 0
+            and {
+                str(r.get("league") or "").upper()
+                for r in rows
+                if str(r.get("league") or "").strip()
+            } <= {"CFB"}
+        )
         offer_recovery = (
             recover_offer_metadata(rows, planned["requests"], cutoff=forecast_cutoff)
             if not synthetic and cfb_execution
@@ -669,7 +676,14 @@ def run_dcm(
         if str(r.get("sportFamily") or "") == "gridiron"
         and str(r.get("league") or "").upper() in {"CFB", "CFB1H"}
     )
-    cfb_execution = cfb_row_count >= 1000
+    cfb_execution = cfb_row_count >= 1000 or (
+        cfb_row_count > 0
+        and {
+            str(r.get("league") or "").upper()
+            for r in rows
+            if str(r.get("league") or "").strip()
+        } <= {"CFB"}
+    )
     offer_recovery = recover_offer_metadata(rows, requests, cutoff=forecast_cutoff) if not synthetic and cfb_execution else {"claims": [], "recovered": 0, "unresolved": [], "requested": 0, "recoveryComplete": True, "source": "SYNTHETIC_DISABLED"}
     if offer_recovery["claims"]:
         bundle["claims"] = dedupe(list(bundle.get("claims") or []) + list(offer_recovery["claims"]))
