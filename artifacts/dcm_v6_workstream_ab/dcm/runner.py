@@ -64,9 +64,12 @@ from dcm.research.cache import ResearchCache
 from dcm.research.classify import accounting_classify as _classify
 from dcm.research.emit import emit_offer_sets_and_manifest, emit_packets_and_graph
 from dcm.research.evidence_graph import attach_runtime_lineage
+from dcm.research.coverage import coverage_report
 from dcm.research.host_plan import build_host_research_plan
 from dcm.research.provider import BundleProvider, FileProvider, FixtureProvider, collect, write_bundle
+from dcm.research.claims import dedupe
 from dcm.research.requests import plan_research
+from dcm.research.offer_metadata import recover_offer_metadata
 from dcm.runtime.checkpoint import load_checkpoint, write_checkpoint
 from dcm.runtime.capabilities import build_capability_manifest, persist_capability_manifest
 from dcm.runtime.cutoff import CutoffRequired, POLICY_DOC, resolve_forecast_cutoff
@@ -364,6 +367,11 @@ def run_dcm(
                 input_boundary_records.append(inspect_input_boundary(source, raw_bytes=raw_bytes))
                 ingests.append(ingest_har(raw_bytes, raw_bytes=raw_bytes))
         ingest = compose_ingests(ingests) if len(ingests) > 1 else ingests[0]
+        # The HAR's own provenance marker is authoritative for fixture versus
+        # captured execution.  Tests and callers may select a fixture research
+        # provider without passing --synthetic; never run live-only recovery
+        # stages against a synthetic HAR.
+        synthetic = bool(ingest.get("synthetic", synthetic))
         cutoff_info = resolve_forecast_cutoff(
             explicit=forecast_cutoff,
             from_capture=cutoff_from_capture,
@@ -538,6 +546,30 @@ def run_dcm(
         (dest / "research_requests.json").write_text(
             json.dumps(planned["requests"], indent=2) + "\n", encoding="utf-8"
         )
+        cfb_only_board = bool({str(r.get("league") or "").upper() for r in rows if str(r.get("league") or "").strip()}) and {
+            str(r.get("league") or "").upper() for r in rows if str(r.get("league") or "").strip()
+        } <= {"CFB"}
+        offer_recovery = (
+            recover_offer_metadata(rows, planned["requests"], cutoff=forecast_cutoff)
+            if not synthetic and cfb_only_board
+            else {"claims": [], "recovered": 0, "unresolved": [], "requested": 0, "recoveryComplete": True, "source": "SYNTHETIC_DISABLED"}
+        )
+        (dest / "evidence").mkdir(exist_ok=True)
+        (dest / "offer_metadata_recovery.json").write_text(
+            json.dumps({k: v for k, v in offer_recovery.items() if k != "claims"}, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        (dest / "evidence" / "claims.json").write_text(
+            json.dumps(offer_recovery["claims"], indent=2) + "\n", encoding="utf-8"
+        )
+        (dest / "evidence_bundle.jsonl").write_text(
+            "".join(json.dumps(claim, ensure_ascii=True, separators=(",", ":")) + "\n" for claim in offer_recovery["claims"]),
+            encoding="utf-8",
+        )
+        (dest / "evidence" / "coverage.json").write_text(
+            json.dumps(coverage_report(planned["requests"], offer_recovery["claims"]), indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
         prepare_cfb_research_os(
             dest,
             rows,
@@ -626,6 +658,26 @@ def run_dcm(
             encoding="utf-8",
         )
         research_cache.close()
+    # Offer metadata is resolved from the authorized HAR independently of web
+    # research. Merge it into the same claim bundle so direct bundle/fixture
+    # runs and the host resume path share one canonical producer.
+    cfb_only_board = bool({str(r.get("league") or "").upper() for r in rows if str(r.get("league") or "").strip()}) and {
+        str(r.get("league") or "").upper() for r in rows if str(r.get("league") or "").strip()
+    } <= {"CFB"}
+    offer_recovery = recover_offer_metadata(rows, requests, cutoff=forecast_cutoff) if not synthetic and cfb_only_board else {"claims": [], "recovered": 0, "unresolved": [], "requested": 0, "recoveryComplete": True, "source": "SYNTHETIC_DISABLED"}
+    if offer_recovery["claims"]:
+        bundle["claims"] = dedupe(list(bundle.get("claims") or []) + list(offer_recovery["claims"]))
+        bundle["coverage"] = coverage_report(requests, bundle["claims"])
+        bundle["missing"] = [
+            str(row.get("requestId") or "")
+            for row in (bundle["coverage"].get("requests") or [])
+            if not row.get("complete")
+        ]
+        bundle["complete"] = not bundle["missing"] and not bundle.get("malformed")
+    (dest / "offer_metadata_recovery.json").write_text(
+        json.dumps({k: v for k, v in offer_recovery.items() if k != "claims"}, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
     (dest / "evidence").mkdir(exist_ok=True)
     (dest / "evidence" / "claims.json").write_text(json.dumps(bundle["claims"], indent=2) + "\n", encoding="utf-8")
     written = write_bundle(dest / "evidence_bundle.jsonl", bundle["claims"])
@@ -682,8 +734,12 @@ def run_dcm(
     # Guarded CFB launch: preserve the established global checkpoint contract
     # for every other execution mode. Only a real (non-synthetic) board with CFB
     # offers may continue through partial research for per-prop modelability.
+    cfb_leagues_only = {
+        str(r.get("league") or "").upper() for r in rows if str(r.get("league") or "").strip()
+    } <= {"CFB"}
     cfb_guarded_research_continue = (
         not synthetic
+        and cfb_leagues_only
         and bool(bundle.get("claims"))
         and any(
             str(r.get("sportFamily") or "") == "gridiron"
