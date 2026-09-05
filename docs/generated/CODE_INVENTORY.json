@@ -1,5 +1,5 @@
 {
-  "contentHash": "b2e9907254f13e22eb2c1ad6c31f3a3bbfd463b6cc455f8e0daf6df3a1f819b9",
+  "contentHash": "ea34cecb0094aa7d04b1da739d5e2cc07e824b22b25c7a81aeb17005a6817d82",
   "moduleCount": 281,
   "modules": [
     {
@@ -2190,7 +2190,7 @@
           "qualname": "cfb_teammate_groups"
         },
         {
-          "doc": "Shared team plays/pass-rate/rush-rate \u2192 residual-aware player opportunity.",
+          "doc": "Shared team plays/pass-rate/rush-rate → residual-aware player opportunity.",
           "endLine": 190,
           "kind": "function",
           "line": 37,
@@ -2223,7 +2223,7 @@
           "qualname": "estimate_frontier_impact"
         },
         {
-          "doc": "Utility(action) = fanout \u00d7 materiality \u00d7 P(success) \u00d7 authority / cost.",
+          "doc": "Utility(action) = fanout × materiality × P(success) × authority / cost.",
           "endLine": 61,
           "kind": "function",
           "line": 40,
@@ -2590,7 +2590,7 @@
           "qualname": "cfb_top100_row"
         },
         {
-          "doc": "Filter CFB \u2192 heap partial Top-K \u2192 deterministic Timsort of the frontier.",
+          "doc": "Filter CFB → heap partial Top-K → deterministic Timsort of the frontier.",
           "endLine": 144,
           "kind": "function",
           "line": 118,
@@ -3676,7 +3676,7 @@
           "qualname": "freeze_map"
         },
         {
-          "doc": "Group every HAR player by playerId. Name \u2260 platform id.",
+          "doc": "Group every HAR player by playerId. Name ≠ platform id.",
           "endLine": 122,
           "kind": "function",
           "line": 69,
@@ -3936,7 +3936,7 @@
           "qualname": "_norm"
         },
         {
-          "doc": "Return (market_key, market_label). Unknown keys stay as a slug \u2014 fail closed later.",
+          "doc": "Return (market_key, market_label). Unknown keys stay as a slug — fail closed later.",
           "endLine": 266,
           "kind": "function",
           "line": 258,
@@ -5267,7 +5267,7 @@
           "qualname": "render_prop_explanation_text"
         },
         {
-          "doc": "entity+eventId \u2192 content hashes of FeatureStore records (and their sourceHashes).",
+          "doc": "entity+eventId → content hashes of FeatureStore records (and their sourceHashes).",
           "endLine": 421,
           "kind": "function",
           "line": 402,
@@ -5495,7 +5495,7 @@
       "sha256": "46bc71050d504effbbd715751187736e7768afcfbbe53c36cedabbc20bd844b9",
       "symbols": [
         {
-          "doc": "Unknown or unverified market. Fail closed \u2014 never nearest-match.",
+          "doc": "Unknown or unverified market. Fail closed — never nearest-match.",
           "endLine": 170,
           "kind": "class",
           "line": 164,
@@ -7978,7 +7978,7 @@
           "qualname": "build_evidence_graph.add_node"
         },
         {
-          "doc": "Resolve Selection/Offer \u2192 Subject \u2192 EvidenceClaim \u2192 SourceDocument.",
+          "doc": "Resolve Selection/Offer → Subject → EvidenceClaim → SourceDocument.",
           "endLine": 486,
           "kind": "function",
           "line": 410,
@@ -8002,7 +8002,7 @@
           "qualname": "_unique_edges"
         },
         {
-          "doc": "Populate Feature \u2192 State \u2192 Parameter \u2192 Simulation \u2192 Selection \u2192 Settlement.",
+          "doc": "Populate Feature → State → Parameter → Simulation → Selection → Settlement.",
           "endLine": 965,
           "kind": "function",
           "line": 502,
@@ -8026,7 +8026,7 @@
           "qualname": "attach_runtime_lineage.add_edge"
         },
         {
-          "doc": "Selection \u2192 PropEvaluation \u2192 Simulation \u2192 ParameterSnapshot \u2192 Feature/Claim.",
+          "doc": "Selection → PropEvaluation → Simulation → ParameterSnapshot → Feature/Claim.",
           "endLine": 1009,
           "kind": "function",
           "line": 968,
@@ -8364,7 +8364,7 @@
       "classes": 0,
       "functions": 1,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/host_plan.py",
-      "sha256": "46a1a2c6d212197644b81ba1d9dcabd15cd1f4e6a99fc6268e4e006a50e7a452",
+      "sha256": "9887620e6f93af29acdcc02670a5c5b8f14bcc7ac5eca76c25b395fd0be399c8",
       "symbols": [
         {
           "doc": null,
@@ -8480,7 +8480,7 @@
           "qualname": "BoardIndexes.query_retrieval_cascade"
         },
         {
-          "doc": "Exact-first identity. Known projectionId \u2192 hash lookup \u2192 done.",
+          "doc": "Exact-first identity. Known projectionId → hash lookup → done.",
           "endLine": 375,
           "kind": "method",
           "line": 290,
@@ -8544,7 +8544,7 @@
           "qualname": "EvidenceIndexes.close"
         },
         {
-          "doc": "Reverse index Requirement \u2192 Offers as Python bitsets plus id lists.",
+          "doc": "Reverse index Requirement → Offers as Python bitsets plus id lists.",
           "endLine": 455,
           "kind": "function",
           "line": 431,
@@ -8690,7 +8690,7 @@
           "qualname": "resolve_material_facts"
         },
         {
-          "doc": "MaterialFactResolution \u2192 FeatureRecords with provenance.",
+          "doc": "MaterialFactResolution → FeatureRecords with provenance.",
           "endLine": 525,
           "kind": "function",
           "line": 406,
@@ -9675,7 +9675,7 @@
           "qualname": "apply_detector_disagreement"
         },
         {
-          "doc": "role_sample \u2192 player_season \u2192 archetype/league prior. Sums to 1.",
+          "doc": "role_sample → player_season → archetype/league prior. Sums to 1.",
           "endLine": 253,
           "kind": "function",
           "line": 236,
@@ -10038,7 +10038,7 @@
           "qualname": "persist_cfb_source_health"
         },
         {
-          "doc": "Restore persisted source-health counters/circuits. Missing file \u2192 default catalog.",
+          "doc": "Restore persisted source-health counters/circuits. Missing file → default catalog.",
           "endLine": 315,
           "kind": "function",
           "line": 297,
@@ -13400,7 +13400,7 @@
           "qualname": "player_efficiency"
         },
         {
-          "doc": "Map opportunity \u00d7 rates to primitive outcomes. Bounds are applied here so",
+          "doc": "Map opportunity × rates to primitive outcomes. Bounds are applied here so",
           "endLine": 81,
           "kind": "function",
           "line": 17,
@@ -13702,7 +13702,7 @@
           "qualname": "settle_football_market"
         },
         {
-          "doc": "World-projection settlement from a PrimitiveStatLedger. Unknown \u2192 fail closed.",
+          "doc": "World-projection settlement from a PrimitiveStatLedger. Unknown → fail closed.",
           "endLine": 126,
           "kind": "function",
           "line": 118,
@@ -16383,7 +16383,7 @@
       "classes": 0,
       "functions": 6,
       "path": "artifacts/dcm_v6_workstream_ab/tests/test_host_native.py",
-      "sha256": "2f9254613d55acd0fc68c3e36aac6d7778f7ee702422e26007edaedcfc4c7bd4",
+      "sha256": "f6c2f98bfc39a9fbd41b9e4f7ea3ac51a97d5e2b34a34ef09215d562b18ec45b",
       "symbols": [
         {
           "doc": null,

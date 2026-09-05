@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from dcm.research.requests import SCOPE_ORDER
+from dcm.research.requests import SCOPE_ORDER; from dcm.research.scopes import canonical_scope
 
 _SCOPE_SPEC: dict[str, dict[str, Any]] = {
     "SPORT": {
@@ -179,7 +179,7 @@ def build_host_research_plan(
     }
     tasks = []
     for request in requests:
-        scope = str(request.get("scope") or "")
+        scope = canonical_scope(str(request.get("scope") or ""))
         spec = _SCOPE_SPEC.get(scope, {"priority": 99, "requiredFields": [], "research": []})
         req_id = str(request.get("request_id") or "")
         cov = coverage_by_id.get(req_id) or {}
@@ -232,7 +232,7 @@ def build_host_research_plan(
         scope_counts[str(task["scope"])] = scope_counts.get(str(task["scope"]), 0) + 1
     if unique_scopes:
         for k, v in unique_scopes.items():
-            scope_counts[str(k)] = int(v)
+            scope_counts[canonical_scope(str(k))] = scope_counts.get(canonical_scope(str(k)), 0) + int(v)
     return {
         "mode": "HOST_WEB_RESEARCH_REQUIRED",
         "orientation": "BUNDLE",

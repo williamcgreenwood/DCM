@@ -13,7 +13,7 @@ uses executable gate states, not percentages.
 | Probability / reliability / calibration separation | IMPLEMENTED | Conformal remains inactive until earned calibration; LR000000/NONE remain unchanged. |
 | Top100 frontier and freeze firewall | IMPLEMENTED | Interim frontier emits a checkpoint, never frozen artifacts or settlement eligibility. |
 | Immutable lineage and per-run root | PARTIAL | Runtime roots are emitted; full release/root certification remains open. |
-| Source-health scheduling and reuse | IMPLEMENTED | Persisted health and content-addressed reuse are active on the CFB path. |
+| Source-health scheduling and reuse | IMPLEMENTED | Persisted health and content-addressed reuse are active on the CFB path. |\n| Canonical host research scope boundary | IMPLEMENTED_PENDING_VALIDATION | Legacy adapter scopes are normalized before host research tasks and bundle keys are emitted. |
 | Prospective settlement and learning promotion | EXTERNAL_BLOCKED | Requires future platform outcomes and chronological unseen settlement evidence. |
 | Current-HAR ChatGPT acceptance | EXTERNAL_BLOCKED | A current sanitized CFB HAR and host-acquired evidence were not supplied. |
 | Complete mixed-sport R1 | NOT_IMPLEMENTED | Explicitly outside this CFB tranche. |
