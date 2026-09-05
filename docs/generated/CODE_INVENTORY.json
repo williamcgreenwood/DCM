@@ -1,5 +1,5 @@
 {
-  "contentHash": "2023e3ef0d862a29999d17e3386b4ba10a5deea2eec7625a357eb4768f44af57",
+  "contentHash": "c6f8b5ccbae2bdb339caed4a72553fef82a456efbd7036207c09a1bb9666374c",
   "moduleCount": 283,
   "modules": [
     {
@@ -10611,93 +10611,93 @@
       "classes": 0,
       "functions": 11,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/runner.py",
-      "sha256": "5c317d64c682d87a93b2771e64d212569a4749bc3a9b80f3e97e01ac8debc72f",
+      "sha256": "14f562c88431dfc14395c68577dba1c1ab0f2084b9a2769edb47c1bf70cc6525",
       "symbols": [
         {
           "doc": "Always write dest/audit/. Optionally copy+commit+push a GitHub pack.",
-          "endLine": 200,
+          "endLine": 201,
           "kind": "function",
-          "line": 126,
+          "line": 127,
           "name": "_finalize_archive",
           "qualname": "_finalize_archive"
         },
         {
           "doc": null,
-          "endLine": 213,
+          "endLine": 214,
           "kind": "function",
-          "line": 204,
+          "line": 205,
           "name": "_synthetic_path",
           "qualname": "_synthetic_path"
         },
         {
           "doc": null,
-          "endLine": 218,
+          "endLine": 219,
           "kind": "function",
-          "line": 217,
+          "line": 218,
           "name": "_run_id",
           "qualname": "_run_id"
         },
         {
           "doc": "Best-effort git HEAD. Never writes git config. Missing git is None, not a crash.",
-          "endLine": 238,
+          "endLine": 239,
           "kind": "function",
-          "line": 221,
+          "line": 222,
           "name": "_git_commit_sha",
           "qualname": "_git_commit_sha"
         },
         {
           "doc": null,
-          "endLine": 249,
+          "endLine": 250,
           "kind": "function",
-          "line": 241,
+          "line": 242,
           "name": "_default_model_config",
           "qualname": "_default_model_config"
         },
         {
           "doc": null,
-          "endLine": 258,
+          "endLine": 259,
           "kind": "function",
-          "line": 252,
+          "line": 253,
           "name": "_active_calibration",
           "qualname": "_active_calibration"
         },
         {
           "doc": null,
-          "endLine": 2036,
+          "endLine": 2054,
           "kind": "function",
-          "line": 261,
+          "line": 262,
           "name": "run_dcm",
           "qualname": "run_dcm"
         },
         {
           "doc": null,
-          "endLine": 843,
+          "endLine": 861,
           "kind": "method",
-          "line": 820,
+          "line": 838,
           "name": "_snapshot_for",
           "qualname": "run_dcm._snapshot_for"
         },
         {
           "doc": null,
-          "endLine": 1282,
+          "endLine": 1300,
           "kind": "method",
-          "line": 1280,
+          "line": 1298,
           "name": "_resimulate_material",
           "qualname": "run_dcm._resimulate_material"
         },
         {
           "doc": null,
-          "endLine": 1515,
+          "endLine": 1533,
           "kind": "method",
-          "line": 1471,
+          "line": 1489,
           "name": "slim",
           "qualname": "run_dcm.slim"
         },
         {
           "doc": null,
-          "endLine": 2154,
+          "endLine": 2172,
           "kind": "function",
-          "line": 2039,
+          "line": 2057,
           "name": "main",
           "qualname": "main"
         }

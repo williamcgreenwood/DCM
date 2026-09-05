@@ -67,6 +67,7 @@ from dcm.research.evidence_graph import attach_runtime_lineage
 from dcm.research.coverage import coverage_report
 from dcm.research.host_plan import build_host_research_plan
 from dcm.research.provider import BundleProvider, FileProvider, FixtureProvider, collect, write_bundle
+from dcm.research.claims import dedupe
 from dcm.research.requests import plan_research
 from dcm.research.offer_metadata import recover_offer_metadata
 from dcm.runtime.checkpoint import load_checkpoint, write_checkpoint
@@ -649,6 +650,23 @@ def run_dcm(
             encoding="utf-8",
         )
         research_cache.close()
+    # Offer metadata is resolved from the authorized HAR independently of web
+    # research. Merge it into the same claim bundle so direct bundle/fixture
+    # runs and the host resume path share one canonical producer.
+    offer_recovery = recover_offer_metadata(rows, requests, cutoff=forecast_cutoff) if not synthetic else {"claims": [], "recovered": 0, "unresolved": [], "requested": 0, "recoveryComplete": True, "source": "SYNTHETIC_DISABLED"}
+    if offer_recovery["claims"]:
+        bundle["claims"] = dedupe(list(bundle.get("claims") or []) + list(offer_recovery["claims"]))
+        bundle["coverage"] = coverage_report(requests, bundle["claims"])
+        bundle["missing"] = [
+            str(row.get("requestId") or "")
+            for row in (bundle["coverage"].get("requests") or [])
+            if not row.get("complete")
+        ]
+        bundle["complete"] = not bundle["missing"] and not bundle.get("malformed")
+    (dest / "offer_metadata_recovery.json").write_text(
+        json.dumps({k: v for k, v in offer_recovery.items() if k != "claims"}, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
     (dest / "evidence").mkdir(exist_ok=True)
     (dest / "evidence" / "claims.json").write_text(json.dumps(bundle["claims"], indent=2) + "\n", encoding="utf-8")
     written = write_bundle(dest / "evidence_bundle.jsonl", bundle["claims"])

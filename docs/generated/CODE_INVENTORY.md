@@ -5,7 +5,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 - Modules: **283**
 - Symbols: **2023**
 - Parse errors: **0**
-- Inventory hash: `2023e3ef0d862a29999d17e3386b4ba10a5deea2eec7625a357eb4768f44af57`
+- Inventory hash: `c6f8b5ccbae2bdb339caed4a72553fef82a456efbd7036207c09a1bb9666374c`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -1929,17 +1929,17 @@ _No class/function symbols._
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/runner.py`
 
-- `function` **_finalize_archive** L126 — Always write dest/audit/. Optionally copy+commit+push a GitHub pack.
-- `function` **_synthetic_path** L204
-- `function` **_run_id** L217
-- `function` **_git_commit_sha** L221 — Best-effort git HEAD. Never writes git config. Missing git is None, not a crash.
-- `function` **_default_model_config** L241
-- `function` **_active_calibration** L252
-- `function` **run_dcm** L261
-- `method` **run_dcm._snapshot_for** L820
-- `method` **run_dcm._resimulate_material** L1280
-- `method` **run_dcm.slim** L1471
-- `function` **main** L2039
+- `function` **_finalize_archive** L127 — Always write dest/audit/. Optionally copy+commit+push a GitHub pack.
+- `function` **_synthetic_path** L205
+- `function` **_run_id** L218
+- `function` **_git_commit_sha** L222 — Best-effort git HEAD. Never writes git config. Missing git is None, not a crash.
+- `function` **_default_model_config** L242
+- `function` **_active_calibration** L253
+- `function` **run_dcm** L262
+- `method` **run_dcm._snapshot_for** L838
+- `method` **run_dcm._resimulate_material** L1298
+- `method` **run_dcm.slim** L1489
+- `function` **main** L2057
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/runtime/__init__.py`
 
