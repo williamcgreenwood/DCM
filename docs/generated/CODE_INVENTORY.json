@@ -1,6 +1,6 @@
 {
-  "contentHash": "c46cc8c0956456426bdecb17d8ab9efa3c8c24d2fe3c74b3669f94e0a7cee49f",
-  "moduleCount": 283,
+  "contentHash": "a426152e282f36bcd650cfe2df445d60456929d116cc782a5c3777a08d4b6c95",
+  "moduleCount": 287,
   "modules": [
     {
       "classes": 0,
@@ -2743,37 +2743,37 @@
       "classes": 0,
       "functions": 4,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/chat/evidence_import.py",
-      "sha256": "9c65858cc1327f6cb59bfe5a567977937574235d3026d5e3b9be34eaf87f647b",
+      "sha256": "1cd3ea5a1e2c0ef3852a35afb6a08a163f248f6e4690b1daaf4cf87b388ed310",
       "symbols": [
         {
           "doc": null,
-          "endLine": 50,
+          "endLine": 60,
           "kind": "function",
-          "line": 23,
+          "line": 33,
           "name": "_load_observations",
           "qualname": "_load_observations"
         },
         {
           "doc": null,
-          "endLine": 63,
+          "endLine": 73,
           "kind": "function",
-          "line": 53,
+          "line": 63,
           "name": "_match_request",
           "qualname": "_match_request"
         },
         {
-          "doc": null,
-          "endLine": 130,
+          "doc": "Legacy entry: validate + convert one observation (rejects empty fields).",
+          "endLine": 83,
           "kind": "function",
-          "line": 66,
+          "line": 76,
           "name": "observation_to_claim",
           "qualname": "observation_to_claim"
         },
         {
           "doc": null,
-          "endLine": 204,
+          "endLine": 178,
           "kind": "function",
-          "line": 133,
+          "line": 86,
           "name": "import_observations",
           "qualname": "import_observations"
         }
@@ -7463,11 +7463,11 @@
       "classes": 0,
       "functions": 3,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/research/claims.py",
-      "sha256": "dc6c421dd1a8a74939c63f501642350b0d62354a45549caf57912285ab1a5128",
+      "sha256": "357d7c9211022b669bf33e30dc2115cf2db269c9cb553b24d8f9a2c9cac3c72b",
       "symbols": [
         {
           "doc": null,
-          "endLine": 71,
+          "endLine": 80,
           "kind": "function",
           "line": 11,
           "name": "claim_record",
@@ -7475,17 +7475,17 @@
         },
         {
           "doc": "Remove byte-logically identical claims without mutating hashed content.",
-          "endLine": 81,
+          "endLine": 90,
           "kind": "function",
-          "line": 74,
+          "line": 83,
           "name": "dedupe",
           "qualname": "dedupe"
         },
         {
           "doc": "Record divergent values separately from immutable EvidenceClaims.",
-          "endLine": 158,
+          "endLine": 167,
           "kind": "function",
-          "line": 84,
+          "line": 93,
           "name": "conflict_ledger",
           "qualname": "conflict_ledger"
         }
@@ -8760,6 +8760,169 @@
           "line": 689,
           "name": "facts_for_refresh",
           "qualname": "facts_for_refresh"
+        }
+      ],
+      "workstream": "P1"
+    },
+    {
+      "classes": 0,
+      "functions": 1,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/research/observation_execute.py",
+      "sha256": "cb2024d7bf5229a92f32a10945bbc7697a42dcf2277ff3123fce03b46320e8a8",
+      "symbols": [
+        {
+          "doc": "Import source-aware host observations and close coverage\u2192consumer contracts.",
+          "endLine": 331,
+          "kind": "function",
+          "line": 50,
+          "name": "execute_source_aware_observations",
+          "qualname": "execute_source_aware_observations"
+        }
+      ],
+      "workstream": "P1"
+    },
+    {
+      "classes": 0,
+      "functions": 9,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/research/observation_execute_support.py",
+      "sha256": "ed94b7ef7f0aae49600eb8f4e9d1e27f1054b756b2b5c700044a0bc64749ebf6",
+      "symbols": [
+        {
+          "doc": "One-shot opponent \u2192 offer ids map (BoardIndexes has no by_counterparty).",
+          "endLine": 47,
+          "kind": "function",
+          "line": 37,
+          "name": "_build_counterparty_index",
+          "qualname": "_build_counterparty_index"
+        },
+        {
+          "doc": "Sport / league family for ResearchStore \u2014 never a semantic_scope kind.",
+          "endLine": 70,
+          "kind": "function",
+          "line": 50,
+          "name": "_derive_sport",
+          "qualname": "_derive_sport"
+        },
+        {
+          "doc": "Resolve dependent offers via BoardIndexes \u2014 no O(N) board scans.",
+          "endLine": 114,
+          "kind": "function",
+          "line": 73,
+          "name": "_affected_rows",
+          "qualname": "_affected_rows"
+        },
+        {
+          "doc": null,
+          "endLine": 91,
+          "kind": "method",
+          "line": 85,
+          "name": "_add",
+          "qualname": "_affected_rows._add"
+        },
+        {
+          "doc": null,
+          "endLine": 142,
+          "kind": "function",
+          "line": 117,
+          "name": "_snapshot_ablation",
+          "qualname": "_snapshot_ablation"
+        },
+        {
+          "doc": "MaterialFact / feature + probability/grade helper hash changes.",
+          "endLine": 249,
+          "kind": "function",
+          "line": 145,
+          "name": "_consumer_ablation",
+          "qualname": "_consumer_ablation"
+        },
+        {
+          "doc": null,
+          "endLine": 204,
+          "kind": "method",
+          "line": 172,
+          "name": "_stub_consumer",
+          "qualname": "_consumer_ablation._stub_consumer"
+        },
+        {
+          "doc": null,
+          "endLine": 263,
+          "kind": "function",
+          "line": 252,
+          "name": "_load_existing_dag",
+          "qualname": "_load_existing_dag"
+        },
+        {
+          "doc": "claim \u2192 PARAMETER \u2192 EVENT_WORLDS \u2192 GRADE for one offer (idempotent add).",
+          "endLine": 285,
+          "kind": "function",
+          "line": 266,
+          "name": "_ensure_offer_lineage",
+          "qualname": "_ensure_offer_lineage"
+        }
+      ],
+      "workstream": "P1"
+    },
+    {
+      "classes": 0,
+      "functions": 7,
+      "path": "artifacts/dcm_v6_workstream_ab/dcm/research/observation_typed.py",
+      "sha256": "8c138b0ff0fcf5a4d23f38e1addc6991a95b35adb8f8a5dfbe14b9cd7db99f85",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 40,
+          "kind": "function",
+          "line": 15,
+          "name": "_load_observations",
+          "qualname": "_load_observations"
+        },
+        {
+          "doc": null,
+          "endLine": 50,
+          "kind": "function",
+          "line": 43,
+          "name": "_nonempty_fields",
+          "qualname": "_nonempty_fields"
+        },
+        {
+          "doc": "Merge ``data`` and typed ``claims[]`` into a semantic claim_value.",
+          "endLine": 83,
+          "kind": "function",
+          "line": 53,
+          "name": "assemble_claim_value",
+          "qualname": "assemble_claim_value"
+        },
+        {
+          "doc": null,
+          "endLine": 87,
+          "kind": "function",
+          "line": 86,
+          "name": "has_valid_field_coverage",
+          "qualname": "has_valid_field_coverage"
+        },
+        {
+          "doc": null,
+          "endLine": 105,
+          "kind": "function",
+          "line": 90,
+          "name": "_match_request",
+          "qualname": "_match_request"
+        },
+        {
+          "doc": null,
+          "endLine": 143,
+          "kind": "function",
+          "line": 108,
+          "name": "_match_action",
+          "qualname": "_match_action"
+        },
+        {
+          "doc": "Validate a source-aware host observation and build an EvidenceClaim.",
+          "endLine": 230,
+          "kind": "function",
+          "line": 146,
+          "name": "observation_to_typed_claim",
+          "qualname": "observation_to_typed_claim"
         }
       ],
       "workstream": "P1"
@@ -11025,9 +11188,9 @@
     },
     {
       "classes": 2,
-      "functions": 13,
+      "functions": 16,
       "path": "artifacts/dcm_v6_workstream_ab/dcm/runtime/dag.py",
-      "sha256": "1687bc08d6801c23654c668147f834199df8ad52a8c172939ee9e783496e1296",
+      "sha256": "d80a33997933738a9aa3204a721e5c938825470022f311bef4407638386ab975",
       "symbols": [
         {
           "doc": null,
@@ -11055,7 +11218,7 @@
         },
         {
           "doc": null,
-          "endLine": 189,
+          "endLine": 257,
           "kind": "class",
           "line": 109,
           "name": "Dag",
@@ -11110,42 +11273,66 @@
           "qualname": "Dag.invalidate_types"
         },
         {
-          "doc": "Invalidate only downstream nodes that depend on this evidence class.",
-          "endLine": 168,
+          "doc": "Reverse adjacency: parent key \u2192 child keys.",
+          "endLine": 166,
           "kind": "method",
           "line": 160,
+          "name": "children_map",
+          "qualname": "Dag.children_map"
+        },
+        {
+          "doc": "Invalidate transitive children of specific node keys via reverse adjacency.",
+          "endLine": 199,
+          "kind": "method",
+          "line": 168,
+          "name": "invalidate_descendants",
+          "qualname": "Dag.invalidate_descendants"
+        },
+        {
+          "doc": "Invalidate only downstream nodes that depend on this evidence class.",
+          "endLine": 209,
+          "kind": "method",
+          "line": 201,
           "name": "invalidate_for_delta",
           "qualname": "Dag.invalidate_for_delta"
         },
         {
-          "doc": null,
-          "endLine": 171,
+          "doc": "Reload a previously persisted DAG snapshot (nodes + parent links).",
+          "endLine": 236,
           "kind": "method",
-          "line": 170,
+          "line": 212,
+          "name": "from_snapshot",
+          "qualname": "Dag.from_snapshot"
+        },
+        {
+          "doc": null,
+          "endLine": 239,
+          "kind": "method",
+          "line": 238,
           "name": "preserved_research_nodes",
           "qualname": "Dag.preserved_research_nodes"
         },
         {
           "doc": null,
-          "endLine": 174,
+          "endLine": 242,
           "kind": "method",
-          "line": 173,
+          "line": 241,
           "name": "reused",
           "qualname": "Dag.reused"
         },
         {
           "doc": null,
-          "endLine": 177,
+          "endLine": 245,
           "kind": "method",
-          "line": 176,
+          "line": 244,
           "name": "pending",
           "qualname": "Dag.pending"
         },
         {
           "doc": null,
-          "endLine": 189,
+          "endLine": 257,
           "kind": "method",
-          "line": 179,
+          "line": 247,
           "name": "snapshot",
           "qualname": "Dag.snapshot"
         }
@@ -14768,6 +14955,87 @@
           "line": 351,
           "name": "test_archive_certification_rejects_interim_frontier",
           "qualname": "test_archive_certification_rejects_interim_frontier"
+        }
+      ],
+      "workstream": "UNMAPPED"
+    },
+    {
+      "classes": 0,
+      "functions": 9,
+      "path": "artifacts/dcm_v6_workstream_ab/tests/test_cfb_source_aware_import.py",
+      "sha256": "41931194f26fa28e50439bb7c566673b2f983eb8e5c280d76c39c0ec5c463205",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 43,
+          "kind": "function",
+          "line": 28,
+          "name": "_board_context",
+          "qualname": "_board_context"
+        },
+        {
+          "doc": null,
+          "endLine": 85,
+          "kind": "function",
+          "line": 46,
+          "name": "_event_observation",
+          "qualname": "_event_observation"
+        },
+        {
+          "doc": null,
+          "endLine": 103,
+          "kind": "function",
+          "line": 88,
+          "name": "test_empty_field_coverage_rejected_and_does_not_close_contract",
+          "qualname": "test_empty_field_coverage_rejected_and_does_not_close_contract"
+        },
+        {
+          "doc": null,
+          "endLine": 157,
+          "kind": "function",
+          "line": 106,
+          "name": "test_one_event_observation_fans_out_and_changes_parameter_consumers",
+          "qualname": "test_one_event_observation_fans_out_and_changes_parameter_consumers"
+        },
+        {
+          "doc": null,
+          "endLine": 171,
+          "kind": "function",
+          "line": 160,
+          "name": "test_idempotent_reimport_does_not_duplicate_claims",
+          "qualname": "test_idempotent_reimport_does_not_duplicate_claims"
+        },
+        {
+          "doc": null,
+          "endLine": 184,
+          "kind": "function",
+          "line": 174,
+          "name": "test_observation_to_claim_rejects_empty_data",
+          "qualname": "test_observation_to_claim_rejects_empty_data"
+        },
+        {
+          "doc": "put_claim must store sport separately from entityKind (scope kind).",
+          "endLine": 203,
+          "kind": "function",
+          "line": 187,
+          "name": "test_research_store_sport_is_not_semantic_scope",
+          "qualname": "test_research_store_sport_is_not_semantic_scope"
+        },
+        {
+          "doc": null,
+          "endLine": 239,
+          "kind": "function",
+          "line": 206,
+          "name": "test_invalidate_descendants_spares_unrelated_offer_parameters",
+          "qualname": "test_invalidate_descendants_spares_unrelated_offer_parameters"
+        },
+        {
+          "doc": null,
+          "endLine": 296,
+          "kind": "function",
+          "line": 242,
+          "name": "test_source_aware_import_uses_indexes_and_consumer_beyond_snapshot",
+          "qualname": "test_source_aware_import_uses_indexes_and_consumer_beyond_snapshot"
         }
       ],
       "workstream": "UNMAPPED"
@@ -18719,5 +18987,5 @@
   "parseErrors": [],
   "root": "artifacts/dcm_v6_workstream_ab",
   "schema": "pillars_dcm.code_inventory.v1",
-  "symbolCount": 2025
+  "symbolCount": 2054
 }

@@ -2,10 +2,10 @@
 
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
-- Modules: **283**
-- Symbols: **2025**
+- Modules: **287**
+- Symbols: **2054**
 - Parse errors: **0**
-- Inventory hash: `c46cc8c0956456426bdecb17d8ab9efa3c8c24d2fe3c74b3669f94e0a7cee49f`
+- Inventory hash: `a426152e282f36bcd650cfe2df445d60456929d116cc782a5c3777a08d4b6c95`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -142,6 +142,9 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/indexes.py` | 2 | 19 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/lineup.py` | 0 | 3 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/material_facts.py` | 0 | 20 |
+| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/observation_execute.py` | 0 | 1 |
+| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/observation_execute_support.py` | 0 | 9 |
+| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/observation_typed.py` | 0 | 7 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/offer_metadata.py` | 0 | 1 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/os_graphs.py` | 0 | 8 |
 | P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/player_offer_set.py` | 1 | 6 |
@@ -170,7 +173,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/checkpoint_outbox.py` | 0 | 4 |
 | P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/checkpoint_reconciliation.py` | 0 | 2 |
 | P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/cutoff.py` | 1 | 4 |
-| P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/dag.py` | 2 | 13 |
+| P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/dag.py` | 2 | 16 |
 | P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/drive_catalog.py` | 1 | 10 |
 | P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/freeze.py` | 0 | 2 |
 | P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/github_archive.py` | 0 | 38 |
@@ -237,6 +240,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_cfb_reference_implementation.py` | 0 | 20 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_cfb_research_os.py` | 0 | 11 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_cfb_semantic_completion.py` | 0 | 20 |
+| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_cfb_source_aware_import.py` | 0 | 9 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_completion_context_runtime.py` | 0 | 9 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_e2e_runner.py` | 0 | 18 |
 | UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_e2e_world_to_lineup.py` | 0 | 21 |
@@ -719,10 +723,10 @@ _No class/function symbols._
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/chat/evidence_import.py`
 
-- `function` **_load_observations** L23
-- `function` **_match_request** L53
-- `function` **observation_to_claim** L66
-- `function` **import_observations** L133
+- `function` **_load_observations** L33
+- `function` **_match_request** L63
+- `function` **observation_to_claim** L76 — Legacy entry: validate + convert one observation (rejects empty fields).
+- `function` **import_observations** L86
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/chat/report.py`
 
@@ -1469,8 +1473,8 @@ _No class/function symbols._
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/claims.py`
 
 - `function` **claim_record** L11
-- `function` **dedupe** L74 — Remove byte-logically identical claims without mutating hashed content.
-- `function` **conflict_ledger** L84 — Record divergent values separately from immutable EvidenceClaims.
+- `function` **dedupe** L83 — Remove byte-logically identical claims without mutating hashed content.
+- `function` **conflict_ledger** L93 — Record divergent values separately from immutable EvidenceClaims.
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/classify.py`
 
@@ -1660,6 +1664,32 @@ _No class/function symbols._
 - `function` **json_safe_value** L585
 - `function` **apply_fact_features_to_packets** L595 — Overlay resolved FeatureRecords onto modeling packets BEFORE RoleEpoch/fit.
 - `function` **facts_for_refresh** L689 — Index MaterialFacts by (scope, scopeId, claimType-or-field). Never latest-claim-wins across types.
+
+### `artifacts/dcm_v6_workstream_ab/dcm/research/observation_execute.py`
+
+- `function` **execute_source_aware_observations** L50 — Import source-aware host observations and close coverage→consumer contracts.
+
+### `artifacts/dcm_v6_workstream_ab/dcm/research/observation_execute_support.py`
+
+- `function` **_build_counterparty_index** L37 — One-shot opponent → offer ids map (BoardIndexes has no by_counterparty).
+- `function` **_derive_sport** L50 — Sport / league family for ResearchStore — never a semantic_scope kind.
+- `function` **_affected_rows** L73 — Resolve dependent offers via BoardIndexes — no O(N) board scans.
+- `method` **_affected_rows._add** L85
+- `function` **_snapshot_ablation** L117
+- `function` **_consumer_ablation** L145 — MaterialFact / feature + probability/grade helper hash changes.
+- `method` **_consumer_ablation._stub_consumer** L172
+- `function` **_load_existing_dag** L252
+- `function` **_ensure_offer_lineage** L266 — claim → PARAMETER → EVENT_WORLDS → GRADE for one offer (idempotent add).
+
+### `artifacts/dcm_v6_workstream_ab/dcm/research/observation_typed.py`
+
+- `function` **_load_observations** L15
+- `function` **_nonempty_fields** L43
+- `function` **assemble_claim_value** L53 — Merge ``data`` and typed ``claims[]`` into a semantic claim_value.
+- `function` **has_valid_field_coverage** L86
+- `function` **_match_request** L90
+- `function` **_match_action** L108
+- `function` **observation_to_typed_claim** L146 — Validate a source-aware host observation and build an EvidenceClaim.
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/research/offer_metadata.py`
 
@@ -2009,11 +2039,14 @@ _No class/function symbols._
 - `method` **Dag.fail** L141
 - `method` **Dag.invalidate_line_descendants** L146 — A line change invalidates market/grade/rank/portfolio/freeze, not research.
 - `method` **Dag.invalidate_types** L150
-- `method` **Dag.invalidate_for_delta** L160 — Invalidate only downstream nodes that depend on this evidence class.
-- `method` **Dag.preserved_research_nodes** L170
-- `method` **Dag.reused** L173
-- `method` **Dag.pending** L176
-- `method` **Dag.snapshot** L179
+- `method` **Dag.children_map** L160 — Reverse adjacency: parent key → child keys.
+- `method` **Dag.invalidate_descendants** L168 — Invalidate transitive children of specific node keys via reverse adjacency.
+- `method` **Dag.invalidate_for_delta** L201 — Invalidate only downstream nodes that depend on this evidence class.
+- `method` **Dag.from_snapshot** L212 — Reload a previously persisted DAG snapshot (nodes + parent links).
+- `method` **Dag.preserved_research_nodes** L238
+- `method` **Dag.reused** L241
+- `method` **Dag.pending** L244
+- `method` **Dag.snapshot** L247
 
 ### `artifacts/dcm_v6_workstream_ab/dcm/runtime/drive_catalog.py`
 
@@ -2606,6 +2639,18 @@ _No class/function symbols._
 - `function` **test_material_fact_resolution_is_lineage_aware_and_conservative** L300
 - `function` **test_probability_bundle_keeps_conformal_inactive_without_earned_calibration** L335
 - `function` **test_archive_certification_rejects_interim_frontier** L351
+
+### `artifacts/dcm_v6_workstream_ab/tests/test_cfb_source_aware_import.py`
+
+- `function` **_board_context** L28
+- `function` **_event_observation** L46
+- `function` **test_empty_field_coverage_rejected_and_does_not_close_contract** L88
+- `function` **test_one_event_observation_fans_out_and_changes_parameter_consumers** L106
+- `function` **test_idempotent_reimport_does_not_duplicate_claims** L160
+- `function` **test_observation_to_claim_rejects_empty_data** L174
+- `function` **test_research_store_sport_is_not_semantic_scope** L187 — put_claim must store sport separately from entityKind (scope kind).
+- `function` **test_invalidate_descendants_spares_unrelated_offer_parameters** L206
+- `function` **test_source_aware_import_uses_indexes_and_consumer_beyond_snapshot** L242
 
 ### `artifacts/dcm_v6_workstream_ab/tests/test_completion_context_runtime.py`
 
