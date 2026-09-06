@@ -31,8 +31,8 @@
   "runtimeResolution": {
     "gitCommit": "RESOLVE_FROM_RELEASE_OR_RUNTIME_HEAD",
     "inventoryContentHash": "READ_FROM_COMMITTED_INVENTORY",
-    "sportPluginRegistry": "artifacts/dcm_v6_workstream_ab/dcm/sports/football/registry.py",
-    "marketDefinitionRegistry": "artifacts/dcm_v6_workstream_ab/dcm/cfb/markets.py",
+    "sportPluginRegistry": "src/dcm/sports/football/registry.py",
+    "marketDefinitionRegistry": "src/dcm/cfb/markets.py",
     "merkleRoot": "EMIT_PER_RUN_AFTER_ALL_SEMANTIC_ARTIFACTS_EXIST"
   },
   "donorP380X": {

@@ -2,316 +2,250 @@
 
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
-- Modules: **287**
-- Symbols: **2054**
+- Modules: **221**
+- Symbols: **1520**
 - Parse errors: **0**
-- Inventory hash: `a426152e282f36bcd650cfe2df445d60456929d116cc782a5c3777a08d4b6c95`
+- Inventory hash: `e65fbeb60369b4d8fab721f5c2e79a385ae56dd72b50310a1ef4d768b43d2ef3`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/__init__.py` | 0 | 0 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/__main__.py` | 0 | 0 |
-| P16 | `artifacts/dcm_v6_workstream_ab/dcm/algorithms/__init__.py` | 0 | 0 |
-| P16 | `artifacts/dcm_v6_workstream_ab/dcm/algorithms/cache.py` | 2 | 7 |
-| P16 | `artifacts/dcm_v6_workstream_ab/dcm/algorithms/catalog.py` | 0 | 3 |
-| P16 | `artifacts/dcm_v6_workstream_ab/dcm/algorithms/constitution.py` | 0 | 6 |
-| P16 | `artifacts/dcm_v6_workstream_ab/dcm/algorithms/contracts.py` | 4 | 7 |
-| P16 | `artifacts/dcm_v6_workstream_ab/dcm/algorithms/control_plane.py` | 5 | 11 |
-| P16 | `artifacts/dcm_v6_workstream_ab/dcm/algorithms/execution_plan.py` | 0 | 3 |
-| P16 | `artifacts/dcm_v6_workstream_ab/dcm/algorithms/graph.py` | 0 | 6 |
-| P16 | `artifacts/dcm_v6_workstream_ab/dcm/algorithms/grouping.py` | 1 | 17 |
-| P16 | `artifacts/dcm_v6_workstream_ab/dcm/algorithms/indexing.py` | 8 | 37 |
-| P16 | `artifacts/dcm_v6_workstream_ab/dcm/algorithms/ml_families.py` | 0 | 13 |
-| P16 | `artifacts/dcm_v6_workstream_ab/dcm/algorithms/registry.py` | 0 | 15 |
-| P16 | `artifacts/dcm_v6_workstream_ab/dcm/algorithms/scheduling.py` | 1 | 12 |
-| P16 | `artifacts/dcm_v6_workstream_ab/dcm/algorithms/searching.py` | 4 | 43 |
-| P16 | `artifacts/dcm_v6_workstream_ab/dcm/algorithms/selection.py` | 1 | 3 |
-| P16 | `artifacts/dcm_v6_workstream_ab/dcm/algorithms/sorting.py` | 1 | 17 |
-| P16 | `artifacts/dcm_v6_workstream_ab/dcm/algorithms/telemetry.py` | 1 | 5 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/archive.py` | 0 | 2 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/cfb/__init__.py` | 0 | 1 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/cfb/accounting.py` | 0 | 3 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/cfb/champion.py` | 0 | 3 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/cfb/coextract.py` | 0 | 3 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/cfb/event_worlds.py` | 0 | 2 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/cfb/frontier.py` | 0 | 4 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/cfb/har_delta.py` | 0 | 3 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/cfb/launch.py` | 0 | 9 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/cfb/markets.py` | 0 | 9 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/cfb/opportunity_ledger.py` | 0 | 6 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/cfb/recompute.py` | 0 | 1 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/cfb/refresh.py` | 0 | 2 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/cfb/reports.py` | 0 | 11 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/cfb/rules.py` | 0 | 1 |
-| P7 | `artifacts/dcm_v6_workstream_ab/dcm/chat/__init__.py` | 0 | 0 |
-| P7 | `artifacts/dcm_v6_workstream_ab/dcm/chat/__main__.py` | 0 | 0 |
-| P7 | `artifacts/dcm_v6_workstream_ab/dcm/chat/archive.py` | 0 | 2 |
-| P7 | `artifacts/dcm_v6_workstream_ab/dcm/chat/cli.py` | 0 | 4 |
-| P7 | `artifacts/dcm_v6_workstream_ab/dcm/chat/contracts.py` | 0 | 0 |
-| P7 | `artifacts/dcm_v6_workstream_ab/dcm/chat/evidence_import.py` | 0 | 4 |
-| P7 | `artifacts/dcm_v6_workstream_ab/dcm/chat/report.py` | 0 | 1 |
-| P7 | `artifacts/dcm_v6_workstream_ab/dcm/chat/research_bridge.py` | 0 | 1 |
-| P7 | `artifacts/dcm_v6_workstream_ab/dcm/chat/session.py` | 1 | 18 |
-| P7 | `artifacts/dcm_v6_workstream_ab/dcm/chat/state.py` | 0 | 4 |
-| P0 | `artifacts/dcm_v6_workstream_ab/dcm/contracts/__init__.py` | 0 | 0 |
-| P0 | `artifacts/dcm_v6_workstream_ab/dcm/contracts/codes.py` | 1 | 0 |
-| P0 | `artifacts/dcm_v6_workstream_ab/dcm/contracts/failure_codes.py` | 0 | 0 |
-| P0 | `artifacts/dcm_v6_workstream_ab/dcm/contracts/hashes.py` | 1 | 6 |
-| P0 | `artifacts/dcm_v6_workstream_ab/dcm/contracts/immutables.py` | 1 | 8 |
-| P0 | `artifacts/dcm_v6_workstream_ab/dcm/contracts/phase_bc.py` | 0 | 0 |
-| P0 | `artifacts/dcm_v6_workstream_ab/dcm/contracts/schemas.py` | 25 | 16 |
-| P0 | `artifacts/dcm_v6_workstream_ab/dcm/contracts/universal_entities.py` | 4 | 5 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/dataset.py` | 0 | 0 |
-| P0 | `artifacts/dcm_v6_workstream_ab/dcm/identity/__init__.py` | 0 | 0 |
-| P0 | `artifacts/dcm_v6_workstream_ab/dcm/identity/resolve.py` | 0 | 5 |
-| P0 | `artifacts/dcm_v6_workstream_ab/dcm/ingest/__init__.py` | 0 | 0 |
-| P0 | `artifacts/dcm_v6_workstream_ab/dcm/ingest/board.py` | 0 | 6 |
-| P0 | `artifacts/dcm_v6_workstream_ab/dcm/ingest/composite.py` | 0 | 6 |
-| P0 | `artifacts/dcm_v6_workstream_ab/dcm/ingest/har.py` | 0 | 13 |
-| P0 | `artifacts/dcm_v6_workstream_ab/dcm/ingest/markets.py` | 0 | 4 |
-| P0 | `artifacts/dcm_v6_workstream_ab/dcm/ingest/outlier.py` | 0 | 3 |
-| P0 | `artifacts/dcm_v6_workstream_ab/dcm/ingest/prizepicks.py` | 0 | 13 |
-| P0 | `artifacts/dcm_v6_workstream_ab/dcm/ingest/sanitize.py` | 0 | 5 |
-| P0 | `artifacts/dcm_v6_workstream_ab/dcm/ingest/wsab_bind.py` | 0 | 2 |
-| P6 | `artifacts/dcm_v6_workstream_ab/dcm/learning/__init__.py` | 0 | 0 |
-| P6 | `artifacts/dcm_v6_workstream_ab/dcm/learning/calibration.py` | 0 | 6 |
-| P6 | `artifacts/dcm_v6_workstream_ab/dcm/learning/dataset.py` | 1 | 13 |
-| P6 | `artifacts/dcm_v6_workstream_ab/dcm/learning/failure_class.py` | 0 | 3 |
-| P6 | `artifacts/dcm_v6_workstream_ab/dcm/learning/postgame.py` | 0 | 13 |
-| P6 | `artifacts/dcm_v6_workstream_ab/dcm/learning/registry.py` | 0 | 10 |
-| P6 | `artifacts/dcm_v6_workstream_ab/dcm/learning/sidecar.py` | 0 | 5 |
-| P6 | `artifacts/dcm_v6_workstream_ab/dcm/learning/walkforward.py` | 1 | 15 |
-| P2 | `artifacts/dcm_v6_workstream_ab/dcm/ml/__init__.py` | 0 | 0 |
-| P2 | `artifacts/dcm_v6_workstream_ab/dcm/ml/feature_store.py` | 1 | 9 |
-| P2-P4 | `artifacts/dcm_v6_workstream_ab/dcm/model/__init__.py` | 0 | 1 |
-| P2-P4 | `artifacts/dcm_v6_workstream_ab/dcm/model/availability.py` | 0 | 2 |
-| P2-P4 | `artifacts/dcm_v6_workstream_ab/dcm/model/basketball_efficiency.py` | 1 | 6 |
-| P2-P4 | `artifacts/dcm_v6_workstream_ab/dcm/model/basketball_opportunity.py` | 1 | 8 |
-| P2-P4 | `artifacts/dcm_v6_workstream_ab/dcm/model/distributions.py` | 0 | 1 |
-| P2-P4 | `artifacts/dcm_v6_workstream_ab/dcm/model/event_world_joint.py` | 0 | 8 |
-| P2-P4 | `artifacts/dcm_v6_workstream_ab/dcm/model/explanation.py` | 0 | 14 |
-| P2-P4 | `artifacts/dcm_v6_workstream_ab/dcm/model/grade.py` | 0 | 1 |
-| P2-P4 | `artifacts/dcm_v6_workstream_ab/dcm/model/gridiron_models.py` | 3 | 14 |
-| P2-P4 | `artifacts/dcm_v6_workstream_ab/dcm/model/line_surface.py` | 0 | 4 |
-| P2-P4 | `artifacts/dcm_v6_workstream_ab/dcm/model/market_derive.py` | 1 | 8 |
-| P2-P4 | `artifacts/dcm_v6_workstream_ab/dcm/model/parameters.py` | 0 | 8 |
-| P2-P4 | `artifacts/dcm_v6_workstream_ab/dcm/model/participation.py` | 1 | 5 |
-| P2-P4 | `artifacts/dcm_v6_workstream_ab/dcm/model/quarter_worlds.py` | 1 | 9 |
-| P2-P4 | `artifacts/dcm_v6_workstream_ab/dcm/model/ranking.py` | 0 | 3 |
-| P2-P4 | `artifacts/dcm_v6_workstream_ab/dcm/model/uncertainty.py` | 0 | 3 |
-| P2-P4 | `artifacts/dcm_v6_workstream_ab/dcm/model/worlds.py` | 0 | 16 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/platform/__init__.py` | 0 | 0 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/platform/prizepicks/__init__.py` | 0 | 0 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/platform/prizepicks/entry_contract.py` | 1 | 3 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/platform/prizepicks/leaderboard.py` | 0 | 0 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/platform/prizepicks/minimum_guarantee.py` | 0 | 0 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/platform/prizepicks/participation.py` | 1 | 2 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/platform/prizepicks/payouts.py` | 0 | 2 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/platform/prizepicks/reboot.py` | 1 | 4 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/platform/prizepicks/settlement.py` | 2 | 6 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/postgame.py` | 0 | 1 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/release.py` | 0 | 14 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/__init__.py` | 0 | 1 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/acquisition.py` | 0 | 5 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/adapters/__init__.py` | 0 | 0 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/adapters/base.py` | 1 | 7 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/adapters/basketball_reference.py` | 7 | 26 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/adapters/espn_status.py` | 1 | 6 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/adapters/html_tables.py` | 1 | 8 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/adapters/official_league.py` | 3 | 6 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/adapters/prizepicks.py` | 1 | 5 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/adapters/pro_football_reference.py` | 2 | 7 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/authority.py` | 1 | 5 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/batch.py` | 0 | 5 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/cache.py` | 1 | 7 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/cache_layers.py` | 1 | 12 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/claims.py` | 0 | 3 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/classify.py` | 0 | 7 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/classify_runtime.py` | 0 | 2 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/coverage.py` | 0 | 11 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/dependency_graph.py` | 0 | 4 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/emit.py` | 0 | 4 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/entity_graph.py` | 0 | 4 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/entity_packets.py` | 0 | 13 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/evidence_graph.py` | 0 | 16 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/freshness.py` | 1 | 12 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/gamelog.py` | 0 | 9 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/gridiron_gamelog.py` | 0 | 9 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/historical_gap.py` | 0 | 4 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/host_plan.py` | 0 | 1 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/indexes.py` | 2 | 19 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/lineup.py` | 0 | 3 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/material_facts.py` | 0 | 20 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/observation_execute.py` | 0 | 1 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/observation_execute_support.py` | 0 | 9 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/observation_typed.py` | 0 | 7 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/offer_metadata.py` | 0 | 1 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/os_graphs.py` | 0 | 8 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/player_offer_set.py` | 1 | 6 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/player_packet.py` | 0 | 13 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/population.py` | 0 | 5 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/provider.py` | 4 | 17 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/readiness.py` | 0 | 4 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/requests.py` | 0 | 6 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/research_store.py` | 1 | 26 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/role_epoch.py` | 1 | 27 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/scopes.py` | 0 | 6 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/source_catalog.py` | 0 | 6 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/source_health.py` | 1 | 18 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/staged.py` | 0 | 5 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/statepack.py` | 4 | 26 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/subject_offer_set.py` | 1 | 10 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/temporal.py` | 1 | 4 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/universal_packets.py` | 0 | 7 |
-| P1 | `artifacts/dcm_v6_workstream_ab/dcm/research/universal_plan.py` | 0 | 1 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/runner.py` | 0 | 11 |
-| P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/__init__.py` | 0 | 0 |
-| P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/archive_receipt.py` | 1 | 7 |
-| P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/benchmark.py` | 0 | 4 |
-| P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/capabilities.py` | 0 | 4 |
-| P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/checkpoint.py` | 0 | 3 |
-| P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/checkpoint_outbox.py` | 0 | 4 |
-| P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/checkpoint_reconciliation.py` | 0 | 2 |
-| P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/cutoff.py` | 1 | 4 |
-| P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/dag.py` | 2 | 16 |
-| P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/drive_catalog.py` | 1 | 10 |
-| P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/freeze.py` | 0 | 2 |
-| P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/github_archive.py` | 0 | 38 |
-| P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/governor.py` | 1 | 4 |
-| P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/har_run.py` | 0 | 3 |
-| P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/input_boundary.py` | 0 | 7 |
-| P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/mount_v541.py` | 0 | 10 |
-| P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/perf.py` | 1 | 2 |
-| P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/pipeline.py` | 0 | 2 |
-| P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/readiness.py` | 0 | 1 |
-| P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/schema_root.py` | 0 | 5 |
-| P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/storage_router.py` | 3 | 12 |
-| P5-P14 | `artifacts/dcm_v6_workstream_ab/dcm/runtime/store.py` | 1 | 4 |
-| P4 | `artifacts/dcm_v6_workstream_ab/dcm/selection/__init__.py` | 0 | 0 |
-| P4 | `artifacts/dcm_v6_workstream_ab/dcm/selection/card_layers.py` | 0 | 17 |
-| P4 | `artifacts/dcm_v6_workstream_ab/dcm/selection/decision_integrity.py` | 1 | 6 |
-| P4 | `artifacts/dcm_v6_workstream_ab/dcm/selection/eligibility.py` | 1 | 3 |
-| P4 | `artifacts/dcm_v6_workstream_ab/dcm/selection/portfolio.py` | 0 | 5 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/settle.py` | 0 | 1 |
-| P15 | `artifacts/dcm_v6_workstream_ab/dcm/signals/__init__.py` | 0 | 0 |
-| P15 | `artifacts/dcm_v6_workstream_ab/dcm/signals/cfb_runtime.py` | 0 | 3 |
-| P15 | `artifacts/dcm_v6_workstream_ab/dcm/signals/compiler.py` | 2 | 5 |
-| P15 | `artifacts/dcm_v6_workstream_ab/dcm/signals/contracts.py` | 5 | 8 |
-| P15 | `artifacts/dcm_v6_workstream_ab/dcm/signals/donor_accounting.py` | 1 | 2 |
-| P15 | `artifacts/dcm_v6_workstream_ab/dcm/signals/executor.py` | 2 | 4 |
-| P15 | `artifacts/dcm_v6_workstream_ab/dcm/signals/integration_gate.py` | 2 | 5 |
-| P15 | `artifacts/dcm_v6_workstream_ab/dcm/signals/overlap.py` | 0 | 2 |
-| P15 | `artifacts/dcm_v6_workstream_ab/dcm/signals/registry.py` | 3 | 8 |
-| P3 | `artifacts/dcm_v6_workstream_ab/dcm/sports/__init__.py` | 0 | 0 |
-| P3 | `artifacts/dcm_v6_workstream_ab/dcm/sports/baseball/__init__.py` | 0 | 0 |
-| P3 | `artifacts/dcm_v6_workstream_ab/dcm/sports/baseball/pa.py` | 0 | 2 |
-| P3 | `artifacts/dcm_v6_workstream_ab/dcm/sports/basketball/__init__.py` | 0 | 0 |
-| P3 | `artifacts/dcm_v6_workstream_ab/dcm/sports/basketball/minimal.py` | 0 | 5 |
-| P3 | `artifacts/dcm_v6_workstream_ab/dcm/sports/common/__init__.py` | 0 | 0 |
-| P3 | `artifacts/dcm_v6_workstream_ab/dcm/sports/common/contract.py` | 2 | 11 |
-| P3 | `artifacts/dcm_v6_workstream_ab/dcm/sports/common/plugin.py` | 1 | 4 |
-| P3 | `artifacts/dcm_v6_workstream_ab/dcm/sports/common/research_schema.py` | 1 | 7 |
-| P3 | `artifacts/dcm_v6_workstream_ab/dcm/sports/football/__init__.py` | 0 | 0 |
-| P3 | `artifacts/dcm_v6_workstream_ab/dcm/sports/football/appearance.py` | 1 | 2 |
-| P3 | `artifacts/dcm_v6_workstream_ab/dcm/sports/football/cfb_role.py` | 0 | 3 |
-| P3 | `artifacts/dcm_v6_workstream_ab/dcm/sports/football/conservation.py` | 0 | 6 |
-| P3 | `artifacts/dcm_v6_workstream_ab/dcm/sports/football/efficiency.py` | 0 | 2 |
-| P3 | `artifacts/dcm_v6_workstream_ab/dcm/sports/football/ledger.py` | 3 | 5 |
-| P3 | `artifacts/dcm_v6_workstream_ab/dcm/sports/football/opportunity.py` | 1 | 5 |
-| P3 | `artifacts/dcm_v6_workstream_ab/dcm/sports/football/projection.py` | 1 | 5 |
-| P3 | `artifacts/dcm_v6_workstream_ab/dcm/sports/football/registry.py` | 0 | 5 |
-| P3 | `artifacts/dcm_v6_workstream_ab/dcm/sports/football/research_requirements.py` | 0 | 3 |
-| P3 | `artifacts/dcm_v6_workstream_ab/dcm/sports/football/settlement_map.py` | 0 | 3 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/validation/__init__.py` | 0 | 0 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/validation/conservation_harness.py` | 1 | 2 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/dcm/version.py` | 1 | 6 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/pillars_dcm/__init__.py` | 0 | 0 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/pillars_dcm/__main__.py` | 0 | 0 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/pillars_dcm/release.py` | 0 | 0 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/pillars_dcm/runner.py` | 0 | 0 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/conftest.py` | 0 | 0 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/fixtures.py` | 0 | 8 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/live_sanitized/__init__.py` | 0 | 0 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/live_sanitized/test_live_prizepicks_har.py` | 0 | 4 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_bundle_e2e_resume.py` | 0 | 2 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_bundle_provider.py` | 0 | 2 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_cfb_freeze_gate.py` | 0 | 26 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_cfb_guarded_launch.py` | 0 | 6 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_cfb_reference_implementation.py` | 0 | 20 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_cfb_research_os.py` | 0 | 11 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_cfb_semantic_completion.py` | 0 | 20 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_cfb_source_aware_import.py` | 0 | 9 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_completion_context_runtime.py` | 0 | 9 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_e2e_runner.py` | 0 | 18 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_e2e_world_to_lineup.py` | 0 | 21 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_entity_packets.py` | 0 | 13 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_evidence_coverage.py` | 0 | 9 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_evidence_graph.py` | 0 | 2 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_explanation.py` | 0 | 6 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_fail_closed_regressions.py` | 0 | 8 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_feature_store.py` | 0 | 3 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_football_registry.py` | 0 | 16 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_freshness.py` | 0 | 8 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_gamelog_normalize.py` | 0 | 14 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_github_archive.py` | 0 | 24 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_gridiron_plugin.py` | 0 | 24 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_har_ingest.py` | 0 | 9 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_historical_gap.py` | 0 | 3 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_host_native.py` | 0 | 6 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_joint_event_world.py` | 0 | 10 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_line_surface.py` | 0 | 3 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_lineage_and_schema.py` | 0 | 5 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_market_derive.py` | 0 | 7 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_multi_har.py` | 0 | 10 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_offer_metadata.py` | 0 | 3 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_official_predicates.py` | 0 | 6 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_p1_authority_role.py` | 0 | 3 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_p4_freeze_contract.py` | 0 | 8 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_p6_learning.py` | 0 | 10 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_p8_status_cache_availability.py` | 0 | 7 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_parameter_snapshot_scopes.py` | 0 | 2 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_phase_bc_v2.py` | 0 | 2 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_player_offer_set.py` | 0 | 4 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_player_packet.py` | 0 | 7 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_plugin_contract.py` | 0 | 5 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_postgame_integrity.py` | 0 | 4 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_production_hardening.py` | 0 | 16 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_quarter_worlds.py` | 0 | 6 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_release_freshness.py` | 0 | 5 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_research_efficiency.py` | 0 | 4 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_research_population.py` | 0 | 3 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_research_store.py` | 0 | 10 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_role_epoch.py` | 0 | 9 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_runtime_lineage.py` | 0 | 6 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_schema_v2_fields.py` | 0 | 4 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_settlement_population.py` | 0 | 6 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_signal_governance.py` | 0 | 21 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_source_catalog.py` | 0 | 4 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_sport_plugin_full_contract.py` | 0 | 3 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_sport_research_schema.py` | 0 | 3 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_statepack.py` | 0 | 5 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_status_start_gates.py` | 0 | 9 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_subject_offer_set_universal.py` | 0 | 5 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_three_layer_card.py` | 0 | 9 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_universal_scopes.py` | 0 | 6 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_v541_mount.py` | 0 | 1 |
-| UNMAPPED | `artifacts/dcm_v6_workstream_ab/tests/test_version_cutoff.py` | 0 | 7 |
+| UNMAPPED | `src/dcm/__init__.py` | 0 | 0 |
+| UNMAPPED | `src/dcm/__main__.py` | 0 | 0 |
+| P16 | `src/dcm/algorithms/__init__.py` | 0 | 0 |
+| P16 | `src/dcm/algorithms/cache.py` | 2 | 7 |
+| P16 | `src/dcm/algorithms/catalog.py` | 0 | 3 |
+| P16 | `src/dcm/algorithms/constitution.py` | 0 | 6 |
+| P16 | `src/dcm/algorithms/contracts.py` | 4 | 7 |
+| P16 | `src/dcm/algorithms/control_plane.py` | 5 | 11 |
+| P16 | `src/dcm/algorithms/execution_plan.py` | 0 | 3 |
+| P16 | `src/dcm/algorithms/graph.py` | 0 | 6 |
+| P16 | `src/dcm/algorithms/grouping.py` | 1 | 17 |
+| P16 | `src/dcm/algorithms/indexing.py` | 8 | 37 |
+| P16 | `src/dcm/algorithms/ml_families.py` | 0 | 13 |
+| P16 | `src/dcm/algorithms/registry.py` | 0 | 15 |
+| P16 | `src/dcm/algorithms/scheduling.py` | 1 | 12 |
+| P16 | `src/dcm/algorithms/searching.py` | 4 | 43 |
+| P16 | `src/dcm/algorithms/selection.py` | 1 | 3 |
+| P16 | `src/dcm/algorithms/sorting.py` | 1 | 17 |
+| P16 | `src/dcm/algorithms/telemetry.py` | 1 | 5 |
+| UNMAPPED | `src/dcm/archive.py` | 0 | 2 |
+| UNMAPPED | `src/dcm/cfb/__init__.py` | 0 | 1 |
+| UNMAPPED | `src/dcm/cfb/accounting.py` | 0 | 3 |
+| UNMAPPED | `src/dcm/cfb/champion.py` | 0 | 3 |
+| UNMAPPED | `src/dcm/cfb/coextract.py` | 0 | 3 |
+| UNMAPPED | `src/dcm/cfb/event_worlds.py` | 0 | 2 |
+| UNMAPPED | `src/dcm/cfb/frontier.py` | 0 | 4 |
+| UNMAPPED | `src/dcm/cfb/har_delta.py` | 0 | 3 |
+| UNMAPPED | `src/dcm/cfb/launch.py` | 0 | 9 |
+| UNMAPPED | `src/dcm/cfb/markets.py` | 0 | 9 |
+| UNMAPPED | `src/dcm/cfb/opportunity_ledger.py` | 0 | 6 |
+| UNMAPPED | `src/dcm/cfb/recompute.py` | 0 | 1 |
+| UNMAPPED | `src/dcm/cfb/refresh.py` | 0 | 2 |
+| UNMAPPED | `src/dcm/cfb/reports.py` | 0 | 11 |
+| UNMAPPED | `src/dcm/cfb/rules.py` | 0 | 1 |
+| P7 | `src/dcm/chat/__init__.py` | 0 | 0 |
+| P7 | `src/dcm/chat/__main__.py` | 0 | 0 |
+| P7 | `src/dcm/chat/archive.py` | 0 | 2 |
+| P7 | `src/dcm/chat/cli.py` | 0 | 4 |
+| P7 | `src/dcm/chat/contracts.py` | 0 | 0 |
+| P7 | `src/dcm/chat/evidence_import.py` | 0 | 4 |
+| P7 | `src/dcm/chat/report.py` | 0 | 1 |
+| P7 | `src/dcm/chat/research_bridge.py` | 0 | 1 |
+| P7 | `src/dcm/chat/session.py` | 1 | 18 |
+| P7 | `src/dcm/chat/state.py` | 0 | 4 |
+| P0 | `src/dcm/contracts/__init__.py` | 0 | 0 |
+| P0 | `src/dcm/contracts/codes.py` | 1 | 0 |
+| P0 | `src/dcm/contracts/failure_codes.py` | 0 | 0 |
+| P0 | `src/dcm/contracts/hashes.py` | 1 | 6 |
+| P0 | `src/dcm/contracts/immutables.py` | 1 | 8 |
+| P0 | `src/dcm/contracts/phase_bc.py` | 0 | 0 |
+| P0 | `src/dcm/contracts/schemas.py` | 25 | 16 |
+| P0 | `src/dcm/contracts/universal_entities.py` | 4 | 5 |
+| UNMAPPED | `src/dcm/dataset.py` | 0 | 0 |
+| P0 | `src/dcm/identity/__init__.py` | 0 | 0 |
+| P0 | `src/dcm/identity/resolve.py` | 0 | 5 |
+| P0 | `src/dcm/ingest/__init__.py` | 0 | 0 |
+| P0 | `src/dcm/ingest/board.py` | 0 | 6 |
+| P0 | `src/dcm/ingest/composite.py` | 0 | 6 |
+| P0 | `src/dcm/ingest/har.py` | 0 | 13 |
+| P0 | `src/dcm/ingest/markets.py` | 0 | 4 |
+| P0 | `src/dcm/ingest/outlier.py` | 0 | 3 |
+| P0 | `src/dcm/ingest/prizepicks.py` | 0 | 13 |
+| P0 | `src/dcm/ingest/sanitize.py` | 0 | 5 |
+| P0 | `src/dcm/ingest/wsab_bind.py` | 0 | 2 |
+| P6 | `src/dcm/learning/__init__.py` | 0 | 0 |
+| P6 | `src/dcm/learning/calibration.py` | 0 | 6 |
+| P6 | `src/dcm/learning/dataset.py` | 1 | 13 |
+| P6 | `src/dcm/learning/failure_class.py` | 0 | 3 |
+| P6 | `src/dcm/learning/postgame.py` | 0 | 13 |
+| P6 | `src/dcm/learning/registry.py` | 0 | 10 |
+| P6 | `src/dcm/learning/sidecar.py` | 0 | 5 |
+| P6 | `src/dcm/learning/walkforward.py` | 1 | 15 |
+| P2 | `src/dcm/ml/__init__.py` | 0 | 0 |
+| P2 | `src/dcm/ml/feature_store.py` | 1 | 9 |
+| P2-P4 | `src/dcm/model/__init__.py` | 0 | 1 |
+| P2-P4 | `src/dcm/model/availability.py` | 0 | 2 |
+| P2-P4 | `src/dcm/model/basketball_efficiency.py` | 1 | 6 |
+| P2-P4 | `src/dcm/model/basketball_opportunity.py` | 1 | 8 |
+| P2-P4 | `src/dcm/model/distributions.py` | 0 | 1 |
+| P2-P4 | `src/dcm/model/event_world_joint.py` | 0 | 8 |
+| P2-P4 | `src/dcm/model/explanation.py` | 0 | 14 |
+| P2-P4 | `src/dcm/model/grade.py` | 0 | 1 |
+| P2-P4 | `src/dcm/model/gridiron_models.py` | 3 | 14 |
+| P2-P4 | `src/dcm/model/line_surface.py` | 0 | 4 |
+| P2-P4 | `src/dcm/model/market_derive.py` | 1 | 8 |
+| P2-P4 | `src/dcm/model/parameters.py` | 0 | 8 |
+| P2-P4 | `src/dcm/model/participation.py` | 1 | 5 |
+| P2-P4 | `src/dcm/model/quarter_worlds.py` | 1 | 9 |
+| P2-P4 | `src/dcm/model/ranking.py` | 0 | 3 |
+| P2-P4 | `src/dcm/model/uncertainty.py` | 0 | 3 |
+| P2-P4 | `src/dcm/model/worlds.py` | 0 | 16 |
+| UNMAPPED | `src/dcm/paths.py` | 0 | 5 |
+| UNMAPPED | `src/dcm/platform/__init__.py` | 0 | 0 |
+| UNMAPPED | `src/dcm/platform/prizepicks/__init__.py` | 0 | 0 |
+| UNMAPPED | `src/dcm/platform/prizepicks/entry_contract.py` | 1 | 3 |
+| UNMAPPED | `src/dcm/platform/prizepicks/leaderboard.py` | 0 | 0 |
+| UNMAPPED | `src/dcm/platform/prizepicks/minimum_guarantee.py` | 0 | 0 |
+| UNMAPPED | `src/dcm/platform/prizepicks/participation.py` | 1 | 2 |
+| UNMAPPED | `src/dcm/platform/prizepicks/payouts.py` | 0 | 2 |
+| UNMAPPED | `src/dcm/platform/prizepicks/reboot.py` | 1 | 4 |
+| UNMAPPED | `src/dcm/platform/prizepicks/settlement.py` | 2 | 6 |
+| UNMAPPED | `src/dcm/postgame.py` | 0 | 1 |
+| UNMAPPED | `src/dcm/release.py` | 0 | 14 |
+| P1 | `src/dcm/research/__init__.py` | 0 | 1 |
+| P1 | `src/dcm/research/acquisition.py` | 0 | 5 |
+| P1 | `src/dcm/research/adapters/__init__.py` | 0 | 0 |
+| P1 | `src/dcm/research/adapters/base.py` | 1 | 7 |
+| P1 | `src/dcm/research/adapters/basketball_reference.py` | 7 | 26 |
+| P1 | `src/dcm/research/adapters/espn_status.py` | 1 | 6 |
+| P1 | `src/dcm/research/adapters/html_tables.py` | 1 | 8 |
+| P1 | `src/dcm/research/adapters/official_league.py` | 3 | 6 |
+| P1 | `src/dcm/research/adapters/prizepicks.py` | 1 | 5 |
+| P1 | `src/dcm/research/adapters/pro_football_reference.py` | 2 | 7 |
+| P1 | `src/dcm/research/authority.py` | 1 | 5 |
+| P1 | `src/dcm/research/batch.py` | 0 | 5 |
+| P1 | `src/dcm/research/cache.py` | 1 | 7 |
+| P1 | `src/dcm/research/cache_layers.py` | 1 | 12 |
+| P1 | `src/dcm/research/claims.py` | 0 | 3 |
+| P1 | `src/dcm/research/classify.py` | 0 | 7 |
+| P1 | `src/dcm/research/classify_runtime.py` | 0 | 2 |
+| P1 | `src/dcm/research/coverage.py` | 0 | 11 |
+| P1 | `src/dcm/research/dependency_graph.py` | 0 | 4 |
+| P1 | `src/dcm/research/emit.py` | 0 | 4 |
+| P1 | `src/dcm/research/entity_graph.py` | 0 | 4 |
+| P1 | `src/dcm/research/entity_packets.py` | 0 | 13 |
+| P1 | `src/dcm/research/evidence_graph.py` | 0 | 16 |
+| P1 | `src/dcm/research/freshness.py` | 1 | 12 |
+| P1 | `src/dcm/research/gamelog.py` | 0 | 9 |
+| P1 | `src/dcm/research/gridiron_gamelog.py` | 0 | 9 |
+| P1 | `src/dcm/research/historical_gap.py` | 0 | 4 |
+| P1 | `src/dcm/research/host_plan.py` | 0 | 1 |
+| P1 | `src/dcm/research/indexes.py` | 2 | 19 |
+| P1 | `src/dcm/research/lineup.py` | 0 | 3 |
+| P1 | `src/dcm/research/material_facts.py` | 0 | 20 |
+| P1 | `src/dcm/research/observation_execute.py` | 0 | 1 |
+| P1 | `src/dcm/research/observation_execute_support.py` | 0 | 9 |
+| P1 | `src/dcm/research/observation_typed.py` | 0 | 7 |
+| P1 | `src/dcm/research/offer_metadata.py` | 0 | 1 |
+| P1 | `src/dcm/research/os_graphs.py` | 0 | 8 |
+| P1 | `src/dcm/research/player_offer_set.py` | 1 | 6 |
+| P1 | `src/dcm/research/player_packet.py` | 0 | 13 |
+| P1 | `src/dcm/research/population.py` | 0 | 5 |
+| P1 | `src/dcm/research/provider.py` | 4 | 17 |
+| P1 | `src/dcm/research/readiness.py` | 0 | 4 |
+| P1 | `src/dcm/research/requests.py` | 0 | 6 |
+| P1 | `src/dcm/research/research_store.py` | 1 | 26 |
+| P1 | `src/dcm/research/role_epoch.py` | 1 | 27 |
+| P1 | `src/dcm/research/scopes.py` | 0 | 6 |
+| P1 | `src/dcm/research/source_catalog.py` | 0 | 6 |
+| P1 | `src/dcm/research/source_health.py` | 1 | 18 |
+| P1 | `src/dcm/research/staged.py` | 0 | 5 |
+| P1 | `src/dcm/research/statepack.py` | 4 | 26 |
+| P1 | `src/dcm/research/subject_offer_set.py` | 1 | 10 |
+| P1 | `src/dcm/research/temporal.py` | 1 | 4 |
+| P1 | `src/dcm/research/universal_packets.py` | 0 | 7 |
+| P1 | `src/dcm/research/universal_plan.py` | 0 | 1 |
+| UNMAPPED | `src/dcm/runner.py` | 0 | 11 |
+| P5-P14 | `src/dcm/runtime/__init__.py` | 0 | 0 |
+| P5-P14 | `src/dcm/runtime/archive_receipt.py` | 1 | 7 |
+| P5-P14 | `src/dcm/runtime/benchmark.py` | 0 | 4 |
+| P5-P14 | `src/dcm/runtime/capabilities.py` | 0 | 4 |
+| P5-P14 | `src/dcm/runtime/checkpoint.py` | 0 | 3 |
+| P5-P14 | `src/dcm/runtime/checkpoint_outbox.py` | 0 | 4 |
+| P5-P14 | `src/dcm/runtime/checkpoint_reconciliation.py` | 0 | 2 |
+| P5-P14 | `src/dcm/runtime/cutoff.py` | 1 | 4 |
+| P5-P14 | `src/dcm/runtime/dag.py` | 2 | 16 |
+| P5-P14 | `src/dcm/runtime/drive_catalog.py` | 1 | 10 |
+| P5-P14 | `src/dcm/runtime/freeze.py` | 0 | 2 |
+| P5-P14 | `src/dcm/runtime/github_archive.py` | 0 | 38 |
+| P5-P14 | `src/dcm/runtime/governor.py` | 1 | 4 |
+| P5-P14 | `src/dcm/runtime/har_run.py` | 0 | 3 |
+| P5-P14 | `src/dcm/runtime/input_boundary.py` | 0 | 7 |
+| P5-P14 | `src/dcm/runtime/mount_v541.py` | 0 | 10 |
+| P5-P14 | `src/dcm/runtime/perf.py` | 1 | 2 |
+| P5-P14 | `src/dcm/runtime/pipeline.py` | 0 | 2 |
+| P5-P14 | `src/dcm/runtime/readiness.py` | 0 | 1 |
+| P5-P14 | `src/dcm/runtime/schema_root.py` | 0 | 5 |
+| P5-P14 | `src/dcm/runtime/storage_router.py` | 3 | 12 |
+| P5-P14 | `src/dcm/runtime/store.py` | 1 | 4 |
+| P4 | `src/dcm/selection/__init__.py` | 0 | 0 |
+| P4 | `src/dcm/selection/card_layers.py` | 0 | 17 |
+| P4 | `src/dcm/selection/decision_integrity.py` | 1 | 6 |
+| P4 | `src/dcm/selection/eligibility.py` | 1 | 3 |
+| P4 | `src/dcm/selection/portfolio.py` | 0 | 5 |
+| UNMAPPED | `src/dcm/settle.py` | 0 | 1 |
+| P15 | `src/dcm/signals/__init__.py` | 0 | 0 |
+| P15 | `src/dcm/signals/cfb_runtime.py` | 0 | 3 |
+| P15 | `src/dcm/signals/compiler.py` | 2 | 5 |
+| P15 | `src/dcm/signals/contracts.py` | 5 | 8 |
+| P15 | `src/dcm/signals/donor_accounting.py` | 1 | 2 |
+| P15 | `src/dcm/signals/executor.py` | 2 | 4 |
+| P15 | `src/dcm/signals/integration_gate.py` | 2 | 5 |
+| P15 | `src/dcm/signals/overlap.py` | 0 | 2 |
+| P15 | `src/dcm/signals/registry.py` | 3 | 8 |
+| P3 | `src/dcm/sports/__init__.py` | 0 | 0 |
+| P3 | `src/dcm/sports/baseball/__init__.py` | 0 | 0 |
+| P3 | `src/dcm/sports/baseball/pa.py` | 0 | 2 |
+| P3 | `src/dcm/sports/basketball/__init__.py` | 0 | 0 |
+| P3 | `src/dcm/sports/basketball/minimal.py` | 0 | 5 |
+| P3 | `src/dcm/sports/common/__init__.py` | 0 | 0 |
+| P3 | `src/dcm/sports/common/contract.py` | 2 | 11 |
+| P3 | `src/dcm/sports/common/plugin.py` | 1 | 4 |
+| P3 | `src/dcm/sports/common/research_schema.py` | 1 | 7 |
+| P3 | `src/dcm/sports/football/__init__.py` | 0 | 0 |
+| P3 | `src/dcm/sports/football/appearance.py` | 1 | 2 |
+| P3 | `src/dcm/sports/football/cfb_role.py` | 0 | 3 |
+| P3 | `src/dcm/sports/football/conservation.py` | 0 | 6 |
+| P3 | `src/dcm/sports/football/efficiency.py` | 0 | 2 |
+| P3 | `src/dcm/sports/football/ledger.py` | 3 | 5 |
+| P3 | `src/dcm/sports/football/opportunity.py` | 1 | 5 |
+| P3 | `src/dcm/sports/football/projection.py` | 1 | 5 |
+| P3 | `src/dcm/sports/football/registry.py` | 0 | 5 |
+| P3 | `src/dcm/sports/football/research_requirements.py` | 0 | 3 |
+| P3 | `src/dcm/sports/football/settlement_map.py` | 0 | 3 |
+| UNMAPPED | `src/dcm/validation/__init__.py` | 0 | 0 |
+| UNMAPPED | `src/dcm/validation/conservation_harness.py` | 1 | 2 |
+| UNMAPPED | `src/dcm/version.py` | 1 | 6 |
+| UNMAPPED | `src/pillars_dcm/__init__.py` | 0 | 0 |
+| UNMAPPED | `src/pillars_dcm/__main__.py` | 0 | 0 |
+| UNMAPPED | `src/pillars_dcm/release.py` | 0 | 0 |
+| UNMAPPED | `src/pillars_dcm/runner.py` | 0 | 0 |
 
 ## Symbols
 
-### `artifacts/dcm_v6_workstream_ab/dcm/__init__.py`
+### `src/dcm/__init__.py`
 
 _No class/function symbols._
 
-### `artifacts/dcm_v6_workstream_ab/dcm/__main__.py`
+### `src/dcm/__main__.py`
 
 _No class/function symbols._
 
-### `artifacts/dcm_v6_workstream_ab/dcm/algorithms/__init__.py`
+### `src/dcm/algorithms/__init__.py`
 
 _No class/function symbols._
 
-### `artifacts/dcm_v6_workstream_ab/dcm/algorithms/cache.py`
+### `src/dcm/algorithms/cache.py`
 
 - `class` **LRUCache** L8
 - `method` **LRUCache.__init__** L9
@@ -323,13 +257,13 @@ _No class/function symbols._
 - `method` **LFUCache.get** L39
 - `method` **LFUCache.put** L45
 
-### `artifacts/dcm_v6_workstream_ab/dcm/algorithms/catalog.py`
+### `src/dcm/algorithms/catalog.py`
 
 - `function` **_a** L10
 - `function` **_ml** L719
 - `function` **registry_document** L840
 
-### `artifacts/dcm_v6_workstream_ab/dcm/algorithms/constitution.py`
+### `src/dcm/algorithms/constitution.py`
 
 - `function` **_candidates** L13
 - `function` **constitution_path** L37
@@ -338,7 +272,7 @@ _No class/function symbols._
 - `function` **prompt_declared_constitution_sha256** L53 — Lineage hash declared by the v3 master prompt. Not a substitute for file bytes.
 - `function` **constitution_identity** L58
 
-### `artifacts/dcm_v6_workstream_ab/dcm/algorithms/contracts.py`
+### `src/dcm/algorithms/contracts.py`
 
 - `class` **AlgorithmNotProductionActive** L33 — Raised when a permanent challenger is invoked as a production algorithm.
 - `function` **_tuple_of** L37
@@ -352,7 +286,7 @@ _No class/function symbols._
 - `class` **HarAlgorithmExecutionPlan** L193
 - `method` **HarAlgorithmExecutionPlan.to_dict** L207
 
-### `artifacts/dcm_v6_workstream_ab/dcm/algorithms/control_plane.py`
+### `src/dcm/algorithms/control_plane.py`
 
 - `class` **AlgorithmApplicabilityEvaluator** L29
 - `method` **AlgorithmApplicabilityEvaluator.__init__** L30
@@ -371,13 +305,13 @@ _No class/function symbols._
 - `class` **AlgorithmExecutionTelemetry** L114 — Named telemetry type required by the constitution control plane.
 - `function` **unused_algorithm_audit** L118
 
-### `artifacts/dcm_v6_workstream_ab/dcm/algorithms/execution_plan.py`
+### `src/dcm/algorithms/execution_plan.py`
 
 - `function` **build_har_algorithm_execution_plan** L36
 - `function` **constitution_run_hashes** L105 — Sidecar hashes for hashes.json. Not forecast-semantic fields.
 - `function` **persist_har_algorithm_execution_plan** L125
 
-### `artifacts/dcm_v6_workstream_ab/dcm/algorithms/graph.py`
+### `src/dcm/algorithms/graph.py`
 
 - `function` **build_csr** L12
 - `function` **cycles** L16
@@ -386,7 +320,7 @@ _No class/function symbols._
 - `function` **shortest_undirected** L30
 - `function` **hypergraph_from_bundles** L34
 
-### `artifacts/dcm_v6_workstream_ab/dcm/algorithms/grouping.py`
+### `src/dcm/algorithms/grouping.py`
 
 - `function` **composite_group** L11
 - `class` **UnionFind** L18
@@ -407,7 +341,7 @@ _No class/function symbols._
 - `function` **dbscan_fallback** L185
 - `function` **gaussian_mixture_1d** L189 — Tiny 1-D GMM for soft archetype membership (stdlib).
 
-### `artifacts/dcm_v6_workstream_ab/dcm/algorithms/indexing.py`
+### `src/dcm/algorithms/indexing.py`
 
 - `function` **hash_table** L13
 - `function` **content_address** L20
@@ -455,7 +389,7 @@ _No class/function symbols._
 - `method` **MinHashLSHIndex.query** L259
 - `function` **git_blob_identity** L263
 
-### `artifacts/dcm_v6_workstream_ab/dcm/algorithms/ml_families.py`
+### `src/dcm/algorithms/ml_families.py`
 
 - `function` **ewma** L15
 - `function` **cusum** L25 — Return indexes where a mean shift is detected.
@@ -471,7 +405,7 @@ _No class/function symbols._
 - `function` **_solve** L188
 - `function` **not_active_challenger** L206
 
-### `artifacts/dcm_v6_workstream_ab/dcm/algorithms/registry.py`
+### `src/dcm/algorithms/registry.py`
 
 - `function` **_candidates** L20
 - `function` **registry_path** L43
@@ -489,7 +423,7 @@ _No class/function symbols._
 - `function` **catalog_source_records** L137
 - `function` **resolve_implementation** L141
 
-### `artifacts/dcm_v6_workstream_ab/dcm/algorithms/scheduling.py`
+### `src/dcm/algorithms/scheduling.py`
 
 - `function` **requirement_weight** L11
 - `method` **requirement_weight.clip** L35
@@ -505,7 +439,7 @@ _No class/function symbols._
 - `function` **cover_actions** L179
 - `function` **lazy_submodular_select** L184
 
-### `artifacts/dcm_v6_workstream_ab/dcm/algorithms/searching.py`
+### `src/dcm/algorithms/searching.py`
 
 - `function` **exact_hash_lookup** L11
 - `function` **composite_key** L15
@@ -555,14 +489,14 @@ _No class/function symbols._
 - `method` **brute_force_cosine._norm** L512
 - `function` **not_active_challenger** L525
 
-### `artifacts/dcm_v6_workstream_ab/dcm/algorithms/selection.py`
+### `src/dcm/algorithms/selection.py`
 
 - `class` **AlgorithmSelectionEngine** L50
 - `method` **AlgorithmSelectionEngine.__post_init__** L53
 - `method` **AlgorithmSelectionEngine.record** L58
 - `method` **AlgorithmSelectionEngine.select** L64
 
-### `artifacts/dcm_v6_workstream_ab/dcm/algorithms/sorting.py`
+### `src/dcm/algorithms/sorting.py`
 
 - `function` **timsort** L10
 - `function` **heap_topk** L14
@@ -583,7 +517,7 @@ _No class/function symbols._
 - `method` **_Reverse.__eq__** L173
 - `function` **topological_kahn** L177
 
-### `artifacts/dcm_v6_workstream_ab/dcm/algorithms/telemetry.py`
+### `src/dcm/algorithms/telemetry.py`
 
 - `class` **AlgorithmTelemetry** L20 — Records constitution algorithm executions on the live HAR path.
 - `method` **AlgorithmTelemetry.__init__** L23
@@ -592,52 +526,52 @@ _No class/function symbols._
 - `method` **AlgorithmTelemetry.snapshot** L113
 - `function` **ceremonial_violations** L139 — NO_CEREMONIAL_ALGORITHM_EXECUTION.
 
-### `artifacts/dcm_v6_workstream_ab/dcm/archive.py`
+### `src/dcm/archive.py`
 
 - `function` **_find_repo_root** L23
 - `function` **main** L33
 
-### `artifacts/dcm_v6_workstream_ab/dcm/cfb/__init__.py`
+### `src/dcm/cfb/__init__.py`
 
 - `function` **__getattr__** L19
 
-### `artifacts/dcm_v6_workstream_ab/dcm/cfb/accounting.py`
+### `src/dcm/cfb/accounting.py`
 
 - `function` **_is_cfb** L13
 - `function` **_market** L17
 - `function` **account_cfb_board** L21 — Account every CFB offer, then classify Goblins / support / modelability gates.
 
-### `artifacts/dcm_v6_workstream_ab/dcm/cfb/champion.py`
+### `src/dcm/cfb/champion.py`
 
 - `function` **_metrics_ok** L52 — Prefer lower log-loss / Brier / ECE; require portable CPU.
 - `function` **select_champion** L59
 - `function` **select_cfb_champions** L118
 
-### `artifacts/dcm_v6_workstream_ab/dcm/cfb/coextract.py`
+### `src/dcm/cfb/coextract.py`
 
 - `function` **_board_ids** L26
 - `function` **harvest_structured_page** L49 — Extract every relevant board entity visible in one structured page.
 - `function` **fanout_acceptance** L135 — executed AcquisitionActions << independent unresolved prop requirements.
 
-### `artifacts/dcm_v6_workstream_ab/dcm/cfb/event_worlds.py`
+### `src/dcm/cfb/event_worlds.py`
 
 - `function` **cfb_teammate_groups** L17
 - `function` **simulate_joint_cfb_event_worlds** L37 — Shared team plays/pass-rate/rush-rate → residual-aware player opportunity.
 
-### `artifacts/dcm_v6_workstream_ab/dcm/cfb/frontier.py`
+### `src/dcm/cfb/frontier.py`
 
 - `function` **_unresolved_material** L20
 - `function` **estimate_frontier_impact** L28 — Offer-level materiality used when no AcquisitionAction graph is supplied.
 - `function` **estimate_action_evsi** L40 — Utility(action) = fanout × materiality × P(success) × authority / cost.
 - `function` **run_frontier_loop** L64
 
-### `artifacts/dcm_v6_workstream_ab/dcm/cfb/har_delta.py`
+### `src/dcm/cfb/har_delta.py`
 
 - `function` **_oid** L23
 - `function` **_identity** L27
 - `function` **classify_board_delta** L36
 
-### `artifacts/dcm_v6_workstream_ab/dcm/cfb/launch.py`
+### `src/dcm/cfb/launch.py`
 
 - `function` **_write** L40
 - `function` **_board_fingerprint** L46
@@ -649,7 +583,7 @@ _No class/function symbols._
 - `function` **emit_cfb_forecast_artifacts** L399
 - `function` **persist_algorithm_telemetry** L592
 
-### `artifacts/dcm_v6_workstream_ab/dcm/cfb/markets.py`
+### `src/dcm/cfb/markets.py`
 
 - `function` **canonicalize_cfb_market** L342
 - `function` **classify_raw_market_label** L354
@@ -661,7 +595,7 @@ _No class/function symbols._
 - `function` **_prove_event_world_primitive** L456
 - `function` **cfb_market_execution_matrix** L472 — Machine-readable completeness of every ACTIVE CFB market's execution path.
 
-### `artifacts/dcm_v6_workstream_ab/dcm/cfb/opportunity_ledger.py`
+### `src/dcm/cfb/opportunity_ledger.py`
 
 - `function` **_role** L24
 - `function` **_mean** L28
@@ -670,16 +604,16 @@ _No class/function symbols._
 - `function` **allocate_counts** L144 — Absolute means, capped, never renormalized to 100% of the team pool.
 - `function` **allocate_team_opportunity** L175 — Return per-player counts plus residual buckets.
 
-### `artifacts/dcm_v6_workstream_ab/dcm/cfb/recompute.py`
+### `src/dcm/cfb/recompute.py`
 
 - `function` **recompute_full_bundle** L19
 
-### `artifacts/dcm_v6_workstream_ab/dcm/cfb/refresh.py`
+### `src/dcm/cfb/refresh.py`
 
 - `function` **_fact_field_value** L44
 - `function` **apply_final_refresh** L57 — Classify line-only vs material. Never independently resimulate worlds.
 
-### `artifacts/dcm_v6_workstream_ab/dcm/cfb/reports.py`
+### `src/dcm/cfb/reports.py`
 
 - `function` **_row** L13
 - `function` **_is_cfb** L17
@@ -693,50 +627,50 @@ _No class/function symbols._
 - `function` **cfb_playables_final** L175
 - `function` **frontier_offer_ids** L211
 
-### `artifacts/dcm_v6_workstream_ab/dcm/cfb/rules.py`
+### `src/dcm/cfb/rules.py`
 
 - `function` **build_cfb_rules_snapshot** L127
 
-### `artifacts/dcm_v6_workstream_ab/dcm/chat/__init__.py`
+### `src/dcm/chat/__init__.py`
 
 _No class/function symbols._
 
-### `artifacts/dcm_v6_workstream_ab/dcm/chat/__main__.py`
+### `src/dcm/chat/__main__.py`
 
 _No class/function symbols._
 
-### `artifacts/dcm_v6_workstream_ab/dcm/chat/archive.py`
+### `src/dcm/chat/archive.py`
 
 - `function` **audit_run** L17
 - `function` **archive_run** L21
 
-### `artifacts/dcm_v6_workstream_ab/dcm/chat/cli.py`
+### `src/dcm/chat/cli.py`
 
 - `function` **_print** L15
 - `function` **_add_run** L19
 - `function` **build_parser** L23
 - `function` **main** L104
 
-### `artifacts/dcm_v6_workstream_ab/dcm/chat/contracts.py`
+### `src/dcm/chat/contracts.py`
 
 _No class/function symbols._
 
-### `artifacts/dcm_v6_workstream_ab/dcm/chat/evidence_import.py`
+### `src/dcm/chat/evidence_import.py`
 
 - `function` **_load_observations** L33
 - `function` **_match_request** L63
 - `function` **observation_to_claim** L76 — Legacy entry: validate + convert one observation (rejects empty fields).
 - `function` **import_observations** L86
 
-### `artifacts/dcm_v6_workstream_ab/dcm/chat/report.py`
+### `src/dcm/chat/report.py`
 
 - `function` **build_report** L13
 
-### `artifacts/dcm_v6_workstream_ab/dcm/chat/research_bridge.py`
+### `src/dcm/chat/research_bridge.py`
 
 - `function` **next_research_batch** L15
 
-### `artifacts/dcm_v6_workstream_ab/dcm/chat/session.py`
+### `src/dcm/chat/session.py`
 
 - `function` **_git_commit** L29
 - `function` **doctor** L43
@@ -758,26 +692,26 @@ _No class/function symbols._
 - `method` **HostSession.settle** L311
 - `function` **cfb_launch** L318 — Guarded CFB vertical slice. Fixture/bundle can freeze; file research returns the host loop.
 
-### `artifacts/dcm_v6_workstream_ab/dcm/chat/state.py`
+### `src/dcm/chat/state.py`
 
 - `function` **utc_now** L13
 - `function` **read_json** L17
 - `function` **write_json** L23
 - `function` **default_host_state** L28
 
-### `artifacts/dcm_v6_workstream_ab/dcm/contracts/__init__.py`
+### `src/dcm/contracts/__init__.py`
 
 _No class/function symbols._
 
-### `artifacts/dcm_v6_workstream_ab/dcm/contracts/codes.py`
+### `src/dcm/contracts/codes.py`
 
 - `class` **FailureCode** L6
 
-### `artifacts/dcm_v6_workstream_ab/dcm/contracts/failure_codes.py`
+### `src/dcm/contracts/failure_codes.py`
 
 _No class/function symbols._
 
-### `artifacts/dcm_v6_workstream_ab/dcm/contracts/hashes.py`
+### `src/dcm/contracts/hashes.py`
 
 - `function` **_normalize** L26
 - `function` **canonical_json** L47
@@ -787,7 +721,7 @@ _No class/function symbols._
 - `method` **LineageError.__init__** L70
 - `function` **bind_source_hashes** L75
 
-### `artifacts/dcm_v6_workstream_ab/dcm/contracts/immutables.py`
+### `src/dcm/contracts/immutables.py`
 
 - `class` **FrozenMap** L9
 - `method` **FrozenMap.__init__** L12
@@ -799,11 +733,11 @@ _No class/function symbols._
 - `function` **deep_freeze** L34
 - `function` **_unfreeze** L46
 
-### `artifacts/dcm_v6_workstream_ab/dcm/contracts/phase_bc.py`
+### `src/dcm/contracts/phase_bc.py`
 
 _No class/function symbols._
 
-### `artifacts/dcm_v6_workstream_ab/dcm/contracts/schemas.py`
+### `src/dcm/contracts/schemas.py`
 
 - `function` **_utcnow** L23
 - `class` **StatSemanticType** L27
@@ -847,7 +781,7 @@ _No class/function symbols._
 - `class` **WorldLineupOutcome** L392
 - `method` **WorldLineupOutcome.__post_init__** L403
 
-### `artifacts/dcm_v6_workstream_ab/dcm/contracts/universal_entities.py`
+### `src/dcm/contracts/universal_entities.py`
 
 - `class` **EntityKind** L14
 - `class` **SubjectType** L27
@@ -859,27 +793,27 @@ _No class/function symbols._
 - `method` **SubjectRef.to_dict** L85
 - `function` **parse_subject_type** L96
 
-### `artifacts/dcm_v6_workstream_ab/dcm/dataset.py`
+### `src/dcm/dataset.py`
 
 _No class/function symbols._
 
-### `artifacts/dcm_v6_workstream_ab/dcm/identity/__init__.py`
+### `src/dcm/identity/__init__.py`
 
 _No class/function symbols._
 
-### `artifacts/dcm_v6_workstream_ab/dcm/identity/resolve.py`
+### `src/dcm/identity/resolve.py`
 
-- `function` **_cfb_names** L16
-- `function` **looks_like_platform_id** L26
-- `function` **resolve_row** L39
-- `function` **freeze_map** L59
-- `function` **build_player_index** L69 — Group every HAR player by playerId. Name ≠ platform id.
+- `function` **_cfb_names** L22
+- `function` **looks_like_platform_id** L32
+- `function` **resolve_row** L45
+- `function` **freeze_map** L65
+- `function` **build_player_index** L75 — Group every HAR player by playerId. Name ≠ platform id.
 
-### `artifacts/dcm_v6_workstream_ab/dcm/ingest/__init__.py`
+### `src/dcm/ingest/__init__.py`
 
 _No class/function symbols._
 
-### `artifacts/dcm_v6_workstream_ab/dcm/ingest/board.py`
+### `src/dcm/ingest/board.py`
 
 - `function` **_time** L18
 - `function` **rows_as_of** L29
@@ -888,7 +822,7 @@ _No class/function symbols._
 - `function` **freeze_board** L127 — Freeze the board.
 - `function` **write_board** L194
 
-### `artifacts/dcm_v6_workstream_ab/dcm/ingest/composite.py`
+### `src/dcm/ingest/composite.py`
 
 - `function` **_time** L19
 - `function` **_attempt_key** L32
@@ -897,7 +831,7 @@ _No class/function symbols._
 - `function` **reconcile_scope_attempts** L72 — Select latest successful response independently for every canonical request scope.
 - `function` **compose_ingests** L162 — Compose captures by latest successful response per canonical request scope.
 
-### `artifacts/dcm_v6_workstream_ab/dcm/ingest/har.py`
+### `src/dcm/ingest/har.py`
 
 - `function` **sha256_bytes** L33
 - `function` **sha256_text** L37
@@ -913,20 +847,20 @@ _No class/function symbols._
 - `function` **_verified_empty_payload** L263 — An empty response clears a scope only when the market collection is explicit.
 - `function` **ingest_har** L275 — Parse a HAR and retain every sanitized request-scope attempt.
 
-### `artifacts/dcm_v6_workstream_ab/dcm/ingest/markets.py`
+### `src/dcm/ingest/markets.py`
 
 - `function` **_norm** L254
 - `function` **map_stat** L258 — Return (market_key, market_label). Unknown keys stay as a slug — fail closed later.
 - `function` **map_league** L269
 - `function` **market_label** L281
 
-### `artifacts/dcm_v6_workstream_ab/dcm/ingest/outlier.py`
+### `src/dcm/ingest/outlier.py`
 
 - `function` **_num** L10
 - `function` **_row** L17
 - `function` **parse_outlier_payload** L63
 
-### `artifacts/dcm_v6_workstream_ab/dcm/ingest/prizepicks.py`
+### `src/dcm/ingest/prizepicks.py`
 
 - `function` **_rel** L10
 - `function` **_attrs** L24
@@ -942,7 +876,7 @@ _No class/function symbols._
 - `function` **_row_from_normalized** L220
 - `function` **parse_prizepicks_payload** L255
 
-### `artifacts/dcm_v6_workstream_ab/dcm/ingest/sanitize.py`
+### `src/dcm/ingest/sanitize.py`
 
 - `function` **_is_secret_header** L69
 - `function` **count_secrets** L73
@@ -950,16 +884,16 @@ _No class/function symbols._
 - `function` **url_denied** L113
 - `function` **url_allowlisted** L118
 
-### `artifacts/dcm_v6_workstream_ab/dcm/ingest/wsab_bind.py`
+### `src/dcm/ingest/wsab_bind.py`
 
-- `function` **_cfb_official_names** L20
-- `function` **annotate_rows** L33
+- `function` **_cfb_official_names** L26
+- `function` **annotate_rows** L39
 
-### `artifacts/dcm_v6_workstream_ab/dcm/learning/__init__.py`
+### `src/dcm/learning/__init__.py`
 
 _No class/function symbols._
 
-### `artifacts/dcm_v6_workstream_ab/dcm/learning/calibration.py`
+### `src/dcm/learning/calibration.py`
 
 - `function` **cell_key** L20
 - `function` **apply_calibration** L24
@@ -968,7 +902,7 @@ _No class/function symbols._
 - `function` **expected_calibration_error** L107
 - `function` **evaluate_calibration_readiness** L124 — Readiness report only. Does not activate cells or advance LR000000.
 
-### `artifacts/dcm_v6_workstream_ab/dcm/learning/dataset.py`
+### `src/dcm/learning/dataset.py`
 
 - `class` **SettlementsMissing** L59 — Run dest has no settlements sidecar; builder will not invent labels.
 - `function` **_load_json** L62
@@ -985,13 +919,13 @@ _No class/function symbols._
 - `function` **write_dataset** L301
 - `function` **main** L316
 
-### `artifacts/dcm_v6_workstream_ab/dcm/learning/failure_class.py`
+### `src/dcm/learning/failure_class.py`
 
 - `function` **_f** L49
 - `function` **_blob** L57
 - `function` **classify_failure** L67 — Assign one failure class. Never authorizes a permanent model patch from one result.
 
-### `artifacts/dcm_v6_workstream_ab/dcm/learning/postgame.py`
+### `src/dcm/learning/postgame.py`
 
 - `function` **_load_jsonl** L34
 - `function` **_population** L51 — Prefer the post-model slim population; fall back to the account-time dump.
@@ -1007,7 +941,7 @@ _No class/function symbols._
 - `function` **_summarize** L320
 - `function` **settle_run** L353
 
-### `artifacts/dcm_v6_workstream_ab/dcm/learning/registry.py`
+### `src/dcm/learning/registry.py`
 
 - `function` **_now** L25
 - `function` **champion_record** L28
@@ -1020,7 +954,7 @@ _No class/function symbols._
 - `function` **promote** L186 — Hard-refuse any promotion that would change LEARNING_REVISION or PREDICTIVE_CLAIM.
 - `function` **main** L206
 
-### `artifacts/dcm_v6_workstream_ab/dcm/learning/sidecar.py`
+### `src/dcm/learning/sidecar.py`
 
 - `function` **_require_kind** L17
 - `function` **append_record** L23
@@ -1028,7 +962,7 @@ _No class/function symbols._
 - `function` **read_ledger_jsonl** L57
 - `function` **mutate_forecast** L75
 
-### `artifacts/dcm_v6_workstream_ab/dcm/learning/walkforward.py`
+### `src/dcm/learning/walkforward.py`
 
 - `class` **WalkForwardLeakage** L22 — Test fold decisionCutoff is not strictly after every train cutoff.
 - `function` **_ts** L25
@@ -1047,11 +981,11 @@ _No class/function symbols._
 - `function` **write_walkforward_report** L326
 - `function` **main** L334
 
-### `artifacts/dcm_v6_workstream_ab/dcm/ml/__init__.py`
+### `src/dcm/ml/__init__.py`
 
 _No class/function symbols._
 
-### `artifacts/dcm_v6_workstream_ab/dcm/ml/feature_store.py`
+### `src/dcm/ml/feature_store.py`
 
 - `function` **signal_evaluation_feature_records** L77 — Canonical consumer for ACTIVE_FEATURE signal outputs.
 - `function` **_s** L113
@@ -1064,16 +998,16 @@ _No class/function symbols._
 - `function` **persist_feature_store** L261 — Write feature_store.jsonl + feature_store_manifest.json. Observations only.
 - `function` **merge_feature_records** L381 — Append deterministic runtime feature records and refresh the manifest.
 
-### `artifacts/dcm_v6_workstream_ab/dcm/model/__init__.py`
+### `src/dcm/model/__init__.py`
 
 - `function` **__getattr__** L27
 
-### `artifacts/dcm_v6_workstream_ab/dcm/model/availability.py`
+### `src/dcm/model/availability.py`
 
 - `function` **_entropy** L36
 - `function` **availability_mixture** L42
 
-### `artifacts/dcm_v6_workstream_ab/dcm/model/basketball_efficiency.py`
+### `src/dcm/model/basketball_efficiency.py`
 
 - `function` **_f** L21
 - `function` **_sum_pair** L29
@@ -1083,7 +1017,7 @@ _No class/function symbols._
 - `class` **EfficiencyModel** L86
 - `method` **EfficiencyModel.fit** L89
 
-### `artifacts/dcm_v6_workstream_ab/dcm/model/basketball_opportunity.py`
+### `src/dcm/model/basketball_opportunity.py`
 
 - `function` **_f** L45
 - `function` **_avg** L53
@@ -1095,11 +1029,11 @@ _No class/function symbols._
 - `method` **OpportunityModel.fit** L113
 - `method` **OpportunityModel.fit._rate** L157
 
-### `artifacts/dcm_v6_workstream_ab/dcm/model/distributions.py`
+### `src/dcm/model/distributions.py`
 
 - `function` **from_worlds** L6
 
-### `artifacts/dcm_v6_workstream_ab/dcm/model/event_world_joint.py`
+### `src/dcm/model/event_world_joint.py`
 
 - `function` **team_minute_target** L39
 - `function` **regulation_minutes** L43
@@ -1110,7 +1044,7 @@ _No class/function symbols._
 - `function` **simulate_joint_team_worlds** L150 — Simulate one EventWorld stream shared by modeled teammates.
 - `function` **summarize_joint_meta** L258
 
-### `artifacts/dcm_v6_workstream_ab/dcm/model/explanation.py`
+### `src/dcm/model/explanation.py`
 
 - `function` **_f** L87
 - `function` **_league_key** L97
@@ -1127,11 +1061,11 @@ _No class/function symbols._
 - `function` **load_feature_hash_index** L402 — entity+eventId → content hashes of FeatureStore records (and their sourceHashes).
 - `function` **persist_prop_explanations** L424
 
-### `artifacts/dcm_v6_workstream_ab/dcm/model/grade.py`
+### `src/dcm/model/grade.py`
 
 - `function` **grade** L6
 
-### `artifacts/dcm_v6_workstream_ab/dcm/model/gridiron_models.py`
+### `src/dcm/model/gridiron_models.py`
 
 - `function` **_f** L72
 - `function` **_avg** L80
@@ -1151,14 +1085,14 @@ _No class/function symbols._
 - `method` **TeamEventModel.fit** L377
 - `method` **TeamEventModel.fit._first** L391
 
-### `artifacts/dcm_v6_workstream_ab/dcm/model/line_surface.py`
+### `src/dcm/model/line_surface.py`
 
 - `function` **_probs** L12
 - `function` **_side_p** L22
 - `function` **_order_break** L26
 - `function` **surface** L36
 
-### `artifacts/dcm_v6_workstream_ab/dcm/model/market_derive.py`
+### `src/dcm/model/market_derive.py`
 
 - `class` **UnknownMarketError** L164 — Unknown or unverified market. Fail closed — never nearest-match.
 - `method` **UnknownMarketError.__init__** L167
@@ -1170,7 +1104,7 @@ _No class/function symbols._
 - `function` **_formulas** L215
 - `function` **derive_market** L271 — Map a ledger + market key to a scalar. Never independently samples.
 
-### `artifacts/dcm_v6_workstream_ab/dcm/model/parameters.py`
+### `src/dcm/model/parameters.py`
 
 - `function` **_f** L37
 - `function` **_pairs** L45
@@ -1181,7 +1115,7 @@ _No class/function symbols._
 - `function` **build_parameter_snapshot** L90
 - `method` **build_parameter_snapshot._rate_claimed** L309
 
-### `artifacts/dcm_v6_workstream_ab/dcm/model/participation.py`
+### `src/dcm/model/participation.py`
 
 - `function` **_f** L19
 - `function` **_avg** L27
@@ -1190,7 +1124,7 @@ _No class/function symbols._
 - `class` **ParticipationModel** L67 — Expected participation units from role-comparable logs.
 - `method` **ParticipationModel.fit** L76
 
-### `artifacts/dcm_v6_workstream_ab/dcm/model/quarter_worlds.py`
+### `src/dcm/model/quarter_worlds.py`
 
 - `class` **QuarterPluginIncomplete** L24
 - `method` **QuarterPluginIncomplete.__init__** L27
@@ -1203,19 +1137,19 @@ _No class/function symbols._
 - `function` **count_quarters_at_least** L110
 - `function` **derive_board_market** L115 — Derive a quarter/half board market from the attached quarter split.
 
-### `artifacts/dcm_v6_workstream_ab/dcm/model/ranking.py`
+### `src/dcm/model/ranking.py`
 
 - `function` **selection_score** L11
 - `function` **frontier_slice** L25 — Partial Top-K without requiring a second full-board sort.
 - `function` **rank_candidates** L34
 
-### `artifacts/dcm_v6_workstream_ab/dcm/model/uncertainty.py`
+### `src/dcm/model/uncertainty.py`
 
 - `function` **evidence_safe_probability** L24
 - `function` **wilson_lower_bound** L34
 - `function` **probability_bundle** L44
 
-### `artifacts/dcm_v6_workstream_ab/dcm/model/worlds.py`
+### `src/dcm/model/worlds.py`
 
 - `function` **_rng** L16
 - `function` **_clip** L22
@@ -1234,41 +1168,49 @@ _No class/function symbols._
 - `function` **value_from_stats** L401
 - `function` **simulate_player_worlds** L424
 
-### `artifacts/dcm_v6_workstream_ab/dcm/platform/__init__.py`
+### `src/dcm/paths.py`
+
+- `function` **repo_root** L16
+- `function` **package_dir** L28 — Directory containing the installed/editable ``dcm`` package.
+- `function` **src_root** L33 — Parent of the ``dcm`` package (``src/`` in checkout).
+- `function` **archive_root** L39 — Historical workstream archive (fixtures/configs/docs). Not install root.
+- `function` **default_workspace** L47
+
+### `src/dcm/platform/__init__.py`
 
 _No class/function symbols._
 
-### `artifacts/dcm_v6_workstream_ab/dcm/platform/prizepicks/__init__.py`
+### `src/dcm/platform/prizepicks/__init__.py`
 
 _No class/function symbols._
 
-### `artifacts/dcm_v6_workstream_ab/dcm/platform/prizepicks/entry_contract.py`
+### `src/dcm/platform/prizepicks/entry_contract.py`
 
 - `class` **EntryContractError** L16
 - `method` **EntryContractError.__init__** L17
 - `function` **build_entry_contract** L22
 - `function` **pick** L82
 
-### `artifacts/dcm_v6_workstream_ab/dcm/platform/prizepicks/leaderboard.py`
+### `src/dcm/platform/prizepicks/leaderboard.py`
 
 _No class/function symbols._
 
-### `artifacts/dcm_v6_workstream_ab/dcm/platform/prizepicks/minimum_guarantee.py`
+### `src/dcm/platform/prizepicks/minimum_guarantee.py`
 
 _No class/function symbols._
 
-### `artifacts/dcm_v6_workstream_ab/dcm/platform/prizepicks/participation.py`
+### `src/dcm/platform/prizepicks/participation.py`
 
 - `class` **ParticipationFacts** L20 — World-realized participation. Reboot evaluation consumes this; it does not decide economics.
 - `function` **football_qualifying_exit** L38 — Official window: leave 1H and do not return in 2H.
 - `function` **board_allows_reboot** L52
 
-### `artifacts/dcm_v6_workstream_ab/dcm/platform/prizepicks/payouts.py`
+### `src/dcm/platform/prizepicks/payouts.py`
 
 - `function` **register_minimum_guarantee_table** L8 — rows maps (payout_tier_count, win_count) -> return amount (not multiplier).
 - `function` **minimum_guarantee_return** L47
 
-### `artifacts/dcm_v6_workstream_ab/dcm/platform/prizepicks/reboot.py`
+### `src/dcm/platform/prizepicks/reboot.py`
 
 - `class` **RebootDecision** L37
 - `function` **evaluate_reboot** L44
@@ -1276,7 +1218,7 @@ _No class/function symbols._
 - `function` **_nfl** L94
 - `function` **_cfb** L120
 
-### `artifacts/dcm_v6_workstream_ab/dcm/platform/prizepicks/settlement.py`
+### `src/dcm/platform/prizepicks/settlement.py`
 
 - `class` **GroupScoreContext** L34 — Optional. Without this, Leaderboard return is UNMODELED.
 - `class` **SettlementError** L41
@@ -1287,32 +1229,32 @@ _No class/function symbols._
 - `function` **settle_world_lineup** L98
 - `function` **_outcome** L224
 
-### `artifacts/dcm_v6_workstream_ab/dcm/postgame.py`
+### `src/dcm/postgame.py`
 
 - `function` **main** L11
 
-### `artifacts/dcm_v6_workstream_ab/dcm/release.py`
+### `src/dcm/release.py`
 
 - `function` **_sha256_bytes** L39
 - `function` **repo_root** L43
-- `function` **package_root** L51
-- `function` **count_pytest_functions** L59
-- `function` **resolve_git_commit** L67 — Populate gitCommit from git rev-parse HEAD. FAIL if blank.
-- `function` **canonical_package_files** L87 — Ordered (relative, absolute) files of the canonical Python package tree.
-- `function` **build_complete_project_source** L107
-- `function` **capability_document** L127
-- `function` **_ensure_build_deps** L161
-- `function` **build_wheel** L180 — Build an installable pillars-dcm wheel into dest (and dest/../dist if present).
-- `function` **build_portable** L223
-- `function` **verify_extraction** L361
-- `function` **verify_complete_project_source** L395
-- `function` **main** L425
+- `function` **package_root** L51 — Return the Python package discovery root (``src/``), not the archive.
+- `function` **count_pytest_functions** L60
+- `function` **resolve_git_commit** L68 — Populate gitCommit from git rev-parse HEAD. FAIL if blank.
+- `function` **canonical_package_files** L88 — Ordered (relative, absolute) files of the canonical Python package tree.
+- `function` **build_complete_project_source** L108
+- `function` **capability_document** L128
+- `function` **_ensure_build_deps** L162
+- `function` **build_wheel** L181 — Build an installable pillars-dcm wheel into dest (and dest/../dist if present).
+- `function` **build_portable** L224
+- `function` **verify_extraction** L362
+- `function` **verify_complete_project_source** L396
+- `function` **main** L426
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/__init__.py`
+### `src/dcm/research/__init__.py`
 
 - `function` **__getattr__** L41
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/acquisition.py`
+### `src/dcm/research/acquisition.py`
 
 - `function` **_req_id** L48
 - `function` **build_acquisition_actions** L52 — Group reusable-entity requests into fan-out AcquisitionActions.
@@ -1320,11 +1262,11 @@ _No class/function symbols._
 - `method` **schedule_acquisition_actions.gain_fn** L262
 - `method` **schedule_acquisition_actions.cost_fn** L272
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/adapters/__init__.py`
+### `src/dcm/research/adapters/__init__.py`
 
 _No class/function symbols._
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/adapters/base.py`
+### `src/dcm/research/adapters/base.py`
 
 - `function` **utc_now** L31
 - `function` **live_fetch_enabled** L35
@@ -1335,7 +1277,7 @@ _No class/function symbols._
 - `method` **SourceAdapter.normalize** L92 — Return adapter records with provenance + content hash.
 - `function` **fetch_normalize** L97
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/adapters/basketball_reference.py`
+### `src/dcm/research/adapters/basketball_reference.py`
 
 - `function` **_as_text** L33
 - `function` **_pick_table** L41
@@ -1371,7 +1313,7 @@ _No class/function symbols._
 - `method` **BasketballReferenceOnOffAdapter.fetch** L504
 - `method` **BasketballReferenceOnOffAdapter.normalize** L512
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/adapters/espn_status.py`
+### `src/dcm/research/adapters/espn_status.py`
 
 - `function` **canonicalize_status** L37
 - `function` **_as_text** L49
@@ -1381,7 +1323,7 @@ _No class/function symbols._
 - `method` **ESPNStatusAdapter.fetch** L93
 - `method` **ESPNStatusAdapter.normalize** L122
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/adapters/html_tables.py`
+### `src/dcm/research/adapters/html_tables.py`
 
 - `function` **unwrap_commented_tables** L16
 - `method` **unwrap_commented_tables.repl** L17
@@ -1393,7 +1335,7 @@ _No class/function symbols._
 - `function` **extract_tables** L139
 - `function` **table_rows_as_dicts** L146
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/adapters/official_league.py`
+### `src/dcm/research/adapters/official_league.py`
 
 - `function` **_as_text** L16
 - `function` **_games** L26
@@ -1405,7 +1347,7 @@ _No class/function symbols._
 - `class` **OfficialWNBAAdapter** L136
 - `class` **OfficialNBAAdapter** L142
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/adapters/prizepicks.py`
+### `src/dcm/research/adapters/prizepicks.py`
 
 - `function` **offer_fields_from_row** L15
 - `class` **PrizePicksOfferAdapter** L41
@@ -1414,7 +1356,7 @@ _No class/function symbols._
 - `method` **PrizePicksOfferAdapter.normalize** L61
 - `method` **PrizePicksOfferAdapter.normalize_rows** L92
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/adapters/pro_football_reference.py`
+### `src/dcm/research/adapters/pro_football_reference.py`
 
 - `function` **_as_text** L30
 - `function` **_pick_table** L38
@@ -1426,7 +1368,7 @@ _No class/function symbols._
 - `method` **FootballReferenceGameLogAdapter.fetch_normalize** L148
 - `class` **ProFootballReferenceAdapter** L165 — Alias used by NFL hosts. Same parser as FootballReferenceGameLogAdapter.
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/authority.py`
+### `src/dcm/research/authority.py`
 
 - `function` **_parse** L22
 - `function` **classify_source** L35
@@ -1435,7 +1377,7 @@ _No class/function symbols._
 - `method` **SourceAuthorityRegistry.__init__** L89
 - `method` **SourceAuthorityRegistry.derive** L92
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/batch.py`
+### `src/dcm/research/batch.py`
 
 - `function` **scheduler_score** L40
 - `function` **_event_id_of** L53
@@ -1443,7 +1385,7 @@ _No class/function symbols._
 - `function` **_host_task** L77 — Expose the minimum actionable context for a host acquisition.
 - `function` **build_next_research_batch** L113
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/cache.py`
+### `src/dcm/research/cache.py`
 
 - `function` **cache_identity** L34
 - `class` **ResearchCache** L57 — Compatibility cache with optional durable SQLite backing.
@@ -1454,7 +1396,7 @@ _No class/function symbols._
 - `method` **ResearchCache.snapshot** L129
 - `method` **ResearchCache.close** L138
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/cache_layers.py`
+### `src/dcm/research/cache_layers.py`
 
 - `function` **_key** L43
 - `function` **_decode_cached_row** L57 — Decode and verify a durable cache row before it becomes a reuse hit.
@@ -1470,13 +1412,13 @@ _No class/function symbols._
 - `method` **ResearchCacheCascade.close** L361
 - `function` **content_address_bytes** L370
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/claims.py`
+### `src/dcm/research/claims.py`
 
 - `function` **claim_record** L11
 - `function` **dedupe** L83 — Remove byte-logically identical claims without mutating hashed content.
 - `function` **conflict_ledger** L93 — Record divergent values separately from immutable EvidenceClaims.
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/classify.py`
+### `src/dcm/research/classify.py`
 
 - `function` **_offered_sides_known** L53
 - `function` **_is_live** L59
@@ -1486,12 +1428,12 @@ _No class/function symbols._
 - `function` **classify_rows** L151
 - `function` **market_definition_id** L189
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/classify_runtime.py`
+### `src/dcm/research/classify_runtime.py`
 
 - `function` **refine_delta** L17
 - `function` **classify_requests** L26
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/coverage.py`
+### `src/dcm/research/coverage.py`
 
 - `function` **_values_for** L17
 - `function` **_merge** L31
@@ -1505,28 +1447,28 @@ _No class/function symbols._
 - `function` **evaluate_request** L215
 - `function` **coverage_report** L312
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/dependency_graph.py`
+### `src/dcm/research/dependency_graph.py`
 
 - `function` **_nid** L38
 - `function` **build_research_dependency_graph** L43
 - `method` **build_research_dependency_graph.add_node** L51
 - `method` **build_research_dependency_graph.add_edge** L61
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/emit.py`
+### `src/dcm/research/emit.py`
 
 - `function` **_write** L26
 - `function` **emit_offer_sets_and_manifest** L32
 - `function` **emit_packets_and_graph** L89
 - `function` **emit_player_centric_research** L212 — Backward-compatible entrypoint; universal artifacts are emitted first.
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/entity_graph.py`
+### `src/dcm/research/entity_graph.py`
 
 - `function` **_nid** L40
 - `function` **build_entity_graph** L45
 - `method` **build_entity_graph.add_node** L57
 - `method` **build_entity_graph.add_edge** L68
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/entity_packets.py`
+### `src/dcm/research/entity_packets.py`
 
 - `function` **_f** L32
 - `function` **_avg** L42
@@ -1542,7 +1484,7 @@ _No class/function symbols._
 - `function` **build_event_research_packet** L374
 - `function` **build_entity_packets** L480 — One team packet per unique team; opponent packets reuse those; one event packet per event.
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/evidence_graph.py`
+### `src/dcm/research/evidence_graph.py`
 
 - `function` **_nid** L71
 - `function` **_node** L76
@@ -1561,7 +1503,7 @@ _No class/function symbols._
 - `function` **trace_runtime_lineage** L968 — Selection → PropEvaluation → Simulation → ParameterSnapshot → Feature/Claim.
 - `method` **trace_runtime_lineage.neighbors** L975
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/freshness.py`
+### `src/dcm/research/freshness.py`
 
 - `class` **FreshnessPolicyError** L96 — Unknown freshness policy input. Fail closed.
 - `function` **normalize_status** L100
@@ -1577,7 +1519,7 @@ _No class/function symbols._
 - `function` **evaluate_freshness** L268
 - `function` **apply_adaptive_freshness** L348 — Refine a classify_delta result using derived timestamps. Never invent times.
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/gamelog.py`
+### `src/dcm/research/gamelog.py`
 
 - `function` **_present** L123
 - `function` **_market_stat_ok** L127
@@ -1589,7 +1531,7 @@ _No class/function symbols._
 - `function` **normalize_basketball_logs** L275 — Split a log list into valid canonical rows and rejected originals.
 - `function` **assert_compatible_basketball_logs** L295 — Coverage helper: minutes-valid logs plus market counting-stat presence.
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/gridiron_gamelog.py`
+### `src/dcm/research/gridiron_gamelog.py`
 
 - `function` **parse_pct** L127 — Parse 71 or '71%' into 0.71. Already-fractional values in [0, 1] stay.
 - `function` **_index_row** L140
@@ -1601,18 +1543,18 @@ _No class/function symbols._
 - `function` **assert_compatible_gridiron_logs** L280 — Coverage helper: opportunity-valid logs plus market counting-stat presence.
 - `function` **looks_like_gridiron_log** L307
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/historical_gap.py`
+### `src/dcm/research/historical_gap.py`
 
 - `function` **_ids** L19
 - `function` **stored_event_ids** L31
 - `function` **resolve_history_gap** L43
 - `function` **apply_history_gap** L70
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/host_plan.py`
+### `src/dcm/research/host_plan.py`
 
 - `function` **build_host_research_plan** L165
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/indexes.py`
+### `src/dcm/research/indexes.py`
 
 - `class` **BoardIndexes** L30 — Exact indexes over a frozen board. No repeated full-board linear scans.
 - `method` **BoardIndexes.__init__** L33
@@ -1636,13 +1578,13 @@ _No class/function symbols._
 - `method` **EvidenceIndexes.close** L424
 - `function` **requirement_offer_bitmaps** L431 — Reverse index Requirement → Offers as Python bitsets plus id lists.
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/lineup.py`
+### `src/dcm/research/lineup.py`
 
 - `function` **_f** L20
 - `function` **shrink_lineup_effect** L30 — Hierarchical shrink of a lineup/on-off delta toward 0 (no effect).
 - `function` **build_lineup_effects** L70 — Normalize a list of {label, with, without, minutes, rawEffect} rows.
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/material_facts.py`
+### `src/dcm/research/material_facts.py`
 
 - `function` **_authority** L49
 - `function` **_freshness** L61
@@ -1665,11 +1607,11 @@ _No class/function symbols._
 - `function` **apply_fact_features_to_packets** L595 — Overlay resolved FeatureRecords onto modeling packets BEFORE RoleEpoch/fit.
 - `function` **facts_for_refresh** L689 — Index MaterialFacts by (scope, scopeId, claimType-or-field). Never latest-claim-wins across types.
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/observation_execute.py`
+### `src/dcm/research/observation_execute.py`
 
 - `function` **execute_source_aware_observations** L50 — Import source-aware host observations and close coverage→consumer contracts.
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/observation_execute_support.py`
+### `src/dcm/research/observation_execute_support.py`
 
 - `function` **_build_counterparty_index** L37 — One-shot opponent → offer ids map (BoardIndexes has no by_counterparty).
 - `function` **_derive_sport** L50 — Sport / league family for ResearchStore — never a semantic_scope kind.
@@ -1681,7 +1623,7 @@ _No class/function symbols._
 - `function` **_load_existing_dag** L252
 - `function` **_ensure_offer_lineage** L266 — claim → PARAMETER → EVENT_WORLDS → GRADE for one offer (idempotent add).
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/observation_typed.py`
+### `src/dcm/research/observation_typed.py`
 
 - `function` **_load_observations** L15
 - `function` **_nonempty_fields** L43
@@ -1691,11 +1633,11 @@ _No class/function symbols._
 - `function` **_match_action** L108
 - `function` **observation_to_typed_claim** L146 — Validate a source-aware host observation and build an EvidenceClaim.
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/offer_metadata.py`
+### `src/dcm/research/offer_metadata.py`
 
 - `function` **recover_offer_metadata** L19 — Return HAR-backed claims, counts, and exact unresolved reasons.
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/os_graphs.py`
+### `src/dcm/research/os_graphs.py`
 
 - `function` **_is_cfb** L34
 - `function` **_offer_id** L38
@@ -1706,7 +1648,7 @@ _No class/function symbols._
 - `function` **build_requirement_graph** L230
 - `function` **persist_research_os_graphs** L322
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/player_offer_set.py`
+### `src/dcm/research/player_offer_set.py`
 
 - `function` **_s** L16
 - `function` **_legacy_offer** L20
@@ -1716,7 +1658,7 @@ _No class/function symbols._
 - `function` **build_player_offer_sets** L76 — Project canonical PLAYER SubjectOfferSets into the legacy shape.
 - `function` **player_offer_sets_document** L100
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/player_packet.py`
+### `src/dcm/research/player_packet.py`
 
 - `function` **_is_gridiron_identity** L34
 - `function` **_f** L42
@@ -1732,7 +1674,7 @@ _No class/function symbols._
 - `function` **build_packets_for_offer_sets** L361 — One packet per PlayerOfferSet. Reused across that set's markets.
 - `function` **packets_document** L434
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/population.py`
+### `src/dcm/research/population.py`
 
 - `function` **_entity_rows** L45
 - `function` **build_legacy_research_population_manifest** L74
@@ -1740,7 +1682,7 @@ _No class/function symbols._
 - `function` **build_universal_research_population_manifest** L171
 - `function` **build_research_population_manifest** L252 — Canonical public builder now returns the universal V2 manifest.
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/provider.py`
+### `src/dcm/research/provider.py`
 
 - `class` **ResearchProvider** L22
 - `method` **ResearchProvider.resolve** L23
@@ -1764,14 +1706,14 @@ _No class/function symbols._
 - `function` **claims_by_scope** L233
 - `function` **collect** L241
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/readiness.py`
+### `src/dcm/research/readiness.py`
 
 - `function` **evaluate_research_os_readiness** L28
 - `function` **persist_research_os_readiness** L92
 - `function` **load_research_os_readiness** L111
 - `function` **require_research_may_begin** L118 — Fail closed: external acquisition is illegal without readiness.
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/requests.py`
+### `src/dcm/research/requests.py`
 
 - `function` **_cap_weight_for_rows** L57
 - `function` **_priority_score** L69
@@ -1780,7 +1722,7 @@ _No class/function symbols._
 - `function` **plan_research** L119
 - `function` **build_requests** L370 — Backward-compatible wrapper. Does not emit legacy MARKET or PLAYER/TEAM.
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/research_store.py`
+### `src/dcm/research/research_store.py`
 
 - `function` **_utc_now** L54
 - `function` **_asof_day** L58
@@ -1810,7 +1752,7 @@ _No class/function symbols._
 - `function` **classify_requests** L489
 - `function` **hydrate_reused_claims** L527 — Pull still-valid stored claims so forecast does not research from zero.
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/role_epoch.py`
+### `src/dcm/research/role_epoch.py`
 
 - `function` **_as_logs** L37
 - `function` **_raw** L43
@@ -1841,7 +1783,7 @@ _No class/function symbols._
 - `method` **RoleEpochBuilder.build** L429
 - `method` **RoleEpochBuilder._build_gridiron** L545
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/scopes.py`
+### `src/dcm/research/scopes.py`
 
 - `function` **canonical_scope** L62
 - `function` **lookup_scopes** L67
@@ -1850,7 +1792,7 @@ _No class/function symbols._
 - `function` **claims_for** L82
 - `function` **is_canonical_scope** L90
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/source_catalog.py`
+### `src/dcm/research/source_catalog.py`
 
 - `function` **_load_raw** L20
 - `function` **load_source_catalog** L31
@@ -1859,7 +1801,7 @@ _No class/function symbols._
 - `function` **catalog_summary** L96
 - `function` **source_health_seeds** L110 — Derive health-router seeds from the versioned capability catalog.
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/source_health.py`
+### `src/dcm/research/source_health.py`
 
 - `function` **_now** L17
 - `function` **_iso** L21
@@ -1881,7 +1823,7 @@ _No class/function symbols._
 - `function` **load_cfb_source_health** L299 — Restore persisted source-health counters/circuits. Missing file → default catalog.
 - `function` **default_cfb_source_health** L320 — CFB router derived from the versioned source-capability catalog.
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/staged.py`
+### `src/dcm/research/staged.py`
 
 - `function` **_f_home** L22
 - `function` **_same_opponent** L33
@@ -1889,7 +1831,7 @@ _No class/function symbols._
 - `function` **deepen_player_packet** L69 — Return a Pass-B overlay. Does not mutate Pass A or replace the full log.
 - `function` **stage_research** L105
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/statepack.py`
+### `src/dcm/research/statepack.py`
 
 - `class` **StatePackError** L89
 - `class` **UnsupportedSchemaVersion** L93
@@ -1922,7 +1864,7 @@ _No class/function symbols._
 - `method` **StatePack.integrity_ok** L483
 - `method` **StatePack.restore_from_export** L530
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/subject_offer_set.py`
+### `src/dcm/research/subject_offer_set.py`
 
 - `function` **_s** L16
 - `function` **_first** L20
@@ -1936,7 +1878,7 @@ _No class/function symbols._
 - `function` **build_subject_offer_sets** L173
 - `function` **subject_offer_sets_document** L216
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/temporal.py`
+### `src/dcm/research/temporal.py`
 
 - `class` **TemporalLeakError** L8
 - `method` **TemporalLeakError.__init__** L9
@@ -1944,7 +1886,7 @@ _No class/function symbols._
 - `function` **assert_not_after_cutoff** L24
 - `function` **filter_claims** L29
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/universal_packets.py`
+### `src/dcm/research/universal_packets.py`
 
 - `function` **_s** L17
 - `function` **_wrap_subject** L21
@@ -1954,29 +1896,29 @@ _No class/function symbols._
 - `function` **_wrap_environment** L114
 - `function` **build_universal_packets** L132
 
-### `artifacts/dcm_v6_workstream_ab/dcm/research/universal_plan.py`
+### `src/dcm/research/universal_plan.py`
 
 - `function` **build_universal_host_research_plan** L99
 
-### `artifacts/dcm_v6_workstream_ab/dcm/runner.py`
+### `src/dcm/runner.py`
 
-- `function` **_finalize_archive** L127 — Always write dest/audit/. Optionally copy+commit+push a GitHub pack.
-- `function` **_synthetic_path** L205
-- `function` **_run_id** L218
-- `function` **_git_commit_sha** L222 — Best-effort git HEAD. Never writes git config. Missing git is None, not a crash.
-- `function` **_default_model_config** L242
-- `function` **_active_calibration** L253
-- `function` **run_dcm** L262
-- `method` **run_dcm._snapshot_for** L870
-- `method` **run_dcm._resimulate_material** L1330
-- `method` **run_dcm.slim** L1521
-- `function` **main** L2089
+- `function` **_finalize_archive** L128 — Always write dest/audit/. Optionally copy+commit+push a GitHub pack.
+- `function` **_synthetic_path** L206
+- `function` **_run_id** L219
+- `function` **_git_commit_sha** L223 — Best-effort git HEAD. Never writes git config. Missing git is None, not a crash.
+- `function` **_default_model_config** L243
+- `function` **_active_calibration** L254
+- `function` **run_dcm** L263
+- `method` **run_dcm._snapshot_for** L871
+- `method` **run_dcm._resimulate_material** L1331
+- `method` **run_dcm.slim** L1522
+- `function` **main** L2090
 
-### `artifacts/dcm_v6_workstream_ab/dcm/runtime/__init__.py`
+### `src/dcm/runtime/__init__.py`
 
 _No class/function symbols._
 
-### `artifacts/dcm_v6_workstream_ab/dcm/runtime/archive_receipt.py`
+### `src/dcm/runtime/archive_receipt.py`
 
 - `function` **build_archive_receipt** L15
 - `function` **persist_archive_receipt** L60
@@ -1987,39 +1929,39 @@ _No class/function symbols._
 - `method` **LocalFallbackRunStore.put** L144
 - `method` **LocalFallbackRunStore.get** L149
 
-### `artifacts/dcm_v6_workstream_ab/dcm/runtime/benchmark.py`
+### `src/dcm/runtime/benchmark.py`
 
 - `function` **_row** L20
 - `function` **_har** L69
 - `function` **benchmark_board** L97
 - `function` **main** L128
 
-### `artifacts/dcm_v6_workstream_ab/dcm/runtime/capabilities.py`
+### `src/dcm/runtime/capabilities.py`
 
 - `function` **_git** L17
 - `function` **_file_descriptor** L28
 - `function` **build_capability_manifest** L44
 - `function` **persist_capability_manifest** L104
 
-### `artifacts/dcm_v6_workstream_ab/dcm/runtime/checkpoint.py`
+### `src/dcm/runtime/checkpoint.py`
 
 - `function` **atomic_write** L13
 - `function` **load_checkpoint** L38
 - `function` **write_checkpoint** L48
 
-### `artifacts/dcm_v6_workstream_ab/dcm/runtime/checkpoint_outbox.py`
+### `src/dcm/runtime/checkpoint_outbox.py`
 
 - `function` **_without_hash** L20
 - `function` **_validated_entries** L24
 - `function` **load_outbox** L46 — Read and validate every outbox record; partial/corrupt logs fail closed.
 - `function` **enqueue_checkpoint_sync** L51 — Append one checkpoint intent, or return the identical existing intent.
 
-### `artifacts/dcm_v6_workstream_ab/dcm/runtime/checkpoint_reconciliation.py`
+### `src/dcm/runtime/checkpoint_reconciliation.py`
 
 - `function` **_remote_state** L14
 - `function` **reconcile_checkpoint_outbox** L25
 
-### `artifacts/dcm_v6_workstream_ab/dcm/runtime/cutoff.py`
+### `src/dcm/runtime/cutoff.py`
 
 - `class` **CutoffRequired** L8 — --cutoff omitted and --cutoff-from-capture was not set (or capture times absent).
 - `function` **_parse** L40
@@ -2027,7 +1969,7 @@ _No class/function symbols._
 - `function` **derive_cutoff_from_capture** L68 — Return the latest capture timestamp under CAPTURE_MAX_STARTED_DATETIME.
 - `function` **resolve_forecast_cutoff** L93
 
-### `artifacts/dcm_v6_workstream_ab/dcm/runtime/dag.py`
+### `src/dcm/runtime/dag.py`
 
 - `function` **node_key** L64
 - `class` **DagNode** L87
@@ -2048,7 +1990,7 @@ _No class/function symbols._
 - `method` **Dag.pending** L244
 - `method` **Dag.snapshot** L247
 
-### `artifacts/dcm_v6_workstream_ab/dcm/runtime/drive_catalog.py`
+### `src/dcm/runtime/drive_catalog.py`
 
 - `class` **DriveObjectCatalog** L21 — Content-addressed local catalog of objects that *would* live on Drive.
 - `method` **DriveObjectCatalog.__init__** L28
@@ -2062,12 +2004,12 @@ _No class/function symbols._
 - `method` **DriveObjectCatalog.persist** L104
 - `method` **DriveObjectCatalog._load** L133
 
-### `artifacts/dcm_v6_workstream_ab/dcm/runtime/freeze.py`
+### `src/dcm/runtime/freeze.py`
 
 - `function` **forecast_hash_payload** L22
 - `function` **compute_forecast_hash** L61
 
-### `artifacts/dcm_v6_workstream_ab/dcm/runtime/github_archive.py`
+### `src/dcm/runtime/github_archive.py`
 
 - `function` **scan_for_secrets** L129 — Return secret-like tokens found in file text. Empty list means clean.
 - `function` **git_identity** L173 — Author/committer identity for archive commits. Never requires git config.
@@ -2108,7 +2050,7 @@ _No class/function symbols._
 - `function` **_sanitize_git_error** L1026
 - `function` **push_to_github** L1038
 
-### `artifacts/dcm_v6_workstream_ab/dcm/runtime/governor.py`
+### `src/dcm/runtime/governor.py`
 
 - `class` **Governor** L15
 - `method` **Governor.max_worlds** L23 — Backwards-compatible name for the initial/fast world count.
@@ -2116,13 +2058,13 @@ _No class/function symbols._
 - `method` **Governor.next_world_count** L31
 - `method` **Governor.pressure_steps** L58
 
-### `artifacts/dcm_v6_workstream_ab/dcm/runtime/har_run.py`
+### `src/dcm/runtime/har_run.py`
 
-- `function` **_run_id** L26
-- `function` **run_har** L30
-- `function` **main** L75
+- `function` **_run_id** L28
+- `function` **run_har** L32
+- `function` **main** L77
 
-### `artifacts/dcm_v6_workstream_ab/dcm/runtime/input_boundary.py`
+### `src/dcm/runtime/input_boundary.py`
 
 - `function` **_sha256** L33
 - `function` **_header_marker** L37
@@ -2132,7 +2074,7 @@ _No class/function symbols._
 - `function` **build_input_boundary_manifest** L120
 - `function` **persist_input_boundary_manifest** L144
 
-### `artifacts/dcm_v6_workstream_ab/dcm/runtime/mount_v541.py`
+### `src/dcm/runtime/mount_v541.py`
 
 - `function` **sha256_file** L27
 - `function` **find_named** L35
@@ -2141,34 +2083,34 @@ _No class/function symbols._
 - `function` **_manifest_ok** L86
 - `function` **attempt_mount** L97
 - `function` **write_mount_state** L161
-- `function` **_usable_workspace** L169
-- `function` **mount_default** L178
-- `function` **main** L196
+- `function` **_usable_workspace** L171
+- `function` **mount_default** L180
+- `function` **main** L198
 
-### `artifacts/dcm_v6_workstream_ab/dcm/runtime/perf.py`
+### `src/dcm/runtime/perf.py`
 
 - `class` **StageTimer** L10
 - `method` **StageTimer.__init__** L11
 - `method` **StageTimer.finish** L16
 
-### `artifacts/dcm_v6_workstream_ab/dcm/runtime/pipeline.py`
+### `src/dcm/runtime/pipeline.py`
 
 - `function` **project_pick** L12
 - `function` **project_and_settle** L20
 
-### `artifacts/dcm_v6_workstream_ab/dcm/runtime/readiness.py`
+### `src/dcm/runtime/readiness.py`
 
 - `function` **build_readiness** L7
 
-### `artifacts/dcm_v6_workstream_ab/dcm/runtime/schema_root.py`
+### `src/dcm/runtime/schema_root.py`
 
 - `function` **sha256_file** L23
 - `function` **_v2_hash_from_tree** L27
-- `function` **verify_schema** L39
-- `function` **v2_schema_path** L85
-- `function` **verify_schema_v2** L98
+- `function` **verify_schema** L40
+- `function` **v2_schema_path** L86
+- `function` **verify_schema_v2** L100
 
-### `artifacts/dcm_v6_workstream_ab/dcm/runtime/storage_router.py`
+### `src/dcm/runtime/storage_router.py`
 
 - `function` **_slug** L78
 - `function` **_sha256_bytes** L84
@@ -2186,7 +2128,7 @@ _No class/function symbols._
 - `method` **StorageRouter.stage_bytes** L225 — Stage an immutable safe object and return its verified manifest.
 - `method` **StorageRouter.persist_run_route** L259
 
-### `artifacts/dcm_v6_workstream_ab/dcm/runtime/store.py`
+### `src/dcm/runtime/store.py`
 
 - `class` **IndexedStore** L34
 - `method` **IndexedStore.__init__** L35
@@ -2194,11 +2136,11 @@ _No class/function symbols._
 - `method` **IndexedStore.query_player** L60
 - `method` **IndexedStore.close** L67
 
-### `artifacts/dcm_v6_workstream_ab/dcm/selection/__init__.py`
+### `src/dcm/selection/__init__.py`
 
 _No class/function symbols._
 
-### `artifacts/dcm_v6_workstream_ab/dcm/selection/card_layers.py`
+### `src/dcm/selection/card_layers.py`
 
 - `function` **_parse_utc** L74
 - `function` **_snapshot_of** L87
@@ -2218,7 +2160,7 @@ _No class/function symbols._
 - `function` **build_directional_passes** L297 — Strongest side for modeled non-PLAYABLE candidates not on the strict card.
 - `function` **write_card_layer_files** L324
 
-### `artifacts/dcm_v6_workstream_ab/dcm/selection/decision_integrity.py`
+### `src/dcm/selection/decision_integrity.py`
 
 - `function` **_hashed** L15
 - `function` **probability_sanity_diagnostic** L20
@@ -2228,14 +2170,14 @@ _No class/function symbols._
 - `method` **SurvivorState.accept** L107
 - `method` **SurvivorState.snapshot** L110
 
-### `artifacts/dcm_v6_workstream_ab/dcm/selection/eligibility.py`
+### `src/dcm/selection/eligibility.py`
 
 - `class` **SelectionForbidden** L9
 - `method` **SelectionForbidden.__init__** L10
 - `function` **reject_goblin_selection** L15
 - `function` **demon_requires_cushion** L23 — Red Demon is demotion-only: extra cushion must actually change the gate.
 
-### `artifacts/dcm_v6_workstream_ab/dcm/selection/portfolio.py`
+### `src/dcm/selection/portfolio.py`
 
 - `function` **_tags** L20
 - `function` **_composite_conflict** L24
@@ -2243,21 +2185,21 @@ _No class/function symbols._
 - `function` **build_card** L55
 - `function` **exposure_report** L128
 
-### `artifacts/dcm_v6_workstream_ab/dcm/settle.py`
+### `src/dcm/settle.py`
 
 - `function` **main** L15
 
-### `artifacts/dcm_v6_workstream_ab/dcm/signals/__init__.py`
+### `src/dcm/signals/__init__.py`
 
 _No class/function symbols._
 
-### `artifacts/dcm_v6_workstream_ab/dcm/signals/cfb_runtime.py`
+### `src/dcm/signals/cfb_runtime.py`
 
 - `function` **build_cfb_signal_registry** L22
 - `function` **_support_context** L54
 - `function` **execute_cfb_signals** L75
 
-### `artifacts/dcm_v6_workstream_ab/dcm/signals/compiler.py`
+### `src/dcm/signals/compiler.py`
 
 - `class` **SignalCompileError** L13
 - `class` **SignalCompiler** L17
@@ -2267,7 +2209,7 @@ _No class/function symbols._
 - `method` **SignalCompiler._cycle_members.visit** L99
 - `method` **SignalCompiler._topological_order** L118
 
-### `artifacts/dcm_v6_workstream_ab/dcm/signals/contracts.py`
+### `src/dcm/signals/contracts.py`
 
 - `class` **SignalStage** L10
 - `class` **LifecycleState** L19
@@ -2283,13 +2225,13 @@ _No class/function symbols._
 - `method` **SignalOperatorSpec.from_mapping** L135 — Parse without mutating or destructively canonicalizing source JSON.
 - `method` **SignalOperatorSpec.to_dict** L166
 
-### `artifacts/dcm_v6_workstream_ab/dcm/signals/donor_accounting.py`
+### `src/dcm/signals/donor_accounting.py`
 
 - `class` **DonorAccountingReport** L20
 - `method` **DonorAccountingReport.to_dict** L27
 - `function` **audit_donor_matrix** L39
 
-### `artifacts/dcm_v6_workstream_ab/dcm/signals/executor.py`
+### `src/dcm/signals/executor.py`
 
 - `function` **_hash** L17
 - `class` **SignalEvaluation** L23
@@ -2298,7 +2240,7 @@ _No class/function symbols._
 - `method` **SignalExecutor.__init__** L57
 - `method` **SignalExecutor.execute** L61
 
-### `artifacts/dcm_v6_workstream_ab/dcm/signals/integration_gate.py`
+### `src/dcm/signals/integration_gate.py`
 
 - `class` **BindingCatalog** L42
 - `method` **BindingCatalog.sport_exists** L50
@@ -2308,12 +2250,12 @@ _No class/function symbols._
 - `method` **SignalIntegrationGate.__init__** L61
 - `method` **SignalIntegrationGate.validate** L64
 
-### `artifacts/dcm_v6_workstream_ab/dcm/signals/overlap.py`
+### `src/dcm/signals/overlap.py`
 
 - `function` **semantic_signature** L10
 - `function` **resolved_overlap_group** L36
 
-### `artifacts/dcm_v6_workstream_ab/dcm/signals/registry.py`
+### `src/dcm/signals/registry.py`
 
 - `class` **CompiledOperator** L13
 - `method` **CompiledOperator.to_dict** L20
@@ -2327,24 +2269,24 @@ _No class/function symbols._
 - `method` **SignalRegistry.extend** L70
 - `method` **SignalRegistry.candidates** L74
 
-### `artifacts/dcm_v6_workstream_ab/dcm/sports/__init__.py`
+### `src/dcm/sports/__init__.py`
 
 _No class/function symbols._
 
-### `artifacts/dcm_v6_workstream_ab/dcm/sports/baseball/__init__.py`
+### `src/dcm/sports/baseball/__init__.py`
 
 _No class/function symbols._
 
-### `artifacts/dcm_v6_workstream_ab/dcm/sports/baseball/pa.py`
+### `src/dcm/sports/baseball/pa.py`
 
 - `function` **conservation** L11
 - `function` **validate** L43
 
-### `artifacts/dcm_v6_workstream_ab/dcm/sports/basketball/__init__.py`
+### `src/dcm/sports/basketball/__init__.py`
 
 _No class/function symbols._
 
-### `artifacts/dcm_v6_workstream_ab/dcm/sports/basketball/minimal.py`
+### `src/dcm/sports/basketball/minimal.py`
 
 - `function` **basketball_market** L48
 - `function` **basketball_conservation** L80
@@ -2352,11 +2294,11 @@ _No class/function symbols._
 - `function` **build_basketball_world** L99
 - `function` **project_basketball_market** L151
 
-### `artifacts/dcm_v6_workstream_ab/dcm/sports/common/__init__.py`
+### `src/dcm/sports/common/__init__.py`
 
 _No class/function symbols._
 
-### `artifacts/dcm_v6_workstream_ab/dcm/sports/common/contract.py`
+### `src/dcm/sports/common/contract.py`
 
 - `class` **ComponentBinding** L51
 - `method` **ComponentBinding.__post_init__** L57
@@ -2372,7 +2314,7 @@ _No class/function symbols._
 - `function` **contract_registry_document** L167
 - `function` **_b** L184
 
-### `artifacts/dcm_v6_workstream_ab/dcm/sports/common/plugin.py`
+### `src/dcm/sports/common/plugin.py`
 
 - `class` **SportPluginManifest** L13
 - `function` **register** L28
@@ -2380,7 +2322,7 @@ _No class/function symbols._
 - `function` **_cap** L36
 - `function` **selection_state** L53
 
-### `artifacts/dcm_v6_workstream_ab/dcm/sports/common/research_schema.py`
+### `src/dcm/sports/common/research_schema.py`
 
 - `class` **SportResearchSchema** L19
 - `method` **SportResearchSchema.validate_contract** L38
@@ -2391,23 +2333,23 @@ _No class/function symbols._
 - `function` **lookup_research_schema** L108
 - `function` **require_research_schema** L112
 
-### `artifacts/dcm_v6_workstream_ab/dcm/sports/football/__init__.py`
+### `src/dcm/sports/football/__init__.py`
 
 _No class/function symbols._
 
-### `artifacts/dcm_v6_workstream_ab/dcm/sports/football/appearance.py`
+### `src/dcm/sports/football/appearance.py`
 
 - `class` **FootballAppearanceProcess** L15
 - `method` **FootballAppearanceProcess.as_payload** L24
 - `function` **appearance_process_for** L36
 
-### `artifacts/dcm_v6_workstream_ab/dcm/sports/football/cfb_role.py`
+### `src/dcm/sports/football/cfb_role.py`
 
 - `function` **_truthy** L25
 - `function` **_num** L31
 - `function` **resolve_cfb_role_state** L38
 
-### `artifacts/dcm_v6_workstream_ab/dcm/sports/football/conservation.py`
+### `src/dcm/sports/football/conservation.py`
 
 - `function` **_rule** L13
 - `function` **football_conservation_rules** L26
@@ -2416,12 +2358,12 @@ _No class/function symbols._
 - `function` **evaluate_football_conservation** L68
 - `function` **conservation_passed** L193
 
-### `artifacts/dcm_v6_workstream_ab/dcm/sports/football/efficiency.py`
+### `src/dcm/sports/football/efficiency.py`
 
 - `function` **player_efficiency** L12
 - `function` **apply_efficiency** L17 — Map opportunity × rates to primitive outcomes. Bounds are applied here so
 
-### `artifacts/dcm_v6_workstream_ab/dcm/sports/football/ledger.py`
+### `src/dcm/sports/football/ledger.py`
 
 - `class` **ConservationError** L27
 - `method` **ConservationError.__init__** L28
@@ -2432,7 +2374,7 @@ _No class/function symbols._
 - `function` **build_football_world** L75
 - `function` **corrupt_stat** L173 — Return a new ledger with one primitive overwritten. Used by the harness.
 
-### `artifacts/dcm_v6_workstream_ab/dcm/sports/football/opportunity.py`
+### `src/dcm/sports/football/opportunity.py`
 
 - `class` **TeamOpportunityPool** L15
 - `method` **TeamOpportunityPool.rush_att** L25
@@ -2441,7 +2383,7 @@ _No class/function symbols._
 - `method` **TeamOpportunityPool.validate_internal** L43
 - `function` **player_opportunity** L50
 
-### `artifacts/dcm_v6_workstream_ab/dcm/sports/football/projection.py`
+### `src/dcm/sports/football/projection.py`
 
 - `class` **ProjectionError** L17
 - `method` **ProjectionError.__init__** L18
@@ -2450,7 +2392,7 @@ _No class/function symbols._
 - `method` **_eval_formula.flush** L48
 - `function` **project_football_market** L73
 
-### `artifacts/dcm_v6_workstream_ab/dcm/sports/football/registry.py`
+### `src/dcm/sports/football/registry.py`
 
 - `function` **football_primitive_keys** L139
 - `function` **football_stat_reboot_eligibility** L143 — Return VERIFIED_TRUE, VERIFIED_FALSE, or UNKNOWN.
@@ -2458,792 +2400,50 @@ _No class/function symbols._
 - `function` **football_market_definitions** L189
 - `function` **lookup_market** L212
 
-### `artifacts/dcm_v6_workstream_ab/dcm/sports/football/research_requirements.py`
+### `src/dcm/sports/football/research_requirements.py`
 
 - `function` **_row_has** L28
 - `function` **support_count** L32
 - `function` **assess_football_support** L38 — Return independent minimum-model and PLAYABLE support states.
 
-### `artifacts/dcm_v6_workstream_ab/dcm/sports/football/settlement_map.py`
+### `src/dcm/sports/football/settlement_map.py`
 
 - `function` **canonicalize_prizepicks_football_market** L89
 - `function` **settle_football_market** L102 — Map a primitive ledger + PrizePicks football market to a scalar identity.
 - `function` **settle_football_player** L118 — World-projection settlement from a PrimitiveStatLedger. Unknown → fail closed.
 
-### `artifacts/dcm_v6_workstream_ab/dcm/validation/__init__.py`
+### `src/dcm/validation/__init__.py`
 
 _No class/function symbols._
 
-### `artifacts/dcm_v6_workstream_ab/dcm/validation/conservation_harness.py`
+### `src/dcm/validation/conservation_harness.py`
 
 - `class` **HarnessCase** L19
 - `function` **_valid_spec** L25
 - `function` **run_football_harness** L136
 
-### `artifacts/dcm_v6_workstream_ab/dcm/version.py`
+### `src/dcm/version.py`
 
 - `class` **ExactVersionMismatch** L14 — Requested --version does not resolve to this build's VERSION.json.
 - `function` **_candidates** L18
-- `function` **version_json_path** L46
-- `function` **load_version_manifest** L53
-- `function` **_manifest** L63
-- `function` **accepted_version_tokens** L88
-- `function` **resolve_requested_version** L94 — Map a CLI --version token onto the VERSION.json manifest.
+- `function` **version_json_path** L47
+- `function` **load_version_manifest** L54
+- `function` **_manifest** L64
+- `function` **accepted_version_tokens** L89
+- `function` **resolve_requested_version** L95 — Map a CLI --version token onto the VERSION.json manifest.
 
-### `artifacts/dcm_v6_workstream_ab/pillars_dcm/__init__.py`
-
-_No class/function symbols._
-
-### `artifacts/dcm_v6_workstream_ab/pillars_dcm/__main__.py`
+### `src/pillars_dcm/__init__.py`
 
 _No class/function symbols._
 
-### `artifacts/dcm_v6_workstream_ab/pillars_dcm/release.py`
+### `src/pillars_dcm/__main__.py`
 
 _No class/function symbols._
 
-### `artifacts/dcm_v6_workstream_ab/pillars_dcm/runner.py`
+### `src/pillars_dcm/release.py`
 
 _No class/function symbols._
 
-### `artifacts/dcm_v6_workstream_ab/tests/conftest.py`
+### `src/pillars_dcm/runner.py`
 
 _No class/function symbols._
-
-### `artifacts/dcm_v6_workstream_ab/tests/fixtures.py`
-
-- `function` **nfl_home_pool** L9
-- `function` **nfl_players** L21
-- `function` **build_nfl_game** L59
-- `function` **build_cfb_game** L68
-- `function` **legal_bball_stats** L83
-- `function` **build_nba_game** L106
-- `function` **played** L116
-- `function` **nfl_pick** L125
-
-### `artifacts/dcm_v6_workstream_ab/tests/live_sanitized/__init__.py`
-
-_No class/function symbols._
-
-### `artifacts/dcm_v6_workstream_ab/tests/live_sanitized/test_live_prizepicks_har.py`
-
-- `function` **test_compact_har_parses_jsonapi_and_accounts_sides_modifiers** L28
-- `function` **test_compact_cli_fixture_run_writes_artifacts** L50
-- `function` **test_full_sanitized_har_accounts_11113** L86
-- `function` **test_v1_expected_hash_unchanged** L150
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_bundle_e2e_resume.py`
-
-- `function` **_frozen_claim** L16
-- `function` **test_checkpoint_bundle_resume_validate_snapshot_model_freeze** L74
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_bundle_provider.py`
-
-- `function` **test_bundle_provider_roundtrip_hashes** L8
-- `function` **test_market_definition_split_reuses_across_offers** L43
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_cfb_freeze_gate.py`
-
-- `function` **_logs** L29
-- `function` **_cfb_row** L50
-- `function` **_claims** L59
-- `function` **test_material_fact_changes_fitted_snapshot_hash_and_role** L83
-- `function` **test_material_status_changes_snapshot_and_availability** L99
-- `function` **test_lone_rb_uses_shared_residual_event_world** L112
-- `function` **test_lone_qb_uses_shared_event_world** L123
-- `function` **test_kicker_remains_isolated** L132
-- `function` **test_starter_qb_not_blindly_capped_at_92** L144
-- `function` **test_conservation_holds_with_residuals** L156
-- `function` **test_material_refresh_rebuild_keys_and_full_bundle_can_flip_direction** L166
-- `function` **test_material_refresh_can_change_ranking** L197
-- `function` **test_frontier_required_cannot_freeze** L223
-- `function` **test_frontier_hash_change_increments_pass** L239
-- `function` **test_unrelated_evidence_does_not_increment_pass** L249
-- `function` **test_status_evidence_does_not_satisfy_game_history** L265
-- `function` **test_exact_id_does_not_query_bloom_composite_sqlite** L291
-- `function` **test_l5_semantic_to_content_address** L307
-- `function` **test_source_health_zero_success_stays_zero** L327
-- `function` **test_open_source_changes_routing_and_celf_gain** L338
-- `function` **test_half_open_is_one_trial** L360
-- `function` **test_market_execution_matrix_not_hardcoded_and_all_active** L373
-- `function` **test_runner_uses_joint_cfb_for_one_player** L389
-- `function` **test_incremental_research_os_skips_static_rebuild** L396
-- `function` **test_warm_reuse_hits_l5_after_ephemeral_clear** L416
-- `function` **test_facts_hash_to_feature_hash_chain** L431
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_cfb_guarded_launch.py`
-
-- `function` **_claim** L24
-- `function` **_claims** L60
-- `function` **test_cfb_guarded_launch_har_to_probability_fixture** L110
-- `function` **_web_claims** L145
-- `function` **test_real_cfb_partial_global_bundle_does_not_checkpoint_supported_rows** L164
-- `function` **test_interim_frontier_has_no_frozen_semantics_or_settlement_eligibility** L192
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_cfb_reference_implementation.py`
-
-- `function` **test_exact_aliases_normalize_to_same_market** L32
-- `function` **test_longest_play_is_genuine_unsupported_not_alias** L48
-- `function` **test_inventory_covers_active_and_unsupported** L57
-- `function` **test_kicking_pts_formula_parses_multiplication** L70
-- `function` **test_kicking_pts_project_from_ledger** L76
-- `function` **test_efficiency_fits_td_int_kicking_from_logs** L85
-- `function` **test_empirical_bayes_and_stdlib_ml_primitives** L111
-- `function` **test_research_may_begin_false_until_readiness** L121
-- `function` **test_har_delta_line_only_reuses_history** L141
-- `function` **test_coextract_fanout_one_page_many_entities** L152
-- `function` **test_champion_portable_and_gpu_rejected** L176
-- `function` **test_portfolio_combo_constraints** L191
-- `function` **test_learning_firewall_stays_lr000000** L197
-- `function` **test_plugin_activates_new_markets** L205
-- `function` **test_hold_playable_demotes_conflict** L211
-- `function` **test_governed_role_epoch_executes_ewma_cusum_page_hinkley** L232
-- `function` **test_archive_retry_reconcile_and_drive_catalog** L245
-- `function` **test_retrieval_cascade_queries_rrf_mmr_lsh** L268
-- `function` **test_failure_class_identity_and_stale** L285
-- `function` **test_joint_cfb_event_worlds_emit_allocation_mode** L294
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_cfb_research_os.py`
-
-- `function` **_rows** L21
-- `function` **_real_shape_har** L26
-- `function` **test_cfb_accounting_before_goblin_exclusion** L34
-- `function` **test_graphs_exist_before_research_and_use_constitution_primitives** L49
-- `function` **test_modelable_is_not_playable_and_per_prop_flags** L70
-- `function` **test_live_batch_uses_celf_not_one_prop_one_search** L84
-- `function` **test_large_board_celf_does_not_starve_on_sport_mass** L96 — SPORT/COMPETITION fanout must not consume the unique-offer budget alone.
-- `function` **test_fixture_provider_cannot_create_production_playables** L114 — FixtureProvider is engineering-only. Graphs still emit; playables stay 0.
-- `function` **test_cfb_fixture_end_to_end_top100_top25_playables_interim** L138
-- `function` **test_offered_side_only_and_goblin_after_accounting** L238
-- `function` **test_partial_bundle_still_emits_graphs_and_per_prop_states** L246
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_cfb_semantic_completion.py`
-
-- `function` **test_ceremonial_violations_detect_sample_queries** L17
-- `function` **test_launch_source_does_not_sample_query_indexes** L43
-- `function` **test_exact_identity_skips_fuzzy** L54
-- `function` **test_lone_rb_does_not_absorb_team_rush** L73
-- `function` **test_kicker_gets_zero_rush_and_targets** L81
-- `function` **test_two_rbs_share_and_leave_residual** L93
-- `function` **test_joint_worlds_residual_and_kicker_isolation** L104
-- `function` **test_material_fact_hash_includes_values** L118
-- `function` **test_source_health_open_skipped_half_open_and_cfb_adapter** L137
-- `function` **test_cache_does_not_self_put_get_requests** L159
-- `function` **test_line_only_refresh_does_not_rebuild_worlds** L176
-- `method` **test_line_only_refresh_does_not_rebuild_worlds.resim** L190
-- `function` **test_material_refresh_flags_rebuild_keys_without_resimulate** L206
-- `method` **test_material_refresh_flags_rebuild_keys_without_resimulate.resim** L220
-- `function` **test_frontier_does_not_increment_on_generic_evidence** L243
-- `function` **test_isotonic_conformal_inactive_at_lr000000** L254
-- `function` **test_prepare_has_no_ceremonial_violations** L274
-- `function` **test_material_fact_resolution_is_lineage_aware_and_conservative** L300
-- `function` **test_probability_bundle_keeps_conformal_inactive_without_earned_calibration** L335
-- `function` **test_archive_certification_rejects_interim_frontier** L351
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_cfb_source_aware_import.py`
-
-- `function` **_board_context** L28
-- `function` **_event_observation** L46
-- `function` **test_empty_field_coverage_rejected_and_does_not_close_contract** L88
-- `function` **test_one_event_observation_fans_out_and_changes_parameter_consumers** L106
-- `function` **test_idempotent_reimport_does_not_duplicate_claims** L160
-- `function` **test_observation_to_claim_rejects_empty_data** L174
-- `function` **test_research_store_sport_is_not_semantic_scope** L187 — put_claim must store sport separately from entityKind (scope kind).
-- `function` **test_invalidate_descendants_spares_unrelated_offer_parameters** L206
-- `function` **test_source_aware_import_uses_indexes_and_consumer_beyond_snapshot** L242
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_completion_context_runtime.py`
-
-- `function` **test_research_cache_reopens_from_durable_sqlite** L29
-- `function` **test_research_cache_rejects_tampered_payload_hash** L43
-- `function` **test_input_boundary_only_emits_safe_hashes_and_marker_classes** L58
-- `function` **test_capability_boundary_summary_is_archive_safe** L85
-- `function` **test_source_health_clock_is_deterministic** L99
-- `function` **test_temporal_correction_replaces_without_false_conflict** L111
-- `function` **test_cfb_signal_runtime_has_real_consumers_and_no_probability_override** L132
-- `function` **test_decision_integrity_is_reject_only_and_rules_are_separate** L145
-- `function` **test_checkpoint_outbox_is_idempotent** L164
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_e2e_runner.py`
-
-- `function` **_synthetic_har** L29
-- `function` **_row** L57
-- `function` **test_a_synthetic_smoke** L84
-- `function` **test_b_real_har_sanitized_fixture_is_supplied** L146
-- `function` **test_c_thousand_row_board_accounts_every_row** L155
-- `function` **test_d_line_change_invalidates_descendants_not_research** L222
-- `function` **test_e_checkpoint_resume_matches_uninterrupted** L248
-- `function` **test_f_zero_playable_returns_empty_card** L277
-- `function` **test_g_demon_is_demotion_only** L300
-- `function` **test_h_simplex_push_aware** L324
-- `function` **test_i_pra_equals_pts_reb_ast_every_world** L335
-- `function` **test_j_unsupported_sport_accounted_not_dropped** L348
-- `function` **test_j_cfb_name_is_not_official_player_id** L357
-- `function` **test_temporal_leak_fails_closed** L373
-- `function` **test_corruption_basketball_and_baseball_fail** L392
-- `function` **test_append_only_learning_refuses_mutation** L416
-- `function` **test_software_version_does_not_promote_lr** L421
-- `function` **test_resume_rejects_tampered_frozen_model_config** L428
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_e2e_world_to_lineup.py`
-
-- `function` **_entry** L21
-- `function` **test_goblin_cannot_enter_production_contract** L31
-- `function` **test_goblin_may_be_built_for_analytics_only** L38
-- `function` **test_missing_display_hash_impossible** L51
-- `function` **test_nba_e2e_win_path** L63
-- `function` **test_nba_reboot_1h_leave_and_already_achieved** L92
-- `function` **test_nfl_e2e_combo_derived_from_same_world** L107
-- `function` **test_nfl_defense_excluded_from_reboot** L132
-- `function` **test_nfl_reboot_qualifying_and_same_team_refund** L140
-- `function` **test_tie_stays_in_eligibility_not_removed** L161
-- `function` **test_dnp_removes_from_eligibility** L179
-- `function` **test_kicker_zero_opportunity_path** L195
-- `function` **test_nfl_preseason_unresolved** L203
-- `function` **test_cfb_unlisted_player_unresolved** L213
-- `function` **test_cfb_registered_player_can_reboot** L223
-- `function` **test_cfb_e2e_path_uses_same_adapter** L243
-- `function` **test_unknown_mg_row_fail_closed** L260
-- `function` **test_leaderboard_modeled_when_group_supplied** L282
-- `function` **test_payout_gt_zero_is_not_net_gt_zero** L304
-- `function` **test_hashes_are_stable_and_bound** L320
-- `function` **test_preseason_e2e_unresolved_does_not_guess_payout** L327
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_entity_packets.py`
-
-- `function` **_team_logs** L32
-- `function` **_paige_rows** L49
-- `function` **_claim** L84
-- `function` **test_one_dal_packet_serves_every_dal_player_and_is_reused_as_opponent** L100
-- `function` **test_fixture_team_prior_is_not_research** L135
-- `function` **test_team_html_adapter_drives_ortg_drtg_pace** L150
-- `function` **test_team_html_alone_drives_ortg_drtg_pace_not_silent_1_0** L178
-- `function` **test_onoff_adapter_and_shrinkage_caps_tiny_samples** L197
-- `function` **test_snapshot_uses_team_packet_ortg_not_silent_1_0** L216
-- `function` **test_entity_graph_reuses_one_team_node** L262
-- `function` **test_staged_pass_a_everyone_pass_b_deepens_without_replacing_log** L290
-- `function` **test_plan_research_fans_out_opponent_as_counterparty** L318
-- `function` **test_player_index_groups_offers_name_is_not_id** L331
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_evidence_coverage.py`
-
-- `function` **_claim** L6
-- `function` **test_player_coverage_requires_status_role_logs_and_model_inputs** L14
-- `function` **test_market_coverage_requires_verified_definition** L42
-- `function` **test_player_object_exists_is_not_coverage** L57
-- `function` **test_points_market_incomplete_without_fga_or_pts** L76
-- `function` **test_pra_requires_minutes_pts_reb_ast** L108
-- `function` **test_football_player_path_not_subject_to_basketball_market_codes** L138
-- `function` **test_points_requires_shot_attempts_not_just_pts_totals** L162
-- `function` **test_fixture_team_pace_one_is_not_coverage** L184
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_evidence_graph.py`
-
-- `function` **test_graph_trace_from_fake_selection_to_claim_url** L18
-- `function` **test_fixture_runner_writes_graph_structures** L75
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_explanation.py`
-
-- `function` **_row** L13
-- `function` **_snapshot** L29
-- `function` **_side_eval** L58
-- `function` **test_explanation_contains_required_keys_for_points_more** L75
-- `function` **test_drivers_empty_list_ok_when_no_delta** L122
-- `function` **test_probability_contract_keys_are_separate** L154
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_fail_closed_regressions.py`
-
-- `function` **_base_row** L13
-- `function` **_claim** L26
-- `function` **test_outlier_unknown_side_fails_closed_and_zero_line_is_preserved** L39
-- `function` **test_unknown_or_uncertain_status_is_not_production_selectable** L59
-- `function` **test_dedupe_never_mutates_hashed_claim_content_and_conflicts_are_sidecar** L82
-- `function` **test_published_after_cutoff_is_temporal_leak_even_if_observed_time_is_safe** L120
-- `function` **test_production_evidence_rejects_secret_bearing_source_url** L138
-- `function` **test_cross_claim_type_field_conflict_is_blocking** L161
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_feature_store.py`
-
-- `function` **_fixture_log** L14
-- `function` **test_l5_mean_matches_hand_computed_from_fixture_log** L28
-- `function` **test_persist_writes_jsonl_and_manifest** L87
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_football_registry.py`
-
-- `function` **test_nfl_and_cfb_share_primitive_keys** L19
-- `function` **test_conservation_rules_exist_for_nfl_cfb_nflp** L29
-- `function` **test_valid_nfl_world_conserves** L35
-- `function` **test_valid_cfb_world_conserves** L43
-- `function` **test_snap_sum_is_not_required_to_equal_plays** L49
-- `function` **test_qb_dropback_identity** L58
-- `function` **test_receptions_cannot_exceed_targets** L65
-- `function` **test_builder_fail_closed_on_pass_rec_mismatch** L72
-- `function` **test_derived_combo_matches_components** L99
-- `function` **test_unverified_market_fail_closed** L107
-- `function` **test_defense_stat_not_reboot_eligible** L116
-- `function` **test_cfb_player_registry_is_explicit** L122
-- `function` **test_unknown_stat_eligibility_is_unknown** L127
-- `function` **test_harness_valid_and_corrupt** L131
-- `function` **test_ledger_hash_changes_on_corruption** L139
-- `function` **test_market_definition_key_is_exact_tuple** L145
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_freshness.py`
-
-- `function` **test_completed_game_facts_do_not_expire** L17
-- `function` **test_season_recent_form_is_not_an_immutable_fact** L32
-- `function` **test_event_multiplier_piecewise** L45
-- `function` **test_status_claim_decays_near_tipoff** L52
-- `function` **test_gtd_is_governed_alias_for_game_time_decision** L82
-- `function` **test_unknown_inputs_fail_closed** L89
-- `function` **test_efficiency_is_not_mapped_to_opportunity_category** L99
-- `function` **test_effective_half_life_matches_spec_defaults** L104
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_gamelog_normalize.py`
-
-- `function` **_player_request** L14
-- `function` **_player_claim** L27
-- `function` **_base_row** L31
-- `function` **_claim** L46
-- `function` **test_br_style_mp_normalizes_minutes_reb_ast** L59
-- `function` **test_mp_clock_string_parses_to_minutes** L71
-- `function` **test_normalize_logs_rejects_missing_minutes_without_inventing_fga** L85
-- `function` **test_coverage_mp_plus_ast_is_complete_for_ast_market** L102
-- `function` **test_coverage_mp_pts_without_ast_misses_market_stat_ast** L123
-- `function` **test_coverage_three_dicts_without_minutes_still_incomplete** L141
-- `function` **_snapshot_for_logs** L166
-- `function` **test_parameters_mp_logs_drive_minutes_not_wnba_prior** L185
-- `function` **test_parameters_empty_logs_use_labeled_prior_not_log_support** L212
-- `function` **test_role_epoch_builder_sees_minutes_after_mp_alias** L224
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_github_archive.py`
-
-- `function` **_player_claim** L27
-- `function` **_event_claim** L47
-- `function` **_market_claim** L64
-- `function` **_requests** L76
-- `function` **_slim_pick** L117
-- `function` **_write_json** L132
-- `function` **_write_jsonl** L137
-- `function` **_fake_dest** L142
-- `function` **test_pick_to_requests_matches_slim_fields** L202
-- `function` **test_lock_without_player_claims_is_not_certified** L218
-- `function` **test_complete_player_event_market_definition_is_certified** L232
-- `function` **test_fixture_evidence_mode_on_live_har_fails_gate** L265
-- `function` **test_empty_card_can_certify_when_research_ran** L287
-- `function` **test_card_with_incomplete_evidence_is_not_certified** L304
-- `function` **test_materialize_github_pack_never_copies_har_or_sqlite** L318
-- `function` **test_build_run_audit_writes_run_audit_md** L352
-- `function` **test_push_to_github_commits_without_network** L369
-- `function` **test_gitignore_still_ignores_har_under_audit_runs** L419
-- `function` **test_manual_research_card_is_not_model_run_certified** L438
-- `function` **test_set_cookie_dest_file_is_not_copied** L471
-- `function` **test_researched_modeled_card_is_python_freeze_certified** L489 — Three-layer modeled card is a Python freeze even while production root stays closed.
-- `function` **test_locks_certified_is_compatibility_helper_not_canonical_state** L522 — Combined lock state is retired from canonical output.
-- `function` **test_archive_copies_explanations_graph_and_feature_store_when_present** L562
-- `function` **test_cookie_header_dest_file_is_not_copied** L586
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_gridiron_plugin.py`
-
-- `function` **_html** L32
-- `function` **_claim** L36
-- `function` **_qb_logs** L49
-- `function` **_wr_logs** L68
-- `function` **test_pfr_aliases_normalize_pass_and_receiving** L85
-- `function` **test_off_pct_parses_and_dnp_rejected** L105
-- `function` **test_adapter_fixture_nfl_qb_and_cfb_qb** L114
-- `function` **test_adapter_fixture_wr_targets_receptions** L131
-- `function` **test_role_epoch_gridiron_starter_depth_and_qb_identity** L141
-- `function` **test_opportunity_and_efficiency_qb_vs_skill** L167
-- `function` **test_team_event_missing_defense_fail_closed_for_playable** L180
-- `function` **test_derive_markets_from_primitive_ledger** L194
-- `function` **test_unknown_football_market_fails_closed** L210
-- `function` **test_cfb_pass_yards_from_fixture_ledger** L222
-- `function` **test_nfl_and_cfb_row_reaches_modeled_path_with_fixture** L230
-- `function` **test_skill_receptions_path_from_fixture** L300
-- `function` **test_production_capable_only_full_path_markets** L325
-- `function` **test_missing_opponent_defense_blocks_playable_snapshot** L346
-- `function` **test_fixture_pass_yards_offer_derived_from_primitive_ledger** L367 — One-line demo: a fixture NFL pass-yards offer equals ledger pass_yds.
-- `function` **test_cfb_attempt_markets_are_opportunity_only_for_model_support** L373
-- `function` **test_cfb_yardage_market_can_model_thin_but_not_playable** L394
-- `function` **test_cfb_market_support_holds_zero_history_for_research** L415
-- `function` **test_cfb_blowout_regime_is_explicit_not_directional** L433
-- `function` **test_cfb_role_state_transfer_and_promoted_are_not_returning_starters** L448
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_har_ingest.py`
-
-- `function` **test_sha256_abc** L18
-- `function` **test_synthetic_har_accounts_every_row_and_goblins** L22
-- `function` **test_denied_account_endpoint_is_not_replayed** L34
-- `function` **test_board_json_accounting_and_wsab_bind** L42
-- `function` **test_prizepicks_jsonapi_payload** L62
-- `function` **test_unknown_shape_fail_closed** L115
-- `function` **test_mount_refuses_wrong_hash** L122
-- `function` **test_mount_copies_only_on_match** L132
-- `function` **test_har_run_synthetic_does_not_promote_lr** L142
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_historical_gap.py`
-
-- `function` **test_append_only_missing_events_38_40** L5
-- `function` **test_unexpected_extra_is_audited_not_deleted** L20
-- `function` **test_stored_event_ids_prefer_eventId** L30
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_host_native.py`
-
-- `function` **test_doctor_reports_identity_and_does_not_claim_performance** L20
-- `function` **test_cli_help_exits_zero** L38
-- `function` **test_cli_doctor** L44
-- `function` **test_host_session_prepare_next_research_import_coverage_report** L52
-- `function` **test_observation_rejects_secret_url** L154
-- `function` **test_cli_prepare_synthetic** L170
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_joint_event_world.py`
-
-- `function` **_spec** L13
-- `function` **test_five_wnba_teammates_minutes_sum_near_200** L40
-- `function` **test_two_teammates_team_total_including_residual_near_200** L54
-- `function` **test_nba_five_teammates_minutes_sum_near_240** L63
-- `function` **_corr** L75
-- `function` **test_fga_negative_correlation_or_residual** L84 — Players compete for a team FGA pool (Dirichlet shares). Shared pace can
-- `function` **test_single_player_path_still_independent** L114
-- `function` **test_reconcile_method_documented** L122
-- `function` **test_runner_two_teammates_writes_joint_meta** L133
-- `method` **test_runner_two_teammates_writes_joint_meta.row** L138
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_line_surface.py`
-
-- `function` **test_tolerance_positive_when_distribution_clears_soft_line_more** L7
-- `function` **test_tolerance_positive_when_distribution_clears_soft_line_less** L23
-- `function` **test_tolerance_zero_when_worlds_do_not_clear_line** L31
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_lineage_and_schema.py`
-
-- `function` **test_schema_version_matches_freeze_id** L9
-- `function` **test_schema_inventory_adds_no_new_common_types** L13
-- `function` **test_lineage_cannot_skip_stages** L22
-- `function` **test_lineage_stage_order_matches_blueprint** L31
-- `function` **test_content_hash_is_deterministic** L37
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_market_derive.py`
-
-- `function` **test_pra_always_pts_plus_reb_plus_ast_on_ledger** L10
-- `function` **test_two_pa_two_pm_identities** L23
-- `function` **test_unknown_market_fails_closed_no_fuzzy** L47
-- `function` **test_fantasy_score_fails_closed_without_registered_definition** L59
-- `function` **test_ledger_contains_required_primitive_keys** L67
-- `function` **test_value_from_stats_pra_ignores_corrupted_precomputed_field** L84
-- `method` **test_value_from_stats_pra_ignores_corrupted_precomputed_field.spy** L88
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_multi_har.py`
-
-- `function` **_row** L10
-- `function` **_har** L35
-- `function` **_ing** L63
-- `function` **test_request_scope_normalizes_query_order_and_volatile_values** L68
-- `function` **test_complementary_hars_union_and_reverse_input_order_is_invariant** L82
-- `function` **test_scope_not_recaptured_retains_prior_valid_state** L105
-- `function` **test_successful_verified_empty_identical_scope_clears_prior_state** L129
-- `function` **test_failed_identical_scope_refresh_retains_prior_valid_state** L141
-- `function` **test_asof_scope_state_uses_last_success_before_cutoff** L155
-- `function` **test_successful_empty_after_cutoff_does_not_clear_pre_cutoff_board** L166
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_offer_metadata.py`
-
-- `function` **_request** L5
-- `function` **test_recovery_uses_har_row_and_never_infers_inverse_side** L9
-- `function` **test_recovery_marks_missing_sides_explicitly** L25
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_official_predicates.py`
-
-- `function` **_cfb** L10
-- `function` **test_cfb_regular_season_does_not_reboot** L24
-- `function` **test_cfb_bowl_does_not_reboot** L33
-- `function` **test_cfb_unknown_phase_unresolved** L42
-- `function` **test_partial_board_never_reboots_nfl** L51
-- `function` **test_third_quarter_exit_is_not_a_reboot** L60
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_p1_authority_role.py`
-
-- `function` **test_source_authority_derives_reliability_freshness** L8
-- `function` **test_sport_specific_event_team_fail_closed** L32
-- `function` **test_role_epoch_builder_partitions_when_claims_exist** L54
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_p4_freeze_contract.py`
-
-- `function` **_row** L20
-- `function` **_har** L48
-- `function` **test_slim_probability_contract_keys_are_separate** L67
-- `function` **test_line_surface_fields_on_playable_or_lean_slim** L108
-- `function` **test_joint_worlds_engaged_on_multi_teammate_board** L131
-- `function` **test_derive_market_used_for_pra_in_simulation_path** L150
-- `method` **test_derive_market_used_for_pra_in_simulation_path.spy** L154
-- `function` **test_pre_freeze_gates_strip_late_out** L168
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_p6_learning.py`
-
-- `function` **_row** L31
-- `function` **_write_settleable** L51
-- `function` **_settle_nine** L109
-- `function` **test_dataset_builds_n_rows_from_synthetic_settled_run** L133
-- `function` **test_dataset_refuses_missing_settlements** L161
-- `function` **test_walkforward_refuses_leakage** L169
-- `function` **test_challenger_shadow_propose_blocked_promote_refuses_lr** L203
-- `function` **test_calibration_readiness_false_on_small_n** L234
-- `function` **test_failure_class_does_not_permanent_patch** L249
-- `function` **test_p6_does_not_add_pkl_or_advance_lr** L265
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_p8_status_cache_availability.py`
-
-- `function` **test_espn_status_maps_questionable_and_rest_out** L17
-- `function` **test_official_wnba_schedule_marks_started_event** L39
-- `function` **test_research_cache_respects_as_of_not_wall_clock** L76
-- `function` **test_availability_mixture_blocks_questionable_records_probable** L100
-- `function` **test_collect_cache_hits_on_second_pass** L118
-- `function` **test_questionable_mixture_produces_sit_worlds_and_stays_playable_blocked** L137
-- `function` **test_active_does_not_mix_sit_worlds** L159
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_parameter_snapshot_scopes.py`
-
-- `function` **_claim** L10
-- `function` **test_snapshot_builds_from_market_definition_and_offer_without_legacy_market** L26
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_phase_bc_v2.py`
-
-- `function` **test_v1_expected_hash_is_immutable_and_bytes_unavailable** L8
-- `function` **test_v2_frozen_hash_matches_bytes** L20
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_player_offer_set.py`
-
-- `function` **_row** L23
-- `function` **test_twelve_paige_offers_collapse_to_one_set** L50
-- `function` **test_same_player_two_events_stay_separate** L76
-- `function` **test_eight_plus_markets_one_set_not_n_subjects** L89
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_player_packet.py`
-
-- `function` **_season_logs** L19
-- `function` **_paige_rows** L42
-- `function` **test_full_season_37_logs_l5_derived_full_log_retained** L69
-- `function` **test_mp_trb_normalize_via_adapter_html** L95
-- `function` **test_one_packet_reused_for_every_offer_in_set** L147
-- `function` **test_pra_identity_fields_on_packet** L179
-- `function` **test_minutes_missing_flagged_never_silent_prior_as_research** L196
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_plugin_contract.py`
-
-- `function` **test_unknown_family_fail_closed** L4
-- `function` **test_cfl_not_automatically_production_reboot** L8
-- `function` **test_boxing_not_ufc** L14
-- `function` **test_every_family_has_path_unit** L19
-- `function` **test_no_generic_esports_model** L26
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_postgame_integrity.py`
-
-- `function` **_make_run** L14
-- `function` **test_postgame_verifies_frozen_run_and_hashes_outcome_source** L26
-- `function` **test_postgame_rejects_tampered_full_population** L36
-- `function` **test_postgame_rejects_tampered_hash_sidecar** L49
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_production_hardening.py`
-
-- `function` **test_missing_offered_side_fails_closed** L17
-- `function` **test_asof_board_excludes_post_cutoff_snapshot** L25
-- `function` **test_fixture_research_is_never_production_ready** L39
-- `function` **_claim** L47
-- `function` **test_real_evidence_parameterizes_worlds_and_separates_opportunity_efficiency** L55
-- `function` **test_synthetic_probability_is_heavily_shrunk** L75
-- `function` **test_directional_line_surface_and_shared_dependency_constraint** L79
-- `method` **test_directional_line_surface_and_shared_dependency_constraint.p** L87
-- `function` **test_event_start_is_not_market_updated_at** L97
-- `function` **test_schema_gate_rejects_reconstruction_hash** L124
-- `function` **test_event_contexts_are_shared_by_event_not_player** L142
-- `function` **test_portfolio_rejects_highly_correlated_simulated_selection_outcomes** L151
-- `method` **test_portfolio_rejects_highly_correlated_simulated_selection_outcomes.candidate** L152
-- `function` **test_adaptive_governor_escalates_only_serious_production_candidates** L176
-- `function` **test_shadow_calibration_cell_cannot_activate_without_lr_promotion** L196
-- `function` **test_physical_count_primitives_are_discrete_and_conserved** L224
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_quarter_worlds.py`
-
-- `function` **test_quarter_shares_sum_to_game_points_and_minutes** L18
-- `function` **test_threshold_counts_quarters_with_3plus_pts** L30
-- `function` **test_do_not_infer_quarters_from_full_game_gaussian_alone** L42
-- `function` **test_half_and_quarter_pts_sum_to_game** L52
-- `function` **test_quarter_reb_board_fails_closed** L65
-- `function` **test_simulate_player_worlds_attaches_quarters** L73
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_release_freshness.py`
-
-- `function` **test_committed_zip_absent** L14
-- `function` **test_manifests_are_not_stale_41** L22
-- `function` **test_portable_release_builder_and_extraction** L42
-- `function` **test_release_manifest_requires_git_commit** L65
-- `function` **test_portable_release_git_commit_and_complete_project_source** L73
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_research_efficiency.py`
-
-- `function` **_board** L20
-- `function` **test_full_har_research_plan_far_below_legacy_20k** L26
-- `function` **test_mlb_shadow_research_opt_in** L94
-- `function` **test_account_only_writes_bundle_oriented_plan** L112
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_research_population.py`
-
-- `function` **_row** L16
-- `function` **test_manifest_counts_universal_entities_and_fanout_priority** L43
-- `function` **test_account_only_emits_canonical_and_legacy_research_artifacts** L97
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_research_store.py`
-
-- `function` **_claim** L14
-- `function` **test_store_is_content_addressed_and_latest_pointer** L34
-- `function` **test_delta_new_entity_then_reuse** L47
-- `function` **test_batch_skips_reuse_valid_and_groups_by_event** L65
-- `function` **test_batch_does_not_reacquire_semantically_complete_request_without_cache_reuse** L112 — Fresh host imports close the current run before cache hydration occurs.
-- `function` **test_classify_requests_hydrates_blob_not_pointer** L132
-- `function` **test_append_missing_history_from_stored_logs** L149
-- `function` **test_game_log_append_is_deduped_and_does_not_replace_history** L163
-- `function` **test_outcome_memory_does_not_change_research_delta** L178
-- `function` **test_source_and_time_indexes_exist** L194
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_role_epoch.py`
-
-- `function` **_bench_to_starter_logs** L8
-- `function` **_claim** L39
-- `function` **_row** L52
-- `function` **test_builder_id_is_not_stub** L67
-- `function` **test_change_point_bench_to_starter_37** L76
-- `function` **test_thin_support_raises_prior_weight** L105
-- `function` **test_parameters_use_role_comparable_minutes_when_epochs_exist** L117
-- `function` **test_thin_role_sample_does_not_set_evidence_used** L145
-- `function` **test_does_not_invent_logs** L182
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_runtime_lineage.py`
-
-- `function` **_claim** L21
-- `function` **test_runtime_lineage_attaches_feature_parameter_simulation_selection** L43
-- `function` **test_settlement_lineage_does_not_use_hit_to_rewrite_research** L115
-- `function` **test_runtime_lineage_emits_operational_nodes_and_edge_provenance** L136
-- `function` **test_dag_line_change_preserves_subject_history** L174
-- `function` **test_participation_is_independent_of_efficiency** L188
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_schema_v2_fields.py`
-
-- `function` **_validate** L23
-- `function` **test_schema_files_load_and_required_keys_present** L49
-- `function` **test_sample_objects_validate_against_field_schema** L66
-- `function` **test_conservation_identities_still_declared_and_enforced** L121
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_settlement_population.py`
-
-- `function` **_row** L18
-- `function` **_write_settleable** L38
-- `function` **test_settle_full_modeled_population_n_records** L86
-- `function` **test_settle_card_only_subset** L127
-- `function` **test_settle_missing_outcome_is_unknown_platform_rule** L140
-- `function` **test_ledger_append_does_not_rewrite_frozen_forecast** L152
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_signal_governance.py`
-
-- `function` **field** L21
-- `function` **spec** L25
-- `function` **compiled_one** L46
-- `function` **test_active_operator_with_zero_consumer_fails_activation** L50
-- `function` **test_dependency_cycle_fails_compile** L56
-- `function` **test_active_dependency_must_also_be_executable** L65
-- `function` **test_missing_unit_or_dimension_fails_contract_ingestion** L75
-- `function` **test_baseball_pitch_operator_cannot_bind_to_hockey_generically** L82
-- `function` **test_invalid_market_definition_pair_fails** L97
-- `function` **test_post_cutoff_input_fails** L109
-- `function` **test_compiled_hash_is_deterministic_across_source_ordering** L114
-- `function` **test_semantic_duplicates_do_not_execute_twice** L122
-- `method` **test_semantic_duplicates_do_not_execute_twice.handler** L128
-- `function` **test_overlap_groups_are_preserved_for_related_non_duplicates** L137
-- `function` **test_rejected_donor_behavior_cannot_activate** L147
-- `function` **test_probability_and_hard_gate_override_flags_are_structurally_impossible** L153
-- `function` **test_active_hard_gate_requires_canonical_authorization** L160
-- `function` **test_feature_store_is_an_explicit_runtime_consumer** L174
-- `function` **test_donor_matrix_accounts_for_all_58_without_activation** L189
-- `function` **test_donor_matrix_cannot_silently_self_activate** L198
-- `function` **test_schema_is_draft_2020_12_and_source_parse_is_non_destructive** L207
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_source_catalog.py`
-
-- `function` **test_catalog_loads_and_is_hashed** L8
-- `function` **test_catalog_priority_official_before_search** L20
-- `function` **test_catalog_counterparty_basketball** L29
-- `function` **test_cfb_health_router_is_derived_from_cfb_catalog_capabilities** L34
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_sport_plugin_full_contract.py`
-
-- `function` **test_registered_sport_plugin_bindings_resolve_but_partial_contracts_do_not_promote** L14
-- `function` **test_sport_plugin_contract_requires_every_named_component** L40
-- `function` **test_unknown_sport_plugin_contract_fails_closed** L48
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_sport_research_schema.py`
-
-- `function` **test_basketball_and_gridiron_research_schemas_are_complete** L13
-- `function` **test_unknown_sport_research_schema_fails_closed** L24
-- `function` **test_universal_host_plan_includes_sport_specific_subject_requirements** L30
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_statepack.py`
-
-- `function` **_claim** L16
-- `function` **test_statepack_indexes_store_and_queries_entity_source_asof** L32
-- `function` **test_snapshot_round_trip_preserves_semantic_hash** L48
-- `function` **test_corrupt_export_fails_closed** L67
-- `function` **test_outcomes_are_indexed_and_do_not_decide_reuse** L80
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_status_start_gates.py`
-
-- `function` **_row** L43
-- `function` **_cand** L72
-- `function` **_claim** L96
-- `function` **_active_logs** L109
-- `function` **test_bonner_status_uncertain_not_playable** L113
-- `function` **test_started_event_not_on_card** L157
-- `function` **test_out_player_not_playable** L196
-- `function` **test_healthy_playable_still_makes_card** L238
-- `function` **test_pre_freeze_strip_uncertain_and_started** L256
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_subject_offer_set_universal.py`
-
-- `function` **_player_row** L9
-- `function` **test_player_aliases_normalize_into_one_subject_offer_set** L32
-- `function` **test_non_player_subject_is_first_class_not_forced_into_player_shape** L49
-- `function` **test_research_dependency_graph_contains_only_universal_entity_types** L84
-- `function` **test_same_subject_different_events_remain_separate** L100
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_three_layer_card.py`
-
-- `function` **_row** L26
-- `function` **_cand** L40
-- `function` **test_v1_hash_and_migration_flag_unchanged** L54
-- `function` **test_gate_split_playable_modeled_card_when_production_root_closed** L60
-- `function` **test_lean_never_fills_strict_card** L82
-- `function` **test_empty_reasons_and_directional_passes** L89
-- `function` **test_synthetic_e2e_writes_layers_with_production_certified_false** L116
-- `function` **test_forced_playable_grades_emit_modeled_card_while_root_closed** L155
-- `function` **test_zero_modeled_rows_sets_empty_no_playables** L187
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_universal_scopes.py`
-
-- `function` **_row** L15
-- `function` **_claim** L36
-- `function` **test_plan_research_emits_universal_scopes_only** L52
-- `function` **test_subject_claims_alias_player_lookup** L69
-- `function` **test_parameter_snapshot_accepts_subject_affiliation_claims** L76
-- `function` **test_universal_packets_wrap_player_team_compat** L113
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_v541_mount.py`
-
-- `function` **test_workspace_mount_is_absent_and_expected_hashes_are_frozen** L6
-
-### `artifacts/dcm_v6_workstream_ab/tests/test_version_cutoff.py`
-
-- `function` **test_version_mismatch_refuses_to_run** L17
-- `function` **test_version_exact_software_and_short_alias** L31
-- `function` **test_missing_cutoff_without_derive_flag_fails** L42
-- `function` **test_cutoff_from_capture_uses_har_started** L52
-- `function` **test_cutoff_from_capture_preserves_fractional_capture_end** L73 — The captured board must not be rejected by its own derived cutoff.
-- `function` **test_explicit_cutoff_used** L83
-- `function` **test_stale_hardcoded_cutoff_gone_from_cli** L99

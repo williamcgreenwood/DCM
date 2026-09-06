@@ -10,6 +10,11 @@ Current bounded execution increment: `P1-CFB-HOST-ACTION-CONTEXT-20260905` makes
 `docs/engineering/DCM_CODING_AND_PROMPT_STANDARD.md`; Drive writes follow
 `docs/engineering/DCM_DRIVE_HIERARCHY.md` and `dcm.runtime.storage_router`.
 
+
+## 2026-09-06 package layout relocate
+
+PR #34 merged to `main` at `b0e44d5886adb98cb84dbf466ee3a3fc1fee28b1`. Active packaging pass `20260906T034800Z_grok_src-dcm-package-layout` relocates the installable engine to `src/dcm` and moves the TypeScript operator UI to `web/src`. `artifacts/dcm_v6_workstream_ab` remains archive-only.
+
 ## Status scale
 
 - 10/10 COMPLETE: executable, integrated, tested, auditable, portable for declared scope; no hidden stub/fallback.
