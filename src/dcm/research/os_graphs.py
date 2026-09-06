@@ -2,7 +2,8 @@
 
 BoardGraph, MarketDemandGraph, and RequirementGraph reuse existing
 grouping/CSR/hypergraph/Union-Find/Tarjan/Kahn primitives. They do not
-replace EvidenceGraph.
+replace EvidenceGraph. AcquisitionActionGraph is built separately in
+``dcm.research.acquisition`` after requirements are grouped into actions.
 """
 from __future__ import annotations
 

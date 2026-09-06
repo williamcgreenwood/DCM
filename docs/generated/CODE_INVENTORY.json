@@ -1,5 +1,5 @@
 {
-  "contentHash": "b435a7c7ef0eb2d2f9afc92dc228c3284c361fb75ee250d444636931938a0d85",
+  "contentHash": "a837b2f74fd918da097a3628373b006d1fec9536fcc34f0286e929372acefd20",
   "moduleCount": 223,
   "modules": [
     {
@@ -2278,77 +2278,77 @@
       "classes": 0,
       "functions": 9,
       "path": "src/dcm/cfb/launch.py",
-      "sha256": "e7395dd040cf8526d51580f46c2b3d3eb2f019a331378aa60d3a972cd4bbcc82",
+      "sha256": "5111af2abb1d4f7bc6d1f0cc13c598ea7666c9bd92bbd4608aaa5e43ee10a05b",
       "symbols": [
         {
           "doc": null,
-          "endLine": 43,
+          "endLine": 47,
           "kind": "function",
-          "line": 40,
+          "line": 44,
           "name": "_write",
           "qualname": "_write"
         },
         {
           "doc": null,
-          "endLine": 50,
+          "endLine": 54,
           "kind": "function",
-          "line": 46,
+          "line": 50,
           "name": "_board_fingerprint",
           "qualname": "_board_fingerprint"
         },
         {
           "doc": null,
-          "endLine": 58,
+          "endLine": 62,
           "kind": "function",
-          "line": 53,
+          "line": 57,
           "name": "_claims_fingerprint",
           "qualname": "_claims_fingerprint"
         },
         {
           "doc": null,
-          "endLine": 62,
+          "endLine": 66,
           "kind": "function",
-          "line": 61,
+          "line": 65,
           "name": "_frontier_fingerprint",
           "qualname": "_frontier_fingerprint"
         },
         {
           "doc": null,
-          "endLine": 72,
+          "endLine": 76,
           "kind": "function",
-          "line": 65,
+          "line": 69,
           "name": "_load_json",
           "qualname": "_load_json"
         },
         {
           "doc": "Emit graphs, indexes, and live AcquisitionActions BEFORE web acquisition.",
-          "endLine": 387,
+          "endLine": 397,
           "kind": "function",
-          "line": 75,
+          "line": 79,
           "name": "prepare_cfb_research_os",
           "qualname": "prepare_cfb_research_os"
         },
         {
           "doc": null,
-          "endLine": 396,
+          "endLine": 406,
           "kind": "function",
-          "line": 390,
+          "line": 400,
           "name": "attach_cfb_prop_flags",
           "qualname": "attach_cfb_prop_flags"
         },
         {
           "doc": null,
-          "endLine": 589,
+          "endLine": 599,
           "kind": "function",
-          "line": 399,
+          "line": 409,
           "name": "emit_cfb_forecast_artifacts",
           "qualname": "emit_cfb_forecast_artifacts"
         },
         {
           "doc": null,
-          "endLine": 598,
+          "endLine": 608,
           "kind": "function",
-          "line": 592,
+          "line": 602,
           "name": "persist_algorithm_telemetry",
           "qualname": "persist_algorithm_telemetry"
         }
@@ -2651,10 +2651,19 @@
     },
     {
       "classes": 0,
-      "functions": 0,
+      "functions": 1,
       "path": "src/dcm/chat/__init__.py",
-      "sha256": "94af07e6940e575613834dcf74e016e07d37cd9f410f1a403ce1505ba3751502",
-      "symbols": [],
+      "sha256": "a460f80424f6044413c0e8d9dbd8c8dad4d667a3545c4c8c139be2e0e7222136",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 28,
+          "kind": "function",
+          "line": 21,
+          "name": "__getattr__",
+          "qualname": "__getattr__"
+        }
+      ],
       "workstream": "P7"
     },
     {
@@ -2741,41 +2750,57 @@
     },
     {
       "classes": 0,
-      "functions": 4,
+      "functions": 6,
       "path": "src/dcm/chat/evidence_import.py",
-      "sha256": "1cd3ea5a1e2c0ef3852a35afb6a08a163f248f6e4690b1daaf4cf87b388ed310",
+      "sha256": "4bd87b5734ed380a2378b7cab1ed3ffbbeb787648b3e36ea51a9f17f1280362e",
       "symbols": [
         {
           "doc": null,
-          "endLine": 60,
+          "endLine": 24,
           "kind": "function",
-          "line": 33,
+          "line": 22,
+          "name": "_observation_execute",
+          "qualname": "_observation_execute"
+        },
+        {
+          "doc": null,
+          "endLine": 57,
+          "kind": "function",
+          "line": 30,
           "name": "_load_observations",
           "qualname": "_load_observations"
         },
         {
           "doc": null,
-          "endLine": 73,
+          "endLine": 70,
           "kind": "function",
-          "line": 63,
+          "line": 60,
           "name": "_match_request",
           "qualname": "_match_request"
         },
         {
           "doc": "Legacy entry: validate + convert one observation (rejects empty fields).",
-          "endLine": 83,
+          "endLine": 80,
           "kind": "function",
-          "line": 76,
+          "line": 73,
           "name": "observation_to_claim",
           "qualname": "observation_to_claim"
         },
         {
           "doc": null,
-          "endLine": 178,
+          "endLine": 175,
           "kind": "function",
-          "line": 86,
+          "line": 83,
           "name": "import_observations",
           "qualname": "import_observations"
+        },
+        {
+          "doc": null,
+          "endLine": 189,
+          "kind": "function",
+          "line": 186,
+          "name": "__getattr__",
+          "qualname": "__getattr__"
         }
       ],
       "workstream": "P7"
@@ -6499,9 +6524,9 @@
     },
     {
       "classes": 0,
-      "functions": 5,
+      "functions": 6,
       "path": "src/dcm/research/acquisition.py",
-      "sha256": "b7a98b622f8d348c36e88b85ac474768b0dcd3d6770eb9cfc0289cc904319f6e",
+      "sha256": "7b6a634596a745811fc91e098315bdabc93fd006b4e5e8ab0a426b8b776b001c",
       "symbols": [
         {
           "doc": null,
@@ -6542,6 +6567,14 @@
           "line": 272,
           "name": "cost_fn",
           "qualname": "schedule_acquisition_actions.cost_fn"
+        },
+        {
+          "doc": "Persistable AcquisitionActionGraph: one action may cover many requirements/offers.",
+          "endLine": 451,
+          "kind": "function",
+          "line": 355,
+          "name": "build_acquisition_action_graph",
+          "qualname": "build_acquisition_action_graph"
         }
       ],
       "workstream": "P1"
@@ -8866,13 +8899,13 @@
       "classes": 0,
       "functions": 1,
       "path": "src/dcm/research/observation_execute.py",
-      "sha256": "cb2024d7bf5229a92f32a10945bbc7697a42dcf2277ff3123fce03b46320e8a8",
+      "sha256": "45e1c9dd94d5d0c3c3031d68d87b3d59ba59449003bb13b5acd5fe2685a76730",
       "symbols": [
         {
           "doc": "Import source-aware host observations and close coverage\u2192consumer contracts.",
-          "endLine": 331,
+          "endLine": 419,
           "kind": "function",
-          "line": 50,
+          "line": 60,
           "name": "execute_source_aware_observations",
           "qualname": "execute_source_aware_observations"
         }
@@ -9046,69 +9079,69 @@
       "classes": 0,
       "functions": 8,
       "path": "src/dcm/research/os_graphs.py",
-      "sha256": "15019101791ffd21bb1085e6ad64f9c0ad022cf23bbf7782fdf1ffb2b7160d99",
+      "sha256": "3904b84ecac6bc15843bd0c7203c0eadd59a8735146191f45920715795b10161",
       "symbols": [
         {
           "doc": null,
-          "endLine": 35,
+          "endLine": 36,
           "kind": "function",
-          "line": 34,
+          "line": 35,
           "name": "_is_cfb",
           "qualname": "_is_cfb"
         },
         {
           "doc": null,
-          "endLine": 39,
+          "endLine": 40,
           "kind": "function",
-          "line": 38,
+          "line": 39,
           "name": "_offer_id",
           "qualname": "_offer_id"
         },
         {
           "doc": "Fill dependent_offer_ids via exact composite-key grouping. No per-prop scans later.",
-          "endLine": 83,
+          "endLine": 84,
           "kind": "function",
-          "line": 42,
+          "line": 43,
           "name": "_attach_dependents",
           "qualname": "_attach_dependents"
         },
         {
           "doc": null,
-          "endLine": 173,
+          "endLine": 174,
           "kind": "function",
-          "line": 86,
+          "line": 87,
           "name": "build_board_graph",
           "qualname": "build_board_graph"
         },
         {
           "doc": null,
-          "endLine": 105,
+          "endLine": 106,
           "kind": "method",
-          "line": 98,
+          "line": 99,
           "name": "add_node",
           "qualname": "build_board_graph.add_node"
         },
         {
           "doc": null,
-          "endLine": 227,
+          "endLine": 228,
           "kind": "function",
-          "line": 176,
+          "line": 177,
           "name": "build_market_demand_graph",
           "qualname": "build_market_demand_graph"
         },
         {
           "doc": null,
-          "endLine": 319,
+          "endLine": 320,
           "kind": "function",
-          "line": 230,
+          "line": 231,
           "name": "build_requirement_graph",
           "qualname": "build_requirement_graph"
         },
         {
           "doc": null,
-          "endLine": 349,
+          "endLine": 350,
           "kind": "function",
-          "line": 322,
+          "line": 323,
           "name": "persist_research_os_graphs",
           "qualname": "persist_research_os_graphs"
         }
@@ -14172,5 +14205,5 @@
   "parseErrors": [],
   "root": "src",
   "schema": "pillars_dcm.code_inventory.v1",
-  "symbolCount": 1524
+  "symbolCount": 1528
 }

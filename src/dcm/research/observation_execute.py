@@ -3,8 +3,9 @@
 Host tasks from ``dcm.research.batch`` carry actionId / sourceFamily / source
 candidates. This module accepts matching timestamped observations, validates
 typed field coverage, imports EvidenceClaims idempotently, recomputes
-requirement coverage, and rebuilds ParameterSnapshots for changed descendants
-only when contracts close. One AcquisitionAction observation fans out to every
+requirement coverage, MaterialFactResolution, reschedules AcquisitionActions via
+CELF/set-cover, shrinks the next host batch, and rebuilds ParameterSnapshots for
+changed descendants only when contracts close. One AcquisitionAction observation fans out to every
 dependent offer at that reusable scope.
 """
 from __future__ import annotations
@@ -12,12 +13,21 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+from dcm.algorithms.telemetry import AlgorithmTelemetry
 from dcm.chat.state import read_json, write_json
+from dcm.contracts.hashes import content_hash
 from dcm.model.parameters import build_parameter_snapshot
+from dcm.research.acquisition import (
+    build_acquisition_action_graph,
+    build_acquisition_actions,
+    schedule_acquisition_actions,
+)
+from dcm.research.batch import build_next_research_batch
 from dcm.research.claims import conflict_ledger, dedupe
 from dcm.research.coverage import coverage_report, evaluate_request
 from dcm.research.evidence_graph import build_evidence_graph
-from dcm.research.indexes import BoardIndexes
+from dcm.research.indexes import BoardIndexes, EvidenceIndexes
+from dcm.research.material_facts import facts_to_features, resolve_material_facts
 from dcm.research.observation_execute_support import (
     _affected_rows,
     _build_counterparty_index,
@@ -286,6 +296,61 @@ def execute_source_aware_observations(
 
     closed_unique = list(dict.fromkeys(closed_request_ids))
     max_fanout = max((int(f.get("dependentOfferCount") or 0) for f in fanouts), default=0)
+
+    # Closed loop: MaterialFactResolution → reschedule AcquisitionActions (CELF) → next batch.
+    action_count_before = int(action_doc.get("actionCount") or len(actions) or 0)
+    unresolved_before = int(coverage_before.get("incompleteRequests") or 0)
+    loop_tel = AlgorithmTelemetry()
+    facts = resolve_material_facts(all_claims, cutoff=cutoff or None)
+    write_json(dest / "material_facts.json", facts)
+    feature_records = facts_to_features(facts, cutoff=cutoff or None)
+    write_json(
+        dest / "material_fact_features.json",
+        {
+            "schema": "pillars_dcm.material_fact_features.v1",
+            "count": len(feature_records),
+            "records": feature_records,
+            "contentHash": content_hash(
+                {"count": len(feature_records), "keys": [r.get("factKey") for r in feature_records]}
+            ),
+        },
+    )
+    evidence_idx = EvidenceIndexes(all_claims, telemetry=loop_tel)
+    rebuilt_actions = build_acquisition_actions(
+        rows,
+        requests,
+        coverage=coverage,
+        evidence=evidence_idx,
+        telemetry=loop_tel,
+    )
+    rebuilt_schedule = schedule_acquisition_actions(rebuilt_actions, telemetry=loop_tel)
+    aa_graph = build_acquisition_action_graph(
+        rebuilt_actions, schedule=rebuilt_schedule, telemetry=loop_tel
+    )
+    write_json(dest / "acquisition_actions.json", rebuilt_actions)
+    write_json(dest / "acquisition_schedule.json", rebuilt_schedule)
+    write_json(dest / "acquisition_action_graph.json", aa_graph)
+    next_batch = build_next_research_batch(
+        requests,
+        coverage=coverage,
+        rows=rows,
+        max_entities=25,
+    )
+    write_json(dest / "host_research_batch.json", next_batch)
+    loop_telem = loop_tel.snapshot()
+    write_json(dest / "closed_loop_algorithm_telemetry.json", loop_telem)
+    try:
+        evidence_idx.close()
+    except Exception:
+        pass
+    action_count_after = int(rebuilt_actions.get("actionCount") or 0)
+    unresolved_after = int(coverage.get("incompleteRequests") or 0)
+    celf_rows = [
+        row
+        for row in (loop_telem.get("executions") or [])
+        if str(row.get("algorithm_id") or row.get("algorithmId") or "") == "ALG-SCHED-001"
+        and row.get("downstream_used")
+    ]
     index_telem = indexes.telemetry.snapshot() if hasattr(indexes.telemetry, "snapshot") else None
     try:
         indexes.close()
@@ -326,6 +391,29 @@ def execute_source_aware_observations(
         "indexTelemetry": index_telem,
         "hostInventedHashes": False,
         "emptyFieldCoverageCountsAsSuccess": False,
+        "materialFactsHash": facts.get("contentHash"),
+        "acquisitionActionGraphHash": aa_graph.get("contentHash"),
+        "liveSelector": rebuilt_schedule.get("liveSelector") or "ALG-SCHED-001",
+        "celfActionIds": list(rebuilt_schedule.get("celfActionIds") or []),
+        "setCoverActionIds": list(rebuilt_schedule.get("setCoverActionIds") or []),
+        "celfDownstreamUsed": bool(celf_rows),
+        "actionCountBefore": action_count_before,
+        "actionCountAfter": action_count_after,
+        "unresolvedBefore": unresolved_before,
+        "unresolvedAfter": unresolved_after,
+        "nextBatchSelectedCount": int(next_batch.get("selectedCount") or 0),
+        "nextBatchUnresolvedCount": int(next_batch.get("unresolvedCount") or 0),
+        "nextBatchShrunk": action_count_after < action_count_before or unresolved_after < unresolved_before,
+        "closedLoopTelemetry": {
+            "algorithmIds": sorted(
+                {
+                    str(r.get("algorithm_id") or r.get("algorithmId") or "")
+                    for r in (loop_telem.get("executions") or [])
+                    if r.get("downstream_used") and (r.get("algorithm_id") or r.get("algorithmId"))
+                }
+            ),
+            "celfCount": len(celf_rows),
+        },
     }
     write_json(dest / "source_aware_import_result.json", result)
     return result

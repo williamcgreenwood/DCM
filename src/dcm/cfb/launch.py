@@ -27,7 +27,11 @@ from dcm.cfb.reports import (
     frontier_offer_ids,
 )
 from dcm.contracts.hashes import content_hash
-from dcm.research.acquisition import build_acquisition_actions, schedule_acquisition_actions
+from dcm.research.acquisition import (
+    build_acquisition_action_graph,
+    build_acquisition_actions,
+    schedule_acquisition_actions,
+)
 from dcm.research.cache_layers import ResearchCacheCascade
 from dcm.research.indexes import BoardIndexes, EvidenceIndexes
 from dcm.research.material_facts import facts_to_features, resolve_material_facts
@@ -275,6 +279,9 @@ def prepare_cfb_research_os(
     if skip_actions:
         actions = _load_json(dest / "acquisition_actions.json") or {"actions": [], "actionCount": 0}
         schedule = _load_json(dest / "acquisition_schedule.json") or {}
+        aa_graph = _load_json(dest / "acquisition_action_graph.json") or build_acquisition_action_graph(actions, schedule=schedule, telemetry=tel)
+        if not (dest / "acquisition_action_graph.json").is_file():
+            _write(dest / "acquisition_action_graph.json", aa_graph)
         fanout = _load_json(dest / "cfb_fanout_acceptance.json") or {}
         readiness = _load_json(dest / "research_os_readiness.json") or evaluate_research_os_readiness(
             board_graph=graphs["boardGraph"],
@@ -298,6 +305,8 @@ def prepare_cfb_research_os(
         schedule = schedule_acquisition_actions(actions, telemetry=tel)
         _write(dest / "acquisition_actions.json", actions)
         _write(dest / "acquisition_schedule.json", schedule)
+        aa_graph = build_acquisition_action_graph(actions, schedule=schedule, telemetry=tel)
+        _write(dest / "acquisition_action_graph.json", aa_graph)
         fanout = fanout_acceptance(actions, requests)
         _write(dest / "cfb_fanout_acceptance.json", fanout)
         if indexes is not None:
@@ -368,6 +377,7 @@ def prepare_cfb_research_os(
         "requirementGraph": graphs["requirementGraph"],
         "acquisitionActions": actions,
         "acquisitionSchedule": schedule,
+        "acquisitionActionGraph": aa_graph,
         "reusedEvidenceScopes": reused,
         "readiness": readiness,
         "materialFacts": facts,

@@ -350,3 +350,102 @@ def schedule_acquisition_actions(
     }
     body["contentHash"] = content_hash({k: v for k, v in body.items() if k != "contentHash"})
     return body
+
+
+def build_acquisition_action_graph(
+    action_doc: Mapping[str, Any] | dict[str, Any],
+    *,
+    schedule: Mapping[str, Any] | dict[str, Any] | None = None,
+    telemetry: AlgorithmTelemetry | None = None,
+) -> dict[str, Any]:
+    """Persistable AcquisitionActionGraph: one action may cover many requirements/offers.
+
+    Separate from RequirementGraph. Nodes are AcquisitionAction / Requirement / Offer;
+    edges are covers (action→requirement) and satisfies (action→offer). Selected
+    actions from the live CELF schedule are marked when schedule is supplied.
+    """
+    tel = telemetry or AlgorithmTelemetry()
+    actions = [a for a in (action_doc.get("actions") or []) if isinstance(a, dict)]
+    selected = set(str(x) for x in ((schedule or {}).get("selectedActionIds") or []))
+    celf_ids = [str(x) for x in ((schedule or {}).get("celfActionIds") or [])]
+    set_cover_ids = [str(x) for x in ((schedule or {}).get("setCoverActionIds") or [])]
+    nodes: list[dict[str, Any]] = []
+    edges: list[dict[str, Any]] = []
+    seen_req: set[str] = set()
+    seen_offer: set[str] = set()
+    for act in actions:
+        aid = str(act.get("actionId") or "")
+        if not aid:
+            continue
+        nodes.append(
+            {
+                "id": f"AcquisitionAction:{aid}",
+                "type": "AcquisitionAction",
+                "actionId": aid,
+                "scope": act.get("scope"),
+                "scopeId": act.get("scopeId"),
+                "sourceFamily": act.get("sourceFamily"),
+                "sourceId": act.get("sourceId"),
+                "requirementCount": int(act.get("requirementCount") or len(act.get("requirementIds") or [])),
+                "dependentOfferCount": int(act.get("dependentOfferCount") or len(act.get("offerIds") or [])),
+                "weight": act.get("weight"),
+                "expectedGain": act.get("expectedGain"),
+                "selected": aid in selected,
+            }
+        )
+        for rid in act.get("requirementIds") or []:
+            rid = str(rid)
+            if not rid:
+                continue
+            if rid not in seen_req:
+                seen_req.add(rid)
+                nodes.append({"id": f"Requirement:{rid}", "type": "Requirement", "requestId": rid})
+            edges.append({"type": "covers", "from": f"AcquisitionAction:{aid}", "to": f"Requirement:{rid}"})
+        for oid in act.get("offerIds") or []:
+            oid = str(oid)
+            if not oid:
+                continue
+            if oid not in seen_offer:
+                seen_offer.add(oid)
+                nodes.append({"id": f"Offer:{oid}", "type": "Offer", "offerId": oid})
+            edges.append({"type": "satisfies", "from": f"AcquisitionAction:{aid}", "to": f"Offer:{oid}"})
+
+    hg = hypergraph_from_bundles({str(a.get("actionId")): list(a.get("requirementIds") or []) for a in actions if a.get("actionId")})
+    tel.record(
+        "ALG-INDEX-014",
+        problem_class="GRAPH_TRAVERSAL",
+        producer="dcm.research.acquisition.build_acquisition_action_graph",
+        consumer="dcm.research.batch",
+        count=len(actions) or 1,
+        downstream_used=True,
+    )
+    if schedule is not None:
+        tel.record(
+            "ALG-SCHED-001",
+            problem_class="RESEARCH_SCHEDULE",
+            producer="dcm.algorithms.scheduling.LazyGreedyScheduler",
+            consumer="dcm.research.acquisition.build_acquisition_action_graph",
+            count=len(celf_ids) or 1,
+            downstream_used=True,
+            note="CELF live selector mirrored onto AcquisitionActionGraph",
+        )
+
+    body = {
+        "schema": "pillars_dcm.acquisition_action_graph.v1",
+        "nodeCount": len(nodes),
+        "edgeCount": len(edges),
+        "actionCount": len(actions),
+        "requirementCount": len(seen_req),
+        "offerCount": len(seen_offer),
+        "selectedActionIds": sorted(selected),
+        "celfActionIds": celf_ids,
+        "setCoverActionIds": set_cover_ids,
+        "liveSelector": str((schedule or {}).get("liveSelector") or "ALG-SCHED-001"),
+        "hyperedges": {k: list(v) for k, v in hg.edge_members.items()},
+        "nodes": sorted(nodes, key=lambda r: str(r["id"])),
+        "edges": sorted(edges, key=lambda r: (r["type"], r["from"], r["to"])),
+        "reverseIndexes": dict(action_doc.get("reverseIndexes") or {}),
+        "note": "ResearchRequirement nodes are covered by AcquisitionActions; one action may satisfy many requirements/offers.",
+    }
+    body["contentHash"] = content_hash({k: v for k, v in body.items() if k != "contentHash"})
+    return body
