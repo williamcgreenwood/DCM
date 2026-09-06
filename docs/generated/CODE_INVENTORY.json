@@ -1,6 +1,6 @@
 {
-  "contentHash": "971f3deccb6e8814b32be66a60d67048a573d57a07d17989e59c722e059e2aef",
-  "moduleCount": 227,
+  "contentHash": "36f6ff19957d748e8168f0b994b3648205af4ed75b6fdf41907625bde2cd8736",
+  "moduleCount": 228,
   "modules": [
     {
       "classes": 0,
@@ -4549,7 +4549,7 @@
       "classes": 0,
       "functions": 13,
       "path": "src/dcm/ingest/prizepicks.py",
-      "sha256": "481b9751a1af430ebd0b5d29c194ce73383d42761a95fd89746d668599a2ad0b",
+      "sha256": "8571365c761a6fd3f9421a2fec7695fb60d679eae2d729998e8c7235ad4e3c98",
       "symbols": [
         {
           "doc": null,
@@ -4593,7 +4593,7 @@
         },
         {
           "doc": "Verify offered sides. Missing side metadata fails closed.",
-          "endLine": 98,
+          "endLine": 97,
           "kind": "function",
           "line": 66,
           "name": "_side",
@@ -4601,57 +4601,57 @@
         },
         {
           "doc": null,
-          "endLine": 119,
+          "endLine": 118,
           "kind": "function",
-          "line": 101,
+          "line": 100,
           "name": "_board_id",
           "qualname": "_board_id"
         },
         {
           "doc": null,
-          "endLine": 134,
+          "endLine": 133,
           "kind": "function",
-          "line": 123,
+          "line": 122,
           "name": "_game_teams",
           "qualname": "_game_teams"
         },
         {
           "doc": null,
-          "endLine": 140,
+          "endLine": 139,
           "kind": "function",
-          "line": 137,
+          "line": 136,
           "name": "_event_label",
           "qualname": "_event_label"
         },
         {
           "doc": null,
-          "endLine": 153,
+          "endLine": 152,
           "kind": "function",
-          "line": 143,
+          "line": 142,
           "name": "_status",
           "qualname": "_status"
         },
         {
           "doc": null,
-          "endLine": 222,
+          "endLine": 221,
           "kind": "function",
-          "line": 156,
+          "line": 155,
           "name": "_row_from_jsonapi",
           "qualname": "_row_from_jsonapi"
         },
         {
           "doc": null,
-          "endLine": 257,
+          "endLine": 256,
           "kind": "function",
-          "line": 225,
+          "line": 224,
           "name": "_row_from_normalized",
           "qualname": "_row_from_normalized"
         },
         {
           "doc": null,
-          "endLine": 287,
+          "endLine": 286,
           "kind": "function",
-          "line": 260,
+          "line": 259,
           "name": "parse_prizepicks_payload",
           "qualname": "parse_prizepicks_payload"
         }
@@ -6725,6 +6725,47 @@
           "line": 47,
           "name": "minimum_guarantee_return",
           "qualname": "minimum_guarantee_return"
+        }
+      ],
+      "workstream": "UNMAPPED"
+    },
+    {
+      "classes": 0,
+      "functions": 4,
+      "path": "src/dcm/platform/prizepicks/platform_rules_authority.py",
+      "sha256": "4c2e32a0e2461ce760d7f64bb8976e99efa255e70b5fc78a6e6c48630422b3c1",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 79,
+          "kind": "function",
+          "line": 61,
+          "name": "_claim_is_platform_rules",
+          "qualname": "_claim_is_platform_rules"
+        },
+        {
+          "doc": null,
+          "endLine": 87,
+          "kind": "function",
+          "line": 82,
+          "name": "_hash_from_claim",
+          "qualname": "_hash_from_claim"
+        },
+        {
+          "doc": null,
+          "endLine": 97,
+          "kind": "function",
+          "line": 90,
+          "name": "collect_platform_rule_claim_hashes",
+          "qualname": "collect_platform_rule_claim_hashes"
+        },
+        {
+          "doc": "Resolve platform settlement authority for build_cfb_rules_snapshot.",
+          "endLine": 132,
+          "kind": "function",
+          "line": 100,
+          "name": "resolve_platform_rules_authority",
+          "qualname": "resolve_platform_rules_authority"
         }
       ],
       "workstream": "UNMAPPED"
@@ -11405,93 +11446,93 @@
       "classes": 0,
       "functions": 11,
       "path": "src/dcm/runner.py",
-      "sha256": "91be0fcb44e624fe49d6e8ec5a553988f2c6ba43062158e121697d042bf606ca",
+      "sha256": "23aca85e4d2687ae2881cb2b386da2be0303dc33fe8ba376c83b225163d77401",
       "symbols": [
         {
           "doc": "Always write dest/audit/. Optionally copy+commit+push a GitHub pack.",
-          "endLine": 202,
+          "endLine": 203,
           "kind": "function",
-          "line": 128,
+          "line": 129,
           "name": "_finalize_archive",
           "qualname": "_finalize_archive"
         },
         {
           "doc": null,
-          "endLine": 215,
+          "endLine": 216,
           "kind": "function",
-          "line": 206,
+          "line": 207,
           "name": "_synthetic_path",
           "qualname": "_synthetic_path"
         },
         {
           "doc": null,
-          "endLine": 220,
+          "endLine": 221,
           "kind": "function",
-          "line": 219,
+          "line": 220,
           "name": "_run_id",
           "qualname": "_run_id"
         },
         {
           "doc": "Best-effort git HEAD. Never writes git config. Missing git is None, not a crash.",
-          "endLine": 240,
+          "endLine": 241,
           "kind": "function",
-          "line": 223,
+          "line": 224,
           "name": "_git_commit_sha",
           "qualname": "_git_commit_sha"
         },
         {
           "doc": null,
-          "endLine": 251,
+          "endLine": 252,
           "kind": "function",
-          "line": 243,
+          "line": 244,
           "name": "_default_model_config",
           "qualname": "_default_model_config"
         },
         {
           "doc": null,
-          "endLine": 260,
+          "endLine": 261,
           "kind": "function",
-          "line": 254,
+          "line": 255,
           "name": "_active_calibration",
           "qualname": "_active_calibration"
         },
         {
           "doc": null,
-          "endLine": 2091,
+          "endLine": 2093,
           "kind": "function",
-          "line": 263,
+          "line": 264,
           "name": "run_dcm",
           "qualname": "run_dcm"
         },
         {
           "doc": null,
-          "endLine": 898,
+          "endLine": 900,
           "kind": "method",
-          "line": 875,
+          "line": 877,
           "name": "_snapshot_for",
           "qualname": "run_dcm._snapshot_for"
         },
         {
           "doc": null,
-          "endLine": 1337,
+          "endLine": 1339,
           "kind": "method",
-          "line": 1335,
+          "line": 1337,
           "name": "_resimulate_material",
           "qualname": "run_dcm._resimulate_material"
         },
         {
           "doc": null,
-          "endLine": 1570,
+          "endLine": 1572,
           "kind": "method",
-          "line": 1526,
+          "line": 1528,
           "name": "slim",
           "qualname": "run_dcm.slim"
         },
         {
           "doc": null,
-          "endLine": 2209,
+          "endLine": 2211,
           "kind": "function",
-          "line": 2094,
+          "line": 2096,
           "name": "main",
           "qualname": "main"
         }
@@ -14809,5 +14850,5 @@
   "parseErrors": [],
   "root": "src",
   "schema": "pillars_dcm.code_inventory.v1",
-  "symbolCount": 1599
+  "symbolCount": 1603
 }

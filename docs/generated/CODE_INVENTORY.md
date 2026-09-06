@@ -2,10 +2,10 @@
 
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
-- Modules: **227**
-- Symbols: **1599**
+- Modules: **228**
+- Symbols: **1603**
 - Parse errors: **0**
-- Inventory hash: `971f3deccb6e8814b32be66a60d67048a573d57a07d17989e59c722e059e2aef`
+- Inventory hash: `36f6ff19957d748e8168f0b994b3648205af4ed75b6fdf41907625bde2cd8736`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -114,6 +114,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | UNMAPPED | `src/dcm/platform/prizepicks/minimum_guarantee.py` | 0 | 0 |
 | UNMAPPED | `src/dcm/platform/prizepicks/participation.py` | 1 | 2 |
 | UNMAPPED | `src/dcm/platform/prizepicks/payouts.py` | 0 | 2 |
+| UNMAPPED | `src/dcm/platform/prizepicks/platform_rules_authority.py` | 0 | 4 |
 | UNMAPPED | `src/dcm/platform/prizepicks/reboot.py` | 1 | 4 |
 | UNMAPPED | `src/dcm/platform/prizepicks/settlement.py` | 2 | 6 |
 | UNMAPPED | `src/dcm/postgame.py` | 0 | 1 |
@@ -954,13 +955,13 @@ _No class/function symbols._
 - `function` **_normalize_side** L43
 - `function` **_side_list** L52
 - `function` **_side** L66 — Verify offered sides. Missing side metadata fails closed.
-- `function` **_board_id** L101
-- `function` **_game_teams** L123
-- `function` **_event_label** L137
-- `function` **_status** L143
-- `function` **_row_from_jsonapi** L156
-- `function` **_row_from_normalized** L225
-- `function` **parse_prizepicks_payload** L260
+- `function` **_board_id** L100
+- `function` **_game_teams** L122
+- `function` **_event_label** L136
+- `function` **_status** L142
+- `function` **_row_from_jsonapi** L155
+- `function` **_row_from_normalized** L224
+- `function` **parse_prizepicks_payload** L259
 
 ### `src/dcm/ingest/sanitize.py`
 
@@ -1296,6 +1297,13 @@ _No class/function symbols._
 
 - `function` **register_minimum_guarantee_table** L8 — rows maps (payout_tier_count, win_count) -> return amount (not multiplier).
 - `function` **minimum_guarantee_return** L47
+
+### `src/dcm/platform/prizepicks/platform_rules_authority.py`
+
+- `function` **_claim_is_platform_rules** L61
+- `function` **_hash_from_claim** L82
+- `function` **collect_platform_rule_claim_hashes** L90
+- `function` **resolve_platform_rules_authority** L100 — Resolve platform settlement authority for build_cfb_rules_snapshot.
 
 ### `src/dcm/platform/prizepicks/reboot.py`
 
@@ -1991,17 +1999,17 @@ _No class/function symbols._
 
 ### `src/dcm/runner.py`
 
-- `function` **_finalize_archive** L128 — Always write dest/audit/. Optionally copy+commit+push a GitHub pack.
-- `function` **_synthetic_path** L206
-- `function` **_run_id** L219
-- `function` **_git_commit_sha** L223 — Best-effort git HEAD. Never writes git config. Missing git is None, not a crash.
-- `function` **_default_model_config** L243
-- `function` **_active_calibration** L254
-- `function` **run_dcm** L263
-- `method` **run_dcm._snapshot_for** L875
-- `method` **run_dcm._resimulate_material** L1335
-- `method` **run_dcm.slim** L1526
-- `function` **main** L2094
+- `function` **_finalize_archive** L129 — Always write dest/audit/. Optionally copy+commit+push a GitHub pack.
+- `function` **_synthetic_path** L207
+- `function` **_run_id** L220
+- `function` **_git_commit_sha** L224 — Best-effort git HEAD. Never writes git config. Missing git is None, not a crash.
+- `function` **_default_model_config** L244
+- `function` **_active_calibration** L255
+- `function` **run_dcm** L264
+- `method` **run_dcm._snapshot_for** L877
+- `method` **run_dcm._resimulate_material** L1337
+- `method` **run_dcm.slim** L1528
+- `function` **main** L2096
 
 ### `src/dcm/runtime/__init__.py`
 
