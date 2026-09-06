@@ -13,15 +13,20 @@ from pathlib import Path
 from typing import Any
 
 from dcm.chat.state import read_json, write_json
-from dcm.contracts.hashes import content_hash
-from dcm.model.grade import grade as grade_of
 from dcm.model.parameters import build_parameter_snapshot
-from dcm.model.uncertainty import probability_bundle
 from dcm.research.claims import conflict_ledger, dedupe
 from dcm.research.coverage import coverage_report, evaluate_request
 from dcm.research.evidence_graph import build_evidence_graph
 from dcm.research.indexes import BoardIndexes
-from dcm.research.material_facts import facts_to_features, resolve_material_facts
+from dcm.research.observation_execute_support import (
+    _affected_rows,
+    _build_counterparty_index,
+    _consumer_ablation,
+    _derive_sport,
+    _ensure_offer_lineage,
+    _load_existing_dag,
+    _snapshot_ablation,
+)
 from dcm.research.observation_typed import (
     _load_observations,
     _match_action,
@@ -32,7 +37,6 @@ from dcm.research.observation_typed import (
 )
 from dcm.research.provider import BundleProvider
 from dcm.research.research_store import ResearchStore
-from dcm.research.scopes import canonical_scope
 from dcm.runtime.dag import Dag
 
 # Re-export for tests and chat.evidence_import
@@ -43,273 +47,6 @@ __all__ = [
     "observation_to_typed_claim",
 ]
 
-_SCOPE_KIND_BLOCKLIST = {
-    "EVENT",
-    "SUBJECT",
-    "AFFILIATION",
-    "COUNTERPARTY",
-    "PLAYER",
-    "TEAM",
-    "ENVIRONMENT",
-    "COMPETITION",
-    "SPORT",
-    "OFFER",
-    "MARKET",
-    "MARKET_DEFINITION",
-}
-
-
-def _build_counterparty_index(rows: list[dict[str, Any]]) -> dict[str, list[str]]:
-    """One-shot opponent → offer ids map (BoardIndexes has no by_counterparty)."""
-    out: dict[str, list[str]] = {}
-    for row in rows:
-        oid = str(row.get("projectionId") or "")
-        if not oid:
-            continue
-        cp = str(row.get("opponentId") or row.get("opponent") or "")
-        if cp:
-            out.setdefault(cp, []).append(oid)
-    return out
-
-
-def _derive_sport(
-    board: dict[str, Any],
-    host_state: dict[str, Any],
-    rows: list[dict[str, Any]],
-) -> str:
-    """Sport / league family for ResearchStore — never a semantic_scope kind."""
-    for src in (board, host_state):
-        if not isinstance(src, dict):
-            continue
-        for key in ("sport", "league", "sportFamily"):
-            val = str(src.get(key) or "").strip()
-            if val and canonical_scope(val) not in _SCOPE_KIND_BLOCKLIST and val.upper() not in _SCOPE_KIND_BLOCKLIST:
-                return val
-    for row in rows:
-        league = str(row.get("league") or "").strip()
-        if league and league.upper() not in _SCOPE_KIND_BLOCKLIST:
-            return league
-        family = str(row.get("sportFamily") or "").strip()
-        if family and family.upper() not in _SCOPE_KIND_BLOCKLIST:
-            return family
-    return "CFB"
-
-
-def _affected_rows(
-    *,
-    indexes: BoardIndexes,
-    by_counterparty: dict[str, list[str]],
-    action: dict[str, Any] | None,
-    claim: dict[str, Any],
-) -> list[dict[str, Any]]:
-    """Resolve dependent offers via BoardIndexes — no O(N) board scans."""
-    offer_ids = [str(x) for x in ((action or {}).get("offerIds") or []) if x]
-    hit: list[dict[str, Any]] = []
-    seen: set[str] = set()
-
-    def _add(oid: str) -> None:
-        if not oid or oid in seen:
-            return
-        row = indexes.exact_offer(oid, downstream_used=True)
-        if row is not None:
-            seen.add(oid)
-            hit.append(row)
-
-    if offer_ids:
-        for oid in offer_ids:
-            _add(oid)
-        return hit
-
-    scope = canonical_scope(str(claim.get("semantic_scope") or ""))
-    scope_id = str(claim.get("scope_id") or "")
-    if not scope_id:
-        return hit
-    if scope == "EVENT":
-        for oid in indexes.by_event.get(scope_id) or ():
-            _add(str(oid))
-    elif scope == "AFFILIATION":
-        for oid in indexes.by_affiliation.get(scope_id) or ():
-            _add(str(oid))
-    elif scope == "SUBJECT":
-        for oid in indexes.by_subject.get(scope_id) or ():
-            _add(str(oid))
-    elif scope == "COUNTERPARTY":
-        for oid in by_counterparty.get(scope_id) or ():
-            _add(str(oid))
-    return hit
-
-
-def _snapshot_ablation(
-    rows: list[dict[str, Any]],
-    claims_before: list[dict[str, Any]],
-    claims_after: list[dict[str, Any]],
-) -> dict[str, Any]:
-    before_hashes: dict[str, str] = {}
-    after_hashes: dict[str, str] = {}
-    changed: list[str] = []
-    for row in rows:
-        oid = str(row.get("projectionId") or "")
-        if not oid:
-            continue
-        b = build_parameter_snapshot(row, claims_before)
-        a = build_parameter_snapshot(row, claims_after)
-        before_hashes[oid] = str(b.get("parameter_snapshot_hash") or "")
-        after_hashes[oid] = str(a.get("parameter_snapshot_hash") or "")
-        if before_hashes[oid] != after_hashes[oid]:
-            changed.append(oid)
-    return {
-        "offerCount": len(before_hashes),
-        "changedOfferCount": len(changed),
-        "changedOfferIds": changed[:50],
-        "parameterConsumerChanged": bool(changed),
-        "beforeHashes": {k: before_hashes[k] for k in list(before_hashes)[:8]},
-        "afterHashes": {k: after_hashes[k] for k in list(after_hashes)[:8]},
-    }
-
-
-def _consumer_ablation(
-    rows: list[dict[str, Any]],
-    claims_before: list[dict[str, Any]],
-    claims_after: list[dict[str, Any]],
-    *,
-    cutoff: str,
-) -> dict[str, Any]:
-    """MaterialFact / feature + probability/grade helper hash changes.
-
-    Proves a consumer beyond ParameterSnapshot. Full EventWorld wiring is out of
-    scope for this repair; this path uses resolve_material_facts → facts_to_features
-    and probability_bundle + grade on snapshot-derived support.
-    """
-    mf_before = resolve_material_facts(claims_before, cutoff=cutoff)
-    mf_after = resolve_material_facts(claims_after, cutoff=cutoff)
-    feat_before = facts_to_features(mf_before, cutoff=cutoff)
-    feat_after = facts_to_features(mf_after, cutoff=cutoff)
-    feature_hash_before = content_hash({"features": feat_before, "material": mf_before.get("contentHash")})
-    feature_hash_after = content_hash({"features": feat_after, "material": mf_after.get("contentHash")})
-
-    grade_before: dict[str, str] = {}
-    grade_after: dict[str, str] = {}
-    prob_before: dict[str, str] = {}
-    prob_after: dict[str, str] = {}
-    changed_grade: list[str] = []
-    changed_prob: list[str] = []
-
-    def _stub_consumer(row: dict[str, Any], claims: list[dict[str, Any]]) -> tuple[str, str, str]:
-        snap = build_parameter_snapshot(row, claims)
-        support = int(snap.get("minimum_model_support") or 0)
-        if support <= 0:
-            opp = snap.get("opportunity") if isinstance(snap.get("opportunity"), dict) else {}
-            eff = snap.get("efficiency") if isinstance(snap.get("efficiency"), dict) else {}
-            support = int(opp.get("support_n") or 0) + int(eff.get("support_n") or 0)
-        data_quality = float(snap.get("data_quality") or 0.0)
-        ood = float(snap.get("ood_risk") or 0.0)
-        # Deterministic stub: scopes_used and evidence shift selected_p slightly.
-        scopes = list(snap.get("scopes_used") or [])
-        raw_p = 0.50 + 0.02 * min(5, len(scopes)) + 0.01 * min(5, len(snap.get("evidence_hashes") or []))
-        raw_p = max(0.05, min(0.95, raw_p))
-        bundle = probability_bundle(
-            raw_selected_p=raw_p,
-            n_worlds=max(8, support * 2 or 8),
-            support_n=max(0, support),
-            data_quality=max(0.05, data_quality) if data_quality else 0.35,
-            ood_risk=ood,
-            volatility=0.2,
-            synthetic=bool(snap.get("synthetic")),
-        )
-        g = grade_of(
-            selected_p=float(bundle["evidence_safe_probability"]),
-            lower_bound=float(bundle["lower_bound"]),
-            demon=False,
-            fragility=0.2,
-        )
-        return (
-            str(snap.get("parameter_snapshot_hash") or ""),
-            content_hash(bundle),
-            g,
-        )
-
-    for row in rows:
-        oid = str(row.get("projectionId") or "")
-        if not oid:
-            continue
-        _sb, pb, gb = _stub_consumer(row, claims_before)
-        _sa, pa, ga = _stub_consumer(row, claims_after)
-        prob_before[oid] = pb
-        prob_after[oid] = pa
-        grade_before[oid] = gb
-        grade_after[oid] = ga
-        if pb != pa:
-            changed_prob.append(oid)
-        if gb != ga:
-            changed_grade.append(oid)
-
-    return {
-        "proven": [
-            "ParameterSnapshot.hash",
-            "MaterialFactResolution + facts_to_features contentHash",
-            "probability_bundle + grade helper (snapshot-derived stub; not full EventWorld)",
-        ],
-        "notProven": [
-            "full EventWorld set resimulation",
-            "runner-grade shared-world probability path",
-        ],
-        "materialFactHashBefore": str(mf_before.get("contentHash") or ""),
-        "materialFactHashAfter": str(mf_after.get("contentHash") or ""),
-        "featureHashBefore": feature_hash_before,
-        "featureHashAfter": feature_hash_after,
-        "materialOrFeatureChanged": feature_hash_before != feature_hash_after
-        or str(mf_before.get("contentHash") or "") != str(mf_after.get("contentHash") or ""),
-        "featureCountBefore": len(feat_before),
-        "featureCountAfter": len(feat_after),
-        "probabilityHashChangedOfferCount": len(changed_prob),
-        "gradeChangedOfferCount": len(changed_grade),
-        "changedProbabilityOfferIds": changed_prob[:50],
-        "changedGradeOfferIds": changed_grade[:50],
-        "consumerChanged": (
-            feature_hash_before != feature_hash_after
-            or str(mf_before.get("contentHash") or "") != str(mf_after.get("contentHash") or "")
-            or bool(changed_prob)
-            or bool(changed_grade)
-        ),
-    }
-
-
-def _load_existing_dag(dest: Path, *, cutoff: str) -> Dag | None:
-    for name in ("source_aware_import_dag.json", "dag.json", "runtime_dag.json"):
-        path = dest / name
-        if not path.is_file():
-            continue
-        snap = read_json(path) or {}
-        if isinstance(snap, dict) and (snap.get("nodes") or snap.get("cutoff")):
-            dag = Dag.from_snapshot(snap)
-            if not dag.cutoff:
-                dag.cutoff = cutoff
-            return dag
-    return None
-
-
-def _ensure_offer_lineage(
-    dag: Dag,
-    *,
-    claim_nodes: list[Any],
-    row: dict[str, Any],
-) -> Any:
-    """claim → PARAMETER → EVENT_WORLDS → GRADE for one offer (idempotent add)."""
-    oid = str(row.get("projectionId") or "")
-    eid = str(row.get("eventId") or oid)
-    parents = [c.key for c in claim_nodes]
-    param = dag.add("PARAMETER", oid, parents=parents)
-    if param.state == "PENDING" and param.artifact_hash is None:
-        dag.complete(param.key, f"param:{oid}")
-    worlds = dag.add("EVENT_WORLDS", eid, parents=[param.key])
-    if worlds.state == "PENDING" and worlds.artifact_hash is None:
-        dag.complete(worlds.key, f"worlds:{eid}")
-    grade_n = dag.add("GRADE", oid, parents=[param.key, worlds.key])
-    if grade_n.state == "PENDING" and grade_n.artifact_hash is None:
-        dag.complete(grade_n.key, f"grade:{oid}")
-    return param
-
-
 def execute_source_aware_observations(
     dest: Path,
     observations_path: Path,
@@ -318,4 +55,277 @@ def execute_source_aware_observations(
 ) -> dict[str, Any]:
     """Import source-aware host observations and close coverage→consumer contracts.
 
-    Empty fiel
+    Empty field coverage is rejected (does not count as success). Valid claims
+    recompute requirement coverage and ParameterSnapshot descendants for the
+    AcquisitionAction fanout.
+    """
+    dest = Path(dest)
+    requests = read_json(dest / "research_requests.json") or []
+    if not isinstance(requests, list):
+        requests = []
+    freeze = read_json(dest / "freeze.json") or {}
+    board = read_json(dest / "board.json") or {}
+    host_state = read_json(dest / "host_state.json") or {}
+    cutoff = str(
+        host_state.get("forecastCutoff")
+        or freeze.get("forecastCutoff")
+        or board.get("forecastCutoff")
+        or ""
+    )
+    if not cutoff:
+        raise ValueError("FORECAST_CUTOFF_REQUIRED")
+    action_doc = read_json(dest / "acquisition_actions.json") or {}
+    actions = list(action_doc.get("actions") or []) if isinstance(action_doc, dict) else []
+    rows = board.get("rows") if isinstance(board, dict) else []
+    if not isinstance(rows, list):
+        rows = []
+
+    indexes = BoardIndexes(rows)
+    by_counterparty = _build_counterparty_index(rows)
+    sport = _derive_sport(board if isinstance(board, dict) else {}, host_state if isinstance(host_state, dict) else {}, rows)
+
+    bundle_path = dest / "evidence_bundle.jsonl"
+    existing = BundleProvider(bundle_path)
+    claims_before = list(existing.all_claims())
+    coverage_before = coverage_report(requests, claims_before)
+
+    observations = _load_observations(Path(observations_path))
+    claims: list[dict[str, Any]] = []
+    errors: list[dict[str, Any]] = []
+    fanouts: list[dict[str, Any]] = []
+    closed_request_ids: list[str] = []
+
+    for i, obs in enumerate(observations):
+        try:
+            req = _match_request(obs, requests)
+            action = _match_action(obs, actions, request=req)
+            claim = observation_to_typed_claim(obs, cutoff=cutoff, request=req, action=action)
+            # Pre-check: claim must actually move semantic coverage for its request.
+            probe_claims = claims_before + claims + [claim]
+            target_req = req
+            if target_req is None and action:
+                # Prefer first incomplete requirement on this action.
+                req_ids = {str(x) for x in (action.get("requirementIds") or [])}
+                for r in requests:
+                    rid = str(r.get("request_id") or r.get("requestId") or "")
+                    if rid in req_ids:
+                        verdict = evaluate_request(r, claims_before + claims)
+                        if not verdict.get("complete"):
+                            target_req = r
+                            break
+                if target_req is None:
+                    for r in requests:
+                        rid = str(r.get("request_id") or r.get("requestId") or "")
+                        if rid in req_ids:
+                            target_req = r
+                            break
+            if target_req is not None:
+                before = evaluate_request(target_req, claims_before + claims)
+                after = evaluate_request(target_req, probe_claims)
+                if before.get("complete") is False and after.get("complete") is False:
+                    # Imported claim exists but does not close the contract — still
+                    # store it (partial progress) while recording unresolved missing.
+                    pass
+                elif after.get("complete"):
+                    closed_request_ids.append(str(target_req.get("request_id") or target_req.get("requestId") or ""))
+            claims.append(claim)
+            offer_ids = list((action or {}).get("offerIds") or [])
+            req_ids = list((action or {}).get("requirementIds") or [])
+            affected = _affected_rows(
+                indexes=indexes,
+                by_counterparty=by_counterparty,
+                action=action,
+                claim=claim,
+            )
+            fanouts.append(
+                {
+                    "actionId": (action or {}).get("actionId") or claim.get("actionId"),
+                    "scope": claim.get("semantic_scope"),
+                    "scopeId": claim.get("scope_id"),
+                    "sourceId": claim.get("source_id"),
+                    "sourceFamily": claim.get("sourceFamily"),
+                    "requirementIds": req_ids,
+                    "offerIds": offer_ids or [str(r.get("projectionId") or "") for r in affected],
+                    "dependentOfferCount": len(offer_ids) if offer_ids else len(affected),
+                    "requestId": (target_req or {}).get("request_id") if target_req else None,
+                }
+            )
+        except (ValueError, TypeError, KeyError) as exc:
+            errors.append({"index": i, "error": str(exc)})
+
+    claims = dedupe(claims)
+    existing_hashes = {str(c.get("claim_hash") or "") for c in claims_before}
+    fresh_claims = [c for c in claims if str(c.get("claim_hash") or "") not in existing_hashes]
+    if fresh_claims:
+        existing.append(fresh_claims)
+    all_claims = existing.all_claims()
+    # Idempotent re-import reports only newly stored claims.
+    claims = fresh_claims
+    coverage = coverage_report(requests, all_claims)
+    write_json(dest / "evidence_coverage.json", coverage)
+    write_json(dest / "evidence" / "coverage.json", coverage)
+    write_json(dest / "evidence" / "conflicts.json", conflict_ledger(all_claims))
+    (dest / "evidence").mkdir(exist_ok=True)
+    write_json(dest / "evidence" / "claims.json", all_claims)
+
+    offer_doc = read_json(dest / "subject_offer_sets.json") or read_json(dest / "player_offer_sets.json") or {}
+    offer_sets = offer_doc.get("sets") or offer_doc.get("offerSets") or []
+    if isinstance(offer_sets, list) and offer_sets:
+        graph = build_evidence_graph(all_claims, offer_sets, packets=[])
+        write_json(dest / "evidence_graph.json", graph)
+
+    store = ResearchStore(store_root or dest / "research_store")
+    stored = []
+    for claim in claims:
+        stored.append(
+            store.put_claim(
+                claim,
+                sport=sport,
+                entity_kind=str(claim.get("semantic_scope") or ""),
+                as_of=cutoff,
+            )
+        )
+
+    # Changed-descendant recompute: only offers touched by imported actions.
+    touched_rows: list[dict[str, Any]] = []
+    seen_oids: set[str] = set()
+    for fan in fanouts:
+        for oid in fan.get("offerIds") or []:
+            oid = str(oid or "")
+            if not oid or oid in seen_oids:
+                continue
+            seen_oids.add(oid)
+            row = indexes.exact_offer(oid, downstream_used=True)
+            if row is not None:
+                touched_rows.append(row)
+    if not touched_rows and claims:
+        for claim in claims:
+            for row in _affected_rows(
+                indexes=indexes,
+                by_counterparty=by_counterparty,
+                action=None,
+                claim=claim,
+            ):
+                oid = str(row.get("projectionId") or "")
+                if oid and oid not in seen_oids:
+                    seen_oids.add(oid)
+                    touched_rows.append(row)
+
+    ablation = _snapshot_ablation(touched_rows, claims_before, all_claims)
+    consumer = _consumer_ablation(touched_rows, claims_before, all_claims, cutoff=cutoff)
+    write_json(
+        dest / "parameters" / "source_aware_import_ablation.json",
+        {
+            "schema": "pillars_dcm.source_aware_import_ablation.v1",
+            "cutoff": cutoff,
+            "ablation": ablation,
+            "consumer": consumer,
+            "fanouts": fanouts,
+        },
+    )
+    # Persist recomputed snapshots for changed offers (descendant artifacts).
+    snapshots = []
+    for row in touched_rows:
+        snap = build_parameter_snapshot(row, all_claims)
+        snapshots.append(
+            {
+                "projectionId": row.get("projectionId"),
+                "parameter_snapshot_hash": snap.get("parameter_snapshot_hash"),
+                "scopes_used": snap.get("scopes_used"),
+                "minimum_model_support": snap.get("minimum_model_support"),
+            }
+        )
+    if snapshots:
+        write_json(
+            dest / "parameters" / "source_aware_import_snapshots.json",
+            {
+                "schema": "pillars_dcm.source_aware_import_snapshots.v1",
+                "count": len(snapshots),
+                "rows": snapshots,
+            },
+        )
+    write_json(
+        dest / "parameters" / "source_aware_import_consumer.json",
+        {
+            "schema": "pillars_dcm.source_aware_import_consumer.v1",
+            "cutoff": cutoff,
+            "consumer": consumer,
+        },
+    )
+
+    # Real descendant invalidation: load existing run DAG when present, else build
+    # claim→parameter→event_world→grade links for touched offers only.
+    dag = _load_existing_dag(dest, cutoff=cutoff)
+    if dag is None:
+        dag = Dag(
+            cutoff=cutoff,
+            config_hash="source-aware-import",
+            schema_version="v1",
+            source_versions={"parser": "host-observation-v1"},
+        )
+    claim_nodes = []
+    for claim in claims:
+        cn = dag.add("EVIDENCE_CLAIM", str(claim.get("claim_hash") or claim.get("scope_id") or "claim"))
+        if cn.state == "PENDING" and cn.artifact_hash is None:
+            dag.complete(cn.key, str(claim.get("claim_hash") or "claim"))
+        claim_nodes.append(cn)
+
+    # Preserve / seed an unrelated PARAMETER lineage when building fresh so
+    # invalidation stays ID-scoped (tests also assert this directly on Dag).
+    touched_oids = {str(r.get("projectionId") or "") for r in touched_rows if r.get("projectionId")}
+    param_nodes_touched = []
+    for row in touched_rows:
+        param_nodes_touched.append(_ensure_offer_lineage(dag, claim_nodes=claim_nodes, row=row))
+
+    invalidated = (
+        dag.invalidate_descendants([n.key for n in param_nodes_touched], include_roots=True)
+        if param_nodes_touched
+        else []
+    )
+    write_json(dest / "source_aware_import_dag.json", dag.snapshot())
+
+    closed_unique = list(dict.fromkeys(closed_request_ids))
+    max_fanout = max((int(f.get("dependentOfferCount") or 0) for f in fanouts), default=0)
+    index_telem = indexes.telemetry.snapshot() if hasattr(indexes.telemetry, "snapshot") else None
+    try:
+        indexes.close()
+    except Exception:
+        pass
+    result = {
+        "schema": "pillars_dcm.source_aware_import_result.v1",
+        "imported": len(claims),
+        "rejected": len(errors),
+        "errors": errors,
+        "bundlePath": str(bundle_path),
+        "claimCount": len(all_claims),
+        "coverageComplete": bool(coverage.get("complete")),
+        "coverageBeforeCompleteRequests": int(coverage_before.get("completeRequests") or 0),
+        "coverageAfterCompleteRequests": int(coverage.get("completeRequests") or 0),
+        "incompleteRequests": coverage.get("incompleteRequests"),
+        "closedRequestIds": closed_unique,
+        "contractsClosed": len(closed_unique),
+        "fanouts": fanouts,
+        "maxFanout": max_fanout,
+        "oneSourceMultipleOffers": max_fanout > 1,
+        "parameterConsumerChanged": bool(ablation.get("parameterConsumerChanged")),
+        "changedOfferCount": int(ablation.get("changedOfferCount") or 0),
+        "ablation": ablation,
+        "consumer": consumer,
+        "materialOrFeatureConsumerChanged": bool(consumer.get("materialOrFeatureChanged")),
+        "probabilityOrGradeConsumerChanged": bool(
+            int(consumer.get("probabilityHashChangedOfferCount") or 0)
+            or int(consumer.get("gradeChangedOfferCount") or 0)
+        ),
+        "invalidatedDescendants": invalidated,
+        "invalidationScopedToTouchedOffers": True,
+        "touchedOfferIds": sorted(touched_oids)[:50],
+        "sport": sport,
+        "conflicts": conflict_ledger(all_claims),
+        "store": store.telemetry(),
+        "stored": stored,
+        "indexTelemetry": index_telem,
+        "hostInventedHashes": False,
+        "emptyFieldCoverageCountsAsSuccess": False,
+    }
+    write_json(dest / "source_aware_import_result.json", result)
+    return result
