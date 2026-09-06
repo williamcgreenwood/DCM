@@ -27,19 +27,8 @@ def _composite_conflict(existing_markets: set[str], market: str) -> bool:
     return any(market in COMPONENTS.get(existing, set()) for existing in existing_markets)
 
 
-def _selection_correlation(a: dict[str, Any], b: dict[str, Any]) -> float | None:
-    """Pearson correlation of aligned simulated pick outcomes.
-
-    Private outcome bytes encode loss=0, push=1, win=2. Mapping to 0/0.5/1
-    keeps pushes neutral and preserves selected-side direction.
-    """
-    xa = a.get("_selectionOutcomes")
-    xb = b.get("_selectionOutcomes")
-    if not isinstance(xa, (bytes, bytearray)) or not isinstance(xb, (bytes, bytearray)):
-        return None
-    n = min(len(xa), len(xb))
-    if n < 16:
-        return None
+def _selection_correlation_reference(xa: bytes | bytearray, xb: bytes | bytearray, n: int) -> float | None:
+    """Pure-Python Pearson path (ChatGPT-native fallback / parity)."""
     av = [xa[i] / 2.0 for i in range(n)]
     bv = [xb[i] / 2.0 for i in range(n)]
     ma = sum(av) / n
@@ -50,6 +39,41 @@ def _selection_correlation(a: dict[str, Any], b: dict[str, Any]) -> float | None
         return None
     cov = sum((av[i] - ma) * (bv[i] - mb) for i in range(n))
     return cov / sqrt(va * vb)
+
+
+def _selection_correlation(a: dict[str, Any], b: dict[str, Any]) -> float | None:
+    """Pearson correlation of aligned simulated pick outcomes.
+
+    Private outcome bytes encode loss=0, push=1, win=2. Mapping to 0/0.5/1
+    keeps pushes neutral and preserves selected-side direction.
+
+    Uses NumPy contiguous reductions when available (Phase 13 leftover); results
+    match the pure-Python reference within float tolerance.
+    """
+    xa = a.get("_selectionOutcomes")
+    xb = b.get("_selectionOutcomes")
+    if not isinstance(xa, (bytes, bytearray)) or not isinstance(xb, (bytes, bytearray)):
+        return None
+    n = min(len(xa), len(xb))
+    if n < 16:
+        return None
+    try:
+        import numpy as np
+
+        av = np.frombuffer(memoryview(xa)[:n], dtype=np.uint8).astype(np.float64) / 2.0
+        bv = np.frombuffer(memoryview(xb)[:n], dtype=np.uint8).astype(np.float64) / 2.0
+        ma = float(av.mean())
+        mb = float(bv.mean())
+        da = av - ma
+        db = bv - mb
+        va = float(np.dot(da, da))
+        vb = float(np.dot(db, db))
+        if va <= 1e-12 or vb <= 1e-12:
+            return None
+        cov = float(np.dot(da, db))
+        return cov / sqrt(va * vb)
+    except ImportError:
+        return _selection_correlation_reference(xa, xb, n)
 
 
 def build_card(

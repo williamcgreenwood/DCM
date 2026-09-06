@@ -7,6 +7,8 @@ constitution_version: DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903
 prompt_declared_constitution_sha256: bba7b082bf67e12d87e675ac58d5b6f96d9cbad9b6a487a0aa157bf7cef9e599
 committed_constitution_sha256: computed at load time from docs/architecture/DCM_ALGORITHMIC_CONSTITUTION.md
 registry: configs/algorithm_registry.json
+consumption_law: docs/engineering/ALGORITHM_CONSUMPTION_LAW.md
+consumption_lock: EXACT_INDEX→CACHE_CELF→DAG→TWO_REP→NUMPY_EVENTWORLD→REGISTRY_ML
 schema: schemas/AlgorithmRequirement.schema.json
 trace: docs/requirements/ALGORITHM_TRACE_MATRIX.md
 runtime: dcm.algorithms

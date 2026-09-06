@@ -52,12 +52,24 @@ mandatory, CI-gated, and inherited by all future versions unless a newer
 constitution is adopted under an Architecture Decision Record.
 
 - Canonical text: `docs/architecture/DCM_ALGORITHMIC_CONSTITUTION.md`
+- Permanent consumption order: `docs/engineering/ALGORITHM_CONSUMPTION_LAW.md`
 - Machine-readable registry: `configs/algorithm_registry.json`
 - Runtime: `dcm.algorithms` (selection engine, HAR AlgorithmExecutionPlan)
 - Silent algorithm retirement is prohibited.
 - ChatGPT-native deterministic fallbacks are required for optional packages.
 - Do not create a second EvidenceGraph, ResearchStore, probability, ranking,
   SportPlugin, or persistence engine to satisfy the constitution.
+
+### Permanent algorithm consumption lock
+
+Always prefer the constitution hot-path order (never silent one-offs):
+
+1. Exact-first indexes via BoardStore / BoardIndexes — no ad hoc O(N) board scans.
+2. Research: cached facts → CELF / set-cover AcquisitionAction (`ALG-SCHED-001`).
+3. True descendant DAG invalidation (ID-scoped reverse adjacency only).
+4. Two-rep: audit objects at boundaries; NumPy / SoA compute inside.
+5. EventWorld: NumPy backend default with reference fallback; C ABI only after measured win.
+6. ML / grouping / appending must go through registered Algorithmic Constitution IDs.
 
 ## Prop-board doctrine
 

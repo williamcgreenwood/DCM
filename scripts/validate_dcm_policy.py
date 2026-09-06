@@ -12,6 +12,7 @@ STANDARD = ROOT / "docs/engineering/DCM_CODING_AND_PROMPT_STANDARD.md"
 HIERARCHY = ROOT / "docs/engineering/DCM_DRIVE_HIERARCHY.md"
 AGENTS = ROOT / "AGENTS.md"
 REGISTRY = ROOT / "configs/algorithm_registry.json"
+CONSUMPTION_LAW = ROOT / "docs/engineering/ALGORITHM_CONSUMPTION_LAW.md"
 
 
 def main() -> int:
@@ -19,7 +20,8 @@ def main() -> int:
     required = {
         STANDARD: ("cutoff", "lineage", "Drive", "PLAYABLE", "checkpoint", "benchmark"),
         HIERARCHY: ("00_control", "02_research", "09_engineering", "read back", "raw HAR"),
-        AGENTS: ("Algorithmic Constitution", "main", "fail closed", "future-only", "storage_router"),
+        AGENTS: ("Algorithmic Constitution", "ALGORITHM_CONSUMPTION_LAW", "main", "fail closed", "future-only", "storage_router"),
+        CONSUMPTION_LAW: ("BoardStore", "CELF", "NumPy", "algorithm_registry", "descendant"),
     }
     for path, needles in required.items():
         if not path.is_file():
