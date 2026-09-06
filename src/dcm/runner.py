@@ -700,6 +700,32 @@ def run_dcm(
             if not row.get("complete")
         ]
         bundle["complete"] = not bundle["missing"] and not bundle.get("malformed")
+    # Re-merge persistent ResearchStore latest claims so host evidence-import
+    # updates (plays/pace/status/logs) survive forecast bundle rewrite.
+    try:
+        from dcm.research.research_store import ResearchStore, merge_latest_store_claims
+
+        store_root = Path(workspace) / "dcm_v6" / "research_store"
+        if store_root.is_dir():
+            store = ResearchStore(store_root)
+            scope_pairs = [
+                (str(req.get("scope") or ""), str(req.get("scope_id") or req.get("scopeId") or ""))
+                for req in requests
+                if isinstance(req, dict)
+            ]
+            merged = merge_latest_store_claims(list(bundle.get("claims") or []), store, scopes=scope_pairs)
+            if len(merged) != len(bundle.get("claims") or []):
+                bundle["claims"] = dedupe(merged)
+                bundle["coverage"] = coverage_report(requests, bundle["claims"])
+                bundle["missing"] = [
+                    str(row.get("requestId") or "")
+                    for row in (bundle["coverage"].get("requests") or [])
+                    if not row.get("complete")
+                ]
+                bundle["complete"] = not bundle["missing"] and not bundle.get("malformed")
+    except (OSError, TypeError, ValueError, KeyError, json.JSONDecodeError):
+        # Store merge is best-effort; never block forecast on store IO.
+        pass
     (dest / "offer_metadata_recovery.json").write_text(
         json.dumps({k: v for k, v in offer_recovery.items() if k != "claims"}, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",

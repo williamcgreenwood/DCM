@@ -1,5 +1,5 @@
 {
-  "contentHash": "ebf7b6fe868019b49caa225df785e4ed598e69af382c6083aada2b4aaed6a351",
+  "contentHash": "8e66aaad1a274a763fb0f48d3f611479f85ea723d2875d56d836591883e53c76",
   "moduleCount": 228,
   "modules": [
     {
@@ -10193,9 +10193,9 @@
     },
     {
       "classes": 1,
-      "functions": 26,
+      "functions": 27,
       "path": "src/dcm/research/research_store.py",
-      "sha256": "2e8a380bd9fc277d3d28540e9ff50fb4f6e5827b5e460a0c1a6eca4fef025e1a",
+      "sha256": "a94d2498b1a7b8f035b58cebf7947945b7e39ddd7b7bbd27d2dd6e3fb9dcedbb",
       "symbols": [
         {
           "doc": null,
@@ -10406,10 +10406,18 @@
           "qualname": "classify_requests"
         },
         {
-          "doc": "Pull still-valid stored claims so forecast does not research from zero.",
-          "endLine": 547,
+          "doc": "Merge ResearchStore latest blobs into a forecast claim list.",
+          "endLine": 573,
           "kind": "function",
-          "line": 527,
+          "line": 528,
+          "name": "merge_latest_store_claims",
+          "qualname": "merge_latest_store_claims"
+        },
+        {
+          "doc": "Pull still-valid stored claims so forecast does not research from zero.",
+          "endLine": 597,
+          "kind": "function",
+          "line": 577,
           "name": "hydrate_reused_claims",
           "qualname": "hydrate_reused_claims"
         }
@@ -11454,7 +11462,7 @@
       "classes": 0,
       "functions": 11,
       "path": "src/dcm/runner.py",
-      "sha256": "1a7f35984660c35461723ad7d283babd0fa89fc62077a42642e6d3d51ef1c980",
+      "sha256": "a6c5334c57682eb29970798440e3ffd083a3228520e23e409a5b06815021bc0f",
       "symbols": [
         {
           "doc": "Always write dest/audit/. Optionally copy+commit+push a GitHub pack.",
@@ -11506,7 +11514,7 @@
         },
         {
           "doc": null,
-          "endLine": 2094,
+          "endLine": 2120,
           "kind": "function",
           "line": 264,
           "name": "run_dcm",
@@ -11514,33 +11522,33 @@
         },
         {
           "doc": null,
-          "endLine": 901,
+          "endLine": 927,
           "kind": "method",
-          "line": 877,
+          "line": 903,
           "name": "_snapshot_for",
           "qualname": "run_dcm._snapshot_for"
         },
         {
           "doc": null,
-          "endLine": 1340,
+          "endLine": 1366,
           "kind": "method",
-          "line": 1338,
+          "line": 1364,
           "name": "_resimulate_material",
           "qualname": "run_dcm._resimulate_material"
         },
         {
           "doc": null,
-          "endLine": 1573,
+          "endLine": 1599,
           "kind": "method",
-          "line": 1529,
+          "line": 1555,
           "name": "slim",
           "qualname": "run_dcm.slim"
         },
         {
           "doc": null,
-          "endLine": 2212,
+          "endLine": 2238,
           "kind": "function",
-          "line": 2097,
+          "line": 2123,
           "name": "main",
           "qualname": "main"
         }
@@ -14858,5 +14866,5 @@
   "parseErrors": [],
   "root": "src",
   "schema": "pillars_dcm.code_inventory.v1",
-  "symbolCount": 1604
+  "symbolCount": 1605
 }

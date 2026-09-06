@@ -524,6 +524,56 @@ def classify_requests(
     return out
 
 
+
+def merge_latest_store_claims(
+    claims: list[dict[str, Any]],
+    store: "ResearchStore",
+    *,
+    scopes: list[tuple[str, str]] | None = None,
+) -> list[dict[str, Any]]:
+    """Merge ResearchStore latest blobs into a forecast claim list.
+
+    evidence-import persists host observations into the store and appends the
+    run bundle, but forecast ``collect`` + ``write_bundle`` can rewrite the
+    bundle without those store updates. Re-attach latest store claims by
+    ``(semantic_scope, scope_id)`` so consumers see plays/pace/status/logs.
+    """
+    out = list(claims or [])
+    seen = {str(c.get("claim_hash") or "") for c in out if c.get("claim_hash")}
+    scope_keys: set[tuple[str, str]] = set()
+    for scope, scope_id in scopes or []:
+        if scope and scope_id:
+            scope_keys.add((str(scope), str(scope_id)))
+    for claim in out:
+        scope = str(claim.get("semantic_scope") or claim.get("scope") or "")
+        scope_id = str(claim.get("scope_id") or claim.get("scopeId") or "")
+        if scope and scope_id:
+            scope_keys.add((scope, scope_id))
+    # Also walk store latest pointer index when available.
+    latest = getattr(store, "_latest", None)
+    pointer_map = latest() if callable(latest) else {}
+    if isinstance(pointer_map, dict):
+        for key in pointer_map:
+            if ":" not in str(key):
+                continue
+            kind, entity_id = str(key).split(":", 1)
+            if kind and entity_id:
+                scope_keys.add((kind, entity_id))
+    for scope, scope_id in sorted(scope_keys):
+        blob = store.latest_blob(scope, scope_id)
+        claim = (blob or {}).get("claim") if isinstance(blob, dict) else None
+        if not isinstance(claim, dict):
+            continue
+        digest = str(claim.get("claim_hash") or (blob or {}).get("contentHash") or "")
+        if digest and digest in seen:
+            continue
+        if digest:
+            seen.add(digest)
+        out.append(claim)
+    return out
+
+
+
 def hydrate_reused_claims(
     store: ResearchStore,
     classified: list[dict[str, Any]],
