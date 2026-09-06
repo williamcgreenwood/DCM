@@ -1,10 +1,10 @@
 {
   "schema": "pillars_dcm.program_status.v1",
-  "updatedAtUtc": "2026-09-05T22:18:54Z",
+  "updatedAtUtc": "2026-09-06T02:35:00Z",
   "activePromotionBranch": "main",
   "targetPromotionBranch": "main",
-  "lastMergedPullRequest": 32,
-  "lastMergedCommit": "ce69ffeda1cfdcff6415e0cba9999fdb1e22c00d",
+  "lastMergedPullRequest": 33,
+  "lastMergedCommit": "24007ef5bd6af38d44f6f004eb19300bb0fc07ab",
   "lastGreenCiRun": 273,
   "canonicalIntegrationBranch": "integration/v6-ml-architecture-20260830",
   "canonicalIntegrationPr": 18,
@@ -48,9 +48,9 @@
       "current": 9,
       "state": "STRONG_PARTIAL",
       "next": [
+        "merge PR #34 source-aware-import repair after green CI",
         "run source-aware import on a current CFB HAR to close remaining shared requirements",
-        "finish mixed-sport R1 remainder after today's CFB slice",
-        "retire remaining PLAYER/TEAM lookup aliases at adapters"
+        "finish mixed-sport R1 remainder after CFB slice"
       ]
     },
     {
@@ -118,9 +118,8 @@
       "current": 8,
       "state": "STRONG_PARTIAL",
       "next": [
-        "execute source-aware evidence-import on the current CFB HAR",
-        "keep host web-fetch outside the Python probability engine",
-        "no second evidence or probability runtime"
+        "merge PR #34 then execute source-aware evidence-import on the current CFB HAR",
+        "no second engine"
       ]
     },
     {
@@ -241,21 +240,22 @@
     "noSilentDowngrades": true,
     "noSilentCompletionClaims": true
   },
-  "activeBranch": "main",
-  "activePullRequest": null,
+  "activeBranch": "task/cfb-grouped-research-20260905",
+  "activePullRequest": 34,
   "latestPass": {
-    "id": "20260905T103541Z_cfb-semantic-coverage-scheduler",
-    "commit": null,
-    "branch": "codex/cfb-coverage-complete-scheduler-20260905",
+    "id": "20260906T023500Z_grok_pr34-phase1-repair",
+    "commit": "020d84478e3e84603fe0f984afa08db3a3878959",
+    "branch": "task/cfb-grouped-research-20260905",
     "targetBranch": "main",
-    "pullRequest": null,
+    "pullRequest": 34,
     "mainTouched": false,
     "inventory": {
-      "modules": 281,
-      "symbols": 2016,
-      "contentHash": "1445f85564d95fbdf1aa1019add2ca9125e14e0a6170a374de3ba50a285f070b"
+      "modules": 286,
+      "symbols": 2054,
+      "contentHash": "8b43b32536ed8cdacb7cee2a60ddddf58e0de43a9d9e56ef2642dda909f004b1"
     },
-    "wheelSha256": "253e3f3d20d77266398e32ca0e360e2f6b6424bad86f21f31d7c81d6c8a9d3fe"
+    "summary": "source-aware-import repair: BoardIndexes, sport vs entityKind, scoped DAG invalidation, MaterialFact/feature+grade consumer",
+    "next": "merge PR #34 after green CI, then live HAR evidence-import"
   },
   "executionClosureGates": {
     "G0_SESSION_TRUTH": "PASS",
@@ -305,6 +305,12 @@
     "targetedHostScopeBoundary": "IMPLEMENTED_MERGED_VERIFIED",
     "semanticCoverageScheduler": "IMPLEMENTED_PENDING_PROMOTION; fresh-wheel current-HAR readback 552->551 after one valid official observation",
     "cfbSourceCatalogCapabilityRouting": "IMPLEMENTED_PENDING_PROMOTION; catalog-derived stable CFB routes and 45 targeted tests green",
-    "mergeCommit": "1b4e91b17b78f3d9323c7c126042a06ed4bcb59e"
+    "mergeCommit": "1b4e91b17b78f3d9323c7c126042a06ed4bcb59e",
+    "sourceAwareImportRepair": "IMPLEMENTED_PENDING_MERGE_PR34"
+  },
+  "claims": {
+    "learningRevision": "LR000000",
+    "predictiveClaim": "NONE",
+    "productionRootCertified": false
   }
 }
