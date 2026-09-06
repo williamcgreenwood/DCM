@@ -157,6 +157,47 @@ class Dag:
                 hit.append(n.key)
         return hit
 
+    def children_map(self) -> dict[str, list[str]]:
+        """Reverse adjacency: parent key → child keys."""
+        children: dict[str, list[str]] = {}
+        for n in self.nodes.values():
+            for parent in n.parents:
+                children.setdefault(parent, []).append(n.key)
+        return children
+
+    def invalidate_descendants(self, node_ids: Iterable[str], *, include_roots: bool = True) -> list[str]:
+        """Invalidate transitive children of specific node keys via reverse adjacency.
+
+        Unlike invalidate_types, this only touches the lineage of the given IDs —
+        unrelated PARAMETER / EVENT_WORLDS / GRADE nodes remain untouched.
+        """
+        roots = [str(x) for x in node_ids if x and str(x) in self.nodes]
+        if not roots:
+            return []
+        children = self.children_map()
+        ordered: list[str] = []
+        seen: set[str] = set()
+        stack = list(roots)
+        while stack:
+            key = stack.pop()
+            if key in seen:
+                continue
+            seen.add(key)
+            ordered.append(key)
+            for child in children.get(key, ()):
+                if child not in seen:
+                    stack.append(child)
+        root_set = set(roots)
+        hit: list[str] = []
+        for key in ordered:
+            if not include_roots and key in root_set:
+                continue
+            n = self.nodes[key]
+            n.state = "INVALIDATED"
+            n.artifact_hash = None
+            hit.append(key)
+        return hit
+
     def invalidate_for_delta(self, delta_class: str) -> list[str]:
         """Invalidate only downstream nodes that depend on this evidence class.
 
@@ -166,6 +207,33 @@ class Dag:
             return []
         types = DELTA_INVALIDATION.get(str(delta_class), LINE_DEPENDENT)
         return self.invalidate_types(types)
+
+    @classmethod
+    def from_snapshot(cls, snap: dict[str, Any]) -> "Dag":
+        """Reload a previously persisted DAG snapshot (nodes + parent links)."""
+        dag = cls(
+            cutoff=str(snap.get("cutoff") or ""),
+            config_hash=str(snap.get("configHash") or ""),
+            schema_version=str(snap.get("schemaVersion") or ""),
+            source_versions={str(k): str(v) for k, v in dict(snap.get("sourceVersions") or {}).items()},
+        )
+        for raw in snap.get("nodes") or []:
+            if not isinstance(raw, dict):
+                continue
+            key = str(raw.get("key") or "")
+            if not key:
+                continue
+            node = DagNode(
+                key=key,
+                node_type=str(raw.get("nodeType") or ""),
+                identity=str(raw.get("identity") or ""),
+                state=str(raw.get("state") or "PENDING"),
+                artifact_hash=raw.get("artifactHash"),
+                error=raw.get("error"),
+                parents=tuple(str(p) for p in (raw.get("parents") or ())),
+            )
+            dag.nodes[key] = node
+        return dag
 
     def preserved_research_nodes(self) -> list[str]:
         return [n.key for n in self.nodes.values() if n.node_type in RESEARCH_STABLE]
