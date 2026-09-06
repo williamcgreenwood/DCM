@@ -19,12 +19,9 @@ from dcm.research.authority import derive_quality
 from dcm.research.claims import claim_record, conflict_ledger, dedupe
 from dcm.research.coverage import coverage_report
 from dcm.research.evidence_graph import build_evidence_graph
-from dcm.research.observation_execute import (
-    assemble_claim_value,
-    execute_source_aware_observations,
-    has_valid_field_coverage,
-    observation_to_typed_claim,
-)
+def _observation_execute():
+    from dcm.research import observation_execute as mod
+    return mod
 from dcm.research.provider import BundleProvider, _validate_source_url
 from dcm.research.research_store import ResearchStore
 from dcm.research.scopes import canonical_scope, lookup_scopes
@@ -80,7 +77,7 @@ def observation_to_claim(
     request: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Legacy entry: validate + convert one observation (rejects empty fields)."""
-    return observation_to_typed_claim(obs, cutoff=cutoff, request=request, action=None)
+    return _observation_execute().observation_to_typed_claim(obs, cutoff=cutoff, request=request, action=None)
 
 
 def import_observations(
@@ -106,7 +103,7 @@ def import_observations(
         for obs in observations
     )
     if source_aware:
-        return execute_source_aware_observations(
+        return _observation_execute().execute_source_aware_observations(
             dest,
             Path(observations_path),
             store_root=store_root,
@@ -184,3 +181,9 @@ __all__ = [
     "import_observations",
     "observation_to_claim",
 ]
+
+
+def __getattr__(name: str):
+    if name in {"assemble_claim_value", "has_valid_field_coverage", "observation_to_typed_claim"}:
+        return getattr(_observation_execute(), name)
+    raise AttributeError(name)

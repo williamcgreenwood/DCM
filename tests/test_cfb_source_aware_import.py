@@ -294,3 +294,65 @@ def test_source_aware_import_uses_indexes_and_consumer_beyond_snapshot(tmp_path:
         if str(row.get("phase") or "") == "QUERIED" and row.get("downstream_used")
     ]
     assert queried_downstream, f"expected BoardIndexes QUERIED+downstream_used telemetry, got {telem}"
+
+
+def test_closed_loop_observation_reschedules_and_shrinks_next_batch(tmp_path: Path):
+    """incomplete → acquisition → observation → coverage → CELF next batch shrinks."""
+    dest, rows, planned, actions = _board_context(tmp_path)
+    event_action = next(a for a in actions["actions"] if a["scope"] == "EVENT")
+    before_batch = build_next_research_batch(
+        planned["requests"],
+        rows=rows,
+        max_entities=25,
+    )
+    assert before_batch["liveSelector"] == "ALG-SCHED-001"
+    assert before_batch["unresolvedCount"] >= 1
+    assert any(t.get("actionId") == event_action["actionId"] for t in before_batch["tasks"])
+    action_count_before = int(actions["actionCount"] or 0)
+    assert action_count_before >= 1
+
+    obs_path = tmp_path / "event_obs.jsonl"
+    obs_path.write_text(json.dumps(_event_observation(event_action, typed=True)) + "\n", encoding="utf-8")
+    result = execute_source_aware_observations(dest, obs_path)
+
+    assert result["imported"] == 1
+    assert result["contractsClosed"] >= 1
+    assert result["liveSelector"] == "ALG-SCHED-001"
+    assert result["celfDownstreamUsed"] is True
+    assert "ALG-SCHED-001" in (result.get("closedLoopTelemetry") or {}).get("algorithmIds", [])
+    assert result["actionCountAfter"] < result["actionCountBefore"]
+    assert result["unresolvedAfter"] < result["unresolvedBefore"]
+    assert result["nextBatchShrunk"] is True
+    assert (dest / "acquisition_action_graph.json").is_file()
+    assert (dest / "acquisition_schedule.json").is_file()
+    assert (dest / "material_facts.json").is_file()
+    assert (dest / "host_research_batch.json").is_file()
+    assert (dest / "closed_loop_algorithm_telemetry.json").is_file()
+
+    graph = json.loads((dest / "acquisition_action_graph.json").read_text(encoding="utf-8"))
+    assert graph["schema"] == "pillars_dcm.acquisition_action_graph.v1"
+    assert graph["liveSelector"] == "ALG-SCHED-001"
+    assert graph["actionCount"] == result["actionCountAfter"]
+    assert any(e["type"] == "covers" for e in graph["edges"])
+
+    schedule = json.loads((dest / "acquisition_schedule.json").read_text(encoding="utf-8"))
+    assert schedule["liveSelector"] == "ALG-SCHED-001"
+    assert schedule.get("celfActionIds") is not None
+
+    telem = json.loads((dest / "closed_loop_algorithm_telemetry.json").read_text(encoding="utf-8"))
+    celf = [
+        row
+        for row in (telem.get("executions") or [])
+        if str(row.get("algorithm_id") or row.get("algorithmId") or "") == "ALG-SCHED-001" and row.get("downstream_used")
+    ]
+    assert celf, f"expected CELF downstream_used telemetry, got {telem}"
+
+    after_batch = json.loads((dest / "host_research_batch.json").read_text(encoding="utf-8"))
+    assert after_batch["liveSelector"] == "ALG-SCHED-001"
+    assert after_batch["unresolvedCount"] < before_batch["unresolvedCount"]
+    assert after_batch["unresolvedCount"] == result["nextBatchUnresolvedCount"]
+    # Closed EVENT requirement must not reappear as an acquire task.
+    assert not any(
+        t.get("actionId") == event_action["actionId"] and t.get("scope") == "EVENT"
+        for t in after_batch.get("tasks") or []
+    )

@@ -6,10 +6,16 @@ Active canonical-main CFB closure slice: `chatgpt/canonical-main-cfb-standard-20
 
 This file is the human dashboard. It must be updated on every coding pass together with a new immutable pass record under `docs/engineering_passes/`.
 
-Current bounded execution increment: `P1-CFB-HOST-ACTION-CONTEXT-20260905` makes the selected host acquisition batch actionable. Each selected reusable action now carries its entity/event context, permitted source candidates, source family, and bounded instruction. This is not a claim that external evidence has already been acquired or that a final CFB ranking is complete.
+Current bounded execution increment: `P1-RESEARCH-OS-CLOSED-LOOP-20260906` finishes the grouped Research OS closed loop on the CFB path (AcquisitionActionGraph persist + observation→coverage→CELF next-batch shrink). This is not a claim that external evidence has already been acquired or that a final CFB ranking is complete.
 `docs/engineering/DCM_CODING_AND_PROMPT_STANDARD.md`; Drive writes follow
 `docs/engineering/DCM_DRIVE_HIERARCHY.md` and `dcm.runtime.storage_router`.
 
+
+## 2026-09-06 Research OS closed-loop slice
+
+`task/research-os-closed-loop-20260906` hardens the grouped CFB Research OS path already on main (graphs, CELF packing, source-aware import). This pass adds persistable **AcquisitionActionGraph**, post-import MaterialFactResolution + CELF reschedule so the **next host batch shrinks** when coverage moves, and proves `ALG-SCHED-001` with `downstream_used` telemetry on the closed loop. Lazy `dcm.chat` exports remove a pre-existing import cycle with `observation_execute`.
+
+Does **not** claim a current live CFB forecast. Remaining operational blockers stay EXTERNAL (current HAR + host-acquired evidence, live adapters, prospective settlements).
 
 ## 2026-09-06 requirement ledger v1
 

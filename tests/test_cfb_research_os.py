@@ -7,7 +7,11 @@ from pathlib import Path
 from dcm.cfb.accounting import account_cfb_board
 from dcm.cfb.launch import emit_cfb_forecast_artifacts, prepare_cfb_research_os
 from dcm.ingest.har import ingest_har
-from dcm.research.acquisition import build_acquisition_actions, schedule_acquisition_actions
+from dcm.research.acquisition import (
+    build_acquisition_action_graph,
+    build_acquisition_actions,
+    schedule_acquisition_actions,
+)
 from dcm.research.batch import build_next_research_batch
 from dcm.research.os_graphs import build_board_graph, build_market_demand_graph, build_requirement_graph
 from dcm.research.provider import write_bundle
@@ -63,6 +67,11 @@ def test_graphs_exist_before_research_and_use_constitution_primitives():
     schedule = schedule_acquisition_actions(actions)
     assert schedule["liveSelector"] == "ALG-SCHED-001"
     assert "ALG-SCHED-001" in schedule["algorithmIds"]
+    aa_graph = build_acquisition_action_graph(actions, schedule=schedule)
+    assert aa_graph["schema"] == "pillars_dcm.acquisition_action_graph.v1"
+    assert aa_graph["liveSelector"] == "ALG-SCHED-001"
+    assert aa_graph["actionCount"] == actions["actionCount"]
+    assert any(e["type"] == "covers" for e in aa_graph["edges"])
     # fanout: at least one action covers more than one offer
     assert any(int(a.get("dependentOfferCount") or 0) > 1 for a in actions["actions"])
 
@@ -77,7 +86,10 @@ def test_modelable_is_not_playable_and_per_prop_flags(tmp_path: Path):
     os_art = prepare_cfb_research_os(dest, rows, planned["requests"], claims=claims)
     assert (dest / "board_graph.json").is_file()
     assert (dest / "requirement_graph.json").is_file()
+    assert (dest / "market_demand_graph.json").is_file()
     assert (dest / "acquisition_actions.json").is_file()
+    assert (dest / "acquisition_action_graph.json").is_file()
+    assert os_art["acquisitionActionGraph"]["schema"] == "pillars_dcm.acquisition_action_graph.v1"
     assert os_art["accounting"]["supported"] == 8
 
 

@@ -1,7 +1,7 @@
 {
   "schema": "pillars_dcm.program_status.v1",
-  "updatedAtUtc": "2026-09-06T04:00:00Z",
-  "activePromotionBranch": "main",
+  "updatedAtUtc": "2026-09-06T04:11:59Z",
+  "activePromotionBranch": "task/research-os-closed-loop-20260906",
   "targetPromotionBranch": "main",
   "lastMergedPullRequest": 35,
   "lastMergedCommit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
@@ -48,8 +48,7 @@
       "current": 9,
       "state": "STRONG_PARTIAL",
       "next": [
-        "use requirement ledger CFB-critical blockers to drive host evidence import on a current CFB HAR",
-        "close remaining shared requirements via source-aware import",
+        "import host-acquired evidence on a current CFB HAR via closed-loop path",
         "finish mixed-sport R1 remainder after CFB slice"
       ]
     },
@@ -118,7 +117,7 @@
       "current": 8,
       "state": "STRONG_PARTIAL",
       "next": [
-        "execute source-aware evidence-import on the current CFB HAR (ledger REQ-HOST-009.02 / REQ-EVID-011.02)",
+        "execute closed-loop evidence-import on the current CFB HAR (ledger REQ-HOST-009.02 / REQ-EVID-011.02)",
         "no second engine"
       ]
     },
@@ -220,7 +219,7 @@
       "state": "STRONG_PARTIAL",
       "next": [
         "keep constitution CI gates green",
-        "mixed-sport Research OS remainder after CFB live CELF packing",
+        "mixed-sport Research OS remainder after CFB closed-loop CELF packing",
         "do not silently retire CORE/CONDITIONAL/CHALLENGER algorithms"
       ]
     }
@@ -240,7 +239,7 @@
     "noSilentDowngrades": true,
     "noSilentCompletionClaims": true
   },
-  "activeBranch": "refactor/src-dcm-package-layout",
+  "activeBranch": "task/research-os-closed-loop-20260906",
   "activePullRequest": null,
   "latestPass": {
     "id": "20260906T034800Z_grok_src-dcm-package-layout",
@@ -320,5 +319,7 @@
     "ledgerVersion": "1.0.0",
     "baseMainSha": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
     "pass": "20260906T040000Z_grok_requirement-ledger-v1"
-  }
+  },
+  "currentBoundedIncrement": "P1-RESEARCH-OS-CLOSED-LOOP-20260906",
+  "notes": "Research OS closed loop: AcquisitionActionGraph persist + observation import reschedules CELF and shrinks next host batch. Operational CFB card still EXTERNAL."
 }

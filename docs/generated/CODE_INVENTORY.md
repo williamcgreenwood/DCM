@@ -3,9 +3,9 @@
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
 - Modules: **223**
-- Symbols: **1524**
+- Symbols: **1528**
 - Parse errors: **0**
-- Inventory hash: `b435a7c7ef0eb2d2f9afc92dc228c3284c361fb75ee250d444636931938a0d85`
+- Inventory hash: `a837b2f74fd918da097a3628373b006d1fec9536fcc34f0286e929372acefd20`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -43,12 +43,12 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | UNMAPPED | `src/dcm/cfb/refresh.py` | 0 | 2 |
 | UNMAPPED | `src/dcm/cfb/reports.py` | 0 | 11 |
 | UNMAPPED | `src/dcm/cfb/rules.py` | 0 | 1 |
-| P7 | `src/dcm/chat/__init__.py` | 0 | 0 |
+| P7 | `src/dcm/chat/__init__.py` | 0 | 1 |
 | P7 | `src/dcm/chat/__main__.py` | 0 | 0 |
 | P7 | `src/dcm/chat/archive.py` | 0 | 2 |
 | P7 | `src/dcm/chat/cli.py` | 0 | 4 |
 | P7 | `src/dcm/chat/contracts.py` | 0 | 0 |
-| P7 | `src/dcm/chat/evidence_import.py` | 0 | 4 |
+| P7 | `src/dcm/chat/evidence_import.py` | 0 | 6 |
 | P7 | `src/dcm/chat/report.py` | 0 | 1 |
 | P7 | `src/dcm/chat/research_bridge.py` | 0 | 1 |
 | P7 | `src/dcm/chat/session.py` | 1 | 18 |
@@ -115,7 +115,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | UNMAPPED | `src/dcm/postgame.py` | 0 | 1 |
 | UNMAPPED | `src/dcm/release.py` | 0 | 14 |
 | P1 | `src/dcm/research/__init__.py` | 0 | 1 |
-| P1 | `src/dcm/research/acquisition.py` | 0 | 5 |
+| P1 | `src/dcm/research/acquisition.py` | 0 | 6 |
 | P1 | `src/dcm/research/adapters/__init__.py` | 0 | 0 |
 | P1 | `src/dcm/research/adapters/base.py` | 1 | 7 |
 | P1 | `src/dcm/research/adapters/basketball_reference.py` | 7 | 26 |
@@ -575,15 +575,15 @@ _No class/function symbols._
 
 ### `src/dcm/cfb/launch.py`
 
-- `function` **_write** L40
-- `function` **_board_fingerprint** L46
-- `function` **_claims_fingerprint** L53
-- `function` **_frontier_fingerprint** L61
-- `function` **_load_json** L65
-- `function` **prepare_cfb_research_os** L75 — Emit graphs, indexes, and live AcquisitionActions BEFORE web acquisition.
-- `function` **attach_cfb_prop_flags** L390
-- `function` **emit_cfb_forecast_artifacts** L399
-- `function` **persist_algorithm_telemetry** L592
+- `function` **_write** L44
+- `function` **_board_fingerprint** L50
+- `function` **_claims_fingerprint** L57
+- `function` **_frontier_fingerprint** L65
+- `function` **_load_json** L69
+- `function` **prepare_cfb_research_os** L79 — Emit graphs, indexes, and live AcquisitionActions BEFORE web acquisition.
+- `function` **attach_cfb_prop_flags** L400
+- `function` **emit_cfb_forecast_artifacts** L409
+- `function` **persist_algorithm_telemetry** L602
 
 ### `src/dcm/cfb/markets.py`
 
@@ -635,7 +635,7 @@ _No class/function symbols._
 
 ### `src/dcm/chat/__init__.py`
 
-_No class/function symbols._
+- `function` **__getattr__** L21
 
 ### `src/dcm/chat/__main__.py`
 
@@ -659,10 +659,12 @@ _No class/function symbols._
 
 ### `src/dcm/chat/evidence_import.py`
 
-- `function` **_load_observations** L33
-- `function` **_match_request** L63
-- `function` **observation_to_claim** L76 — Legacy entry: validate + convert one observation (rejects empty fields).
-- `function` **import_observations** L86
+- `function` **_observation_execute** L22
+- `function` **_load_observations** L30
+- `function` **_match_request** L60
+- `function` **observation_to_claim** L73 — Legacy entry: validate + convert one observation (rejects empty fields).
+- `function` **import_observations** L83
+- `function` **__getattr__** L186
 
 ### `src/dcm/chat/report.py`
 
@@ -1274,6 +1276,7 @@ _No class/function symbols._
 - `function` **schedule_acquisition_actions** L228 — Live CELF selector with set-cover + constrained batch packing.
 - `method` **schedule_acquisition_actions.gain_fn** L262
 - `method` **schedule_acquisition_actions.cost_fn** L272
+- `function` **build_acquisition_action_graph** L355 — Persistable AcquisitionActionGraph: one action may cover many requirements/offers.
 
 ### `src/dcm/research/adapters/__init__.py`
 
@@ -1622,7 +1625,7 @@ _No class/function symbols._
 
 ### `src/dcm/research/observation_execute.py`
 
-- `function` **execute_source_aware_observations** L50 — Import source-aware host observations and close coverage→consumer contracts.
+- `function` **execute_source_aware_observations** L60 — Import source-aware host observations and close coverage→consumer contracts.
 
 ### `src/dcm/research/observation_execute_support.py`
 
@@ -1652,14 +1655,14 @@ _No class/function symbols._
 
 ### `src/dcm/research/os_graphs.py`
 
-- `function` **_is_cfb** L34
-- `function` **_offer_id** L38
-- `function` **_attach_dependents** L42 — Fill dependent_offer_ids via exact composite-key grouping. No per-prop scans later.
-- `function` **build_board_graph** L86
-- `method` **build_board_graph.add_node** L98
-- `function` **build_market_demand_graph** L176
-- `function` **build_requirement_graph** L230
-- `function` **persist_research_os_graphs** L322
+- `function` **_is_cfb** L35
+- `function` **_offer_id** L39
+- `function` **_attach_dependents** L43 — Fill dependent_offer_ids via exact composite-key grouping. No per-prop scans later.
+- `function` **build_board_graph** L87
+- `method` **build_board_graph.add_node** L99
+- `function` **build_market_demand_graph** L177
+- `function` **build_requirement_graph** L231
+- `function` **persist_research_os_graphs** L323
 
 ### `src/dcm/research/player_offer_set.py`
 
