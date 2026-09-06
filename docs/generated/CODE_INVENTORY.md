@@ -5,7 +5,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 - Modules: **227**
 - Symbols: **1599**
 - Parse errors: **0**
-- Inventory hash: `b0c129593cbb1158a536b297b7e9abf8354636b82a992c1c48185719f2d38d62`
+- Inventory hash: `9c0bd3d20ee1a16c68713c77f10b0b039e12ac5b933006bcd8d1ef9c041ddefb`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -954,13 +954,13 @@ _No class/function symbols._
 - `function` **_normalize_side** L43
 - `function` **_side_list** L52
 - `function` **_side** L66 — Verify offered sides. Missing side metadata fails closed.
-- `function` **_board_id** L96
-- `function` **_game_teams** L118
-- `function` **_event_label** L132
-- `function` **_status** L138
-- `function` **_row_from_jsonapi** L151
-- `function` **_row_from_normalized** L220
-- `function` **parse_prizepicks_payload** L255
+- `function` **_board_id** L101
+- `function` **_game_teams** L123
+- `function` **_event_label** L137
+- `function` **_status** L143
+- `function` **_row_from_jsonapi** L156
+- `function` **_row_from_normalized** L225
+- `function` **parse_prizepicks_payload** L260
 
 ### `src/dcm/ingest/sanitize.py`
 
