@@ -13,7 +13,7 @@ Current bounded execution increment: `P18-LUNA-MASTER-COMPLETION-20260906` perma
 
 ## 2026-09-06 Phase 18 Luna master completion (algo consumption lock)
 
-`docs/algo-constitution-lock-completion-20260906` (base `main` @ `e51d4ae1f0c3057c4f0431547c5cc869c3669332`, PR #42). Permanent Algorithmic Constitution **consumption lock** + honest Phase 18 matrix. No HAR commit. No fake 10/10. No predictive claims.
+Merged to `main` @ `a5328a23137541a3fd17c856e51c7af0455c1ec7` via PR #43 (promo branch `docs/algo-constitution-lock-completion-20260906` retired; content based on `main` @ `e51d4ae1f0c3057c4f0431547c5cc869c3669332` / PR #42). Permanent Algorithmic Constitution **consumption lock** + honest Phase 18 matrix. No HAR commit. No fake 10/10. No predictive claims.
 
 - Law: `docs/engineering/ALGORITHM_CONSUMPTION_LAW.md` (exact BoardStore indexes → CELF/set-cover → true DAG → two-rep → NumPy EventWorld → registry ML/group/append).
 - Surfaces: `AGENTS.md`, `CONSTITUTION_INHERITANCE.md`; CI via constitution governance test + `validate_dcm_policy.py`.
@@ -23,7 +23,7 @@ Current bounded execution increment: `P18-LUNA-MASTER-COMPLETION-20260906` perma
 
 | Field | Status |
 |---|---|
-| ENGINEERING_INTEGRATED | PASS (PRs #34–#42 on main @ e51d4ae) |
+| ENGINEERING_INTEGRATED | PASS (PRs #34–#42; status bump PR #43 on main @ a5328a2) |
 | CFB_OPERATIONAL | PARTIAL (synthetic E2E; live HAR EXTERNAL) |
 | RECOMMENDATION_ELIGIBLE | DEFERRED |
 | HOST_PERFORMANCE_CERTIFIED | FAIL (`hostPerformanceCertified=false`) |
