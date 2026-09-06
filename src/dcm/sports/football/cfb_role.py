@@ -35,21 +35,75 @@ def _num(value: Any) -> float | None:
         return None
 
 
+def _prior_season_blob(player: dict[str, Any]) -> dict[str, Any]:
+    for key in (
+        "priorSeason_2025",
+        "prior_season_2025",
+        "priorSeason",
+        "prior_season",
+        "season2025",
+        "priorSeason_2024",
+    ):
+        value = player.get(key)
+        if isinstance(value, dict) and value:
+            return value
+    return {}
+
+
 def resolve_cfb_role_state(player: dict[str, Any], *, role: str | None = None) -> dict[str, Any]:
     player = player if isinstance(player, dict) else {}
+    prior_season = _prior_season_blob(player)
+    opportunity = player.get("opportunity") if isinstance(player.get("opportunity"), dict) else {}
     role_text = str(role or player.get("role") or "").strip().upper()
     depth = str(
         player.get("depth_chart_role")
         or player.get("depthChartRole")
         or player.get("projected_role")
+        or opportunity.get("pass_attempts_role")
+        or opportunity.get("rush_attempts_role")
+        or opportunity.get("depth_chart_role")
         or player.get("role")
         or ""
     ).strip().lower()
     current_starter = any(token in depth for token in ("starter", "wr1", "rb1", "qb1", "te1"))
     current_rotation = any(token in depth for token in ("rotation", "depth", "backup", "wr2", "wr3", "rb2", "te2"))
-    prior_starts = _num(player.get("prior_season_starts") or player.get("priorStarts"))
-    prior_role = str(player.get("prior_role") or player.get("priorRole") or "").strip().lower()
-    transferred = _truthy(player.get("transfer")) or bool(player.get("previous_school") or player.get("previousSchool"))
+    # Host observations often set role=QB/RB/WR with starter cues in opportunity
+    # metadata rather than depth_chart_role. Consume those cues; do not invent.
+    snap_share = str(opportunity.get("snap_share_expected") or player.get("snap_share_expected") or "").lower()
+    if not current_starter and (
+        "starter" in snap_share
+        or "majority" in snap_share
+        or str(opportunity.get("pass_attempts_role") or "").upper() in {"QB1", "STARTER"}
+        or str(opportunity.get("rush_attempts_role") or "").upper() in {"RB1", "STARTER"}
+    ):
+        current_starter = True
+        depth = depth or "starter"
+    prior_starts = _num(
+        player.get("prior_season_starts")
+        or player.get("priorStarts")
+        or prior_season.get("starts")
+        or prior_season.get("games_started")
+        or prior_season.get("gamesStarted")
+        or player.get("starts")
+    )
+    # If host provided multi-game logs but no starts count, use log count as a
+    # lower-bound observed start/appearance support for role classification only.
+    if prior_starts is None:
+        logs = player.get("game_logs") or player.get("game_logs_sample_2025") or []
+        if isinstance(logs, list) and len(logs) >= 5:
+            prior_starts = float(len(logs))
+    prior_role = str(
+        player.get("prior_role")
+        or player.get("priorRole")
+        or prior_season.get("role")
+        or ""
+    ).strip().lower()
+    transferred = _truthy(player.get("transfer")) or bool(
+        player.get("previous_school")
+        or player.get("previousSchool")
+        or prior_season.get("previous_school")
+        or player.get("priorSchool")
+    )
     true_freshman = _truthy(player.get("true_freshman")) or str(player.get("class") or "").strip().upper() in {"FR", "TRUE FRESHMAN"}
     injury_return = _truthy(player.get("injury_return") or player.get("returning_from_injury"))
     new_system = _truthy(player.get("new_coordinator_system") or player.get("new_offensive_coordinator"))

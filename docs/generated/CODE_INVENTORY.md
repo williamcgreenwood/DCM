@@ -3,9 +3,9 @@
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
 - Modules: **228**
-- Symbols: **1605**
+- Symbols: **1606**
 - Parse errors: **0**
-- Inventory hash: `8e66aaad1a274a763fb0f48d3f611479f85ea723d2875d56d836591883e53c76`
+- Inventory hash: `987ec392ffcd623dd8a52a54d55959d24aef4c9b5f83b5a045babc3bb9d33e10`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -221,7 +221,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P3 | `src/dcm/sports/common/research_schema.py` | 1 | 7 |
 | P3 | `src/dcm/sports/football/__init__.py` | 0 | 0 |
 | P3 | `src/dcm/sports/football/appearance.py` | 1 | 2 |
-| P3 | `src/dcm/sports/football/cfb_role.py` | 0 | 3 |
+| P3 | `src/dcm/sports/football/cfb_role.py` | 0 | 4 |
 | P3 | `src/dcm/sports/football/conservation.py` | 0 | 6 |
 | P3 | `src/dcm/sports/football/efficiency.py` | 0 | 2 |
 | P3 | `src/dcm/sports/football/ledger.py` | 3 | 5 |
@@ -2460,7 +2460,8 @@ _No class/function symbols._
 
 - `function` **_truthy** L25
 - `function` **_num** L31
-- `function` **resolve_cfb_role_state** L38
+- `function` **_prior_season_blob** L38
+- `function` **resolve_cfb_role_state** L53
 
 ### `src/dcm/sports/football/conservation.py`
 
