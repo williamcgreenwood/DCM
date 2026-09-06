@@ -1,6 +1,6 @@
 {
-  "contentHash": "e65fbeb60369b4d8fab721f5c2e79a385ae56dd72b50310a1ef4d768b43d2ef3",
-  "moduleCount": 221,
+  "contentHash": "b435a7c7ef0eb2d2f9afc92dc228c3284c361fb75ee250d444636931938a0d85",
+  "moduleCount": 223,
   "modules": [
     {
       "classes": 0,
@@ -3627,6 +3627,55 @@
       "path": "src/dcm/dataset.py",
       "sha256": "e6d81d3530a7f36f53ec661c80b3cdd39558fdd14aab159fe1db20ca13c2d9b8",
       "symbols": [],
+      "workstream": "UNMAPPED"
+    },
+    {
+      "classes": 0,
+      "functions": 0,
+      "path": "src/dcm/governance/__init__.py",
+      "sha256": "8559511815e36eb8b2026526e0301e118c452720b5c1c5a92a575d43bc908574",
+      "symbols": [],
+      "workstream": "UNMAPPED"
+    },
+    {
+      "classes": 0,
+      "functions": 4,
+      "path": "src/dcm/governance/requirement_ledger.py",
+      "sha256": "8d336336d2d319cae2059b5dda659fdf001d2586c81e142c3df7a286f613b3e8",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 33,
+          "kind": "function",
+          "line": 21,
+          "name": "_default_ledger_path",
+          "qualname": "_default_ledger_path"
+        },
+        {
+          "doc": "Load and lightly validate the canonical requirement ledger.",
+          "endLine": 54,
+          "kind": "function",
+          "line": 37,
+          "name": "load_requirement_ledger",
+          "qualname": "load_requirement_ledger"
+        },
+        {
+          "doc": "Return status \u2192 count. By default counts atomic REQ-* rows only.",
+          "endLine": 67,
+          "kind": "function",
+          "line": 57,
+          "name": "summarize_by_status",
+          "qualname": "summarize_by_status"
+        },
+        {
+          "doc": "Return CFB-critical atomics that are not IMPLEMENTED.",
+          "endLine": 90,
+          "kind": "function",
+          "line": 70,
+          "name": "cfb_critical_blockers",
+          "qualname": "cfb_critical_blockers"
+        }
+      ],
       "workstream": "UNMAPPED"
     },
     {
@@ -14123,5 +14172,5 @@
   "parseErrors": [],
   "root": "src",
   "schema": "pillars_dcm.code_inventory.v1",
-  "symbolCount": 1520
+  "symbolCount": 1524
 }

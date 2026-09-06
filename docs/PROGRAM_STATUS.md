@@ -11,9 +11,13 @@ Current bounded execution increment: `P1-CFB-HOST-ACTION-CONTEXT-20260905` makes
 `docs/engineering/DCM_DRIVE_HIERARCHY.md` and `dcm.runtime.storage_router`.
 
 
+## 2026-09-06 requirement ledger v1
+
+`main` is at `c01724382f478ddb4221a098e37e98f55fcd9ffe` after PR #35 (`src/dcm` relocate). Pass `20260906T040000Z_grok_requirement-ledger-v1` publishes canonical `docs/requirements/REQUIREMENT_LEDGER.v1.json` + `REQUIREMENT_CROSSWALK.md` from the handoff seed (HANDOFF-001…042 expanded to atomic REQ-* IDs). Statuses are honest vs live `src/dcm`. P380X remains a candidate SignalOperator catalog (compile-to-active-DAG); ZIP quarry code was not installed into the runtime package. CFB operational acceptance remains EXTERNAL pending current HAR + host-acquired evidence.
+
 ## 2026-09-06 package layout relocate
 
-PR #34 merged to `main` at `b0e44d5886adb98cb84dbf466ee3a3fc1fee28b1`. Active packaging pass `20260906T034800Z_grok_src-dcm-package-layout` relocates the installable engine to `src/dcm` and moves the TypeScript operator UI to `web/src`. `artifacts/dcm_v6_workstream_ab` remains archive-only.
+PR #34 merged to `main` at `b0e44d5886adb98cb84dbf466ee3a3fc1fee28b1`; PR #35 merged at `c01724382f478ddb4221a098e37e98f55fcd9ffe` completing the `src/dcm` relocate (TypeScript operator UI under `web/src`). `artifacts/dcm_v6_workstream_ab` remains archive-only.
 
 ## Status scale
 

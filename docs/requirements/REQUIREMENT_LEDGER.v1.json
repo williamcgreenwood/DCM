@@ -1,0 +1,2834 @@
+{
+  "schema": "pillars_dcm.requirement_ledger.v1",
+  "ledger_version": "1.0.0",
+  "generated_at_utc": "2026-09-06T04:01:00Z",
+  "inspected_main_sha": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+  "inspected_main_note": "PR #35 src/dcm relocate merged; main protected",
+  "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+  "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+  "status_values": [
+    "IMPLEMENTED",
+    "PARTIAL",
+    "MISSING",
+    "EXTERNAL",
+    "SUPERSEDED",
+    "N/A"
+  ],
+  "status_policy": "Statuses are honest vs live src/dcm at inspected_main_sha. Parent HANDOFF-* nodes are grouping shells (PARTIAL). Atomic REQ-* nodes carry implementation truth. No completion inferred from handoff documents alone.",
+  "handoff_quarry": {
+    "path": "/workspace/dcm-handoff-pack/PILLARS_DCM_GROK_MASTER_HANDOFF_20260905",
+    "seed_ledger_sha256": "697817ac9af2705161f42f31e6965896ffde0a3a288e961de619032e7ba76f8b",
+    "source_manifest_sha256": "8473da20755adbfb22ef465d9c639164f332a6926e2c8966a823c9c01c5be968",
+    "master_blueprint_sha256": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+    "source_manifest_entries": 95,
+    "seed_domain_count": 42,
+    "read_only": true,
+    "never_execute_embedded_code": true,
+    "never_copy_wholesale_into_runtime": true
+  },
+  "deliberately_not_copied_from_zip": [
+    "P380X 1500+ pillar/engine implementations (catalog + compile-to-active-DAG only)",
+    "original_sources/*.docx/*.xlsx/*.zip binary workbooks and donor packages as runtime code",
+    "source_text extractions wholesale into src/dcm",
+    "dcm_v6_workstream_ab / WSAB standalone package onto import path",
+    "Any HAR bytes (none in handoff; never commit)",
+    "Embedded executable code from GROK_EXECUTION_PROMPT or donor ZIPs"
+  ],
+  "p380x_policy": {
+    "pillars_are": "candidate SignalOperator catalog only",
+    "rule": "compile-to-active-DAG with typed specs, real producers/consumers, tests",
+    "forbidden": "copying 1500 engines into runtime package",
+    "governance_modules": [
+      "src/dcm/signals/compiler.py",
+      "src/dcm/signals/registry.py",
+      "src/dcm/signals/donor_accounting.py"
+    ]
+  },
+  "counts": {
+    "total_records": 98,
+    "parent_domains": 42,
+    "atomic_requirements": 56,
+    "by_status": {
+      "EXTERNAL": 6,
+      "IMPLEMENTED": 28,
+      "MISSING": 5,
+      "N/A": 1,
+      "PARTIAL": 57,
+      "SUPERSEDED": 1
+    },
+    "atomic_by_status": {
+      "EXTERNAL": 6,
+      "IMPLEMENTED": 28,
+      "MISSING": 5,
+      "N/A": 1,
+      "PARTIAL": 15,
+      "SUPERSEDED": 1
+    },
+    "cfb_critical_atomic": 35,
+    "cfb_critical_blockers": 10
+  },
+  "cfb_critical_path_blockers": [
+    {
+      "requirement_id": "REQ-ID-003.02",
+      "title": "Namesake and transfer collision handling",
+      "status": "PARTIAL",
+      "blocker": "Live cross-source official CFB PrizePicks id map / current HAR with both fields still needed for full acceptance"
+    },
+    {
+      "requirement_id": "REQ-SIDE-005.01",
+      "title": "OfferMetadataRecovery for offered sides",
+      "status": "PARTIAL",
+      "blocker": "Large share of live boards still land UNRESOLVED side rows; web stats must not invent sides"
+    },
+    {
+      "requirement_id": "REQ-HOST-009.02",
+      "title": "Source-aware host action context",
+      "status": "PARTIAL",
+      "blocker": "Software path merged; current live CFB HAR + host-acquired evidence still required for operational closure"
+    },
+    {
+      "requirement_id": "REQ-ADAPT-010.01",
+      "title": "Source catalog + health + fallbacks",
+      "status": "PARTIAL",
+      "blocker": "Live adapter fetch beyond fixtures incomplete; licensed providers optional/external"
+    },
+    {
+      "requirement_id": "REQ-EVID-011.02",
+      "title": "Current-HAR evidence sufficiency for playable card",
+      "status": "EXTERNAL",
+      "blocker": "Current sanitized CFB HAR + host-acquired reusable evidence not supplied in this session"
+    },
+    {
+      "requirement_id": "REQ-CFB-MKT-016.01",
+      "title": "19 ACTIVE CFB markets + unsupported tasking",
+      "status": "PARTIAL",
+      "blocker": "Operational acceptance of 19 markets on a current live board still pending"
+    },
+    {
+      "requirement_id": "REQ-UNC-019.01",
+      "title": "Uncertainty decomposition; conformal inactive at LR000000",
+      "status": "PARTIAL",
+      "blocker": "Calibration promotion EXTERNAL until prospective settlements exist"
+    },
+    {
+      "requirement_id": "REQ-FRZ-023.02",
+      "title": "CFB operational freeze on current HAR",
+      "status": "EXTERNAL",
+      "blocker": "Blocked on current HAR + host-acquired evidence (REQ-EVID-011.02)"
+    },
+    {
+      "requirement_id": "REQ-LEARN-026.01",
+      "title": "Full-population chronological settlement consumers",
+      "status": "PARTIAL",
+      "blocker": "Prospective CFB settlements and chronological unseen evidence EXTERNAL"
+    },
+    {
+      "requirement_id": "REQ-FINAL-042.01",
+      "title": "Evidence-linked per-scope release receipt",
+      "status": "EXTERNAL",
+      "blocker": "CFB operational acceptance and predictive gates still open"
+    }
+  ],
+  "requirements": [
+    {
+      "requirement_id": "HANDOFF-001",
+      "parent_id": null,
+      "title": "Authority and baseline",
+      "source_locator": "MASTER_BLUEPRINT.md\u00a72; seed HANDOFF-001",
+      "source_hash": "697817ac9af2705161f42f31e6965896ffde0a3a288e961de619032e7ba76f8b",
+      "normative_requirement": "Live main and PR/check/review readback; dirty work preserved",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Atomic children carry honest status; parent is a grouping node",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": "Seed acceptance domain from handoff; expanded into atomic children below"
+    },
+    {
+      "requirement_id": "HANDOFF-002",
+      "parent_id": null,
+      "title": "Source integration",
+      "source_locator": "MASTER_BLUEPRINT.md\u00a74; seed HANDOFF-002",
+      "source_hash": "697817ac9af2705161f42f31e6965896ffde0a3a288e961de619032e7ba76f8b",
+      "normative_requirement": "Every original indexed requirement has a traced disposition",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Atomic children carry honest status; parent is a grouping node",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": false,
+      "notes": "Seed acceptance domain from handoff; expanded into atomic children below"
+    },
+    {
+      "requirement_id": "HANDOFF-003",
+      "parent_id": null,
+      "title": "Identity",
+      "source_locator": "MASTER_BLUEPRINT.md\u00a75; seed HANDOFF-003",
+      "source_hash": "697817ac9af2705161f42f31e6965896ffde0a3a288e961de619032e7ba76f8b",
+      "normative_requirement": "Exact crosswalks, namesake and transfer regression tests",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Atomic children carry honest status; parent is a grouping node",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": "Seed acceptance domain from handoff; expanded into atomic children below"
+    },
+    {
+      "requirement_id": "HANDOFF-004",
+      "parent_id": null,
+      "title": "Private ingestion",
+      "source_locator": "MASTER_BLUEPRINT.md\u00a76; seed HANDOFF-004",
+      "source_hash": "697817ac9af2705161f42f31e6965896ffde0a3a288e961de619032e7ba76f8b",
+      "normative_requirement": "All-row disjoint accounting and privacy tests",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Atomic children carry honest status; parent is a grouping node",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": "Seed acceptance domain from handoff; expanded into atomic children below"
+    },
+    {
+      "requirement_id": "HANDOFF-005",
+      "parent_id": null,
+      "title": "Side recovery",
+      "source_locator": "MASTER_BLUEPRINT.md\u00a76; seed HANDOFF-005",
+      "source_hash": "697817ac9af2705161f42f31e6965896ffde0a3a288e961de619032e7ba76f8b",
+      "normative_requirement": "Fractional cutoffs and recoverable/absent side tests",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Atomic children carry honest status; parent is a grouping node",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": "Seed acceptance domain from handoff; expanded into atomic children below"
+    },
+    {
+      "requirement_id": "HANDOFF-006",
+      "parent_id": null,
+      "title": "Temporal firewall",
+      "source_locator": "MASTER_BLUEPRINT.md\u00a77; seed HANDOFF-006",
+      "source_hash": "697817ac9af2705161f42f31e6965896ffde0a3a288e961de619032e7ba76f8b",
+      "normative_requirement": "Capture/retrieval/cutoff separation and leakage rejection",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Atomic children carry honest status; parent is a grouping node",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": "Seed acceptance domain from handoff; expanded into atomic children below"
+    },
+    {
+      "requirement_id": "HANDOFF-007",
+      "parent_id": null,
+      "title": "Shared graph",
+      "source_locator": "MASTER_BLUEPRINT.md\u00a78; seed HANDOFF-007",
+      "source_hash": "697817ac9af2705161f42f31e6965896ffde0a3a288e961de619032e7ba76f8b",
+      "normative_requirement": "Typed one-page multi-offer fanout without mis-scoped facts",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Atomic children carry honest status; parent is a grouping node",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": "Seed acceptance domain from handoff; expanded into atomic children below"
+    },
+    {
+      "requirement_id": "HANDOFF-008",
+      "parent_id": null,
+      "title": "Acquisition planner",
+      "source_locator": "MASTER_BLUEPRINT.md\u00a79; seed HANDOFF-008",
+      "source_hash": "697817ac9af2705161f42f31e6965896ffde0a3a288e961de619032e7ba76f8b",
+      "normative_requirement": "Unique marginal coverage, deterministic packing and budgets",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Atomic children carry honest status; parent is a grouping node",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": "Seed acceptance domain from handoff; expanded into atomic children below"
+    },
+    {
+      "requirement_id": "HANDOFF-009",
+      "parent_id": null,
+      "title": "Executing host loop",
+      "source_locator": "MASTER_BLUEPRINT.md\u00a79; seed HANDOFF-009",
+      "source_hash": "697817ac9af2705161f42f31e6965896ffde0a3a288e961de619032e7ba76f8b",
+      "normative_requirement": "Actual acquisition/import/recompute with progress termination",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Atomic children carry honest status; parent is a grouping node",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": "Seed acceptance domain from handoff; expanded into atomic children below"
+    },
+    {
+      "requirement_id": "HANDOFF-010",
+      "parent_id": null,
+      "title": "Source adapters",
+      "source_locator": "MASTER_BLUEPRINT.md\u00a710; seed HANDOFF-010",
+      "source_hash": "697817ac9af2705161f42f31e6965896ffde0a3a288e961de619032e7ba76f8b",
+      "normative_requirement": "Permission, health, mappings, fixture and fallback evidence",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Atomic children carry honest status; parent is a grouping node",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": "Seed acceptance domain from handoff; expanded into atomic children below"
+    },
+    {
+      "requirement_id": "HANDOFF-011",
+      "parent_id": null,
+      "title": "Evidence sufficiency",
+      "source_locator": "MASTER_BLUEPRINT.md\u00a711; seed HANDOFF-011",
+      "source_hash": "697817ac9af2705161f42f31e6965896ffde0a3a288e961de619032e7ba76f8b",
+      "normative_requirement": "Field semantics, contradiction and criticality checks",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Atomic children carry honest status; parent is a grouping node",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": "Seed acceptance domain from handoff; expanded into atomic children below"
+    },
+    {
+      "requirement_id": "HANDOFF-012",
+      "parent_id": null,
+      "title": "Parameter compiler",
+      "source_locator": "MASTER_BLUEPRINT.md\u00a711; seed HANDOFF-012",
+      "source_hash": "697817ac9af2705161f42f31e6965896ffde0a3a288e961de619032e7ba76f8b",
+      "normative_requirement": "Claim lineage and evidence-change downstream effect",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Atomic children carry honest status; parent is a grouping node",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": "Seed acceptance domain from handoff; expanded into atomic children below"
+    },
+    {
+      "requirement_id": "HANDOFF-013",
+      "parent_id": null,
+      "title": "CFB opportunities",
+      "source_locator": "MASTER_BLUEPRINT.md\u00a712; seed HANDOFF-013",
+      "source_hash": "697817ac9af2705161f42f31e6965896ffde0a3a288e961de619032e7ba76f8b",
+      "normative_requirement": "Role, team allocation, opponent and residual participation tests",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Atomic children carry honest status; parent is a grouping node",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": "Seed acceptance domain from handoff; expanded into atomic children below"
+    },
+    {
+      "requirement_id": "HANDOFF-014",
+      "parent_id": null,
+      "title": "CFB efficiency",
+      "source_locator": "MASTER_BLUEPRINT.md\u00a712; seed HANDOFF-014",
+      "source_hash": "697817ac9af2705161f42f31e6965896ffde0a3a288e961de619032e7ba76f8b",
+      "normative_requirement": "Versioned sample support, shrinkage and distribution tests",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Atomic children carry honest status; parent is a grouping node",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": "Seed acceptance domain from handoff; expanded into atomic children below"
+    },
+    {
+      "requirement_id": "HANDOFF-015",
+      "parent_id": null,
+      "title": "CFB conservation",
+      "source_locator": "MASTER_BLUEPRINT.md\u00a712; seed HANDOFF-015",
+      "source_hash": "697817ac9af2705161f42f31e6965896ffde0a3a288e961de619032e7ba76f8b",
+      "normative_requirement": "Primitive/composite identities and explicit non-identities",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Atomic children carry honest status; parent is a grouping node",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": "Seed acceptance domain from handoff; expanded into atomic children below"
+    },
+    {
+      "requirement_id": "HANDOFF-016",
+      "parent_id": null,
+      "title": "CFB market coverage",
+      "source_locator": "MASTER_BLUEPRINT.md\u00a712; seed HANDOFF-016",
+      "source_hash": "697817ac9af2705161f42f31e6965896ffde0a3a288e961de619032e7ba76f8b",
+      "normative_requirement": "Every HAR market mapped to supported or exact pending task",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Atomic children carry honest status; parent is a grouping node",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": "Seed acceptance domain from handoff; expanded into atomic children below"
+    },
+    {
+      "requirement_id": "HANDOFF-017",
+      "parent_id": null,
+      "title": "CFB special teams",
+      "source_locator": "MASTER_BLUEPRINT.md\u00a712; seed HANDOFF-017",
+      "source_hash": "697817ac9af2705161f42f31e6965896ffde0a3a288e961de619032e7ba76f8b",
+      "normative_requirement": "Shared scoring/opportunity and kicking projections",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Atomic children carry honest status; parent is a grouping node",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": false,
+      "notes": "Seed acceptance domain from handoff; expanded into atomic children below"
+    },
+    {
+      "requirement_id": "HANDOFF-018",
+      "parent_id": null,
+      "title": "Probability",
+      "source_locator": "MASTER_BLUEPRINT.md\u00a713; seed HANDOFF-018",
+      "source_hash": "697817ac9af2705161f42f31e6965896ffde0a3a288e961de619032e7ba76f8b",
+      "normative_requirement": "Higher/lower/push plus administrative state law",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Atomic children carry honest status; parent is a grouping node",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": "Seed acceptance domain from handoff; expanded into atomic children below"
+    },
+    {
+      "requirement_id": "HANDOFF-019",
+      "parent_id": null,
+      "title": "Uncertainty",
+      "source_locator": "MASTER_BLUEPRINT.md\u00a713; seed HANDOFF-019",
+      "source_hash": "697817ac9af2705161f42f31e6965896ffde0a3a288e961de619032e7ba76f8b",
+      "normative_requirement": "Evidence/parameter/model/MCSE decomposition and stopping",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Atomic children carry honest status; parent is a grouping node",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": "Seed acceptance domain from handoff; expanded into atomic children below"
+    },
+    {
+      "requirement_id": "HANDOFF-020",
+      "parent_id": null,
+      "title": "Full board ranking",
+      "source_locator": "MASTER_BLUEPRINT.md\u00a713; seed HANDOFF-020",
+      "source_hash": "697817ac9af2705161f42f31e6965896ffde0a3a288e961de619032e7ba76f8b",
+      "normative_requirement": "Complete modeled population and Top-K reference parity",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Atomic children carry honest status; parent is a grouping node",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": "Seed acceptance domain from handoff; expanded into atomic children below"
+    },
+    {
+      "requirement_id": "HANDOFF-021",
+      "parent_id": null,
+      "title": "Frontier refresh",
+      "source_locator": "MASTER_BLUEPRINT.md\u00a713; seed HANDOFF-021",
+      "source_hash": "697817ac9af2705161f42f31e6965896ffde0a3a288e961de619032e7ba76f8b",
+      "normative_requirement": "Bounded refinement, line surface, fresh status and ranks",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Atomic children carry honest status; parent is a grouping node",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": "Seed acceptance domain from handoff; expanded into atomic children below"
+    },
+    {
+      "requirement_id": "HANDOFF-022",
+      "parent_id": null,
+      "title": "Portfolio",
+      "source_locator": "MASTER_BLUEPRINT.md\u00a713; seed HANDOFF-022",
+      "source_hash": "697817ac9af2705161f42f31e6965896ffde0a3a288e961de619032e7ba76f8b",
+      "normative_requirement": "Joint worlds, constraints, verified rules, zero-six not padded",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Atomic children carry honest status; parent is a grouping node",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": "Seed acceptance domain from handoff; expanded into atomic children below"
+    },
+    {
+      "requirement_id": "HANDOFF-023",
+      "parent_id": null,
+      "title": "Immutable freeze",
+      "source_locator": "MASTER_BLUEPRINT.md\u00a713; seed HANDOFF-023",
+      "source_hash": "697817ac9af2705161f42f31e6965896ffde0a3a288e961de619032e7ba76f8b",
+      "normative_requirement": "Exact bindings and mutation rejection",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Atomic children carry honest status; parent is a grouping node",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": "Seed acceptance domain from handoff; expanded into atomic children below"
+    },
+    {
+      "requirement_id": "HANDOFF-024",
+      "parent_id": null,
+      "title": "Algorithm registry",
+      "source_locator": "MASTER_BLUEPRINT.md\u00a714; seed HANDOFF-024",
+      "source_hash": "697817ac9af2705161f42f31e6965896ffde0a3a288e961de619032e7ba76f8b",
+      "normative_requirement": "Every active algorithm has caller/fallback/test/telemetry",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Atomic children carry honest status; parent is a grouping node",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": false,
+      "notes": "Seed acceptance domain from handoff; expanded into atomic children below"
+    },
+    {
+      "requirement_id": "HANDOFF-025",
+      "parent_id": null,
+      "title": "Measured performance",
+      "source_locator": "MASTER_BLUEPRINT.md\u00a714; seed HANDOFF-025",
+      "source_hash": "697817ac9af2705161f42f31e6965896ffde0a3a288e961de619032e7ba76f8b",
+      "normative_requirement": "Cold/warm equal-quality CPU/RSS/token/latency measurements",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Atomic children carry honest status; parent is a grouping node",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": false,
+      "notes": "Seed acceptance domain from handoff; expanded into atomic children below"
+    },
+    {
+      "requirement_id": "HANDOFF-026",
+      "parent_id": null,
+      "title": "Learning consumers",
+      "source_locator": "MASTER_BLUEPRINT.md\u00a715; seed HANDOFF-026",
+      "source_hash": "697817ac9af2705161f42f31e6965896ffde0a3a288e961de619032e7ba76f8b",
+      "normative_requirement": "Full-population chronological settlement and evaluation",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Atomic children carry honest status; parent is a grouping node",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": false,
+      "notes": "Seed acceptance domain from handoff; expanded into atomic children below"
+    },
+    {
+      "requirement_id": "HANDOFF-027",
+      "parent_id": null,
+      "title": "Advanced challengers",
+      "source_locator": "MASTER_BLUEPRINT.md\u00a715; seed HANDOFF-027",
+      "source_hash": "697817ac9af2705161f42f31e6965896ffde0a3a288e961de619032e7ba76f8b",
+      "normative_requirement": "Source requirement mapping, tested shadow consumers, activation gates",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Atomic children carry honest status; parent is a grouping node",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": false,
+      "notes": "Seed acceptance domain from handoff; expanded into atomic children below"
+    },
+    {
+      "requirement_id": "HANDOFF-028",
+      "parent_id": null,
+      "title": "Persistence",
+      "source_locator": "MASTER_BLUEPRINT.md\u00a716; seed HANDOFF-028",
+      "source_hash": "697817ac9af2705161f42f31e6965896ffde0a3a288e961de619032e7ba76f8b",
+      "normative_requirement": "Transactional outbox, snapshots, remote verified readback",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Atomic children carry honest status; parent is a grouping node",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": false,
+      "notes": "Seed acceptance domain from handoff; expanded into atomic children below"
+    },
+    {
+      "requirement_id": "HANDOFF-029",
+      "parent_id": null,
+      "title": "Recovery",
+      "source_locator": "MASTER_BLUEPRINT.md\u00a716; seed HANDOFF-029",
+      "source_hash": "697817ac9af2705161f42f31e6965896ffde0a3a288e961de619032e7ba76f8b",
+      "normative_requirement": "Interruption, duplicates, lost DB and corrupted snapshot tests",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Atomic children carry honest status; parent is a grouping node",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": false,
+      "notes": "Seed acceptance domain from handoff; expanded into atomic children below"
+    },
+    {
+      "requirement_id": "HANDOFF-030",
+      "parent_id": null,
+      "title": "Donor integration",
+      "source_locator": "MASTER_BLUEPRINT.md\u00a74; seed HANDOFF-030",
+      "source_hash": "697817ac9af2705161f42f31e6965896ffde0a3a288e961de619032e7ba76f8b",
+      "normative_requirement": "Canonical producer/consumer tests; no second import engine",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Atomic children carry honest status; parent is a grouping node",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": false,
+      "notes": "Seed acceptance domain from handoff; expanded into atomic children below"
+    },
+    {
+      "requirement_id": "HANDOFF-031",
+      "parent_id": null,
+      "title": "Clean wheel",
+      "source_locator": "MASTER_BLUEPRINT.md\u00a718; seed HANDOFF-031",
+      "source_hash": "697817ac9af2705161f42f31e6965896ffde0a3a288e961de619032e7ba76f8b",
+      "normative_requirement": "Installed execution and resume outside checkout",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Atomic children carry honest status; parent is a grouping node",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": false,
+      "notes": "Seed acceptance domain from handoff; expanded into atomic children below"
+    },
+    {
+      "requirement_id": "HANDOFF-032",
+      "parent_id": null,
+      "title": "Protected promotion",
+      "source_locator": "MASTER_BLUEPRINT.md\u00a718; seed HANDOFF-032",
+      "source_hash": "697817ac9af2705161f42f31e6965896ffde0a3a288e961de619032e7ba76f8b",
+      "normative_requirement": "Exact-head required checks/reviews and main readback",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Atomic children carry honest status; parent is a grouping node",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": false,
+      "notes": "Seed acceptance domain from handoff; expanded into atomic children below"
+    },
+    {
+      "requirement_id": "HANDOFF-033",
+      "parent_id": null,
+      "title": "Tennis",
+      "source_locator": "MASTER_BLUEPRINT.md\u00a717; seed HANDOFF-033",
+      "source_hash": "697817ac9af2705161f42f31e6965896ffde0a3a288e961de619032e7ba76f8b",
+      "normative_requirement": "All canonical plugin components and sport-specific acceptance",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Atomic children carry honest status; parent is a grouping node",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": false,
+      "notes": "Seed acceptance domain from handoff; expanded into atomic children below"
+    },
+    {
+      "requirement_id": "HANDOFF-034",
+      "parent_id": null,
+      "title": "UFC and boxing",
+      "source_locator": "MASTER_BLUEPRINT.md\u00a717; seed HANDOFF-034",
+      "source_hash": "697817ac9af2705161f42f31e6965896ffde0a3a288e961de619032e7ba76f8b",
+      "normative_requirement": "All canonical plugin components and sport-specific acceptance",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Atomic children carry honest status; parent is a grouping node",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": false,
+      "notes": "Seed acceptance domain from handoff; expanded into atomic children below"
+    },
+    {
+      "requirement_id": "HANDOFF-035",
+      "parent_id": null,
+      "title": "Soccer leagues",
+      "source_locator": "MASTER_BLUEPRINT.md\u00a717; seed HANDOFF-035",
+      "source_hash": "697817ac9af2705161f42f31e6965896ffde0a3a288e961de619032e7ba76f8b",
+      "normative_requirement": "All canonical plugin components and sport-specific acceptance",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Atomic children carry honest status; parent is a grouping node",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": false,
+      "notes": "Seed acceptance domain from handoff; expanded into atomic children below"
+    },
+    {
+      "requirement_id": "HANDOFF-036",
+      "parent_id": null,
+      "title": "MLB",
+      "source_locator": "MASTER_BLUEPRINT.md\u00a717; seed HANDOFF-036",
+      "source_hash": "697817ac9af2705161f42f31e6965896ffde0a3a288e961de619032e7ba76f8b",
+      "normative_requirement": "All canonical plugin components and sport-specific acceptance",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Atomic children carry honest status; parent is a grouping node",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": false,
+      "notes": "Seed acceptance domain from handoff; expanded into atomic children below"
+    },
+    {
+      "requirement_id": "HANDOFF-037",
+      "parent_id": null,
+      "title": "WNBA and NBA",
+      "source_locator": "MASTER_BLUEPRINT.md\u00a717; seed HANDOFF-037",
+      "source_hash": "697817ac9af2705161f42f31e6965896ffde0a3a288e961de619032e7ba76f8b",
+      "normative_requirement": "All canonical plugin components and sport-specific acceptance",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Atomic children carry honest status; parent is a grouping node",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": false,
+      "notes": "Seed acceptance domain from handoff; expanded into atomic children below"
+    },
+    {
+      "requirement_id": "HANDOFF-038",
+      "parent_id": null,
+      "title": "Hockey",
+      "source_locator": "MASTER_BLUEPRINT.md\u00a717; seed HANDOFF-038",
+      "source_hash": "697817ac9af2705161f42f31e6965896ffde0a3a288e961de619032e7ba76f8b",
+      "normative_requirement": "All canonical plugin components and sport-specific acceptance",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Atomic children carry honest status; parent is a grouping node",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": false,
+      "notes": "Seed acceptance domain from handoff; expanded into atomic children below"
+    },
+    {
+      "requirement_id": "HANDOFF-039",
+      "parent_id": null,
+      "title": "Remaining declared sports",
+      "source_locator": "MASTER_BLUEPRINT.md\u00a717; seed HANDOFF-039",
+      "source_hash": "697817ac9af2705161f42f31e6965896ffde0a3a288e961de619032e7ba76f8b",
+      "normative_requirement": "Expand each sport into all component/market/source requirements",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Atomic children carry honest status; parent is a grouping node",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": false,
+      "notes": "Seed acceptance domain from handoff; expanded into atomic children below"
+    },
+    {
+      "requirement_id": "HANDOFF-040",
+      "parent_id": null,
+      "title": "Root authenticity",
+      "source_locator": "MASTER_BLUEPRINT.md\u00a73; seed HANDOFF-040",
+      "source_hash": "697817ac9af2705161f42f31e6965896ffde0a3a288e961de619032e7ba76f8b",
+      "normative_requirement": "Original source/ledger bytes verified; no reconstructed hash substitution",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Atomic children carry honest status; parent is a grouping node",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": false,
+      "notes": "Seed acceptance domain from handoff; expanded into atomic children below"
+    },
+    {
+      "requirement_id": "HANDOFF-041",
+      "parent_id": null,
+      "title": "Predictive promotion",
+      "source_locator": "MASTER_BLUEPRINT.md\u00a715; seed HANDOFF-041",
+      "source_hash": "697817ac9af2705161f42f31e6965896ffde0a3a288e961de619032e7ba76f8b",
+      "normative_requirement": "Future chronological evidence and independent promotion gates",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Atomic children carry honest status; parent is a grouping node",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": false,
+      "notes": "Seed acceptance domain from handoff; expanded into atomic children below"
+    },
+    {
+      "requirement_id": "HANDOFF-042",
+      "parent_id": null,
+      "title": "Final acceptance",
+      "source_locator": "MASTER_BLUEPRINT.md\u00a719; seed HANDOFF-042",
+      "source_hash": "697817ac9af2705161f42f31e6965896ffde0a3a288e961de619032e7ba76f8b",
+      "normative_requirement": "Exact evidence-linked per-scope release receipt",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Atomic children carry honest status; parent is a grouping node",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": false,
+      "notes": "Seed acceptance domain from handoff; expanded into atomic children below"
+    },
+    {
+      "requirement_id": "REQ-AUTH-001.01",
+      "parent_id": "HANDOFF-001",
+      "title": "Live main SHA readback",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a72",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "Agents verify live origin/main SHA and required checks before claiming baseline; quoted handoff SHAs are clues only.",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": "git/gh (operator)",
+        "consumer": "PROGRAM_STATUS / agents",
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "IMPLEMENTED",
+      "blocker": null,
+      "evidence_commit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": "main @ c017243 (#35 src/dcm relocate merged)"
+    },
+    {
+      "requirement_id": "REQ-AUTH-001.02",
+      "parent_id": "HANDOFF-001",
+      "title": "Protected main promotion only",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a718",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "Promotion to main only via reviewable PR + required checks; no direct/force push.",
+      "applicability": "program",
+      "dependencies": [
+        "REQ-AUTH-001.01"
+      ],
+      "current_implementation": {
+        "producer": "GitHub branch protection",
+        "consumer": "CI workflows",
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "IMPLEMENTED",
+      "blocker": null,
+      "evidence_commit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-SRC-002.01",
+      "parent_id": "HANDOFF-002",
+      "title": "Canonical requirement ledger in-repo",
+      "source_locator": "handoff:REQUIREMENT_LEDGER.json@697817ac9af2; handoff:SOURCE_MANIFEST.json@8473da20755a",
+      "source_hash": "697817ac9af2705161f42f31e6965896ffde0a3a288e961de619032e7ba76f8b",
+      "normative_requirement": "Every indexed handoff acceptance domain has a traced disposition in docs/requirements/REQUIREMENT_LEDGER.v1.json.",
+      "applicability": "program",
+      "dependencies": [
+        "REQ-AUTH-001.01"
+      ],
+      "current_implementation": {
+        "producer": "docs/requirements/REQUIREMENT_LEDGER.v1.json",
+        "consumer": "agents / governance loader",
+        "fallback": null
+      },
+      "tests": [
+        "tests/governance/test_requirement_ledger.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "IMPLEMENTED",
+      "blocker": null,
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": false,
+      "notes": "This ledger pass; do not treat handoff seed as exhaustive atomization forever"
+    },
+    {
+      "requirement_id": "REQ-SRC-002.02",
+      "parent_id": "HANDOFF-002",
+      "title": "Handoff ZIP is quarry-only",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a74",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "Handoff/original_sources/P380X ZIP code must never be installed into the runtime package or executed from the quarry.",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": "docs/engineering policy",
+        "consumer": "CI / code review",
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "IMPLEMENTED",
+      "blocker": null,
+      "evidence_commit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": "Deliberately NOT copied: donor engines, workbook binaries, 1500 P380X pillars as runtime"
+    },
+    {
+      "requirement_id": "REQ-ID-003.01",
+      "parent_id": "HANDOFF-003",
+      "title": "Exact-first identity resolution",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a75",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "Resolve subjects by exact platform/official IDs first; never invent platform IDs from names.",
+      "applicability": "CFB+universal",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": "src/dcm/identity/resolve.py",
+        "consumer": "src/dcm/research/indexes.py BoardIndexes",
+        "fallback": "fail-closed unresolved"
+      },
+      "tests": [
+        "tests/test_cfb_semantic_completion.py",
+        "tests/test_e2e_runner.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [
+        "identity.resolve"
+      ],
+      "status": "IMPLEMENTED",
+      "blocker": null,
+      "evidence_commit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-ID-003.02",
+      "parent_id": "HANDOFF-003",
+      "title": "Namesake and transfer collision handling",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a75",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "Namesakes, transfers, duplicate initials, and rematches remain explicit collisions; fuzzy matching proposes candidates only.",
+      "applicability": "CFB+universal",
+      "dependencies": [
+        "REQ-ID-003.01"
+      ],
+      "current_implementation": {
+        "producer": "src/dcm/identity/resolve.py",
+        "consumer": "research population",
+        "fallback": "UNRESOLVED_IDENTITY"
+      },
+      "tests": [
+        "tests/test_e2e_runner.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Live cross-source official CFB PrizePicks id map / current HAR with both fields still needed for full acceptance",
+      "evidence_commit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-HAR-004.01",
+      "parent_id": "HANDOFF-004",
+      "title": "All-row HAR accounting before exclusion",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a76",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "Account every HAR row into disjoint terminal categories before Goblin/unsupported/malformed exclusions; conservation sums must hold.",
+      "applicability": "CFB+universal",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": "src/dcm/ingest/har.py / src/dcm/cfb/accounting.py",
+        "consumer": "src/dcm/runner.py / cfb.launch",
+        "fallback": null
+      },
+      "tests": [
+        "tests/test_har_ingest.py",
+        "tests/test_cfb_guarded_launch.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [
+        "har.accounting"
+      ],
+      "status": "IMPLEMENTED",
+      "blocker": null,
+      "evidence_commit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-HAR-004.02",
+      "parent_id": "HANDOFF-004",
+      "title": "HAR privacy quarantine",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a76",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "HAR is private quarantined local input; never commit, upload to Drive/GitHub/CI, or log raw cookies/tokens/paths.",
+      "applicability": "program",
+      "dependencies": [
+        "REQ-HAR-004.01"
+      ],
+      "current_implementation": {
+        "producer": "src/dcm/runtime/input_boundary.py",
+        "consumer": "archive / chat host",
+        "fallback": null
+      },
+      "tests": [
+        "tests/test_host_native.py",
+        "tests/test_github_archive.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "IMPLEMENTED",
+      "blocker": null,
+      "evidence_commit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-SIDE-005.01",
+      "parent_id": "HANDOFF-005",
+      "title": "OfferMetadataRecovery for offered sides",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a76",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "Recover offered sides only from applicable captured platform data; fractional timestamps preserved; absent side \u2192 UNRESOLVED_PLATFORM_METADATA:OFFERED_SIDE_MISSING.",
+      "applicability": "CFB+universal",
+      "dependencies": [
+        "REQ-HAR-004.01"
+      ],
+      "current_implementation": {
+        "producer": "src/dcm/research/offer_metadata.py",
+        "consumer": "model grading / selection",
+        "fallback": "UNRESOLVED_PLATFORM_METADATA"
+      },
+      "tests": [
+        "tests/test_offer_metadata.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Large share of live boards still land UNRESOLVED side rows; web stats must not invent sides",
+      "evidence_commit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-SIDE-005.02",
+      "parent_id": "HANDOFF-005",
+      "title": "Fractional capture/cutoff precision",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a76-7",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "Preserve sub-second capture precision; cutoff-from-capture equality/order must not truncate milliseconds.",
+      "applicability": "CFB+universal",
+      "dependencies": [
+        "REQ-HAR-004.01"
+      ],
+      "current_implementation": {
+        "producer": "src/dcm/runtime/cutoff.py",
+        "consumer": "temporal / freeze",
+        "fallback": null
+      },
+      "tests": [
+        "tests/test_freshness.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "IMPLEMENTED",
+      "blocker": null,
+      "evidence_commit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-TIME-006.01",
+      "parent_id": "HANDOFF-006",
+      "title": "Capture/retrieval/cutoff separation",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a77",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "Maintain separate HAR capture, publication/availability, retrieval, decision cutoff, and freeze clocks; reject temporal leakage.",
+      "applicability": "CFB+universal",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": "src/dcm/research/temporal.py",
+        "consumer": "evidence import / MaterialFacts",
+        "fallback": "fail-closed leak"
+      },
+      "tests": [
+        "tests/test_e2e_runner.py",
+        "tests/test_fail_closed_regressions.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [
+        "temporal.firewall"
+      ],
+      "status": "IMPLEMENTED",
+      "blocker": null,
+      "evidence_commit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-TIME-006.02",
+      "parent_id": "HANDOFF-006",
+      "title": "Started-event playable gate",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a77",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "Already-started events cannot become new pregame PLAYABLE cards; diagnostics/settlement may continue separately.",
+      "applicability": "CFB",
+      "dependencies": [
+        "REQ-TIME-006.01"
+      ],
+      "current_implementation": {
+        "producer": "src/dcm/runtime/freeze.py / cfb.rules",
+        "consumer": "selection portfolio",
+        "fallback": "demote PLAYABLE"
+      },
+      "tests": [
+        "tests/test_cfb_freeze_gate.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "IMPLEMENTED",
+      "blocker": null,
+      "evidence_commit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-GRAPH-007.01",
+      "parent_id": "HANDOFF-007",
+      "title": "BoardGraph + RequirementGraph + SubjectOfferSet",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a78",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "Build typed board/requirement/subject-offer graphs with one-page multi-offer fanout without mis-scoped facts.",
+      "applicability": "CFB+universal",
+      "dependencies": [
+        "REQ-HAR-004.01",
+        "REQ-ID-003.01"
+      ],
+      "current_implementation": {
+        "producer": "src/dcm/research/os_graphs.py / subject_offer_set.py",
+        "consumer": "acquisition planner",
+        "fallback": null
+      },
+      "tests": [
+        "tests/test_cfb_research_os.py",
+        "tests/test_subject_offer_set_universal.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [
+        "research.os_graphs"
+      ],
+      "status": "IMPLEMENTED",
+      "blocker": null,
+      "evidence_commit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-ACQ-008.01",
+      "parent_id": "HANDOFF-008",
+      "title": "CELF unique-marginal acquisition packing",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a79",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "AcquisitionActions pack by unique marginal coverage with deterministic budgets; SPORT/COMPETITION mass must not starve EVENT/TEAM batches.",
+      "applicability": "CFB+universal",
+      "dependencies": [
+        "REQ-GRAPH-007.01"
+      ],
+      "current_implementation": {
+        "producer": "src/dcm/algorithms/scheduling.py ALG-SCHED-001",
+        "consumer": "src/dcm/research/acquisition.py / host_plan.py",
+        "fallback": "static queue forbidden as live selector"
+      },
+      "tests": [
+        "tests/test_cfb_research_os.py",
+        "tests/governance/test_algorithm_registry_hash.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [
+        "ALG-SCHED-001"
+      ],
+      "status": "IMPLEMENTED",
+      "blocker": null,
+      "evidence_commit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-HOST-009.01",
+      "parent_id": "HANDOFF-009",
+      "title": "Host-native CFB launch loop",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a79",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "dcm-host cfb-launch performs acquisition/import/recompute with progress termination; host does not compute probabilities.",
+      "applicability": "CFB",
+      "dependencies": [
+        "REQ-ACQ-008.01"
+      ],
+      "current_implementation": {
+        "producer": "src/dcm/chat/cli.py / cfb/launch.py",
+        "consumer": "operator / ChatGPT-native host",
+        "fallback": null
+      },
+      "tests": [
+        "tests/test_cfb_guarded_launch.py",
+        "tests/test_host_native.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [
+        "cfb.launch"
+      ],
+      "status": "IMPLEMENTED",
+      "blocker": null,
+      "evidence_commit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-HOST-009.02",
+      "parent_id": "HANDOFF-009",
+      "title": "Source-aware host action context",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a79-10; PR #33/#34 lineage",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "Each selected host action carries entity/event context, permitted source candidates, source family, and bounded instruction.",
+      "applicability": "CFB",
+      "dependencies": [
+        "REQ-HOST-009.01",
+        "REQ-ADAPT-010.01"
+      ],
+      "current_implementation": {
+        "producer": "src/dcm/research/host_plan.py",
+        "consumer": "chat evidence_import",
+        "fallback": null
+      },
+      "tests": [
+        "tests/test_cfb_source_aware_import.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Software path merged; current live CFB HAR + host-acquired evidence still required for operational closure",
+      "evidence_commit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-ADAPT-010.01",
+      "parent_id": "HANDOFF-010",
+      "title": "Source catalog + health + fallbacks",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a710",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "Adapters declare permission, health, mappings, fixtures, and fallback routes; OPEN\u2192cooldown\u2192HALF_OPEN with real timestamps.",
+      "applicability": "CFB+universal",
+      "dependencies": [
+        "REQ-GRAPH-007.01"
+      ],
+      "current_implementation": {
+        "producer": "src/dcm/research/source_catalog.py / source_health.py / adapters/",
+        "consumer": "acquisition routing",
+        "fallback": "fallback traversal"
+      },
+      "tests": [
+        "tests/test_source_catalog.py",
+        "tests/test_cfb_semantic_completion.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [
+        "source.health"
+      ],
+      "status": "PARTIAL",
+      "blocker": "Live adapter fetch beyond fixtures incomplete; licensed providers optional/external",
+      "evidence_commit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-EVID-011.01",
+      "parent_id": "HANDOFF-011",
+      "title": "Semantic requirement completion",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a711",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "Requirement completion is semantic (evaluate_request); STATUS evidence does not complete GAME_HISTORY; field semantics/contradictions/criticality checked.",
+      "applicability": "CFB+universal",
+      "dependencies": [
+        "REQ-GRAPH-007.01",
+        "REQ-TIME-006.01"
+      ],
+      "current_implementation": {
+        "producer": "src/dcm/research/coverage.py / evidence_graph.py / material_facts.py",
+        "consumer": "parameter compiler / model",
+        "fallback": "conservative hold on contradiction"
+      },
+      "tests": [
+        "tests/test_evidence_coverage.py",
+        "tests/test_evidence_graph.py",
+        "tests/test_cfb_freeze_gate.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [
+        "evidence.coverage"
+      ],
+      "status": "IMPLEMENTED",
+      "blocker": null,
+      "evidence_commit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-EVID-011.02",
+      "parent_id": "HANDOFF-011",
+      "title": "Current-HAR evidence sufficiency for playable card",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a711/\u00a719",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "A current board must acquire enough critical evidence to leave AWAITING_FRONTIER_RESEARCH or record a precise terminal blockage.",
+      "applicability": "CFB",
+      "dependencies": [
+        "REQ-EVID-011.01",
+        "REQ-HOST-009.02"
+      ],
+      "current_implementation": {
+        "producer": "cfb.frontier / research.population",
+        "consumer": "freeze gate",
+        "fallback": "FRONTIER_INTERIM checkpoint"
+      },
+      "tests": [
+        "tests/test_cfb_freeze_gate.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [
+        "frontier.state"
+      ],
+      "status": "EXTERNAL",
+      "blocker": "Current sanitized CFB HAR + host-acquired reusable evidence not supplied in this session",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": "CFB_CURRENT_HAR_OPERATIONAL_ACCEPTANCE_PENDING"
+    },
+    {
+      "requirement_id": "REQ-PARAM-012.01",
+      "parent_id": "HANDOFF-012",
+      "title": "MaterialFact \u2192 ParameterSnapshot lineage",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a711",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "ParameterSnapshots compile from MaterialFacts with claim lineage; evidence-change invalidates downstream worlds/probabilities.",
+      "applicability": "CFB+universal",
+      "dependencies": [
+        "REQ-EVID-011.01"
+      ],
+      "current_implementation": {
+        "producer": "src/dcm/model/parameters.py / research/material_facts.py",
+        "consumer": "EventWorlds / distributions",
+        "fallback": null
+      },
+      "tests": [
+        "tests/test_parameter_snapshot_scopes.py",
+        "tests/test_cfb_freeze_gate.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [
+        "parameters.snapshot"
+      ],
+      "status": "IMPLEMENTED",
+      "blocker": null,
+      "evidence_commit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-CFB-OPP-013.01",
+      "parent_id": "HANDOFF-013",
+      "title": "CFB opportunity shares + residual buckets",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a712",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "Role/team allocation/opponent/residual participation modeled; board membership is not 100% of team opportunity; kickers isolated.",
+      "applicability": "CFB",
+      "dependencies": [
+        "REQ-PARAM-012.01"
+      ],
+      "current_implementation": {
+        "producer": "src/dcm/cfb/opportunity_ledger.py / event_worlds.py / sports/football/",
+        "consumer": "efficiency / probability",
+        "fallback": null
+      },
+      "tests": [
+        "tests/test_cfb_reference_implementation.py",
+        "tests/test_joint_event_world.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [
+        "cfb.opportunity"
+      ],
+      "status": "IMPLEMENTED",
+      "blocker": null,
+      "evidence_commit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-CFB-EFF-014.01",
+      "parent_id": "HANDOFF-014",
+      "title": "CFB efficiency with shrinkage / sample support",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a712",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "Versioned sample support, shrinkage, and distribution fits for efficiency markets; early-season role states without inventing history.",
+      "applicability": "CFB",
+      "dependencies": [
+        "REQ-CFB-OPP-013.01"
+      ],
+      "current_implementation": {
+        "producer": "src/dcm/model/gridiron_models.py / sports/football/",
+        "consumer": "probability grading",
+        "fallback": "Empirical Bayes snapshots"
+      },
+      "tests": [
+        "tests/test_gridiron_plugin.py",
+        "tests/test_football_registry.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "IMPLEMENTED",
+      "blocker": null,
+      "evidence_commit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-CFB-CONS-015.01",
+      "parent_id": "HANDOFF-015",
+      "title": "Primitive/composite identities and JOINT_TEAM conservation",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a712; ADR-V6-001",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "Primitive vs composite market identities explicit; joint EventWorlds enforce conservation meta; non-identities recorded.",
+      "applicability": "CFB",
+      "dependencies": [
+        "REQ-CFB-OPP-013.01"
+      ],
+      "current_implementation": {
+        "producer": "src/dcm/cfb/event_worlds.py / model/event_world_joint.py",
+        "consumer": "market_derive / ranking",
+        "fallback": null
+      },
+      "tests": [
+        "tests/test_joint_event_world.py",
+        "tests/test_football_registry.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [
+        "JOINT_TEAM"
+      ],
+      "status": "IMPLEMENTED",
+      "blocker": null,
+      "evidence_commit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-CFB-MKT-016.01",
+      "parent_id": "HANDOFF-016",
+      "title": "19 ACTIVE CFB markets + unsupported tasking",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a712",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "Every HAR market maps to supported ACTIVE definition or exact pending unsupported task; 19/19 ACTIVE complete on software path.",
+      "applicability": "CFB",
+      "dependencies": [
+        "REQ-HAR-004.01"
+      ],
+      "current_implementation": {
+        "producer": "src/dcm/cfb/markets.py",
+        "consumer": "runner / selection",
+        "fallback": "UNSUPPORTED_FAIL_CLOSED"
+      },
+      "tests": [
+        "tests/test_cfb_reference_implementation.py",
+        "tests/test_market_derive.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Operational acceptance of 19 markets on a current live board still pending",
+      "evidence_commit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-CFB-ST-017.01",
+      "parent_id": "HANDOFF-017",
+      "title": "Special teams / kicking projections",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a712",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "Shared scoring/opportunity with kicker isolation and kicking projections.",
+      "applicability": "CFB",
+      "dependencies": [
+        "REQ-CFB-OPP-013.01"
+      ],
+      "current_implementation": {
+        "producer": "src/dcm/cfb/event_worlds.py",
+        "consumer": "model markets",
+        "fallback": null
+      },
+      "tests": [
+        "tests/test_joint_event_world.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Kicker isolation present; broader ST market coverage beyond active set remains incomplete",
+      "evidence_commit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": false,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-PROB-018.01",
+      "parent_id": "HANDOFF-018",
+      "title": "Higher/lower/push simplex + admin states",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a713",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "P(H)+P(L)+P(P)=1 with administrative state law; Demon is demotion-only.",
+      "applicability": "CFB+universal",
+      "dependencies": [
+        "REQ-CFB-EFF-014.01"
+      ],
+      "current_implementation": {
+        "producer": "src/dcm/model/distributions.py / grade.py",
+        "consumer": "ranking / portfolio",
+        "fallback": "SIMPLEX_FAILURE abort"
+      },
+      "tests": [
+        "tests/test_e2e_runner.py",
+        "tests/test_e2e_world_to_lineup.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [
+        "probability.simplex"
+      ],
+      "status": "IMPLEMENTED",
+      "blocker": null,
+      "evidence_commit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-UNC-019.01",
+      "parent_id": "HANDOFF-019",
+      "title": "Uncertainty decomposition; conformal inactive at LR000000",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a713",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "Evidence/parameter/model/MCSE decomposition present; isotonic/conformal remain INACTIVE until chronological unseen settlements.",
+      "applicability": "CFB+universal",
+      "dependencies": [
+        "REQ-PROB-018.01"
+      ],
+      "current_implementation": {
+        "producer": "src/dcm/model/uncertainty.py / learning/calibration.py",
+        "consumer": "grading / freeze",
+        "fallback": "conformal widening OFF"
+      },
+      "tests": [
+        "tests/test_p6_learning.py",
+        "tests/test_cfb_freeze_gate.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Calibration promotion EXTERNAL until prospective settlements exist",
+      "evidence_commit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-RANK-020.01",
+      "parent_id": "HANDOFF-020",
+      "title": "Full modeled population Top100/Top25/0-6",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a713",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "Complete modeled population ranked; Top-K heap then Timsort; Top100/Top25/0\u20136 Playables never padded.",
+      "applicability": "CFB",
+      "dependencies": [
+        "REQ-PROB-018.01"
+      ],
+      "current_implementation": {
+        "producer": "src/dcm/model/ranking.py / selection/",
+        "consumer": "frontier / freeze",
+        "fallback": "EMPTY_CARD allowed"
+      },
+      "tests": [
+        "tests/test_e2e_runner.py",
+        "tests/test_three_layer_card.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [
+        "ranking.topk"
+      ],
+      "status": "IMPLEMENTED",
+      "blocker": null,
+      "evidence_commit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-FRNT-021.01",
+      "parent_id": "HANDOFF-021",
+      "title": "Bounded frontier refinement + line surface",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a713",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "Bounded refinement with line surface, fresh status, and ranks; line-only refresh reuses worlds; material refresh resimulates.",
+      "applicability": "CFB",
+      "dependencies": [
+        "REQ-RANK-020.01",
+        "REQ-PARAM-012.01"
+      ],
+      "current_implementation": {
+        "producer": "src/dcm/cfb/frontier.py / refresh.py / model/line_surface.py",
+        "consumer": "freeze",
+        "fallback": "FRONTIER_INTERIM"
+      },
+      "tests": [
+        "tests/test_line_surface.py",
+        "tests/test_cfb_freeze_gate.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [
+        "frontier.pass"
+      ],
+      "status": "IMPLEMENTED",
+      "blocker": null,
+      "evidence_commit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-PORT-022.01",
+      "parent_id": "HANDOFF-022",
+      "title": "Joint-world portfolio constraints; no padding",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a713",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "Portfolio respects joint worlds, constraints, verified rules; zero-six cards are not padded.",
+      "applicability": "CFB+universal",
+      "dependencies": [
+        "REQ-RANK-020.01"
+      ],
+      "current_implementation": {
+        "producer": "src/dcm/selection/portfolio.py",
+        "consumer": "freeze / card",
+        "fallback": "EMPTY_CARD_COMPLETE"
+      },
+      "tests": [
+        "tests/test_e2e_runner.py",
+        "tests/test_e2e_world_to_lineup.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "IMPLEMENTED",
+      "blocker": null,
+      "evidence_commit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-FRZ-023.01",
+      "parent_id": "HANDOFF-023",
+      "title": "Immutable freeze bindings + mutation rejection",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a713",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "Exact bindings on freeze; mutation rejected; interim frontier cannot emit settlement-eligible frozen artifacts.",
+      "applicability": "CFB+universal",
+      "dependencies": [
+        "REQ-PORT-022.01",
+        "REQ-FRNT-021.01"
+      ],
+      "current_implementation": {
+        "producer": "src/dcm/runtime/freeze.py",
+        "consumer": "postgame / archive",
+        "fallback": "AWAITING_FRONTIER_RESEARCH"
+      },
+      "tests": [
+        "tests/test_p4_freeze_contract.py",
+        "tests/test_cfb_freeze_gate.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [
+        "freeze.hash"
+      ],
+      "status": "IMPLEMENTED",
+      "blocker": null,
+      "evidence_commit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-FRZ-023.02",
+      "parent_id": "HANDOFF-023",
+      "title": "CFB operational freeze on current HAR",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a73/\u00a719",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "Produce eligible freeze or precise terminal blockage from a current CFB HAR with critical evidence.",
+      "applicability": "CFB",
+      "dependencies": [
+        "REQ-FRZ-023.01",
+        "REQ-EVID-011.02"
+      ],
+      "current_implementation": {
+        "producer": "cfb.launch",
+        "consumer": "release receipt",
+        "fallback": null
+      },
+      "tests": [
+        "tests/test_cfb_freeze_gate.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "EXTERNAL",
+      "blocker": "Blocked on current HAR + host-acquired evidence (REQ-EVID-011.02)",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-ALG-024.01",
+      "parent_id": "HANDOFF-024",
+      "title": "Algorithm registry caller/fallback/test/telemetry",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a714; constitution",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "Every active algorithm has caller, fallback, tests, and telemetry; no silent retirement without ADR.",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": "src/dcm/algorithms/registry.py / configs/algorithm_registry.json",
+        "consumer": "control_plane / CI",
+        "fallback": "constitution fallbacks"
+      },
+      "tests": [
+        "tests/governance/test_algorithm_registry_hash.py",
+        "tests/governance/test_algorithm_retirement_requires_adr.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [
+        "algorithm.telemetry"
+      ],
+      "status": "IMPLEMENTED",
+      "blocker": null,
+      "evidence_commit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": false,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-PERF-025.01",
+      "parent_id": "HANDOFF-025",
+      "title": "Host performance certification",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a714",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "Cold/warm equal-quality CPU/RSS/token/latency measurements on intended host; do not fake PeakRSS PASS.",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": "src/dcm/runtime/perf.py / benchmark.py",
+        "consumer": "release gates",
+        "fallback": "INSTRUMENTED_NOT_CERTIFIED"
+      },
+      "tests": [
+        "tests/test_production_hardening.py"
+      ],
+      "benchmark": "engineering synthetic only",
+      "runtime_telemetry": [],
+      "status": "EXTERNAL",
+      "blocker": "Intended production host measurement not certified",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": false,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-LEARN-026.01",
+      "parent_id": "HANDOFF-026",
+      "title": "Full-population chronological settlement consumers",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a715",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "Settlement/evaluation consumers exist append-only; LR000000 until promotion earned.",
+      "applicability": "CFB+universal",
+      "dependencies": [
+        "REQ-FRZ-023.01"
+      ],
+      "current_implementation": {
+        "producer": "src/dcm/learning/ / settle.py / postgame.py",
+        "consumer": "calibration / champion",
+        "fallback": null
+      },
+      "tests": [
+        "tests/test_p6_learning.py",
+        "tests/test_settlement_population.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Prospective CFB settlements and chronological unseen evidence EXTERNAL",
+      "evidence_commit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": "LR000000; predictive NONE"
+    },
+    {
+      "requirement_id": "REQ-CHAL-027.01",
+      "parent_id": "HANDOFF-027",
+      "title": "Shadow challengers with activation gates",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a715",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "Advanced challengers mapped as SHADOW/RESEARCH_ONLY with tested shadow consumers; no theory promotion.",
+      "applicability": "program",
+      "dependencies": [
+        "REQ-LEARN-026.01"
+      ],
+      "current_implementation": {
+        "producer": "learning/registry.py / cfb/champion.py",
+        "consumer": "shadow evaluation",
+        "fallback": "SHADOW_DIAGNOSTIC"
+      },
+      "tests": [
+        "tests/test_p6_learning.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Activation gates require future chronological comparison",
+      "evidence_commit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": false,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-PERS-028.01",
+      "parent_id": "HANDOFF-028",
+      "title": "Transactional outbox + checkpoints",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a716",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "Transactional outbox, snapshots, local reconciliation; remote verified readback for Drive/GitHub when credentials present.",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": "src/dcm/runtime/checkpoint.py / checkpoint_outbox.py / store.py / dag.py",
+        "consumer": "runner / archive",
+        "fallback": null
+      },
+      "tests": [
+        "tests/test_completion_context_runtime.py",
+        "tests/test_bundle_e2e_resume.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Drive PRIMARY credentials and remote readback incomplete",
+      "evidence_commit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": false,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-REC-029.01",
+      "parent_id": "HANDOFF-029",
+      "title": "Interruption/duplicate/corruption recovery tests",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a716",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "Resume after interruption; duplicates and corrupted snapshots fail closed or reconcile deterministically.",
+      "applicability": "program",
+      "dependencies": [
+        "REQ-PERS-028.01"
+      ],
+      "current_implementation": {
+        "producer": "src/dcm/runtime/checkpoint_reconciliation.py",
+        "consumer": "runner",
+        "fallback": null
+      },
+      "tests": [
+        "tests/test_e2e_runner.py",
+        "tests/test_bundle_e2e_resume.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Broader production ops recovery taxonomy still open (P14)",
+      "evidence_commit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": false,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-P380X-030.01",
+      "parent_id": "HANDOFF-030",
+      "title": "P380X candidate SignalOperator catalog only",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a74; P15",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "P380X 1500+ pillars are a candidate SignalOperator catalog. Compile-to-active-DAG only after typed specs, real producers/consumers, and tests. Do NOT copy 1500 engines into runtime.",
+      "applicability": "program",
+      "dependencies": [
+        "REQ-SRC-002.02"
+      ],
+      "current_implementation": {
+        "producer": "src/dcm/signals/compiler.py / registry.py / donor_accounting.py",
+        "consumer": "FeatureStore / cfb_runtime",
+        "fallback": "REJECTED_INVALID / non-executable lifecycle"
+      },
+      "tests": [
+        "tests/test_signal_governance.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [
+        "signals.compile"
+      ],
+      "status": "PARTIAL",
+      "blocker": "Exact donor ZIP archive bytes EXTERNAL; later tranches future; governance foundation IMPLEMENTED",
+      "evidence_commit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": false,
+      "notes": "Tranche A/B governance present; no wholesale donor engine install"
+    },
+    {
+      "requirement_id": "REQ-P380X-030.02",
+      "parent_id": "HANDOFF-030",
+      "title": "No second import engine from donor packages",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a74; PR #35",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "Donor/WSAB packages must not sit beside canonical dcm on the import path; artifacts/ remains archive-only after #35.",
+      "applicability": "program",
+      "dependencies": [
+        "REQ-P380X-030.01"
+      ],
+      "current_implementation": {
+        "producer": "src/dcm package layout",
+        "consumer": "pyproject / CI",
+        "fallback": null
+      },
+      "tests": [
+        "tests/governance/test_algorithm_registry_hash.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "IMPLEMENTED",
+      "blocker": null,
+      "evidence_commit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": "Production package is src/dcm; artifacts/dcm_v6_workstream_ab archive-only"
+    },
+    {
+      "requirement_id": "REQ-WHEEL-031.01",
+      "parent_id": "HANDOFF-031",
+      "title": "Installable wheel outside checkout",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a718",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "Installed execution and resume work outside the repository checkout via clean wheel.",
+      "applicability": "program",
+      "dependencies": [
+        "REQ-AUTH-001.02"
+      ],
+      "current_implementation": {
+        "producer": "pyproject.toml / src/dcm",
+        "consumer": "pillars-dcm / dcm / dcm-host entrypoints",
+        "fallback": null
+      },
+      "tests": [
+        "tests/test_e2e_runner.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Wheel builds exist historically; fresh-environment current-HAR acceptance still open",
+      "evidence_commit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": false,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-PROMO-032.01",
+      "parent_id": "HANDOFF-032",
+      "title": "Exact-head required checks before merge",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a718",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "Squash-merge only after exact-head required checks/reviews green and main readback.",
+      "applicability": "program",
+      "dependencies": [
+        "REQ-AUTH-001.02"
+      ],
+      "current_implementation": {
+        "producer": "GitHub Actions python-dcm",
+        "consumer": "operators",
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "IMPLEMENTED",
+      "blocker": null,
+      "evidence_commit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": false,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-SPORT-033.01",
+      "parent_id": "HANDOFF-033",
+      "title": "Tennis SportPlugin full contract",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a717",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "All canonical plugin components and sport-specific acceptance for tennis.",
+      "applicability": "tennis",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": "UNSUPPORTED_FAIL_CLOSED accounting"
+      },
+      "tests": [
+        "tests/test_plugin_contract.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "MISSING",
+      "blocker": "Outside CFB-first order; mixed-sport R1 not started for tennis",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": false,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-SPORT-034.01",
+      "parent_id": "HANDOFF-034",
+      "title": "UFC/boxing SportPlugin full contract",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a717",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "All canonical plugin components and sport-specific acceptance for UFC and boxing.",
+      "applicability": "combat",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": "UNSUPPORTED_FAIL_CLOSED accounting"
+      },
+      "tests": [
+        "tests/test_plugin_contract.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "MISSING",
+      "blocker": "Outside CFB-first order",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": false,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-SPORT-035.01",
+      "parent_id": "HANDOFF-035",
+      "title": "Soccer leagues SportPlugin full contract",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a717",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "All canonical plugin components and sport-specific acceptance for soccer leagues.",
+      "applicability": "soccer",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": "UNSUPPORTED_FAIL_CLOSED accounting"
+      },
+      "tests": [
+        "tests/test_plugin_contract.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "MISSING",
+      "blocker": "Outside CFB-first order",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": false,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-SPORT-036.01",
+      "parent_id": "HANDOFF-036",
+      "title": "MLB SportPlugin production promotion",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a717",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "MLB PA conservation exists as SHADOW_SUPPORTED; production promotion requires chronological gates.",
+      "applicability": "baseball",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": "src/dcm/sports/baseball/",
+        "consumer": "runner (shadow only)",
+        "fallback": "SHADOW_SUPPORTED_NOT_SELECTABLE"
+      },
+      "tests": [
+        "tests/test_e2e_runner.py",
+        "tests/test_sport_plugin_full_contract.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Do not promote on unit tests alone",
+      "evidence_commit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": false,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-SPORT-037.01",
+      "parent_id": "HANDOFF-037",
+      "title": "WNBA/NBA SportPlugin full contract",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a717",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "Basketball event-once PRA path exists for development; full WNBA/NBA production plugin acceptance incomplete.",
+      "applicability": "basketball",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": "src/dcm/sports/basketball/ / model/basketball_*.py",
+        "consumer": "runner",
+        "fallback": null
+      },
+      "tests": [
+        "tests/test_e2e_runner.py",
+        "tests/test_plugin_contract.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "PARTIAL",
+      "blocker": "Development samplers present; production registry/live acceptance incomplete",
+      "evidence_commit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": false,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-SPORT-038.01",
+      "parent_id": "HANDOFF-038",
+      "title": "Hockey SportPlugin full contract",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a717",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "All canonical plugin components and sport-specific acceptance for hockey.",
+      "applicability": "hockey",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": "UNSUPPORTED_FAIL_CLOSED accounting"
+      },
+      "tests": [
+        "tests/test_plugin_contract.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "MISSING",
+      "blocker": "Outside CFB-first order",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": false,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-SPORT-039.01",
+      "parent_id": "HANDOFF-039",
+      "title": "Remaining declared sports expansion",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a717",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "Expand each remaining declared sport into component/market/source requirements before implementation claims.",
+      "applicability": "multi-sport",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": "account then fail-closed"
+      },
+      "tests": [
+        "tests/test_e2e_runner.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "MISSING",
+      "blocker": "Explicitly deferred behind CFB operational closure",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": false,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-ROOT-040.01",
+      "parent_id": "HANDOFF-040",
+      "title": "v5.4.1 original source/ledger bytes",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a73; legacy REQ-V541-BYTES",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "Original source/ledger bytes verified; no reconstructed hash substitution; mount refuses copy on mismatch.",
+      "applicability": "program",
+      "dependencies": [],
+      "current_implementation": {
+        "producer": "src/dcm/runtime/mount_v541.py / schema_root.py",
+        "consumer": "release retrieval",
+        "fallback": "refuse-copy on mismatch"
+      },
+      "tests": [
+        "tests/test_v541_mount.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "EXTERNAL",
+      "blocker": "Canonical v5.4.1 COMPLETE_PROJECT_SOURCE + ledger bytes not attached",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": false,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-PRED-041.01",
+      "parent_id": "HANDOFF-041",
+      "title": "Independent predictive promotion gates",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a715",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "Future chronological evidence and independent promotion gates required before any predictive superiority claim; keep NONE until earned.",
+      "applicability": "program",
+      "dependencies": [
+        "REQ-LEARN-026.01"
+      ],
+      "current_implementation": {
+        "producer": "learning/walkforward.py / champion.py",
+        "consumer": "release integrity",
+        "fallback": "predictiveClaim=NONE"
+      },
+      "tests": [
+        "tests/test_p6_learning.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "EXTERNAL",
+      "blocker": "No chronological unseen settlement corpus yet",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": false,
+      "notes": "optimizedDcm60Claim remains false"
+    },
+    {
+      "requirement_id": "REQ-FINAL-042.01",
+      "parent_id": "HANDOFF-042",
+      "title": "Evidence-linked per-scope release receipt",
+      "source_locator": "handoff:MASTER_BLUEPRINT.md@f066576040ca \u00a719",
+      "source_hash": "f066576040ca4ff1bc15fe4a358d52734b14ad984d6faa491ce8c1aade06a99d",
+      "normative_requirement": "Exact evidence-linked per-scope release receipt for CFB operational + engineering gates.",
+      "applicability": "CFB",
+      "dependencies": [
+        "REQ-FRZ-023.02",
+        "REQ-EVID-011.02",
+        "REQ-WHEEL-031.01"
+      ],
+      "current_implementation": {
+        "producer": "src/dcm/release.py",
+        "consumer": "PROGRAM_STATUS / operators",
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "EXTERNAL",
+      "blocker": "CFB operational acceptance and predictive gates still open",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-LEGACY-HAR-SPINE",
+      "parent_id": null,
+      "title": "HAR spine ingest (legacy REQ-HAR-SPINE)",
+      "source_locator": "legacy:PILLARS_REQUIREMENTS_CROSSWALK.json#REQ-HAR-SPINE",
+      "source_hash": "a9ec99bd86829f5010a5c307f7072d142b6177641f81fb1371de14e28d66b320",
+      "normative_requirement": "HAR \u2192 board accounting spine remains the sole production ingest path under src/dcm/ingest.",
+      "applicability": "program",
+      "dependencies": [
+        "REQ-HAR-004.01"
+      ],
+      "current_implementation": {
+        "producer": "src/dcm/ingest/har.py",
+        "consumer": "runner",
+        "fallback": null
+      },
+      "tests": [
+        "tests/test_har_ingest.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "IMPLEMENTED",
+      "blocker": null,
+      "evidence_commit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": "Path updated from artifacts/... to src/dcm after #35"
+    },
+    {
+      "requirement_id": "REQ-LEGACY-EMPTY-CARD",
+      "parent_id": null,
+      "title": "Empty card never padded (legacy REQ-EMPTY-CARD)",
+      "source_locator": "legacy:PILLARS_REQUIREMENTS_CROSSWALK.json#REQ-EMPTY-CARD",
+      "source_hash": "a9ec99bd86829f5010a5c307f7072d142b6177641f81fb1371de14e28d66b320",
+      "normative_requirement": "Zero playable returns empty card; never pad to six.",
+      "applicability": "program",
+      "dependencies": [
+        "REQ-PORT-022.01"
+      ],
+      "current_implementation": {
+        "producer": "src/dcm/selection/portfolio.py",
+        "consumer": "card builder",
+        "fallback": null
+      },
+      "tests": [
+        "tests/test_e2e_runner.py"
+      ],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "IMPLEMENTED",
+      "blocker": null,
+      "evidence_commit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": true,
+      "notes": null
+    },
+    {
+      "requirement_id": "REQ-LEGACY-OPTIMIZED-60",
+      "parent_id": null,
+      "title": "Do not declare OPTIMIZED_DCM_6_0",
+      "source_locator": "legacy:PILLARS_REQUIREMENTS_CROSSWALK.json#REQ-OPTIMIZED-60",
+      "source_hash": "a9ec99bd86829f5010a5c307f7072d142b6177641f81fb1371de14e28d66b320",
+      "normative_requirement": "optimizedDcm60Claim must remain false until host cert + chronological superiority.",
+      "applicability": "program",
+      "dependencies": [
+        "REQ-PRED-041.01"
+      ],
+      "current_implementation": {
+        "producer": "VERSION / integrity metadata",
+        "consumer": "release",
+        "fallback": null
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "SUPERSEDED",
+      "blocker": null,
+      "evidence_commit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": false,
+      "notes": "Superseded by REQ-PRED-041.01 policy; claim remains false"
+    },
+    {
+      "requirement_id": "REQ-LEGACY-BEL-CHALLENGERS",
+      "parent_id": null,
+      "title": "BEL/DPMM/GPLVM frozen challenger roles",
+      "source_locator": "legacy:PILLARS_REQUIREMENTS_CROSSWALK.json#REQ-BEL-DPMM-GPLVM",
+      "source_hash": "a9ec99bd86829f5010a5c307f7072d142b6177641f81fb1371de14e28d66b320",
+      "normative_requirement": "Frozen challenger roles remain RESEARCH_ONLY / SHADOW; do not promote from theory.",
+      "applicability": "program",
+      "dependencies": [
+        "REQ-CHAL-027.01"
+      ],
+      "current_implementation": {
+        "producer": null,
+        "consumer": null,
+        "fallback": "RESEARCH_ONLY"
+      },
+      "tests": [],
+      "benchmark": null,
+      "runtime_telemetry": [],
+      "status": "N/A",
+      "blocker": "Deferred by frozen design; tracked under REQ-CHAL-027.01",
+      "evidence_commit": null,
+      "adr_version": "ADR-REQ-LEDGER-V1-20260906",
+      "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "cfb_critical_path": false,
+      "notes": null
+    }
+  ]
+}

@@ -2,10 +2,10 @@
 
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
-- Modules: **221**
-- Symbols: **1520**
+- Modules: **223**
+- Symbols: **1524**
 - Parse errors: **0**
-- Inventory hash: `e65fbeb60369b4d8fab721f5c2e79a385ae56dd72b50310a1ef4d768b43d2ef3`
+- Inventory hash: `b435a7c7ef0eb2d2f9afc92dc228c3284c361fb75ee250d444636931938a0d85`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -62,6 +62,8 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P0 | `src/dcm/contracts/schemas.py` | 25 | 16 |
 | P0 | `src/dcm/contracts/universal_entities.py` | 4 | 5 |
 | UNMAPPED | `src/dcm/dataset.py` | 0 | 0 |
+| UNMAPPED | `src/dcm/governance/__init__.py` | 0 | 0 |
+| UNMAPPED | `src/dcm/governance/requirement_ledger.py` | 0 | 4 |
 | P0 | `src/dcm/identity/__init__.py` | 0 | 0 |
 | P0 | `src/dcm/identity/resolve.py` | 0 | 5 |
 | P0 | `src/dcm/ingest/__init__.py` | 0 | 0 |
@@ -796,6 +798,17 @@ _No class/function symbols._
 ### `src/dcm/dataset.py`
 
 _No class/function symbols._
+
+### `src/dcm/governance/__init__.py`
+
+_No class/function symbols._
+
+### `src/dcm/governance/requirement_ledger.py`
+
+- `function` **_default_ledger_path** L21
+- `function` **load_requirement_ledger** L37 — Load and lightly validate the canonical requirement ledger.
+- `function` **summarize_by_status** L57 — Return status → count. By default counts atomic REQ-* rows only.
+- `function` **cfb_critical_blockers** L70 — Return CFB-critical atomics that are not IMPLEMENTED.
 
 ### `src/dcm/identity/__init__.py`
 

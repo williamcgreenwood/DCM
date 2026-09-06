@@ -1,10 +1,10 @@
 {
   "schema": "pillars_dcm.program_status.v1",
-  "updatedAtUtc": "2026-09-06T03:48:16Z",
+  "updatedAtUtc": "2026-09-06T04:00:00Z",
   "activePromotionBranch": "main",
   "targetPromotionBranch": "main",
-  "lastMergedPullRequest": 34,
-  "lastMergedCommit": "b0e44d5886adb98cb84dbf466ee3a3fc1fee28b1",
+  "lastMergedPullRequest": 35,
+  "lastMergedCommit": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
   "lastGreenCiRun": 273,
   "canonicalIntegrationBranch": "integration/v6-ml-architecture-20260830",
   "canonicalIntegrationPr": 18,
@@ -48,8 +48,8 @@
       "current": 9,
       "state": "STRONG_PARTIAL",
       "next": [
-        "merge PR #34 source-aware-import repair after green CI",
-        "run source-aware import on a current CFB HAR to close remaining shared requirements",
+        "use requirement ledger CFB-critical blockers to drive host evidence import on a current CFB HAR",
+        "close remaining shared requirements via source-aware import",
         "finish mixed-sport R1 remainder after CFB slice"
       ]
     },
@@ -118,7 +118,7 @@
       "current": 8,
       "state": "STRONG_PARTIAL",
       "next": [
-        "merge PR #34 then execute source-aware evidence-import on the current CFB HAR",
+        "execute source-aware evidence-import on the current CFB HAR (ledger REQ-HOST-009.02 / REQ-EVID-011.02)",
         "no second engine"
       ]
     },
@@ -207,8 +207,8 @@
       "current": 8,
       "state": "STRONG_PARTIAL",
       "next": [
-        "Tranche D role/archetype, matchup, and context integration through typed signal operators",
-        "compile exact donor definitions only when archive bytes are available",
+        "P380X pillars remain candidate SignalOperator catalog only \u2014 compile-to-active-DAG",
+        "do not copy 1500 engines into runtime",
         "promote operators only after real producer-consumer integration and tests"
       ]
     },
@@ -313,5 +313,12 @@
     "learningRevision": "LR000000",
     "predictiveClaim": "NONE",
     "productionRootCertified": false
+  },
+  "requirementLedger": {
+    "path": "docs/requirements/REQUIREMENT_LEDGER.v1.json",
+    "crosswalk": "docs/requirements/REQUIREMENT_CROSSWALK.md",
+    "ledgerVersion": "1.0.0",
+    "baseMainSha": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+    "pass": "20260906T040000Z_grok_requirement-ledger-v1"
   }
 }
