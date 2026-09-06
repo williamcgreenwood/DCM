@@ -238,3 +238,135 @@ def allocate_team_opportunity(
         "modeledPassShare": (sum(player_pass) / team_pass_att) if team_pass_att else 0.0,
         "shareEstimates": share_rows,
     }
+
+
+def _pool_mean_cap_for_total(
+    player: Mapping[str, Any],
+    *,
+    pool: str,
+    team_total: float,
+) -> tuple[float, float, bool]:
+    """Return (mean, allocate_cap, fallback) matching estimate_opportunity_share math.
+
+    Skips content_hash / audit body construction for hot EventWorld loops.
+    """
+    role = _role(player)
+    params = player.get("params") if isinstance(player.get("params"), Mapping) else {}
+    is_k = role in KICKER_ROLES
+    total = max(0.0, float(team_total))
+    if is_k or pool not in {"rush", "targets", "pass"}:
+        return 0.0, 0.0, False
+    if pool == "rush":
+        mean = _mean(params, "rush_att_mean", DEFAULT_RUSH_MEAN.get(role, 1.0))
+        cap = ROLE_RUSH_CAP.get(role, 0.12)
+        prior_mean = DEFAULT_RUSH_MEAN.get(role, 1.0)
+    elif pool == "targets":
+        if params.get("routes_mean") is not None:
+            mean = _mean(params, "routes_mean", 8.0) * _mean(
+                params, "target_rate", DEFAULT_TARGET_MEAN.get(role, 3.0) / 8.0
+            )
+        else:
+            mean = _mean(params, "targets_mean", DEFAULT_TARGET_MEAN.get(role, 3.0))
+        cap = ROLE_TARGET_CAP.get(role, 0.15)
+        prior_mean = DEFAULT_TARGET_MEAN.get(role, 3.0)
+    else:
+        mean = _mean(params, "pass_att_mean", DEFAULT_PASS_MEAN.get(role, 0.0) if role == "QB" else 0.0)
+        cap = ROLE_PASS_CAP.get(role, 0.0)
+        prior_mean = DEFAULT_PASS_MEAN.get(role, 0.0) if role == "QB" else 0.0
+
+    support = _support_n(params)
+    starter = str(params.get("projected_role") or params.get("starter") or player.get("starter") or "").lower()
+    is_starter = starter in {"1", "true", "starter", "starter_qb", "starting"} or (
+        role == "QB" and support >= 3 and mean >= 0.85 * max(total, 1.0)
+    )
+    if support >= 3 and total > 0:
+        share = min(1.0, max(0.0, mean / total))
+        if is_starter and role == "QB" and pool == "pass":
+            share = min(share, 0.99)
+        mean = share * total
+        fallback = False
+    elif support > 0 and total > 0:
+        share = min(1.0, max(0.0, mean / total))
+        mean = share * total
+        fallback = False
+    else:
+        share = float(cap)
+        mean = cap * total
+        fallback = True
+        if total > 0 and prior_mean:
+            arch = min(cap, prior_mean / total) if total else cap
+            share = arch
+            mean = share * total
+    allocate_cap = 1.0 if not fallback else float(cap)
+    if is_k:
+        return 0.0, 0.0, False
+    return float(mean), float(allocate_cap), bool(fallback)
+
+
+def allocate_team_opportunity_fast(
+    players: Sequence[Mapping[str, Any]],
+    *,
+    team_pass_att: int,
+    team_rush_att: int,
+    team_targets: int,
+) -> dict[str, Any]:
+    """Hot-path allocation without per-call content_hash / shareEstimates bodies.
+
+    Counts and residuals match ``allocate_team_opportunity``; audit share rows are omitted.
+    """
+    rush_means: list[float] = []
+    rush_caps: list[float] = []
+    tgt_means: list[float] = []
+    tgt_caps: list[float] = []
+    pass_means: list[float] = []
+    pass_caps: list[float] = []
+    kicker_flags: list[bool] = []
+    for p in players:
+        role = _role(p)
+        is_k = role in KICKER_ROLES
+        kicker_flags.append(is_k)
+        if is_k:
+            rush_means.append(0.0)
+            rush_caps.append(0.0)
+            tgt_means.append(0.0)
+            tgt_caps.append(0.0)
+            pass_means.append(0.0)
+            pass_caps.append(0.0)
+            continue
+        rm, rc, _ = _pool_mean_cap_for_total(p, pool="rush", team_total=team_rush_att)
+        tm, tc, _ = _pool_mean_cap_for_total(p, pool="targets", team_total=team_targets)
+        pm, pc, _ = _pool_mean_cap_for_total(p, pool="pass", team_total=team_pass_att)
+        rush_means.append(rm)
+        rush_caps.append(rc)
+        tgt_means.append(tm)
+        tgt_caps.append(tc)
+        pass_means.append(pm)
+        pass_caps.append(pc)
+
+    player_rush, residual_rush = allocate_counts(rush_means, rush_caps, team_rush_att)
+    player_tgt, residual_tgt = allocate_counts(tgt_means, tgt_caps, team_targets)
+    player_pass, residual_pass = allocate_counts(pass_means, pass_caps, team_pass_att)
+
+    for i, is_k in enumerate(kicker_flags):
+        if is_k:
+            player_rush[i] = 0
+            player_tgt[i] = 0
+            player_pass[i] = 0
+
+    return {
+        "playerRushAtt": player_rush,
+        "playerTargets": player_tgt,
+        "playerPassAtt": player_pass,
+        "residualRushAtt": residual_rush,
+        "residualTargets": residual_tgt,
+        "residualPassAtt": residual_pass,
+        "kickerIsolated": all(
+            player_rush[i] == 0 and player_tgt[i] == 0 for i, k in enumerate(kicker_flags) if k
+        )
+        if any(kicker_flags)
+        else True,
+        "modeledRushShare": (sum(player_rush) / team_rush_att) if team_rush_att else 0.0,
+        "modeledTargetShare": (sum(player_tgt) / team_targets) if team_targets else 0.0,
+        "modeledPassShare": (sum(player_pass) / team_pass_att) if team_pass_att else 0.0,
+        "shareEstimates": [],
+    }

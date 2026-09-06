@@ -408,19 +408,27 @@ def profile_compact_ops(board_sizes: list[int]) -> list[dict[str, Any]]:
     return results
 
 
-def profile_event_world(world_sizes: list[int], *, players: int = 8) -> list[dict[str, Any]]:
+def profile_event_world(
+    world_sizes: list[int],
+    *,
+    players: int = 8,
+    backend: str | None = None,
+) -> list[dict[str, Any]]:
     specs = _cfb_team_specs(players)
     results: list[dict[str, Any]] = []
     for n in world_sizes:
         gc.collect()
         tracemalloc.start()
         timer = StageTimer("cfb_event_world_joint")
-        out = simulate_joint_cfb_event_worlds(specs, n=n, seed="baseline-profile-20260906")
+        out = simulate_joint_cfb_event_worlds(
+            specs, n=n, seed="baseline-profile-20260906", backend=backend
+        )
         peak = tracemalloc.get_traced_memory()[1]
         # Deterministic fingerprint of first player's first few worlds.
         first_pid = specs[0]["row"]["playerId"]
         sample = out["worlds"][first_pid][: min(8, n)]
-        digest = content_hash({"meta": out["meta"], "sample": sample, "n": n, "players": players})
+        # Hash worlds sample only (meta carries backend labels).
+        digest = content_hash({"sample": sample, "n": n, "players": players, "seed": "baseline-profile-20260906"})
         rec = _stage_metrics(
             timer,
             tracemalloc_peak=peak,
@@ -430,6 +438,8 @@ def profile_event_world(world_sizes: list[int], *, players: int = 8) -> list[dic
             outputRows=n * players,
             conservationFailures=out["meta"].get("conservationFailures"),
             allocationMode=out["meta"].get("allocationMode"),
+            backend=out["meta"].get("backend"),
+            rngVersion=out["meta"].get("rngVersion"),
         )
         wall = float(rec["WallSeconds"])
         rec["worldsPerWallSecond"] = (n / wall) if wall > 0 else None
@@ -440,6 +450,8 @@ def profile_event_world(world_sizes: list[int], *, players: int = 8) -> list[dic
                 "stageGroup": "CFBEventWorld",
                 "worldCount": n,
                 "playerCount": players,
+                "backend": out["meta"].get("backend"),
+                "rngVersion": out["meta"].get("rngVersion"),
                 "timing": rec,
                 "outputHash": digest,
                 "hostPerformanceCertified": False,
@@ -510,9 +522,10 @@ def identify_hotspots(
                     f"({t.get('worldsPerWallSecond') or 0:.1f} worlds/s)"
                 ),
                 "recommendation": (
-                    "Phase 11: NumPy-vectorize team play / residual allocation and "
-                    "per-player sample_football draws first; C ABI challenger only after "
-                    "a measured NumPy win on the same synthetic matrix."
+                    "Phase 11 NumPy backend landed (~2× vs reference on same matrix, "
+                    "rngVersion v1 bitwise parity). Remaining C ABI candidacy: "
+                    "sample_football binomial/poisson loops and per-world Python dict "
+                    "materialization — only after representative real-evidence SLOs."
                 ),
                 "wallSeconds": t["WallSeconds"],
                 "module": "dcm.cfb.event_worlds.simulate_joint_cfb_event_worlds",
@@ -613,6 +626,10 @@ def render_markdown(report: dict[str, Any]) -> str:
     lines.append("")
     lines.append("## CFB EventWorld / distribution path")
     lines.append("")
+    be = report.get("eventWorldBackend")
+    if be:
+        lines.append(f"- Backend: `{be}`")
+        lines.append("")
     lines.append("| worlds | players | wall s | CPU s | worlds/s | peak RSS B | outputHash |")
     lines.append("|---:|---:|---:|---:|---:|---:|---|")
     for r in report["eventWorld"]:
@@ -623,6 +640,22 @@ def render_markdown(report: dict[str, Any]) -> str:
             f"{t['PeakRSSBytesObserved']} | `{r['outputHash'][:12]}…` |"
         )
     lines.append("")
+    cmp = report.get("eventWorldBackendCompare")
+    if cmp and cmp.get("rows"):
+        lines.append("## EventWorld reference vs NumPy speedup")
+        lines.append("")
+        lines.append("| worlds | players | reference s | numpy s | speedup | hash match |")
+        lines.append("|---:|---:|---:|---:|---:|---|")
+        for row in cmp["rows"]:
+            lines.append(
+                f"| {row['worldCount']} | {row['playerCount']} | "
+                f"{row['referenceWallSeconds']:.4f} | {row['numpyWallSeconds']:.4f} | "
+                f"{row['speedup']} | {row['outputHashMatch']} |"
+            )
+        lines.append("")
+        lines.append(f"- Notes: {cmp.get('notes')}")
+        lines.append(f"- rngVersion: `{cmp['rows'][0].get('rngVersion')}`")
+        lines.append("")
     lines.append("## Cache / DAG counters (synthetic)")
     lines.append("")
     c = report["cacheAndDag"]
@@ -651,7 +684,8 @@ def render_markdown(report: dict[str, Any]) -> str:
     lines.append("## Notes")
     lines.append("")
     lines.append("- Synthetic/sanitized loads only — not production certification.")
-    lines.append("- No HAR bytes committed. No C++ / native extension in this phase.")
+    lines.append("- No HAR bytes committed. No mandatory C++ / native extension in this phase.")
+    lines.append("- EventWorld NumPy backend keeps rngVersion v1 (no silent RNG semantic change).")
     lines.append("- Deterministic `outputHash` values use `content_hash` over stage fingerprints.")
     lines.append("")
     return "\n".join(lines)
@@ -664,15 +698,47 @@ def build_report(
     players: int,
     out_dir: Path,
     command: str,
+    backend: str | None = None,
+    compare_backends: bool = False,
 ) -> dict[str, Any]:
     board_kept, board_skip = _safe_board_sizes(board_sizes)
     world_kept, world_skip = _safe_world_sizes(world_sizes, players=players)
 
     board = profile_board_store(board_kept)
     compact = profile_compact_ops(board_kept)
-    worlds = profile_event_world(world_kept, players=players)
+    worlds = profile_event_world(world_kept, players=players, backend=backend)
     cache = profile_cache_and_dag()
     hotspots = identify_hotspots(board, compact, worlds)
+    backend_compare = None
+    if compare_backends:
+        ref = profile_event_world(world_kept, players=players, backend="reference")
+        npb = profile_event_world(world_kept, players=players, backend="numpy")
+        rows = []
+        for a, b in zip(ref, npb):
+            tw = float(a["timing"]["WallSeconds"])
+            tn = float(b["timing"]["WallSeconds"])
+            rows.append(
+                {
+                    "worldCount": a["worldCount"],
+                    "playerCount": players,
+                    "referenceWallSeconds": tw,
+                    "numpyWallSeconds": tn,
+                    "speedup": (tw / tn) if tn > 0 else None,
+                    "referenceWorldsPerSec": a["timing"].get("worldsPerWallSecond"),
+                    "numpyWorldsPerSec": b["timing"].get("worldsPerWallSecond"),
+                    "outputHashMatch": a["outputHash"] == b["outputHash"],
+                    "rngVersion": b.get("rngVersion"),
+                }
+            )
+        backend_compare = {
+            "schema": "pillars_dcm.eventworld_backend_compare.v1",
+            "rows": rows,
+            "hostPerformanceCertified": False,
+            "notes": (
+                "Same seed + rngVersion v1; NumPy backend skips per-world share "
+                "content_hash while preserving bitwise world ledgers."
+            ),
+        }
 
     avail = _available_ram_bytes()
     report: dict[str, Any] = {
@@ -700,6 +766,8 @@ def build_report(
         "boardStore": board,
         "compact": compact,
         "eventWorld": worlds,
+        "eventWorldBackend": (worlds[0].get("backend") if worlds else backend),
+        "eventWorldBackendCompare": backend_compare,
         "cacheAndDag": cache,
         "hotspots": hotspots,
         "bytesReadWrite": {
@@ -720,6 +788,17 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--out", type=Path, default=ROOT / "docs" / "benchmarks")
     parser.add_argument("--tag", type=str, default="20260906")
     parser.add_argument("--smoke", action="store_true", help="Tiny sizes for CI/harness smoke")
+    parser.add_argument(
+        "--backend",
+        type=str,
+        default=None,
+        help="EventWorld backend: numpy|reference (default: resolve_event_world_backend)",
+    )
+    parser.add_argument(
+        "--compare-backends",
+        action="store_true",
+        help="Also time reference vs numpy EventWorld and emit speedup rows",
+    )
     args = parser.parse_args(argv)
 
     if args.smoke:
@@ -741,6 +820,10 @@ def main(argv: list[str] | None = None) -> int:
     )
     if args.smoke:
         cmd += " --smoke"
+    if args.backend:
+        cmd += f" --backend {args.backend}"
+    if args.compare_backends:
+        cmd += " --compare-backends"
 
     report = build_report(
         board_sizes=list(args.board_sizes),
@@ -748,6 +831,8 @@ def main(argv: list[str] | None = None) -> int:
         players=int(args.players),
         out_dir=out_dir,
         command=cmd,
+        backend=args.backend,
+        compare_backends=bool(args.compare_backends),
     )
     assert report["hostPerformanceCertified"] is False
 

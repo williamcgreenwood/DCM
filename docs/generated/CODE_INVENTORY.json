@@ -1,6 +1,6 @@
 {
-  "contentHash": "9f33cf08b34a826cab8df0106da6e2e38fa2dc6a032c4ec321f68e53c36862e7",
-  "moduleCount": 225,
+  "contentHash": "2b189a06b6724e9597abe28d7fa0e433071a4c5bffaf2051522d2d49af422c28",
+  "moduleCount": 227,
   "modules": [
     {
       "classes": 0,
@@ -2378,25 +2378,83 @@
     },
     {
       "classes": 0,
-      "functions": 2,
-      "path": "src/dcm/cfb/event_worlds.py",
-      "sha256": "b2906c243a6877d18f666ade28361959c20fcb93775f3a5fc42a50f02d9e2f3f",
+      "functions": 3,
+      "path": "src/dcm/cfb/event_world_backend.py",
+      "sha256": "2e50f1f44a33c8f59951f2955788d65a29d0c6af16b695d4b357d69385caacc4",
       "symbols": [
         {
           "doc": null,
-          "endLine": 34,
+          "endLine": 29,
           "kind": "function",
-          "line": 17,
+          "line": 23,
+          "name": "numpy_available",
+          "qualname": "numpy_available"
+        },
+        {
+          "doc": "Resolve backend: explicit arg \u2192 env \u2192 default (numpy if available).",
+          "endLine": 43,
+          "kind": "function",
+          "line": 32,
+          "name": "resolve_event_world_backend",
+          "qualname": "resolve_event_world_backend"
+        },
+        {
+          "doc": null,
+          "endLine": 53,
+          "kind": "function",
+          "line": 46,
+          "name": "backend_meta",
+          "qualname": "backend_meta"
+        }
+      ],
+      "workstream": "UNMAPPED"
+    },
+    {
+      "classes": 0,
+      "functions": 3,
+      "path": "src/dcm/cfb/event_worlds.py",
+      "sha256": "41f4ee96486c82adfc4e05a87322a23d8d6377c6fe4ff1b47a375bfccc9d3d74",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 40,
+          "kind": "function",
+          "line": 23,
           "name": "cfb_teammate_groups",
           "qualname": "cfb_teammate_groups"
         },
         {
-          "doc": "Shared team plays/pass-rate/rush-rate \u2192 residual-aware player opportunity.",
-          "endLine": 190,
+          "doc": "Portable pure-Python joint CFB EventWorld (mandatory fallback path).",
+          "endLine": 197,
           "kind": "function",
-          "line": 37,
+          "line": 43,
+          "name": "simulate_joint_cfb_event_worlds_reference",
+          "qualname": "simulate_joint_cfb_event_worlds_reference"
+        },
+        {
+          "doc": "Shared team plays/pass-rate/rush-rate \u2192 residual-aware player opportunity.",
+          "endLine": 224,
+          "kind": "function",
+          "line": 200,
           "name": "simulate_joint_cfb_event_worlds",
           "qualname": "simulate_joint_cfb_event_worlds"
+        }
+      ],
+      "workstream": "UNMAPPED"
+    },
+    {
+      "classes": 0,
+      "functions": 1,
+      "path": "src/dcm/cfb/event_worlds_numpy.py",
+      "sha256": "27c5cb173f658633295805dfaefa4f70386ee8295f47524c9e512877440ea9d2",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 270,
+          "kind": "function",
+          "line": 47,
+          "name": "simulate_joint_cfb_event_worlds_numpy",
+          "qualname": "simulate_joint_cfb_event_worlds_numpy"
         }
       ],
       "workstream": "UNMAPPED"
@@ -2639,9 +2697,9 @@
     },
     {
       "classes": 0,
-      "functions": 6,
+      "functions": 8,
       "path": "src/dcm/cfb/opportunity_ledger.py",
-      "sha256": "d8bf452f8e66a38bce19e4da5dad5981b796af921c8faca11d4dc462cc5cc485",
+      "sha256": "d99ce0105ffbbb5cc4e531358eeae1264670832d32b6d29ca79841bc45663fb2",
       "symbols": [
         {
           "doc": null,
@@ -2690,6 +2748,22 @@
           "line": 175,
           "name": "allocate_team_opportunity",
           "qualname": "allocate_team_opportunity"
+        },
+        {
+          "doc": "Return (mean, allocate_cap, fallback) matching estimate_opportunity_share math.",
+          "endLine": 303,
+          "kind": "function",
+          "line": 243,
+          "name": "_pool_mean_cap_for_total",
+          "qualname": "_pool_mean_cap_for_total"
+        },
+        {
+          "doc": "Hot-path allocation without per-call content_hash / shareEstimates bodies.",
+          "endLine": 372,
+          "kind": "function",
+          "line": 306,
+          "name": "allocate_team_opportunity_fast",
+          "qualname": "allocate_team_opportunity_fast"
         }
       ],
       "workstream": "UNMAPPED"
@@ -5552,17 +5626,25 @@
     },
     {
       "classes": 0,
-      "functions": 1,
+      "functions": 2,
       "path": "src/dcm/model/distributions.py",
-      "sha256": "d63a29cfdeb34aa9628e34645d896802725825ff9213b5473c74664ed0cdf62a",
+      "sha256": "148842fce2ff384b00efebbbcab4650d10e1888a24580305a09423b7f1b7c5be",
       "symbols": [
         {
-          "doc": null,
-          "endLine": 18,
+          "doc": "Empirical P(Higher)/P(Lower)/P(Push) from world samples.",
+          "endLine": 33,
           "kind": "function",
-          "line": 6,
+          "line": 8,
           "name": "from_worlds",
           "qualname": "from_worlds"
+        },
+        {
+          "doc": "Pure-Python fallback used by parity tests.",
+          "endLine": 49,
+          "kind": "function",
+          "line": 36,
+          "name": "from_worlds_reference",
+          "qualname": "from_worlds_reference"
         }
       ],
       "workstream": "P2-P4"
@@ -14719,5 +14801,5 @@
   "parseErrors": [],
   "root": "src",
   "schema": "pillars_dcm.code_inventory.v1",
-  "symbolCount": 1590
+  "symbolCount": 1598
 }

@@ -2,10 +2,10 @@
 
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
-- Modules: **225**
-- Symbols: **1590**
+- Modules: **227**
+- Symbols: **1598**
 - Parse errors: **0**
-- Inventory hash: `9f33cf08b34a826cab8df0106da6e2e38fa2dc6a032c4ec321f68e53c36862e7`
+- Inventory hash: `2b189a06b6724e9597abe28d7fa0e433071a4c5bffaf2051522d2d49af422c28`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -34,12 +34,14 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | UNMAPPED | `src/dcm/cfb/accounting.py` | 0 | 3 |
 | UNMAPPED | `src/dcm/cfb/champion.py` | 0 | 3 |
 | UNMAPPED | `src/dcm/cfb/coextract.py` | 0 | 3 |
-| UNMAPPED | `src/dcm/cfb/event_worlds.py` | 0 | 2 |
+| UNMAPPED | `src/dcm/cfb/event_world_backend.py` | 0 | 3 |
+| UNMAPPED | `src/dcm/cfb/event_worlds.py` | 0 | 3 |
+| UNMAPPED | `src/dcm/cfb/event_worlds_numpy.py` | 0 | 1 |
 | UNMAPPED | `src/dcm/cfb/frontier.py` | 0 | 4 |
 | UNMAPPED | `src/dcm/cfb/har_delta.py` | 0 | 3 |
 | UNMAPPED | `src/dcm/cfb/launch.py` | 0 | 9 |
 | UNMAPPED | `src/dcm/cfb/markets.py` | 0 | 9 |
-| UNMAPPED | `src/dcm/cfb/opportunity_ledger.py` | 0 | 6 |
+| UNMAPPED | `src/dcm/cfb/opportunity_ledger.py` | 0 | 8 |
 | UNMAPPED | `src/dcm/cfb/recompute.py` | 0 | 1 |
 | UNMAPPED | `src/dcm/cfb/refresh.py` | 0 | 2 |
 | UNMAPPED | `src/dcm/cfb/reports.py` | 0 | 11 |
@@ -91,7 +93,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P2-P4 | `src/dcm/model/availability.py` | 0 | 2 |
 | P2-P4 | `src/dcm/model/basketball_efficiency.py` | 1 | 6 |
 | P2-P4 | `src/dcm/model/basketball_opportunity.py` | 1 | 8 |
-| P2-P4 | `src/dcm/model/distributions.py` | 0 | 1 |
+| P2-P4 | `src/dcm/model/distributions.py` | 0 | 2 |
 | P2-P4 | `src/dcm/model/event_world_joint.py` | 0 | 8 |
 | P2-P4 | `src/dcm/model/explanation.py` | 0 | 14 |
 | P2-P4 | `src/dcm/model/grade.py` | 0 | 1 |
@@ -584,10 +586,21 @@ _No class/function symbols._
 - `function` **harvest_structured_page** L49 — Extract every relevant board entity visible in one structured page.
 - `function` **fanout_acceptance** L135 — executed AcquisitionActions << independent unresolved prop requirements.
 
+### `src/dcm/cfb/event_world_backend.py`
+
+- `function` **numpy_available** L23
+- `function` **resolve_event_world_backend** L32 — Resolve backend: explicit arg → env → default (numpy if available).
+- `function` **backend_meta** L46
+
 ### `src/dcm/cfb/event_worlds.py`
 
-- `function` **cfb_teammate_groups** L17
-- `function` **simulate_joint_cfb_event_worlds** L37 — Shared team plays/pass-rate/rush-rate → residual-aware player opportunity.
+- `function` **cfb_teammate_groups** L23
+- `function` **simulate_joint_cfb_event_worlds_reference** L43 — Portable pure-Python joint CFB EventWorld (mandatory fallback path).
+- `function` **simulate_joint_cfb_event_worlds** L200 — Shared team plays/pass-rate/rush-rate → residual-aware player opportunity.
+
+### `src/dcm/cfb/event_worlds_numpy.py`
+
+- `function` **simulate_joint_cfb_event_worlds_numpy** L47
 
 ### `src/dcm/cfb/frontier.py`
 
@@ -634,6 +647,8 @@ _No class/function symbols._
 - `function` **estimate_opportunity_share** L52 — Evidence-driven share of a team opportunity pool.
 - `function` **allocate_counts** L144 — Absolute means, capped, never renormalized to 100% of the team pool.
 - `function` **allocate_team_opportunity** L175 — Return per-player counts plus residual buckets.
+- `function` **_pool_mean_cap_for_total** L243 — Return (mean, allocate_cap, fallback) matching estimate_opportunity_share math.
+- `function` **allocate_team_opportunity_fast** L306 — Hot-path allocation without per-call content_hash / shareEstimates bodies.
 
 ### `src/dcm/cfb/recompute.py`
 
@@ -1102,7 +1117,8 @@ _No class/function symbols._
 
 ### `src/dcm/model/distributions.py`
 
-- `function` **from_worlds** L6
+- `function` **from_worlds** L8 — Empirical P(Higher)/P(Lower)/P(Push) from world samples.
+- `function` **from_worlds_reference** L36 — Pure-Python fallback used by parity tests.
 
 ### `src/dcm/model/event_world_joint.py`
 
