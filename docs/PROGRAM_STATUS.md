@@ -1,5 +1,6 @@
 # PROGRAM STATUS
 
+- **Constitution:** `DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903`
 - **asOf:** 2026-09-06T20:01:22.585865+00:00
 - **canonical main:** `a4ff32af22b274ae0429862a33063aa22d4fe2a2`
 - **LR:** `LR000000`

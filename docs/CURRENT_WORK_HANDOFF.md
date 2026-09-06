@@ -1,6 +1,7 @@
 # CURRENT WORK HANDOFF — CFB LIVE FRONTIER CLOSURE
 
 - **Timestamp:** `2026-09-06T20:01:22.586427+00:00`
+- **Constitution version:** `DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903`
 - **Active branch:** `main`
 - **Canonical main HEAD:** `a4ff32af22b274ae0429862a33063aa22d4fe2a2`
 - **Learning revision:** `LR000000`
