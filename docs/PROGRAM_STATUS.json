@@ -1,10 +1,10 @@
 {
   "schema": "pillars_dcm.program_status.v1",
-  "updatedAtUtc": "2026-09-05T21:42:00Z",
+  "updatedAtUtc": "2026-09-06T03:27:02Z",
   "activePromotionBranch": "main",
   "targetPromotionBranch": "main",
-  "lastMergedPullRequest": 32,
-  "lastMergedCommit": "ce69ffeda1cfdcff6415e0cba9999fdb1e22c00d",
+  "lastMergedPullRequest": 33,
+  "lastMergedCommit": "24007ef5bd6af38d44f6f004eb19300bb0fc07ab",
   "lastGreenCiRun": 273,
   "canonicalIntegrationBranch": "integration/v6-ml-architecture-20260830",
   "canonicalIntegrationPr": 18,
@@ -48,9 +48,9 @@
       "current": 9,
       "state": "STRONG_PARTIAL",
       "next": [
-        "use action context and permitted source candidates to import grouped CFB shared evidence",
-        "finish mixed-sport R1 remainder after today's CFB slice",
-        "retire remaining PLAYER/TEAM lookup aliases at adapters"
+        "merge PR #34 source-aware-import repair after green CI",
+        "run source-aware import on a current CFB HAR to close remaining shared requirements",
+        "finish mixed-sport R1 remainder after CFB slice"
       ]
     },
     {
@@ -118,8 +118,8 @@
       "current": 8,
       "state": "STRONG_PARTIAL",
       "next": [
-        "validate source-aware host-action batches on the current CFB HAR",
-        "no second probability engine"
+        "merge PR #34 then execute source-aware evidence-import on the current CFB HAR",
+        "no second engine"
       ]
     },
     {
@@ -240,21 +240,22 @@
     "noSilentDowngrades": true,
     "noSilentCompletionClaims": true
   },
-  "activeBranch": "main",
-  "activePullRequest": null,
+  "activeBranch": "task/cfb-grouped-research-20260905",
+  "activePullRequest": 34,
   "latestPass": {
-    "id": "20260905T103541Z_cfb-semantic-coverage-scheduler",
-    "commit": null,
-    "branch": "codex/cfb-coverage-complete-scheduler-20260905",
+    "id": "20260906T023500Z_grok_pr34-phase1-repair",
+    "commit": "be4647633f26ce31be244733ae7d9f3ff8ddddda",
+    "branch": "task/cfb-grouped-research-20260905",
     "targetBranch": "main",
-    "pullRequest": null,
+    "pullRequest": 34,
     "mainTouched": false,
     "inventory": {
-      "modules": 281,
-      "symbols": 2016,
-      "contentHash": "1445f85564d95fbdf1aa1019add2ca9125e14e0a6170a374de3ba50a285f070b"
+      "modules": 287,
+      "symbols": 2054,
+      "contentHash": "a426152e282f36bcd650cfe2df445d60456929d116cc782a5c3777a08d4b6c95"
     },
-    "wheelSha256": "253e3f3d20d77266398e32ca0e360e2f6b6424bad86f21f31d7c81d6c8a9d3fe"
+    "summary": "source-aware-import repair + split observation_execute modules; inventory regen",
+    "next": "merge PR #34 after green CI, then live HAR evidence-import"
   },
   "executionClosureGates": {
     "G0_SESSION_TRUTH": "PASS",
@@ -304,6 +305,12 @@
     "targetedHostScopeBoundary": "IMPLEMENTED_MERGED_VERIFIED",
     "semanticCoverageScheduler": "IMPLEMENTED_PENDING_PROMOTION; fresh-wheel current-HAR readback 552->551 after one valid official observation",
     "cfbSourceCatalogCapabilityRouting": "IMPLEMENTED_PENDING_PROMOTION; catalog-derived stable CFB routes and 45 targeted tests green",
-    "mergeCommit": "1b4e91b17b78f3d9323c7c126042a06ed4bcb59e"
+    "mergeCommit": "1b4e91b17b78f3d9323c7c126042a06ed4bcb59e",
+    "sourceAwareImportRepair": "IMPLEMENTED_PENDING_MERGE_PR34_INVENTORY_PUSH"
+  },
+  "claims": {
+    "learningRevision": "LR000000",
+    "predictiveClaim": "NONE",
+    "productionRootCertified": false
   }
 }

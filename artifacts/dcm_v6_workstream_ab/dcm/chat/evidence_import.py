@@ -3,6 +3,10 @@
 The host supplies source/url/timestamps/entity/data. DCM owns identity
 resolution, cutoff, source policy, reliability/freshness, hashing, dedupe,
 conflicts, EvidenceGraph insertion and cache identity.
+
+When ``acquisition_actions.json`` is present, import runs the source-aware
+closed loop (typed field validation, fanout, coverage + ParameterSnapshot
+descendant recompute). Empty field coverage never counts as success.
 """
 from __future__ import annotations
 
@@ -15,6 +19,12 @@ from dcm.research.authority import derive_quality
 from dcm.research.claims import claim_record, conflict_ledger, dedupe
 from dcm.research.coverage import coverage_report
 from dcm.research.evidence_graph import build_evidence_graph
+from dcm.research.observation_execute import (
+    assemble_claim_value,
+    execute_source_aware_observations,
+    has_valid_field_coverage,
+    observation_to_typed_claim,
+)
 from dcm.research.provider import BundleProvider, _validate_source_url
 from dcm.research.research_store import ResearchStore
 from dcm.research.scopes import canonical_scope, lookup_scopes
@@ -69,65 +79,8 @@ def observation_to_claim(
     cutoff: str,
     request: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    url = str(obs.get("sourceUrl") or obs.get("url") or "")
-    if not url:
-        raise ValueError("HOST_OBSERVATION_SOURCE_URL_REQUIRED")
-    _validate_source_url(url)
-    retrieved = str(obs.get("retrievedAt") or obs.get("observed_at") or obs.get("observedAt") or "")
-    if not retrieved:
-        raise ValueError("HOST_OBSERVATION_RETRIEVED_AT_REQUIRED")
-    published = str(obs.get("publishedAt") or obs.get("published_at") or retrieved)
-    entity = obs.get("entityRef") if isinstance(obs.get("entityRef"), dict) else {}
-    kind = canonical_scope(
-        str(entity.get("kind") or obs.get("scope") or (request or {}).get("scope") or "")
-    )
-    entity_id = str(
-        entity.get("id")
-        or obs.get("scope_id")
-        or (request or {}).get("scope_id")
-        or ""
-    )
-    if not kind or not entity_id:
-        raise ValueError("HOST_OBSERVATION_ENTITY_REF_REQUIRED")
-    data = obs.get("data")
-    if data is None:
-        data = {}
-    if not isinstance(data, dict):
-        data = {"value": data}
-    evidence_type = str(
-        obs.get("evidenceType")
-        or obs.get("claim_type")
-        or (request or {}).get("need")
-        or "HOST_OBSERVATION"
-    )
-    source_label = str(obs.get("sourceLabel") or obs.get("source_id") or "HOST_WEB")
-    quality = derive_quality(
-        source_id=source_label,
-        url=url,
-        published_at=published,
-        observed_at=retrieved,
-        forecast_cutoff=cutoff,
-    )
-    # Host-supplied hashes/reliability are ignored. DCM recomputes them.
-    return claim_record(
-        source_id=source_label,
-        url=url,
-        published_at=published,
-        observed_at=retrieved,
-        forecast_cutoff=cutoff,
-        semantic_scope=kind,
-        scope_id=entity_id,
-        claim_type=evidence_type,
-        claim_value=data,
-        reliability=quality["reliability"],
-        freshness=quality["freshness"],
-        valid_from=obs.get("validFrom") or obs.get("valid_from") or obs.get("validAt") or obs.get("valid_at"),
-        valid_to=obs.get("validTo") or obs.get("valid_to"),
-        supersedes=obs.get("supersedes") if isinstance(obs.get("supersedes"), (list, tuple)) else ([obs.get("supersedes")] if obs.get("supersedes") else None),
-        retracts=obs.get("retracts") if isinstance(obs.get("retracts"), (list, tuple)) else ([obs.get("retracts")] if obs.get("retracts") else None),
-        correction_of=str(obs.get("correctionOf") or obs.get("correction_of") or "") or None,
-        state=str(obs.get("state") or "") or None,
-    )
+    """Legacy entry: validate + convert one observation (rejects empty fields)."""
+    return observation_to_typed_claim(obs, cutoff=cutoff, request=request, action=None)
 
 
 def import_observations(
@@ -137,10 +90,31 @@ def import_observations(
     store_root: Path | None = None,
 ) -> dict[str, Any]:
     dest = Path(dest)
+    # Prefer the source-aware closed loop whenever the run has acquisition actions
+    # or host observations carry action/source projection fields.
+    action_doc = read_json(dest / "acquisition_actions.json") or {}
+    observations = _load_observations(Path(observations_path))
+    source_aware = bool(action_doc.get("actions")) or any(
+        isinstance(obs, dict)
+        and (
+            obs.get("actionId")
+            or obs.get("sourceFamily")
+            or obs.get("sourceCandidates")
+            or obs.get("claims")
+            or obs.get("parserVersion")
+        )
+        for obs in observations
+    )
+    if source_aware:
+        return execute_source_aware_observations(
+            dest,
+            Path(observations_path),
+            store_root=store_root,
+        )
+
     requests = read_json(dest / "research_requests.json") or []
     if not isinstance(requests, list):
         requests = []
-    cutoff = ""
     freeze = read_json(dest / "freeze.json") or {}
     board = read_json(dest / "board.json") or {}
     host_state = read_json(dest / "host_state.json") or {}
@@ -152,7 +126,6 @@ def import_observations(
     )
     if not cutoff:
         raise ValueError("FORECAST_CUTOFF_REQUIRED")
-    observations = _load_observations(Path(observations_path))
     claims: list[dict[str, Any]] = []
     errors: list[dict[str, Any]] = []
     for i, obs in enumerate(observations):
@@ -201,4 +174,13 @@ def import_observations(
         "store": store.telemetry(),
         "stored": stored,
         "hostInventedHashes": False,
+        "emptyFieldCoverageCountsAsSuccess": False,
     }
+
+
+__all__ = [
+    "assemble_claim_value",
+    "has_valid_field_coverage",
+    "import_observations",
+    "observation_to_claim",
+]
