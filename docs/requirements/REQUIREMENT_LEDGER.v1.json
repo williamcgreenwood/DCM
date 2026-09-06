@@ -1765,7 +1765,9 @@
       },
       "tests": [
         "tests/test_parameter_snapshot_scopes.py",
-        "tests/test_cfb_freeze_gate.py"
+        "tests/test_cfb_freeze_gate.py",
+        "tests/test_dag_true_invalidation.py",
+        "tests/test_cfb_source_aware_import.py"
       ],
       "benchmark": null,
       "runtime_telemetry": [
@@ -1777,7 +1779,7 @@
       "adr_version": "ADR-REQ-LEDGER-V1-20260906",
       "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
       "cfb_critical_path": true,
-      "notes": null
+      "notes": "Phase 6: runtime Dag ID-scoped invalidate + claim\u2192fact\u2192feature\u2192parameter lineage on CFB import; evidence-change invalidates descendants only."
     },
     {
       "requirement_id": "REQ-CFB-OPP-013.01",
@@ -2108,7 +2110,8 @@
       },
       "tests": [
         "tests/test_p4_freeze_contract.py",
-        "tests/test_cfb_freeze_gate.py"
+        "tests/test_cfb_freeze_gate.py",
+        "tests/test_dag_true_invalidation.py"
       ],
       "benchmark": null,
       "runtime_telemetry": [
@@ -2120,7 +2123,7 @@
       "adr_version": "ADR-REQ-LEDGER-V1-20260906",
       "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
       "cfb_critical_path": true,
-      "notes": null
+      "notes": "Dag.mark_freeze / DagFrozenError rejects post-seal invalidate."
     },
     {
       "requirement_id": "REQ-FRZ-023.02",

@@ -35,6 +35,7 @@ from dcm.research.observation_execute_support import (
     _derive_sport,
     _ensure_offer_lineage,
     _load_existing_dag,
+    _persist_run_dag,
     _snapshot_ablation,
 )
 from dcm.research.observation_typed import (
@@ -287,12 +288,13 @@ def execute_source_aware_observations(
     for row in touched_rows:
         param_nodes_touched.append(_ensure_offer_lineage(dag, claim_nodes=claim_nodes, row=row))
 
+    # ID-scoped descendants only — never type-wipe unrelated PARAMETER/EVENT_WORLDS/GRADE.
     invalidated = (
-        dag.invalidate_descendants([n.key for n in param_nodes_touched], include_roots=True)
+        dag.invalidate([n.key for n in param_nodes_touched], include_roots=True)
         if param_nodes_touched
         else []
     )
-    write_json(dest / "source_aware_import_dag.json", dag.snapshot())
+    _persist_run_dag(dest, dag)
 
     closed_unique = list(dict.fromkeys(closed_request_ids))
     max_fanout = max((int(f.get("dependentOfferCount") or 0) for f in fanouts), default=0)
