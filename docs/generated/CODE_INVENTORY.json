@@ -1,5 +1,5 @@
 {
-  "contentHash": "15962e469f7bb491d85d6e1b3e95076daa49aec30a68e2be9c6002d16df3c123",
+  "contentHash": "af5c82ab05671a8724ed286afdf6f1179329018e8aaa3816ceae93a58ea69b94",
   "moduleCount": 228,
   "modules": [
     {
@@ -8914,77 +8914,77 @@
       "classes": 0,
       "functions": 9,
       "path": "src/dcm/research/gridiron_gamelog.py",
-      "sha256": "15b7e5059e9301f8d3e8f13930a7c161e90cea4ed46239fa1efaac0cf7551ca9",
+      "sha256": "a673d248bb1d5971c695cce93e4138df6c99810617d987bf2e264aff21527806",
       "symbols": [
         {
           "doc": "Parse 71 or '71%' into 0.71. Already-fractional values in [0, 1] stay.",
-          "endLine": 137,
+          "endLine": 161,
           "kind": "function",
-          "line": 127,
+          "line": 151,
           "name": "parse_pct",
           "qualname": "parse_pct"
         },
         {
           "doc": null,
-          "endLine": 144,
+          "endLine": 168,
           "kind": "function",
-          "line": 140,
+          "line": 164,
           "name": "_index_row",
           "qualname": "_index_row"
         },
         {
           "doc": null,
-          "endLine": 148,
+          "endLine": 172,
           "kind": "function",
-          "line": 147,
+          "line": 171,
           "name": "_present",
           "qualname": "_present"
         },
         {
           "doc": null,
-          "endLine": 171,
+          "endLine": 195,
           "kind": "function",
-          "line": 151,
+          "line": 175,
           "name": "_market_stat_ok",
           "qualname": "_market_stat_ok"
         },
         {
           "doc": "Return a canonical gridiron log, or None if opportunity cannot be resolved.",
-          "endLine": 257,
+          "endLine": 282,
           "kind": "function",
-          "line": 174,
+          "line": 198,
           "name": "normalize_gridiron_log",
           "qualname": "normalize_gridiron_log"
         },
         {
           "doc": null,
-          "endLine": 194,
+          "endLine": 218,
           "kind": "method",
-          "line": 186,
+          "line": 210,
           "name": "_take",
           "qualname": "normalize_gridiron_log._take"
         },
         {
           "doc": "Split a log list into valid canonical rows and rejected originals.",
-          "endLine": 277,
+          "endLine": 302,
           "kind": "function",
-          "line": 260,
+          "line": 285,
           "name": "normalize_gridiron_logs",
           "qualname": "normalize_gridiron_logs"
         },
         {
           "doc": "Coverage helper: opportunity-valid logs plus market counting-stat presence.",
-          "endLine": 304,
+          "endLine": 329,
           "kind": "function",
-          "line": 280,
+          "line": 305,
           "name": "assert_compatible_gridiron_logs",
           "qualname": "assert_compatible_gridiron_logs"
         },
         {
           "doc": null,
-          "endLine": 315,
+          "endLine": 344,
           "kind": "function",
-          "line": 307,
+          "line": 332,
           "name": "looks_like_gridiron_log",
           "qualname": "looks_like_gridiron_log"
         }
@@ -10193,9 +10193,9 @@
     },
     {
       "classes": 1,
-      "functions": 27,
+      "functions": 29,
       "path": "src/dcm/research/research_store.py",
-      "sha256": "a94d2498b1a7b8f035b58cebf7947945b7e39ddd7b7bbd27d2dd6e3fb9dcedbb",
+      "sha256": "3591d685d304b83f180998c20f1be6e415880e3f0522c15a78180821826b0f3e",
       "symbols": [
         {
           "doc": null,
@@ -10230,194 +10230,210 @@
           "qualname": "extract_game_logs"
         },
         {
-          "doc": "Append-only merge. First identity wins; history is never silently replaced.",
-          "endLine": 105,
+          "doc": "Copy already-observed historical support into a claim_value that omits it.",
+          "endLine": 140,
           "kind": "function",
-          "line": 87,
+          "line": 88,
+          "name": "preserve_historical_support_fields",
+          "qualname": "preserve_historical_support_fields"
+        },
+        {
+          "doc": "Return a shallow-copied claim whose claim_value keeps prior historical support.",
+          "endLine": 196,
+          "kind": "function",
+          "line": 143,
+          "name": "enrich_claim_value_from_prior_records",
+          "qualname": "enrich_claim_value_from_prior_records"
+        },
+        {
+          "doc": "Append-only merge. First identity wins; history is never silently replaced.",
+          "endLine": 217,
+          "kind": "function",
+          "line": 199,
           "name": "merge_game_logs",
           "qualname": "merge_game_logs"
         },
         {
           "doc": null,
-          "endLine": 118,
+          "endLine": 230,
           "kind": "function",
-          "line": 108,
+          "line": 220,
           "name": "last_verified_event",
           "qualname": "last_verified_event"
         },
         {
           "doc": null,
-          "endLine": 135,
+          "endLine": 247,
           "kind": "function",
-          "line": 121,
+          "line": 233,
           "name": "history_gap",
           "qualname": "history_gap"
         },
         {
           "doc": "Filesystem content-addressed store. Git never receives raw HARs/HTML dumps.",
-          "endLine": 391,
+          "endLine": 516,
           "kind": "class",
-          "line": 138,
+          "line": 250,
           "name": "ResearchStore",
           "qualname": "ResearchStore"
         },
         {
           "doc": null,
-          "endLine": 153,
+          "endLine": 265,
           "kind": "method",
-          "line": 141,
+          "line": 253,
           "name": "__init__",
           "qualname": "ResearchStore.__init__"
         },
         {
           "doc": null,
-          "endLine": 157,
+          "endLine": 269,
           "kind": "method",
-          "line": 155,
+          "line": 267,
           "name": "_append_index",
           "qualname": "ResearchStore._append_index"
         },
         {
           "doc": null,
-          "endLine": 171,
+          "endLine": 283,
           "kind": "method",
-          "line": 159,
+          "line": 271,
           "name": "_load_index",
           "qualname": "ResearchStore._load_index"
         },
         {
           "doc": null,
-          "endLine": 180,
+          "endLine": 292,
           "kind": "method",
-          "line": 173,
+          "line": 285,
           "name": "_latest",
           "qualname": "ResearchStore._latest"
         },
         {
           "doc": null,
-          "endLine": 185,
+          "endLine": 297,
           "kind": "method",
-          "line": 182,
+          "line": 294,
           "name": "_set_latest",
           "qualname": "ResearchStore._set_latest"
         },
         {
           "doc": null,
-          "endLine": 194,
+          "endLine": 306,
           "kind": "method",
-          "line": 187,
+          "line": 299,
           "name": "_load_map",
           "qualname": "ResearchStore._load_map"
         },
         {
           "doc": null,
-          "endLine": 201,
+          "endLine": 313,
           "kind": "method",
-          "line": 196,
+          "line": 308,
           "name": "_index_push",
           "qualname": "ResearchStore._index_push"
         },
         {
           "doc": null,
-          "endLine": 256,
+          "endLine": 381,
           "kind": "method",
-          "line": 203,
+          "line": 315,
           "name": "put_claim",
           "qualname": "ResearchStore.put_claim"
         },
         {
           "doc": null,
-          "endLine": 283,
+          "endLine": 408,
           "kind": "method",
-          "line": 258,
+          "line": 383,
           "name": "put_game_logs",
           "qualname": "ResearchStore.put_game_logs"
         },
         {
           "doc": null,
-          "endLine": 290,
+          "endLine": 415,
           "kind": "method",
-          "line": 285,
+          "line": 410,
           "name": "get",
           "qualname": "ResearchStore.get"
         },
         {
           "doc": null,
-          "endLine": 294,
+          "endLine": 419,
           "kind": "method",
-          "line": 292,
+          "line": 417,
           "name": "latest_for",
           "qualname": "ResearchStore.latest_for"
         },
         {
           "doc": null,
-          "endLine": 300,
+          "endLine": 425,
           "kind": "method",
-          "line": 296,
+          "line": 421,
           "name": "latest_blob",
           "qualname": "ResearchStore.latest_blob"
         },
         {
           "doc": "Hydrate classify_delta `prior` from the stored blob, not the pointer.",
-          "endLine": 333,
+          "endLine": 458,
           "kind": "method",
-          "line": 302,
+          "line": 427,
           "name": "prior_fields",
           "qualname": "ResearchStore.prior_fields"
         },
         {
           "doc": null,
-          "endLine": 349,
+          "endLine": 474,
           "kind": "method",
-          "line": 335,
+          "line": 460,
           "name": "records_for",
           "qualname": "ResearchStore.records_for"
         },
         {
           "doc": "Store settlement memory separately from research validity.",
-          "endLine": 372,
+          "endLine": 497,
           "kind": "method",
-          "line": 351,
+          "line": 476,
           "name": "put_outcome",
           "qualname": "ResearchStore.put_outcome"
         },
         {
           "doc": null,
-          "endLine": 391,
+          "endLine": 516,
           "kind": "method",
-          "line": 374,
+          "line": 499,
           "name": "telemetry",
           "qualname": "ResearchStore.telemetry"
         },
         {
           "doc": "Deterministic gap analysis before the host is asked to research.",
-          "endLine": 486,
+          "endLine": 611,
           "kind": "function",
-          "line": 394,
+          "line": 519,
           "name": "classify_delta",
           "qualname": "classify_delta"
         },
         {
           "doc": null,
-          "endLine": 524,
+          "endLine": 649,
           "kind": "function",
-          "line": 489,
+          "line": 614,
           "name": "classify_requests",
           "qualname": "classify_requests"
         },
         {
           "doc": "Merge ResearchStore latest blobs into a forecast claim list.",
-          "endLine": 573,
+          "endLine": 699,
           "kind": "function",
-          "line": 528,
+          "line": 653,
           "name": "merge_latest_store_claims",
           "qualname": "merge_latest_store_claims"
         },
         {
           "doc": "Pull still-valid stored claims so forecast does not research from zero.",
-          "endLine": 597,
+          "endLine": 726,
           "kind": "function",
-          "line": 577,
+          "line": 703,
           "name": "hydrate_reused_claims",
           "qualname": "hydrate_reused_claims"
         }
@@ -14874,5 +14890,5 @@
   "parseErrors": [],
   "root": "src",
   "schema": "pillars_dcm.code_inventory.v1",
-  "symbolCount": 1606
+  "symbolCount": 1608
 }

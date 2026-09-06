@@ -3,9 +3,9 @@
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
 - Modules: **228**
-- Symbols: **1606**
+- Symbols: **1608**
 - Parse errors: **0**
-- Inventory hash: `15962e469f7bb491d85d6e1b3e95076daa49aec30a68e2be9c6002d16df3c123`
+- Inventory hash: `af5c82ab05671a8724ed286afdf6f1179329018e8aaa3816ceae93a58ea69b94`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -161,7 +161,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P1 | `src/dcm/research/provider.py` | 4 | 17 |
 | P1 | `src/dcm/research/readiness.py` | 0 | 4 |
 | P1 | `src/dcm/research/requests.py` | 0 | 6 |
-| P1 | `src/dcm/research/research_store.py` | 1 | 27 |
+| P1 | `src/dcm/research/research_store.py` | 1 | 29 |
 | P1 | `src/dcm/research/role_epoch.py` | 1 | 27 |
 | P1 | `src/dcm/research/scopes.py` | 0 | 6 |
 | P1 | `src/dcm/research/source_catalog.py` | 0 | 6 |
@@ -1630,15 +1630,15 @@ _No class/function symbols._
 
 ### `src/dcm/research/gridiron_gamelog.py`
 
-- `function` **parse_pct** L127 — Parse 71 or '71%' into 0.71. Already-fractional values in [0, 1] stay.
-- `function` **_index_row** L140
-- `function` **_present** L147
-- `function` **_market_stat_ok** L151
-- `function` **normalize_gridiron_log** L174 — Return a canonical gridiron log, or None if opportunity cannot be resolved.
-- `method` **normalize_gridiron_log._take** L186
-- `function` **normalize_gridiron_logs** L260 — Split a log list into valid canonical rows and rejected originals.
-- `function` **assert_compatible_gridiron_logs** L280 — Coverage helper: opportunity-valid logs plus market counting-stat presence.
-- `function` **looks_like_gridiron_log** L307
+- `function` **parse_pct** L151 — Parse 71 or '71%' into 0.71. Already-fractional values in [0, 1] stay.
+- `function` **_index_row** L164
+- `function` **_present** L171
+- `function` **_market_stat_ok** L175
+- `function` **normalize_gridiron_log** L198 — Return a canonical gridiron log, or None if opportunity cannot be resolved.
+- `method` **normalize_gridiron_log._take** L210
+- `function` **normalize_gridiron_logs** L285 — Split a log list into valid canonical rows and rejected originals.
+- `function` **assert_compatible_gridiron_logs** L305 — Coverage helper: opportunity-valid logs plus market counting-stat presence.
+- `function` **looks_like_gridiron_log** L332
 
 ### `src/dcm/research/historical_gap.py`
 
@@ -1826,30 +1826,32 @@ _No class/function symbols._
 - `function` **_asof_day** L58
 - `function` **game_identity** L65 — Stable sport-agnostic identity for one completed event log row.
 - `function` **extract_game_logs** L77
-- `function` **merge_game_logs** L87 — Append-only merge. First identity wins; history is never silently replaced.
-- `function` **last_verified_event** L108
-- `function` **history_gap** L121
-- `class` **ResearchStore** L138 — Filesystem content-addressed store. Git never receives raw HARs/HTML dumps.
-- `method` **ResearchStore.__init__** L141
-- `method` **ResearchStore._append_index** L155
-- `method` **ResearchStore._load_index** L159
-- `method` **ResearchStore._latest** L173
-- `method` **ResearchStore._set_latest** L182
-- `method` **ResearchStore._load_map** L187
-- `method` **ResearchStore._index_push** L196
-- `method` **ResearchStore.put_claim** L203
-- `method` **ResearchStore.put_game_logs** L258
-- `method` **ResearchStore.get** L285
-- `method` **ResearchStore.latest_for** L292
-- `method` **ResearchStore.latest_blob** L296
-- `method` **ResearchStore.prior_fields** L302 — Hydrate classify_delta `prior` from the stored blob, not the pointer.
-- `method` **ResearchStore.records_for** L335
-- `method` **ResearchStore.put_outcome** L351 — Store settlement memory separately from research validity.
-- `method` **ResearchStore.telemetry** L374
-- `function` **classify_delta** L394 — Deterministic gap analysis before the host is asked to research.
-- `function` **classify_requests** L489
-- `function` **merge_latest_store_claims** L528 — Merge ResearchStore latest blobs into a forecast claim list.
-- `function` **hydrate_reused_claims** L577 — Pull still-valid stored claims so forecast does not research from zero.
+- `function` **preserve_historical_support_fields** L88 — Copy already-observed historical support into a claim_value that omits it.
+- `function` **enrich_claim_value_from_prior_records** L143 — Return a shallow-copied claim whose claim_value keeps prior historical support.
+- `function` **merge_game_logs** L199 — Append-only merge. First identity wins; history is never silently replaced.
+- `function` **last_verified_event** L220
+- `function` **history_gap** L233
+- `class` **ResearchStore** L250 — Filesystem content-addressed store. Git never receives raw HARs/HTML dumps.
+- `method` **ResearchStore.__init__** L253
+- `method` **ResearchStore._append_index** L267
+- `method` **ResearchStore._load_index** L271
+- `method` **ResearchStore._latest** L285
+- `method` **ResearchStore._set_latest** L294
+- `method` **ResearchStore._load_map** L299
+- `method` **ResearchStore._index_push** L308
+- `method` **ResearchStore.put_claim** L315
+- `method` **ResearchStore.put_game_logs** L383
+- `method` **ResearchStore.get** L410
+- `method` **ResearchStore.latest_for** L417
+- `method` **ResearchStore.latest_blob** L421
+- `method` **ResearchStore.prior_fields** L427 — Hydrate classify_delta `prior` from the stored blob, not the pointer.
+- `method` **ResearchStore.records_for** L460
+- `method` **ResearchStore.put_outcome** L476 — Store settlement memory separately from research validity.
+- `method` **ResearchStore.telemetry** L499
+- `function` **classify_delta** L519 — Deterministic gap analysis before the host is asked to research.
+- `function` **classify_requests** L614
+- `function` **merge_latest_store_claims** L653 — Merge ResearchStore latest blobs into a forecast claim list.
+- `function` **hydrate_reused_claims** L703 — Pull still-valid stored claims so forecast does not research from zero.
 
 ### `src/dcm/research/role_epoch.py`
 
