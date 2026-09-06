@@ -1,10 +1,10 @@
 {
   "schema": "pillars_dcm.program_status.v1",
-  "updatedAtUtc": "2026-09-06T04:38:47Z",
-  "activePromotionBranch": "task/compact-boardstore-soa-20260906",
+  "updatedAtUtc": "2026-09-06T04:55:00Z",
+  "activePromotionBranch": "perf/baseline-profile-20260906",
   "targetPromotionBranch": "main",
-  "lastMergedPullRequest": 38,
-  "lastMergedCommit": "8fdd520c388bebcb6090fe1742a6d1d52d18e254",
+  "lastMergedPullRequest": 39,
+  "lastMergedCommit": "86dcd6065f32ac53c5ae552d919eb5f4dc854b4c",
   "lastGreenCiRun": 273,
   "canonicalIntegrationBranch": "integration/v6-ml-architecture-20260830",
   "canonicalIntegrationPr": 18,
@@ -182,8 +182,8 @@
       "current": 8,
       "state": "STRONG_PARTIAL",
       "next": [
-        "profile BoardStore/SoA path on representative CFB boards (Phase 9)",
-        "measured CPU/RSS/token certification; host-performance remains uncertified"
+        "Phase 11 NumPy EventWorld accel using baseline hotspot evidence",
+        "host-performance remains uncertified until representative real-evidence SLOs"
       ]
     },
     {
@@ -239,12 +239,12 @@
     "noSilentDowngrades": true,
     "noSilentCompletionClaims": true
   },
-  "activeBranch": "task/compact-boardstore-soa-20260906",
+  "activeBranch": "perf/baseline-profile-20260906",
   "activePullRequest": null,
   "latestPass": {
-    "id": "20260906T043847Z_grok_compact-boardstore-soa",
+    "id": "20260906T045500Z_grok_baseline-profile",
     "commit": null,
-    "branch": "task/compact-boardstore-soa-20260906",
+    "branch": "perf/baseline-profile-20260906",
     "targetBranch": "main",
     "pullRequest": null,
     "mainTouched": false,
@@ -254,8 +254,13 @@
       "contentHash": "9f33cf08b34a826cab8df0106da6e2e38fa2dc6a032c4ec321f68e53c36862e7",
       "root": "src"
     },
-    "summary": "BoardStore single-copy SoA indexes + compact Feature/Parameter matrices",
-    "next": "Phase 9 profiling on representative boards; wire matrices where producers already numerical"
+    "summary": "Phase 9 baseline profiler + committed JSON/MD timings; EventWorld is top hotspot",
+    "next": "Phase 11 NumPy-first EventWorld acceleration; keep hostPerformanceCertified=false",
+    "baselineArtifacts": [
+      "docs/benchmarks/baseline_profile_20260906.json",
+      "docs/benchmarks/baseline_profile_20260906.md"
+    ],
+    "hostPerformanceCertified": false
   },
   "executionClosureGates": {
     "G0_SESSION_TRUTH": "PASS",
@@ -311,7 +316,8 @@
   "claims": {
     "learningRevision": "LR000000",
     "predictiveClaim": "NONE",
-    "productionRootCertified": false
+    "productionRootCertified": false,
+    "hostPerformanceCertified": false
   },
   "requirementLedger": {
     "path": "docs/requirements/REQUIREMENT_LEDGER.v1.json",
@@ -320,6 +326,6 @@
     "baseMainSha": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
     "pass": "20260906T040000Z_grok_requirement-ledger-v1"
   },
-  "currentBoundedIncrement": "P0-COMPACT-BOARDSTORE-SOA-20260906",
-  "notes": "Phase 7\u20138 two-representation BoardStore: single-copy audit rows + int32/NumPy SoA indexes; SQLite keys+row_id only; compact Feature/Parameter matrices with audit boundary conversion. BoardIndexes API preserved. Host-performance certification and primary-path matrix wiring deferred to Phase 9 profiling."
+  "currentBoundedIncrement": "P0-BASELINE-PROFILE-20260906",
+  "notes": "Phase 9 baseline profiling committed under docs/benchmarks/. Synthetic BoardStore/compact/EventWorld matrix measured; hostPerformanceCertified remains false. Top hotspot: CFB EventWorld joint sample (~24.7s for 8 players \u00d7 10000 worlds). No C++ / native code in this phase."
 }

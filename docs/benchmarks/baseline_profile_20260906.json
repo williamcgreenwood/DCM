@@ -1,0 +1,709 @@
+{
+  "boardSizes": [
+    100,
+    1000,
+    4000,
+    10000
+  ],
+  "boardStore": [
+    {
+      "boardRows": 100,
+      "build": {
+        "CPUSeconds": 0.25470820699999996,
+        "PeakRSSBytesObserved": 41152512,
+        "QualityGateState": "INSTRUMENTED_NOT_CERTIFIED",
+        "Stage": "board_store_build",
+        "WallSeconds": 0.046420958009548485,
+        "boardRows": 100,
+        "compactN": 100,
+        "hostPerformanceCertified": false,
+        "inputBytes": 54187,
+        "inputRows": 100,
+        "pythonTracemallocPeakBytes": 670842,
+        "sqlitePayloadDuplicated": false
+      },
+      "hostPerformanceCertified": false,
+      "outputHash": "b591b228c58e9f8adaafdbb574e43df82e3f303b7dec4a57790568544501daa9",
+      "query": {
+        "CPUSeconds": 0.0008146490000000561,
+        "PeakRSSBytesObserved": 41152512,
+        "QualityGateState": "INSTRUMENTED_NOT_CERTIFIED",
+        "Stage": "board_store_query",
+        "WallSeconds": 0.000815114937722683,
+        "boardRows": 100,
+        "eventLookups": 3,
+        "eventRowIdsReturned": 100,
+        "exactOfferHits": 50,
+        "exactOfferLookups": 50,
+        "hostPerformanceCertified": false,
+        "outputRows": 100,
+        "pythonTracemallocPeakBytes": 7135
+      },
+      "sqliteBytes": 57344,
+      "stageGroup": "BoardStore"
+    },
+    {
+      "boardRows": 1000,
+      "build": {
+        "CPUSeconds": 0.10831787500000012,
+        "PeakRSSBytesObserved": 46284800,
+        "QualityGateState": "INSTRUMENTED_NOT_CERTIFIED",
+        "Stage": "board_store_build",
+        "WallSeconds": 0.10831665003206581,
+        "boardRows": 1000,
+        "compactN": 1000,
+        "hostPerformanceCertified": false,
+        "inputBytes": 547359,
+        "inputRows": 1000,
+        "pythonTracemallocPeakBytes": 1908410,
+        "sqlitePayloadDuplicated": false
+      },
+      "hostPerformanceCertified": false,
+      "outputHash": "10da7cba54c9004e4b13dd9c39922e2f3c303d09d7f464eb57fd760a80cc62fa",
+      "query": {
+        "CPUSeconds": 0.0019253070000000427,
+        "PeakRSSBytesObserved": 46284800,
+        "QualityGateState": "INSTRUMENTED_NOT_CERTIFIED",
+        "Stage": "board_store_query",
+        "WallSeconds": 0.0019262880086898804,
+        "boardRows": 1000,
+        "eventLookups": 25,
+        "eventRowIdsReturned": 1000,
+        "exactOfferHits": 50,
+        "exactOfferLookups": 50,
+        "hostPerformanceCertified": false,
+        "outputRows": 1000,
+        "pythonTracemallocPeakBytes": 11329
+      },
+      "sqliteBytes": 237568,
+      "stageGroup": "BoardStore"
+    },
+    {
+      "boardRows": 4000,
+      "build": {
+        "CPUSeconds": 0.4327854550000001,
+        "PeakRSSBytesObserved": 65888256,
+        "QualityGateState": "INSTRUMENTED_NOT_CERTIFIED",
+        "Stage": "board_store_build",
+        "WallSeconds": 0.4327910029096529,
+        "boardRows": 4000,
+        "compactN": 4000,
+        "hostPerformanceCertified": false,
+        "inputBytes": 2201854,
+        "inputRows": 4000,
+        "pythonTracemallocPeakBytes": 7631737,
+        "sqlitePayloadDuplicated": false
+      },
+      "hostPerformanceCertified": false,
+      "outputHash": "bbb1620543d3aef96f17bfbd1b58b5bdfb182a5ab97dc207c0e1f21709c87644",
+      "query": {
+        "CPUSeconds": 0.0028667880000001755,
+        "PeakRSSBytesObserved": 65888256,
+        "QualityGateState": "INSTRUMENTED_NOT_CERTIFIED",
+        "Stage": "board_store_query",
+        "WallSeconds": 0.0028691060142591596,
+        "boardRows": 4000,
+        "eventLookups": 40,
+        "eventRowIdsReturned": 1600,
+        "exactOfferHits": 50,
+        "exactOfferLookups": 50,
+        "hostPerformanceCertified": false,
+        "outputRows": 1600,
+        "pythonTracemallocPeakBytes": 11913
+      },
+      "sqliteBytes": 843776,
+      "stageGroup": "BoardStore"
+    },
+    {
+      "boardRows": 10000,
+      "build": {
+        "CPUSeconds": 1.1116035860000002,
+        "PeakRSSBytesObserved": 105463808,
+        "QualityGateState": "INSTRUMENTED_NOT_CERTIFIED",
+        "Stage": "board_store_build",
+        "WallSeconds": 1.1116657560924068,
+        "boardRows": 10000,
+        "compactN": 10000,
+        "hostPerformanceCertified": false,
+        "inputBytes": 5522844,
+        "inputRows": 10000,
+        "pythonTracemallocPeakBytes": 18675319,
+        "sqlitePayloadDuplicated": false
+      },
+      "hostPerformanceCertified": false,
+      "outputHash": "5f66b2d64bd889c47f8da08515c691ed144e2f0fb83f5bc9cc4f59955d000243",
+      "query": {
+        "CPUSeconds": 0.002651962999999924,
+        "PeakRSSBytesObserved": 105463808,
+        "QualityGateState": "INSTRUMENTED_NOT_CERTIFIED",
+        "Stage": "board_store_query",
+        "WallSeconds": 0.00265564804431051,
+        "boardRows": 10000,
+        "eventLookups": 40,
+        "eventRowIdsReturned": 1600,
+        "exactOfferHits": 50,
+        "exactOfferLookups": 50,
+        "hostPerformanceCertified": false,
+        "outputRows": 1600,
+        "pythonTracemallocPeakBytes": 14289
+      },
+      "sqliteBytes": 2084864,
+      "stageGroup": "BoardStore"
+    }
+  ],
+  "bytesReadWrite": {
+    "boardInputBytesApprox": [
+      {
+        "boardRows": 100,
+        "inputBytes": 54187
+      },
+      {
+        "boardRows": 1000,
+        "inputBytes": 547359
+      },
+      {
+        "boardRows": 4000,
+        "inputBytes": 2201854
+      },
+      {
+        "boardRows": 10000,
+        "inputBytes": 5522844
+      }
+    ],
+    "note": "Synthetic in-process only; no production HAR I/O in this harness."
+  },
+  "cacheAndDag": {
+    "cacheHits": 94,
+    "cacheMisses": 26,
+    "hostPerformanceCertified": false,
+    "invalidatedKeysHead": [
+      "3ad035f5f958d656153f21d8396f330d413dde2091b803794a0b752537643920",
+      "81f8329b8d278bdf20d89bd5496d65c1865c19c6aa288acabb61190be29e0046",
+      "bd196defe95e374c7ebeb22951c0436339c873c2b4046bedd05d34039dc1d450",
+      "522af1919fd6f98e22cf2c7f3115c13e54e1126a12f1964381a660a7ec161273"
+    ],
+    "invalidatedNodes": 4,
+    "pendingAfter": 4,
+    "reusedNodesAfter": 116,
+    "reusedNodesBefore": 120,
+    "stageGroup": "CacheAndDag"
+  },
+  "capturedAtUtc": "2026-09-06T04:53:24Z",
+  "certificationBlocker": "SYNTHETIC_BASELINE_NOT_PRODUCTION_CERTIFICATION",
+  "certificationEligible": false,
+  "compact": [
+    {
+      "boardRows": 100,
+      "dictLineSum": {
+        "CPUSeconds": 0.0003617339999997249,
+        "PeakRSSBytesObserved": 105463808,
+        "QualityGateState": "INSTRUMENTED_NOT_CERTIFIED",
+        "Stage": "compact_dict_line_sum",
+        "WallSeconds": 0.0003617570037022233,
+        "boardRows": 100,
+        "hostPerformanceCertified": false,
+        "iterations": 50,
+        "lineSum": 6000.0,
+        "pythonTracemallocPeakBytes": 752
+      },
+      "featureMatrix": {
+        "CPUSeconds": 0.00036182099999981787,
+        "PeakRSSBytesObserved": 105463808,
+        "QualityGateState": "INSTRUMENTED_NOT_CERTIFIED",
+        "Stage": "feature_matrix_pack",
+        "WallSeconds": 0.0003619299968704581,
+        "boardRows": 100,
+        "hostPerformanceCertified": false,
+        "matrixBytes": 3200,
+        "pythonTracemallocPeakBytes": 16064,
+        "shape": [
+          100,
+          4
+        ]
+      },
+      "featureRowMeans": {
+        "CPUSeconds": 0.00023788400000013254,
+        "PeakRSSBytesObserved": 105463808,
+        "QualityGateState": "INSTRUMENTED_NOT_CERTIFIED",
+        "Stage": "feature_matrix_row_means",
+        "WallSeconds": 0.00023807806428521872,
+        "boardRows": 100,
+        "finiteMeans": 100,
+        "hostPerformanceCertified": false,
+        "pythonTracemallocPeakBytes": 9832
+      },
+      "fromRows": {
+        "CPUSeconds": 0.0018588519999997999,
+        "PeakRSSBytesObserved": 105463808,
+        "QualityGateState": "INSTRUMENTED_NOT_CERTIFIED",
+        "Stage": "compact_board_from_rows",
+        "WallSeconds": 0.001860989024862647,
+        "boardRows": 100,
+        "hostPerformanceCertified": false,
+        "pythonTracemallocPeakBytes": 21206
+      },
+      "hostPerformanceCertified": false,
+      "outputHash": "a7bfb0ec2d0ee55199cb006507645cf938145bd5c492201676e967f3526a17df",
+      "parameterMatrix": {
+        "CPUSeconds": 0.0014833090000001548,
+        "PeakRSSBytesObserved": 105463808,
+        "QualityGateState": "INSTRUMENTED_NOT_CERTIFIED",
+        "Stage": "parameter_matrix_pack",
+        "WallSeconds": 0.0014834069879725575,
+        "boardRows": 100,
+        "hostPerformanceCertified": false,
+        "matrixBytes": 10400,
+        "pythonTracemallocPeakBytes": 50360,
+        "shape": [
+          100,
+          13
+        ]
+      },
+      "soaLineSum": {
+        "CPUSeconds": 0.0004257560000002769,
+        "PeakRSSBytesObserved": 105463808,
+        "QualityGateState": "INSTRUMENTED_NOT_CERTIFIED",
+        "Stage": "compact_line_sum_soa",
+        "WallSeconds": 0.0004259749548509717,
+        "boardRows": 100,
+        "hostPerformanceCertified": false,
+        "iterations": 50,
+        "lineSum": 6000.0,
+        "pythonTracemallocPeakBytes": 1732
+      },
+      "soaVsDictSpeedup": 0.84924477268572,
+      "stageGroup": "CompactMatrix"
+    },
+    {
+      "boardRows": 1000,
+      "dictLineSum": {
+        "CPUSeconds": 0.0018998310000002405,
+        "PeakRSSBytesObserved": 105463808,
+        "QualityGateState": "INSTRUMENTED_NOT_CERTIFIED",
+        "Stage": "compact_dict_line_sum",
+        "WallSeconds": 0.0018996279686689377,
+        "boardRows": 1000,
+        "hostPerformanceCertified": false,
+        "iterations": 50,
+        "lineSum": 135000.0,
+        "pythonTracemallocPeakBytes": 648
+      },
+      "featureMatrix": {
+        "CPUSeconds": 0.0034151750000002146,
+        "PeakRSSBytesObserved": 105463808,
+        "QualityGateState": "INSTRUMENTED_NOT_CERTIFIED",
+        "Stage": "feature_matrix_pack",
+        "WallSeconds": 0.0034146609250456095,
+        "boardRows": 1000,
+        "hostPerformanceCertified": false,
+        "matrixBytes": 32000,
+        "pythonTracemallocPeakBytes": 162508,
+        "shape": [
+          1000,
+          4
+        ]
+      },
+      "featureRowMeans": {
+        "CPUSeconds": 0.0002305850000001719,
+        "PeakRSSBytesObserved": 105463808,
+        "QualityGateState": "INSTRUMENTED_NOT_CERTIFIED",
+        "Stage": "feature_matrix_row_means",
+        "WallSeconds": 0.0002304209629073739,
+        "boardRows": 1000,
+        "finiteMeans": 1000,
+        "hostPerformanceCertified": false,
+        "pythonTracemallocPeakBytes": 81448
+      },
+      "fromRows": {
+        "CPUSeconds": 0.017256307999999887,
+        "PeakRSSBytesObserved": 105463808,
+        "QualityGateState": "INSTRUMENTED_NOT_CERTIFIED",
+        "Stage": "compact_board_from_rows",
+        "WallSeconds": 0.01725605397950858,
+        "boardRows": 1000,
+        "hostPerformanceCertified": false,
+        "pythonTracemallocPeakBytes": 193967
+      },
+      "hostPerformanceCertified": false,
+      "outputHash": "4e86ddac46bbc6f9f1ff22143db4d86878794019bd4d38187c96ff90398f8519",
+      "parameterMatrix": {
+        "CPUSeconds": 0.014485430000000132,
+        "PeakRSSBytesObserved": 105463808,
+        "QualityGateState": "INSTRUMENTED_NOT_CERTIFIED",
+        "Stage": "parameter_matrix_pack",
+        "WallSeconds": 0.014484067098237574,
+        "boardRows": 1000,
+        "hostPerformanceCertified": false,
+        "matrixBytes": 104000,
+        "pythonTracemallocPeakBytes": 497824,
+        "shape": [
+          1000,
+          13
+        ]
+      },
+      "soaLineSum": {
+        "CPUSeconds": 0.0005069599999996122,
+        "PeakRSSBytesObserved": 105463808,
+        "QualityGateState": "INSTRUMENTED_NOT_CERTIFIED",
+        "Stage": "compact_line_sum_soa",
+        "WallSeconds": 0.0005069620674476027,
+        "boardRows": 1000,
+        "hostPerformanceCertified": false,
+        "iterations": 50,
+        "lineSum": 135000.0,
+        "pythonTracemallocPeakBytes": 9712
+      },
+      "soaVsDictSpeedup": 3.747081074986492,
+      "stageGroup": "CompactMatrix"
+    },
+    {
+      "boardRows": 4000,
+      "dictLineSum": {
+        "CPUSeconds": 0.007703561000000025,
+        "PeakRSSBytesObserved": 105463808,
+        "QualityGateState": "INSTRUMENTED_NOT_CERTIFIED",
+        "Stage": "compact_dict_line_sum",
+        "WallSeconds": 0.007702384958975017,
+        "boardRows": 4000,
+        "hostPerformanceCertified": false,
+        "iterations": 50,
+        "lineSum": 540000.0,
+        "pythonTracemallocPeakBytes": 592
+      },
+      "featureMatrix": {
+        "CPUSeconds": 0.015314433999999988,
+        "PeakRSSBytesObserved": 105463808,
+        "QualityGateState": "INSTRUMENTED_NOT_CERTIFIED",
+        "Stage": "feature_matrix_pack",
+        "WallSeconds": 0.015329057001508772,
+        "boardRows": 4000,
+        "hostPerformanceCertified": false,
+        "matrixBytes": 128000,
+        "pythonTracemallocPeakBytes": 626988,
+        "shape": [
+          4000,
+          4
+        ]
+      },
+      "featureRowMeans": {
+        "CPUSeconds": 0.00037984000000035323,
+        "PeakRSSBytesObserved": 105463808,
+        "QualityGateState": "INSTRUMENTED_NOT_CERTIFIED",
+        "Stage": "feature_matrix_row_means",
+        "WallSeconds": 0.00037982803769409657,
+        "boardRows": 4000,
+        "finiteMeans": 4000,
+        "hostPerformanceCertified": false,
+        "pythonTracemallocPeakBytes": 258928
+      },
+      "fromRows": {
+        "CPUSeconds": 0.07269323799999983,
+        "PeakRSSBytesObserved": 105463808,
+        "QualityGateState": "INSTRUMENTED_NOT_CERTIFIED",
+        "Stage": "compact_board_from_rows",
+        "WallSeconds": 0.07270101096946746,
+        "boardRows": 4000,
+        "hostPerformanceCertified": false,
+        "pythonTracemallocPeakBytes": 797231
+      },
+      "hostPerformanceCertified": false,
+      "outputHash": "3783cb73290f89d91c882ccf0fdb26e4d3c05a0b3bd463315929843273cb7c39",
+      "parameterMatrix": {
+        "CPUSeconds": 0.05844803399999998,
+        "PeakRSSBytesObserved": 105463808,
+        "QualityGateState": "INSTRUMENTED_NOT_CERTIFIED",
+        "Stage": "parameter_matrix_pack",
+        "WallSeconds": 0.058445366099476814,
+        "boardRows": 4000,
+        "hostPerformanceCertified": false,
+        "matrixBytes": 416000,
+        "pythonTracemallocPeakBytes": 1986152,
+        "shape": [
+          4000,
+          13
+        ]
+      },
+      "soaLineSum": {
+        "CPUSeconds": 0.0007210009999996103,
+        "PeakRSSBytesObserved": 105463808,
+        "QualityGateState": "INSTRUMENTED_NOT_CERTIFIED",
+        "Stage": "compact_line_sum_soa",
+        "WallSeconds": 0.0007209520554170012,
+        "boardRows": 4000,
+        "hostPerformanceCertified": false,
+        "iterations": 50,
+        "lineSum": 540000.0,
+        "pythonTracemallocPeakBytes": 36664
+      },
+      "soaVsDictSpeedup": 10.683629932256633,
+      "stageGroup": "CompactMatrix"
+    },
+    {
+      "boardRows": 10000,
+      "dictLineSum": {
+        "CPUSeconds": 0.021859901000000015,
+        "PeakRSSBytesObserved": 105463808,
+        "QualityGateState": "INSTRUMENTED_NOT_CERTIFIED",
+        "Stage": "compact_dict_line_sum",
+        "WallSeconds": 0.021858723019249737,
+        "boardRows": 10000,
+        "hostPerformanceCertified": false,
+        "iterations": 50,
+        "lineSum": 1350000.0,
+        "pythonTracemallocPeakBytes": 560
+      },
+      "featureMatrix": {
+        "CPUSeconds": 0.03597684999999995,
+        "PeakRSSBytesObserved": 105463808,
+        "QualityGateState": "INSTRUMENTED_NOT_CERTIFIED",
+        "Stage": "feature_matrix_pack",
+        "WallSeconds": 0.03597516694571823,
+        "boardRows": 10000,
+        "hostPerformanceCertified": false,
+        "matrixBytes": 320000,
+        "pythonTracemallocPeakBytes": 1563044,
+        "shape": [
+          10000,
+          4
+        ]
+      },
+      "featureRowMeans": {
+        "CPUSeconds": 0.0006389140000000459,
+        "PeakRSSBytesObserved": 105463808,
+        "QualityGateState": "INSTRUMENTED_NOT_CERTIFIED",
+        "Stage": "feature_matrix_row_means",
+        "WallSeconds": 0.0006387389730662107,
+        "boardRows": 10000,
+        "finiteMeans": 10000,
+        "hostPerformanceCertified": false,
+        "pythonTracemallocPeakBytes": 587512
+      },
+      "fromRows": {
+        "CPUSeconds": 0.1873572160000001,
+        "PeakRSSBytesObserved": 105463808,
+        "QualityGateState": "INSTRUMENTED_NOT_CERTIFIED",
+        "Stage": "compact_board_from_rows",
+        "WallSeconds": 0.1873559959931299,
+        "boardRows": 10000,
+        "hostPerformanceCertified": false,
+        "pythonTracemallocPeakBytes": 1909607
+      },
+      "hostPerformanceCertified": false,
+      "outputHash": "cc18807facab3f0f427533f573494cc437265f5a36e8a64bdeac8a10bdebc9b2",
+      "parameterMatrix": {
+        "CPUSeconds": 0.14962967700000007,
+        "PeakRSSBytesObserved": 105463808,
+        "QualityGateState": "INSTRUMENTED_NOT_CERTIFIED",
+        "Stage": "parameter_matrix_pack",
+        "WallSeconds": 0.1496450490085408,
+        "boardRows": 10000,
+        "hostPerformanceCertified": false,
+        "matrixBytes": 1040000,
+        "pythonTracemallocPeakBytes": 4970392,
+        "shape": [
+          10000,
+          13
+        ]
+      },
+      "soaLineSum": {
+        "CPUSeconds": 0.0010798819999999765,
+        "PeakRSSBytesObserved": 105463808,
+        "QualityGateState": "INSTRUMENTED_NOT_CERTIFIED",
+        "Stage": "compact_line_sum_soa",
+        "WallSeconds": 0.0010822369949892163,
+        "boardRows": 10000,
+        "hostPerformanceCertified": false,
+        "iterations": 50,
+        "lineSum": 1350000.0,
+        "pythonTracemallocPeakBytes": 90616
+      },
+      "soaVsDictSpeedup": 20.197722976072853,
+      "stageGroup": "CompactMatrix"
+    }
+  ],
+  "engineeringFixtureOnly": true,
+  "eventWorld": [
+    {
+      "hostPerformanceCertified": false,
+      "outputHash": "01516a19fc3ab683613defb4a058148e61e722c8aefcbf05d3cb8074ced502de",
+      "playerCount": 8,
+      "stageGroup": "CFBEventWorld",
+      "timing": {
+        "CPUSeconds": 0.16043465700000015,
+        "PeakRSSBytesObserved": 105463808,
+        "QualityGateState": "INSTRUMENTED_NOT_CERTIFIED",
+        "Stage": "cfb_event_world_joint",
+        "WallSeconds": 0.1604446329874918,
+        "allocationMode": "JOINT_TEAM",
+        "conservationFailures": 42,
+        "hostPerformanceCertified": false,
+        "inputRows": 8,
+        "outputRows": 512,
+        "playerCount": 8,
+        "playerWorldsPerWallSecond": 3191.1319840777433,
+        "pythonTracemallocPeakBytes": 579026,
+        "worldCount": 64,
+        "worldsPerWallSecond": 398.8914980097179
+      },
+      "worldCount": 64
+    },
+    {
+      "hostPerformanceCertified": false,
+      "outputHash": "90a5283afe464a09070dea6b7fe9e790cf886180870feee6b5c32b7ede3c63aa",
+      "playerCount": 8,
+      "stageGroup": "CFBEventWorld",
+      "timing": {
+        "CPUSeconds": 0.3305919620000002,
+        "PeakRSSBytesObserved": 105463808,
+        "QualityGateState": "INSTRUMENTED_NOT_CERTIFIED",
+        "Stage": "cfb_event_world_joint",
+        "WallSeconds": 0.33063100394792855,
+        "allocationMode": "JOINT_TEAM",
+        "conservationFailures": 90,
+        "hostPerformanceCertified": false,
+        "inputRows": 8,
+        "outputRows": 1024,
+        "playerCount": 8,
+        "playerWorldsPerWallSecond": 3097.1082196552593,
+        "pythonTracemallocPeakBytes": 1110530,
+        "worldCount": 128,
+        "worldsPerWallSecond": 387.1385274569074
+      },
+      "worldCount": 128
+    },
+    {
+      "hostPerformanceCertified": false,
+      "outputHash": "67bea661ba7fb3b0b04bde9e8c439d4f6bf23ff35a3ad209686ae28a778c38da",
+      "playerCount": 8,
+      "stageGroup": "CFBEventWorld",
+      "timing": {
+        "CPUSeconds": 1.331770991,
+        "PeakRSSBytesObserved": 105463808,
+        "QualityGateState": "INSTRUMENTED_NOT_CERTIFIED",
+        "Stage": "cfb_event_world_joint",
+        "WallSeconds": 1.3318594050360844,
+        "allocationMode": "JOINT_TEAM",
+        "conservationFailures": 379,
+        "hostPerformanceCertified": false,
+        "inputRows": 8,
+        "outputRows": 4096,
+        "playerCount": 8,
+        "playerWorldsPerWallSecond": 3075.399688970193,
+        "pythonTracemallocPeakBytes": 4301218,
+        "worldCount": 512,
+        "worldsPerWallSecond": 384.4249611212741
+      },
+      "worldCount": 512
+    },
+    {
+      "hostPerformanceCertified": false,
+      "outputHash": "2a59e0730bb0705d47ff68ce0b9d335f5a0ccab5079446d555c14b5f235e533f",
+      "playerCount": 8,
+      "stageGroup": "CFBEventWorld",
+      "timing": {
+        "CPUSeconds": 5.019042805000001,
+        "PeakRSSBytesObserved": 105463808,
+        "QualityGateState": "INSTRUMENTED_NOT_CERTIFIED",
+        "Stage": "cfb_event_world_joint",
+        "WallSeconds": 5.019388788030483,
+        "allocationMode": "JOINT_TEAM",
+        "conservationFailures": 1561,
+        "hostPerformanceCertified": false,
+        "inputRows": 8,
+        "outputRows": 16384,
+        "playerCount": 8,
+        "playerWorldsPerWallSecond": 3264.1424467995403,
+        "pythonTracemallocPeakBytes": 17073250,
+        "worldCount": 2048,
+        "worldsPerWallSecond": 408.01780584994253
+      },
+      "worldCount": 2048
+    },
+    {
+      "hostPerformanceCertified": false,
+      "outputHash": "ad168048a095f5d7ae972fd960132b007a876702ba3571a0ef0ee5c576631871",
+      "playerCount": 8,
+      "stageGroup": "CFBEventWorld",
+      "timing": {
+        "CPUSeconds": 24.661132006000003,
+        "PeakRSSBytesObserved": 230580224,
+        "QualityGateState": "INSTRUMENTED_NOT_CERTIFIED",
+        "Stage": "cfb_event_world_joint",
+        "WallSeconds": 24.664285097969696,
+        "allocationMode": "JOINT_TEAM",
+        "conservationFailures": 7519,
+        "hostPerformanceCertified": false,
+        "inputRows": 8,
+        "outputRows": 80000,
+        "playerCount": 8,
+        "playerWorldsPerWallSecond": 3243.5564088814967,
+        "pythonTracemallocPeakBytes": 83150242,
+        "worldCount": 10000,
+        "worldsPerWallSecond": 405.4445511101871
+      },
+      "worldCount": 10000
+    }
+  ],
+  "eventWorldPlayers": 8,
+  "host": {
+    "cpuCount": 8,
+    "memAvailableBytes": 6341488640,
+    "numpy": "2.5.2",
+    "peakRssBytesObserved": 230580224,
+    "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+    "python": "3.13.5"
+  },
+  "hostPerformanceCertified": false,
+  "hotspots": [
+    {
+      "evidence": "simulate_joint_cfb_event_worlds players=8 worlds=10000: wall=24.6643s cpu=24.6611s (405.4 worlds/s)",
+      "id": "CFB_EVENTWORLD_JOINT_SAMPLE",
+      "module": "dcm.cfb.event_worlds.simulate_joint_cfb_event_worlds",
+      "rank": 1,
+      "recommendation": "Phase 11: NumPy-vectorize team play / residual allocation and per-player sample_football draws first; C ABI challenger only after a measured NumPy win on the same synthetic matrix.",
+      "wallSeconds": 24.664285097969696
+    },
+    {
+      "evidence": "BoardStore build n=10000: wall=1.1117s cpu=1.1116s sqliteBytes=2084864",
+      "id": "BOARDSTORE_BUILD_INDEXES",
+      "module": "dcm.board_store.BoardStore",
+      "rank": 2,
+      "recommendation": "Keep SoA posting lists; avoid reintroducing per-row JSON payload. Further accel only if representative CFB boards (>4k offers) show build dominating end-to-end wall.",
+      "wallSeconds": 1.1116657560924068
+    },
+    {
+      "evidence": "CompactNumericBoard.from_board_rows n=10000: wall=0.1874s; line_sum SoA=0.001082s vs dict=0.021859s (speedup=20.197722976072853)",
+      "id": "COMPACT_MATRIX_PACK_AND_REDUCE",
+      "module": "dcm.compact",
+      "rank": 3,
+      "recommendation": "Prefer CompactNumericBoard / FeatureMatrix on numerical hot paths; audit boundary conversion only at I/O edges.",
+      "wallSeconds": 0.1873559959931299
+    }
+  ],
+  "reproducibleCommand": "python benchmarks/baseline/profile_baseline.py --board-sizes 100 1000 4000 10000 --world-sizes 64 128 512 2048 10000 --players 8 --out docs/benchmarks",
+  "requestedBoardSizes": [
+    100,
+    1000,
+    4000,
+    10000
+  ],
+  "requestedWorldSizes": [
+    64,
+    128,
+    512,
+    2048,
+    10000
+  ],
+  "schema": "pillars_dcm.baseline_profile.v1",
+  "skippedSizes": {
+    "board": [],
+    "world": []
+  },
+  "worldSizes": [
+    64,
+    128,
+    512,
+    2048,
+    10000
+  ]
+}
