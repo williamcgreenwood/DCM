@@ -84,6 +84,118 @@ def extract_game_logs(payload: Any) -> list[dict[str, Any]]:
     return []
 
 
+
+def preserve_historical_support_fields(
+    target: dict[str, Any],
+    source: dict[str, Any],
+) -> dict[str, Any]:
+    """Copy already-observed historical support into a claim_value that omits it.
+
+    Never invents logs — only preserves non-empty fields already stored on a
+    prior claim_value (game_logs, priorSeason_*, opportunity/efficiency support).
+    Destination keys win when already populated.
+    """
+    if not isinstance(target, dict):
+        target = {}
+    if not isinstance(source, dict):
+        return dict(target)
+    out = dict(target)
+
+    if not extract_game_logs(out):
+        logs = extract_game_logs(source)
+        if logs:
+            if "game_logs" in source or "gameLogs" not in source:
+                out["game_logs"] = list(logs)
+            else:
+                out["gameLogs"] = list(logs)
+        role_logs = source.get("role_epoch_logs")
+        if isinstance(role_logs, list) and role_logs and not out.get("role_epoch_logs"):
+            out["role_epoch_logs"] = list(role_logs)
+
+    for key, value in source.items():
+        key_s = str(key)
+        if not (key_s.startswith("priorSeason") or key_s.startswith("game_logs_sample")):
+            continue
+        if key in out and out.get(key) not in (None, "", [], {}):
+            continue
+        if value in (None, "", [], {}):
+            continue
+        out[key] = value
+
+    for key in ("opportunity", "efficiency"):
+        src = source.get(key)
+        if not isinstance(src, dict) or not src:
+            continue
+        dst = out.get(key)
+        if not isinstance(dst, dict) or not dst:
+            out[key] = dict(src)
+            continue
+        merged = dict(src)
+        merged.update({k: v for k, v in dst.items() if v not in (None, "", [], {})})
+        for sk, sv in src.items():
+            if sk not in merged or merged.get(sk) in (None, "", [], {}):
+                merged[sk] = sv
+        out[key] = merged
+
+    return out
+
+
+def enrich_claim_value_from_prior_records(
+    claim: dict[str, Any],
+    store: "ResearchStore",
+    *,
+    scope: str,
+    scope_id: str,
+) -> dict[str, Any]:
+    """Return a shallow-copied claim whose claim_value keeps prior historical support."""
+    if not isinstance(claim, dict):
+        return claim
+    out = dict(claim)
+    value = out.get("claim_value") if isinstance(out.get("claim_value"), dict) else {}
+    value = dict(value)
+    needs_logs = not extract_game_logs(value)
+    needs_prior_season = not any(str(k).startswith("priorSeason") for k in value)
+    needs_support = not (
+        isinstance(value.get("opportunity"), dict) and value.get("opportunity")
+    ) and not (
+        isinstance(value.get("efficiency"), dict) and value.get("efficiency")
+    )
+    if not (needs_logs or needs_prior_season or needs_support):
+        return out
+
+    records = store.records_for(scope, scope_id) if store is not None else []
+    # Newest-first so we prefer the most recent prior blob that still carries history.
+    for rec in reversed(list(records or [])):
+        if not isinstance(rec, dict):
+            continue
+        prior_claim = rec.get("claim") if isinstance(rec.get("claim"), dict) else None
+        if not isinstance(prior_claim, dict):
+            continue
+        prior_hash = str(prior_claim.get("claim_hash") or rec.get("contentHash") or "")
+        self_hash = str(out.get("claim_hash") or "")
+        if prior_hash and self_hash and prior_hash == self_hash:
+            continue
+        prior_value = prior_claim.get("claim_value") if isinstance(prior_claim.get("claim_value"), dict) else {}
+        if not prior_value:
+            continue
+        if not extract_game_logs(prior_value) and not any(
+            str(k).startswith("priorSeason") for k in prior_value
+        ) and not (
+            isinstance(prior_value.get("opportunity"), dict) and prior_value.get("opportunity")
+        ) and not (
+            isinstance(prior_value.get("efficiency"), dict) and prior_value.get("efficiency")
+        ):
+            continue
+        value = preserve_historical_support_fields(value, prior_value)
+        needs_logs = not extract_game_logs(value)
+        if not needs_logs:
+            # Logs are the critical regression; stop once restored.
+            break
+
+    out["claim_value"] = value
+    return out
+
+
 def merge_game_logs(existing: list[dict[str, Any]], incoming: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     """Append-only merge. First identity wins; history is never silently replaced."""
     seen: dict[str, dict[str, Any]] = {}
@@ -211,6 +323,19 @@ class ResearchStore:
         kind = canonical_scope(entity_kind or str(claim.get("semantic_scope") or ""))
         entity_id = str(claim.get("scope_id") or "")
         asof = as_of or str(claim.get("forecast_cutoff") or claim.get("observed_at") or "")
+        # Volatile status/context claims must not hide already-stored historical logs.
+        claim = dict(claim)
+        value = claim.get("claim_value") if isinstance(claim.get("claim_value"), dict) else None
+        if isinstance(value, dict) and entity_id and not extract_game_logs(value):
+            prior_blob = self.latest_blob(kind, entity_id)
+            prior_claim = (prior_blob or {}).get("claim") if isinstance(prior_blob, dict) else None
+            prior_value = (
+                prior_claim.get("claim_value")
+                if isinstance(prior_claim, dict) and isinstance(prior_claim.get("claim_value"), dict)
+                else {}
+            )
+            if prior_value:
+                claim["claim_value"] = preserve_historical_support_fields(dict(value), prior_value)
         payload = {
             "schema": STORE_SCHEMA,
             "sport": sport,
@@ -564,6 +689,7 @@ def merge_latest_store_claims(
         claim = (blob or {}).get("claim") if isinstance(blob, dict) else None
         if not isinstance(claim, dict):
             continue
+        claim = enrich_claim_value_from_prior_records(claim, store, scope=scope, scope_id=scope_id)
         digest = str(claim.get("claim_hash") or (blob or {}).get("contentHash") or "")
         if digest and digest in seen:
             continue
@@ -584,10 +710,13 @@ def hydrate_reused_claims(
     for rec in classified:
         if rec.get("acquire"):
             continue
-        blob = store.latest_blob(str(rec.get("scope") or ""), str(rec.get("scope_id") or ""))
+        scope = str(rec.get("scope") or "")
+        scope_id = str(rec.get("scope_id") or "")
+        blob = store.latest_blob(scope, scope_id)
         claim = (blob or {}).get("claim") if isinstance(blob, dict) else None
         if not isinstance(claim, dict):
             continue
+        claim = enrich_claim_value_from_prior_records(claim, store, scope=scope, scope_id=scope_id)
         digest = str(claim.get("claim_hash") or (blob or {}).get("contentHash") or "")
         if digest and digest in seen:
             continue
