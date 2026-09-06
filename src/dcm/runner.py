@@ -552,13 +552,15 @@ def run_dcm(
             if str(r.get("sportFamily") or "") == "gridiron"
             and str(r.get("league") or "").upper() in {"CFB", "CFB1H"}
         )
-        cfb_execution = cfb_row_count >= 1000 or (
-            cfb_row_count > 0
-            and {
-                str(r.get("league") or "").upper()
-                for r in rows
-                if str(r.get("league") or "").strip()
-            } <= {"CFB"}
+        _leagues = {
+            str(r.get("league") or "").upper()
+            for r in rows
+            if str(r.get("league") or "").strip()
+        }
+        cfb_execution = cfb_row_count > 0 and (
+            cfb_row_count >= 1000
+            or _leagues <= {"CFB", "CFB1H"}
+            or cfb_row_count >= max(100, (len(rows) + 1) // 2)
         )
         offer_recovery = (
             recover_offer_metadata(rows, planned["requests"], cutoff=forecast_cutoff)
@@ -677,13 +679,15 @@ def run_dcm(
         if str(r.get("sportFamily") or "") == "gridiron"
         and str(r.get("league") or "").upper() in {"CFB", "CFB1H"}
     )
-    cfb_execution = cfb_row_count >= 1000 or (
-        cfb_row_count > 0
-        and {
-            str(r.get("league") or "").upper()
-            for r in rows
-            if str(r.get("league") or "").strip()
-        } <= {"CFB"}
+    _leagues = {
+        str(r.get("league") or "").upper()
+        for r in rows
+        if str(r.get("league") or "").strip()
+    }
+    cfb_execution = cfb_row_count > 0 and (
+        cfb_row_count >= 1000
+        or _leagues <= {"CFB", "CFB1H"}
+        or cfb_row_count >= max(100, (len(rows) + 1) // 2)
     )
     offer_recovery = recover_offer_metadata(rows, requests, cutoff=forecast_cutoff) if not synthetic and cfb_execution else {"claims": [], "recovered": 0, "unresolved": [], "requested": 0, "recoveryComplete": True, "source": "SYNTHETIC_DISABLED"}
     if offer_recovery["claims"]:
