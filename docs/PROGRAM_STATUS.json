@@ -1,10 +1,10 @@
 {
   "schema": "pillars_dcm.program_status.v1",
-  "updatedAtUtc": "2026-09-06T03:27:02Z",
+  "updatedAtUtc": "2026-09-06T03:48:16Z",
   "activePromotionBranch": "main",
   "targetPromotionBranch": "main",
-  "lastMergedPullRequest": 33,
-  "lastMergedCommit": "24007ef5bd6af38d44f6f004eb19300bb0fc07ab",
+  "lastMergedPullRequest": 34,
+  "lastMergedCommit": "b0e44d5886adb98cb84dbf466ee3a3fc1fee28b1",
   "lastGreenCiRun": 273,
   "canonicalIntegrationBranch": "integration/v6-ml-architecture-20260830",
   "canonicalIntegrationPr": 18,
@@ -240,22 +240,23 @@
     "noSilentDowngrades": true,
     "noSilentCompletionClaims": true
   },
-  "activeBranch": "task/cfb-grouped-research-20260905",
-  "activePullRequest": 34,
+  "activeBranch": "refactor/src-dcm-package-layout",
+  "activePullRequest": null,
   "latestPass": {
-    "id": "20260906T023500Z_grok_pr34-phase1-repair",
-    "commit": "be4647633f26ce31be244733ae7d9f3ff8ddddda",
-    "branch": "task/cfb-grouped-research-20260905",
+    "id": "20260906T034800Z_grok_src-dcm-package-layout",
+    "commit": "7f573cf",
+    "branch": "refactor/src-dcm-package-layout",
     "targetBranch": "main",
-    "pullRequest": 34,
+    "pullRequest": null,
     "mainTouched": false,
     "inventory": {
-      "modules": 287,
-      "symbols": 2054,
-      "contentHash": "a426152e282f36bcd650cfe2df445d60456929d116cc782a5c3777a08d4b6c95"
+      "modules": 221,
+      "symbols": 1520,
+      "contentHash": "e65fbeb60369b4d8fab721f5c2e79a385ae56dd72b50310a1ef4d768b43d2ef3",
+      "root": "src"
     },
-    "summary": "source-aware-import repair + split observation_execute modules; inventory regen",
-    "next": "merge PR #34 after green CI, then live HAR evidence-import"
+    "summary": "Behavior-preserving relocate production package to src/dcm; TS UI to web/src; archive remains fixtures/docs only",
+    "next": "Merge src layout PR after green python-dcm; then continue CFB live HAR evidence-import"
   },
   "executionClosureGates": {
     "G0_SESSION_TRUTH": "PASS",

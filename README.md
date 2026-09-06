@@ -10,6 +10,11 @@ Phase B/C V1 expected SHA-256 `6e78dacc19843338643bdcabc7477fd3ce2dd065da1e96296
 
 Python is the single canonical DCM. The TypeScript operator console must not implement a second model.
 
+
+## Operator UI
+
+The TypeScript operator console lives under `web/src` (moved out of top-level `src/` so the Python package can own `src/dcm`). Vite/TanStack resolve `@/*` to `web/src/*`.
+
 ## Install
 
 ```bash
@@ -23,7 +28,7 @@ After install, `pillars-dcm`, `python -m dcm`, and `python -m pillars_dcm` work 
 Without install (legacy):
 
 ```bash
-PYTHONPATH=artifacts/dcm_v6_workstream_ab python3 -m dcm.runner --help
+python3 -m dcm.runner --help
 ```
 
 ## Tests
@@ -31,7 +36,7 @@ PYTHONPATH=artifacts/dcm_v6_workstream_ab python3 -m dcm.runner --help
 ```bash
 pytest -q
 # or
-PYTHONPATH=artifacts/dcm_v6_workstream_ab python3 -m pytest -q artifacts/dcm_v6_workstream_ab/tests
+python3 -m pytest -q tests
 ```
 
 CI uses `DCM_FAST_WORLDS=64` (and related caps) so Monte Carlo stays bounded.

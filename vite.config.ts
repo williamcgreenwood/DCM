@@ -12,7 +12,7 @@ import { grokPwaPlugin } from "./scripts/grok-pwa-plugin.mjs";
 import { appEnvPlugin } from "./scripts/app-env-plugin.mjs";
 import { isMigrationFile } from "./scripts/migration-plan.mjs";
 
-/** The files `src/lib/db.ts` globs — same directory, same non-recursive scope. */
+/** The files `web/src/lib/db.ts` globs — same directory, same non-recursive scope. */
 function hasGlobbedMigrations(root: string): boolean {
   try {
     return readdirSync(join(root, "migrations")).some(isMigrationFile);
@@ -28,7 +28,7 @@ function pgliteBootstrapPlugin(): Plugin {
     async configureServer(server) {
       if (!hasGlobbedMigrations(server.config.root)) return;
       try {
-        const mod = (await server.ssrLoadModule("/src/lib/db.ts")) as {
+        const mod = (await server.ssrLoadModule("/web/src/lib/db.ts")) as {
           ensureDbReady?: () => Promise<void>;
         };
         if (typeof mod.ensureDbReady === "function") {
@@ -77,7 +77,7 @@ function authPopupPlugin(): Plugin {
           }
           if (!requestHeaders.has("host")) requestHeaders.set("host", host);
           const request = new Request(`${proto}://${host}${rawUrl}`, { method: "GET", headers: requestHeaders });
-          const mod = (await server.ssrLoadModule("/src/lib/auth/popup.server.ts")) as {
+          const mod = (await server.ssrLoadModule("/web/src/lib/auth/popup.server.ts")) as {
             handleAuthPopupRequest: (req: Request) => Promise<Response>;
           };
           const response = await mod.handleAuthPopupRequest(request);
@@ -125,7 +125,7 @@ export default defineConfig(({ command, isPreview }) => ({
     appEnvPlugin(),
     grokPwaPlugin(),
     tailwindcss(),
-    tanstackStart(),
+    tanstackStart({ srcDirectory: "web/src" }),
     ...(command === "build" || isPreview
       ? [
           nitro({

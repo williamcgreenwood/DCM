@@ -22,9 +22,9 @@ def test_algorithm_registry_hash_from_committed_bytes():
     assert blob == catalog_bytes()
     digest = hashlib.sha256(blob).hexdigest()
     assert algorithm_registry_sha256() == digest
-    pkg_copy = ROOT / "artifacts" / "dcm_v6_workstream_ab" / "dcm" / "algorithms" / "data" / "algorithm_registry.json"
+    pkg_copy = ROOT / "src" / "dcm" / "algorithms" / "data" / "algorithm_registry.json"
     assert pkg_copy.read_bytes() == blob
-    source = (ROOT / "artifacts" / "dcm_v6_workstream_ab" / "dcm" / "algorithms" / "registry.py").read_text(encoding="utf-8")
+    source = (ROOT / "src" / "dcm" / "algorithms" / "registry.py").read_text(encoding="utf-8")
     assert "bba7b082bf67e12d87e675ac58d5b6f96d9cbad9b6a487a0aa157bf7cef9e599" not in source
     assert digest not in source
     records = load_algorithm_registry()

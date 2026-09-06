@@ -201,16 +201,20 @@ Never set `hostPerformanceCertified=true` without measured evidence.
   upload and must read back the exact object hash.
 
 Primary Python package:
-`artifacts/dcm_v6_workstream_ab/dcm`
+`src/dcm`
 
 Primary tests:
-`artifacts/dcm_v6_workstream_ab/tests`
+`tests/`
 
-Standard validation from `artifacts/dcm_v6_workstream_ab`:
+Historical archive (fixtures/docs only; not the install root):
+`artifacts/dcm_v6_workstream_ab`
+
+Standard validation from repo root:
 
 ```bash
-python -m compileall -q dcm tests
-PYTHONPATH=. DCM_FAST_WORLDS=64 DCM_SERIOUS_WORLDS=128 pytest -q
+python -m pip install -e ".[dev]"
+python -m compileall -q src/dcm tests
+DCM_FAST_WORLDS=64 DCM_SERIOUS_WORLDS=128 pytest -q
 ```
 
 ## Agent reporting

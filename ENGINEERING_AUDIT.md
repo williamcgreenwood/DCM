@@ -3,7 +3,7 @@
 Date: 2026-08-29 (PT) / 2026-08-30 UTC
 Branch: `grok/v6-live-har-production` from `chatgpt/v6-production-completion-20260828` @ `795e545`
 Canonical tree: `/workspace/DCM-repo`
-Canonical engine: `artifacts/dcm_v6_workstream_ab/dcm` (Python). Not `/workspace/pillars-dcm`.
+Canonical engine: `src/dcm` (Python). Historical archive: `artifacts/dcm_v6_workstream_ab`. Not `/workspace/pillars-dcm`.
 
 Learning Revision: **LR000000** (not promoted)
 Predictive claim: **NONE**

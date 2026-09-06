@@ -24,13 +24,13 @@
     "baseUrl": ".",
     "paths": {
       "@/*": [
-        "./src/*"
+        "./web/src/*"
       ]
     },
     "allowImportingTsExtensions": true
   },
   "include": [
-    "src",
+    "web/src",
     "server"
   ]
 }
