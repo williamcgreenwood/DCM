@@ -47,3 +47,35 @@ def test_bare_position_still_uncertain() -> None:
     state = resolve_cfb_role_state({"role": "WR", "status": "ACTIVE"})
     assert state["resolved"] is False
     assert state["primary"] == "ROLE_UNCERTAIN"
+
+
+def test_opportunity_role_wr1_te1_tokens() -> None:
+    wr = resolve_cfb_role_state(
+        {
+            "role": "WR",
+            "opportunity": {"role": "WR1"},
+            "game_logs": [{"date": f"2025-09-{i:02d}", "receptions": 3} for i in range(1, 12)],
+        }
+    )
+    assert wr["resolved"] is True
+    assert wr["primary"] == "RETURNING_STARTER"
+    te = resolve_cfb_role_state(
+        {
+            "role": "TE",
+            "opportunity": {"role": "TE1"},
+            "game_logs": [{"date": f"2025-09-{i:02d}", "receptions": 2} for i in range(1, 12)],
+        }
+    )
+    assert te["resolved"] is True
+    assert te["primary"] == "RETURNING_STARTER"
+
+
+def test_wr1_candidate_stays_uncertain() -> None:
+    state = resolve_cfb_role_state(
+        {
+            "role": "WR",
+            "opportunity": {"role": "WR1_candidate"},
+            "game_logs": [{"date": f"2025-09-{i:02d}", "receptions": 3} for i in range(1, 12)],
+        }
+    )
+    assert state["resolved"] is False

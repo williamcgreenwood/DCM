@@ -81,18 +81,21 @@ def resolve_cfb_role_state(player: dict[str, Any], *, role: str | None = None) -
     # Host observations often encode starter/rotation in opportunity.role /
     # depth_chart rather than depth_chart_role. Consume those cues; do not invent.
     snap_share = str(opportunity.get("snap_share_expected") or player.get("snap_share_expected") or "").lower()
+    rank_tokens = {"qb1", "rb1", "wr1", "te1", "k1"}
     if not current_starter and (
         "starter" in snap_share
         or "majority" in snap_share
         or "starting_" in opp_role
+        or "starting_" in opp_depth
         or opp_role.startswith("featured_")
         or "starter" in opp_role
         or str(opportunity.get("pass_attempts_role") or "").upper() in {"QB1", "STARTER"}
         or str(opportunity.get("rush_attempts_role") or "").upper() in {"RB1", "STARTER"}
-        or opp_depth in {"qb1", "rb1", "wr1", "te1", "k1"}
+        or opp_depth in rank_tokens
+        or opp_role in rank_tokens
     ):
         current_starter = True
-        depth = depth or opp_depth or "starter"
+        depth = depth or (opp_role if opp_role in rank_tokens else "") or opp_depth or "starter"
     if not current_rotation and ("rotation" in opp_role or "committee" in opp_role or "backup" in opp_role):
         current_rotation = True
         if not current_starter:
