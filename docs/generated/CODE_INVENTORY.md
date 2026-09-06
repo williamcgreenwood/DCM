@@ -2,10 +2,10 @@
 
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
-- Modules: **223**
-- Symbols: **1542**
+- Modules: **225**
+- Symbols: **1590**
 - Parse errors: **0**
-- Inventory hash: `9886c0a5423dd80ea1e1140d4708ec2f6271e95695edbd551a2e7b8cb4613866`
+- Inventory hash: `9f33cf08b34a826cab8df0106da6e2e38fa2dc6a032c4ec321f68e53c36862e7`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -29,6 +29,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P16 | `src/dcm/algorithms/sorting.py` | 1 | 17 |
 | P16 | `src/dcm/algorithms/telemetry.py` | 1 | 5 |
 | UNMAPPED | `src/dcm/archive.py` | 0 | 2 |
+| UNMAPPED | `src/dcm/board_store.py` | 1 | 23 |
 | UNMAPPED | `src/dcm/cfb/__init__.py` | 0 | 1 |
 | UNMAPPED | `src/dcm/cfb/accounting.py` | 0 | 3 |
 | UNMAPPED | `src/dcm/cfb/champion.py` | 0 | 3 |
@@ -53,6 +54,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P7 | `src/dcm/chat/research_bridge.py` | 0 | 1 |
 | P7 | `src/dcm/chat/session.py` | 1 | 18 |
 | P7 | `src/dcm/chat/state.py` | 0 | 4 |
+| UNMAPPED | `src/dcm/compact.py` | 4 | 20 |
 | P0 | `src/dcm/contracts/__init__.py` | 0 | 0 |
 | P0 | `src/dcm/contracts/codes.py` | 1 | 0 |
 | P0 | `src/dcm/contracts/failure_codes.py` | 0 | 0 |
@@ -533,6 +535,33 @@ _No class/function symbols._
 - `function` **_find_repo_root** L23
 - `function` **main** L33
 
+### `src/dcm/board_store.py`
+
+- `class` **BoardStore** L27 — Single-copy board with SoA indexes. No repeated full-board linear scans.
+- `method` **BoardStore.__init__** L30
+- `method` **BoardStore.row** L145
+- `method` **BoardStore.exact_offer** L150
+- `method` **BoardStore.offer_by_id_map** L164 — Legacy-compatible view: offer_id → audit row (same dict objects, no copy).
+- `method` **BoardStore.rows_for** L168
+- `method` **BoardStore.offer_ids_for** L171
+- `method` **BoardStore.row_ids_for_event** L176
+- `method` **BoardStore.row_ids_for_subject** L179
+- `method` **BoardStore.row_ids_for_affiliation** L182
+- `method` **BoardStore.row_ids_for_market** L185
+- `method` **BoardStore.offer_ids_for_event** L188
+- `method` **BoardStore.offer_ids_for_subject** L191
+- `method` **BoardStore.offer_ids_for_affiliation** L194
+- `method` **BoardStore.offer_ids_for_market** L197
+- `method` **BoardStore.legacy_string_indexes** L200 — BoardIndexes-compatible posting lists (string offer IDs).
+- `method` **BoardStore.lookup_composite** L210
+- `method` **BoardStore.sqlite_event_offers** L223
+- `method` **BoardStore.sqlite_has_payload_column** L235
+- `method` **BoardStore.might_have_offer** L240
+- `method` **BoardStore.mapping_audit** L243 — Stable ID mapping summary for audits / PROGRAM_STATUS.
+- `method` **BoardStore.close** L261
+- `function` **board_store_matches_index_semantics** L268 — Compare BoardStore lookups to BoardIndexes string-index semantics.
+- `method` **board_store_matches_index_semantics._same** L278
+
 ### `src/dcm/cfb/__init__.py`
 
 - `function` **__getattr__** L19
@@ -702,6 +731,33 @@ _No class/function symbols._
 - `function` **read_json** L17
 - `function` **write_json** L23
 - `function` **default_host_state** L28
+
+### `src/dcm/compact.py`
+
+- `class` **IdMap** L23 — Bidirectional string ↔ int32 registry. Stable insertion order.
+- `method` **IdMap.intern** L29
+- `method` **IdMap.get** L43
+- `method` **IdMap.resolve** L49
+- `method` **IdMap.__len__** L54
+- `method` **IdMap.strings** L58
+- `method` **IdMap.to_audit** L61
+- `class` **CompactNumericBoard** L71 — Structure-of-arrays hot columns aligned by row_id (int32 index).
+- `method` **CompactNumericBoard.empty** L93
+- `method` **CompactNumericBoard.from_board_rows** L111 — Build SoA columns from auditable board row dicts (one pass).
+- `method` **CompactNumericBoard.fill_from_grade_rows** L135 — Overlay mean/reliability/fragility/ood from graded rows. Returns fills.
+- `method` **CompactNumericBoard.line_sum** L157 — Microbench-friendly SoA reduction (ignores NaN).
+- `method` **CompactNumericBoard.to_audit_row** L164 — Boundary conversion: compact row → auditable dict.
+- `class` **FeatureMatrix** L186 — Dense feature matrix (entities × named numerical features).
+- `method` **FeatureMatrix.shape** L196
+- `method` **FeatureMatrix.to_audit_records** L199 — Public/audit boundary: expand matrix back to typed feature dicts.
+- `class` **ParameterMatrix** L219 — Dense parameter fields aligned to offer (or subject) IDs.
+- `method` **ParameterMatrix.shape** L228
+- `method` **ParameterMatrix.to_audit_snapshots** L231
+- `function` **feature_matrix_from_records** L261 — Pack already-numerical FeatureStore records into a dense matrix.
+- `function` **parameter_matrix_from_snapshots** L301 — Pack numerical fields from parameter snapshots into a dense matrix.
+- `function` **round_trip_id_maps** L335 — Verify string↔int32 maps round-trip for every populated row.
+- `function` **_as_float** L367
+- `function` **_finite_or_none** L375
 
 ### `src/dcm/contracts/__init__.py`
 
@@ -1572,27 +1628,27 @@ _No class/function symbols._
 
 ### `src/dcm/research/indexes.py`
 
-- `class` **BoardIndexes** L30 — Exact indexes over a frozen board. No repeated full-board linear scans.
-- `method` **BoardIndexes.__init__** L33
-- `method` **BoardIndexes.exact_offer** L104
-- `method` **BoardIndexes.lookup_composite** L115
-- `method` **BoardIndexes.sqlite_event_offers** L128
-- `method` **BoardIndexes.might_have_offer** L133
-- `method` **BoardIndexes.alias_hits** L137
-- `method` **BoardIndexes.fts_rank** L141 — BM25 over player names. Never used to rediscover known offer IDs.
-- `method` **BoardIndexes.fuzzy_player** L163
-- `method` **BoardIndexes.near_duplicate_names** L184
-- `method` **BoardIndexes.requirement_bitmaps** L209
-- `method` **BoardIndexes.query_retrieval_cascade** L222 — Exact-first then lexical/fuzzy/near-dup fusion. Never embeddings for known IDs.
-- `method` **BoardIndexes.resolve_identities** L290 — Exact-first identity. Known projectionId → hash lookup → done.
-- `method` **BoardIndexes.close** L377
-- `class` **EvidenceIndexes** L384 — Exact reusable-evidence lookup. Web acquisition is last.
-- `method` **EvidenceIndexes.__init__** L387
-- `method` **EvidenceIndexes.add** L397
-- `method` **EvidenceIndexes.lookup_scope** L413
-- `method` **EvidenceIndexes.has_hash** L418
-- `method` **EvidenceIndexes.close** L424
-- `function` **requirement_offer_bitmaps** L431 — Reverse index Requirement → Offers as Python bitsets plus id lists.
+- `class` **BoardIndexes** L34 — Exact indexes over a frozen board. No repeated full-board linear scans.
+- `method` **BoardIndexes.__init__** L41
+- `method` **BoardIndexes.exact_offer** L86
+- `method` **BoardIndexes.lookup_composite** L98
+- `method` **BoardIndexes.sqlite_event_offers** L111
+- `method` **BoardIndexes.might_have_offer** L116
+- `method` **BoardIndexes.alias_hits** L120
+- `method` **BoardIndexes.fts_rank** L124 — BM25 over player names. Never used to rediscover known offer IDs.
+- `method` **BoardIndexes.fuzzy_player** L146
+- `method` **BoardIndexes.near_duplicate_names** L167
+- `method` **BoardIndexes.requirement_bitmaps** L192
+- `method` **BoardIndexes.query_retrieval_cascade** L205 — Exact-first then lexical/fuzzy/near-dup fusion. Never embeddings for known IDs.
+- `method` **BoardIndexes.resolve_identities** L273 — Exact-first identity. Known projectionId → hash lookup → done.
+- `method` **BoardIndexes.close** L360
+- `class` **EvidenceIndexes** L367 — Exact reusable-evidence lookup. Web acquisition is last.
+- `method` **EvidenceIndexes.__init__** L370
+- `method` **EvidenceIndexes.add** L380
+- `method` **EvidenceIndexes.lookup_scope** L396
+- `method` **EvidenceIndexes.has_hash** L401
+- `method` **EvidenceIndexes.close** L407
+- `function` **requirement_offer_bitmaps** L414 — Reverse index Requirement → Offers as Python bitsets plus id lists.
 
 ### `src/dcm/research/lineup.py`
 

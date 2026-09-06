@@ -1,6 +1,6 @@
 {
-  "contentHash": "9886c0a5423dd80ea1e1140d4708ec2f6271e95695edbd551a2e7b8cb4613866",
-  "moduleCount": 223,
+  "contentHash": "9f33cf08b34a826cab8df0106da6e2e38fa2dc6a032c4ec321f68e53c36862e7",
+  "moduleCount": 225,
   "modules": [
     {
       "classes": 0,
@@ -2060,6 +2060,207 @@
       "workstream": "UNMAPPED"
     },
     {
+      "classes": 1,
+      "functions": 23,
+      "path": "src/dcm/board_store.py",
+      "sha256": "0e668471f8c3c1abbf0f4dd6d2f13bb710f2122b11923d3c95333e0adc8827df",
+      "symbols": [
+        {
+          "doc": "Single-copy board with SoA indexes. No repeated full-board linear scans.",
+          "endLine": 265,
+          "kind": "class",
+          "line": 27,
+          "name": "BoardStore",
+          "qualname": "BoardStore"
+        },
+        {
+          "doc": null,
+          "endLine": 141,
+          "kind": "method",
+          "line": 30,
+          "name": "__init__",
+          "qualname": "BoardStore.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 148,
+          "kind": "method",
+          "line": 145,
+          "name": "row",
+          "qualname": "BoardStore.row"
+        },
+        {
+          "doc": null,
+          "endLine": 162,
+          "kind": "method",
+          "line": 150,
+          "name": "exact_offer",
+          "qualname": "BoardStore.exact_offer"
+        },
+        {
+          "doc": "Legacy-compatible view: offer_id \u2192 audit row (same dict objects, no copy).",
+          "endLine": 166,
+          "kind": "method",
+          "line": 164,
+          "name": "offer_by_id_map",
+          "qualname": "BoardStore.offer_by_id_map"
+        },
+        {
+          "doc": null,
+          "endLine": 169,
+          "kind": "method",
+          "line": 168,
+          "name": "rows_for",
+          "qualname": "BoardStore.rows_for"
+        },
+        {
+          "doc": null,
+          "endLine": 172,
+          "kind": "method",
+          "line": 171,
+          "name": "offer_ids_for",
+          "qualname": "BoardStore.offer_ids_for"
+        },
+        {
+          "doc": null,
+          "endLine": 177,
+          "kind": "method",
+          "line": 176,
+          "name": "row_ids_for_event",
+          "qualname": "BoardStore.row_ids_for_event"
+        },
+        {
+          "doc": null,
+          "endLine": 180,
+          "kind": "method",
+          "line": 179,
+          "name": "row_ids_for_subject",
+          "qualname": "BoardStore.row_ids_for_subject"
+        },
+        {
+          "doc": null,
+          "endLine": 183,
+          "kind": "method",
+          "line": 182,
+          "name": "row_ids_for_affiliation",
+          "qualname": "BoardStore.row_ids_for_affiliation"
+        },
+        {
+          "doc": null,
+          "endLine": 186,
+          "kind": "method",
+          "line": 185,
+          "name": "row_ids_for_market",
+          "qualname": "BoardStore.row_ids_for_market"
+        },
+        {
+          "doc": null,
+          "endLine": 189,
+          "kind": "method",
+          "line": 188,
+          "name": "offer_ids_for_event",
+          "qualname": "BoardStore.offer_ids_for_event"
+        },
+        {
+          "doc": null,
+          "endLine": 192,
+          "kind": "method",
+          "line": 191,
+          "name": "offer_ids_for_subject",
+          "qualname": "BoardStore.offer_ids_for_subject"
+        },
+        {
+          "doc": null,
+          "endLine": 195,
+          "kind": "method",
+          "line": 194,
+          "name": "offer_ids_for_affiliation",
+          "qualname": "BoardStore.offer_ids_for_affiliation"
+        },
+        {
+          "doc": null,
+          "endLine": 198,
+          "kind": "method",
+          "line": 197,
+          "name": "offer_ids_for_market",
+          "qualname": "BoardStore.offer_ids_for_market"
+        },
+        {
+          "doc": "BoardIndexes-compatible posting lists (string offer IDs).",
+          "endLine": 208,
+          "kind": "method",
+          "line": 200,
+          "name": "legacy_string_indexes",
+          "qualname": "BoardStore.legacy_string_indexes"
+        },
+        {
+          "doc": null,
+          "endLine": 221,
+          "kind": "method",
+          "line": 210,
+          "name": "lookup_composite",
+          "qualname": "BoardStore.lookup_composite"
+        },
+        {
+          "doc": null,
+          "endLine": 233,
+          "kind": "method",
+          "line": 223,
+          "name": "sqlite_event_offers",
+          "qualname": "BoardStore.sqlite_event_offers"
+        },
+        {
+          "doc": null,
+          "endLine": 238,
+          "kind": "method",
+          "line": 235,
+          "name": "sqlite_has_payload_column",
+          "qualname": "BoardStore.sqlite_has_payload_column"
+        },
+        {
+          "doc": null,
+          "endLine": 241,
+          "kind": "method",
+          "line": 240,
+          "name": "might_have_offer",
+          "qualname": "BoardStore.might_have_offer"
+        },
+        {
+          "doc": "Stable ID mapping summary for audits / PROGRAM_STATUS.",
+          "endLine": 259,
+          "kind": "method",
+          "line": 243,
+          "name": "mapping_audit",
+          "qualname": "BoardStore.mapping_audit"
+        },
+        {
+          "doc": null,
+          "endLine": 265,
+          "kind": "method",
+          "line": 261,
+          "name": "close",
+          "qualname": "BoardStore.close"
+        },
+        {
+          "doc": "Compare BoardStore lookups to BoardIndexes string-index semantics.",
+          "endLine": 306,
+          "kind": "function",
+          "line": 268,
+          "name": "board_store_matches_index_semantics",
+          "qualname": "board_store_matches_index_semantics"
+        },
+        {
+          "doc": null,
+          "endLine": 283,
+          "kind": "method",
+          "line": 278,
+          "name": "_same",
+          "qualname": "board_store_matches_index_semantics._same"
+        }
+      ],
+      "workstream": "UNMAPPED"
+    },
+    {
       "classes": 0,
       "functions": 1,
       "path": "src/dcm/cfb/__init__.py",
@@ -3040,6 +3241,207 @@
         }
       ],
       "workstream": "P7"
+    },
+    {
+      "classes": 4,
+      "functions": 20,
+      "path": "src/dcm/compact.py",
+      "sha256": "f4ce084ccc66626c3a7770b1324bd4b7616ebdedf93182ea67f0152640686702",
+      "symbols": [
+        {
+          "doc": "Bidirectional string \u2194 int32 registry. Stable insertion order.",
+          "endLine": 67,
+          "kind": "class",
+          "line": 23,
+          "name": "IdMap",
+          "qualname": "IdMap"
+        },
+        {
+          "doc": null,
+          "endLine": 41,
+          "kind": "method",
+          "line": 29,
+          "name": "intern",
+          "qualname": "IdMap.intern"
+        },
+        {
+          "doc": null,
+          "endLine": 47,
+          "kind": "method",
+          "line": 43,
+          "name": "get",
+          "qualname": "IdMap.get"
+        },
+        {
+          "doc": null,
+          "endLine": 52,
+          "kind": "method",
+          "line": 49,
+          "name": "resolve",
+          "qualname": "IdMap.resolve"
+        },
+        {
+          "doc": null,
+          "endLine": 55,
+          "kind": "method",
+          "line": 54,
+          "name": "__len__",
+          "qualname": "IdMap.__len__"
+        },
+        {
+          "doc": null,
+          "endLine": 59,
+          "kind": "method",
+          "line": 58,
+          "name": "strings",
+          "qualname": "IdMap.strings"
+        },
+        {
+          "doc": null,
+          "endLine": 67,
+          "kind": "method",
+          "line": 61,
+          "name": "to_audit",
+          "qualname": "IdMap.to_audit"
+        },
+        {
+          "doc": "Structure-of-arrays hot columns aligned by row_id (int32 index).",
+          "endLine": 182,
+          "kind": "class",
+          "line": 71,
+          "name": "CompactNumericBoard",
+          "qualname": "CompactNumericBoard"
+        },
+        {
+          "doc": null,
+          "endLine": 108,
+          "kind": "method",
+          "line": 93,
+          "name": "empty",
+          "qualname": "CompactNumericBoard.empty"
+        },
+        {
+          "doc": "Build SoA columns from auditable board row dicts (one pass).",
+          "endLine": 133,
+          "kind": "method",
+          "line": 111,
+          "name": "from_board_rows",
+          "qualname": "CompactNumericBoard.from_board_rows"
+        },
+        {
+          "doc": "Overlay mean/reliability/fragility/ood from graded rows. Returns fills.",
+          "endLine": 155,
+          "kind": "method",
+          "line": 135,
+          "name": "fill_from_grade_rows",
+          "qualname": "CompactNumericBoard.fill_from_grade_rows"
+        },
+        {
+          "doc": "Microbench-friendly SoA reduction (ignores NaN).",
+          "endLine": 162,
+          "kind": "method",
+          "line": 157,
+          "name": "line_sum",
+          "qualname": "CompactNumericBoard.line_sum"
+        },
+        {
+          "doc": "Boundary conversion: compact row \u2192 auditable dict.",
+          "endLine": 182,
+          "kind": "method",
+          "line": 164,
+          "name": "to_audit_row",
+          "qualname": "CompactNumericBoard.to_audit_row"
+        },
+        {
+          "doc": "Dense feature matrix (entities \u00d7 named numerical features).",
+          "endLine": 215,
+          "kind": "class",
+          "line": 186,
+          "name": "FeatureMatrix",
+          "qualname": "FeatureMatrix"
+        },
+        {
+          "doc": null,
+          "endLine": 197,
+          "kind": "method",
+          "line": 196,
+          "name": "shape",
+          "qualname": "FeatureMatrix.shape"
+        },
+        {
+          "doc": "Public/audit boundary: expand matrix back to typed feature dicts.",
+          "endLine": 215,
+          "kind": "method",
+          "line": 199,
+          "name": "to_audit_records",
+          "qualname": "FeatureMatrix.to_audit_records"
+        },
+        {
+          "doc": "Dense parameter fields aligned to offer (or subject) IDs.",
+          "endLine": 240,
+          "kind": "class",
+          "line": 219,
+          "name": "ParameterMatrix",
+          "qualname": "ParameterMatrix"
+        },
+        {
+          "doc": null,
+          "endLine": 229,
+          "kind": "method",
+          "line": 228,
+          "name": "shape",
+          "qualname": "ParameterMatrix.shape"
+        },
+        {
+          "doc": null,
+          "endLine": 240,
+          "kind": "method",
+          "line": 231,
+          "name": "to_audit_snapshots",
+          "qualname": "ParameterMatrix.to_audit_snapshots"
+        },
+        {
+          "doc": "Pack already-numerical FeatureStore records into a dense matrix.",
+          "endLine": 298,
+          "kind": "function",
+          "line": 261,
+          "name": "feature_matrix_from_records",
+          "qualname": "feature_matrix_from_records"
+        },
+        {
+          "doc": "Pack numerical fields from parameter snapshots into a dense matrix.",
+          "endLine": 332,
+          "kind": "function",
+          "line": 301,
+          "name": "parameter_matrix_from_snapshots",
+          "qualname": "parameter_matrix_from_snapshots"
+        },
+        {
+          "doc": "Verify string\u2194int32 maps round-trip for every populated row.",
+          "endLine": 364,
+          "kind": "function",
+          "line": 335,
+          "name": "round_trip_id_maps",
+          "qualname": "round_trip_id_maps"
+        },
+        {
+          "doc": null,
+          "endLine": 372,
+          "kind": "function",
+          "line": 367,
+          "name": "_as_float",
+          "qualname": "_as_float"
+        },
+        {
+          "doc": null,
+          "endLine": 380,
+          "kind": "function",
+          "line": 375,
+          "name": "_finite_or_none",
+          "qualname": "_finite_or_none"
+        }
+      ],
+      "workstream": "UNMAPPED"
     },
     {
       "classes": 0,
@@ -8520,173 +8922,173 @@
       "classes": 2,
       "functions": 19,
       "path": "src/dcm/research/indexes.py",
-      "sha256": "de0365734bd5131ffa17e84dab999fe53f62c4535b47be3fc2245f3010eeff8b",
+      "sha256": "8e3fba9dc8a751e42c7f90ee9ecfae6f839679f810606a60339e6269ec904de7",
       "symbols": [
         {
           "doc": "Exact indexes over a frozen board. No repeated full-board linear scans.",
-          "endLine": 381,
+          "endLine": 364,
           "kind": "class",
-          "line": 30,
+          "line": 34,
           "name": "BoardIndexes",
           "qualname": "BoardIndexes"
         },
         {
           "doc": null,
-          "endLine": 102,
+          "endLine": 84,
           "kind": "method",
-          "line": 33,
+          "line": 41,
           "name": "__init__",
           "qualname": "BoardIndexes.__init__"
         },
         {
           "doc": null,
-          "endLine": 113,
+          "endLine": 96,
           "kind": "method",
-          "line": 104,
+          "line": 86,
           "name": "exact_offer",
           "qualname": "BoardIndexes.exact_offer"
         },
         {
           "doc": null,
-          "endLine": 126,
+          "endLine": 109,
           "kind": "method",
-          "line": 115,
+          "line": 98,
           "name": "lookup_composite",
           "qualname": "BoardIndexes.lookup_composite"
         },
         {
           "doc": null,
-          "endLine": 131,
+          "endLine": 114,
           "kind": "method",
-          "line": 128,
+          "line": 111,
           "name": "sqlite_event_offers",
           "qualname": "BoardIndexes.sqlite_event_offers"
         },
         {
           "doc": null,
-          "endLine": 135,
+          "endLine": 118,
           "kind": "method",
-          "line": 133,
+          "line": 116,
           "name": "might_have_offer",
           "qualname": "BoardIndexes.might_have_offer"
         },
         {
           "doc": null,
-          "endLine": 139,
+          "endLine": 122,
           "kind": "method",
-          "line": 137,
+          "line": 120,
           "name": "alias_hits",
           "qualname": "BoardIndexes.alias_hits"
         },
         {
           "doc": "BM25 over player names. Never used to rediscover known offer IDs.",
-          "endLine": 161,
+          "endLine": 144,
           "kind": "method",
-          "line": 141,
+          "line": 124,
           "name": "fts_rank",
           "qualname": "BoardIndexes.fts_rank"
         },
         {
           "doc": null,
-          "endLine": 182,
+          "endLine": 165,
           "kind": "method",
-          "line": 163,
+          "line": 146,
           "name": "fuzzy_player",
           "qualname": "BoardIndexes.fuzzy_player"
         },
         {
           "doc": null,
-          "endLine": 207,
+          "endLine": 190,
           "kind": "method",
-          "line": 184,
+          "line": 167,
           "name": "near_duplicate_names",
           "qualname": "BoardIndexes.near_duplicate_names"
         },
         {
           "doc": null,
-          "endLine": 220,
+          "endLine": 203,
           "kind": "method",
-          "line": 209,
+          "line": 192,
           "name": "requirement_bitmaps",
           "qualname": "BoardIndexes.requirement_bitmaps"
         },
         {
           "doc": "Exact-first then lexical/fuzzy/near-dup fusion. Never embeddings for known IDs.",
-          "endLine": 288,
+          "endLine": 271,
           "kind": "method",
-          "line": 222,
+          "line": 205,
           "name": "query_retrieval_cascade",
           "qualname": "BoardIndexes.query_retrieval_cascade"
         },
         {
           "doc": "Exact-first identity. Known projectionId \u2192 hash lookup \u2192 done.",
-          "endLine": 375,
+          "endLine": 358,
           "kind": "method",
-          "line": 290,
+          "line": 273,
           "name": "resolve_identities",
           "qualname": "BoardIndexes.resolve_identities"
         },
         {
           "doc": null,
-          "endLine": 381,
+          "endLine": 364,
           "kind": "method",
-          "line": 377,
+          "line": 360,
           "name": "close",
           "qualname": "BoardIndexes.close"
         },
         {
           "doc": "Exact reusable-evidence lookup. Web acquisition is last.",
-          "endLine": 428,
+          "endLine": 411,
           "kind": "class",
-          "line": 384,
+          "line": 367,
           "name": "EvidenceIndexes",
           "qualname": "EvidenceIndexes"
         },
         {
           "doc": null,
-          "endLine": 395,
+          "endLine": 378,
           "kind": "method",
-          "line": 387,
+          "line": 370,
           "name": "__init__",
           "qualname": "EvidenceIndexes.__init__"
         },
         {
           "doc": null,
-          "endLine": 411,
+          "endLine": 394,
           "kind": "method",
-          "line": 397,
+          "line": 380,
           "name": "add",
           "qualname": "EvidenceIndexes.add"
         },
         {
           "doc": null,
-          "endLine": 416,
+          "endLine": 399,
           "kind": "method",
-          "line": 413,
+          "line": 396,
           "name": "lookup_scope",
           "qualname": "EvidenceIndexes.lookup_scope"
         },
         {
           "doc": null,
-          "endLine": 422,
+          "endLine": 405,
           "kind": "method",
-          "line": 418,
+          "line": 401,
           "name": "has_hash",
           "qualname": "EvidenceIndexes.has_hash"
         },
         {
           "doc": null,
-          "endLine": 428,
+          "endLine": 411,
           "kind": "method",
-          "line": 424,
+          "line": 407,
           "name": "close",
           "qualname": "EvidenceIndexes.close"
         },
         {
           "doc": "Reverse index Requirement \u2192 Offers as Python bitsets plus id lists.",
-          "endLine": 455,
+          "endLine": 438,
           "kind": "function",
-          "line": 431,
+          "line": 414,
           "name": "requirement_offer_bitmaps",
           "qualname": "requirement_offer_bitmaps"
         }
@@ -14317,5 +14719,5 @@
   "parseErrors": [],
   "root": "src",
   "schema": "pillars_dcm.code_inventory.v1",
-  "symbolCount": 1542
+  "symbolCount": 1590
 }
