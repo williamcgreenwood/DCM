@@ -1,10 +1,10 @@
 {
   "schema": "pillars_dcm.program_status.v1",
-  "updatedAtUtc": "2026-09-06T05:12:00Z",
-  "activePromotionBranch": "perf/eventworld-numpy-20260906",
+  "updatedAtUtc": "2026-09-06T05:24:00Z",
+  "activePromotionBranch": "task/cfb-e2e-synthetic-20260906",
   "targetPromotionBranch": "main",
-  "lastMergedPullRequest": 40,
-  "lastMergedCommit": "a3e28fb82cabbecc69e70cff92c36c8db938a6f1",
+  "lastMergedPullRequest": 41,
+  "lastMergedCommit": "2b021217a006847a6d79d27d77d571509f6065c4",
   "lastGreenCiRun": 273,
   "canonicalIntegrationBranch": "integration/v6-ml-architecture-20260830",
   "canonicalIntegrationPr": 18,
@@ -48,6 +48,7 @@
       "current": 9,
       "state": "STRONG_PARTIAL",
       "next": [
+        "live current-HAR operational card remains EXTERNAL after synthetic E2E",
         "import host-acquired evidence on a current CFB HAR via closed-loop path",
         "finish mixed-sport R1 remainder after CFB slice"
       ]
@@ -117,7 +118,7 @@
       "current": 8,
       "state": "STRONG_PARTIAL",
       "next": [
-        "execute closed-loop evidence-import on the current CFB HAR (ledger REQ-HOST-009.02 / REQ-EVID-011.02)",
+        "synthetic host/CFB E2E PATH_A/B green; current CFB HAR host-action batch still EXTERNAL",
         "no second engine"
       ]
     },
@@ -218,6 +219,7 @@
       "current": 9,
       "state": "STRONG_PARTIAL",
       "next": [
+        "PATH_A proved BoardStore/CELF/NumPy EventWorld on CFB launch path",
         "keep constitution CI gates green",
         "mixed-sport Research OS remainder after CFB closed-loop CELF packing",
         "do not silently retire CORE/CONDITIONAL/CHALLENGER algorithms"
@@ -239,12 +241,12 @@
     "noSilentDowngrades": true,
     "noSilentCompletionClaims": true
   },
-  "activeBranch": "perf/eventworld-numpy-20260906",
+  "activeBranch": "task/cfb-e2e-synthetic-20260906",
   "activePullRequest": null,
   "latestPass": {
-    "id": "20260906T051200Z_grok_eventworld-numpy",
+    "id": "20260906T052400Z_grok_cfb-e2e-synthetic",
     "commit": null,
-    "branch": "perf/eventworld-numpy-20260906",
+    "branch": "task/cfb-e2e-synthetic-20260906",
     "targetBranch": "main",
     "pullRequest": null,
     "mainTouched": false,
@@ -254,17 +256,18 @@
       "contentHash": "2b189a06b6724e9597abe28d7fa0e433071a4c5bffaf2051522d2d49af422c28",
       "root": "src"
     },
-    "summary": "Phase 11 NumPy EventWorld backend (~2\u00d7 vs reference, rngVersion v1 bitwise parity); hostPerformanceCertified=false",
-    "next": "Optional C ABI challenger only after real-evidence SLOs; keep hostPerformanceCertified=false",
-    "baselineArtifacts": [
-      "docs/benchmarks/eventworld_numpy_accel_20260906.json",
-      "docs/benchmarks/eventworld_numpy_accel_20260906.md",
-      "docs/benchmarks/baseline_profile_eventworld_numpy_20260906.json",
-      "docs/benchmarks/baseline_profile_eventworld_numpy_20260906.md"
-    ],
+    "summary": "Phase 15 synthetic CFB E2E (PATH_A freeze+PLAYABLE; PATH_B incomplete/conflicted; PATH_C private aggregates-only). CFB_OPERATIONAL=PARTIAL; live card EXTERNAL; LR000000/NONE unchanged.",
+    "next": "Current live HAR + host-acquired evidence for operational card; keep RECOMMENDATION_ELIGIBLE/PREDICTIVE_CERTIFIED deferred",
+    "paths": {
+      "A": "PASS_SYNTHETIC",
+      "B": "PASS_SYNTHETIC",
+      "C": "PASS_AGGREGATES_ONLY_OR_SKIP"
+    },
     "hostPerformanceCertified": false,
-    "rngVersion": "dcm.cfb.event_world.rng.v1",
-    "eventWorldSpeedupApprox": 2.0
+    "cfbOperational": "PARTIAL",
+    "recommendationEligible": "DEFERRED",
+    "predictiveCertified": "DEFERRED",
+    "learningRevision": "LR000000"
   },
   "executionClosureGates": {
     "G0_SESSION_TRUTH": "PASS",
@@ -279,9 +282,11 @@
   "completionStates": {
     "SOFTWARE_CLOSED": "PASS_DECLARED_OFFLINE_SCOPE",
     "HAR_ACCOUNTING_ACCEPTED": "PASS",
-    "OPERATIONAL_ACCEPTED_WITH_CURRENT_HAR": "PARTIAL",
+    "OPERATIONAL_ACCEPTED_WITH_CURRENT_HAR": "PARTIAL_EXTERNAL",
     "PREDICTIVE_CERTIFIED": "DEFERRED",
-    "PRODUCTION_ROOT_CERTIFIED": "FAIL"
+    "PRODUCTION_ROOT_CERTIFIED": "FAIL",
+    "CFB_OPERATIONAL": "PARTIAL",
+    "RECOMMENDATION_ELIGIBLE": "DEFERRED"
   },
   "latestHarAccounting": {
     "sourceName": "CFB0905260254pst(3).har",
@@ -321,7 +326,9 @@
     "learningRevision": "LR000000",
     "predictiveClaim": "NONE",
     "productionRootCertified": false,
-    "hostPerformanceCertified": false
+    "hostPerformanceCertified": false,
+    "cfbOperational": "PARTIAL",
+    "recommendationEligible": "DEFERRED"
   },
   "requirementLedger": {
     "path": "docs/requirements/REQUIREMENT_LEDGER.v1.json",
@@ -330,6 +337,6 @@
     "baseMainSha": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
     "pass": "20260906T040000Z_grok_requirement-ledger-v1"
   },
-  "currentBoundedIncrement": "P0-EVENTWORLD-NUMPY-20260906",
-  "notes": "Phase 11 NumPy EventWorld acceleration committed. Default backend=numpy with mandatory reference fallback. Bitwise parity under rngVersion v1. Synthetic ~2\u00d7 speedup vs Phase 9 reference hotspot; hostPerformanceCertified remains false. No HAR / no mandatory C++."
+  "currentBoundedIncrement": "P0-CFB-E2E-SYNTHETIC-20260906",
+  "notes": "Phase 15 synthetic CFB E2E proof committed. PATH_A freezes with \u22651 PLAYABLE on evidence-complete fixtures; PATH_B fails closed into incomplete/conflicted states; PATH_C accounts private aggregates only when present. CFB_OPERATIONAL=PARTIAL; live HAR card EXTERNAL; LR000000 / predictive NONE unchanged. No private HAR upload."
 }

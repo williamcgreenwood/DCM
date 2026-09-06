@@ -189,3 +189,15 @@ Re-run `python scripts/export_algorithm_registry.py` after catalog changes.
 | REQ-ALG-NO-SILENT-RETIRE | Retirement requires ADR | CLOSED as contract/CI |
 
 R0 does not close BoardGraph/RequirementGraph/AcquisitionAction live HAR research (R1).
+
+## Runtime consumption note — Phase 15 CFB synthetic E2E (2026-09-06)
+
+Proved on `tests/test_cfb_e2e_synthetic_phase15.py` PATH_A (synthetic fixtures only):
+
+| Algorithm / surface | Runtime producer | Runtime consumer (CFB path) | Evidence artifact |
+|---|---|---|---|
+| BoardStore + `ALG-INDEX-001` | `dcm.board_store.BoardStore` / `BoardIndexes` | `dcm.cfb.launch.prepare_cfb_research_os` → `run_dcm` | `board_indexes.json` (`exactIdentityCount`, algorithms list) |
+| CELF / `ALG-SCHED-001` | `dcm.algorithms.scheduling` via `schedule_acquisition_actions` | CFB Research OS acquisition packing | `acquisition_schedule.json`, algorithm telemetry |
+| NumPy EventWorld | `dcm.cfb.event_worlds_numpy` (default) | `run_dcm` joint CFB worlds | `event_worlds_meta.json` (`backend=numpy`, conservation, rngVersion v1) |
+
+Does not retire or replace any registry row. Live operational card remains EXTERNAL.

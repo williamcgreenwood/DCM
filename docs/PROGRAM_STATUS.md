@@ -6,10 +6,20 @@ Active canonical-main CFB closure slice: `chatgpt/canonical-main-cfb-standard-20
 
 This file is the human dashboard. It must be updated on every coding pass together with a new immutable pass record under `docs/engineering_passes/`.
 
-Current bounded execution increment: `P0-EVENTWORLD-NUMPY-20260906` NumPy-first CFB EventWorld acceleration on top of Phase 9 baseline timings.
+Current bounded execution increment: `P0-CFB-E2E-SYNTHETIC-20260906` Phase 15 synthetic CFB positive/negative E2E proof on top of Phase 11 NumPy EventWorld.
 `docs/engineering/DCM_CODING_AND_PROMPT_STANDARD.md`; Drive writes follow
 `docs/engineering/DCM_DRIVE_HIERARCHY.md` and `dcm.runtime.storage_router`.
 
+
+## 2026-09-06 Phase 15 CFB synthetic E2E proof
+
+`task/cfb-e2e-synthetic-20260906` (base `main` @ `2b021217a006847a6d79d27d77d571509f6065c4`, PR #41). Adds deterministic integration tests proving the CFB path end-to-end on **synthetic** fixtures:
+
+- **PATH_A (evidence-complete)**: accounting → Research OS graphs → evidence/features → ParameterSnapshots → conserved shared EventWorlds (NumPy OK) → probabilities → ≥1 PLAYABLE → portfolio 0–6 → freeze. No Top100 truncation before baseline processing of supported modelable offers; no invented sides; no confidence→probability; no card padding.
+- **PATH_B (incomplete/conflicted)**: emits HELD_FOR_RESEARCH / UNSUPPORTED / EXCLUDED_GOBLIN / LEAN|PASS|TRAP / frontier-interim abstention states — not a silent zero-card success.
+- **PATH_C (private aggregates only)**: if box attachments exist, accounts aggregates only and reports exact terminal limitation when the board is live/stale; never manufactures a card; never publishes HAR.
+
+**`CFB_OPERATIONAL=PARTIAL`** (synthetic E2E green; live HAR card remains EXTERNAL). `RECOMMENDATION_ELIGIBLE` / `PREDICTIVE_CERTIFIED` remain **DEFERRED/NONE**. Learning revision **LR000000** unchanged. Algorithmic Constitution consumers proved on PATH_A: BoardStore/`ALG-INDEX-001`, CELF/`ALG-SCHED-001`, NumPy EventWorld.
 
 ## 2026-09-06 Phase 11 EventWorld NumPy acceleration
 
@@ -251,7 +261,7 @@ Execution-closure gates:
 | G6_EVALUATION_FIREWALL | PASS_OFFLINE | cutoff/accounting/full-population/future-only guards pass; calibration evidence is absent |
 | G7_RELEASE | PARTIAL | fresh wheel and E2E runs pass; host-performance/current-live research remain unverified; required remote CI run #250 passed |
 
-Unearned states remain explicit: `SOFTWARE_CLOSED=PASS` for the declared offline scope; `HAR_ACCOUNTING_ACCEPTED=PASS`; `OPERATIONAL_ACCEPTED_WITH_CURRENT_HAR=PARTIAL`; `PREDICTIVE_CERTIFIED=DEFERRED`; `PRODUCTION_ROOT_CERTIFIED=FAIL`. Learning remains `LR000000`, predictive claim `NONE`, and no production picks are issued.
+Unearned states remain explicit: `SOFTWARE_CLOSED=PASS` for the declared offline scope; `HAR_ACCOUNTING_ACCEPTED=PASS`; `CFB_OPERATIONAL=PARTIAL` (synthetic E2E green; live HAR card EXTERNAL); `OPERATIONAL_ACCEPTED_WITH_CURRENT_HAR=PARTIAL_EXTERNAL`; `RECOMMENDATION_ELIGIBLE=DEFERRED`; `PREDICTIVE_CERTIFIED=DEFERRED`; `PRODUCTION_ROOT_CERTIFIED=FAIL`. Learning remains `LR000000`, predictive claim `NONE`, and no production picks are issued.
 
 The unfiltered historical suite is not claimed green: four tests remain externally blocked because the repository's legacy `prizepicks_20260829.sanitized.har` is an empty fixture while its tests require 11,113 rows. No replacement rows were fabricated.
 
