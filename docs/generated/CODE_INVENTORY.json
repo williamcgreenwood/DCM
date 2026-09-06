@@ -1,5 +1,5 @@
 {
-  "contentHash": "7a6b19cf5cc09512a1abb3d680d8dedbac29cfb8d03ef92ec713698c5f00af26",
+  "contentHash": "15962e469f7bb491d85d6e1b3e95076daa49aec30a68e2be9c6002d16df3c123",
   "moduleCount": 228,
   "modules": [
     {
@@ -14311,7 +14311,7 @@
       "classes": 0,
       "functions": 4,
       "path": "src/dcm/sports/football/cfb_role.py",
-      "sha256": "5fd9e3b578d643c6e0ccf885e38ccf14389328f9917c71faec1be59517ea7b3c",
+      "sha256": "ce4352e3d7dc6d0247453a21f7733c6ffe4923c91babb40fb94dfe9fc0925234",
       "symbols": [
         {
           "doc": null,
@@ -14339,7 +14339,7 @@
         },
         {
           "doc": null,
-          "endLine": 177,
+          "endLine": 180,
           "kind": "function",
           "line": 55,
           "name": "resolve_cfb_role_state",
