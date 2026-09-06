@@ -1,10 +1,10 @@
 {
   "schema": "pillars_dcm.program_status.v1",
-  "updatedAtUtc": "2026-09-06T05:39:11Z",
-  "activePromotionBranch": "docs/algo-constitution-lock-completion-20260906",
+  "updatedAtUtc": "2026-09-06T06:37:46Z",
+  "activePromotionBranch": "main",
   "targetPromotionBranch": "main",
-  "lastMergedPullRequest": 42,
-  "lastMergedCommit": "e51d4ae1f0c3057c4f0431547c5cc869c3669332",
+  "lastMergedPullRequest": 43,
+  "lastMergedCommit": "a5328a23137541a3fd17c856e51c7af0455c1ec7",
   "lastGreenCiRun": 273,
   "canonicalIntegrationBranch": "integration/v6-ml-architecture-20260830",
   "canonicalIntegrationPr": 18,
@@ -183,7 +183,7 @@
       "current": 8,
       "state": "STRONG_PARTIAL",
       "next": [
-        "portfolio selection-correlation NumPy path landed; EventWorld NumPy ~2× synthetic committed",
+        "portfolio selection-correlation NumPy path landed; EventWorld NumPy ~2\u00d7 synthetic committed",
         "remaining C ABI candidacy after real-evidence SLOs",
         "host-performance remains uncertified (HOST_PERFORMANCE_CERTIFIED=FAIL)"
       ]
@@ -208,7 +208,7 @@
       "current": 8,
       "state": "STRONG_PARTIAL",
       "next": [
-        "P380X pillars remain candidate SignalOperator catalog only — compile-to-active-DAG",
+        "P380X pillars remain candidate SignalOperator catalog only \u2014 compile-to-active-DAG",
         "do not copy 1500 engines into runtime",
         "promote operators only after real producer-consumer integration and tests"
       ]
@@ -242,15 +242,15 @@
     "noSilentDowngrades": true,
     "noSilentCompletionClaims": true
   },
-  "activeBranch": "docs/algo-constitution-lock-completion-20260906",
+  "activeBranch": "main",
   "activePullRequest": null,
   "latestPass": {
     "id": "20260906T053911Z_luna_master_completion_report",
-    "commit": null,
-    "branch": "docs/algo-constitution-lock-completion-20260906",
+    "commit": "a5328a23137541a3fd17c856e51c7af0455c1ec7",
+    "branch": "main",
     "targetBranch": "main",
-    "pullRequest": null,
-    "mainTouched": false,
+    "pullRequest": 43,
+    "mainTouched": true,
     "inventory": {
       "modules": 227,
       "symbols": 1599,
@@ -282,7 +282,8 @@
       "39": "86dcd6065f32ac53c5ae552d919eb5f4dc854b4c",
       "40": "a3e28fb82cabbecc69e70cff92c36c8db938a6f1",
       "41": "2b021217a006847a6d79d27d77d571509f6065c4",
-      "42": "e51d4ae1f0c3057c4f0431547c5cc869c3669332"
+      "42": "e51d4ae1f0c3057c4f0431547c5cc869c3669332",
+      "43": "a5328a23137541a3fd17c856e51c7af0455c1ec7"
     }
   },
   "executionClosureGates": {
@@ -361,5 +362,5 @@
     "pass": "20260906T040000Z_grok_requirement-ledger-v1"
   },
   "currentBoundedIncrement": "P18-LUNA-MASTER-COMPLETION-20260906",
-  "notes": "Phase 18 Luna master completion: permanent algo consumption lock + honest matrix. ENGINEERING_INTEGRATED=PASS (PRs #34–#42). CFB_OPERATIONAL=PARTIAL. HOST_PERFORMANCE_CERTIFIED=FAIL. RECOVERY_CERTIFIED=PARTIAL. RECOMMENDATION_ELIGIBLE/PREDICTIVE_CERTIFIED=DEFERRED. UNIVERSAL_SPORT_COMPLETE=FAIL. LR000000 / predictive NONE. No private HAR upload."
+  "notes": "Phase 18 Luna master completion: permanent algo consumption lock + honest matrix. ENGINEERING_INTEGRATED=PASS (PRs #34\u2013#42). CFB_OPERATIONAL=PARTIAL. HOST_PERFORMANCE_CERTIFIED=FAIL. RECOVERY_CERTIFIED=PARTIAL. RECOMMENDATION_ELIGIBLE/PREDICTIVE_CERTIFIED=DEFERRED. UNIVERSAL_SPORT_COMPLETE=FAIL. LR000000 / predictive NONE. No private HAR upload."
 }
