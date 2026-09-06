@@ -50,10 +50,71 @@ def _pairs(claims: list[dict], scope: str, scope_id: str) -> list[tuple[dict, di
     return sorted(out, key=lambda x: str(x[0].get("observed_at") or ""))
 
 
+_GAME_LOG_LIST_KEYS = frozenset({"game_logs", "gameLogs", "role_epoch_logs"})
+
+
+def _game_log_row_marker(row: dict[str, Any]) -> str:
+    """Stable per-game marker for claim log union (date / game_date / gameId)."""
+    return str(row.get("date") or row.get("game_date") or row.get("gameId") or "")
+
+
+def _union_log_row_fields(base: dict[str, Any], incoming: dict[str, Any]) -> dict[str, Any]:
+    """Per-row field union: incoming fills missing/null keys only.
+
+    Does not invent values. Prefers non-null over null. Keeps explicit 0.
+    Existing non-null values are not overwritten by later claims.
+    Mutates and returns ``base``.
+    """
+    for key, value in incoming.items():
+        if key not in base or base[key] is None:
+            if value is not None or key not in base:
+                base[key] = value
+    return base
+
+
+def _union_game_log_lists(
+    existing: list[Any] | None,
+    incoming: list[Any] | None,
+) -> list[dict[str, Any]]:
+    """Union game-log lists by date/game_date/gameId with per-row field union."""
+    ordered: list[dict[str, Any]] = []
+    by_marker: dict[str, dict[str, Any]] = {}
+    unmarked: list[dict[str, Any]] = []
+
+    def _ingest(rows: list[Any] | None) -> None:
+        if not isinstance(rows, list):
+            return
+        for row in rows:
+            if not isinstance(row, dict):
+                continue
+            marker = _game_log_row_marker(row)
+            if not marker:
+                unmarked.append(dict(row))
+                continue
+            prior = by_marker.get(marker)
+            if prior is None:
+                merged = dict(row)
+                by_marker[marker] = merged
+                ordered.append(merged)
+            else:
+                _union_log_row_fields(prior, row)
+
+    _ingest(existing)
+    _ingest(incoming)
+    return ordered + unmarked
+
+
 def _merge(pairs: list[tuple[dict, dict]]) -> dict:
     out: dict[str, Any] = {}
     for _, value in pairs:
-        out.update(value)
+        if not isinstance(value, dict):
+            continue
+        for key, item in value.items():
+            if key in _GAME_LOG_LIST_KEYS and isinstance(item, list):
+                prior = out.get(key)
+                out[key] = _union_game_log_lists(prior if isinstance(prior, list) else None, item)
+            else:
+                out[key] = item
     return out
 
 
@@ -89,7 +150,11 @@ def _shrink(sample: float | None, n: int, prior: float, prior_n: float = 5.0) ->
 
 
 def _collect_player_game_logs(player: dict[str, Any]) -> list[dict[str, Any]]:
-    """Collect per-game logs from common host/claim aliases without inventing rows."""
+    """Collect per-game logs from common host/claim aliases without inventing rows.
+
+    Duplicate date/game markers across alias keys are field-unioned so a later
+    thinner alias cannot drop rush_att (or other) fields already observed.
+    """
     keys = (
         "role_epoch_logs",
         "game_logs",
@@ -102,22 +167,16 @@ def _collect_player_game_logs(player: dict[str, Any]) -> list[dict[str, Any]]:
         "season_logs",
     )
     collected: list[dict[str, Any]] = []
-    seen: set[str] = set()
     for key in keys:
         value = player.get(key)
         if not isinstance(value, list):
             continue
-        for row in value:
-            if not isinstance(row, dict):
-                continue
-            # Skip empty placeholder lists' non-dict noise; require some signal.
-            if not any(row.get(field) is not None for field in row):
-                continue
-            marker = str(row.get("date") or row.get("game_date") or row.get("gameId") or row)
-            if marker in seen:
-                continue
-            seen.add(marker)
-            collected.append(row)
+        usable = [
+            row
+            for row in value
+            if isinstance(row, dict) and any(row.get(field) is not None for field in row)
+        ]
+        collected = _union_game_log_lists(collected, usable)
     return collected
 
 

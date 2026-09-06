@@ -1,5 +1,5 @@
 {
-  "contentHash": "af5c82ab05671a8724ed286afdf6f1179329018e8aaa3816ceae93a58ea69b94",
+  "contentHash": "263ed6c7310627cae30f63f1c535895cb4f5133ca79b169710eee6e06d328920",
   "moduleCount": 228,
   "modules": [
     {
@@ -6129,9 +6129,9 @@
     },
     {
       "classes": 0,
-      "functions": 9,
+      "functions": 13,
       "path": "src/dcm/model/parameters.py",
-      "sha256": "139898a2220681915fa145a71c458c0c2230ea3b5089cccdf0618c10c1878ab7",
+      "sha256": "39133f7820cfa825fa98c57a851263958aa759ae08ad2076bf87f3fe7f2f7676",
       "symbols": [
         {
           "doc": null,
@@ -6150,58 +6150,90 @@
           "qualname": "_pairs"
         },
         {
-          "doc": null,
-          "endLine": 57,
+          "doc": "Stable per-game marker for claim log union (date / game_date / gameId).",
+          "endLine": 58,
           "kind": "function",
-          "line": 53,
+          "line": 56,
+          "name": "_game_log_row_marker",
+          "qualname": "_game_log_row_marker"
+        },
+        {
+          "doc": "Per-row field union: incoming fills missing/null keys only.",
+          "endLine": 72,
+          "kind": "function",
+          "line": 61,
+          "name": "_union_log_row_fields",
+          "qualname": "_union_log_row_fields"
+        },
+        {
+          "doc": "Union game-log lists by date/game_date/gameId with per-row field union.",
+          "endLine": 104,
+          "kind": "function",
+          "line": 75,
+          "name": "_union_game_log_lists",
+          "qualname": "_union_game_log_lists"
+        },
+        {
+          "doc": null,
+          "endLine": 100,
+          "kind": "method",
+          "line": 84,
+          "name": "_ingest",
+          "qualname": "_union_game_log_lists._ingest"
+        },
+        {
+          "doc": null,
+          "endLine": 118,
+          "kind": "function",
+          "line": 107,
           "name": "_merge",
           "qualname": "_merge"
         },
         {
           "doc": null,
-          "endLine": 69,
+          "endLine": 130,
           "kind": "function",
-          "line": 60,
+          "line": 121,
           "name": "_avg",
           "qualname": "_avg"
         },
         {
           "doc": null,
-          "endLine": 79,
+          "endLine": 140,
           "kind": "function",
-          "line": 72,
+          "line": 133,
           "name": "_sd",
           "qualname": "_sd"
         },
         {
           "doc": null,
-          "endLine": 87,
+          "endLine": 148,
           "kind": "function",
-          "line": 82,
+          "line": 143,
           "name": "_shrink",
           "qualname": "_shrink"
         },
         {
           "doc": "Collect per-game logs from common host/claim aliases without inventing rows.",
-          "endLine": 121,
+          "endLine": 180,
           "kind": "function",
-          "line": 91,
+          "line": 152,
           "name": "_collect_player_game_logs",
           "qualname": "_collect_player_game_logs"
         },
         {
           "doc": null,
-          "endLine": 724,
+          "endLine": 783,
           "kind": "function",
-          "line": 124,
+          "line": 183,
           "name": "build_parameter_snapshot",
           "qualname": "build_parameter_snapshot"
         },
         {
           "doc": null,
-          "endLine": 361,
+          "endLine": 420,
           "kind": "method",
-          "line": 358,
+          "line": 417,
           "name": "_rate_claimed",
           "qualname": "build_parameter_snapshot._rate_claimed"
         }
@@ -14890,5 +14922,5 @@
   "parseErrors": [],
   "root": "src",
   "schema": "pillars_dcm.code_inventory.v1",
-  "symbolCount": 1608
+  "symbolCount": 1612
 }
