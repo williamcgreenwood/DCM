@@ -6,10 +6,32 @@ Active canonical-main CFB closure slice: `chatgpt/canonical-main-cfb-standard-20
 
 This file is the human dashboard. It must be updated on every coding pass together with a new immutable pass record under `docs/engineering_passes/`.
 
-Current bounded execution increment: `P0-CFB-E2E-SYNTHETIC-20260906` Phase 15 synthetic CFB positive/negative E2E proof on top of Phase 11 NumPy EventWorld.
+Current bounded execution increment: `P18-LUNA-MASTER-COMPLETION-20260906` permanent algo consumption lock + Phase 18 completion report on top of Phase 15 synthetic E2E.
 `docs/engineering/DCM_CODING_AND_PROMPT_STANDARD.md`; Drive writes follow
 `docs/engineering/DCM_DRIVE_HIERARCHY.md` and `dcm.runtime.storage_router`.
 
+
+## 2026-09-06 Phase 18 Luna master completion (algo consumption lock)
+
+`docs/algo-constitution-lock-completion-20260906` (base `main` @ `e51d4ae1f0c3057c4f0431547c5cc869c3669332`, PR #42). Permanent Algorithmic Constitution **consumption lock** + honest Phase 18 matrix. No HAR commit. No fake 10/10. No predictive claims.
+
+- Law: `docs/engineering/ALGORITHM_CONSUMPTION_LAW.md` (exact BoardStore indexes → CELF/set-cover → true DAG → two-rep → NumPy EventWorld → registry ML/group/append).
+- Surfaces: `AGENTS.md`, `CONSTITUTION_INHERITANCE.md`; CI via constitution governance test + `validate_dcm_policy.py`.
+- Portfolio selection-correlation NumPy path (reference fallback) — Phase 13 leftover, small + tested.
+
+### Phase 18 completion fields
+
+| Field | Status |
+|---|---|
+| ENGINEERING_INTEGRATED | PASS (PRs #34–#42 on main @ e51d4ae) |
+| CFB_OPERATIONAL | PARTIAL (synthetic E2E; live HAR EXTERNAL) |
+| RECOMMENDATION_ELIGIBLE | DEFERRED |
+| HOST_PERFORMANCE_CERTIFIED | FAIL (`hostPerformanceCertified=false`) |
+| RECOVERY_CERTIFIED | PARTIAL (capture recovery merged; not live-ops certified) |
+| PREDICTIVE_CERTIFIED | DEFERRED (`NONE` / LR000000) |
+| UNIVERSAL_SPORT_COMPLETE | FAIL (CFB software path only) |
+
+Pass record: `docs/engineering_passes/20260906T053911Z_luna_master_completion_report.md`.
 
 ## 2026-09-06 Phase 15 CFB synthetic E2E proof
 
@@ -85,10 +107,10 @@ PR #34 merged to `main` at `b0e44d5886adb98cb84dbf466ee3a3fc1fee28b1`; PR #35 me
 | P10 Full sport coverage | 10 | 3 | EARLY | each supported sport reaches 24/24 plugin components + validation suite |
 | P11 Release + fresh-environment acceptance | 10 | 7 | PARTIAL | wheel/release + exact hash + current HAR-only fresh ChatGPT acceptance |
 | P12 Research archive / index / reuse | 10 | 8 | STRONG PARTIAL | Drive credentials; high-volume queryable store; retention/licensing enforcement beyond local blobs |
-| P13 Performance / search / token optimization | 10 | 8 | STRONG PARTIAL | Phase 11 NumPy EventWorld ~2× vs reference committed; remaining C ABI candidacy after real-evidence SLOs; hostPerformanceCertified=false |
+| P13 Performance / search / token optimization | 10 | 8 | STRONG PARTIAL | EventWorld NumPy ~2× + portfolio correlation NumPy; C ABI after real-evidence SLOs; HOST_PERFORMANCE_CERTIFIED=FAIL |
 | P14 Production operations / observability | 10 | 5 | PARTIAL | run health/readiness, failure taxonomy, deterministic recovery, release gates |
 | P15 P380X donor signal governance | 10 | 8 | STRONG PARTIAL | Tranche C MaterialFact/source-truth runtime closure; next typed role/matchup/context operators; exact donor archive bytes and later tranches remain external/future |
-| P16 Algorithmic Constitution / strategy registry | 10 | 9 | STRONG PARTIAL | CFB live CELF + telemetry done; remaining mixed-sport R1; keep CI gates; no silent algorithm retirement |
+| P16 Algorithmic Constitution / strategy registry | 10 | 9 | STRONG PARTIAL | ALGORITHM_CONSUMPTION_LAW locked + CI; remaining mixed-sport R1; no silent algorithm retirement |
 
 Constitution version `DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903` is inherited. Learning revision remains `LR000000`; predictive superiority remains `NONE`; production-root certification remains false.
 

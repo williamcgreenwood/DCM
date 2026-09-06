@@ -3,9 +3,9 @@
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
 - Modules: **227**
-- Symbols: **1598**
+- Symbols: **1599**
 - Parse errors: **0**
-- Inventory hash: `2b189a06b6724e9597abe28d7fa0e433071a4c5bffaf2051522d2d49af422c28`
+- Inventory hash: `b0c129593cbb1158a536b297b7e9abf8354636b82a992c1c48185719f2d38d62`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -198,7 +198,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P4 | `src/dcm/selection/card_layers.py` | 0 | 17 |
 | P4 | `src/dcm/selection/decision_integrity.py` | 1 | 6 |
 | P4 | `src/dcm/selection/eligibility.py` | 1 | 3 |
-| P4 | `src/dcm/selection/portfolio.py` | 0 | 5 |
+| P4 | `src/dcm/selection/portfolio.py` | 0 | 6 |
 | UNMAPPED | `src/dcm/settle.py` | 0 | 1 |
 | P15 | `src/dcm/signals/__init__.py` | 0 | 0 |
 | P15 | `src/dcm/signals/cfb_runtime.py` | 0 | 3 |
@@ -2283,9 +2283,10 @@ _No class/function symbols._
 
 - `function` **_tags** L20
 - `function` **_composite_conflict** L24
-- `function` **_selection_correlation** L30 — Pearson correlation of aligned simulated pick outcomes.
-- `function` **build_card** L55
-- `function` **exposure_report** L128
+- `function` **_selection_correlation_reference** L30 — Pure-Python Pearson path (ChatGPT-native fallback / parity).
+- `function` **_selection_correlation** L44 — Pearson correlation of aligned simulated pick outcomes.
+- `function` **build_card** L79
+- `function` **exposure_report** L152
 
 ### `src/dcm/settle.py`
 

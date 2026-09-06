@@ -1,5 +1,5 @@
 {
-  "contentHash": "2b189a06b6724e9597abe28d7fa0e433071a4c5bffaf2051522d2d49af422c28",
+  "contentHash": "b0c129593cbb1158a536b297b7e9abf8354636b82a992c1c48185719f2d38d62",
   "moduleCount": 227,
   "modules": [
     {
@@ -13300,9 +13300,9 @@
     },
     {
       "classes": 0,
-      "functions": 5,
+      "functions": 6,
       "path": "src/dcm/selection/portfolio.py",
-      "sha256": "1bdd26638ee8bd3d856c355e9d8504bcf0bf36703f33beca2151ba5c36c419ac",
+      "sha256": "172d3b4aef807d0a828171c195a599b2b49796567b6973767f40f7d36b3a8d46",
       "symbols": [
         {
           "doc": null,
@@ -13321,26 +13321,34 @@
           "qualname": "_composite_conflict"
         },
         {
-          "doc": "Pearson correlation of aligned simulated pick outcomes.",
-          "endLine": 52,
+          "doc": "Pure-Python Pearson path (ChatGPT-native fallback / parity).",
+          "endLine": 41,
           "kind": "function",
           "line": 30,
+          "name": "_selection_correlation_reference",
+          "qualname": "_selection_correlation_reference"
+        },
+        {
+          "doc": "Pearson correlation of aligned simulated pick outcomes.",
+          "endLine": 76,
+          "kind": "function",
+          "line": 44,
           "name": "_selection_correlation",
           "qualname": "_selection_correlation"
         },
         {
           "doc": null,
-          "endLine": 125,
+          "endLine": 149,
           "kind": "function",
-          "line": 55,
+          "line": 79,
           "name": "build_card",
           "qualname": "build_card"
         },
         {
           "doc": null,
-          "endLine": 153,
+          "endLine": 177,
           "kind": "function",
-          "line": 128,
+          "line": 152,
           "name": "exposure_report",
           "qualname": "exposure_report"
         }
@@ -14801,5 +14809,5 @@
   "parseErrors": [],
   "root": "src",
   "schema": "pillars_dcm.code_inventory.v1",
-  "symbolCount": 1598
+  "symbolCount": 1599
 }

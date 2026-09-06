@@ -1,10 +1,10 @@
 {
   "schema": "pillars_dcm.program_status.v1",
-  "updatedAtUtc": "2026-09-06T05:24:00Z",
-  "activePromotionBranch": "task/cfb-e2e-synthetic-20260906",
+  "updatedAtUtc": "2026-09-06T05:39:11Z",
+  "activePromotionBranch": "docs/algo-constitution-lock-completion-20260906",
   "targetPromotionBranch": "main",
-  "lastMergedPullRequest": 41,
-  "lastMergedCommit": "2b021217a006847a6d79d27d77d571509f6065c4",
+  "lastMergedPullRequest": 42,
+  "lastMergedCommit": "e51d4ae1f0c3057c4f0431547c5cc869c3669332",
   "lastGreenCiRun": 273,
   "canonicalIntegrationBranch": "integration/v6-ml-architecture-20260830",
   "canonicalIntegrationPr": 18,
@@ -183,8 +183,9 @@
       "current": 8,
       "state": "STRONG_PARTIAL",
       "next": [
-        "remaining C ABI candidacy for sample_football / dict materialization after real-evidence SLOs",
-        "host-performance remains uncertified until representative real-evidence SLOs"
+        "portfolio selection-correlation NumPy path landed; EventWorld NumPy ~2× synthetic committed",
+        "remaining C ABI candidacy after real-evidence SLOs",
+        "host-performance remains uncertified (HOST_PERFORMANCE_CERTIFIED=FAIL)"
       ]
     },
     {
@@ -207,7 +208,7 @@
       "current": 8,
       "state": "STRONG_PARTIAL",
       "next": [
-        "P380X pillars remain candidate SignalOperator catalog only \u2014 compile-to-active-DAG",
+        "P380X pillars remain candidate SignalOperator catalog only — compile-to-active-DAG",
         "do not copy 1500 engines into runtime",
         "promote operators only after real producer-consumer integration and tests"
       ]
@@ -219,9 +220,9 @@
       "current": 9,
       "state": "STRONG_PARTIAL",
       "next": [
-        "PATH_A proved BoardStore/CELF/NumPy EventWorld on CFB launch path",
+        "permanent ALGORITHM_CONSUMPTION_LAW locked in AGENTS + CI",
         "keep constitution CI gates green",
-        "mixed-sport Research OS remainder after CFB closed-loop CELF packing",
+        "mixed-sport Research OS remainder after CFB live acceptance",
         "do not silently retire CORE/CONDITIONAL/CHALLENGER algorithms"
       ]
     }
@@ -241,33 +242,48 @@
     "noSilentDowngrades": true,
     "noSilentCompletionClaims": true
   },
-  "activeBranch": "task/cfb-e2e-synthetic-20260906",
+  "activeBranch": "docs/algo-constitution-lock-completion-20260906",
   "activePullRequest": null,
   "latestPass": {
-    "id": "20260906T052400Z_grok_cfb-e2e-synthetic",
+    "id": "20260906T053911Z_luna_master_completion_report",
     "commit": null,
-    "branch": "task/cfb-e2e-synthetic-20260906",
+    "branch": "docs/algo-constitution-lock-completion-20260906",
     "targetBranch": "main",
     "pullRequest": null,
     "mainTouched": false,
     "inventory": {
       "modules": 227,
-      "symbols": 1598,
-      "contentHash": "2b189a06b6724e9597abe28d7fa0e433071a4c5bffaf2051522d2d49af422c28",
+      "symbols": 1599,
+      "contentHash": "b0c129593cbb1158a536b297b7e9abf8354636b82a992c1c48185719f2d38d62",
       "root": "src"
     },
-    "summary": "Phase 15 synthetic CFB E2E (PATH_A freeze+PLAYABLE; PATH_B incomplete/conflicted; PATH_C private aggregates-only). CFB_OPERATIONAL=PARTIAL; live card EXTERNAL; LR000000/NONE unchanged.",
-    "next": "Current live HAR + host-acquired evidence for operational card; keep RECOMMENDATION_ELIGIBLE/PREDICTIVE_CERTIFIED deferred",
-    "paths": {
-      "A": "PASS_SYNTHETIC",
-      "B": "PASS_SYNTHETIC",
-      "C": "PASS_AGGREGATES_ONLY_OR_SKIP"
+    "summary": "Phase 18: permanent ALGORITHM_CONSUMPTION_LAW lock + honest completion matrix. ENGINEERING_INTEGRATED=PASS; CFB_OPERATIONAL=PARTIAL; HOST_PERFORMANCE/UNIVERSAL_SPORT FAIL; RECOMMENDATION/PREDICTIVE DEFERRED; LR000000/NONE.",
+    "next": "Fresh pregame HAR + host evidence-import for live card; keep consumption lock green; no predictive claims",
+    "completionMatrix": {
+      "ENGINEERING_INTEGRATED": "PASS",
+      "CFB_OPERATIONAL": "PARTIAL",
+      "RECOMMENDATION_ELIGIBLE": "DEFERRED",
+      "HOST_PERFORMANCE_CERTIFIED": "FAIL",
+      "RECOVERY_CERTIFIED": "PARTIAL",
+      "PREDICTIVE_CERTIFIED": "DEFERRED",
+      "UNIVERSAL_SPORT_COMPLETE": "FAIL"
     },
     "hostPerformanceCertified": false,
     "cfbOperational": "PARTIAL",
     "recommendationEligible": "DEFERRED",
     "predictiveCertified": "DEFERRED",
-    "learningRevision": "LR000000"
+    "learningRevision": "LR000000",
+    "prs34to42": {
+      "34": "b0e44d5886adb98cb84dbf466ee3a3fc1fee28b1",
+      "35": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
+      "36": "3ab948a3abd84e51387715b9f5e2921827d7ba94",
+      "37": "1fe6d21721cbc85fa54c77d06b3c4c6d38a0ad46",
+      "38": "8fdd520c388bebcb6090fe1742a6d1d52d18e254",
+      "39": "86dcd6065f32ac53c5ae552d919eb5f4dc854b4c",
+      "40": "a3e28fb82cabbecc69e70cff92c36c8db938a6f1",
+      "41": "2b021217a006847a6d79d27d77d571509f6065c4",
+      "42": "e51d4ae1f0c3057c4f0431547c5cc869c3669332"
+    }
   },
   "executionClosureGates": {
     "G0_SESSION_TRUTH": "PASS",
@@ -283,10 +299,14 @@
     "SOFTWARE_CLOSED": "PASS_DECLARED_OFFLINE_SCOPE",
     "HAR_ACCOUNTING_ACCEPTED": "PASS",
     "OPERATIONAL_ACCEPTED_WITH_CURRENT_HAR": "PARTIAL_EXTERNAL",
-    "PREDICTIVE_CERTIFIED": "DEFERRED",
-    "PRODUCTION_ROOT_CERTIFIED": "FAIL",
+    "ENGINEERING_INTEGRATED": "PASS",
     "CFB_OPERATIONAL": "PARTIAL",
-    "RECOMMENDATION_ELIGIBLE": "DEFERRED"
+    "RECOMMENDATION_ELIGIBLE": "DEFERRED",
+    "HOST_PERFORMANCE_CERTIFIED": "FAIL",
+    "RECOVERY_CERTIFIED": "PARTIAL",
+    "PREDICTIVE_CERTIFIED": "DEFERRED",
+    "UNIVERSAL_SPORT_COMPLETE": "FAIL",
+    "PRODUCTION_ROOT_CERTIFIED": "FAIL"
   },
   "latestHarAccounting": {
     "sourceName": "CFB0905260254pst(3).har",
@@ -328,7 +348,10 @@
     "productionRootCertified": false,
     "hostPerformanceCertified": false,
     "cfbOperational": "PARTIAL",
-    "recommendationEligible": "DEFERRED"
+    "recommendationEligible": "DEFERRED",
+    "engineeringIntegrated": "PASS",
+    "recoveryCertified": "PARTIAL",
+    "universalSportComplete": "FAIL"
   },
   "requirementLedger": {
     "path": "docs/requirements/REQUIREMENT_LEDGER.v1.json",
@@ -337,6 +360,6 @@
     "baseMainSha": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
     "pass": "20260906T040000Z_grok_requirement-ledger-v1"
   },
-  "currentBoundedIncrement": "P0-CFB-E2E-SYNTHETIC-20260906",
-  "notes": "Phase 15 synthetic CFB E2E proof committed. PATH_A freezes with \u22651 PLAYABLE on evidence-complete fixtures; PATH_B fails closed into incomplete/conflicted states; PATH_C accounts private aggregates only when present. CFB_OPERATIONAL=PARTIAL; live HAR card EXTERNAL; LR000000 / predictive NONE unchanged. No private HAR upload."
+  "currentBoundedIncrement": "P18-LUNA-MASTER-COMPLETION-20260906",
+  "notes": "Phase 18 Luna master completion: permanent algo consumption lock + honest matrix. ENGINEERING_INTEGRATED=PASS (PRs #34–#42). CFB_OPERATIONAL=PARTIAL. HOST_PERFORMANCE_CERTIFIED=FAIL. RECOVERY_CERTIFIED=PARTIAL. RECOMMENDATION_ELIGIBLE/PREDICTIVE_CERTIFIED=DEFERRED. UNIVERSAL_SPORT_COMPLETE=FAIL. LR000000 / predictive NONE. No private HAR upload."
 }

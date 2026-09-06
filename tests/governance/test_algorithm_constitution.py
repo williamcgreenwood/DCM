@@ -55,3 +55,54 @@ def test_har_algorithm_execution_plan_before_research():
     sched = engine.select("RESEARCH_SCHEDULE", {"one_prop_one_search": True, "consumer": "test"})
     assert "ONE_PROP_ONE_SEARCH_NONCOMPLIANT" in sched.reasons
     assert len(load_algorithm_registry()) >= 150
+
+
+def test_algorithm_consumption_law_lock():
+    """Permanent hot-path consumption order is documented and wired."""
+    from pathlib import Path as P
+
+    root = P(__file__).resolve().parents[2]
+    law = root / "docs" / "engineering" / "ALGORITHM_CONSUMPTION_LAW.md"
+    assert law.is_file(), "ALGORITHM_CONSUMPTION_LAW_MISSING"
+    body = law.read_text(encoding="utf-8")
+    for needle in (
+        "BoardStore",
+        "BoardIndexes",
+        "CELF",
+        "AcquisitionAction",
+        "descendant",
+        "NumPy",
+        "SoA",
+        "EventWorld",
+        "algorithm_registry",
+        "Silent one-off",
+    ):
+        assert needle.lower() in body.lower(), needle
+    agents = (root / "AGENTS.md").read_text(encoding="utf-8")
+    assert "ALGORITHM_CONSUMPTION_LAW.md" in agents
+    assert "Exact-first indexes" in agents or "BoardStore" in agents
+    inherit = (root / "docs" / "architecture" / "CONSTITUTION_INHERITANCE.md").read_text(encoding="utf-8")
+    assert "ALGORITHM_CONSUMPTION_LAW" in inherit
+
+    # Known constitution hot-path modules must remain present (pragmatic gate).
+    required_modules = (
+        root / "src" / "dcm" / "board_store.py",
+        root / "src" / "dcm" / "research" / "indexes.py",
+        root / "src" / "dcm" / "research" / "acquisition.py",
+        root / "src" / "dcm" / "cfb" / "event_worlds_numpy.py",
+        root / "src" / "dcm" / "selection" / "portfolio.py",
+        root / "configs" / "algorithm_registry.json",
+    )
+    missing = [str(p.relative_to(root)) for p in required_modules if not p.is_file()]
+    assert missing == []
+
+    # Portfolio correlation must prefer NumPy when installed (no pure-Python-only lock-in).
+    port = (root / "src" / "dcm" / "selection" / "portfolio.py").read_text(encoding="utf-8")
+    assert "import numpy" in port
+    assert "_selection_correlation_reference" in port
+
+    # Anti-bypass: hot research/board modules must still name constitution consumers.
+    board = (root / "src" / "dcm" / "board_store.py").read_text(encoding="utf-8")
+    assert "BoardStore" in board
+    acq = (root / "src" / "dcm" / "research" / "acquisition.py").read_text(encoding="utf-8")
+    assert "ALG-SCHED-001" in acq or "CELF" in acq or "LazyGreedy" in acq
