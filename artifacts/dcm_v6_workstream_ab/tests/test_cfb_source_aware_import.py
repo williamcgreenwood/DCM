@@ -182,3 +182,115 @@ def test_observation_to_claim_rejects_empty_data():
             },
             cutoff=CUTOFF,
         )
+
+
+def test_research_store_sport_is_not_semantic_scope(tmp_path: Path):
+    """put_claim must store sport separately from entityKind (scope kind)."""
+    dest, rows, planned, actions = _board_context(tmp_path)
+    event_action = next(a for a in actions["actions"] if a["scope"] == "EVENT")
+    obs_path = tmp_path / "event_obs.jsonl"
+    obs_path.write_text(json.dumps(_event_observation(event_action, typed=True)) + "\n", encoding="utf-8")
+    result = execute_source_aware_observations(dest, obs_path)
+    assert result["imported"] == 1
+    assert result["stored"], "expected ResearchStore pointers"
+    pointer = result["stored"][0]
+    scope_kinds = {"EVENT", "SUBJECT", "AFFILIATION", "COUNTERPARTY", "PLAYER", "TEAM", "ENVIRONMENT"}
+    assert pointer["sport"] not in scope_kinds
+    assert str(pointer["sport"]).upper() not in scope_kinds
+    assert pointer["entityKind"] == "EVENT"
+    assert result.get("sport") not in scope_kinds
+    # CFB fixture boards resolve sport from row league / family.
+    assert str(result["sport"]).upper() in {"CFB", "GRIDIRON"} or result["sport"] == "gridiron"
+
+
+def test_invalidate_descendants_spares_unrelated_offer_parameters():
+    from dcm.runtime.dag import Dag
+
+    dag = Dag(
+        cutoff=CUTOFF,
+        config_hash="source-aware-import",
+        schema_version="v1",
+        source_versions={"parser": "test"},
+    )
+    claim = dag.add("EVIDENCE_CLAIM", "c1")
+    dag.complete(claim.key, "c1")
+    p_touch = dag.add("PARAMETER", "offer-touch", parents=[claim.key])
+    dag.complete(p_touch.key, "pt")
+    w_touch = dag.add("EVENT_WORLDS", "event-touch", parents=[p_touch.key])
+    dag.complete(w_touch.key, "wt")
+    g_touch = dag.add("GRADE", "offer-touch", parents=[p_touch.key, w_touch.key])
+    dag.complete(g_touch.key, "gt")
+
+    p_other = dag.add("PARAMETER", "offer-other", parents=[claim.key])
+    dag.complete(p_other.key, "po")
+    w_other = dag.add("EVENT_WORLDS", "event-other", parents=[p_other.key])
+    dag.complete(w_other.key, "wo")
+    g_other = dag.add("GRADE", "offer-other", parents=[p_other.key, w_other.key])
+    dag.complete(g_other.key, "go")
+
+    hit = dag.invalidate_descendants([p_touch.key], include_roots=True)
+    assert p_touch.key in hit
+    assert w_touch.key in hit
+    assert g_touch.key in hit
+    assert dag.nodes[p_other.key].state == "COMPLETE_VERIFIED"
+    assert dag.nodes[w_other.key].state == "COMPLETE_VERIFIED"
+    assert dag.nodes[g_other.key].state == "COMPLETE_VERIFIED"
+    assert p_other.key not in hit
+    assert g_other.key not in hit
+
+
+def test_source_aware_import_uses_indexes_and_consumer_beyond_snapshot(tmp_path: Path):
+    dest, rows, planned, actions = _board_context(tmp_path)
+    # Seed an unrelated PARAMETER lineage in a prior DAG artifact so execute
+    # loads it and must not blanket-invalidate by type.
+    from dcm.runtime.dag import Dag
+
+    prior = Dag(
+        cutoff=CUTOFF,
+        config_hash="source-aware-import",
+        schema_version="v1",
+        source_versions={"parser": "host-observation-v1"},
+    )
+    other = prior.add("PARAMETER", "UNRELATED_OFFER_XYZ")
+    prior.complete(other.key, "other-param")
+    other_w = prior.add("EVENT_WORLDS", "UNRELATED_EVENT", parents=[other.key])
+    prior.complete(other_w.key, "other-world")
+    other_g = prior.add("GRADE", "UNRELATED_OFFER_XYZ", parents=[other.key, other_w.key])
+    prior.complete(other_g.key, "other-grade")
+    write_json(dest / "source_aware_import_dag.json", prior.snapshot())
+
+    event_action = next(a for a in actions["actions"] if a["scope"] == "EVENT")
+    obs_path = tmp_path / "event_obs.jsonl"
+    obs_path.write_text(json.dumps(_event_observation(event_action, typed=True)) + "\n", encoding="utf-8")
+    result = execute_source_aware_observations(dest, obs_path)
+    assert result["imported"] == 1
+    assert result["parameterConsumerChanged"] is True
+    assert result["materialOrFeatureConsumerChanged"] is True
+    consumer = result["consumer"]
+    assert consumer["materialOrFeatureChanged"] is True
+    assert "ParameterSnapshot.hash" in consumer["proven"]
+    assert "facts_to_features" in " ".join(consumer["proven"])
+    assert (dest / "parameters" / "source_aware_import_consumer.json").is_file()
+
+    # Unrelated prior PARAMETER lineage must survive scoped invalidation.
+    dag_snap = json.loads((dest / "source_aware_import_dag.json").read_text(encoding="utf-8"))
+    by_key = {n["key"]: n for n in dag_snap["nodes"]}
+    assert by_key[other.key]["state"] == "COMPLETE_VERIFIED"
+    assert by_key[other_g.key]["state"] == "COMPLETE_VERIFIED"
+    # Touched grade/world nodes should be invalidated.
+    invalidated = set(result["invalidatedDescendants"])
+    assert invalidated
+    assert other.key not in invalidated
+
+    # BoardIndexes queried with downstream_used (HOT_HASH_INDEX QUERIED).
+    telem = result.get("indexTelemetry") or {}
+    executions = telem.get("executions") or telem.get("algorithms") or []
+    if isinstance(telem, dict) and not executions:
+        # snapshot shape: executions list under "executions"
+        executions = telem.get("executions") or []
+    queried_downstream = [
+        row
+        for row in executions
+        if str(row.get("phase") or "") == "QUERIED" and row.get("downstream_used")
+    ]
+    assert queried_downstream, f"expected BoardIndexes QUERIED+downstream_used telemetry, got {telem}"
