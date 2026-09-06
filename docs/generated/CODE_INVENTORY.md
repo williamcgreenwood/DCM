@@ -3,9 +3,9 @@
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
 - Modules: **228**
-- Symbols: **1604**
+- Symbols: **1605**
 - Parse errors: **0**
-- Inventory hash: `ebf7b6fe868019b49caa225df785e4ed598e69af382c6083aada2b4aaed6a351`
+- Inventory hash: `8e66aaad1a274a763fb0f48d3f611479f85ea723d2875d56d836591883e53c76`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -161,7 +161,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P1 | `src/dcm/research/provider.py` | 4 | 17 |
 | P1 | `src/dcm/research/readiness.py` | 0 | 4 |
 | P1 | `src/dcm/research/requests.py` | 0 | 6 |
-| P1 | `src/dcm/research/research_store.py` | 1 | 26 |
+| P1 | `src/dcm/research/research_store.py` | 1 | 27 |
 | P1 | `src/dcm/research/role_epoch.py` | 1 | 27 |
 | P1 | `src/dcm/research/scopes.py` | 0 | 6 |
 | P1 | `src/dcm/research/source_catalog.py` | 0 | 6 |
@@ -1848,7 +1848,8 @@ _No class/function symbols._
 - `method` **ResearchStore.telemetry** L374
 - `function` **classify_delta** L394 — Deterministic gap analysis before the host is asked to research.
 - `function` **classify_requests** L489
-- `function` **hydrate_reused_claims** L527 — Pull still-valid stored claims so forecast does not research from zero.
+- `function` **merge_latest_store_claims** L528 — Merge ResearchStore latest blobs into a forecast claim list.
+- `function` **hydrate_reused_claims** L577 — Pull still-valid stored claims so forecast does not research from zero.
 
 ### `src/dcm/research/role_epoch.py`
 
@@ -2007,10 +2008,10 @@ _No class/function symbols._
 - `function` **_default_model_config** L244
 - `function` **_active_calibration** L255
 - `function` **run_dcm** L264
-- `method` **run_dcm._snapshot_for** L877
-- `method` **run_dcm._resimulate_material** L1338
-- `method` **run_dcm.slim** L1529
-- `function` **main** L2097
+- `method` **run_dcm._snapshot_for** L903
+- `method` **run_dcm._resimulate_material** L1364
+- `method` **run_dcm.slim** L1555
+- `function` **main** L2123
 
 ### `src/dcm/runtime/__init__.py`
 
