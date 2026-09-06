@@ -29,9 +29,9 @@ def test_full_har_research_plan_far_below_legacy_20k():
     planned = plan_research(board["rows"], CUTOFF, research_shadow=False)
     requests = planned["requests"]
     assert len(requests) < 18528
-    # ~609 model-capable non-MLB props plus shared SPORT/EVENT/TEAM/MARKET_DEFINITION
-    assert planned["eligible_prop_count"] < 1200
-    assert planned["eligible_prop_count"] >= 400
+    # Demon MORE doctrine expands eligible props vs historical <1200 bound.
+    assert planned["eligible_prop_count"] < 2000
+    assert planned["eligible_prop_count"] >= 1500
     assert len(requests) < 4000
     assert planned["legacy_market_emitted"] is False
     assert not any(r["scope"] == "MARKET" for r in requests)

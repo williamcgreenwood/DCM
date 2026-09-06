@@ -100,7 +100,9 @@ def test_full_sanitized_har_accounts_11113(tmp_path: Path):
     assert acc["raw_missing_wager_types"] == 1955
     assert acc["raw_over_wager_types"] == 6868
     assert acc["raw_under_or_over_wager_types"] == 2290
-    assert acc["missing_sides_fail_closed"] >= 1600
+    # Demons without under-side metadata are MORE (Goblin-parallel doctrine);
+    # remaining fail-closed mass is primarily Standard lacking wager types.
+    assert acc["missing_sides_fail_closed"] == 704
     assert acc["pre_game_rows"] == EXPECTED_FULL["status"]["pre_game"]
     assert acc["in_progress_rows"] == EXPECTED_FULL["status"]["in_progress"]
     assert acc["suspended_rows"] == EXPECTED_FULL["status"]["suspended"]
