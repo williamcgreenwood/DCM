@@ -3,9 +3,9 @@
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
 - Modules: **228**
-- Symbols: **1603**
+- Symbols: **1604**
 - Parse errors: **0**
-- Inventory hash: `292cbc1f5873e2ca364b14555b1c1bd1dd85167e19b57db4b6a0a6d4d1655ee0`
+- Inventory hash: `ebf7b6fe868019b49caa225df785e4ed598e69af382c6083aada2b4aaed6a351`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -100,7 +100,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P2-P4 | `src/dcm/model/gridiron_models.py` | 3 | 14 |
 | P2-P4 | `src/dcm/model/line_surface.py` | 0 | 4 |
 | P2-P4 | `src/dcm/model/market_derive.py` | 1 | 8 |
-| P2-P4 | `src/dcm/model/parameters.py` | 0 | 8 |
+| P2-P4 | `src/dcm/model/parameters.py` | 0 | 9 |
 | P2-P4 | `src/dcm/model/participation.py` | 1 | 5 |
 | P2-P4 | `src/dcm/model/quarter_worlds.py` | 1 | 9 |
 | P2-P4 | `src/dcm/model/ranking.py` | 0 | 3 |
@@ -1200,8 +1200,9 @@ _No class/function symbols._
 - `function` **_avg** L60
 - `function` **_sd** L72
 - `function` **_shrink** L82
-- `function` **build_parameter_snapshot** L90
-- `method` **build_parameter_snapshot._rate_claimed** L325
+- `function` **_collect_player_game_logs** L91 — Collect per-game logs from common host/claim aliases without inventing rows.
+- `function` **build_parameter_snapshot** L124
+- `method` **build_parameter_snapshot._rate_claimed** L358
 
 ### `src/dcm/model/participation.py`
 

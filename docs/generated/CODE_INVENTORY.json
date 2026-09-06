@@ -1,5 +1,5 @@
 {
-  "contentHash": "292cbc1f5873e2ca364b14555b1c1bd1dd85167e19b57db4b6a0a6d4d1655ee0",
+  "contentHash": "ebf7b6fe868019b49caa225df785e4ed598e69af382c6083aada2b4aaed6a351",
   "moduleCount": 228,
   "modules": [
     {
@@ -6129,9 +6129,9 @@
     },
     {
       "classes": 0,
-      "functions": 8,
+      "functions": 9,
       "path": "src/dcm/model/parameters.py",
-      "sha256": "ad63355a5734cbedc2368dc2ad3178417bca8ed2eec571e0a43f534b85606a64",
+      "sha256": "139898a2220681915fa145a71c458c0c2230ea3b5089cccdf0618c10c1878ab7",
       "symbols": [
         {
           "doc": null,
@@ -6182,18 +6182,26 @@
           "qualname": "_shrink"
         },
         {
-          "doc": null,
-          "endLine": 691,
+          "doc": "Collect per-game logs from common host/claim aliases without inventing rows.",
+          "endLine": 121,
           "kind": "function",
-          "line": 90,
+          "line": 91,
+          "name": "_collect_player_game_logs",
+          "qualname": "_collect_player_game_logs"
+        },
+        {
+          "doc": null,
+          "endLine": 724,
+          "kind": "function",
+          "line": 124,
           "name": "build_parameter_snapshot",
           "qualname": "build_parameter_snapshot"
         },
         {
           "doc": null,
-          "endLine": 328,
+          "endLine": 361,
           "kind": "method",
-          "line": 325,
+          "line": 358,
           "name": "_rate_claimed",
           "qualname": "build_parameter_snapshot._rate_claimed"
         }
@@ -14850,5 +14858,5 @@
   "parseErrors": [],
   "root": "src",
   "schema": "pillars_dcm.code_inventory.v1",
-  "symbolCount": 1603
+  "symbolCount": 1604
 }

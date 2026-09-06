@@ -87,6 +87,40 @@ def _shrink(sample: float | None, n: int, prior: float, prior_n: float = 5.0) ->
     return empirical_bayes_shrink(float(sample), float(n), float(prior), float(prior_n))
 
 
+
+def _collect_player_game_logs(player: dict[str, Any]) -> list[dict[str, Any]]:
+    """Collect per-game logs from common host/claim aliases without inventing rows."""
+    keys = (
+        "role_epoch_logs",
+        "game_logs",
+        "gameLogs",
+        "logs",
+        "game_logs_sample_2026",
+        "game_logs_sample_2025",
+        "game_logs_sample",
+        "prior_game_logs",
+        "season_logs",
+    )
+    collected: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for key in keys:
+        value = player.get(key)
+        if not isinstance(value, list):
+            continue
+        for row in value:
+            if not isinstance(row, dict):
+                continue
+            # Skip empty placeholder lists' non-dict noise; require some signal.
+            if not any(row.get(field) is not None for field in row):
+                continue
+            marker = str(row.get("date") or row.get("game_date") or row.get("gameId") or row)
+            if marker in seen:
+                continue
+            seen.add(marker)
+            collected.append(row)
+    return collected
+
+
 def build_parameter_snapshot(
     row: dict[str, Any],
     claims: list[dict[str, Any]],
@@ -209,8 +243,7 @@ def build_parameter_snapshot(
     synthetic = any(str(c.get("source_id") or "").upper().startswith("FIXTURE_") or bool(c.get("synthetic")) for c in all_claims)
     rel = mean([_f(c.get("reliability"), 0.0) for c in all_claims]) if all_claims else 0.0
     fresh = mean([_f(c.get("freshness"), 0.0) for c in all_claims]) if all_claims else 0.0
-    logs = player.get("role_epoch_logs") or player.get("game_logs") or []
-    logs = [r for r in logs if isinstance(r, dict)] if isinstance(logs, list) else []
+    logs = _collect_player_game_logs(player)
     opp = player.get("opportunity") if isinstance(player.get("opportunity"), dict) else {}
     eff = player.get("efficiency") if isinstance(player.get("efficiency"), dict) else {}
     family = str(row.get("sportFamily") or "")
