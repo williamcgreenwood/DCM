@@ -73,3 +73,16 @@ jobs:
           assert [r["boardRows"] for r in report["results"]] == [100, 1000]
           assert all(r["rowsPerWallSecond"] > 0 for r in report["results"])
           PY
+      - name: Baseline profile harness smoke
+        run: |
+          python benchmarks/baseline/profile_baseline.py --smoke --out /tmp/dcm-baseline-smoke --tag smoke
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report = json.loads(Path("/tmp/dcm-baseline-smoke/baseline_profile_smoke.json").read_text())
+          assert report["hostPerformanceCertified"] is False
+          assert report["schema"] == "pillars_dcm.baseline_profile.v1"
+          assert report["boardSizes"] == [100]
+          assert report["worldSizes"] == [64]
+          assert report["hotspots"]
+          PY
