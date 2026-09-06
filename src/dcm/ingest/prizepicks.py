@@ -84,9 +84,8 @@ def _side(attrs: dict) -> tuple[str, bool, bool]:
         less = True
     if _modifier(attrs) == "GOBLIN":
         return "MORE", True, False
-    # PrizePicks Demon lines are harder overs: when the capture omits under-side
-    # metadata, treat the offered side as MORE only (fail closed if LESS was
-    # explicitly indicated above).
+    # Platform product rule (PP_PLATFORM_RULES_AUTHORITY_V1): Demon is a harder
+    # over. When under-side metadata is absent, offered side is MORE only.
     if _modifier(attrs) == "DEMON" and not less:
         return "MORE", True, False
     if selected is not None:

@@ -26,6 +26,7 @@ from dcm.cfb.launch import emit_cfb_forecast_artifacts, persist_algorithm_teleme
 from dcm.cfb.recompute import recompute_full_bundle
 from dcm.cfb.refresh import apply_final_refresh
 from dcm.cfb.rules import build_cfb_rules_snapshot
+from dcm.platform.prizepicks.platform_rules_authority import resolve_platform_rules_authority
 from dcm.research.material_facts import apply_hold_playable, facts_to_features, hold_playable_scope_ids, resolve_material_facts
 from dcm.contracts.hashes import content_hash
 from dcm.identity.resolve import build_player_index, freeze_map, resolve_row
@@ -860,6 +861,7 @@ def run_dcm(
     signal_errors: list[dict[str, Any]] = []
     survivor_state = SurvivorState()
     decision_integrity_records: list[dict[str, Any]] = []
+    platform_authority = resolve_platform_rules_authority(bundle.get("claims") or [])
     cfb_rules_snapshot = build_cfb_rules_snapshot(
         as_of=forecast_cutoff,
         # The HAR is an offer/input dataset, not official statistical
@@ -868,8 +870,8 @@ def run_dcm(
         statistical_source_hashes=tuple(
             sorted({str(claim.get("source_hash") or "") for claim in (bundle.get("claims") or []) if claim.get("source_hash")})
         ),
-        platform_source_hashes=(),
-        platform_rules_verified=False,
+        platform_source_hashes=tuple(platform_authority["platform_source_hashes"]),
+        platform_rules_verified=bool(platform_authority["platform_rules_verified"]),
     )
 
     def _snapshot_for(prow: dict[str, Any]) -> dict[str, Any]:
