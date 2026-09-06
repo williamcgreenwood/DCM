@@ -14,6 +14,7 @@ from dcm.research.adapters.pro_football_reference import (
     ProFootballReferenceAdapter,
 )
 from dcm.research.gridiron_gamelog import (
+    looks_like_gridiron_log,
     normalize_gridiron_log,
     normalize_gridiron_logs,
 )
@@ -109,6 +110,39 @@ def test_off_pct_parses_and_dnp_rejected():
     batch = normalize_gridiron_logs([{"note": "Did Not Play"}, {"pass_att": 20, "pass_yds": 180}])
     assert len(batch["logs"]) == 1
     assert batch["reasonCounts"]["GAMELOG_OPPORTUNITY"] == 1
+
+
+
+def test_kicker_only_log_normalizes_and_batch_keeps():
+    row = {
+        "date": "2025-09-06",
+        "fg_att": 3,
+        "fg_made": 2,
+        "xp_att": 4,
+        "xp_made": 4,
+        "kicking_pts": 10,
+    }
+    assert looks_like_gridiron_log(row)
+    normalized = normalize_gridiron_log(row, league="CFB")
+    assert normalized is not None
+    assert normalized["fg_att"] == 3
+    assert normalized["fg_made"] == 2
+    assert normalized["xp_att"] == 4
+    assert normalized["xp_made"] == 4
+    assert normalized["kicking_pts"] == 10
+    aliased = normalize_gridiron_log({"fga": 2, "fgm": 1, "xpa": 3, "xpm": 3, "kicking_points": 6})
+    assert aliased is not None
+    assert aliased["fg_att"] == 2
+    assert aliased["xp_att"] == 3
+    assert aliased["kicking_pts"] == 6
+    batch = normalize_gridiron_logs([
+        {"note": "Did Not Play"},
+        row,
+        {"fga": 1, "xp_att": 2, "kicking_pts": 5},
+    ], league="CFB")
+    assert len(batch["logs"]) == 2
+    assert batch["reasonCounts"].get("GAMELOG_OPPORTUNITY") == 1
+    assert all("fg_att" in log or "xp_att" in log for log in batch["logs"])
 
 
 def test_adapter_fixture_nfl_qb_and_cfb_qb():

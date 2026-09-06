@@ -35,6 +35,11 @@ CANONICAL_GRIDIRON_FIELDS: tuple[str, ...] = (
     "dropbacks",
     "designed_rush_att",
     "qb_id",
+    "fg_att",
+    "fg_made",
+    "xp_att",
+    "xp_made",
+    "kicking_pts",
 )
 
 # Lowercase alias -> canonical field. Canonical names win when both present.
@@ -97,11 +102,30 @@ _ALIASES: dict[str, str] = {
     "qb_id": "qb_id",
     "qb": "qb_id",
     "quarterback_id": "qb_id",
+    "fg_att": "fg_att",
+    "fga": "fg_att",
+    "fg_attempts": "fg_att",
+    "field_goal_attempts": "fg_att",
+    "fg_made": "fg_made",
+    "fgm": "fg_made",
+    "field_goals_made": "fg_made",
+    "xp_att": "xp_att",
+    "xpa": "xp_att",
+    "pat_att": "xp_att",
+    "extra_point_attempts": "xp_att",
+    "xp_made": "xp_made",
+    "xpm": "xp_made",
+    "pat_made": "xp_made",
+    "extra_points_made": "xp_made",
+    "kicking_pts": "kicking_pts",
+    "kicking_points": "kicking_pts",
+    "kick_pts": "kicking_pts",
 }
 
 _OPPORTUNITY_KEYS = (
     "snaps", "snap_pct", "pass_att", "rush_att", "routes", "targets",
     "receptions", "rec_yds", "pass_yds",
+    "fg_att", "xp_att",
 )
 
 _MARKET_CODES = {
@@ -213,6 +237,7 @@ def normalize_gridiron_log(row: dict, *, league: str | None = None) -> dict | No
         "pass_att", "pass_cmp", "pass_yds", "pass_td", "interceptions",
         "rush_att", "rush_yds", "rush_td", "sacks_taken", "scramble_att",
         "dropbacks", "designed_rush_att",
+        "fg_att", "fg_made", "xp_att", "xp_made", "kicking_pts",
     )
     for field in numeric_fields:
         raw_val = _take(field)
@@ -311,5 +336,9 @@ def looks_like_gridiron_log(row: dict[str, Any]) -> bool:
     football = {
         "pass_att", "pass_yds", "rush_att", "rush_yds", "targets", "receptions",
         "rec", "rec_yds", "off_pct", "snaps", "off_snaps", "routes",
+        # Canonical kicking only — do not include basketball `fga`/`fgm` aliases here
+        # or basketball logs are misclassified as gridiron.
+        "fg_att", "fg_made", "xp_att", "xp_made", "kicking_pts",
+        "xpa", "xpm", "kicking_points",
     }
     return bool(keys & football)
