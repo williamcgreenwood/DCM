@@ -6,10 +6,16 @@ Active canonical-main CFB closure slice: `chatgpt/canonical-main-cfb-standard-20
 
 This file is the human dashboard. It must be updated on every coding pass together with a new immutable pass record under `docs/engineering_passes/`.
 
-Current bounded execution increment: `P0-BASELINE-PROFILE-20260906` adds the two-representation BoardStore (audit dicts + int32/NumPy SoA indexes) and compact Feature/Parameter matrix helpers. CFB launch still consumes BoardIndexes at the public boundary.
+Current bounded execution increment: `P0-EVENTWORLD-NUMPY-20260906` NumPy-first CFB EventWorld acceleration on top of Phase 9 baseline timings.
 `docs/engineering/DCM_CODING_AND_PROMPT_STANDARD.md`; Drive writes follow
 `docs/engineering/DCM_DRIVE_HIERARCHY.md` and `dcm.runtime.storage_router`.
 
+
+## 2026-09-06 Phase 11 EventWorld NumPy acceleration
+
+`perf/eventworld-numpy-20260906` (base `main` @ `a3e28fb82cabbecc69e70cff92c36c8db938a6f1`, PR #40). Replaces dict-heavy per-world opportunity hashing with a NumPy/SoA backend (default) while keeping a mandatory portable `reference` Python path. Public API: `simulate_joint_cfb_event_worlds` / `simulate_cfb_event`. **Bitwise world parity** under `rngVersion=dcm.cfb.event_world.rng.v1` (no silent RNG change). Measured ~**2×** wall speedup vs reference on the Phase 9 synthetic matrix (8×10000: ~24.5s → ~12.2s). Artifacts: `docs/benchmarks/eventworld_numpy_accel_20260906.{md,json}`.
+
+**`hostPerformanceCertified=false` still.** Remaining C ABI candidacy: `sample_football` binomial/poisson + dict materialization — only after real-evidence SLOs. No HAR, no mandatory C++, no predictive certification.
 
 ## 2026-09-06 Phase 9 baseline profiling
 
@@ -69,7 +75,7 @@ PR #34 merged to `main` at `b0e44d5886adb98cb84dbf466ee3a3fc1fee28b1`; PR #35 me
 | P10 Full sport coverage | 10 | 3 | EARLY | each supported sport reaches 24/24 plugin components + validation suite |
 | P11 Release + fresh-environment acceptance | 10 | 7 | PARTIAL | wheel/release + exact hash + current HAR-only fresh ChatGPT acceptance |
 | P12 Research archive / index / reuse | 10 | 8 | STRONG PARTIAL | Drive credentials; high-volume queryable store; retention/licensing enforcement beyond local blobs |
-| P13 Performance / search / token optimization | 10 | 8 | STRONG PARTIAL | Phase 9 baseline committed (`docs/benchmarks/`); Phase 11 NumPy EventWorld accel; hostPerformanceCertified=false |
+| P13 Performance / search / token optimization | 10 | 8 | STRONG PARTIAL | Phase 11 NumPy EventWorld ~2× vs reference committed; remaining C ABI candidacy after real-evidence SLOs; hostPerformanceCertified=false |
 | P14 Production operations / observability | 10 | 5 | PARTIAL | run health/readiness, failure taxonomy, deterministic recovery, release gates |
 | P15 P380X donor signal governance | 10 | 8 | STRONG PARTIAL | Tranche C MaterialFact/source-truth runtime closure; next typed role/matchup/context operators; exact donor archive bytes and later tranches remain external/future |
 | P16 Algorithmic Constitution / strategy registry | 10 | 9 | STRONG PARTIAL | CFB live CELF + telemetry done; remaining mixed-sport R1; keep CI gates; no silent algorithm retirement |

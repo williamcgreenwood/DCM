@@ -1,0 +1,128 @@
+{
+  "capturedAtUtc": "2026-09-06T05:10:00Z",
+  "hostPerformanceCertified": false,
+  "notes": "Bitwise world parity under rngVersion v1; synthetic loads only.",
+  "phase11Numpy": [
+    {
+      "backend": "numpy",
+      "outputHash": "946d7c56c662e5b442ed3323b39b8ecf64f9f322e8f24b6b7262c3255b4751af",
+      "wallSeconds": 0.08127255504950881,
+      "worldCount": 64
+    },
+    {
+      "backend": "numpy",
+      "outputHash": "d9daff902bbcde6200adb3ade3f2a69c2febddc67746ce8333ec20b0a72f6a0f",
+      "wallSeconds": 0.15025980805512518,
+      "worldCount": 128
+    },
+    {
+      "backend": "numpy",
+      "outputHash": "06cb14d908a3a2e5ed59766f87aeb43a251b1a324e5d7a22d0f64c1b3963a861",
+      "wallSeconds": 0.616116028977558,
+      "worldCount": 512
+    },
+    {
+      "backend": "numpy",
+      "outputHash": "59b3ae63c3c68c040549bb305ef25d02f4db34d684c1435fe3335660149a8253",
+      "wallSeconds": 2.4705919310217723,
+      "worldCount": 2048
+    },
+    {
+      "backend": "numpy",
+      "outputHash": "2e5261e1f20043c301774f5da8452383a3919fa971b4d1eaeb0053f84ec50065",
+      "wallSeconds": 12.134470305056311,
+      "worldCount": 10000
+    }
+  ],
+  "phase9Baseline": [
+    {
+      "outputHash": "01516a19fc3ab683613defb4a058148e61e722c8aefcbf05d3cb8074ced502de",
+      "wallSeconds": 0.1604446329874918,
+      "worldCount": 64
+    },
+    {
+      "outputHash": "90a5283afe464a09070dea6b7fe9e790cf886180870feee6b5c32b7ede3c63aa",
+      "wallSeconds": 0.33063100394792855,
+      "worldCount": 128
+    },
+    {
+      "outputHash": "67bea661ba7fb3b0b04bde9e8c439d4f6bf23ff35a3ad209686ae28a778c38da",
+      "wallSeconds": 1.3318594050360844,
+      "worldCount": 512
+    },
+    {
+      "outputHash": "2a59e0730bb0705d47ff68ce0b9d335f5a0ccab5079446d555c14b5f235e533f",
+      "wallSeconds": 5.019388788030483,
+      "worldCount": 2048
+    },
+    {
+      "outputHash": "ad168048a095f5d7ae972fd960132b007a876702ba3571a0ef0ee5c576631871",
+      "wallSeconds": 24.664285097969696,
+      "worldCount": 10000
+    }
+  ],
+  "rngVersion": "dcm.cfb.event_world.rng.v1",
+  "sameRunCompare": {
+    "hostPerformanceCertified": false,
+    "notes": "Same seed + rngVersion v1; NumPy backend skips per-world share content_hash while preserving bitwise world ledgers.",
+    "rows": [
+      {
+        "numpyWallSeconds": 0.07876480801496655,
+        "numpyWorldsPerSec": 812.5456230127419,
+        "outputHashMatch": true,
+        "playerCount": 8,
+        "referenceWallSeconds": 0.15693198307417333,
+        "referenceWorldsPerSec": 407.8199914784141,
+        "rngVersion": "dcm.cfb.event_world.rng.v1",
+        "speedup": 1.9924124368379568,
+        "worldCount": 64
+      },
+      {
+        "numpyWallSeconds": 0.15487295796629041,
+        "numpyWorldsPerSec": 826.4838592923396,
+        "outputHashMatch": true,
+        "playerCount": 8,
+        "referenceWallSeconds": 0.31196783599443734,
+        "referenceWorldsPerSec": 410.2987078523132,
+        "rngVersion": "dcm.cfb.event_world.rng.v1",
+        "speedup": 2.0143467270918927,
+        "worldCount": 128
+      },
+      {
+        "numpyWallSeconds": 0.6192201699595898,
+        "numpyWorldsPerSec": 826.8464511312883,
+        "outputHashMatch": true,
+        "playerCount": 8,
+        "referenceWallSeconds": 1.2327437900239602,
+        "referenceWorldsPerSec": 415.3336679879349,
+        "rngVersion": "dcm.cfb.event_world.rng.v1",
+        "speedup": 1.990800445186417,
+        "worldCount": 512
+      },
+      {
+        "numpyWallSeconds": 2.484866229002364,
+        "numpyWorldsPerSec": 824.1892364653532,
+        "outputHashMatch": true,
+        "playerCount": 8,
+        "referenceWallSeconds": 4.989269486046396,
+        "referenceWorldsPerSec": 410.48093427859294,
+        "rngVersion": "dcm.cfb.event_world.rng.v1",
+        "speedup": 2.007862406359602,
+        "worldCount": 2048
+      },
+      {
+        "numpyWallSeconds": 12.215908145997673,
+        "numpyWorldsPerSec": 818.6047144825924,
+        "outputHashMatch": true,
+        "playerCount": 8,
+        "referenceWallSeconds": 24.482302088988945,
+        "referenceWorldsPerSec": 408.4583207760334,
+        "rngVersion": "dcm.cfb.event_world.rng.v1",
+        "speedup": 2.004132791143337,
+        "worldCount": 10000
+      }
+    ],
+    "schema": "pillars_dcm.eventworld_backend_compare.v1"
+  },
+  "schema": "pillars_dcm.eventworld_numpy_accel.v1"
+}

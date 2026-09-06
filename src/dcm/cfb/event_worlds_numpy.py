@@ -1,74 +1,106 @@
-"""Shared CFB EventWorlds. Correlations emerge from shared football primitives.
+"""NumPy / SoA-oriented CFB joint EventWorld backend.
 
-Do not independently simulate each prop. Player carries cannot exceed team
-rushing attempts; completions cannot exceed attempts; catches cannot exceed
-targets. Board players never absorb 100% of a team pool by default.
-Composites are identities on the same ledger.
+Keeps the reference ``random.Random`` stream (rngVersion v1) for bitwise ledger
+parity with ``simulate_joint_cfb_event_worlds_reference``. Acceleration comes from:
+- skipping per-world content_hash share audit bodies (``allocate_team_opportunity_fast``)
+- contiguous NumPy team-play / residual / opportunity buffers
+- optional SoA views of hot ledger fields (exported in meta; public worlds remain dicts)
 
-Backends:
-- ``reference`` — pure Python dict loop (portable fallback; always available)
-- ``numpy`` — default when NumPy is available; same RNG stream (rngVersion v1),
-  fast opportunity allocation + SoA team/opportunity buffers
+Public return shape matches the reference backend (dict-of-list-of-dict worlds).
 """
 from __future__ import annotations
 
-from collections import defaultdict
 from typing import Any
 
-from dcm.cfb.event_world_backend import backend_meta, resolve_event_world_backend
-from dcm.cfb.opportunity_ledger import KICKER_ROLES, allocate_team_opportunity
+import numpy as np
+
+from dcm.cfb.event_world_backend import RNG_VERSION, backend_meta
+from dcm.cfb.opportunity_ledger import KICKER_ROLES, allocate_team_opportunity_fast
 from dcm.model.worlds import _clip, _nonneg_int_gauss, _p, _rng, sample_football
 
+# Hot fields mirrored into SoA for future C ABI / matrix consumers.
+_SOA_FIELDS = (
+    "pass_att",
+    "pass_cmp",
+    "pass_yds",
+    "pass_td",
+    "interceptions",
+    "rush_att",
+    "rush_yds",
+    "rush_td",
+    "targets",
+    "receptions",
+    "rec_yds",
+    "rec_td",
+    "fg_made",
+    "xp_made",
+    "kicking_pts",
+    "team_off_plays",
+    "team_pass_att",
+    "team_rush_att",
+    "unmodeled_rush_residual",
+    "unmodeled_target_residual",
+    "unmodeled_pass_residual",
+)
 
-def cfb_teammate_groups(rows: list[dict[str, Any]]) -> dict[tuple[str, str], dict[str, dict[str, Any]]]:
-    from dcm.research.classify import accounting_classify
 
-    groups: dict[tuple[str, str], dict[str, dict[str, Any]]] = defaultdict(dict)
-    for row in rows:
-        if str(row.get("sportFamily") or "") != "gridiron":
-            continue
-        if str(row.get("league") or "").upper() != "CFB":
-            continue
-        state, _blocker = accounting_classify(row)
-        if state not in {"MODELED", "MODELED_DIAGNOSTIC"}:
-            continue
-        pid = str(row.get("playerId") or "")
-        if not pid:
-            continue
-        key = (str(row.get("eventId") or ""), str(row.get("teamId") or ""))
-        groups[key].setdefault(pid, row)
-    return dict(groups)
-
-
-def simulate_joint_cfb_event_worlds_reference(
+def simulate_joint_cfb_event_worlds_numpy(
     specs: list[dict[str, Any]],
     *,
     n: int,
     seed: str,
     event_contexts: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
-    """Portable pure-Python joint CFB EventWorld (mandatory fallback path)."""
     if not specs:
-        return {"worlds": {}, "meta": {"joint": False, "n": 0, **backend_meta("reference")}}
+        return {
+            "worlds": {},
+            "meta": {
+                "joint": False,
+                "n": 0,
+                **backend_meta("numpy"),
+            },
+        }
+
     rng = _rng(f"cfb-joint:{seed}:{specs[0]['row'].get('eventId')}")
-    players = []
+    players: list[dict[str, Any]] = []
     for spec in specs:
         row = spec["row"]
         snap = spec.get("snapshot") or {}
         params = snap.get("parameters") if isinstance(snap.get("parameters"), dict) else snap
-        players.append({
-            "playerId": str(row.get("playerId")),
-            "role": str(row.get("role") or params.get("role") or "WR").upper(),
-            "params": params if isinstance(params, dict) else {},
-            "row": row,
-        })
+        players.append(
+            {
+                "playerId": str(row.get("playerId")),
+                "role": str(row.get("role") or params.get("role") or "WR").upper(),
+                "params": params if isinstance(params, dict) else {},
+                "row": row,
+            }
+        )
 
-    worlds: dict[str, list[dict[str, float]]] = {p["playerId"]: [] for p in players}
+    n_worlds = max(0, int(n))
+    n_players = len(players)
+    player_ids = [p["playerId"] for p in players]
+
+    team_plays_a = np.zeros(n_worlds, dtype=np.int32)
+    team_pass_a = np.zeros(n_worlds, dtype=np.int32)
+    team_rush_a = np.zeros(n_worlds, dtype=np.int32)
+    residual_rush_a = np.zeros(n_worlds, dtype=np.int32)
+    residual_tgt_a = np.zeros(n_worlds, dtype=np.int32)
+    residual_pass_a = np.zeros(n_worlds, dtype=np.int32)
+    player_pass_a = np.zeros((n_worlds, n_players), dtype=np.int32)
+    player_rush_a = np.zeros((n_worlds, n_players), dtype=np.int32)
+    player_tgt_a = np.zeros((n_worlds, n_players), dtype=np.int32)
+    soa: dict[str, dict[str, np.ndarray]] = {
+        pid: {f: np.zeros(n_worlds, dtype=np.float64) for f in _SOA_FIELDS} for pid in player_ids
+    }
+
+    worlds: dict[str, list[dict[str, float]]] = {pid: [] for pid in player_ids}
     conservation_failures = 0
     residual_acc = {"rush": 0, "targets": 0, "pass": 0}
     last_alloc: dict[str, Any] = {}
-    for i in range(int(n)):
-        ctx = (event_contexts or [{}])[i % max(1, len(event_contexts or [{}]))]
+    ctx_list = event_contexts or [{}]
+
+    for i in range(n_worlds):
+        ctx = ctx_list[i % max(1, len(ctx_list))]
         pace = float(ctx.get("pace") or 1.0)
         pass_rate = _clip(float(ctx.get("pass_rate") or 0.55), 0.25, 0.80)
         team_plays = max(40, _nonneg_int_gauss(rng, 68.0 * pace, 6.0))
@@ -77,7 +109,7 @@ def simulate_joint_cfb_event_worlds_reference(
         team_rush_att = max(0, team_plays - team_pass_att - team_sacks)
         team_targets = team_pass_att
 
-        alloc = allocate_team_opportunity(
+        alloc = allocate_team_opportunity_fast(
             players,
             team_pass_att=team_pass_att,
             team_rush_att=team_rush_att,
@@ -91,27 +123,52 @@ def simulate_joint_cfb_event_worlds_reference(
         residual_acc["pass"] += int(alloc["residualPassAtt"])
         last_alloc = alloc
 
+        team_plays_a[i] = team_plays
+        team_pass_a[i] = team_pass_att
+        team_rush_a[i] = team_rush_att
+        residual_rush_a[i] = int(alloc["residualRushAtt"])
+        residual_tgt_a[i] = int(alloc["residualTargets"])
+        residual_pass_a[i] = int(alloc["residualPassAtt"])
+        player_pass_a[i, :] = np.asarray(player_pass, dtype=np.int32)
+        player_rush_a[i, :] = np.asarray(player_rush, dtype=np.int32)
+        player_tgt_a[i, :] = np.asarray(player_tgt, dtype=np.int32)
+
         drawn: dict[str, dict[str, float]] = {}
         rec_yds_sum = 0.0
         pass_yds_qb = 0.0
         rush_sum = 0
         tgt_sum = 0
         scoring = {"pass_td": 0.0, "rush_td": 0.0, "rec_td": 0.0}
+
         for j, p in enumerate(players):
             role = p["role"]
             params = dict(p["params"])
             params["pass_att_mean"] = float(player_pass[j])
             params["rush_att_mean"] = float(player_rush[j])
-            params["routes_mean"] = float(max(player_tgt[j], 1) / max(_p(params, "target_rate", 0.28), 0.05))
+            params["routes_mean"] = float(
+                max(player_tgt[j], 1) / max(_p(params, "target_rate", 0.28), 0.05)
+            )
             try:
                 stats = sample_football(rng, role, params)
             except RuntimeError:
                 conservation_failures += 1
                 stats = {
-                    "pass_att": player_pass[j], "pass_cmp": 0, "pass_yds": 0, "pass_td": 0, "interceptions": 0,
-                    "rush_att": player_rush[j], "rush_yds": 0, "rush_td": 0,
-                    "targets": player_tgt[j], "receptions": 0, "rec_yds": 0, "rec_td": 0,
-                    "fg_att": 0, "fg_made": 0, "xp_att": 0, "xp_made": 0,
+                    "pass_att": player_pass[j],
+                    "pass_cmp": 0,
+                    "pass_yds": 0,
+                    "pass_td": 0,
+                    "interceptions": 0,
+                    "rush_att": player_rush[j],
+                    "rush_yds": 0,
+                    "rush_td": 0,
+                    "targets": player_tgt[j],
+                    "receptions": 0,
+                    "rec_yds": 0,
+                    "rec_td": 0,
+                    "fg_att": 0,
+                    "fg_made": 0,
+                    "xp_att": 0,
+                    "xp_made": 0,
                 }
             if role in KICKER_ROLES:
                 stats["pass_att"] = 0
@@ -156,6 +213,8 @@ def simulate_joint_cfb_event_worlds_reference(
             stats["unmodeled_target_residual"] = float(alloc["residualTargets"])
             stats["unmodeled_pass_residual"] = float(alloc["residualPassAtt"])
             drawn[p["playerId"]] = stats
+            for f in _SOA_FIELDS:
+                soa[p["playerId"]][f][i] = float(stats.get(f) or 0.0)
 
         if rush_sum + alloc["residualRushAtt"] > team_rush_att + 1:
             conservation_failures += 1
@@ -168,12 +227,12 @@ def simulate_joint_cfb_event_worlds_reference(
         for pid, stats in drawn.items():
             worlds[pid].append(stats)
 
-    n_worlds = max(1, int(n))
+    denom = max(1, n_worlds)
     identities_ok = conservation_failures == 0
     meta = {
         "joint": True,
         "n": n,
-        "playerCount": len(players),
+        "playerCount": n_players,
         "allocationMode": "JOINT_TEAM",
         "conservationFailures": conservation_failures,
         "conservation": {
@@ -185,44 +244,27 @@ def simulate_joint_cfb_event_worlds_reference(
             "targets_plus_residual_le_team": True,
         },
         "residual": {
-            "rushAttMean": residual_acc["rush"] / n_worlds,
-            "targetsMean": residual_acc["targets"] / n_worlds,
-            "passAttMean": residual_acc["pass"] / n_worlds,
+            "rushAttMean": residual_acc["rush"] / denom,
+            "targetsMean": residual_acc["targets"] / denom,
+            "passAttMean": residual_acc["pass"] / denom,
         },
         "kickerIsolated": bool(last_alloc.get("kickerIsolated", True)),
-        "sharedPrimitives": ["team_off_plays", "team_pass_att", "team_rush_att", "pass_rate", "pace", "residual"],
+        "sharedPrimitives": [
+            "team_off_plays",
+            "team_pass_att",
+            "team_rush_att",
+            "pass_rate",
+            "pace",
+            "residual",
+        ],
         "eventId": specs[0]["row"].get("eventId"),
-        **backend_meta("reference"),
+        **backend_meta("numpy"),
+        "soaFields": list(_SOA_FIELDS),
+        "teamPlayBufferBytes": int(team_plays_a.nbytes + team_pass_a.nbytes + team_rush_a.nbytes),
+        "opportunityBufferBytes": int(
+            player_pass_a.nbytes + player_rush_a.nbytes + player_tgt_a.nbytes
+        ),
+        "soaBufferBytes": int(sum(arr.nbytes for pid in soa for arr in soa[pid].values())),
+        "rngVersion": RNG_VERSION,
     }
-    return {"worlds": worlds, "meta": meta}
-
-
-def simulate_joint_cfb_event_worlds(
-    specs: list[dict[str, Any]],
-    *,
-    n: int,
-    seed: str,
-    event_contexts: list[dict[str, Any]] | None = None,
-    backend: str | None = None,
-) -> dict[str, Any]:
-    """Shared team plays/pass-rate/rush-rate → residual-aware player opportunity.
-
-    ``backend``: ``None`` (default numpy when available), ``\"numpy\"``, or ``\"reference\"``.
-    Env override: ``DCM_EVENTWORLD_BACKEND``.
-    """
-    chosen = resolve_event_world_backend(backend)
-    if chosen == "numpy":
-        from dcm.cfb.event_worlds_numpy import simulate_joint_cfb_event_worlds_numpy
-
-        out = simulate_joint_cfb_event_worlds_numpy(
-            specs, n=n, seed=seed, event_contexts=event_contexts
-        )
-        # Keep public surface to worlds + meta only (SoA is an internal accel aid).
-        return {"worlds": out["worlds"], "meta": out["meta"]}
-    return simulate_joint_cfb_event_worlds_reference(
-        specs, n=n, seed=seed, event_contexts=event_contexts
-    )
-
-
-# Conceptual public alias used in Phase 11 docs / host call sites.
-simulate_cfb_event = simulate_joint_cfb_event_worlds
+    return {"worlds": worlds, "meta": meta, "_soa": soa}
