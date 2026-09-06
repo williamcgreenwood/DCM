@@ -5,7 +5,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 - Modules: **228**
 - Symbols: **1606**
 - Parse errors: **0**
-- Inventory hash: `987ec392ffcd623dd8a52a54d55959d24aef4c9b5f83b5a045babc3bb9d33e10`
+- Inventory hash: `7a6b19cf5cc09512a1abb3d680d8dedbac29cfb8d03ef92ec713698c5f00af26`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -2461,7 +2461,7 @@ _No class/function symbols._
 - `function` **_truthy** L25
 - `function` **_num** L31
 - `function` **_prior_season_blob** L38
-- `function` **resolve_cfb_role_state** L53
+- `function` **resolve_cfb_role_state** L55
 
 ### `src/dcm/sports/football/conservation.py`
 
