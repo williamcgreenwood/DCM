@@ -10,7 +10,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-PKG = ROOT / "artifacts" / "dcm_v6_workstream_ab"
+PKG = ROOT / "src"
 sys.path.insert(0, str(PKG))
 
 from dcm.algorithms.catalog import ALGORITHM_RECORDS, CONSTITUTION_VERSION  # noqa: E402

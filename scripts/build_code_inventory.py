@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
-PKG_ROOT = ROOT / "artifacts" / "dcm_v6_workstream_ab"
+PKG_ROOT = ROOT / "src"
 OUT_JSON = ROOT / "docs" / "generated" / "CODE_INVENTORY.json"
 OUT_MD = ROOT / "docs" / "generated" / "CODE_INVENTORY.md"
 

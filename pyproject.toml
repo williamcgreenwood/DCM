@@ -18,11 +18,8 @@ pillars-dcm = "dcm.runner:main"
 dcm = "dcm.runner:main"
 dcm-host = "dcm.chat.cli:main"
 
-[tool.setuptools.package-dir]
-"" = "artifacts/dcm_v6_workstream_ab"
-
 [tool.setuptools.packages.find]
-where = ["artifacts/dcm_v6_workstream_ab"]
+where = ["src"]
 include = ["dcm*", "pillars_dcm*"]
 
 [tool.setuptools.package-data]
@@ -36,6 +33,6 @@ dcm = [
 ]
 
 [tool.pytest.ini_options]
-testpaths = ["artifacts/dcm_v6_workstream_ab/tests", "tests/governance"]
-pythonpath = ["artifacts/dcm_v6_workstream_ab"]
+testpaths = ["tests"]
+pythonpath = ["src"]
 addopts = "-q"

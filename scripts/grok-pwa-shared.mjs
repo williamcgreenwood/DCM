@@ -8,7 +8,7 @@ import { join } from "node:path";
 
 export const DEFAULT_APP_NAME = "Grok App";
 export const OG_SERVICE_URL_DEFAULT = "https://og.grok.me";
-export const OG_SITE_REL_PATH = "src/lib/og/site.json";
+export const OG_SITE_REL_PATH = "web/src/lib/og/site.json";
 
 const SHARE_META_KEYS = new Set([
   "og:title",
