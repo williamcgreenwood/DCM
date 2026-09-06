@@ -228,7 +228,7 @@ def test_invalidate_descendants_spares_unrelated_offer_parameters():
     g_other = dag.add("GRADE", "offer-other", parents=[p_other.key, w_other.key])
     dag.complete(g_other.key, "go")
 
-    hit = dag.invalidate_descendants([p_touch.key], include_roots=True)
+    hit = dag.invalidate([p_touch.key], include_roots=True)
     assert p_touch.key in hit
     assert w_touch.key in hit
     assert g_touch.key in hit
@@ -237,6 +237,18 @@ def test_invalidate_descendants_spares_unrelated_offer_parameters():
     assert dag.nodes[g_other.key].state == "COMPLETE_VERIFIED"
     assert p_other.key not in hit
     assert g_other.key not in hit
+    # Legacy alias still works and stays ID-scoped
+    dag2 = Dag.from_snapshot(dag.snapshot())
+    # restore other lineage to COMPLETE for alias check on a fresh touch
+    claim2 = dag2.add("EVIDENCE_CLAIM", "c2")
+    dag2.complete(claim2.key, "c2")
+    p2 = dag2.add("PARAMETER", "offer-touch-2", parents=[claim2.key])
+    dag2.complete(p2.key, "p2")
+    g2o = [n for n in dag2.nodes.values() if n.identity == "offer-other" and n.node_type == "GRADE"][0]
+    assert g2o.state == "COMPLETE_VERIFIED"
+    hit2 = dag2.invalidate_descendants([p2.key], include_roots=True)
+    assert p2.key in hit2
+    assert g2o.key not in hit2
 
 
 def test_source_aware_import_uses_indexes_and_consumer_beyond_snapshot(tmp_path: Path):
@@ -277,6 +289,15 @@ def test_source_aware_import_uses_indexes_and_consumer_beyond_snapshot(tmp_path:
     by_key = {n["key"]: n for n in dag_snap["nodes"]}
     assert by_key[other.key]["state"] == "COMPLETE_VERIFIED"
     assert by_key[other_g.key]["state"] == "COMPLETE_VERIFIED"
+    assert (dest / "runtime_dag.json").is_file()
+    runtime_snap = json.loads((dest / "runtime_dag.json").read_text(encoding="utf-8"))
+    assert runtime_snap.get("children") is not None
+    runtime_by_key = {n["key"]: n for n in runtime_snap["nodes"]}
+    assert runtime_by_key[other.key]["state"] == "COMPLETE_VERIFIED"
+    assert runtime_by_key[other_g.key]["state"] == "COMPLETE_VERIFIED"
+    # Touched offers install claim→fact→feature→parameter lineage
+    assert any(n.get("nodeType") == "FACT" for n in runtime_snap["nodes"])
+    assert any(n.get("nodeType") == "FEATURE" for n in runtime_snap["nodes"])
     # Touched grade/world nodes should be invalidated.
     invalidated = set(result["invalidatedDescendants"])
     assert invalidated

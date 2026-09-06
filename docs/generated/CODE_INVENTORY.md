@@ -3,9 +3,9 @@
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
 - Modules: **223**
-- Symbols: **1528**
+- Symbols: **1542**
 - Parse errors: **0**
-- Inventory hash: `a837b2f74fd918da097a3628373b006d1fec9536fcc34f0286e929372acefd20`
+- Inventory hash: `9886c0a5423dd80ea1e1140d4708ec2f6271e95695edbd551a2e7b8cb4613866`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -146,7 +146,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P1 | `src/dcm/research/lineup.py` | 0 | 3 |
 | P1 | `src/dcm/research/material_facts.py` | 0 | 20 |
 | P1 | `src/dcm/research/observation_execute.py` | 0 | 1 |
-| P1 | `src/dcm/research/observation_execute_support.py` | 0 | 9 |
+| P1 | `src/dcm/research/observation_execute_support.py` | 0 | 10 |
 | P1 | `src/dcm/research/observation_typed.py` | 0 | 7 |
 | P1 | `src/dcm/research/offer_metadata.py` | 0 | 1 |
 | P1 | `src/dcm/research/os_graphs.py` | 0 | 8 |
@@ -176,7 +176,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P5-P14 | `src/dcm/runtime/checkpoint_outbox.py` | 0 | 4 |
 | P5-P14 | `src/dcm/runtime/checkpoint_reconciliation.py` | 0 | 2 |
 | P5-P14 | `src/dcm/runtime/cutoff.py` | 1 | 4 |
-| P5-P14 | `src/dcm/runtime/dag.py` | 2 | 16 |
+| P5-P14 | `src/dcm/runtime/dag.py` | 3 | 28 |
 | P5-P14 | `src/dcm/runtime/drive_catalog.py` | 1 | 10 |
 | P5-P14 | `src/dcm/runtime/freeze.py` | 0 | 2 |
 | P5-P14 | `src/dcm/runtime/github_archive.py` | 0 | 38 |
@@ -1625,7 +1625,7 @@ _No class/function symbols._
 
 ### `src/dcm/research/observation_execute.py`
 
-- `function` **execute_source_aware_observations** L60 — Import source-aware host observations and close coverage→consumer contracts.
+- `function` **execute_source_aware_observations** L61 — Import source-aware host observations and close coverage→consumer contracts.
 
 ### `src/dcm/research/observation_execute_support.py`
 
@@ -1636,8 +1636,9 @@ _No class/function symbols._
 - `function` **_snapshot_ablation** L117
 - `function` **_consumer_ablation** L145 — MaterialFact / feature + probability/grade helper hash changes.
 - `method` **_consumer_ablation._stub_consumer** L172
-- `function` **_load_existing_dag** L252
-- `function` **_ensure_offer_lineage** L266 — claim → PARAMETER → EVENT_WORLDS → GRADE for one offer (idempotent add).
+- `function` **_load_existing_dag** L252 — Prefer canonical run DAG artifacts over throwaway mini-DAGs.
+- `function` **_persist_run_dag** L269 — Write canonical runtime_dag.json plus source-aware alias used by tests.
+- `function` **_ensure_offer_lineage** L278 — Permanent claim→fact→feature→parameter→worlds→grade→rank for one offer.
 
 ### `src/dcm/research/observation_typed.py`
 
@@ -1987,24 +1988,37 @@ _No class/function symbols._
 
 ### `src/dcm/runtime/dag.py`
 
-- `function` **node_key** L64
-- `class` **DagNode** L87
-- `method` **DagNode.to_dict** L96
-- `class` **Dag** L109
-- `method` **Dag.add** L116
-- `method` **Dag.complete** L131
-- `method` **Dag.block** L136
-- `method` **Dag.fail** L141
-- `method` **Dag.invalidate_line_descendants** L146 — A line change invalidates market/grade/rank/portfolio/freeze, not research.
-- `method` **Dag.invalidate_types** L150
-- `method` **Dag.children_map** L160 — Reverse adjacency: parent key → child keys.
-- `method` **Dag.invalidate_descendants** L168 — Invalidate transitive children of specific node keys via reverse adjacency.
-- `method` **Dag.invalidate_for_delta** L201 — Invalidate only downstream nodes that depend on this evidence class.
-- `method` **Dag.from_snapshot** L212 — Reload a previously persisted DAG snapshot (nodes + parent links).
-- `method` **Dag.preserved_research_nodes** L238
-- `method` **Dag.reused** L241
-- `method` **Dag.pending** L244
-- `method` **Dag.snapshot** L247
+- `class` **DagFrozenError** L135 — Raised when invalidate attempts backward mutation after FREEZE is verified.
+- `method` **DagFrozenError.__init__** L138
+- `function` **node_key** L142
+- `class` **DagNode** L165
+- `method` **DagNode.to_dict** L174
+- `class` **Dag** L187
+- `method` **Dag.add** L196
+- `method` **Dag.complete** L214
+- `method` **Dag.block** L219
+- `method` **Dag.fail** L224
+- `method` **Dag.is_frozen** L229 — True only after an explicit freeze latch (``mark_freeze`` / snapshot).
+- `method` **Dag.children_map** L239 — Reverse adjacency: parent key → child keys (sorted for determinism).
+- `method` **Dag.reverse_adjacency_indexes** L249 — Permanent conceptual indexes used by run invalidation / audit.
+- `method` **Dag.nodes_of_type** L286
+- `method` **Dag.find_by_identity** L293
+- `method` **Dag._assert_not_frozen** L305
+- `method` **Dag.invalidate** L309 — Deterministic BFS invalidation of actual children only.
+- `method` **Dag.invalidate_descendants** L354 — Alias for ``invalidate`` — ID-scoped transitive children only.
+- `method` **Dag.invalidate_line_descendants** L360 — Line change: invalidate MARKET_LINE/LINE_SURFACE seeds and *their* descendants.
+- `method` **Dag.invalidate_types** L370 — Legacy / coarse helper: wipe every node whose type is in ``types``.
+- `method` **Dag.invalidate_for_delta** L388 — Legacy coarse delta-class wipe via ``invalidate_types``.
+- `method` **Dag.invalidate_role_lineage** L400 — Role/epoch change: only the given role nodes and their actual descendants.
+- `method` **Dag.invalidate_environment_lineage** L404 — Weather/environment change: only relevant env/weather nodes + descendants.
+- `method` **Dag.ensure_offer_lineage** L408 — Install permanent claim→fact→feature→parameter→worlds→grade→rank chain.
+- `method` **Dag.ensure_portfolio_link** L444
+- `method` **Dag.mark_freeze** L451
+- `method` **Dag.from_snapshot** L459 — Reload a previously persisted DAG snapshot (nodes + parent links).
+- `method` **Dag.preserved_research_nodes** L486
+- `method` **Dag.reused** L489
+- `method` **Dag.pending** L492
+- `method` **Dag.snapshot** L495
 
 ### `src/dcm/runtime/drive_catalog.py`
 

@@ -6,10 +6,16 @@ Active canonical-main CFB closure slice: `chatgpt/canonical-main-cfb-standard-20
 
 This file is the human dashboard. It must be updated on every coding pass together with a new immutable pass record under `docs/engineering_passes/`.
 
-Current bounded execution increment: `P1-RESEARCH-OS-CLOSED-LOOP-20260906` finishes the grouped Research OS closed loop on the CFB path (AcquisitionActionGraph persist + observation→coverage→CELF next-batch shrink). This is not a claim that external evidence has already been acquired or that a final CFB ranking is complete.
+Current bounded execution increment: `P0-TRUE-DESCENDANT-DAG-20260906` upgrades runtime Dag to true changed-node→descendant invalidation on the CFB research/import path (ID-scoped BFS; research-stable line changes; role/weather scoping; freeze latch). Compact array BoardStore remains Phase 7.
 `docs/engineering/DCM_CODING_AND_PROMPT_STANDARD.md`; Drive writes follow
 `docs/engineering/DCM_DRIVE_HIERARCHY.md` and `dcm.runtime.storage_router`.
 
+
+## 2026-09-06 true dependency invalidation (Phase 6)
+
+`task/true-descendant-dag-20260906` (base `main` @ `1fe6d21721cb`, PR #37). Runtime `Dag.invalidate` walks reverse adjacency only; `invalidate_line_descendants` is ID-scoped; CFB `execute_source_aware_observations` persists canonical `runtime_dag.json` with claim→fact→feature→parameter→worlds→grade→rank links. Legacy `invalidate_types` / `invalidate_for_delta` remain for coarse deltas. Freeze latch (`mark_freeze` / `DagFrozenError`) ends backward DAG mutation after seal.
+
+Does **not** claim compact arrays, EventWorld C++, or a current live CFB forecast.
 
 ## 2026-09-06 Research OS closed-loop slice
 

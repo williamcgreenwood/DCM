@@ -250,7 +250,10 @@ def _consumer_ablation(
 
 
 def _load_existing_dag(dest: Path, *, cutoff: str) -> Dag | None:
-    for name in ("source_aware_import_dag.json", "dag.json", "runtime_dag.json"):
+    """Prefer canonical run DAG artifacts over throwaway mini-DAGs."""
+    from dcm.runtime.dag import CANONICAL_DAG_ARTIFACTS
+
+    for name in CANONICAL_DAG_ARTIFACTS:
         path = dest / name
         if not path.is_file():
             continue
@@ -263,23 +266,26 @@ def _load_existing_dag(dest: Path, *, cutoff: str) -> Dag | None:
     return None
 
 
+def _persist_run_dag(dest: Path, dag: Dag) -> None:
+    """Write canonical runtime_dag.json plus source-aware alias used by tests."""
+    from dcm.chat.state import write_json
+
+    snap = dag.snapshot()
+    write_json(dest / "runtime_dag.json", snap)
+    write_json(dest / "source_aware_import_dag.json", snap)
+
+
 def _ensure_offer_lineage(
     dag: Dag,
     *,
     claim_nodes: list[Any],
     row: dict[str, Any],
 ) -> Any:
-    """claim → PARAMETER → EVENT_WORLDS → GRADE for one offer (idempotent add)."""
+    """Permanent claim→fact→feature→parameter→worlds→grade→rank for one offer."""
     oid = str(row.get("projectionId") or "")
     eid = str(row.get("eventId") or oid)
-    parents = [c.key for c in claim_nodes]
-    param = dag.add("PARAMETER", oid, parents=parents)
-    if param.state == "PENDING" and param.artifact_hash is None:
-        dag.complete(param.key, f"param:{oid}")
-    worlds = dag.add("EVENT_WORLDS", eid, parents=[param.key])
-    if worlds.state == "PENDING" and worlds.artifact_hash is None:
-        dag.complete(worlds.key, f"worlds:{eid}")
-    grade_n = dag.add("GRADE", oid, parents=[param.key, worlds.key])
-    if grade_n.state == "PENDING" and grade_n.artifact_hash is None:
-        dag.complete(grade_n.key, f"grade:{oid}")
-    return param
+    return dag.ensure_offer_lineage(
+        claim_keys=[c.key for c in claim_nodes],
+        offer_id=oid,
+        event_id=eid,
+    )

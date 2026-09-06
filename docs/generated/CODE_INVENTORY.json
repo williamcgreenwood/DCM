@@ -1,5 +1,5 @@
 {
-  "contentHash": "a837b2f74fd918da097a3628373b006d1fec9536fcc34f0286e929372acefd20",
+  "contentHash": "9886c0a5423dd80ea1e1140d4708ec2f6271e95695edbd551a2e7b8cb4613866",
   "moduleCount": 223,
   "modules": [
     {
@@ -8899,13 +8899,13 @@
       "classes": 0,
       "functions": 1,
       "path": "src/dcm/research/observation_execute.py",
-      "sha256": "45e1c9dd94d5d0c3c3031d68d87b3d59ba59449003bb13b5acd5fe2685a76730",
+      "sha256": "f98baf98618fc77f40750c251fc9a7cf1ee931ef04f4e11d01071a3356be5bfd",
       "symbols": [
         {
           "doc": "Import source-aware host observations and close coverage\u2192consumer contracts.",
-          "endLine": 419,
+          "endLine": 421,
           "kind": "function",
-          "line": 60,
+          "line": 61,
           "name": "execute_source_aware_observations",
           "qualname": "execute_source_aware_observations"
         }
@@ -8914,9 +8914,9 @@
     },
     {
       "classes": 0,
-      "functions": 9,
+      "functions": 10,
       "path": "src/dcm/research/observation_execute_support.py",
-      "sha256": "ed94b7ef7f0aae49600eb8f4e9d1e27f1054b756b2b5c700044a0bc64749ebf6",
+      "sha256": "9deaae836d4961632dce33908a053d4ce88cb91a3bbdf150601238d15be95040",
       "symbols": [
         {
           "doc": "One-shot opponent \u2192 offer ids map (BoardIndexes has no by_counterparty).",
@@ -8975,18 +8975,26 @@
           "qualname": "_consumer_ablation._stub_consumer"
         },
         {
-          "doc": null,
-          "endLine": 263,
+          "doc": "Prefer canonical run DAG artifacts over throwaway mini-DAGs.",
+          "endLine": 266,
           "kind": "function",
           "line": 252,
           "name": "_load_existing_dag",
           "qualname": "_load_existing_dag"
         },
         {
-          "doc": "claim \u2192 PARAMETER \u2192 EVENT_WORLDS \u2192 GRADE for one offer (idempotent add).",
-          "endLine": 285,
+          "doc": "Write canonical runtime_dag.json plus source-aware alias used by tests.",
+          "endLine": 275,
           "kind": "function",
-          "line": 266,
+          "line": 269,
+          "name": "_persist_run_dag",
+          "qualname": "_persist_run_dag"
+        },
+        {
+          "doc": "Permanent claim\u2192fact\u2192feature\u2192parameter\u2192worlds\u2192grade\u2192rank for one offer.",
+          "endLine": 291,
+          "kind": "function",
+          "line": 278,
           "name": "_ensure_offer_lineage",
           "qualname": "_ensure_offer_lineage"
         }
@@ -11318,152 +11326,256 @@
       "workstream": "P5-P14"
     },
     {
-      "classes": 2,
-      "functions": 16,
+      "classes": 3,
+      "functions": 28,
       "path": "src/dcm/runtime/dag.py",
-      "sha256": "d80a33997933738a9aa3204a721e5c938825470022f311bef4407638386ab975",
+      "sha256": "30db68e8c2b9595b98ac74d429cc607abf564c10afde5556e30eeb0b1cfb0b14",
       "symbols": [
         {
-          "doc": null,
-          "endLine": 83,
-          "kind": "function",
-          "line": 64,
-          "name": "node_key",
-          "qualname": "node_key"
-        },
-        {
-          "doc": null,
-          "endLine": 105,
+          "doc": "Raised when invalidate attempts backward mutation after FREEZE is verified.",
+          "endLine": 139,
           "kind": "class",
-          "line": 87,
-          "name": "DagNode",
-          "qualname": "DagNode"
-        },
-        {
-          "doc": null,
-          "endLine": 105,
-          "kind": "method",
-          "line": 96,
-          "name": "to_dict",
-          "qualname": "DagNode.to_dict"
-        },
-        {
-          "doc": null,
-          "endLine": 257,
-          "kind": "class",
-          "line": 109,
-          "name": "Dag",
-          "qualname": "Dag"
-        },
-        {
-          "doc": null,
-          "endLine": 129,
-          "kind": "method",
-          "line": 116,
-          "name": "add",
-          "qualname": "Dag.add"
-        },
-        {
-          "doc": null,
-          "endLine": 134,
-          "kind": "method",
-          "line": 131,
-          "name": "complete",
-          "qualname": "Dag.complete"
+          "line": 135,
+          "name": "DagFrozenError",
+          "qualname": "DagFrozenError"
         },
         {
           "doc": null,
           "endLine": 139,
           "kind": "method",
-          "line": 136,
+          "line": 138,
+          "name": "__init__",
+          "qualname": "DagFrozenError.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 161,
+          "kind": "function",
+          "line": 142,
+          "name": "node_key",
+          "qualname": "node_key"
+        },
+        {
+          "doc": null,
+          "endLine": 183,
+          "kind": "class",
+          "line": 165,
+          "name": "DagNode",
+          "qualname": "DagNode"
+        },
+        {
+          "doc": null,
+          "endLine": 183,
+          "kind": "method",
+          "line": 174,
+          "name": "to_dict",
+          "qualname": "DagNode.to_dict"
+        },
+        {
+          "doc": null,
+          "endLine": 513,
+          "kind": "class",
+          "line": 187,
+          "name": "Dag",
+          "qualname": "Dag"
+        },
+        {
+          "doc": null,
+          "endLine": 212,
+          "kind": "method",
+          "line": 196,
+          "name": "add",
+          "qualname": "Dag.add"
+        },
+        {
+          "doc": null,
+          "endLine": 217,
+          "kind": "method",
+          "line": 214,
+          "name": "complete",
+          "qualname": "Dag.complete"
+        },
+        {
+          "doc": null,
+          "endLine": 222,
+          "kind": "method",
+          "line": 219,
           "name": "block",
           "qualname": "Dag.block"
         },
         {
           "doc": null,
-          "endLine": 144,
+          "endLine": 227,
           "kind": "method",
-          "line": 141,
+          "line": 224,
           "name": "fail",
           "qualname": "Dag.fail"
         },
         {
-          "doc": "A line change invalidates market/grade/rank/portfolio/freeze, not research.",
-          "endLine": 148,
+          "doc": "True only after an explicit freeze latch (``mark_freeze`` / snapshot).",
+          "endLine": 237,
           "kind": "method",
-          "line": 146,
-          "name": "invalidate_line_descendants",
-          "qualname": "Dag.invalidate_line_descendants"
+          "line": 229,
+          "name": "is_frozen",
+          "qualname": "Dag.is_frozen"
         },
         {
-          "doc": null,
-          "endLine": 158,
+          "doc": "Reverse adjacency: parent key \u2192 child keys (sorted for determinism).",
+          "endLine": 247,
           "kind": "method",
-          "line": 150,
-          "name": "invalidate_types",
-          "qualname": "Dag.invalidate_types"
-        },
-        {
-          "doc": "Reverse adjacency: parent key \u2192 child keys.",
-          "endLine": 166,
-          "kind": "method",
-          "line": 160,
+          "line": 239,
           "name": "children_map",
           "qualname": "Dag.children_map"
         },
         {
-          "doc": "Invalidate transitive children of specific node keys via reverse adjacency.",
-          "endLine": 199,
+          "doc": "Permanent conceptual indexes used by run invalidation / audit.",
+          "endLine": 284,
           "kind": "method",
-          "line": 168,
+          "line": 249,
+          "name": "reverse_adjacency_indexes",
+          "qualname": "Dag.reverse_adjacency_indexes"
+        },
+        {
+          "doc": null,
+          "endLine": 291,
+          "kind": "method",
+          "line": 286,
+          "name": "nodes_of_type",
+          "qualname": "Dag.nodes_of_type"
+        },
+        {
+          "doc": null,
+          "endLine": 303,
+          "kind": "method",
+          "line": 293,
+          "name": "find_by_identity",
+          "qualname": "Dag.find_by_identity"
+        },
+        {
+          "doc": null,
+          "endLine": 307,
+          "kind": "method",
+          "line": 305,
+          "name": "_assert_not_frozen",
+          "qualname": "Dag._assert_not_frozen"
+        },
+        {
+          "doc": "Deterministic BFS invalidation of actual children only.",
+          "endLine": 352,
+          "kind": "method",
+          "line": 309,
+          "name": "invalidate",
+          "qualname": "Dag.invalidate"
+        },
+        {
+          "doc": "Alias for ``invalidate`` \u2014 ID-scoped transitive children only.",
+          "endLine": 358,
+          "kind": "method",
+          "line": 354,
           "name": "invalidate_descendants",
           "qualname": "Dag.invalidate_descendants"
         },
         {
-          "doc": "Invalidate only downstream nodes that depend on this evidence class.",
-          "endLine": 209,
+          "doc": "Line change: invalidate MARKET_LINE/LINE_SURFACE seeds and *their* descendants.",
+          "endLine": 368,
           "kind": "method",
-          "line": 201,
+          "line": 360,
+          "name": "invalidate_line_descendants",
+          "qualname": "Dag.invalidate_line_descendants"
+        },
+        {
+          "doc": "Legacy / coarse helper: wipe every node whose type is in ``types``.",
+          "endLine": 386,
+          "kind": "method",
+          "line": 370,
+          "name": "invalidate_types",
+          "qualname": "Dag.invalidate_types"
+        },
+        {
+          "doc": "Legacy coarse delta-class wipe via ``invalidate_types``.",
+          "endLine": 398,
+          "kind": "method",
+          "line": 388,
           "name": "invalidate_for_delta",
           "qualname": "Dag.invalidate_for_delta"
         },
         {
-          "doc": "Reload a previously persisted DAG snapshot (nodes + parent links).",
-          "endLine": 236,
+          "doc": "Role/epoch change: only the given role nodes and their actual descendants.",
+          "endLine": 402,
           "kind": "method",
-          "line": 212,
+          "line": 400,
+          "name": "invalidate_role_lineage",
+          "qualname": "Dag.invalidate_role_lineage"
+        },
+        {
+          "doc": "Weather/environment change: only relevant env/weather nodes + descendants.",
+          "endLine": 406,
+          "kind": "method",
+          "line": 404,
+          "name": "invalidate_environment_lineage",
+          "qualname": "Dag.invalidate_environment_lineage"
+        },
+        {
+          "doc": "Install permanent claim\u2192fact\u2192feature\u2192parameter\u2192worlds\u2192grade\u2192rank chain.",
+          "endLine": 442,
+          "kind": "method",
+          "line": 408,
+          "name": "ensure_offer_lineage",
+          "qualname": "Dag.ensure_offer_lineage"
+        },
+        {
+          "doc": null,
+          "endLine": 449,
+          "kind": "method",
+          "line": 444,
+          "name": "ensure_portfolio_link",
+          "qualname": "Dag.ensure_portfolio_link"
+        },
+        {
+          "doc": null,
+          "endLine": 456,
+          "kind": "method",
+          "line": 451,
+          "name": "mark_freeze",
+          "qualname": "Dag.mark_freeze"
+        },
+        {
+          "doc": "Reload a previously persisted DAG snapshot (nodes + parent links).",
+          "endLine": 484,
+          "kind": "method",
+          "line": 459,
           "name": "from_snapshot",
           "qualname": "Dag.from_snapshot"
         },
         {
           "doc": null,
-          "endLine": 239,
+          "endLine": 487,
           "kind": "method",
-          "line": 238,
+          "line": 486,
           "name": "preserved_research_nodes",
           "qualname": "Dag.preserved_research_nodes"
         },
         {
           "doc": null,
-          "endLine": 242,
+          "endLine": 490,
           "kind": "method",
-          "line": 241,
+          "line": 489,
           "name": "reused",
           "qualname": "Dag.reused"
         },
         {
           "doc": null,
-          "endLine": 245,
+          "endLine": 493,
           "kind": "method",
-          "line": 244,
+          "line": 492,
           "name": "pending",
           "qualname": "Dag.pending"
         },
         {
           "doc": null,
-          "endLine": 257,
+          "endLine": 513,
           "kind": "method",
-          "line": 247,
+          "line": 495,
           "name": "snapshot",
           "qualname": "Dag.snapshot"
         }
@@ -14205,5 +14317,5 @@
   "parseErrors": [],
   "root": "src",
   "schema": "pillars_dcm.code_inventory.v1",
-  "symbolCount": 1528
+  "symbolCount": 1542
 }
