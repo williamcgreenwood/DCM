@@ -2,6 +2,9 @@
 
 Order of use: in-memory hash → composite key → content-hash → SQLite B-tree
 → inverted/FTS → alias (Aho-Corasick) → fuzzy → semantic (never for known IDs).
+
+BoardIndexes is backed by the canonical single-copy BoardStore (Phase 7–8):
+audit dicts stay one copy; compute indexes use int32 row IDs / bitmaps / lean SQLite.
 """
 from __future__ import annotations
 
@@ -18,6 +21,7 @@ from dcm.algorithms.indexing import (
 )
 from dcm.algorithms.searching import AhoCorasick, InvertedIndex
 from dcm.algorithms.telemetry import AlgorithmTelemetry
+from dcm.board_store import BoardStore
 from dcm.contracts.hashes import content_hash
 
 
@@ -28,75 +32,53 @@ GUARDED_CFB_MARKETS = GUARDED_LAUNCH_MARKETS
 
 
 class BoardIndexes:
-    """Exact indexes over a frozen board. No repeated full-board linear scans."""
+    """Exact indexes over a frozen board. No repeated full-board linear scans.
 
-    def __init__(self, rows: Iterable[Mapping[str, Any]], *, telemetry: AlgorithmTelemetry | None = None) -> None:
+    Backed by BoardStore: one audit copy of each row; SoA / int32 posting lists
+    for compute; SQLite stores keys+row_id only (no per-row json.dumps payload).
+    """
+
+    def __init__(
+        self,
+        rows: Iterable[Mapping[str, Any]],
+        *,
+        telemetry: AlgorithmTelemetry | None = None,
+        store: BoardStore | None = None,
+    ) -> None:
         self.telemetry = telemetry or AlgorithmTelemetry()
-        self.offer_by_id: dict[str, dict[str, Any]] = hash_table()
-        self.composite: dict[tuple[str, str, str, str, str, str], list[str]] = {}
-        self.by_event: dict[str, list[str]] = {}
-        self.by_affiliation: dict[str, list[str]] = {}
-        self.by_subject: dict[str, list[str]] = {}
-        self.by_market: dict[str, list[str]] = {}
-        self.by_league: dict[str, list[str]] = {}
-        self.content: dict[str, str] = {}
-        self.eligibility = Bitset()
-        self.cfb_supported = Bitset()
-        self.bloom = BloomFilter(m_bits=4096, k=4)
+        self.store = store if store is not None else BoardStore(rows, telemetry=self.telemetry)
+        # Legacy string views (behavior-preserving API for CFB launch / OS graphs).
+        legacy = self.store.legacy_string_indexes()
+        self.offer_by_id: dict[str, dict[str, Any]] = hash_table(self.store.offer_by_id_map().items())
+        self.composite: dict[tuple[str, str, str, str, str, str], list[str]] = {
+            k: self.store.offer_ids_for(v) for k, v in self.store.composite.items()
+        }
+        self.by_event: dict[str, list[str]] = legacy["by_event"]
+        self.by_affiliation: dict[str, list[str]] = legacy["by_affiliation"]
+        self.by_subject: dict[str, list[str]] = legacy["by_subject"]
+        self.by_market: dict[str, list[str]] = legacy["by_market"]
+        self.by_league: dict[str, list[str]] = legacy["by_league"]
+        self.content = dict(self.store.content)
+        self.eligibility = self.store.eligibility
+        self.cfb_supported = self.store.cfb_supported
+        self.bloom = self.store.bloom
+        self.sqlite = self.store.sqlite
+        self.offer_ids = self.store.offer_ids
         self.alias = AhoCorasick()
         self.inverted = InvertedIndex()
-        self.sqlite = open_memory_index()
-        self.sqlite.execute(
-            "CREATE TABLE IF NOT EXISTS offers ("
-            "offer_id TEXT PRIMARY KEY, sport TEXT, league TEXT, event_id TEXT, "
-            "team_id TEXT, subject_id TEXT, market TEXT, player_name TEXT, payload TEXT)"
-        )
-        sqlite_composite_index(self.sqlite, "offers", ("sport", "league", "event_id", "team_id", "subject_id", "market"))
-        sqlite_composite_index(self.sqlite, "offers", ("league", "market"), name="idx_offers_league_market")
-        sqlite_composite_index(self.sqlite, "offers", ("event_id", "subject_id"), name="idx_offers_event_subject")
         names: list[str] = []
-        offer_ids: list[str] = []
-        for i, raw in enumerate(rows):
-            row = dict(raw)
-            oid = str(row.get("projectionId") or "")
-            if not oid:
-                continue
-            self.offer_by_id[oid] = row
-            offer_ids.append(oid)
-            sport = str(row.get("sportFamily") or "")
-            league = str(row.get("league") or "").upper()
-            event = str(row.get("eventId") or "")
-            team = str(row.get("teamId") or row.get("team") or "")
-            subject = str(row.get("playerId") or row.get("subjectId") or "")
-            market = str(row.get("market") or "").lower()
-            key = (sport, league, event, team, subject, market)
-            self.composite.setdefault(key, []).append(oid)
-            self.by_event.setdefault(event, []).append(oid)
-            self.by_affiliation.setdefault(team, []).append(oid)
-            self.by_subject.setdefault(subject, []).append(oid)
-            self.by_market.setdefault(market, []).append(oid)
-            self.by_league.setdefault(league, []).append(oid)
-            digest = content_hash({"offer": oid, "line": row.get("line"), "market": market})
-            self.content[digest] = oid
-            self.eligibility.add(i)
-            if league == "CFB" and market in SUPPORTED_CFB_MARKETS and row.get("modifier") != "GOBLIN":
-                self.cfb_supported.add(i)
-            self.bloom.add(oid)
+        for i, oid in enumerate(self.offer_ids):
+            row = self.offer_by_id[oid]
             name = str(row.get("playerName") or "")
             if name:
                 names.append(name)
                 self.alias.add(name.lower())
                 self.inverted.add(i, name.lower().split())
-            self.sqlite.execute(
-                "INSERT OR REPLACE INTO offers VALUES (?,?,?,?,?,?,?,?,?)",
-                (oid, sport, league, event, team, subject, market, name, json.dumps(row, sort_keys=True, default=str)),
-            )
         if names:
             self.alias.build()
-        self.offer_ids = tuple(offer_ids)
-        self.telemetry.record("ALG-INDEX-001", problem_class="HOT_HASH_INDEX", producer="dcm.research.indexes.BoardIndexes", consumer="dcm.cfb.launch", count=len(self.offer_by_id), phase="BUILT", note="index constructed, not queried")
+        self.telemetry.record("ALG-INDEX-001", problem_class="HOT_HASH_INDEX", producer="dcm.research.indexes.BoardIndexes", consumer="dcm.cfb.launch", count=len(self.offer_by_id), phase="BUILT", note="BoardStore-backed index constructed, not queried")
         self.telemetry.record("ALG-SEARCH-002", problem_class="COMPOSITE_KEY", producer="dcm.research.indexes.BoardIndexes", consumer="dcm.cfb.launch", count=len(self.composite), phase="BUILT", note="index constructed, not queried")
-        self.telemetry.record("ALG-INDEX-002", problem_class="SQLITE_INDEX", producer="dcm.research.indexes.BoardIndexes", consumer="dcm.cfb.launch", phase="BUILT")
+        self.telemetry.record("ALG-INDEX-002", problem_class="SQLITE_INDEX", producer="dcm.research.indexes.BoardIndexes", consumer="dcm.cfb.launch", phase="BUILT", note="keys+row_id only")
         self.telemetry.record("ALG-INDEX-009", problem_class="BLOOM_REJECT", producer="dcm.research.indexes.BoardIndexes", consumer="dcm.cfb.launch", phase="BUILT")
         self.telemetry.record("ALG-SEARCH-008", problem_class="MULTI_ALIAS_SCAN", producer="dcm.identity.resolve", consumer="dcm.research.indexes.BoardIndexes", count=len(names), phase="BUILT")
         self.telemetry.record("ALG-INDEX-016", problem_class="CONTENT_ADDRESS", producer="dcm.research.indexes.BoardIndexes", consumer="dcm.cfb.launch", count=len(self.content), phase="BUILT")
@@ -110,6 +92,7 @@ class BoardIndexes:
             phase="QUERIED",
             downstream_used=downstream_used,
         )
+        # Same single-copy dict as BoardStore (offer_by_id shares store rows).
         return self.offer_by_id.get(str(offer_id))
 
     def lookup_composite(
@@ -376,7 +359,7 @@ class BoardIndexes:
 
     def close(self) -> None:
         try:
-            self.sqlite.close()
+            self.store.close()
         except sqlite3.Error:
             return
 

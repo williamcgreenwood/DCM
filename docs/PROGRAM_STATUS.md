@@ -6,10 +6,16 @@ Active canonical-main CFB closure slice: `chatgpt/canonical-main-cfb-standard-20
 
 This file is the human dashboard. It must be updated on every coding pass together with a new immutable pass record under `docs/engineering_passes/`.
 
-Current bounded execution increment: `P0-TRUE-DESCENDANT-DAG-20260906` upgrades runtime Dag to true changed-node→descendant invalidation on the CFB research/import path (ID-scoped BFS; research-stable line changes; role/weather scoping; freeze latch). Compact array BoardStore remains Phase 7.
+Current bounded execution increment: `P0-COMPACT-BOARDSTORE-SOA-20260906` adds the two-representation BoardStore (audit dicts + int32/NumPy SoA indexes) and compact Feature/Parameter matrix helpers. CFB launch still consumes BoardIndexes at the public boundary.
 `docs/engineering/DCM_CODING_AND_PROMPT_STANDARD.md`; Drive writes follow
 `docs/engineering/DCM_DRIVE_HIERARCHY.md` and `dcm.runtime.storage_router`.
 
+
+## 2026-09-06 BoardStore + compact arrays (Phase 7–8)
+
+`task/compact-boardstore-soa-20260906` (base `main` @ `8fdd520c388b`, PR #38). Canonical `BoardStore` keeps one audit copy per offer; compute indexes use int32 row IDs / bitmaps; SQLite stores keys+row_id only (no per-row `json.dumps` payload). `compact.py` provides IdMap, CompactNumericBoard (line/mean/variance/reliability/fragility/ood), and Feature/Parameter matrices with audit round-trip. `BoardIndexes` is BoardStore-backed without breaking CFB launch APIs.
+
+Does **not** claim host-performance certification, EventWorld C++, or a current live CFB forecast. Feature/Parameter matrices are available to producers/consumers but not yet the primary launch path. Phase 9 = profiling.
 
 ## 2026-09-06 true dependency invalidation (Phase 6)
 
@@ -57,7 +63,7 @@ PR #34 merged to `main` at `b0e44d5886adb98cb84dbf466ee3a3fc1fee28b1`; PR #35 me
 | P10 Full sport coverage | 10 | 3 | EARLY | each supported sport reaches 24/24 plugin components + validation suite |
 | P11 Release + fresh-environment acceptance | 10 | 7 | PARTIAL | wheel/release + exact hash + current HAR-only fresh ChatGPT acceptance |
 | P12 Research archive / index / reuse | 10 | 8 | STRONG PARTIAL | Drive credentials; high-volume queryable store; retention/licensing enforcement beyond local blobs |
-| P13 Performance / search / token optimization | 10 | 8 | STRONG PARTIAL | measured CPU/RSS/token certification; host-performance remains uncertified |
+| P13 Performance / search / token optimization | 10 | 8 | STRONG PARTIAL | Phase 9 profile BoardStore/SoA on representative boards; measured CPU/RSS/token certification; host-performance uncertified |
 | P14 Production operations / observability | 10 | 5 | PARTIAL | run health/readiness, failure taxonomy, deterministic recovery, release gates |
 | P15 P380X donor signal governance | 10 | 8 | STRONG PARTIAL | Tranche C MaterialFact/source-truth runtime closure; next typed role/matchup/context operators; exact donor archive bytes and later tranches remain external/future |
 | P16 Algorithmic Constitution / strategy registry | 10 | 9 | STRONG PARTIAL | CFB live CELF + telemetry done; remaining mixed-sport R1; keep CI gates; no silent algorithm retirement |
