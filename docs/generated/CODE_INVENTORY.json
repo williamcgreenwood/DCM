@@ -1,5 +1,5 @@
 {
-  "contentHash": "36f6ff19957d748e8168f0b994b3648205af4ed75b6fdf41907625bde2cd8736",
+  "contentHash": "292cbc1f5873e2ca364b14555b1c1bd1dd85167e19b57db4b6a0a6d4d1655ee0",
   "moduleCount": 228,
   "modules": [
     {
@@ -6131,7 +6131,7 @@
       "classes": 0,
       "functions": 8,
       "path": "src/dcm/model/parameters.py",
-      "sha256": "4495ef7f3a100116354ac749fd542ae816375158fac1b389738cecca8c5650e4",
+      "sha256": "ad63355a5734cbedc2368dc2ad3178417bca8ed2eec571e0a43f534b85606a64",
       "symbols": [
         {
           "doc": null,
@@ -6183,7 +6183,7 @@
         },
         {
           "doc": null,
-          "endLine": 675,
+          "endLine": 691,
           "kind": "function",
           "line": 90,
           "name": "build_parameter_snapshot",
@@ -6191,9 +6191,9 @@
         },
         {
           "doc": null,
-          "endLine": 312,
+          "endLine": 328,
           "kind": "method",
-          "line": 309,
+          "line": 325,
           "name": "_rate_claimed",
           "qualname": "build_parameter_snapshot._rate_claimed"
         }
@@ -11446,7 +11446,7 @@
       "classes": 0,
       "functions": 11,
       "path": "src/dcm/runner.py",
-      "sha256": "23aca85e4d2687ae2881cb2b386da2be0303dc33fe8ba376c83b225163d77401",
+      "sha256": "1a7f35984660c35461723ad7d283babd0fa89fc62077a42642e6d3d51ef1c980",
       "symbols": [
         {
           "doc": "Always write dest/audit/. Optionally copy+commit+push a GitHub pack.",
@@ -11498,7 +11498,7 @@
         },
         {
           "doc": null,
-          "endLine": 2093,
+          "endLine": 2094,
           "kind": "function",
           "line": 264,
           "name": "run_dcm",
@@ -11506,7 +11506,7 @@
         },
         {
           "doc": null,
-          "endLine": 900,
+          "endLine": 901,
           "kind": "method",
           "line": 877,
           "name": "_snapshot_for",
@@ -11514,25 +11514,25 @@
         },
         {
           "doc": null,
-          "endLine": 1339,
+          "endLine": 1340,
           "kind": "method",
-          "line": 1337,
+          "line": 1338,
           "name": "_resimulate_material",
           "qualname": "run_dcm._resimulate_material"
         },
         {
           "doc": null,
-          "endLine": 1572,
+          "endLine": 1573,
           "kind": "method",
-          "line": 1528,
+          "line": 1529,
           "name": "slim",
           "qualname": "run_dcm.slim"
         },
         {
           "doc": null,
-          "endLine": 2211,
+          "endLine": 2212,
           "kind": "function",
-          "line": 2096,
+          "line": 2097,
           "name": "main",
           "qualname": "main"
         }

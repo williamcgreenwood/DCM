@@ -894,6 +894,7 @@ def run_dcm(
             event_packets=event_packet_map,
             opponent_packets=opponent_packet_map,
             fact_features=relevant or None,
+            rules_snapshot=cfb_rules_snapshot,
         )
         if oid:
             parameter_cache[oid] = snap

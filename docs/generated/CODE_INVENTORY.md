@@ -5,7 +5,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 - Modules: **228**
 - Symbols: **1603**
 - Parse errors: **0**
-- Inventory hash: `36f6ff19957d748e8168f0b994b3648205af4ed75b6fdf41907625bde2cd8736`
+- Inventory hash: `292cbc1f5873e2ca364b14555b1c1bd1dd85167e19b57db4b6a0a6d4d1655ee0`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -1201,7 +1201,7 @@ _No class/function symbols._
 - `function` **_sd** L72
 - `function` **_shrink** L82
 - `function` **build_parameter_snapshot** L90
-- `method` **build_parameter_snapshot._rate_claimed** L309
+- `method` **build_parameter_snapshot._rate_claimed** L325
 
 ### `src/dcm/model/participation.py`
 
@@ -2007,9 +2007,9 @@ _No class/function symbols._
 - `function` **_active_calibration** L255
 - `function` **run_dcm** L264
 - `method` **run_dcm._snapshot_for** L877
-- `method` **run_dcm._resimulate_material** L1337
-- `method` **run_dcm.slim** L1528
-- `function` **main** L2096
+- `method` **run_dcm._resimulate_material** L1338
+- `method` **run_dcm.slim** L1529
+- `function` **main** L2097
 
 ### `src/dcm/runtime/__init__.py`
 
