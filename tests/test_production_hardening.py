@@ -20,6 +20,11 @@ def test_missing_offered_side_fails_closed():
     assert more is False and less is False
     side, more, less = _side({"odds_type": "goblin"})
     assert (side, more, less) == ("MORE", True, False)
+    side, more, less = _side({"odds_type": "demon"})
+    assert (side, more, less) == ("MORE", True, False)
+    # Explicit under metadata must not be overwritten by Demon doctrine.
+    side, more, less = _side({"odds_type": "demon", "allowed_wager_types": "under"})
+    assert side == "LESS" and less is True
 
 
 def test_asof_board_excludes_post_cutoff_snapshot():

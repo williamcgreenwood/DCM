@@ -1,5 +1,5 @@
 {
-  "contentHash": "b0c129593cbb1158a536b297b7e9abf8354636b82a992c1c48185719f2d38d62",
+  "contentHash": "9c0bd3d20ee1a16c68713c77f10b0b039e12ac5b933006bcd8d1ef9c041ddefb",
   "moduleCount": 227,
   "modules": [
     {
@@ -4549,7 +4549,7 @@
       "classes": 0,
       "functions": 13,
       "path": "src/dcm/ingest/prizepicks.py",
-      "sha256": "7a7996254b99b471fb95df0b9fc075b5b1465a90fbe07b75b79f7551ef7de37b",
+      "sha256": "481b9751a1af430ebd0b5d29c194ce73383d42761a95fd89746d668599a2ad0b",
       "symbols": [
         {
           "doc": null,
@@ -4593,7 +4593,7 @@
         },
         {
           "doc": "Verify offered sides. Missing side metadata fails closed.",
-          "endLine": 93,
+          "endLine": 98,
           "kind": "function",
           "line": 66,
           "name": "_side",
@@ -4601,57 +4601,57 @@
         },
         {
           "doc": null,
-          "endLine": 114,
+          "endLine": 119,
           "kind": "function",
-          "line": 96,
+          "line": 101,
           "name": "_board_id",
           "qualname": "_board_id"
         },
         {
           "doc": null,
-          "endLine": 129,
+          "endLine": 134,
           "kind": "function",
-          "line": 118,
+          "line": 123,
           "name": "_game_teams",
           "qualname": "_game_teams"
         },
         {
           "doc": null,
-          "endLine": 135,
+          "endLine": 140,
           "kind": "function",
-          "line": 132,
+          "line": 137,
           "name": "_event_label",
           "qualname": "_event_label"
         },
         {
           "doc": null,
-          "endLine": 148,
+          "endLine": 153,
           "kind": "function",
-          "line": 138,
+          "line": 143,
           "name": "_status",
           "qualname": "_status"
         },
         {
           "doc": null,
-          "endLine": 217,
+          "endLine": 222,
           "kind": "function",
-          "line": 151,
+          "line": 156,
           "name": "_row_from_jsonapi",
           "qualname": "_row_from_jsonapi"
         },
         {
           "doc": null,
-          "endLine": 252,
+          "endLine": 257,
           "kind": "function",
-          "line": 220,
+          "line": 225,
           "name": "_row_from_normalized",
           "qualname": "_row_from_normalized"
         },
         {
           "doc": null,
-          "endLine": 282,
+          "endLine": 287,
           "kind": "function",
-          "line": 255,
+          "line": 260,
           "name": "parse_prizepicks_payload",
           "qualname": "parse_prizepicks_payload"
         }

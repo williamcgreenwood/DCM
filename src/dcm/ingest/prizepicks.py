@@ -84,6 +84,11 @@ def _side(attrs: dict) -> tuple[str, bool, bool]:
         less = True
     if _modifier(attrs) == "GOBLIN":
         return "MORE", True, False
+    # PrizePicks Demon lines are harder overs: when the capture omits under-side
+    # metadata, treat the offered side as MORE only (fail closed if LESS was
+    # explicitly indicated above).
+    if _modifier(attrs) == "DEMON" and not less:
+        return "MORE", True, False
     if selected is not None:
         return selected, more, less
     if more and not less:
