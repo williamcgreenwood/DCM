@@ -1,1 +1,1 @@
-PLACEHOLDER_LOAD_FROM_DISK
+file:///workspace/obs_stdout.txt
