@@ -42,6 +42,8 @@ def _prior_season_blob(player: dict[str, Any]) -> dict[str, Any]:
         "priorSeason",
         "prior_season",
         "season2025",
+        "season2025_observed",
+        "season2024_observed",
         "priorSeason_2024",
     ):
         value = player.get(key)
@@ -65,25 +67,43 @@ def resolve_cfb_role_state(player: dict[str, Any], *, role: str | None = None) -
         or player.get("role")
         or ""
     ).strip().lower()
-    current_starter = any(token in depth for token in ("starter", "wr1", "rb1", "qb1", "te1"))
+    opp_role = str(opportunity.get("role") or "").strip().lower()
+    opp_depth = str(
+        opportunity.get("depth_chart")
+        or opportunity.get("depthChart")
+        or opportunity.get("depth_chart_role")
+        or ""
+    ).strip().lower()
+    if opp_depth and (not depth or depth in {"qb", "rb", "wr", "te", "quarterback", "running back", "wide receiver", "tight end"}):
+        depth = opp_depth
+    current_starter = any(token in depth for token in ("starter", "wr1", "rb1", "qb1", "te1", "k1"))
     current_rotation = any(token in depth for token in ("rotation", "depth", "backup", "wr2", "wr3", "rb2", "te2"))
-    # Host observations often set role=QB/RB/WR with starter cues in opportunity
-    # metadata rather than depth_chart_role. Consume those cues; do not invent.
+    # Host observations often encode starter/rotation in opportunity.role /
+    # depth_chart rather than depth_chart_role. Consume those cues; do not invent.
     snap_share = str(opportunity.get("snap_share_expected") or player.get("snap_share_expected") or "").lower()
     if not current_starter and (
         "starter" in snap_share
         or "majority" in snap_share
+        or "starting_" in opp_role
+        or opp_role.startswith("featured_")
+        or "starter" in opp_role
         or str(opportunity.get("pass_attempts_role") or "").upper() in {"QB1", "STARTER"}
         or str(opportunity.get("rush_attempts_role") or "").upper() in {"RB1", "STARTER"}
+        or opp_depth in {"qb1", "rb1", "wr1", "te1", "k1"}
     ):
         current_starter = True
-        depth = depth or "starter"
+        depth = depth or opp_depth or "starter"
+    if not current_rotation and ("rotation" in opp_role or "committee" in opp_role or "backup" in opp_role):
+        current_rotation = True
+        if not current_starter:
+            depth = depth or "rotation"
     prior_starts = _num(
         player.get("prior_season_starts")
         or player.get("priorStarts")
         or prior_season.get("starts")
         or prior_season.get("games_started")
         or prior_season.get("gamesStarted")
+        or prior_season.get("games")
         or player.get("starts")
     )
     # If host provided multi-game logs but no starts count, use log count as a

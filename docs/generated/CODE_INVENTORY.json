@@ -1,5 +1,5 @@
 {
-  "contentHash": "987ec392ffcd623dd8a52a54d55959d24aef4c9b5f83b5a045babc3bb9d33e10",
+  "contentHash": "7a6b19cf5cc09512a1abb3d680d8dedbac29cfb8d03ef92ec713698c5f00af26",
   "moduleCount": 228,
   "modules": [
     {
@@ -14311,7 +14311,7 @@
       "classes": 0,
       "functions": 4,
       "path": "src/dcm/sports/football/cfb_role.py",
-      "sha256": "ede38db9888507d338bfb3f8fe15cb9a3b124fee1e92210eaf437f6f1160f2ec",
+      "sha256": "5fd9e3b578d643c6e0ccf885e38ccf14389328f9917c71faec1be59517ea7b3c",
       "symbols": [
         {
           "doc": null,
@@ -14331,7 +14331,7 @@
         },
         {
           "doc": null,
-          "endLine": 50,
+          "endLine": 52,
           "kind": "function",
           "line": 38,
           "name": "_prior_season_blob",
@@ -14339,9 +14339,9 @@
         },
         {
           "doc": null,
-          "endLine": 157,
+          "endLine": 177,
           "kind": "function",
-          "line": 53,
+          "line": 55,
           "name": "resolve_cfb_role_state",
           "qualname": "resolve_cfb_role_state"
         }
