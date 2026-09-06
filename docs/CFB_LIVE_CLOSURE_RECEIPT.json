@@ -1,0 +1,205 @@
+{
+  "schema": "pillars_dcm.cfb_live_closure_receipt.v1",
+  "asOf": "2026-09-06T20:01:22.581019+00:00",
+  "liveRepository": {
+    "repo": "williamcgreenwood/DCM",
+    "mainStartSHA": "a4ff32af22b274ae0429862a33063aa22d4fe2a2",
+    "mainEndSHA": "a4ff32af22b274ae0429862a33063aa22d4fe2a2",
+    "mergedPRs": [
+      {
+        "number": 54,
+        "title": "kicker normalize + store game_logs preserve",
+        "url": "https://github.com/williamcgreenwood/DCM/pull/54",
+        "mergeSHA": "a4ff32af22b274ae0429862a33063aa22d4fe2a2"
+      }
+    ],
+    "inFlightPRs": [
+      {
+        "branch": "fix/cfb-merge-game-logs-field-union",
+        "purpose": "_merge unions game_logs fields by date (Flanagan rush_att=0 overwrite)"
+      }
+    ],
+    "requiredCI": "python-dcm",
+    "CI": "green on #54"
+  },
+  "runIdentity": {
+    "runId": "RUN_d3271703636992cc",
+    "harSha256": "72f75ec7ee32035b5e5863e1a61a688350b49ca6c94da091437f5368a41ec5e2",
+    "cutoff": "2026-09-06T15:30:00Z",
+    "state": "AWAITING_FRONTIER_RESEARCH",
+    "rawHarPathDisclosed": false
+  },
+  "boardAccounting": {
+    "raw": 686,
+    "Goblin": 131,
+    "Demon": 319,
+    "Standard": 236,
+    "propStates": {
+      "UNSUPPORTED": 7,
+      "MODELED": 238,
+      "HELD_FOR_RESEARCH": 69,
+      "UNRESOLVED": 130,
+      "EXCLUDED_GOBLIN": 131,
+      "MODELED_DIAGNOSTIC": 46
+    },
+    "rejectedCount": 117
+  },
+  "researchEffects": {
+    "batches": [
+      "batch11",
+      "batch12",
+      "flanagan_store_restore"
+    ],
+    "batch12": {
+      "observations": 47,
+      "imported": 47,
+      "rejected": 0,
+      "contractsClosed": 13,
+      "changedOffers": 169
+    },
+    "coverageBeforePass3ish": "446/484",
+    "coverageNow": {
+      "complete": 450,
+      "incomplete": 34,
+      "total": 484
+    }
+  },
+  "blockerTable": [
+    {
+      "reason": "PLAYER_STATUS_UNKNOWN",
+      "before": 23,
+      "after": 0,
+      "class": "cleared",
+      "next": "none"
+    },
+    {
+      "reason": "MINIMUM_OPPORTUNITY_SUPPORT_MISSING",
+      "before": 65,
+      "after": 66,
+      "class": "mostly MARKET_PRIMITIVE_MISSING targets/rush_att or NO_GAME_LOG",
+      "next": "team/event game logs with authoritative targets when available"
+    },
+    {
+      "reason": "CFB_ROLE_STATE_UNCERTAIN",
+      "before": 41,
+      "after": 44,
+      "class": "soft/candidate fail-closed",
+      "next": "do not soften *_candidate"
+    },
+    {
+      "reason": "HAR_SIDE_METADATA_ABSENT",
+      "before": 172,
+      "after": 172,
+      "class": "terminal",
+      "next": "do not research"
+    },
+    {
+      "reason": "MATERIAL_FACT_CONFLICT",
+      "before": 3,
+      "after": 2,
+      "class": "env/schedule",
+      "next": "only if material to Top25"
+    }
+  ],
+  "output": {
+    "PLAYABLE": 1,
+    "Top25": {
+      "LEAN": 18,
+      "PASS": 7
+    },
+    "Top100": {
+      "LEAN": 18,
+      "PASS": 41,
+      "TRAP": 41
+    },
+    "playables": [
+      {
+        "projectionId": "14187516",
+        "subject": "Caden Pinnick",
+        "subjectId": "338765",
+        "team": "WSU",
+        "opponent": "WASH",
+        "event": "WSU @ WASH",
+        "market": "pass_yds",
+        "line": 180.5,
+        "modifier": "STANDARD",
+        "exactOfferedSide": "MORE",
+        "chosenDirection": "MORE",
+        "P_Higher": 0.796875,
+        "P_Lower": 0.203125,
+        "P_Push": 0.0,
+        "Reliability": 0.4732772365069181,
+        "Data_Quality": 0.5147798166666667,
+        "Volatility": 0.2417132731169181,
+        "Fragility": 0.2063775413597829,
+        "OOD": 0.161244006917321,
+        "roleState": "QB",
+        "status": "ACTIVE",
+        "opportunitySupportN": 12,
+        "rank": 1,
+        "lineTolerance": 30.5,
+        "material_blockers": [
+          "MATERIAL_FACT_CONFLICT"
+        ]
+      }
+    ],
+    "forcedCard": false
+  },
+  "opportunityGapAudit": {
+    "trueEvidenceMissing": 26,
+    "consumerGaps": 0,
+    "marketPrimitiveMissing": 40,
+    "legitimateInsufficient": 0,
+    "total": 66,
+    "reasonCounts": {
+      "MARKET_PRIMITIVE_MISSING": 40,
+      "NO_GAME_LOG_EVIDENCE": 26
+    }
+  },
+  "engineering": {
+    "verifiedOnMain": [
+      "PR54 kicker normalize",
+      "PR54 store latest preserves game_logs"
+    ],
+    "operationalRepairs": [
+      "put_game_logs restore after status-latest clobber (Pass3)",
+      "Flanagan richer game_logs restore after poorer overwrite"
+    ],
+    "pendingSoftware": [
+      "_merge game_logs field-union PR (in flight)"
+    ]
+  },
+  "storage": {
+    "Drive": "DRIVE_DURABILITY_EXTERNAL_BLOCKED",
+    "localCheckpoint": "valid",
+    "driveCheck": "/workspace/dcm-cfb-ops/DRIVE_CAPABILITY_CHECK.json"
+  },
+  "unearnedGates": {
+    "LR": "LR000000",
+    "predictiveClaim": "NONE",
+    "productionRootCertified": false,
+    "hostPerformanceCertified": false,
+    "recommendationEligible": false,
+    "CFB_operational": "partial_frontier_incomplete",
+    "universalSports": false
+  },
+  "frontier": {
+    "terminal": false,
+    "stopReason": "Material recoverable requirements remain: targets/rush_att primitives and missing game logs for non-frontier-critical offers; role soft/candidate fail-closed; Standard missing sides terminal. Status unknowns cleared.",
+    "remainingMaterial": [
+      "MARKET_PRIMITIVE_MISSING ~targets/rush_att",
+      "NO_GAME_LOG_EVIDENCE",
+      "CFB_ROLE_STATE_UNCERTAIN soft/candidate"
+    ],
+    "terminalExclusions": [
+      "HAR_SIDE_METADATA_ABSENT x172"
+    ]
+  },
+  "nextExactCommand": "python -m dcm.chat next-research --run /workspace/dcm-cfb-ops/runs_kickoff/RUN_d3271703636992cc --workspace /workspace/dcm-cfb-ops/ws",
+  "artifacts": {
+    "opportunity_support_gap_audit": "/workspace/dcm-cfb-ops/opportunity_support_gap_audit.json",
+    "playable_audit_packets": "/workspace/dcm-cfb-ops/playable_audit_packets.json",
+    "batch12_report": "/workspace/dcm-cfb-ops/batch12_report.md",
+    "checkpoint": "/workspace/dcm-cfb-ops/CFB_LIVE_CHECKPOINT_MANIFEST.json"
+  }
+}

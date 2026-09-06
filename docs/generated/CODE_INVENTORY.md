@@ -3,9 +3,9 @@
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
 - Modules: **228**
-- Symbols: **1608**
+- Symbols: **1612**
 - Parse errors: **0**
-- Inventory hash: `af5c82ab05671a8724ed286afdf6f1179329018e8aaa3816ceae93a58ea69b94`
+- Inventory hash: `263ed6c7310627cae30f63f1c535895cb4f5133ca79b169710eee6e06d328920`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -100,7 +100,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P2-P4 | `src/dcm/model/gridiron_models.py` | 3 | 14 |
 | P2-P4 | `src/dcm/model/line_surface.py` | 0 | 4 |
 | P2-P4 | `src/dcm/model/market_derive.py` | 1 | 8 |
-| P2-P4 | `src/dcm/model/parameters.py` | 0 | 9 |
+| P2-P4 | `src/dcm/model/parameters.py` | 0 | 13 |
 | P2-P4 | `src/dcm/model/participation.py` | 1 | 5 |
 | P2-P4 | `src/dcm/model/quarter_worlds.py` | 1 | 9 |
 | P2-P4 | `src/dcm/model/ranking.py` | 0 | 3 |
@@ -1196,13 +1196,17 @@ _No class/function symbols._
 
 - `function` **_f** L37
 - `function` **_pairs** L45
-- `function` **_merge** L53
-- `function` **_avg** L60
-- `function` **_sd** L72
-- `function` **_shrink** L82
-- `function` **_collect_player_game_logs** L91 — Collect per-game logs from common host/claim aliases without inventing rows.
-- `function` **build_parameter_snapshot** L124
-- `method` **build_parameter_snapshot._rate_claimed** L358
+- `function` **_game_log_row_marker** L56 — Stable per-game marker for claim log union (date / game_date / gameId).
+- `function` **_union_log_row_fields** L61 — Per-row field union: incoming fills missing/null keys only.
+- `function` **_union_game_log_lists** L75 — Union game-log lists by date/game_date/gameId with per-row field union.
+- `method` **_union_game_log_lists._ingest** L84
+- `function` **_merge** L107
+- `function` **_avg** L121
+- `function` **_sd** L133
+- `function` **_shrink** L143
+- `function` **_collect_player_game_logs** L152 — Collect per-game logs from common host/claim aliases without inventing rows.
+- `function` **build_parameter_snapshot** L183
+- `method` **build_parameter_snapshot._rate_claimed** L417
 
 ### `src/dcm/model/participation.py`
 
