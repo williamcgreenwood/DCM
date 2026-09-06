@@ -1,0 +1,42 @@
+{
+  "log": {
+    "version": "1.2",
+    "creator": {
+      "name": "pillars-cfb-guarded-launch",
+      "version": "1"
+    },
+    "entries": [
+      {
+        "startedDateTime": "2026-09-02T18:00:00.000Z",
+        "request": {
+          "method": "GET",
+          "url": "https://api.prizepicks.com/projections",
+          "headers": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "response": {
+          "status": 200,
+          "headers": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "content": {
+            "mimeType": "application/json",
+            "text": "{\"data\": [{\"projectionId\": \"cfb-qb-pass\", \"sportFamily\": \"gridiron\", \"league\": \"CFB\", \"eventId\": \"CFB_TEST_1\", \"eventLabel\": \"AAA @ BBB\", \"playerId\": \"QB1\", \"playerName\": \"Test Quarterback\", \"teamId\": \"AAA\", \"team\": \"AAA\", \"opponentId\": \"BBB\", \"opponent\": \"BBB\", \"market\": \"pass_yds\", \"marketLabel\": \"Passing Yards\", \"line\": 180.5, \"side\": \"MORE\", \"offeredHigher\": true, \"offeredLower\": true, \"modifier\": \"STANDARD\", \"boardId\": \"FULL_GAME\", \"productType\": \"PLAYER_PICKS\", \"role\": \"QB\"}, {\"projectionId\": \"cfb-qb-att\", \"sportFamily\": \"gridiron\", \"league\": \"CFB\", \"eventId\": \"CFB_TEST_1\", \"eventLabel\": \"AAA @ BBB\", \"playerId\": \"QB1\", \"playerName\": \"Test Quarterback\", \"teamId\": \"AAA\", \"team\": \"AAA\", \"opponentId\": \"BBB\", \"opponent\": \"BBB\", \"market\": \"pass_att\", \"marketLabel\": \"Pass Attempts\", \"line\": 20.5, \"side\": \"MORE\", \"offeredHigher\": true, \"offeredLower\": true, \"modifier\": \"STANDARD\", \"boardId\": \"FULL_GAME\", \"productType\": \"PLAYER_PICKS\", \"role\": \"QB\"}, {\"projectionId\": \"cfb-qb-rush\", \"sportFamily\": \"gridiron\", \"league\": \"CFB\", \"eventId\": \"CFB_TEST_1\", \"eventLabel\": \"AAA @ BBB\", \"playerId\": \"QB1\", \"playerName\": \"Test Quarterback\", \"teamId\": \"AAA\", \"team\": \"AAA\", \"opponentId\": \"BBB\", \"opponent\": \"BBB\", \"market\": \"rush_yds\", \"marketLabel\": \"Rushing Yards\", \"line\": 10.5, \"side\": \"MORE\", \"offeredHigher\": true, \"offeredLower\": true, \"modifier\": \"DEMON\", \"boardId\": \"FULL_GAME\", \"productType\": \"PLAYER_PICKS\", \"role\": \"QB\"}, {\"projectionId\": \"cfb-rb-rush\", \"sportFamily\": \"gridiron\", \"league\": \"CFB\", \"eventId\": \"CFB_TEST_1\", \"eventLabel\": \"AAA @ BBB\", \"playerId\": \"RB1\", \"playerName\": \"Test Running Back\", \"teamId\": \"AAA\", \"team\": \"AAA\", \"opponentId\": \"BBB\", \"opponent\": \"BBB\", \"market\": \"rush_yds\", \"marketLabel\": \"Rushing Yards\", \"line\": 50.5, \"side\": \"MORE\", \"offeredHigher\": true, \"offeredLower\": true, \"modifier\": \"STANDARD\", \"boardId\": \"FULL_GAME\", \"productType\": \"PLAYER_PICKS\", \"role\": \"RB\"}, {\"projectionId\": \"cfb-rb-att\", \"sportFamily\": \"gridiron\", \"league\": \"CFB\", \"eventId\": \"CFB_TEST_1\", \"eventLabel\": \"AAA @ BBB\", \"playerId\": \"RB1\", \"playerName\": \"Test Running Back\", \"teamId\": \"AAA\", \"team\": \"AAA\", \"opponentId\": \"BBB\", \"opponent\": \"BBB\", \"market\": \"rush_att\", \"marketLabel\": \"Rush Attempts\", \"line\": 8.5, \"side\": \"MORE\", \"offeredHigher\": true, \"offeredLower\": true, \"modifier\": \"STANDARD\", \"boardId\": \"FULL_GAME\", \"productType\": \"PLAYER_PICKS\", \"role\": \"RB\"}, {\"projectionId\": \"cfb-wr-recyd\", \"sportFamily\": \"gridiron\", \"league\": \"CFB\", \"eventId\": \"CFB_TEST_1\", \"eventLabel\": \"AAA @ BBB\", \"playerId\": \"WR1\", \"playerName\": \"Test Wide Receiver\", \"teamId\": \"AAA\", \"team\": \"AAA\", \"opponentId\": \"BBB\", \"opponent\": \"BBB\", \"market\": \"rec_yds\", \"marketLabel\": \"Receiving Yards\", \"line\": 40.5, \"side\": \"MORE\", \"offeredHigher\": true, \"offeredLower\": true, \"modifier\": \"STANDARD\", \"boardId\": \"FULL_GAME\", \"productType\": \"PLAYER_PICKS\", \"role\": \"WR\"}, {\"projectionId\": \"cfb-wr-rec\", \"sportFamily\": \"gridiron\", \"league\": \"CFB\", \"eventId\": \"CFB_TEST_1\", \"eventLabel\": \"AAA @ BBB\", \"playerId\": \"WR1\", \"playerName\": \"Test Wide Receiver\", \"teamId\": \"AAA\", \"team\": \"AAA\", \"opponentId\": \"BBB\", \"opponent\": \"BBB\", \"market\": \"receptions\", \"marketLabel\": \"Receptions\", \"line\": 2.5, \"side\": \"MORE\", \"offeredHigher\": true, \"offeredLower\": true, \"modifier\": \"STANDARD\", \"boardId\": \"FULL_GAME\", \"productType\": \"PLAYER_PICKS\", \"role\": \"WR\"}, {\"projectionId\": \"cfb-qb-combo\", \"sportFamily\": \"gridiron\", \"league\": \"CFB\", \"eventId\": \"CFB_TEST_1\", \"eventLabel\": \"AAA @ BBB\", \"playerId\": \"QB1\", \"playerName\": \"Test Quarterback\", \"teamId\": \"AAA\", \"team\": \"AAA\", \"opponentId\": \"BBB\", \"opponent\": \"BBB\", \"market\": \"pass_rush_yds\", \"marketLabel\": \"Pass + Rush Yards\", \"line\": 200.5, \"side\": \"MORE\", \"offeredHigher\": true, \"offeredLower\": true, \"modifier\": \"STANDARD\", \"boardId\": \"FULL_GAME\", \"productType\": \"PLAYER_PICKS\", \"role\": \"QB\"}, {\"projectionId\": \"cfb-fantasy-1\", \"sportFamily\": \"gridiron\", \"league\": \"CFB\", \"eventId\": \"CFB_TEST_1\", \"eventLabel\": \"AAA @ BBB\", \"playerId\": \"QB1\", \"playerName\": \"Test Quarterback\", \"teamId\": \"AAA\", \"team\": \"AAA\", \"opponentId\": \"BBB\", \"opponent\": \"BBB\", \"market\": \"fantasy\", \"marketLabel\": \"Fantasy Score\", \"line\": 22.5, \"side\": \"MORE\", \"offeredHigher\": true, \"offeredLower\": true, \"modifier\": \"STANDARD\", \"boardId\": \"FULL_GAME\", \"productType\": \"PLAYER_PICKS\", \"role\": \"QB\"}, {\"projectionId\": \"cfb-goblin-pass\", \"sportFamily\": \"gridiron\", \"league\": \"CFB\", \"eventId\": \"CFB_TEST_1\", \"eventLabel\": \"AAA @ BBB\", \"playerId\": \"QB1\", \"playerName\": \"Test Quarterback\", \"teamId\": \"AAA\", \"team\": \"AAA\", \"opponentId\": \"BBB\", \"opponent\": \"BBB\", \"market\": \"pass_yds\", \"marketLabel\": \"Passing Yards\", \"line\": 199.5, \"side\": \"MORE\", \"offeredHigher\": true, \"offeredLower\": true, \"modifier\": \"GOBLIN\", \"boardId\": \"FULL_GAME\", \"productType\": \"PLAYER_PICKS\", \"role\": \"QB\"}, {\"projectionId\": \"cfb-side-unknown\", \"sportFamily\": \"gridiron\", \"league\": \"CFB\", \"eventId\": \"CFB_TEST_1\", \"eventLabel\": \"AAA @ BBB\", \"playerId\": \"RB1\", \"playerName\": \"Test Running Back\", \"teamId\": \"AAA\", \"team\": \"AAA\", \"opponentId\": \"BBB\", \"opponent\": \"BBB\", \"market\": \"rush_yds\", \"marketLabel\": \"Rushing Yards\", \"line\": 60.5, \"side\": null, \"offeredHigher\": false, \"offeredLower\": false, \"modifier\": \"STANDARD\", \"boardId\": \"FULL_GAME\", \"productType\": \"PLAYER_PICKS\", \"role\": \"RB\"}]}"
+          }
+        }
+      }
+    ]
+  },
+  "_dcm_fixture": {
+    "schema": "pillars_dcm.synthetic_fixture.v1",
+    "label": "SYNTHETIC_INCOMPLETE_CONFLICTED_CFB_E2E_PHASE15",
+    "note": "Synthetic incomplete/conflicted board for negative-path proof."
+  }
+}
