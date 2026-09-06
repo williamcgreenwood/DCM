@@ -95,6 +95,7 @@ def build_parameter_snapshot(
     event_packets: dict[str, dict[str, Any]] | None = None,
     opponent_packets: dict[str, dict[str, Any]] | None = None,
     fact_features: list[dict[str, Any]] | None = None,
+    rules_snapshot: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     player_pairs = _pairs(claims, "SUBJECT", str(row.get("playerId") or row.get("subjectId") or ""))
     team_pairs = _pairs(claims, "AFFILIATION", str(row.get("teamId") or row.get("affiliationId") or ""))
@@ -125,6 +126,21 @@ def build_parameter_snapshot(
     counterparty = _merge(opp_pairs)
     environment = _merge(env_pairs)
     competition = _merge(competition_pairs)
+    # Consume versioned CFB rules snapshot for market definition verification.
+    # Host MARKET_DEFINITION claims remain authoritative when present; the
+    # snapshot fills verified=True for mapped active markets once platform
+    # settlement authority is production-eligible.
+    if rules_snapshot and rules_snapshot.get("productionEligible") and not market.get("definition_verified"):
+        market_name = str(row.get("market") or "")
+        for mapping in rules_snapshot.get("marketMappings") or []:
+            if str(mapping.get("market") or "") == market_name and mapping.get("verified"):
+                market = {
+                    **market,
+                    "definition_verified": True,
+                    "definition_authority": "CFB_RULES_SNAPSHOT",
+                    "definition_snapshot_hash": rules_snapshot.get("contentHash"),
+                }
+                break
     if environment:
         event = {**event, **{k: v for k, v in environment.items() if v is not None}}
     if competition:
