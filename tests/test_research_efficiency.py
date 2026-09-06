@@ -59,7 +59,9 @@ def test_full_har_research_plan_far_below_legacy_20k():
     assert skipped["goblin"] == 1849
     assert skipped["unsupported_sport"] >= 3000
     assert skipped["live_or_in_progress"] >= 1
-    assert skipped["side_unknown"] >= 1000
+    # Demons no longer inflate side_unknown; Standard-missing remains.
+    assert skipped["side_unknown"] >= 500
+    assert skipped["side_unknown"] < 1000
     assert skipped["shadow"] >= 1000
     assert skipped["shadow_researched"] == 0
 
