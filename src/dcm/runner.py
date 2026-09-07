@@ -63,6 +63,7 @@ from dcm.model.quarter_worlds import QuarterPluginIncomplete
 from dcm.model.worlds import generate_event_contexts, simulate_player_worlds, value_from_stats
 from dcm.research.cache import ResearchCache
 from dcm.research.classify import accounting_classify as _classify
+from dcm.runtime.host_contract import build_terminal_accounting
 from dcm.research.emit import emit_offer_sets_and_manifest, emit_packets_and_graph
 from dcm.research.evidence_graph import attach_runtime_lineage
 from dcm.research.coverage import coverage_report
@@ -502,15 +503,15 @@ def run_dcm(
     dag.complete(n_id.key, id_map["contentHash"])
 
     if account_only:
-        classified = []
-        counts = {"EXCLUDED_GOBLIN": 0, "UNSUPPORTED": 0, "UNRESOLVED": 0, "MODELED": 0, "SHADOW": 0}
-        for row in rows:
-            state, blocker = _classify(row)
-            classified.append({"row": row, "state": state, "blocker": blocker, "grade": None})
-            counts[state] = counts.get(state, 0) + 1
+        terminal, receipt = build_terminal_accounting(rows, _classify, run_id=run_id, research_required=True)
+        classified = [{"row": row, "state": rec["state"], "blocker": rec["blocker"], "grade": None}
+                      for row, rec in zip(sorted(rows, key=lambda r: str(r.get("projectionId") or "")), terminal["records"])]
+        counts = dict(terminal["counts"])
         acc = dict(board.get("accounting") or {})
         acc["classified"] = counts
         acc["goblins_excluded_from_selection"] = counts.get("EXCLUDED_GOBLIN", 0)
+        acc["terminalAccounting"] = terminal
+        acc["hostReceipt"] = receipt.as_dict()
         (dest / "accounting.json").write_text(json.dumps(acc, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         (dest / "population_full.jsonl").write_text("".join(json.dumps({"projectionId": p["row"]["projectionId"], "state": p["state"], "blocker": p["blocker"], "league": p["row"].get("league"), "sportFamily": p["row"].get("sportFamily"), "modifier": p["row"].get("modifier"), "status": p["row"].get("status"), "offeredHigher": p["row"].get("offeredHigher"), "offeredLower": p["row"].get("offeredLower")}) + "\n" for p in classified), encoding="utf-8")
         (dest / "full_population.jsonl").write_text((dest / "population_full.jsonl").read_text(encoding="utf-8"), encoding="utf-8")
