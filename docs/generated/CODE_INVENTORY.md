@@ -3,9 +3,9 @@
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
 - Modules: **228**
-- Symbols: **1614**
+- Symbols: **1612**
 - Parse errors: **0**
-- Inventory hash: `d11f53bf9e1f969f790855189135263839c86d153308f7ff0ed1365c17436b4f`
+- Inventory hash: `263ed6c7310627cae30f63f1c535895cb4f5133ca79b169710eee6e06d328920`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -165,7 +165,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P1 | `src/dcm/research/role_epoch.py` | 1 | 27 |
 | P1 | `src/dcm/research/scopes.py` | 0 | 6 |
 | P1 | `src/dcm/research/source_catalog.py` | 0 | 6 |
-| P1 | `src/dcm/research/source_health.py` | 1 | 19 |
+| P1 | `src/dcm/research/source_health.py` | 1 | 18 |
 | P1 | `src/dcm/research/staged.py` | 0 | 5 |
 | P1 | `src/dcm/research/statepack.py` | 4 | 26 |
 | P1 | `src/dcm/research/subject_offer_set.py` | 1 | 10 |
@@ -228,7 +228,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P3 | `src/dcm/sports/football/opportunity.py` | 1 | 5 |
 | P3 | `src/dcm/sports/football/projection.py` | 1 | 5 |
 | P3 | `src/dcm/sports/football/registry.py` | 0 | 5 |
-| P3 | `src/dcm/sports/football/research_requirements.py` | 0 | 4 |
+| P3 | `src/dcm/sports/football/research_requirements.py` | 0 | 3 |
 | P3 | `src/dcm/sports/football/settlement_map.py` | 0 | 3 |
 | UNMAPPED | `src/dcm/validation/__init__.py` | 0 | 0 |
 | UNMAPPED | `src/dcm/validation/conservation_harness.py` | 1 | 2 |
@@ -1358,10 +1358,10 @@ _No class/function symbols._
 
 - `function` **_req_id** L48
 - `function` **build_acquisition_actions** L52 — Group reusable-entity requests into fan-out AcquisitionActions.
-- `function` **schedule_acquisition_actions** L231 — Live CELF selector with set-cover + constrained batch packing.
-- `method` **schedule_acquisition_actions.gain_fn** L265
-- `method` **schedule_acquisition_actions.cost_fn** L275
-- `function` **build_acquisition_action_graph** L358 — Persistable AcquisitionActionGraph: one action may cover many requirements/offers.
+- `function` **schedule_acquisition_actions** L228 — Live CELF selector with set-cover + constrained batch packing.
+- `method` **schedule_acquisition_actions.gain_fn** L262
+- `method` **schedule_acquisition_actions.cost_fn** L272
+- `function` **build_acquisition_action_graph** L355 — Persistable AcquisitionActionGraph: one action may cover many requirements/offers.
 
 ### `src/dcm/research/adapters/__init__.py`
 
@@ -1747,8 +1747,8 @@ _No class/function symbols._
 - `function` **build_board_graph** L87
 - `method` **build_board_graph.add_node** L99
 - `function` **build_market_demand_graph** L177
-- `function` **build_requirement_graph** L235
-- `function` **persist_research_os_graphs** L327
+- `function` **build_requirement_graph** L231
+- `function` **persist_research_os_graphs** L323
 
 ### `src/dcm/research/player_offer_set.py`
 
@@ -1822,7 +1822,7 @@ _No class/function symbols._
 - `function` **_add** L79
 - `function` **_graph_rows** L106
 - `function` **plan_research** L119
-- `function` **build_requests** L372 — Backward-compatible wrapper. Does not emit legacy MARKET or PLAYER/TEAM.
+- `function` **build_requests** L370 — Backward-compatible wrapper. Does not emit legacy MARKET or PLAYER/TEAM.
 
 ### `src/dcm/research/research_store.py`
 
@@ -1926,8 +1926,7 @@ _No class/function symbols._
 - `method` **SourceHealthRegistry.load_snapshot** L260 — Overlay persisted counters/circuits onto the live catalog. Never invent 0.85.
 - `function` **persist_cfb_source_health** L284 — Write the live source-health snapshot so later research passes restore it.
 - `function` **load_cfb_source_health** L299 — Restore persisted source-health counters/circuits. Missing file → default catalog.
-- `function` **default_gridiron_source_health** L320 — League-keyed gridiron router derived from the source-capability catalog.
-- `function` **default_cfb_source_health** L351 — Backward-compatible CFB-only router.
+- `function` **default_cfb_source_health** L320 — CFB router derived from the versioned source-capability catalog.
 
 ### `src/dcm/research/staged.py`
 
@@ -2523,10 +2522,9 @@ _No class/function symbols._
 
 ### `src/dcm/sports/football/research_requirements.py`
 
-- `function` **market_requirements** L35 — Return the supported physical-market requirements for one league.
-- `function` **_row_has** L49
-- `function` **support_count** L53
-- `function` **assess_football_support** L59 — Return independent minimum-model and PLAYABLE support states.
+- `function` **_row_has** L28
+- `function` **support_count** L32
+- `function` **assess_football_support** L38 — Return independent minimum-model and PLAYABLE support states.
 
 ### `src/dcm/sports/football/settlement_map.py`
 
