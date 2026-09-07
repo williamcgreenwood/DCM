@@ -1,8 +1,8 @@
 # PROGRAM STATUS
 
 - **Constitution:** `DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903`
-- **asOf:** 2026-09-06T20:01:22.585865+00:00
-- **canonical main:** `a4ff32af22b274ae0429862a33063aa22d4fe2a2`
+- **asOf:** 2026-09-07T12:00:00+00:00
+- **canonical main:** `3b80d1c1dfc5f5c1663b67735d5ed0d4a8bb0d39`
 - **LR:** `LR000000`
 - **predictiveClaim:** `NONE`
 - **productionRootCertified:** false
@@ -18,6 +18,10 @@
 - Coverage: 450/484
 
 ## Next
+Complete the reviewable NFL league-keyed research-contract increment, including
+its generated inventory and all normal checks, before attempting an NFL
+current-HAR operation.
+
 ```bash
-python -m dcm.chat next-research --run /workspace/dcm-cfb-ops/runs_kickoff/RUN_d3271703636992cc --workspace /workspace/dcm-cfb-ops/ws
+python -m dcm.chat next-research --run <RUN_ROOT>/runs_kickoff/RUN_d3271703636992cc --workspace <WORKSPACE>
 ```

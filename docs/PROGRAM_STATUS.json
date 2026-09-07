@@ -1,7 +1,7 @@
 {
   "schema": "pillars_dcm.program_status.v1",
-  "asOf": "2026-09-06T20:01:22.585865+00:00",
-  "canonicalMain": "a4ff32af22b274ae0429862a33063aa22d4fe2a2",
+  "asOf": "2026-09-07T12:00:00+00:00",
+  "canonicalMain": "3b80d1c1dfc5f5c1663b67735d5ed0d4a8bb0d39",
   "learningRevision": "LR000000",
   "predictiveClaim": "NONE",
   "productionRootCertified": false,
@@ -13,6 +13,8 @@
   "notes": [
     "Batch12 cleared PLAYER_STATUS_UNKNOWN",
     "Remaining material: opportunity primitives/logs; role soft/candidate fail-closed; Standard missing sides terminal",
-    "PR54 on main; game_logs _merge union PR in flight"
+    "PR #55 game_logs field-union fix is on main",
+    "PR #56 established the DCM 6.1 CFB/NFL release contract on main",
+    "NFL league-keyed research-contract parity remains an unmerged, reviewable increment"
   ]
 }

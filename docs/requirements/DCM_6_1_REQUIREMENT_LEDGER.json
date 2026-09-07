@@ -1,0 +1,30 @@
+{
+  "schema": "pillars_dcm.release_requirement_ledger.v1",
+  "release": "6.1.0",
+  "base_main_sha": "90d9e65dad3ba7e7e3c64ebcff0cfe1c7eb0afee",
+  "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+  "status_values": ["PLANNED", "PARTIAL", "VERIFIED", "EXTERNAL_BLOCKED"],
+  "status_policy": "This is a release control ledger layered over REQUIREMENT_LEDGER.v1.json. VERIFIED requires reproducible evidence; a missing live input or protected promotion remains EXTERNAL_BLOCKED.",
+  "requirements": [
+    {"id": "DCM61-01", "title": "Bounded CFB/NFL release scope", "status": "VERIFIED", "pr": 1, "gate": "Only CFB/NFL operate; all other league routes fail closed."},
+    {"id": "DCM61-02", "title": "One canonical engine", "status": "PARTIAL", "pr": 3, "gate": "Fresh installation resolves only canonical src/dcm runtime."},
+    {"id": "DCM61-03", "title": "Private input boundary", "status": "VERIFIED", "pr": 1, "gate": "No raw HAR, cookie, credential, response body, or run DB in Git/output."},
+    {"id": "DCM61-04", "title": "Native runtime", "status": "PARTIAL", "pr": 3, "gate": "6.1 uses self-contained runtime; legacy replay fails closed when bytes are absent."},
+    {"id": "DCM61-05", "title": "Typed host runner", "status": "PARTIAL", "pr": 4, "gate": "dcm-host run emits schema-versioned receipt for CFB and NFL."},
+    {"id": "DCM61-06", "title": "Full-board accounting", "status": "PARTIAL", "pr": 4, "gate": "Every offer has a terminal disposition before exclusions."},
+    {"id": "DCM61-07", "title": "HAR/platform offer authority", "status": "PARTIAL", "pr": 4, "gate": "Offer line/side/market/status resolve from platform authority or fail closed."},
+    {"id": "DCM61-08", "title": "League-aware external research", "status": "PARTIAL", "pr": 2, "gate": "CFB and NFL source routing is explicit, typed, and test-covered."},
+    {"id": "DCM61-09", "title": "Typed evidence provenance", "status": "PARTIAL", "pr": 5, "gate": "Evidence includes authority, source key, cutoff, hash, and failure state."},
+    {"id": "DCM61-10", "title": "Reuse and resume", "status": "PARTIAL", "pr": 5, "gate": "Content-addressed reuse and idempotent restart are observable."},
+    {"id": "DCM61-11", "title": "CFB operational acceptance", "status": "EXTERNAL_BLOCKED", "pr": 6, "gate": "Current private HAR and host evidence yield a redacted local receipt."},
+    {"id": "DCM61-12", "title": "NFL operational acceptance", "status": "EXTERNAL_BLOCKED", "pr": 7, "gate": "Current private HAR and host evidence yield a redacted local receipt."},
+    {"id": "DCM61-13", "title": "Conserved model path", "status": "PARTIAL", "pr": 4, "gate": "Model output links to evidence, parameter, event-world, and algorithm plans."},
+    {"id": "DCM61-14", "title": "No forced selection", "status": "PARTIAL", "pr": 4, "gate": "Ineligible/uncertain rows hold; only PLAYABLE_CANDIDATE enters portfolio path."},
+    {"id": "DCM61-15", "title": "Freeze firewall", "status": "PARTIAL", "pr": 8, "gate": "Frozen output is immutable and evidence-linked."},
+    {"id": "DCM61-16", "title": "Future-only settlement", "status": "PARTIAL", "pr": 8, "gate": "Settlement/learning is append-only, chronological, and separate from forecast."},
+    {"id": "DCM61-17", "title": "Failure-path coverage", "status": "PLANNED", "pr": 4, "gate": "Missing side, source failure, stale/conflict, unsupported league tests pass."},
+    {"id": "DCM61-18", "title": "Clean CI and benchmark", "status": "PARTIAL", "pr": 8, "gate": "Fresh-install, targeted, full-suite, policy, inventory, and representative benchmark pass."},
+    {"id": "DCM61-19", "title": "Protected promotion", "status": "PLANNED", "pr": 8, "gate": "Normal PR review/checks, remote readback, and no direct main write."},
+    {"id": "DCM61-20", "title": "Honest 6.1 release receipt", "status": "PLANNED", "pr": 8, "gate": "Versioned receipt distinguishes software, operational, predictive, and root states."}
+  ]
+}
