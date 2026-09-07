@@ -8,6 +8,7 @@
 - **productionRootCertified:** false
 - **hostPerformanceCertified:** false
 - **CFB operational:** PARTIAL — `AWAITING_FRONTIER_RESEARCH` on `RUN_d3271703636992cc`
+- **NFL operational:** ENGINEERING PARITY IN PROGRESS — not live-HAR validated or frozen
 - **recommendationEligible:** false
 
 ## Active run

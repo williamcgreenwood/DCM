@@ -7,12 +7,14 @@
   "productionRootCertified": false,
   "hostPerformanceCertified": false,
   "cfbOperational": "PARTIAL_AWAITING_FRONTIER_RESEARCH",
+  "nflOperational": "ENGINEERING_PARITY_IN_PROGRESS_NOT_LIVE_VALIDATED",
   "recommendationEligible": false,
   "activeRun": "RUN_d3271703636992cc",
   "activeRunState": "AWAITING_FRONTIER_RESEARCH",
   "notes": [
     "Batch12 cleared PLAYER_STATUS_UNKNOWN",
     "Remaining material: opportunity primitives/logs; role soft/candidate fail-closed; Standard missing sides terminal",
-    "PR54 on main; game_logs _merge union PR in flight"
+    "PR54 on main; game_logs _merge union PR in flight",
+    "NFL league-keyed research-contract/source-routing parity is implemented on a review branch; live NFL HAR acceptance remains open"
   ]
 }
