@@ -16,7 +16,7 @@ from dcm.algorithms.telemetry import AlgorithmTelemetry
 from dcm.contracts.hashes import content_hash
 from dcm.research.indexes import BoardIndexes
 from dcm.research.scopes import SCOPE_RANK, canonical_scope
-from dcm.sports.football.research_requirements import MARKET_REQUIREMENTS
+from dcm.sports.football.research_requirements import MARKET_REQUIREMENTS, market_requirements
 
 
 SCOPE_PREREQS = {
@@ -189,7 +189,8 @@ def build_market_demand_graph(
         def_id = f"MarketDefinition:{family}|{league}|{market}"
         offer_ids = [_offer_id(r) for r in group if _offer_id(r)]
         bundles[def_id] = offer_ids
-        supported = league == "CFB" and market in MARKET_REQUIREMENTS
+        requirements = market_requirements(league)
+        supported = market in requirements
         nodes.append(
             {
                 "id": def_id,
@@ -199,7 +200,7 @@ def build_market_demand_graph(
                 "market": market,
                 "offerCount": len(offer_ids),
                 "guardedLaunchSupported": supported,
-                "requirements": dict(MARKET_REQUIREMENTS.get(market) or {}) if supported else None,
+                "requirements": dict(requirements.get(market) or {}) if supported else None,
             }
         )
         for oid in offer_ids:
@@ -223,6 +224,9 @@ def build_market_demand_graph(
                 if _is_cfb(r) and str(r.get("market") or "").lower() not in MARKET_REQUIREMENTS
             }
         ),
+        "footballSupportedDefinitions": [
+            n["market"] for n in nodes if n.get("guardedLaunchSupported") and n.get("league") in {"CFB", "NFL"}
+        ],
     }
     body["contentHash"] = content_hash({k: v for k, v in body.items() if k != "contentHash"})
     return body

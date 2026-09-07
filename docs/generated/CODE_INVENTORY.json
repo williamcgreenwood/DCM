@@ -1,5 +1,5 @@
 {
-  "contentHash": "263ed6c7310627cae30f63f1c535895cb4f5133ca79b169710eee6e06d328920",
+  "contentHash": "d11f53bf9e1f969f790855189135263839c86d153308f7ff0ed1365c17436b4f",
   "moduleCount": 228,
   "modules": [
     {
@@ -7091,7 +7091,7 @@
       "classes": 0,
       "functions": 6,
       "path": "src/dcm/research/acquisition.py",
-      "sha256": "7b6a634596a745811fc91e098315bdabc93fd006b4e5e8ab0a426b8b776b001c",
+      "sha256": "9aed60dd826c3e465eee872796123251fc8369c7ff3acd37ff6d1b1af5b91501",
       "symbols": [
         {
           "doc": null,
@@ -7103,7 +7103,7 @@
         },
         {
           "doc": "Group reusable-entity requests into fan-out AcquisitionActions.",
-          "endLine": 225,
+          "endLine": 228,
           "kind": "function",
           "line": 52,
           "name": "build_acquisition_actions",
@@ -7111,33 +7111,33 @@
         },
         {
           "doc": "Live CELF selector with set-cover + constrained batch packing.",
-          "endLine": 352,
+          "endLine": 355,
           "kind": "function",
-          "line": 228,
+          "line": 231,
           "name": "schedule_acquisition_actions",
           "qualname": "schedule_acquisition_actions"
         },
         {
           "doc": null,
-          "endLine": 270,
+          "endLine": 273,
           "kind": "method",
-          "line": 262,
+          "line": 265,
           "name": "gain_fn",
           "qualname": "schedule_acquisition_actions.gain_fn"
         },
         {
           "doc": null,
-          "endLine": 273,
+          "endLine": 276,
           "kind": "method",
-          "line": 272,
+          "line": 275,
           "name": "cost_fn",
           "qualname": "schedule_acquisition_actions.cost_fn"
         },
         {
           "doc": "Persistable AcquisitionActionGraph: one action may cover many requirements/offers.",
-          "endLine": 451,
+          "endLine": 454,
           "kind": "function",
-          "line": 355,
+          "line": 358,
           "name": "build_acquisition_action_graph",
           "qualname": "build_acquisition_action_graph"
         }
@@ -9652,7 +9652,7 @@
       "classes": 0,
       "functions": 8,
       "path": "src/dcm/research/os_graphs.py",
-      "sha256": "3904b84ecac6bc15843bd0c7203c0eadd59a8735146191f45920715795b10161",
+      "sha256": "4cbcaf343d8a289c2cac5205d669ce50fffde9c6edaa22322fc9fcf6ad9b875d",
       "symbols": [
         {
           "doc": null,
@@ -9696,7 +9696,7 @@
         },
         {
           "doc": null,
-          "endLine": 228,
+          "endLine": 232,
           "kind": "function",
           "line": 177,
           "name": "build_market_demand_graph",
@@ -9704,17 +9704,17 @@
         },
         {
           "doc": null,
-          "endLine": 320,
+          "endLine": 324,
           "kind": "function",
-          "line": 231,
+          "line": 235,
           "name": "build_requirement_graph",
           "qualname": "build_requirement_graph"
         },
         {
           "doc": null,
-          "endLine": 350,
+          "endLine": 354,
           "kind": "function",
-          "line": 323,
+          "line": 327,
           "name": "persist_research_os_graphs",
           "qualname": "persist_research_os_graphs"
         }
@@ -10170,7 +10170,7 @@
       "classes": 0,
       "functions": 6,
       "path": "src/dcm/research/requests.py",
-      "sha256": "5b960ae9b42067cc0f4edbd8d800a1879c70e0a5486d352e21d660b423eccc34",
+      "sha256": "f8ec461685de86d3c530588730257cc80138c166ec1bfdddf356829d4527e758",
       "symbols": [
         {
           "doc": null,
@@ -10206,7 +10206,7 @@
         },
         {
           "doc": null,
-          "endLine": 367,
+          "endLine": 369,
           "kind": "function",
           "line": 119,
           "name": "plan_research",
@@ -10214,9 +10214,9 @@
         },
         {
           "doc": "Backward-compatible wrapper. Does not emit legacy MARKET or PLAYER/TEAM.",
-          "endLine": 377,
+          "endLine": 379,
           "kind": "function",
-          "line": 370,
+          "line": 372,
           "name": "build_requests",
           "qualname": "build_requests"
         }
@@ -10766,7 +10766,7 @@
       "classes": 0,
       "functions": 6,
       "path": "src/dcm/research/source_catalog.py",
-      "sha256": "0e86b09c5b53281e46b766ea7039ece9066884aeb662589cbe471383de6cc67c",
+      "sha256": "b79d1d024fb1af88339d3d235d3087205864c63d7989fb13833daf995c0b9ef7",
       "symbols": [
         {
           "doc": null,
@@ -10810,7 +10810,7 @@
         },
         {
           "doc": "Derive health-router seeds from the versioned capability catalog.",
-          "endLine": 149,
+          "endLine": 151,
           "kind": "function",
           "line": 110,
           "name": "source_health_seeds",
@@ -10821,9 +10821,9 @@
     },
     {
       "classes": 1,
-      "functions": 18,
+      "functions": 19,
       "path": "src/dcm/research/source_health.py",
-      "sha256": "40779a86430030f14207eafca3f0b0565c3d913b5e5e85ed4185de52e0d82eac",
+      "sha256": "951c6a5b75105e4258e0bf36c803262f0a0ca5b3af6b8f880c76aada7a08a9ab",
       "symbols": [
         {
           "doc": null,
@@ -10970,10 +10970,18 @@
           "qualname": "load_cfb_source_health"
         },
         {
-          "doc": "CFB router derived from the versioned source-capability catalog.",
-          "endLine": 340,
+          "doc": "League-keyed gridiron router derived from the source-capability catalog.",
+          "endLine": 348,
           "kind": "function",
           "line": 320,
+          "name": "default_gridiron_source_health",
+          "qualname": "default_gridiron_source_health"
+        },
+        {
+          "doc": "Backward-compatible CFB-only router.",
+          "endLine": 353,
+          "kind": "function",
+          "line": 351,
           "name": "default_cfb_source_health",
           "qualname": "default_cfb_source_health"
         }
@@ -14716,31 +14724,39 @@
     },
     {
       "classes": 0,
-      "functions": 3,
+      "functions": 4,
       "path": "src/dcm/sports/football/research_requirements.py",
-      "sha256": "0d51c2ffede897ada693bcaf06f3a0a02f0f68e615cf982ec415ccd255a4f46a",
+      "sha256": "2611df6a044be8a297dce881ec5e0715059281234578d3125adc9914885bdde4",
       "symbols": [
         {
-          "doc": null,
-          "endLine": 29,
+          "doc": "Return the supported physical-market requirements for one league.",
+          "endLine": 41,
           "kind": "function",
-          "line": 28,
+          "line": 35,
+          "name": "market_requirements",
+          "qualname": "market_requirements"
+        },
+        {
+          "doc": null,
+          "endLine": 50,
+          "kind": "function",
+          "line": 49,
           "name": "_row_has",
           "qualname": "_row_has"
         },
         {
           "doc": null,
-          "endLine": 35,
+          "endLine": 56,
           "kind": "function",
-          "line": 32,
+          "line": 53,
           "name": "support_count",
           "qualname": "support_count"
         },
         {
           "doc": "Return independent minimum-model and PLAYABLE support states.",
-          "endLine": 106,
+          "endLine": 130,
           "kind": "function",
-          "line": 38,
+          "line": 59,
           "name": "assess_football_support",
           "qualname": "assess_football_support"
         }
@@ -14922,5 +14938,5 @@
   "parseErrors": [],
   "root": "src",
   "schema": "pillars_dcm.code_inventory.v1",
-  "symbolCount": 1612
+  "symbolCount": 1614
 }

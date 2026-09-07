@@ -9,11 +9,18 @@ from __future__ import annotations
 from typing import Any
 
 from dcm.cfb.markets import ACTIVE_CFB_MARKETS, MARKET_CONTRACTS
+from dcm.sports.football.registry import CFB_LEAGUE, NFL_LEAGUE
 
 ACTIVE = {"ACTIVE", "AVAILABLE", "PROBABLE", "EXPECTED_ACTIVE"}
 INACTIVE = {"OUT", "DNP", "INACTIVE", "SUSPENDED", "IR", "PUP"}
 
-MARKET_REQUIREMENTS: dict[str, dict[str, tuple[str, ...] | bool]] = {
+SUPPORTED_FOOTBALL_LEAGUES = frozenset({CFB_LEAGUE, NFL_LEAGUE})
+
+# The current active CFB set is the first production-proven physical market
+# contract. NFL uses the same primitive ledger and MarketDefinition semantics,
+# but keeps a separate league key at every research boundary.  This prevents a
+# CFB-only acceptance result from being mistaken for NFL operational proof.
+_GRIDIRON_MARKET_REQUIREMENTS: dict[str, dict[str, tuple[str, ...] | bool]] = {
     key: {
         "opportunity": spec["opportunity"],
         "efficiency": spec["efficiency"],
@@ -23,6 +30,20 @@ MARKET_REQUIREMENTS: dict[str, dict[str, tuple[str, ...] | bool]] = {
     for key, spec in MARKET_CONTRACTS.items()
     if key in ACTIVE_CFB_MARKETS
 }
+
+
+def market_requirements(league: str) -> dict[str, dict[str, tuple[str, ...] | bool]]:
+    """Return the supported physical-market requirements for one league.
+
+    Unknown leagues deliberately receive no requirements.  Callers must then
+    fail closed instead of inheriting a CFB contract by accident.
+    """
+    return _GRIDIRON_MARKET_REQUIREMENTS if str(league or "").upper() in SUPPORTED_FOOTBALL_LEAGUES else {}
+
+
+# Backward-compatible CFB view used by existing CFB-only reports/tests. New
+# football consumers must call market_requirements(league).
+MARKET_REQUIREMENTS = market_requirements(CFB_LEAGUE)
 
 
 def _row_has(row: dict[str, Any], fields: tuple[str, ...]) -> bool:
@@ -37,6 +58,7 @@ def support_count(logs: list[dict[str, Any]], fields: tuple[str, ...]) -> int:
 
 def assess_football_support(
     *,
+    league: str = CFB_LEAGUE,
     market: str,
     role: str,
     status: str,
@@ -52,13 +74,15 @@ def assess_football_support(
     team/opponent context. Missing efficiency never blocks a pure opportunity
     market such as pass attempts or rush attempts.
     """
-    req = MARKET_REQUIREMENTS.get(str(market or "").lower())
+    league_u = str(league or "").upper()
+    req = market_requirements(league_u).get(str(market or "").lower())
     if req is None:
+        blocker = f"UNSUPPORTED_{league_u or 'FOOTBALL'}_MARKET_REQUIREMENTS"
         return {
             "modelable": False,
             "playableSupport": False,
-            "modelBlockers": ["UNSUPPORTED_CFB_MARKET_REQUIREMENTS"],
-            "playableBlockers": ["UNSUPPORTED_CFB_MARKET_REQUIREMENTS"],
+            "modelBlockers": [blocker],
+            "playableBlockers": [blocker],
             "opportunitySupportN": 0,
             "efficiencySupportN": 0,
         }

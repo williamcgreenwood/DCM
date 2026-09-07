@@ -126,6 +126,8 @@ def source_health_seeds(
         "open_meteo_weather": {"ENVIRONMENT": 90, "EVENT": 50},
         "espn_status": {"SUBJECT": 70, "EVENT": 75, "ENVIRONMENT": 40},
         "generic_web_search": {"SUBJECT": 20, "EVENT": 20, "AFFILIATION": 20, "COUNTERPARTY": 20, "ENVIRONMENT": 20},
+        "official_nfl": {"EVENT": 100, "SUBJECT": 90, "AFFILIATION": 85, "COUNTERPARTY": 85},
+        "pro_football_reference": {"SUBJECT": 85, "AFFILIATION": 80, "EVENT": 65},
     }
     seeds: list[dict[str, Any]] = []
     for source in sources_for(sport=sport, competition=competition, catalog=catalog):

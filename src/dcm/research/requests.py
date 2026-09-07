@@ -302,6 +302,8 @@ def plan_research(
             cutoff=cutoff,
             extra={
                 "market": row.get("market"),
+                "league": row.get("league"),
+                "sportFamily": row.get("sportFamily"),
                 "line": row.get("line"),
                 "playerId": row.get("playerId"),
                 "subjectId": row.get("playerId") or row.get("subjectId"),

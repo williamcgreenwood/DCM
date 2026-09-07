@@ -216,7 +216,7 @@ class SourceHealthRegistry:
         half_open_used = False
         for sid, row in self._state.items():
             self._refresh_circuit(row, now=now)
-            if sport and row["sports"] and sport not in row["sports"] and "CFB" not in row["sports"]:
+            if sport and row["sports"] and str(sport).upper() not in {str(item).upper() for item in row["sports"]}:
                 continue
             if row["circuitState"] == CIRCUIT_OPEN:
                 skipped_open.append(sid)
@@ -317,24 +317,37 @@ def load_cfb_source_health(path=None) -> SourceHealthRegistry:
     return health
 
 
-def default_cfb_source_health() -> SourceHealthRegistry:
-    """CFB router derived from the versioned source-capability catalog."""
+def default_gridiron_source_health(league: str | None = None) -> SourceHealthRegistry:
+    """League-keyed gridiron router derived from the source-capability catalog.
+
+    With no league supplied, include both production football catalogs so a
+    mixed-board scheduler still chooses only sources declared for each action.
+    """
     stable_ids = {
         "cfb_official_athletics": "CFB_OFFICIAL_GAMEBOOK",
         "college_football_reference": "CFB_SPORTS_REFERENCE",
         "open_meteo_weather": "CFB_WEATHER",
         "espn_status": "CFB_STATUS",
         "generic_web_search": "WEB_SEARCH",
+        "official_nfl": "NFL_OFFICIAL",
+        "pro_football_reference": "NFL_PRO_FOOTBALL_REFERENCE",
     }
+    leagues = (str(league).upper(),) if league else ("CFB", "NFL")
     seeds: list[dict[str, Any]] = []
-    for source in source_health_seeds(sport="gridiron", competition="CFB"):
-        row = dict(source)
-        catalog_id = str(row.get("sourceId") or "")
-        row["catalogSourceId"] = catalog_id
-        row["sourceId"] = stable_ids.get(catalog_id, catalog_id)
-        row["fallbackSourceIds"] = [
-            stable_ids.get(str(fallback), str(fallback))
-            for fallback in (row.get("fallbackSourceIds") or [])
-        ]
-        seeds.append(row)
+    for competition in leagues:
+        for source in source_health_seeds(sport="gridiron", competition=competition):
+            row = dict(source)
+            catalog_id = str(row.get("sourceId") or "")
+            row["catalogSourceId"] = catalog_id
+            row["sourceId"] = stable_ids.get(catalog_id, catalog_id)
+            row["fallbackSourceIds"] = [
+                stable_ids.get(str(fallback), str(fallback))
+                for fallback in (row.get("fallbackSourceIds") or [])
+            ]
+            seeds.append(row)
     return SourceHealthRegistry({"sources": seeds})
+
+
+def default_cfb_source_health() -> SourceHealthRegistry:
+    """Backward-compatible CFB-only router."""
+    return default_gridiron_source_health("CFB")
