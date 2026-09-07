@@ -150,6 +150,61 @@ register_research_schema(
     )
 )
 
+# Every sport exposed by the universal plugin registry receives an explicit
+# CFB-scale research contract.  These contracts make the research hierarchy,
+# provenance, cutoff, participation, opportunity, and efficiency requirements
+# portable before a sport is promoted to production modeling.  They are
+# deliberately RESEARCH_ONLY until a sport-specific adapter and acceptance
+# receipt exists; unknown IDs still fail closed.
+_RESEARCH_ONLY_SPORTS = {
+    "australian_rules": ("disposals", "inside50s", "clearances"),
+    "baseball": ("plate_appearances", "batted_ball_events", "pitching_opportunity"),
+    "combat": ("rounds", "significant_strikes", "takedowns"),
+    "cricket": ("balls_faced", "overs", "wickets"),
+    "esports": ("rounds", "map_time", "objective_events"),
+    "golf": ("holes_played", "strokes", "course_conditions"),
+    "handball": ("possessions", "shots", "assists"),
+    "hockey": ("shifts", "shots", "ice_time"),
+    "lacrosse": ("possessions", "shots", "caused_turnovers"),
+    "motorsport": ("laps", "stints", "sector_times"),
+    "racket": ("points", "games", "serve_points"),
+    "rugby": ("possessions", "carries", "tackles"),
+    "soccer": ("possessions", "touches", "shots"),
+    "volleyball": ("rotations", "attacks", "blocks"),
+}
+
+for _sport_id, _opportunity in _RESEARCH_ONLY_SPORTS.items():
+    register_research_schema(
+        SportResearchSchema(
+            sport_id=_sport_id,
+            schema_version=f"{_sport_id.upper()}_RESEARCH_V1_2026-09-07",
+            capability_state=RESEARCH_ONLY,
+            required_identity_fields=("subjectId", "subjectName", "competitionId", "eventId"),
+            required_historical_fields=("event_logs", "event_date", "counterparty"),
+            required_participation_fields=("status", "role", "participation_units"),
+            required_opportunity_fields=_opportunity,
+            required_efficiency_fields=("conversion_rate", "rate_denominator"),
+            required_affiliation_context=("competition_context", "organization_context", "availability"),
+            required_counterparty_context=("counterparty_strength", "style_or_matchup", "availability"),
+            required_event_context=("scheduled_start", "event_status", "venue_or_environment"),
+            optional_advanced_fields=("lineup_or_start_order", "travel", "rest", "surface_or_map", "weather"),
+            availability_requirements=("official_or_high_authority_status", "role_or_start_state"),
+            minimum_support_thresholds={"role_comparable_history": 3, "recent_window": 3},
+            normalization_rules=(
+                "preserve sport-native units and periods",
+                "derive windows from chronological complete history",
+                "do not infer participation or efficiency denominators",
+                "unknown market semantics fail closed",
+            ),
+            source_preference_hierarchy=("official", "historical_stats_authority", "reputable_status_news", "platform_offer"),
+            freshness_requirements={
+                "status": "same_event_day_or_newer_when_available",
+                "event": "latest_pre_cutoff",
+                "historical_event": "immutable_after_official_final",
+            },
+        )
+    )
+
 register_research_schema(
     SportResearchSchema(
         sport_id="gridiron",

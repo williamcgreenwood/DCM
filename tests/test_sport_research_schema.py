@@ -22,9 +22,22 @@ def test_basketball_and_gridiron_research_schemas_are_complete():
 
 
 def test_unknown_sport_research_schema_fails_closed():
-    assert lookup_research_schema("motorsport") is None
+    assert lookup_research_schema("unknown_sport") is None
     with pytest.raises(LookupError, match="SPORT_RESEARCH_SCHEMA_UNSUPPORTED"):
-        require_research_schema("motorsport")
+        require_research_schema("unknown_sport")
+
+
+def test_universal_sports_have_explicit_research_contracts():
+    sports = (
+        "australian_rules", "baseball", "combat", "cricket", "esports", "golf",
+        "handball", "hockey", "lacrosse", "motorsport", "racket", "rugby",
+        "soccer", "volleyball",
+    )
+    for sport in sports:
+        schema = require_research_schema(sport)
+        assert schema.contract_complete is True
+        assert schema.capability_state == "RESEARCH_ONLY"
+        assert schema.minimum_support_thresholds["role_comparable_history"] >= 3
 
 
 def test_universal_host_plan_includes_sport_specific_subject_requirements():
