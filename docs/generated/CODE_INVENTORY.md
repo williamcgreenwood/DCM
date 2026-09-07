@@ -2,10 +2,10 @@
 
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
-- Modules: **228**
-- Symbols: **1614**
+- Modules: **229**
+- Symbols: **1617**
 - Parse errors: **0**
-- Inventory hash: `471d06604dd2026eb21e686e6d9962eebb2d05ff1b2e4e9f5301b4b601d4e878`
+- Inventory hash: `61c658e36bbb0a5a267365dc65177a7b7f442a498756275df4302e7cbb606103`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -187,6 +187,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P5-P14 | `src/dcm/runtime/github_archive.py` | 0 | 38 |
 | P5-P14 | `src/dcm/runtime/governor.py` | 1 | 4 |
 | P5-P14 | `src/dcm/runtime/har_run.py` | 0 | 3 |
+| P5-P14 | `src/dcm/runtime/host_contract.py` | 1 | 2 |
 | P5-P14 | `src/dcm/runtime/input_boundary.py` | 0 | 7 |
 | P5-P14 | `src/dcm/runtime/mount_v541.py` | 0 | 10 |
 | P5-P14 | `src/dcm/runtime/perf.py` | 1 | 2 |
@@ -2008,17 +2009,17 @@ _No class/function symbols._
 
 ### `src/dcm/runner.py`
 
-- `function` **_finalize_archive** L129 — Always write dest/audit/. Optionally copy+commit+push a GitHub pack.
-- `function` **_synthetic_path** L207
-- `function` **_run_id** L220
-- `function` **_git_commit_sha** L224 — Best-effort git HEAD. Never writes git config. Missing git is None, not a crash.
-- `function` **_default_model_config** L244
-- `function` **_active_calibration** L255
-- `function` **run_dcm** L264
-- `method` **run_dcm._snapshot_for** L903
-- `method` **run_dcm._resimulate_material** L1364
-- `method` **run_dcm.slim** L1555
-- `function` **main** L2123
+- `function` **_finalize_archive** L130 — Always write dest/audit/. Optionally copy+commit+push a GitHub pack.
+- `function` **_synthetic_path** L208
+- `function` **_run_id** L221
+- `function` **_git_commit_sha** L225 — Best-effort git HEAD. Never writes git config. Missing git is None, not a crash.
+- `function` **_default_model_config** L245
+- `function` **_active_calibration** L256
+- `function` **run_dcm** L265
+- `method` **run_dcm._snapshot_for** L904
+- `method` **run_dcm._resimulate_material** L1365
+- `method` **run_dcm.slim** L1556
+- `function` **main** L2124
 
 ### `src/dcm/runtime/__init__.py`
 
@@ -2182,6 +2183,12 @@ _No class/function symbols._
 - `function` **_run_id** L28
 - `function` **run_har** L32
 - `function` **main** L77
+
+### `src/dcm/runtime/host_contract.py`
+
+- `class` **HostReceipt** L11
+- `method` **HostReceipt.as_dict** L20
+- `function` **build_terminal_accounting** L24 — Classify every row exactly once and emit a deterministic receipt.
 
 ### `src/dcm/runtime/input_boundary.py`
 

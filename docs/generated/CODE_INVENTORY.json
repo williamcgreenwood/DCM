@@ -1,6 +1,6 @@
 {
-  "contentHash": "471d06604dd2026eb21e686e6d9962eebb2d05ff1b2e4e9f5301b4b601d4e878",
-  "moduleCount": 228,
+  "contentHash": "61c658e36bbb0a5a267365dc65177a7b7f442a498756275df4302e7cbb606103",
+  "moduleCount": 229,
   "modules": [
     {
       "classes": 0,
@@ -11518,93 +11518,93 @@
       "classes": 0,
       "functions": 11,
       "path": "src/dcm/runner.py",
-      "sha256": "a6c5334c57682eb29970798440e3ffd083a3228520e23e409a5b06815021bc0f",
+      "sha256": "41e9f2859a813fcd20e1481abe1b82b906a9d4ad885eecdc8de6796b8874c2a1",
       "symbols": [
         {
           "doc": "Always write dest/audit/. Optionally copy+commit+push a GitHub pack.",
-          "endLine": 203,
+          "endLine": 204,
           "kind": "function",
-          "line": 129,
+          "line": 130,
           "name": "_finalize_archive",
           "qualname": "_finalize_archive"
         },
         {
           "doc": null,
-          "endLine": 216,
+          "endLine": 217,
           "kind": "function",
-          "line": 207,
+          "line": 208,
           "name": "_synthetic_path",
           "qualname": "_synthetic_path"
         },
         {
           "doc": null,
-          "endLine": 221,
+          "endLine": 222,
           "kind": "function",
-          "line": 220,
+          "line": 221,
           "name": "_run_id",
           "qualname": "_run_id"
         },
         {
           "doc": "Best-effort git HEAD. Never writes git config. Missing git is None, not a crash.",
-          "endLine": 241,
+          "endLine": 242,
           "kind": "function",
-          "line": 224,
+          "line": 225,
           "name": "_git_commit_sha",
           "qualname": "_git_commit_sha"
         },
         {
           "doc": null,
-          "endLine": 252,
+          "endLine": 253,
           "kind": "function",
-          "line": 244,
+          "line": 245,
           "name": "_default_model_config",
           "qualname": "_default_model_config"
         },
         {
           "doc": null,
-          "endLine": 261,
+          "endLine": 262,
           "kind": "function",
-          "line": 255,
+          "line": 256,
           "name": "_active_calibration",
           "qualname": "_active_calibration"
         },
         {
           "doc": null,
-          "endLine": 2120,
+          "endLine": 2121,
           "kind": "function",
-          "line": 264,
+          "line": 265,
           "name": "run_dcm",
           "qualname": "run_dcm"
         },
         {
           "doc": null,
-          "endLine": 927,
+          "endLine": 928,
           "kind": "method",
-          "line": 903,
+          "line": 904,
           "name": "_snapshot_for",
           "qualname": "run_dcm._snapshot_for"
         },
         {
           "doc": null,
-          "endLine": 1366,
+          "endLine": 1367,
           "kind": "method",
-          "line": 1364,
+          "line": 1365,
           "name": "_resimulate_material",
           "qualname": "run_dcm._resimulate_material"
         },
         {
           "doc": null,
-          "endLine": 1599,
+          "endLine": 1600,
           "kind": "method",
-          "line": 1555,
+          "line": 1556,
           "name": "slim",
           "qualname": "run_dcm.slim"
         },
         {
           "doc": null,
-          "endLine": 2238,
+          "endLine": 2239,
           "kind": "function",
-          "line": 2123,
+          "line": 2124,
           "name": "main",
           "qualname": "main"
         }
@@ -12692,6 +12692,39 @@
           "line": 77,
           "name": "main",
           "qualname": "main"
+        }
+      ],
+      "workstream": "P5-P14"
+    },
+    {
+      "classes": 1,
+      "functions": 2,
+      "path": "src/dcm/runtime/host_contract.py",
+      "sha256": "96c1459d6f85b441243467f3ac94652311503ea20293dcd978d184e771a85aab",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 21,
+          "kind": "class",
+          "line": 11,
+          "name": "HostReceipt",
+          "qualname": "HostReceipt"
+        },
+        {
+          "doc": null,
+          "endLine": 21,
+          "kind": "method",
+          "line": 20,
+          "name": "as_dict",
+          "qualname": "HostReceipt.as_dict"
+        },
+        {
+          "doc": "Classify every row exactly once and emit a deterministic receipt.",
+          "endLine": 56,
+          "kind": "function",
+          "line": 24,
+          "name": "build_terminal_accounting",
+          "qualname": "build_terminal_accounting"
         }
       ],
       "workstream": "P5-P14"
@@ -14938,5 +14971,5 @@
   "parseErrors": [],
   "root": "src",
   "schema": "pillars_dcm.code_inventory.v1",
-  "symbolCount": 1614
+  "symbolCount": 1617
 }
