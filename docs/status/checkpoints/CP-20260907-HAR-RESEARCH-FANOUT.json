@@ -1,0 +1,15 @@
+{
+  "schema": "pillars_dcm.checkpoint.v1",
+  "checkpointId": "CP-20260907-HAR-RESEARCH-FANOUT",
+  "runId": "RUN_79e006b3d1c7d1c7",
+  "input": {"harSha256": "dc21273d998aaf320d179867d699ec1829f915cc62323ece07510081805895eb", "rawHarCommitted": false},
+  "accounting": {"rawRows": 14310, "goblinsExcluded": 2248, "modeled": 1425, "unresolved": 454, "unsupported": 10183, "terminalRows": 14310},
+  "hostReceipt": {"schema": "pillars_dcm.host_execution_receipt.v1", "accountingHash": "99bd3c14f9ff7ce3eba9dfbfa7b618fc5ee3b2a3a86316a204a3a2530b2dfa32", "state": "ACCOUNTED"},
+  "research": {"universalTasks": 233, "subjectOfferSets": 1839, "nextBatchEntities": 8, "nextBatchDependentOffers": 793, "unresolvedTasks": 235, "researchPerformed": false, "reason": "account-only HAR pass; host web research is next"},
+  "nextAction": "execute universal host research plan, import validated claims, recompute coverage, then forecast/freeze",
+  "software": "6.0.0+WSAB.E2E.PRODUCTION_PIPELINE.LR000000",
+  "predictiveClaim": "NONE",
+  "productionCertified": false,
+  "rawPaths": "sanitized; use <RUN_ROOT>",
+  "status": "CHECKPOINTED_EXTERNAL_RESEARCH_PENDING"
+}
