@@ -75,6 +75,6 @@ def test_universal_host_plan_includes_sport_specific_subject_requirements():
     assert requirements["minimumSupport"]["role_comparable_history"] >= 3
 
     motorsport = next(t for t in plan["tasks"] if t["entityId"] == "D1")
-    assert motorsport["sportResearchSchemaState"] == "RESEARCH_ONLY"
-    assert motorsport["sportResearchSchemaVersion"]
-    assert motorsport["sportSpecificRequirements"]["minimumSupport"]["role_comparable_history"] >= 3
+    assert motorsport["sportResearchSchemaState"] == "UNSUPPORTED_FAIL_CLOSED"
+    assert motorsport["sportResearchSchemaVersion"] is None
+    assert "sportSpecificRequirements" not in motorsport
