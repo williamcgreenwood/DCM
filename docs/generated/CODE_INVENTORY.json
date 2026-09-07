@@ -1,5 +1,5 @@
 {
-  "contentHash": "d11f53bf9e1f969f790855189135263839c86d153308f7ff0ed1365c17436b4f",
+  "contentHash": "471d06604dd2026eb21e686e6d9962eebb2d05ff1b2e4e9f5301b4b601d4e878",
   "moduleCount": 228,
   "modules": [
     {
@@ -14253,7 +14253,7 @@
       "classes": 1,
       "functions": 7,
       "path": "src/dcm/sports/common/research_schema.py",
-      "sha256": "48c417fe3707786f65a93039912e923a116859c57a5dc375192de2e537db24aa",
+      "sha256": "485a8c7cee9d369cadb49b9b45d04e34444b0708a9b549a9943e03f5df9c4878",
       "symbols": [
         {
           "doc": null,
