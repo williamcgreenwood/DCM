@@ -77,15 +77,15 @@
     {
       "id": "S12",
       "name": "semantic current-run coverage scheduling",
-      "state": "implemented_pending_promotion",
-      "proof": "Fresh-wheel quarantined-HAR execution imported one official event observation, reduced unresolved requests from 552 to 551, and verified the completed request was not reissued before cross-run cache hydration."
+      "state": "implemented",
+      "proof": "Merge commit e018d1a93113b8f52750a7346235e44b96599983 is an ancestor of live main 8044c459de29fe9c92db79906682fffd8dce6435; the semantic-completion predicate and regression test are present on main."
     }
   ],
   "activeExecution": {
     "taskId": "P0-CFB-COVERAGE-COMPLETION-20260905",
     "stage": "S12",
     "name": "treat semantic current-run coverage as authoritative in research scheduling",
-    "state": "implemented_pending_promotion",
+    "state": "completed_on_main",
     "requirementIds": [
       "ROS-RESEARCH-COVERAGE-001"
     ],
@@ -108,9 +108,9 @@
       "invariant": "coverage-complete requests are not selected even before cache reuse classification",
       "localSuite": "24 targeted research/host/CFB tests PASS",
       "freshWheelHarReadback": "552 initial; import=1/rejected=0; 551 unresolved; completed event absent from next batch",
-      "remoteSuite": "PENDING_PR"
+      "remoteSuite": "MERGED_MAIN_READBACK"
     },
     "externalGateRemaining": "551 current-HAR research requests still require permitted evidence; final forecast, ranking, freeze, settlement, and predictive certification remain separately gated."
   },
-  "nextDeterministicTask": "Promote the semantic-coverage scheduler repair after exact-head checks. Then acquire/import permitted evidence for the remaining current-HAR requests, re-run coverage and forecast, and publish Top100/Top25 only if a final run is produced."
+  "nextDeterministicTask": "Promote the Work/Codex batch-research audit and execution prompt through the normal protected workflow. Then acquire/import permitted evidence for remaining current-HAR requests only from a verified current run, re-run coverage and forecast, and publish Top100/Top25 only if a final run is produced."
 }
