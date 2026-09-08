@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Any
 
 from dcm.algorithms.telemetry import AlgorithmTelemetry
+from dcm.chat.research_bridge import load_batch_policy
 from dcm.chat.state import read_json, write_json
 from dcm.contracts.hashes import content_hash
 from dcm.model.parameters import build_parameter_snapshot
@@ -341,11 +342,13 @@ def execute_source_aware_observations(
     write_json(dest / "acquisition_actions.json", rebuilt_actions)
     write_json(dest / "acquisition_schedule.json", rebuilt_schedule)
     write_json(dest / "acquisition_action_graph.json", aa_graph)
+    batch_policy = load_batch_policy(dest)
     next_batch = build_next_research_batch(
         requests,
         coverage=coverage,
         rows=rows,
-        max_entities=25,
+        max_entities=int(batch_policy["maxEntities"]),
+        max_dependent_offers=int(batch_policy["maxDependentOffers"]),
         excluded_action_ids=excluded_action_ids,
     )
     write_json(dest / "host_research_batch.json", next_batch)

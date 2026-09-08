@@ -97,6 +97,7 @@ def make_batch_envelope(
     owner_token: str | None = None,
     sealed_at: str | None = None,
     source_policy_hash: str | None = None,
+    search_blueprint_hash: str | None = None,
 ) -> dict[str, Any]:
     body: dict[str, Any] = {
         "schema": BATCH_SCHEMA,
@@ -110,6 +111,10 @@ def make_batch_envelope(
         "generation": int(generation),
         "budgets": dict(budgets or {}),
         "sourcePolicyHash": str(source_policy_hash or "") or None,
+        # The blueprint is part of the immutable batch identity.  A response
+        # generated from a different blueprint must never be importable into
+        # this batch.
+        "searchBlueprintHash": str(search_blueprint_hash or "") or None,
         "actions": [dict(action) for action in actions if isinstance(action, Mapping)],
     }
     body["actions"] = sorted(body["actions"], key=lambda row: (str(row.get("actionId") or ""), str(row.get("requestId") or "")))
@@ -125,7 +130,7 @@ def _validate_envelope(raw: Mapping[str, Any]) -> dict[str, Any]:
     body = dict(raw)
     if body.get("schema") != BATCH_SCHEMA:
         raise BatchEnvelopeError("BATCH_ENVELOPE_INVALID_SCHEMA")
-    for key in ("runId", "batchId", "manifestSha", "harSha256", "forecastCutoff", "codeSha", "batchContentSha"):
+    for key in ("runId", "batchId", "manifestSha", "harSha256", "forecastCutoff", "codeSha", "searchBlueprintHash", "batchContentSha"):
         if not body.get(key):
             raise BatchEnvelopeError(f"BATCH_ENVELOPE_MISSING:{key}")
     expected_id = f"BATCH_{content_hash(_identity(body))[:24]}"
@@ -178,6 +183,7 @@ def _envelope_args(envelope: Mapping[str, Any]) -> dict[str, Any]:
         "owner_token": envelope.get("ownerToken"),
         "sealed_at": envelope.get("sealedAt"),
         "source_policy_hash": envelope.get("sourcePolicyHash"),
+        "search_blueprint_hash": envelope.get("searchBlueprintHash"),
     }
 
 
@@ -198,6 +204,7 @@ def write_checkpoint_cas(
     failed_action_ids: list[str] | tuple[str, ...] = (),
     coverage_sha: str | None = None,
     fence: int | None = None,
+    search_blueprint_hash: str | None = None,
 ) -> dict[str, Any]:
     path = Path(path)
     current: dict[str, Any] | None = None
@@ -220,6 +227,7 @@ def write_checkpoint_cas(
         "failedActionIds": sorted({str(x) for x in failed_action_ids}),
         "coverageSha": str(coverage_sha or "") or None,
         "fence": int(fence) if fence is not None else None,
+        "searchBlueprintHash": str(search_blueprint_hash or "") or None,
     }
     body["checkpointHash"] = _checkpoint_hash(body)
     _atomic_replace(path, body)

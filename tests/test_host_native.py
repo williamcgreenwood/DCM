@@ -9,6 +9,7 @@ import pytest
 from dcm.chat import HostSession, doctor
 from dcm.chat.cli import main as host_main
 from dcm.chat.evidence_import import observation_to_claim
+from dcm.research.batch_store import load_batch
 from dcm.research.scopes import CANONICAL_SCOPES
 
 
@@ -149,6 +150,34 @@ def test_host_session_prepare_next_research_import_coverage_report(tmp_path: Pat
     assert (dest / "chat_result.json").is_file()
     assert report["learningRevision"] == "LR000000"
     assert report["predictiveClaim"] == "NONE"
+
+
+def test_explicit_batch_limits_survive_implicit_next_batch_transition(tmp_path: Path):
+    session = HostSession.prepare(
+        har=None,
+        run_root=tmp_path / "RUNS",
+        cutoff=CUTOFF,
+        workspace=tmp_path,
+        synthetic=True,
+    )
+    first = session.research_batch(max_entities=2, max_dependent_offers=9)
+    assert first["maxEntities"] == 2
+    assert first["maxDependentOffers"] == 9
+    policy = json.loads((session.dest / "research_batch_policy.json").read_text())
+    assert policy["maxEntities"] == 2
+    assert policy["maxDependentOffers"] == 9
+    # Simulate a successful import/checkpoint boundary.  The next batch is
+    # then created by coverage without repeating CLI flags.
+    session._persist_research_checkpoint(active_batch_id=first["batchId"])
+    coverage = session.coverage(incremental=True)
+    assert coverage["nextRecommendedBatch"]["maxEntities"] == 2
+    assert coverage["nextRecommendedBatch"]["maxDependentOffers"] == 9
+    active = json.loads((session.dest / "active_research_batch.json").read_text())
+    envelope = load_batch(Path(active["envelopePath"]))
+    assert envelope["budgets"] == {"maxEntities": 2, "maxDependentOffers": 9}
+    blueprint = json.loads((session.dest / "search_blueprint.json").read_text())
+    assert blueprint["batchBudget"]["maxActions"] == 2
+    assert blueprint["batchBudget"]["maxDependentOffers"] == 9
 
 
 def test_observation_rejects_secret_url():

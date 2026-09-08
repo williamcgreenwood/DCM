@@ -34,6 +34,8 @@ def build_search_blueprint(
     requests: Iterable[Mapping[str, Any]] = (),
     cutoff: str | None = None,
     breakdown: Mapping[str, Any] | None = None,
+    max_actions: int = 25,
+    max_dependent_offers: int = 500,
 ) -> dict[str, Any]:
     requests_by_id = {str(req.get("request_id") or req.get("requestId") or ""): req for req in requests if isinstance(req, Mapping)}
     compiled = []
@@ -63,7 +65,12 @@ def build_search_blueprint(
         "verifiedHarOfferRowCount": verified,
         "fanoutRatio": round(predicted / max(1, len(compiled)), 6),
         "fanoutClaimPolicy": "predicted is not verified; no extrapolation from a pilot to all sports",
-        "batchBudget": {"maxActions": 25, "maxDependentOffers": 500, "maxSearchCallsPerAction": 3, "maxSourcesPerAction": 8},
+        "batchBudget": {
+            "maxActions": int(max_actions),
+            "maxDependentOffers": int(max_dependent_offers),
+            "maxSearchCallsPerAction": 3,
+            "maxSourcesPerAction": 8,
+        },
         "algorithmIds": ["ALG-GROUP-006", "ALG-SEARCH-001", "ALG-SEARCH-013", "ALG-SEARCH-014", "ALG-SCHED-001", "ALG-SCHED-002", "ALG-SCHED-003", "ALG-SCHED-004"],
         "failurePolicy": {"missingField": "REQUIRED_FIELD_MISSING", "unresolvedEntity": "ENTITY_NOT_RESOLVED", "cutoff": "CUTOFF_VIOLATION", "terminalFailureExcluded": True},
     }

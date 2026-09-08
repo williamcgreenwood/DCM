@@ -244,7 +244,11 @@ def eligible_action_ids(
 ) -> set[str]:
     """Return only actions safe to schedule at this instant."""
     states = states or {}
-    current = _parse_time(now)
+    # A caller may inject ``now`` for deterministic tests/replay.  Production
+    # scheduling must still evaluate retry deadlines when the caller omits it;
+    # otherwise retryable failures are eligible immediately and can monopolize
+    # the queue despite their recorded backoff.
+    current = _parse_time(now) or datetime.now(timezone.utc)
     failures_list = list(failures)
     eligible: set[str] = set()
     for action in actions:

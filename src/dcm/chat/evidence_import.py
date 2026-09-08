@@ -53,6 +53,15 @@ def _load_observations(path: Path) -> list[dict[str, Any]]:
     if isinstance(parsed, list):
         return [x for x in parsed if isinstance(x, dict)]
     if isinstance(parsed, dict):
+        # Response envelopes are control records.  A failure-only response is
+        # valid and must yield zero observation rows, not one malformed
+        # pseudo-observation representing the envelope itself.
+        if "observations" in parsed:
+            rows = parsed.get("observations")
+            return [x for x in rows if isinstance(x, dict)] if isinstance(rows, list) else []
+        if "rows" in parsed:
+            rows = parsed.get("rows")
+            return [x for x in rows if isinstance(x, dict)] if isinstance(rows, list) else []
         return [parsed]
     return []
 

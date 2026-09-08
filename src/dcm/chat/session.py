@@ -17,7 +17,7 @@ from dcm.chat.archive import archive_run, audit_run
 from dcm.chat.contracts import REQUIRED_PREPARE_ARTIFACTS
 from dcm.chat.evidence_import import import_observations
 from dcm.chat.report import build_report
-from dcm.chat.research_bridge import next_research_batch
+from dcm.chat.research_bridge import load_batch_policy, next_research_batch
 from dcm.chat.state import default_host_state, read_json, utc_now, write_json
 from dcm.research.coverage import coverage_report
 from dcm.research.coverage_incremental import incremental_coverage_report
@@ -206,7 +206,7 @@ class HostSession:
             )
         )
 
-    def next_research_batch(self, *, max_entities: int = 25, max_dependent_offers: int = 500) -> dict[str, Any]:
+    def next_research_batch(self, *, max_entities: int | None = None, max_dependent_offers: int | None = None) -> dict[str, Any]:
         batch = next_research_batch(
             self.dest,
             max_entities=max_entities,
@@ -217,10 +217,14 @@ class HostSession:
         self._save_host_state(
             lastCommand="next-research",
             researchLoopCount=int(state.get("researchLoopCount") or 0) + 1,
+            searchBlueprintHash=batch.get("searchBlueprintHash") or state.get("searchBlueprintHash"),
+            researchBatchPolicyHash=batch.get("batchPolicyHash") or state.get("researchBatchPolicyHash"),
+            researchBatchMaxEntities=batch.get("maxEntities"),
+            researchBatchMaxDependentOffers=batch.get("maxDependentOffers"),
         )
         return batch
 
-    def research_batch(self, *, max_entities: int = 25, max_dependent_offers: int = 500) -> dict[str, Any]:
+    def research_batch(self, *, max_entities: int | None = None, max_dependent_offers: int | None = None) -> dict[str, Any]:
         """Canonical durable batch command; next-research remains compatible."""
         return self.next_research_batch(max_entities=max_entities, max_dependent_offers=max_dependent_offers)
 
@@ -266,6 +270,8 @@ class HostSession:
                 requests=requests if isinstance(requests, list) else [],
                 cutoff=cutoff,
                 breakdown=read_json(self.dest / "har_breakdown.json"),
+                max_actions=int(load_batch_policy(self.dest)["maxEntities"]),
+                max_dependent_offers=int(load_batch_policy(self.dest)["maxDependentOffers"]),
             )
             write_json(self.dest / "search_blueprint.json", blueprint)
             self._save_host_state(lastCommand="search-blueprint", searchBlueprintHash=blueprint.get("blueprintHash"))
@@ -441,6 +447,9 @@ class HostSession:
                 "selectedCount": batch.get("selectedCount"),
                 "unresolvedCount": batch.get("unresolvedCount"),
                 "eventBatchCount": batch.get("eventBatchCount"),
+                "maxEntities": batch.get("maxEntities"),
+                "maxDependentOffers": batch.get("maxDependentOffers"),
+                "batchPolicyHash": batch.get("batchPolicyHash"),
             },
             "semanticRule": "Coverage means required SportResearchSchema fields exist, not merely that a request returned something.",
         }
@@ -481,7 +490,7 @@ class HostSession:
         states = load_action_state(self.dest / "research_action_state.json")
         terminal = TERMINAL_STATES
         artifacts: dict[str, str] = {}
-        for name in ("active_research_batch.json", "research_action_state.json", "research_failures.jsonl", "evidence_coverage.json", "last_import_claim_refs.json"):
+        for name in ("active_research_batch.json", "research_action_state.json", "research_failures.jsonl", "evidence_coverage.json", "last_import_claim_refs.json", "research_batch_policy.json"):
             file = self.dest / name
             if file.is_file():
                 artifacts[name] = hashlib.sha256(file.read_bytes()).hexdigest()
@@ -497,6 +506,11 @@ class HostSession:
             pending_action_ids=[aid for aid, row in states.items() if row.get("state") not in terminal],
             failed_action_ids=[aid for aid, row in states.items() if str(row.get("state") or "").startswith(("FAILED_", "BLOCKED_"))],
             coverage_sha=content_hash(coverage),
+            search_blueprint_hash=str(
+                (self._host_state() or {}).get("searchBlueprintHash")
+                or (read_json(self.dest / "search_blueprint.json") or {}).get("blueprintHash")
+                or ""
+            ),
         )
         return result
 

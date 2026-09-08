@@ -9,7 +9,7 @@ from typing import Any
 
 from dcm.chat.session import HostSession, doctor
 from dcm.runtime.cutoff import CutoffRequired
-from dcm.research.run_lock import RunBusyError, RunFenceError
+from dcm.research.run_lock import RunBusyError, RunFenceError, repair_stale_lease
 from dcm.research.batch_store import BatchEnvelopeError
 from dcm.version import ExactVersionMismatch
 
@@ -50,14 +50,14 @@ def build_parser() -> argparse.ArgumentParser:
 
     n = sub.add_parser("next-research", help="Next optimized reusable-entity research batch")
     _add_run(n)
-    n.add_argument("--max-entities", type=int, default=25)
-    n.add_argument("--max-dependent-offers", type=int, default=500)
+    n.add_argument("--max-entities", type=int, default=None)
+    n.add_argument("--max-dependent-offers", type=int, default=None)
     n.add_argument("--workspace", type=Path, default=None)
 
     nb = sub.add_parser("research-batch", help="Seal the next immutable, failure-aware research batch")
     _add_run(nb)
-    nb.add_argument("--max-entities", type=int, default=25)
-    nb.add_argument("--max-dependent-offers", type=int, default=500)
+    nb.add_argument("--max-entities", type=int, default=None)
+    nb.add_argument("--max-dependent-offers", type=int, default=None)
     nb.add_argument("--workspace", type=Path, default=None)
 
     e = sub.add_parser("evidence-import", help="Import simple host observations (engine hashes)")
@@ -81,6 +81,9 @@ def build_parser() -> argparse.ArgumentParser:
     rf.add_argument("--exclusion-scope", default="ATTEMPT_ONLY")
     rf.add_argument("--safe-reason", default=None)
     rf.add_argument("--workspace", type=Path, default=None)
+
+    rr = sub.add_parser("research-lock-repair", help="Explicitly repair an abandoned research-run lease")
+    _add_run(rr)
 
     c = sub.add_parser("coverage", help="Semantic coverage vs SportResearchSchema")
     _add_run(c)
@@ -183,6 +186,9 @@ def main(argv: list[str] | None = None) -> int:
                 bundle_path=args.bundle,
                 workspace=args.workspace,
             ))
+            return 0
+        if args.command == "research-lock-repair":
+            _print(repair_stale_lease(args.run))
             return 0
         session = HostSession.open(args.run, workspace=getattr(args, "workspace", None))
         if args.command == "next-research":

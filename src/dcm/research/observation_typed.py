@@ -23,9 +23,22 @@ def _load_observations(path: Path) -> list[dict[str, Any]]:
         if isinstance(parsed, list):
             return [x for x in parsed if isinstance(x, dict)]
         if isinstance(parsed, dict):
-            rows = parsed.get("observations") or parsed.get("rows")
-            if isinstance(rows, list):
-                return [x for x in rows if isinstance(x, dict)]
+            # A Work response envelope may legitimately contain no successful
+            # observations and only machine-readable failures.  Do not treat
+            # that control envelope as an observation; doing so creates a
+            # misleading SOURCE_URL_REQUIRED rejection during import.
+            if "observations" in parsed:
+                rows = parsed.get("observations")
+                if rows is None:
+                    return []
+                if isinstance(rows, list):
+                    return [x for x in rows if isinstance(x, dict)]
+                return []
+            if "rows" in parsed:
+                rows = parsed.get("rows")
+                if isinstance(rows, list):
+                    return [x for x in rows if isinstance(x, dict)]
+                return []
             return [parsed]
     except json.JSONDecodeError:
         pass
@@ -228,5 +241,4 @@ def observation_to_typed_claim(
         action_id=str(obs.get("actionId") or (action or {}).get("actionId") or "") or None,
         source_family=str(obs.get("sourceFamily") or (action or {}).get("sourceFamily") or "") or None,
     )
-
 

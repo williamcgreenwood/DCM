@@ -340,8 +340,25 @@ def schedule_acquisition_actions(
     def cost_fn(aid: str) -> float:
         return max(1e-6, float(actions[aid].get("cost") or 1.0))
 
+    # Remove actions that cannot fit even when selected first.  Passing only
+    # ``max_actions`` candidates to CELF is not sufficient: if every top
+    # candidate is oversized, the later feasible actions would never be
+    # considered after the budget gate rejects those first candidates.
+    individually_infeasible: list[str] = []
+    schedulable_ids: list[str] = []
+    for aid, act in actions.items():
+        scope = str(act.get("scope") or "")
+        if scope in {"SPORT", "COMPETITION"}:
+            schedulable_ids.append(aid)
+            continue
+        unique_offer_count = len({str(value) for value in (act.get("offerIds") or []) if str(value)})
+        if unique_offer_count > max_dependent_offers:
+            individually_infeasible.append(aid)
+        else:
+            schedulable_ids.append(aid)
+
     scheduler = LazyGreedyScheduler(gain_fn, cost_fn)
-    celf_ids = scheduler.run(list(actions), k=max_actions)
+    celf_ids = scheduler.run(schedulable_ids, k=max_actions)
     tel.record("ALG-SCHED-001", problem_class="RESEARCH_SCHEDULE", producer="dcm.algorithms.scheduling.LazyGreedyScheduler", consumer="dcm.research.acquisition.schedule_acquisition_actions", count=len(celf_ids) or 1, downstream_used=True)
     tel.record("ALG-SEARCH-020", problem_class="SUBMODULAR", producer="dcm.research.acquisition.schedule_acquisition_actions", consumer="dcm.research.batch", downstream_used=True)
 
@@ -349,13 +366,24 @@ def schedule_acquisition_actions(
     # SPORT/COMPETITION do not consume the unique-offer budget.
     selected: list[str] = []
     covered_offers: set[str] = set()
+    budget_skipped: list[str] = list(individually_infeasible)
     for aid in celf_ids:
         act = actions[aid]
         scope = str(act.get("scope") or "")
         oids = [str(x) for x in (act.get("offerIds") or []) if x]
         budgeted = scope not in {"SPORT", "COMPETITION"}
         new_offers = [oid for oid in oids if oid not in covered_offers] if budgeted else []
-        if selected and budgeted and (len(covered_offers) + len(new_offers) > max_dependent_offers):
+        # A single action is not allowed to bypass the ceiling merely because
+        # it is the first selected item.  That exception made a nominal
+        # 250-offer batch carry 672 offers in the live HAR run.  Oversized
+        # actions remain pending and are reported as deferred; a later run may
+        # select them with a larger budget or after action fragmentation is
+        # enabled, but this batch never violates its declared bound.
+        if budgeted and (
+            len(new_offers) > max_dependent_offers
+            or len(covered_offers) + len(new_offers) > max_dependent_offers
+        ):
+            budget_skipped.append(aid)
             continue
         selected.append(aid)
         if budgeted:
@@ -378,12 +406,22 @@ def schedule_acquisition_actions(
     batches = []
     for event_id, aids in sorted(by_event.items(), key=lambda kv: (-sum(float(actions[a].get("weight") or 0) for a in kv[1]), kv[0])):
         tasks = [actions[a] for a in aids]
+        batch_offer_ids = {
+            str(offer_id)
+            for action in tasks
+            if str(action.get("scope") or "") not in {"SPORT", "COMPETITION"}
+            for offer_id in (action.get("offerIds") or [])
+            if str(offer_id)
+        }
         batches.append(
             {
                 "eventId": event_id,
                 "actionIds": aids,
                 "entityCount": len(aids),
-                "dependentOfferCount": sum(int(actions[a].get("dependentOfferCount") or 0) for a in aids),
+                # This is the unique budgeted offer count, matching
+                # dependentOfferBudgetUsed.  Per-action counts remain on each
+                # task for provenance; the packed batch itself is bounded.
+                "dependentOfferCount": len(batch_offer_ids),
                 "tasks": [
                     {
                         "actionId": t["actionId"],
@@ -414,6 +452,8 @@ def schedule_acquisition_actions(
         "dependentOfferBudgetUsed": offer_budget,
         "maxActions": max_actions,
         "maxDependentOffers": max_dependent_offers,
+        "budgetSkippedActionIds": sorted(set(budget_skipped)),
+        "budgetSkippedCount": len(set(budget_skipped)),
         "excludedActionIds": sorted(excluded),
         "setCoverMode": set_cover_mode,
         "setCoverUncoveredCount": len(set_cover_uncovered),

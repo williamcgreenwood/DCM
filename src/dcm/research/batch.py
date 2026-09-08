@@ -206,8 +206,12 @@ def build_next_research_batch(
             ),
         )
         take = group_sorted[:remaining]
-        dep = sum(int(r.get("dependent_prop_count") or 0) for r in take)
-        if offer_budget and offer_budget + dep > max_dependent_offers:
+        dep = sum(
+            len({str(oid) for oid in (r.get("dependent_offer_ids") or []) if str(oid)})
+            or int(r.get("dependent_prop_count") or 0)
+            for r in take
+        )
+        if dep > max_dependent_offers or offer_budget + dep > max_dependent_offers:
             continue
         selected.extend(take)
         offer_budget += dep
@@ -239,7 +243,11 @@ def build_next_research_batch(
         for rec in ungrouped:
             if len(selected) >= max_entities:
                 break
+            dep = len({str(oid) for oid in (rec.get("dependent_offer_ids") or []) if str(oid)}) or int(rec.get("dependent_prop_count") or 0)
+            if dep > max_dependent_offers or offer_budget + dep > max_dependent_offers:
+                continue
             selected.append(rec)
+            offer_budget += dep
 
     reused = [r for r in scored if not r.get("acquire")]
     action_doc = build_acquisition_actions(list(rows or []), acquire, coverage=coverage, excluded_action_ids=excluded)
@@ -306,6 +314,8 @@ def build_next_research_batch(
         "reusedCount": len(reused),
         "eventBatchCount": len(batches),
         "dependentOfferBudgetUsed": offer_budget,
+        "budgetSkippedActionIds": list(schedule.get("budgetSkippedActionIds") or []),
+        "budgetSkippedCount": int(schedule.get("budgetSkippedCount") or 0),
         "stopWhen": "coverage closed or additional research cannot change production eligibility enough to justify cost",
         "hostInstruction": (
             "Research reusable entities once. Do not invent hashes, reliability, "

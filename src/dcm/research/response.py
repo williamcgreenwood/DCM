@@ -62,7 +62,7 @@ def load_response(path: Path) -> dict[str, Any]:
             raise ResponseEnvelopeError(f"{ResponseEnvelopeError.code}:SCHEMA")
         observations = _rows(parsed, field="observations")
         failures = _rows(parsed, field="failures")
-        for key in ("runId", "batchId", "batchContentSha", "checkpointSha"):
+        for key in ("runId", "batchId", "batchContentSha", "checkpointSha", "searchBlueprintHash"):
             if parsed.get(key) not in (None, ""):
                 metadata[key] = str(parsed[key])
         metadata["schema"] = str(parsed.get("schema") or RESPONSE_SCHEMA)
@@ -81,6 +81,7 @@ def load_response(path: Path) -> dict[str, Any]:
         "batchId": metadata.get("batchId"),
         "batchContentSha": metadata.get("batchContentSha"),
         "checkpointSha": metadata.get("checkpointSha"),
+        "searchBlueprintHash": metadata.get("searchBlueprintHash"),
         "observations": observations,
         "failures": failures,
     }
@@ -104,6 +105,8 @@ def _active_envelope(run_dir: Path) -> dict[str, Any] | None:
     envelope = load_batch(envelope_path)
     if str(pointer.get("batchContentSha") or "") != str(envelope.get("batchContentSha") or ""):
         raise ResponseEnvelopeError(f"{ResponseEnvelopeError.code}:ACTIVE_POINTER_HASH")
+    if str(pointer.get("searchBlueprintHash") or "") != str(envelope.get("searchBlueprintHash") or ""):
+        raise ResponseEnvelopeError(f"{ResponseEnvelopeError.code}:ACTIVE_POINTER_BLUEPRINT")
     return envelope
 
 
@@ -111,9 +114,12 @@ def validate_response_binding(response: Mapping[str, Any], run_dir: Path) -> dic
     """Fail closed when an explicit response envelope targets another batch."""
     response = dict(response)
     envelope = _active_envelope(Path(run_dir))
-    explicit = any(response.get(key) not in (None, "") for key in ("runId", "batchId", "batchContentSha"))
-    if response.get("schema") == RESPONSE_SCHEMA and not response.get("batchId"):
-        raise ResponseEnvelopeError(f"{ResponseEnvelopeError.code}:BATCH_ID_REQUIRED")
+    strict = response.get("schema") == RESPONSE_SCHEMA
+    explicit = strict or any(response.get(key) not in (None, "") for key in ("runId", "batchId", "batchContentSha", "checkpointSha", "searchBlueprintHash"))
+    if strict:
+        for key in ("runId", "batchId", "batchContentSha", "checkpointSha", "searchBlueprintHash"):
+            if response.get(key) in (None, ""):
+                raise ResponseEnvelopeError(f"{ResponseEnvelopeError.code}:{key.upper()}_REQUIRED")
     if explicit:
         if envelope is None:
             raise ResponseEnvelopeError(f"{ResponseEnvelopeError.code}:NO_ACTIVE_BATCH")
@@ -123,6 +129,10 @@ def validate_response_binding(response: Mapping[str, Any], run_dir: Path) -> dic
             raise ResponseEnvelopeError(f"{ResponseEnvelopeError.code}:BATCH_MISMATCH")
         if response.get("batchContentSha") not in (None, "", str(envelope.get("batchContentSha") or "")):
             raise ResponseEnvelopeError(f"{ResponseEnvelopeError.code}:BATCH_CONTENT_MISMATCH")
+        if response.get("searchBlueprintHash") not in (None, "", str(envelope.get("searchBlueprintHash") or "")):
+            raise ResponseEnvelopeError(f"{ResponseEnvelopeError.code}:BLUEPRINT_MISMATCH")
+        if strict and str(response.get("checkpointSha") or "") != str(envelope.get("parentCheckpointSha") or ""):
+            raise ResponseEnvelopeError(f"{ResponseEnvelopeError.code}:CHECKPOINT_MISMATCH")
     observation_mismatches: list[str] = []
     for index, observation in enumerate(response.get("observations") or []):
         if not isinstance(observation, Mapping):
@@ -134,6 +144,8 @@ def validate_response_binding(response: Mapping[str, Any], run_dir: Path) -> dic
             observation_mismatches.append(f"{index}:batch")
         if envelope is not None and observation.get("batchContentSha") not in (None, "", str(envelope.get("batchContentSha") or "")):
             observation_mismatches.append(f"{index}:content")
+        if envelope is not None and observation.get("searchBlueprintHash") not in (None, "", str(envelope.get("searchBlueprintHash") or "")):
+            observation_mismatches.append(f"{index}:blueprint")
     if observation_mismatches:
         raise ResponseEnvelopeError(f"{ResponseEnvelopeError.code}:OBSERVATION_BINDING:{','.join(observation_mismatches[:20])}")
     response["bindingStatus"] = "BOUND" if explicit else "LEGACY_UNBOUND_COMPATIBILITY"

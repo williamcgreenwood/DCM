@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from pathlib import Path
 import subprocess
-from typing import Any
+from typing import Any, Mapping
 
 from dcm.algorithms.selection import AlgorithmSelectionEngine
 from dcm.chat.state import read_json, write_json
@@ -20,6 +20,83 @@ from dcm.research.search_blueprint import build_search_blueprint
 from dcm.contracts.hashes import content_hash
 from dcm.runtime.checkpoint import load_checkpoint
 from dcm.version import SOFTWARE
+
+
+DEFAULT_MAX_ENTITIES = 25
+DEFAULT_MAX_DEPENDENT_OFFERS = 500
+BATCH_POLICY_SCHEMA = "pillars_dcm.research_batch_policy.v1"
+
+
+def _positive_limit(value: Any, *, field: str) -> int:
+    try:
+        parsed = int(value)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"RESEARCH_BATCH_POLICY_INVALID:{field}") from exc
+    if parsed < 1:
+        raise ValueError(f"RESEARCH_BATCH_POLICY_INVALID:{field}")
+    return parsed
+
+
+def _policy_body(dest: Path, *, max_entities: int, max_dependent_offers: int) -> dict[str, Any]:
+    body: dict[str, Any] = {
+        "schema": BATCH_POLICY_SCHEMA,
+        "runId": dest.name,
+        "maxEntities": _positive_limit(max_entities, field="maxEntities"),
+        "maxDependentOffers": _positive_limit(max_dependent_offers, field="maxDependentOffers"),
+    }
+    body["contentHash"] = content_hash(body)
+    return body
+
+
+def load_batch_policy(dest: Path) -> dict[str, Any]:
+    """Load the durable limits used by every implicit next-batch transition."""
+    dest = Path(dest)
+    raw = read_json(dest / "research_batch_policy.json")
+    if raw is None:
+        return _policy_body(
+            dest,
+            max_entities=DEFAULT_MAX_ENTITIES,
+            max_dependent_offers=DEFAULT_MAX_DEPENDENT_OFFERS,
+        )
+    if not isinstance(raw, dict) or raw.get("schema") != BATCH_POLICY_SCHEMA:
+        raise RuntimeError("RESEARCH_BATCH_POLICY_INVALID_SCHEMA")
+    if str(raw.get("runId") or "") != dest.name:
+        raise RuntimeError("RESEARCH_BATCH_POLICY_RUN_MISMATCH")
+    expected = content_hash({key: value for key, value in raw.items() if key != "contentHash"})
+    if str(raw.get("contentHash") or "") != expected:
+        raise RuntimeError("RESEARCH_BATCH_POLICY_HASH_MISMATCH")
+    return _policy_body(
+        dest,
+        max_entities=raw.get("maxEntities"),
+        max_dependent_offers=raw.get("maxDependentOffers"),
+    )
+
+
+def persist_batch_policy(dest: Path, *, max_entities: int, max_dependent_offers: int) -> dict[str, Any]:
+    policy = _policy_body(
+        Path(dest),
+        max_entities=max_entities,
+        max_dependent_offers=max_dependent_offers,
+    )
+    write_json(Path(dest) / "research_batch_policy.json", policy)
+    return policy
+
+
+def _persist_policy_from_envelope(dest: Path, pending: Mapping[str, Any]) -> dict[str, Any]:
+    """Recover policy from a pre-policy active envelope without changing it."""
+    existing = read_json(Path(dest) / "research_batch_policy.json")
+    if isinstance(existing, dict):
+        return load_batch_policy(Path(dest))
+    envelope_path = Path(str(pending.get("envelopePath") or ""))
+    if not envelope_path.is_absolute():
+        envelope_path = Path(dest) / envelope_path
+    envelope = load_batch(envelope_path)
+    budgets = envelope.get("budgets") if isinstance(envelope.get("budgets"), dict) else {}
+    return persist_batch_policy(
+        Path(dest),
+        max_entities=_positive_limit(budgets.get("maxEntities", DEFAULT_MAX_ENTITIES), field="maxEntities"),
+        max_dependent_offers=_positive_limit(budgets.get("maxDependentOffers", DEFAULT_MAX_DEPENDENT_OFFERS), field="maxDependentOffers"),
+    )
 
 
 def _code_sha(dest: Path) -> str:
@@ -71,13 +148,52 @@ def _ensure_research_prerequisites(dest: Path) -> dict[str, Any]:
     coverage = read_json(dest / "evidence_coverage.json") or read_json(dest / "evidence" / "coverage.json") or {}
     coverage = coverage if isinstance(coverage, dict) else {}
     action_doc = read_json(dest / "acquisition_actions.json") or {}
-    if not isinstance(action_doc, dict) or int(action_doc.get("actionCount") or 0) == 0 and requests:
+    request_ids = {
+        str(row.get("request_id") or row.get("requestId") or "")
+        for row in requests
+        if isinstance(row, dict) and str(row.get("request_id") or row.get("requestId") or "")
+    }
+    action_rows = action_doc.get("actions") if isinstance(action_doc, dict) else []
+    action_rows = [row for row in action_rows if isinstance(row, dict)]
+    action_requirement_ids = {
+        str(requirement_id)
+        for action in action_rows
+        for requirement_id in (action.get("requirementIds") or [])
+        if str(requirement_id)
+    }
+    action_plan_matches_requests = (
+        isinstance(action_doc, dict)
+        and int(action_doc.get("requirementCount") or 0) == len(request_ids)
+        and action_requirement_ids == request_ids
+    )
+    if requests and not action_plan_matches_requests:
+        # ``resume`` can regenerate the canonical request plan while leaving
+        # an older acquisition action file in place.  Reusing that file would
+        # bind a new batch to stale requirements and can make coverage appear
+        # to move against the wrong population.  Rebuild deterministically
+        # whenever the request/action identity sets differ, not only when the
+        # action file is absent.
+        previous_action_count = len(action_rows)
+        previous_requirement_count = int(action_doc.get("requirementCount") or 0) if isinstance(action_doc, dict) else 0
         action_doc = build_acquisition_actions(rows, requests, coverage=coverage)
         schedule = schedule_acquisition_actions(action_doc)
         action_graph = build_acquisition_action_graph(action_doc, schedule=schedule)
         write_json(dest / "acquisition_actions.json", action_doc)
         write_json(dest / "acquisition_schedule.json", schedule)
         write_json(dest / "acquisition_action_graph.json", action_graph)
+        repair = {
+            "schema": "pillars_dcm.research_prerequisite_repair.v1",
+            "runId": dest.name,
+            "action": "REBUILD_ACQUISITION_ACTIONS",
+            "reason": "REQUEST_ACTION_IDENTITY_MISMATCH",
+            "requestCount": len(request_ids),
+            "previousActionCount": previous_action_count,
+            "previousRequirementCount": previous_requirement_count,
+            "newActionCount": int(action_doc.get("actionCount") or 0),
+            "newRequirementCount": int(action_doc.get("requirementCount") or 0),
+        }
+        repair["contentHash"] = content_hash({key: value for key, value in repair.items() if key != "contentHash"})
+        write_json(dest / "research_prerequisite_repair.json", repair)
     index_meta = read_json(dest / "research_indexes_meta.json") or {}
     if not isinstance(index_meta, dict) or not index_meta.get("contentHash"):
         index_meta = {
@@ -121,6 +237,8 @@ def _pending_active_batch(dest: Path) -> dict[str, Any] | None:
     envelope = load_batch(envelope_path)
     if str(pointer.get("batchContentSha") or "") != str(envelope.get("batchContentSha") or ""):
         raise RuntimeError("ACTIVE_BATCH_POINTER_HASH_MISMATCH")
+    if str(pointer.get("searchBlueprintHash") or "") != str(envelope.get("searchBlueprintHash") or ""):
+        raise RuntimeError("ACTIVE_BATCH_POINTER_BLUEPRINT_MISMATCH")
     checkpoint = read_json(dest / "research_checkpoint.json") or {}
     committed = bool(
         isinstance(checkpoint, dict)
@@ -146,6 +264,7 @@ def _pending_active_batch(dest: Path) -> dict[str, Any] | None:
         "resumeRequired": True,
         "envelopePath": str(envelope_path),
         "batchContentSha": envelope.get("batchContentSha"),
+        "searchBlueprintHash": envelope.get("searchBlueprintHash"),
         "parentCheckpointSha": envelope.get("parentCheckpointSha"),
     }
 
@@ -153,8 +272,8 @@ def _pending_active_batch(dest: Path) -> dict[str, Any] | None:
 def next_research_batch(
     dest: Path,
     *,
-    max_entities: int = 25,
-    max_dependent_offers: int = 500,
+    max_entities: int | None = None,
+    max_dependent_offers: int | None = None,
     store_root: Path | None = None,
 ) -> dict[str, Any]:
     dest = Path(dest)
@@ -164,7 +283,28 @@ def next_research_batch(
     with RunLock(dest, command="next-research"):
         pending = _pending_active_batch(dest)
         if pending is not None:
+            # Recover limits from a legacy active envelope without replacing
+            # or mutating that immutable batch.  This also makes an old run
+            # safe to resume after the policy sidecar was introduced.
+            policy = _persist_policy_from_envelope(dest, pending)
+            pending["batchPolicyHash"] = policy.get("contentHash")
+            pending["maxEntities"] = int(policy["maxEntities"])
+            pending["maxDependentOffers"] = int(policy["maxDependentOffers"])
             return pending
+        stored_policy = load_batch_policy(dest)
+        max_entities = _positive_limit(
+            stored_policy["maxEntities"] if max_entities is None else max_entities,
+            field="maxEntities",
+        )
+        max_dependent_offers = _positive_limit(
+            stored_policy["maxDependentOffers"] if max_dependent_offers is None else max_dependent_offers,
+            field="maxDependentOffers",
+        )
+        policy = persist_batch_policy(
+            dest,
+            max_entities=max_entities,
+            max_dependent_offers=max_dependent_offers,
+        )
         _ensure_research_prerequisites(dest)
         require_research_may_begin(dest)
         requests = read_json(dest / "research_requests.json") or []
@@ -228,6 +368,8 @@ def next_research_batch(
             requests=requests,
             cutoff=cutoff,
             breakdown=read_json(dest / "har_breakdown.json"),
+            max_actions=max_entities,
+            max_dependent_offers=max_dependent_offers,
         )
         write_json(dest / "search_blueprint.json", blueprint)
         batch["searchBlueprintHash"] = blueprint.get("blueprintHash")
@@ -242,6 +384,7 @@ def next_research_batch(
             generation=int(checkpoint.get("generation") or checkpoint.get("researchGeneration") or 0),
             budgets={"maxEntities": int(max_entities), "maxDependentOffers": int(max_dependent_offers)},
             source_policy_hash=content_hash({"sourceCatalog": (read_json(dest / "source_catalog.json") or {}).get("contentHash")}),
+            search_blueprint_hash=str(blueprint.get("blueprintHash") or ""),
         )
         batch_dir = dest / "research_batches"
         sealed = seal_batch(batch_dir / f"{envelope['batchId']}.json", envelope)
@@ -254,6 +397,7 @@ def next_research_batch(
                 "forecastCutoff": sealed["forecastCutoff"],
                 "codeSha": sealed["codeSha"],
                 "parentCheckpointSha": sealed.get("parentCheckpointSha"),
+                "batchPolicyHash": policy.get("contentHash"),
                 "envelopePath": str(batch_dir / f"{sealed['batchId']}.json"),
                 "excludedActionIds": sorted(excluded),
                 "stateSchema": "pillars_dcm.action_state.v1",
@@ -277,6 +421,8 @@ def next_research_batch(
             "runId": dest.name,
             "batchId": sealed["batchId"],
             "batchContentSha": sealed["batchContentSha"],
+            "searchBlueprintHash": sealed["searchBlueprintHash"],
+            "batchPolicyHash": policy.get("contentHash"),
             "envelopePath": str(batch_dir / f"{sealed['batchId']}.json"),
         }
         write_json(dest / "active_research_batch.json", pointer)
