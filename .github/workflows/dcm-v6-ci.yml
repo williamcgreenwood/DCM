@@ -162,3 +162,27 @@ jobs:
           name: dcm-ci-diagnostics-${{ github.run_id }}-performance-${{ github.run_attempt }}
           path: /tmp/dcm-ci-diagnostics-performance.json
           if-no-files-found: warn
+
+  # The repository's protected branch historically requires the check named
+  # `python-dcm`. Keep that stable required-check identity while exposing the
+  # individual gate jobs above for actionable diagnostics.
+  python-dcm:
+    name: python-dcm
+    if: ${{ always() }}
+    needs: [package, tests, constitution, inventory, research-contract, performance]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every DCM gate
+        env:
+          PACKAGE_RESULT: ${{ needs.package.result }}
+          TESTS_RESULT: ${{ needs.tests.result }}
+          CONSTITUTION_RESULT: ${{ needs.constitution.result }}
+          INVENTORY_RESULT: ${{ needs.inventory.result }}
+          RESEARCH_CONTRACT_RESULT: ${{ needs.research-contract.result }}
+          PERFORMANCE_RESULT: ${{ needs.performance.result }}
+        run: |
+          set -euo pipefail
+          for result in "$PACKAGE_RESULT" "$TESTS_RESULT" "$CONSTITUTION_RESULT" "$INVENTORY_RESULT" "$RESEARCH_CONTRACT_RESULT" "$PERFORMANCE_RESULT"; do
+            test "$result" = success || { echo "DCM_GATE_FAILED:$result" >&2; exit 1; }
+          done
+          echo "DCM_GATE_SUMMARY:all six visible gates passed"
