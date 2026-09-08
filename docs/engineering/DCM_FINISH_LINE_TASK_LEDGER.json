@@ -112,5 +112,5 @@
     },
     "externalGateRemaining": "551 current-HAR research requests still require permitted evidence; final forecast, ranking, freeze, settlement, and predictive certification remain separately gated."
   },
-  "nextDeterministicTask": "Promote the Work/Codex batch-research audit and execution prompt through the normal protected workflow. Then acquire/import permitted evidence for remaining current-HAR requests only from a verified current run, re-run coverage and forecast, and publish Top100/Top25 only if a final run is produced."
+  "nextDeterministicTask": "Acquire/import permitted evidence for remaining current-HAR requests only from a verified current run, re-run coverage and forecast, and publish Top100/Top25 only if a final run is produced. The Work/Codex batch-research audit and execution prompt are merged in PR #64 at 96bc0e5c5bd2be874c7a84aaf29144248679d646."
 }

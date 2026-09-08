@@ -1,7 +1,7 @@
 {
   "schema": "pillars_dcm.program_status.v1",
-  "asOf": "2026-09-08T08:19:14+00:00",
-  "canonicalMain": "8044c459de29fe9c92db79906682fffd8dce6435",
+  "asOf": "2026-09-08T08:35:36+00:00",
+  "canonicalMain": "96bc0e5c5bd2be874c7a84aaf29144248679d646",
   "learningRevision": "LR000000",
   "predictiveClaim": "NONE",
   "productionRootCertified": false,
@@ -12,8 +12,8 @@
   "activeRunProvenance": "LAST_RECORDED_NOT_REOPENED_IN_THIS_CLEAN_DOCUMENTATION_WORKTREE",
   "activeRunState": "AWAITING_FRONTIER_RESEARCH",
   "repositoryReadback": {
-    "verifiedAt": "2026-09-08T08:19:14+00:00",
-    "main": "8044c459de29fe9c92db79906682fffd8dce6435",
+    "verifiedAt": "2026-09-08T08:35:36+00:00",
+    "main": "96bc0e5c5bd2be874c7a84aaf29144248679d646",
     "requiredCheck": "python-dcm",
     "openPullRequestsBeforeThisPass": 0,
     "startupChecks": {
@@ -22,7 +22,8 @@
       "generatedInventory": "PASS",
       "policy": "PASS",
       "diffCheck": "PASS",
-      "pytest": "TOOL_UNAVAILABLE_IN_CONFIGURED_RUNTIME"
+      "pytest": "TOOL_UNAVAILABLE_IN_CONFIGURED_RUNTIME",
+      "remotePythonDcm": "PASS_RUN_334"
     }
   },
   "notes": [
@@ -31,6 +32,7 @@
     "PR #55 game_logs field-union fix is on main",
     "PR #56 established the DCM 6.1 CFB/NFL release contract on main",
     "NFL league-keyed research-contract parity is merged in PR #57 and DCM61-08 is VERIFIED",
+    "PR #64 merged the audit and Work/Codex execution prompt at 96bc0e5c5bd2be874c7a84aaf29144248679d646",
     "The last recorded operational run was not reopened by the 2026-09-08 documentation readback",
     "Remaining CFB/NFL operational, predictive, production-root, and host-performance gates require their own receipts"
   ]
