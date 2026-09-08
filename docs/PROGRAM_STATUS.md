@@ -1,8 +1,8 @@
 # PROGRAM STATUS
 
 - **Constitution:** `DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903`
-- **asOf:** 2026-09-08T08:19:14+00:00
-- **canonical main:** `8044c459de29fe9c92db79906682fffd8dce6435`
+- **asOf:** 2026-09-08T08:35:36+00:00
+- **canonical main:** `96bc0e5c5bd2be874c7a84aaf29144248679d646`
 - **LR:** `LR000000`
 - **predictiveClaim:** `NONE`
 - **productionRootCertified:** false
@@ -24,16 +24,17 @@ live-board freshness or completion.
 
 ## Verified repository readback
 
-- `main` was read back at `8044c459de29fe9c92db79906682fffd8dce6435`.
+- `main` was read back at `96bc0e5c5bd2be874c7a84aaf29144248679d646` after PR #64 merged.
 - The NFL league-keyed research-contract increment is already merged in PR #57 and
   recorded as `DCM61-08: VERIFIED`; it must not be duplicated.
-- PRs #60, #61, #62, and #63 are also in the current first-parent history.
+- PRs #60, #61, #62, #63, and #64 are in the current first-parent history.
 - `main` is protected and requires the `python-dcm` check; this pass found no open PR
   before its own implementation branch was created.
 - The local startup gate passed `doctor`, `compileall`, generated-inventory check,
   policy validation, and whitespace validation. The configured runtime did not provide
   `pytest`, so the full pytest suite remains a separately recorded tool-availability
-  limitation.
+  limitation; PR #64's remote `python-dcm` workflow, including the full test,
+  constitution, policy, inventory, benchmark, and profile steps, completed green.
 
 ## Next
 

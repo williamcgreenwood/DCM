@@ -1,9 +1,9 @@
 # CURRENT WORK HANDOFF — CHECKPOINTED DCM WORK/CODEX EXECUTION
 
-- **Timestamp:** `2026-09-08T08:19:14+00:00`
+- **Timestamp:** `2026-09-08T08:35:36+00:00`
 - **Constitution version:** `DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903`
 - **Active branch:** `main`
-- **Canonical main HEAD:** `8044c459de29fe9c92db79906682fffd8dce6435`
+- **Canonical main HEAD:** `96bc0e5c5bd2be874c7a84aaf29144248679d646`
 - **Learning revision:** `LR000000`
 - **Predictive claim:** `NONE`
 - **Production root:** NOT CERTIFIED
@@ -30,8 +30,8 @@ this clean documentation pass.
   acceptance
 - PR #60 universal research contracts, PR #61 host receipt, PR #62 CFB research
   acceptance, and PR #63 1,839-set acceptance are in current main history
-- The Work/Codex batch-research audit and executable prompt are being promoted in
-  this pass; they do not close any external research or predictive gate
+- PR #64 promoted the Work/Codex batch-research audit and executable prompt; its
+  required CI workflow completed green and main readback is `96bc0e5…`
 - Closure receipt/audit/checkpoint written under `<RUN_ROOT>` and `docs/`
 
 ## Do not
