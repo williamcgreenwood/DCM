@@ -94,6 +94,38 @@ def test_retryable_failure_is_excluded_until_deterministic_backoff_expires(tmp_p
     assert eligible_action_ids([action], states=states, failures=load_failures(failure_path), now="2026-09-08T00:00:30Z") == {"AA_1"}
 
 
+def test_retryable_failure_backoff_is_enforced_when_scheduler_omits_now(tmp_path: Path):
+    states: dict[str, dict[str, object]] = {}
+    failure_path = tmp_path / "failures.jsonl"
+    row, failure = apply_failure(
+        states,
+        run_id="RUN_1",
+        batch_id="BATCH_1",
+        action_id="AA_1",
+        request_id="REQ_1",
+        code="SOURCE_RATE_LIMITED",
+        retryable=True,
+        failure_path=failure_path,
+        next_retry_at="2999-01-01T00:00:00Z",
+        now="2026-09-08T00:00:00Z",
+    )
+    assert row["state"] == "FAILED_RETRYABLE"
+    assert not eligible_action_ids(
+        [_action("AA_1", "REQ_1")],
+        states=states,
+        failures=load_failures(failure_path),
+    )
+
+
+def test_lock_repair_cli_is_exposed_in_the_host_contract():
+    from dcm.chat.cli import build_parser
+    from dcm.chat.contracts import HOST_COMMANDS
+
+    assert "research-lock-repair" in HOST_COMMANDS
+    parsed = build_parser().parse_args(["research-lock-repair", "--run", "/tmp/run"])
+    assert parsed.command == "research-lock-repair"
+
+
 def test_same_response_failure_key_does_not_increment_attempt_twice(tmp_path: Path):
     states: dict[str, dict[str, object]] = {}
     failure_path = tmp_path / "failures.jsonl"

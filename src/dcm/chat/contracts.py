@@ -8,6 +8,7 @@ HOST_COMMANDS = (
     "research-batch",
     "research-validate",
     "research-failure",
+    "research-lock-repair",
     "evidence-import",
     "coverage",
     "har-breakdown",

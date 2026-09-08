@@ -5,7 +5,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 - Modules: **241**
 - Symbols: **1734**
 - Parse errors: **0**
-- Inventory hash: `5d9ce399737eff6c78994266b9e195f3ea6e45d409774ee04876b4158ff21524`
+- Inventory hash: `39b8ed1b05925b3c26aac811c52f0b44dbd8d475b01abbd52aa381fc475ec1e9`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -709,7 +709,7 @@ _No class/function symbols._
 - `function` **_print** L17
 - `function` **_add_run** L21
 - `function` **build_parser** L25
-- `function` **main** L151
+- `function` **main** L154
 
 ### `src/dcm/chat/contracts.py`
 
@@ -2014,13 +2014,13 @@ _No class/function symbols._
 - `method` **RunLock.__init__** L44
 - `method` **RunLock._connect** L55
 - `method` **RunLock.acquire** L67
-- `method` **RunLock.renew** L137
-- `method` **RunLock.assert_fence** L148
-- `method` **RunLock.metadata** L159
-- `method` **RunLock.release** L169
-- `method` **RunLock.__enter__** L190
-- `method` **RunLock.__exit__** L193
-- `function` **repair_stale_lease** L197 — Explicitly record and remove an abandoned lease while holding the file lock.
+- `method` **RunLock.renew** L152
+- `method` **RunLock.assert_fence** L163
+- `method` **RunLock.metadata** L174
+- `method` **RunLock.release** L184
+- `method` **RunLock.__enter__** L205
+- `method` **RunLock.__exit__** L208
+- `function` **repair_stale_lease** L212 — Explicitly record and remove an abandoned lease while holding the file lock.
 
 ### `src/dcm/research/scopes.py`
 

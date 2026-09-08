@@ -84,7 +84,17 @@ class RunLock:
             ).fetchone()
             now = _now_epoch()
             if row is not None and float(row[2]) > now and str(row[0]) != self.owner_token:
-                raise RunBusyError("active lease")
+                try:
+                    active_metadata = json.loads(str(row[3] or "{}"))
+                    active_metadata = active_metadata if isinstance(active_metadata, dict) else {}
+                except json.JSONDecodeError:
+                    active_metadata = {}
+                holder = str(active_metadata.get("command") or "unknown")[:80]
+                raise RunBusyError(
+                    "active lease; "
+                    f"fence={int(row[1])}; leaseUntil={float(row[2]):.3f}; command={holder}; "
+                    "recovery=wait-for-owner-or-use-explicit-lock-repair-after-confirming-process-exit"
+                )
             prior_metadata: dict[str, Any] = {}
             if row is not None:
                 try:
@@ -98,7 +108,12 @@ class RunLock:
                     and not prior_metadata.get("released")
                     and not prior_metadata.get("staleRepaired")
                 ):
-                    raise RunBusyError("stale lease requires explicit repair")
+                    holder = str(prior_metadata.get("command") or "unknown")[:80]
+                    raise RunBusyError(
+                        "stale lease requires explicit repair; "
+                        f"fence={int(row[1])}; leaseUntil={float(row[2]):.3f}; command={holder}; "
+                        "recovery=python -m dcm.chat research-lock-repair --run <RUN_DIR>"
+                    )
             fence = int(row[1]) + 1 if row is not None else 1
             metadata = {
                 "runId": self.run_dir.name,
