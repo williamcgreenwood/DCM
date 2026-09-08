@@ -2,10 +2,10 @@
 
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
-- Modules: **229**
-- Symbols: **1617**
+- Modules: **241**
+- Symbols: **1734**
 - Parse errors: **0**
-- Inventory hash: `61c658e36bbb0a5a267365dc65177a7b7f442a498756275df4302e7cbb606103`
+- Inventory hash: `5d9ce399737eff6c78994266b9e195f3ea6e45d409774ee04876b4158ff21524`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -53,8 +53,8 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P7 | `src/dcm/chat/contracts.py` | 0 | 0 |
 | P7 | `src/dcm/chat/evidence_import.py` | 0 | 6 |
 | P7 | `src/dcm/chat/report.py` | 0 | 1 |
-| P7 | `src/dcm/chat/research_bridge.py` | 0 | 1 |
-| P7 | `src/dcm/chat/session.py` | 1 | 18 |
+| P7 | `src/dcm/chat/research_bridge.py` | 0 | 5 |
+| P7 | `src/dcm/chat/session.py` | 1 | 26 |
 | P7 | `src/dcm/chat/state.py` | 0 | 4 |
 | UNMAPPED | `src/dcm/compact.py` | 4 | 20 |
 | P0 | `src/dcm/contracts/__init__.py` | 0 | 0 |
@@ -120,7 +120,8 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | UNMAPPED | `src/dcm/postgame.py` | 0 | 1 |
 | UNMAPPED | `src/dcm/release.py` | 0 | 14 |
 | P1 | `src/dcm/research/__init__.py` | 0 | 1 |
-| P1 | `src/dcm/research/acquisition.py` | 0 | 6 |
+| P1 | `src/dcm/research/acquisition.py` | 0 | 7 |
+| P1 | `src/dcm/research/action_state.py` | 0 | 10 |
 | P1 | `src/dcm/research/adapters/__init__.py` | 0 | 0 |
 | P1 | `src/dcm/research/adapters/base.py` | 1 | 7 |
 | P1 | `src/dcm/research/adapters/basketball_reference.py` | 7 | 26 |
@@ -131,20 +132,25 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P1 | `src/dcm/research/adapters/pro_football_reference.py` | 2 | 7 |
 | P1 | `src/dcm/research/authority.py` | 1 | 5 |
 | P1 | `src/dcm/research/batch.py` | 0 | 5 |
+| P1 | `src/dcm/research/batch_store.py` | 3 | 13 |
 | P1 | `src/dcm/research/cache.py` | 1 | 7 |
 | P1 | `src/dcm/research/cache_layers.py` | 1 | 12 |
 | P1 | `src/dcm/research/claims.py` | 0 | 3 |
 | P1 | `src/dcm/research/classify.py` | 0 | 7 |
 | P1 | `src/dcm/research/classify_runtime.py` | 0 | 2 |
 | P1 | `src/dcm/research/coverage.py` | 0 | 11 |
+| P1 | `src/dcm/research/coverage_incremental.py` | 1 | 5 |
 | P1 | `src/dcm/research/dependency_graph.py` | 0 | 4 |
 | P1 | `src/dcm/research/emit.py` | 0 | 4 |
 | P1 | `src/dcm/research/entity_graph.py` | 0 | 4 |
 | P1 | `src/dcm/research/entity_packets.py` | 0 | 13 |
 | P1 | `src/dcm/research/evidence_graph.py` | 0 | 16 |
+| P1 | `src/dcm/research/failures.py` | 0 | 8 |
 | P1 | `src/dcm/research/freshness.py` | 1 | 12 |
 | P1 | `src/dcm/research/gamelog.py` | 0 | 9 |
 | P1 | `src/dcm/research/gridiron_gamelog.py` | 0 | 9 |
+| P1 | `src/dcm/research/har_breakdown.py` | 1 | 9 |
+| P1 | `src/dcm/research/har_records.py` | 0 | 12 |
 | P1 | `src/dcm/research/historical_gap.py` | 0 | 4 |
 | P1 | `src/dcm/research/host_plan.py` | 0 | 1 |
 | P1 | `src/dcm/research/indexes.py` | 2 | 19 |
@@ -162,8 +168,13 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P1 | `src/dcm/research/readiness.py` | 0 | 4 |
 | P1 | `src/dcm/research/requests.py` | 0 | 6 |
 | P1 | `src/dcm/research/research_store.py` | 1 | 29 |
+| P1 | `src/dcm/research/response.py` | 1 | 5 |
 | P1 | `src/dcm/research/role_epoch.py` | 1 | 27 |
+| P1 | `src/dcm/research/run_lock.py` | 3 | 13 |
 | P1 | `src/dcm/research/scopes.py` | 0 | 6 |
+| P1 | `src/dcm/research/search_blueprint.py` | 0 | 2 |
+| P1 | `src/dcm/research/search_engine.py` | 1 | 9 |
+| P1 | `src/dcm/research/search_query.py` | 0 | 4 |
 | P1 | `src/dcm/research/source_catalog.py` | 0 | 6 |
 | P1 | `src/dcm/research/source_health.py` | 1 | 19 |
 | P1 | `src/dcm/research/staged.py` | 0 | 5 |
@@ -182,6 +193,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P5-P14 | `src/dcm/runtime/checkpoint_reconciliation.py` | 0 | 2 |
 | P5-P14 | `src/dcm/runtime/cutoff.py` | 1 | 4 |
 | P5-P14 | `src/dcm/runtime/dag.py` | 3 | 28 |
+| P5-P14 | `src/dcm/runtime/diagnostics.py` | 0 | 4 |
 | P5-P14 | `src/dcm/runtime/drive_catalog.py` | 1 | 10 |
 | P5-P14 | `src/dcm/runtime/freeze.py` | 0 | 2 |
 | P5-P14 | `src/dcm/runtime/github_archive.py` | 0 | 38 |
@@ -694,10 +706,10 @@ _No class/function symbols._
 
 ### `src/dcm/chat/cli.py`
 
-- `function` **_print** L15
-- `function` **_add_run** L19
-- `function` **build_parser** L23
-- `function` **main** L104
+- `function` **_print** L17
+- `function` **_add_run** L21
+- `function` **build_parser** L25
+- `function` **main** L151
 
 ### `src/dcm/chat/contracts.py`
 
@@ -718,36 +730,48 @@ _No class/function symbols._
 
 ### `src/dcm/chat/research_bridge.py`
 
-- `function` **next_research_batch** L15
+- `function` **_code_sha** L25
+- `function` **_har_sha** L47
+- `function` **_ensure_research_prerequisites** L57 — Repair the missing bridge artifacts needed before external research.
+- `function` **_pending_active_batch** L106 — Return an uncheckpointed active batch without selecting a replacement.
+- `function` **next_research_batch** L153
 
 ### `src/dcm/chat/session.py`
 
-- `function` **_git_commit** L29
-- `function` **doctor** L43
-- `class` **HostSession** L92 — One run directory, one Python probability engine.
-- `method` **HostSession.__init__** L95
-- `method` **HostSession.open** L100
-- `method` **HostSession.prepare** L107
-- `method` **HostSession._host_state** L138
-- `method` **HostSession._save_host_state** L141
-- `method` **HostSession._write_prepare_artifacts** L150
-- `method` **HostSession.next_research_batch** L185
-- `method` **HostSession.import_evidence** L199
-- `method` **HostSession.coverage** L208
-- `method` **HostSession.forecast** L244
-- `method` **HostSession.report** L278
-- `method` **HostSession.resume** L285
-- `method` **HostSession.audit** L301
-- `method` **HostSession.archive** L306
-- `method` **HostSession.settle** L311
-- `function` **cfb_launch** L318 — Guarded CFB vertical slice. Fixture/bundle can freeze; file research returns the host loop.
+- `function` **_git_commit** L41
+- `function` **doctor** L55
+- `class` **HostSession** L116 — One run directory, one Python probability engine.
+- `method` **HostSession.__init__** L119
+- `method` **HostSession.open** L124
+- `method` **HostSession.prepare** L131
+- `method` **HostSession._host_state** L162
+- `method` **HostSession._save_host_state** L165
+- `method` **HostSession._write_prepare_artifacts** L174
+- `method` **HostSession.next_research_batch** L209
+- `method` **HostSession.research_batch** L223 — Canonical durable batch command; next-research remains compatible.
+- `method` **HostSession.har_breakdown** L227
+- `method` **HostSession.index_build** L241
+- `method` **HostSession.search_blueprint** L255 — Compile the sport-neutral public-search fan-out plan for this run.
+- `method` **HostSession.research_validate** L274
+- `method` **HostSession.import_evidence** L313
+- `method` **HostSession.coverage** L413
+- `method` **HostSession.record_research_failure** L456
+- `method` **HostSession.checkpoint_verify** L467
+- `method` **HostSession._persist_research_checkpoint** L477
+- `method` **HostSession.forecast** L503
+- `method` **HostSession.report** L537
+- `method` **HostSession.resume** L544
+- `method` **HostSession.audit** L560
+- `method` **HostSession.archive** L565
+- `method` **HostSession.settle** L570
+- `function` **cfb_launch** L577 — Guarded CFB vertical slice. Fixture/bundle can freeze; file research returns the host loop.
 
 ### `src/dcm/chat/state.py`
 
-- `function` **utc_now** L13
-- `function` **read_json** L17
-- `function` **write_json** L23
-- `function` **default_host_state** L28
+- `function` **utc_now** L14
+- `function` **read_json** L18
+- `function` **write_json** L24
+- `function` **default_host_state** L43
 
 ### `src/dcm/compact.py`
 
@@ -1357,12 +1381,26 @@ _No class/function symbols._
 
 ### `src/dcm/research/acquisition.py`
 
-- `function` **_req_id** L48
-- `function` **build_acquisition_actions** L52 — Group reusable-entity requests into fan-out AcquisitionActions.
-- `function` **schedule_acquisition_actions** L231 — Live CELF selector with set-cover + constrained batch packing.
-- `method` **schedule_acquisition_actions.gain_fn** L265
-- `method` **schedule_acquisition_actions.cost_fn** L275
-- `function` **build_acquisition_action_graph** L358 — Persistable AcquisitionActionGraph: one action may cover many requirements/offers.
+- `function` **_scalable_weighted_set_cover** L49 — Lazy greedy set cover using a requirement→action reverse index.
+- `function` **_req_id** L95
+- `function` **build_acquisition_actions** L99 — Group reusable-entity requests into fan-out AcquisitionActions.
+- `function` **schedule_acquisition_actions** L283 — Live CELF selector with set-cover + constrained batch packing.
+- `method` **schedule_acquisition_actions.gain_fn** L330
+- `method` **schedule_acquisition_actions.cost_fn** L340
+- `function` **build_acquisition_action_graph** L426 — Persistable AcquisitionActionGraph: one action may cover many requirements/offers.
+
+### `src/dcm/research/action_state.py`
+
+- `function` **_parse_time** L46
+- `function` **deterministic_backoff** L57
+- `function` **transition** L62
+- `function` **initial_action_state** L72
+- `function` **load_action_state** L83
+- `function` **save_action_state** L108
+- `function` **apply_transition** L139
+- `function` **apply_failure** L151
+- `function` **_failure_applies** L219
+- `function` **eligible_action_ids** L236 — Return only actions safe to schedule at this instant.
 
 ### `src/dcm/research/adapters/__init__.py`
 
@@ -1487,6 +1525,25 @@ _No class/function symbols._
 - `function` **_host_task** L77 — Expose the minimum actionable context for a host acquisition.
 - `function` **build_next_research_batch** L113
 
+### `src/dcm/research/batch_store.py`
+
+- `class` **BatchEnvelopeError** L16
+- `class` **BatchEnvelopeOverwriteBlocked** L20
+- `class` **CheckpointCasMismatch** L24
+- `function` **_canonical_bytes** L28
+- `function` **_fsync_dir** L32
+- `function` **_atomic_create** L43 — Create a file without replacing an existing path, even on a race.
+- `function` **_atomic_replace** L64
+- `function` **_identity** L75
+- `function` **make_batch_envelope** L86
+- `function` **_validate_envelope** L124
+- `function` **load_batch** L142
+- `function` **seal_batch** L146 — Seal once.  A repeat with the same identity returns the original bytes.
+- `function` **_envelope_args** L167
+- `function` **_checkpoint_hash** L184
+- `function` **write_checkpoint_cas** L188
+- `function` **verify_checkpoint** L229
+
 ### `src/dcm/research/cache.py`
 
 - `function` **cache_identity** L34
@@ -1549,6 +1606,15 @@ _No class/function symbols._
 - `function` **evaluate_request** L215
 - `function` **coverage_report** L312
 
+### `src/dcm/research/coverage_incremental.py`
+
+- `class` **IncrementalCoverageMismatch** L11
+- `function` **_request_id** L15
+- `function` **_row_digest** L19
+- `function` **coverage_index_hash** L23
+- `function` **_dirty_ids** L35
+- `function` **incremental_coverage_report** L51 — Evaluate only requests touched by changed claims, then reuse old rows.
+
 ### `src/dcm/research/dependency_graph.py`
 
 - `function` **_nid** L38
@@ -1605,6 +1671,17 @@ _No class/function symbols._
 - `function` **trace_runtime_lineage** L968 — Selection → PropEvaluation → Simulation → ParameterSnapshot → Feature/Claim.
 - `method` **trace_runtime_lineage.neighbors** L975
 
+### `src/dcm/research/failures.py`
+
+- `function` **utc_now** L51
+- `function` **_without_hash** L55
+- `function` **_failure_identity** L59
+- `function` **failure_record** L72 — Build and validate one safe failure record.
+- `function` **_validate** L149
+- `function` **load_failures** L167
+- `function` **append_failure** L185 — Append a failure exactly once; conflicting reuse fails closed.
+- `function` **failure_ledger** L208
+
 ### `src/dcm/research/freshness.py`
 
 - `class` **FreshnessPolicyError** L96 — Unknown freshness policy input. Fail closed.
@@ -1644,6 +1721,34 @@ _No class/function symbols._
 - `function` **normalize_gridiron_logs** L285 — Split a log list into valid canonical rows and rejected originals.
 - `function` **assert_compatible_gridiron_logs** L305 — Coverage helper: opportunity-valid logs plus market counting-stat presence.
 - `function` **looks_like_gridiron_log** L332
+
+### `src/dcm/research/har_breakdown.py`
+
+- `class` **HarLimitError** L28
+- `function` **_sha256** L32
+- `function` **safe_parse_har** L36 — Read and validate a HAR without executing or persisting its content.
+- `function` **_route_digest** L77
+- `function` **_capture_summary** L84
+- `function` **_relationships** L120
+- `function` **_demand_summary** L214
+- `function` **_canonical_record_summary** L240 — Summarize adapter-normalized records without persisting their values.
+- `method` **_canonical_record_summary.unique_digest** L251
+- `function` **build_har_breakdown** L268
+
+### `src/dcm/research/har_records.py`
+
+- `function` **type_class** L26
+- `function` **schema_paths** L42 — Return bounded shape-only paths, not values.
+- `method` **schema_paths.walk** L46
+- `function` **schema_fingerprint** L65
+- `function` **_keys** L70
+- `function` **record_family** L74
+- `function` **_identifier_digests** L98
+- `function` **_decode_body** L108
+- `function` **_walk_records** L130
+- `method` **_walk_records.walk** L133
+- `function` **_route_digest** L151
+- `function` **build_record_units** L159
 
 ### `src/dcm/research/historical_gap.py`
 
@@ -1711,7 +1816,7 @@ _No class/function symbols._
 
 ### `src/dcm/research/observation_execute.py`
 
-- `function` **execute_source_aware_observations** L61 — Import source-aware host observations and close coverage→consumer contracts.
+- `function` **execute_source_aware_observations** L63 — Import source-aware host observations and close coverage→consumer contracts.
 
 ### `src/dcm/research/observation_execute_support.py`
 
@@ -1858,6 +1963,15 @@ _No class/function symbols._
 - `function` **merge_latest_store_claims** L653 — Merge ResearchStore latest blobs into a forecast claim list.
 - `function` **hydrate_reused_claims** L703 — Pull still-valid stored claims so forecast does not research from zero.
 
+### `src/dcm/research/response.py`
+
+- `class` **ResponseEnvelopeError** L16
+- `function` **_rows** L20
+- `function` **load_response** L29 — Parse either the Work response object or legacy JSONL observations.
+- `function` **_active_envelope** L93
+- `function` **validate_response_binding** L110 — Fail closed when an explicit response envelope targets another batch.
+- `function` **validate_failure_payload** L144
+
 ### `src/dcm/research/role_epoch.py`
 
 - `function` **_as_logs** L37
@@ -1889,6 +2003,25 @@ _No class/function symbols._
 - `method` **RoleEpochBuilder.build** L429
 - `method` **RoleEpochBuilder._build_gridiron** L545
 
+### `src/dcm/research/run_lock.py`
+
+- `class` **RunBusyError** L22
+- `method` **RunBusyError.__init__** L25
+- `class` **RunFenceError** L29
+- `function` **_now_epoch** L33
+- `function` **_now_iso** L37
+- `class` **RunLock** L41 — Context manager for one run's mutating critical section.
+- `method` **RunLock.__init__** L44
+- `method` **RunLock._connect** L55
+- `method` **RunLock.acquire** L67
+- `method` **RunLock.renew** L137
+- `method` **RunLock.assert_fence** L148
+- `method` **RunLock.metadata** L159
+- `method` **RunLock.release** L169
+- `method` **RunLock.__enter__** L190
+- `method` **RunLock.__exit__** L193
+- `function` **repair_stale_lease** L197 — Explicitly record and remove an abandoned lease while holding the file lock.
+
 ### `src/dcm/research/scopes.py`
 
 - `function` **canonical_scope** L62
@@ -1897,6 +2030,31 @@ _No class/function symbols._
 - `function` **claim_matches** L76
 - `function` **claims_for** L82
 - `function` **is_canonical_scope** L90
+
+### `src/dcm/research/search_blueprint.py`
+
+- `function` **compile_action_blueprint** L14
+- `function` **build_search_blueprint** L31
+
+### `src/dcm/research/search_engine.py`
+
+- `function` **_tokens** L38
+- `function` **_time** L42
+- `class` **SearchEngine** L52
+- `method` **SearchEngine.__init__** L53
+- `method` **SearchEngine._build** L67
+- `method` **SearchEngine.index_receipt** L99
+- `method` **SearchEngine._eligible** L111
+- `method` **SearchEngine.duplicate_candidates** L128
+- `method` **SearchEngine.search** L149
+- `method` **SearchEngine.search.similarity** L186
+
+### `src/dcm/research/search_query.py`
+
+- `function` **_cutoff_date** L15
+- `function` **_terms** L28
+- `function` **_required_fields** L78
+- `function` **compile_query** L91
 
 ### `src/dcm/research/source_catalog.py`
 
@@ -2109,6 +2267,13 @@ _No class/function symbols._
 - `method` **Dag.reused** L489
 - `method` **Dag.pending** L492
 - `method` **Dag.snapshot** L495
+
+### `src/dcm/runtime/diagnostics.py`
+
+- `function` **_safe** L27
+- `function` **_exception_info** L45
+- `function` **build_diagnostics** L59
+- `function` **write_diagnostics** L88
 
 ### `src/dcm/runtime/drive_catalog.py`
 
