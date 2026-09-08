@@ -113,7 +113,7 @@ jobs:
           path: /tmp/dcm-ci-diagnostics-inventory.json
           if-no-files-found: warn
 
-  research-contract:
+  research_contract:
     name: Durable batch-search contract
     runs-on: ubuntu-latest
     steps:
@@ -169,7 +169,7 @@ jobs:
   python-dcm:
     name: python-dcm
     if: ${{ always() }}
-    needs: [package, tests, constitution, inventory, research-contract, performance]
+    needs: [package, tests, constitution, inventory, research_contract, performance]
     runs-on: ubuntu-latest
     steps:
       - name: Require every DCM gate
@@ -178,7 +178,7 @@ jobs:
           TESTS_RESULT: ${{ needs.tests.result }}
           CONSTITUTION_RESULT: ${{ needs.constitution.result }}
           INVENTORY_RESULT: ${{ needs.inventory.result }}
-          RESEARCH_CONTRACT_RESULT: ${{ needs.research-contract.result }}
+          RESEARCH_CONTRACT_RESULT: ${{ needs.research_contract.result }}
           PERFORMANCE_RESULT: ${{ needs.performance.result }}
         run: |
           set -euo pipefail

@@ -15,10 +15,11 @@ def test_workflow_covers_main_pr_merge_queue_and_dispatch():
 
 def test_workflow_has_visible_gates_and_failure_diagnostics():
     text = WORKFLOW.read_text(encoding="utf-8")
-    for job in ("package", "tests", "constitution", "inventory", "research-contract"):
+    for job in ("package", "tests", "constitution", "inventory", "research_contract", "python-dcm"):
         assert f"  {job}:" in text
     assert "if: ${{ failure() }}" in text
     assert "scripts/ci/run_gate.py" in text
     assert "actions/upload-artifact@v4" in text
     assert "continue-on-error" not in text
     assert "090826" not in text
+    assert "needs.research_contract.result" in text
