@@ -119,7 +119,9 @@ def build_next_research_batch(
     max_dependent_offers: int = 500,
     catalog_source_id: str = "generic_web_search",
     rows: list[dict[str, Any]] | None = None,
+    excluded_action_ids: set[str] | frozenset[str] | None = None,
 ) -> dict[str, Any]:
+    excluded = {str(value) for value in (excluded_action_ids or set()) if str(value)}
     classified = classify_requests(list(requests or []), store)
     coverage_by_id = {
         str(row.get("requestId") or ""): row
@@ -156,7 +158,11 @@ def build_next_research_batch(
         rec["eventId"] = _event_id_of(rec)
         scored.append(rec)
 
-    acquire = [r for r in scored if r.get("acquire")]
+    acquire = [
+        r for r in scored
+        if r.get("acquire")
+        and f"AA_{canonical_scope(str(r.get('scope') or ''))}_{str(r.get('scope_id') or '')}" not in excluded
+    ]
     acquire.sort(
         key=lambda r: (
             SCOPE_RANK.get(canonical_scope(str(r.get("scope") or "")), 99),
@@ -236,7 +242,7 @@ def build_next_research_batch(
             selected.append(rec)
 
     reused = [r for r in scored if not r.get("acquire")]
-    action_doc = build_acquisition_actions(list(rows or []), acquire, coverage=coverage)
+    action_doc = build_acquisition_actions(list(rows or []), acquire, coverage=coverage, excluded_action_ids=excluded)
     actions_by_id = {
         str(action.get("actionId") or ""): dict(action)
         for action in (action_doc.get("actions") or [])
@@ -246,6 +252,7 @@ def build_next_research_batch(
         action_doc,
         max_actions=max_entities,
         max_dependent_offers=max_dependent_offers,
+        excluded_action_ids=excluded,
     )
     selected_ids = set(schedule.get("selectedActionIds") or [])
     if selected_ids:
@@ -293,6 +300,7 @@ def build_next_research_batch(
         "celfActionIds": list(schedule.get("celfActionIds") or []),
         "maxEntities": int(max_entities),
         "maxDependentOffers": int(max_dependent_offers),
+        "excludedActionIds": sorted(excluded),
         "unresolvedCount": len(acquire),
         "selectedCount": len(selected),
         "reusedCount": len(reused),

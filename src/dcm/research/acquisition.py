@@ -6,6 +6,7 @@ is LazyGreedyScheduler; set-cover is both a selector input and telemetry.
 from __future__ import annotations
 
 from collections import defaultdict
+import heapq
 from typing import Any, Mapping
 
 from dcm.algorithms.graph import hypergraph_from_bundles
@@ -45,6 +46,52 @@ WEATHER_APPLICABLE_MARKETS = frozenset(
 )
 
 
+def _scalable_weighted_set_cover(
+    universe: list[str],
+    cover_sets: Mapping[str, list[str]],
+    weights: Mapping[str, float],
+) -> tuple[list[str], set[str]]:
+    """Lazy greedy set cover using a requirement→action reverse index.
+
+    ``weighted_set_cover`` is retained for small inputs and remains the
+    constitution reference.  Its full action×universe scan is quadratic for a
+    live capture with thousands of offers, so this equivalent lazy heap
+    implementation is selected above the threshold.  Every heap score is
+    recomputed against the current uncovered set before selection, preserving
+    the same deterministic greedy tie-break.
+    """
+    uncovered = set(universe)
+    normalized = {str(aid): set(str(x) for x in members) for aid, members in cover_sets.items()}
+    reverse: dict[str, list[str]] = defaultdict(list)
+    for aid, members in normalized.items():
+        for member in members:
+            reverse[member].append(aid)
+    heap: list[tuple[float, str, int]] = []
+    for aid, members in normalized.items():
+        gain = len(members & uncovered)
+        if gain:
+            heapq.heappush(heap, (-(gain / max(float(weights.get(aid, 1.0)), 1e-12)), aid, 0))
+    chosen: list[str] = []
+    chosen_set: set[str] = set()
+    while uncovered and heap:
+        neg_score, aid, stamp = heapq.heappop(heap)
+        if aid in chosen_set:
+            continue
+        gain = len(normalized[aid] & uncovered)
+        if not gain:
+            continue
+        score = gain / max(float(weights.get(aid, 1.0)), 1e-12)
+        # Lazy upper bounds need refreshing after prior selections.  A
+        # deterministic aid tie-break avoids dependence on dict insertion.
+        if heap and score + 1e-15 < -heap[0][0]:
+            heapq.heappush(heap, (-score, aid, stamp + 1))
+            continue
+        chosen.append(aid)
+        chosen_set.add(aid)
+        uncovered -= normalized[aid]
+    return chosen, uncovered
+
+
 def _req_id(req: Mapping[str, Any]) -> str:
     return str(req.get("request_id") or req.get("requestId") or "")
 
@@ -58,11 +105,13 @@ def build_acquisition_actions(
     frontier_offer_ids: set[str] | None = None,
     telemetry: AlgorithmTelemetry | None = None,
     source_health: SourceHealthRegistry | None = None,
+    excluded_action_ids: set[str] | frozenset[str] | None = None,
 ) -> dict[str, Any]:
     """Group reusable-entity requests into fan-out AcquisitionActions."""
     tel = telemetry or AlgorithmTelemetry()
     health = source_health or default_gridiron_source_health()
     reqs = _attach_dependents(list(requests or []), rows)
+    excluded = {str(value) for value in (excluded_action_ids or set()) if str(value)}
     coverage_by_id = {
         str(row.get("requestId") or row.get("request_id") or ""): row
         for row in ((coverage or {}).get("requests") or [])
@@ -94,6 +143,8 @@ def build_acquisition_actions(
         scope = canonical_scope(str(rec.get("scope") or ""))
         sid = str(rec.get("scope_id") or "")
         action_id = f"AA_{scope}_{sid}"
+        if action_id in excluded:
+            continue
         act = actions.setdefault(
             action_id,
             {
@@ -220,6 +271,7 @@ def build_acquisition_actions(
             "actionToOffers": reverse_action_offer,
         },
         "reusedEvidenceLookup": bool(evidence is not None),
+        "excludedActionIds": sorted(excluded),
         "semanticCompletionOnly": True,
         "candidateEvidenceCount": len(candidate_evidence),
         "cfbFanoutLaw": "event/team before player; one action populates every board-relevant entity from that source",
@@ -234,10 +286,16 @@ def schedule_acquisition_actions(
     max_actions: int = 25,
     max_dependent_offers: int = 500,
     telemetry: AlgorithmTelemetry | None = None,
+    excluded_action_ids: set[str] | frozenset[str] | None = None,
 ) -> dict[str, Any]:
     """Live CELF selector with set-cover + constrained batch packing."""
     tel = telemetry or AlgorithmTelemetry()
-    actions = {str(a["actionId"]): dict(a) for a in (action_doc.get("actions") or [])}
+    excluded = {str(value) for value in (excluded_action_ids or set()) if str(value)}
+    actions = {
+        str(a["actionId"]): dict(a)
+        for a in (action_doc.get("actions") or [])
+        if str(a.get("actionId") or "") not in excluded
+    }
     if not actions:
         empty = {
             "schema": "pillars_dcm.acquisition_schedule.v1",
@@ -245,6 +303,7 @@ def schedule_acquisition_actions(
             "packedBatches": [],
             "setCoverActionIds": [],
             "algorithmIds": ["ALG-SCHED-001", "ALG-SCHED-002", "ALG-SCHED-003", "ALG-SCHED-004", "ALG-SEARCH-019"],
+            "excludedActionIds": sorted(excluded),
         }
         empty["contentHash"] = content_hash(empty)
         return empty
@@ -256,8 +315,14 @@ def schedule_acquisition_actions(
         universe.extend(cover_sets[aid])
     universe = list(dict.fromkeys(universe))
     weights = {aid: float(act.get("cost") or 1.0) for aid, act in actions.items()}
-    set_cover_ids = cover_actions(universe, cover_sets, weights)
-    tel.record("ALG-SEARCH-019", problem_class="SET_COVER", producer="dcm.research.acquisition.schedule_acquisition_actions", consumer="dcm.research.batch", count=len(set_cover_ids) or 1, downstream_used=True)
+    if len(actions) > 1000:
+        set_cover_ids, set_cover_uncovered = _scalable_weighted_set_cover(universe, cover_sets, weights)
+        set_cover_mode = "LAZY_REVERSE_INDEX"
+    else:
+        set_cover_ids = cover_actions(universe, cover_sets, weights)
+        set_cover_uncovered = set(universe) - {rid for aid in set_cover_ids for rid in cover_sets.get(aid, [])}
+        set_cover_mode = "REFERENCE_WEIGHTED_SET_COVER"
+    tel.record("ALG-SEARCH-019", problem_class="SET_COVER", producer="dcm.research.acquisition.schedule_acquisition_actions", consumer="dcm.research.batch", count=len(set_cover_ids) or 1, downstream_used=True, note=set_cover_mode)
     tel.record("ALG-SCHED-002", problem_class="RESEARCH_SCHEDULE", producer="dcm.research.acquisition.schedule_acquisition_actions", consumer="dcm.research.batch", downstream_used=True)
 
     covered: set[str] = set()
@@ -349,6 +414,9 @@ def schedule_acquisition_actions(
         "dependentOfferBudgetUsed": offer_budget,
         "maxActions": max_actions,
         "maxDependentOffers": max_dependent_offers,
+        "excludedActionIds": sorted(excluded),
+        "setCoverMode": set_cover_mode,
+        "setCoverUncoveredCount": len(set_cover_uncovered),
         "stopWhen": "coverage closed or additional research cannot change PLAYABLE/Top25 enough to justify cost",
     }
     body["contentHash"] = content_hash({k: v for k, v in body.items() if k != "contentHash"})

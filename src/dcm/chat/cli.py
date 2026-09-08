@@ -9,6 +9,8 @@ from typing import Any
 
 from dcm.chat.session import HostSession, doctor
 from dcm.runtime.cutoff import CutoffRequired
+from dcm.research.run_lock import RunBusyError, RunFenceError
+from dcm.research.batch_store import BatchEnvelopeError
 from dcm.version import ExactVersionMismatch
 
 
@@ -33,6 +35,8 @@ def build_parser() -> argparse.ArgumentParser:
     d = sub.add_parser("doctor", help="Runtime identity, plugins, catalog, blockers")
     d.add_argument("--release-manifest", type=Path, default=None)
     d.add_argument("--workspace", type=Path, default=None)
+    d.add_argument("--run", type=Path, default=None)
+    d.add_argument("--format", choices=["json"], default="json")
 
     p = sub.add_parser("prepare", help="Ingest HAR, account every offer, emit research population")
     p.add_argument("--har", type=Path, default=None)
@@ -50,14 +54,57 @@ def build_parser() -> argparse.ArgumentParser:
     n.add_argument("--max-dependent-offers", type=int, default=500)
     n.add_argument("--workspace", type=Path, default=None)
 
+    nb = sub.add_parser("research-batch", help="Seal the next immutable, failure-aware research batch")
+    _add_run(nb)
+    nb.add_argument("--max-entities", type=int, default=25)
+    nb.add_argument("--max-dependent-offers", type=int, default=500)
+    nb.add_argument("--workspace", type=Path, default=None)
+
     e = sub.add_parser("evidence-import", help="Import simple host observations (engine hashes)")
     _add_run(e)
     e.add_argument("--input", type=Path, required=True)
     e.add_argument("--workspace", type=Path, default=None)
 
+    rv = sub.add_parser("research-validate", help="Validate observations without importing them")
+    _add_run(rv)
+    rv.add_argument("--input", type=Path, required=True)
+    rv.add_argument("--workspace", type=Path, default=None)
+
+    rf = sub.add_parser("research-failure", help="Append one machine-readable research failure")
+    _add_run(rf)
+    rf.add_argument("--action-id", required=True)
+    rf.add_argument("--request-id", default=None)
+    rf.add_argument("--source-id", default=None)
+    rf.add_argument("--batch-id", default=None)
+    rf.add_argument("--code", required=True)
+    rf.add_argument("--retryable", action="store_true")
+    rf.add_argument("--exclusion-scope", default="ATTEMPT_ONLY")
+    rf.add_argument("--safe-reason", default=None)
+    rf.add_argument("--workspace", type=Path, default=None)
+
     c = sub.add_parser("coverage", help="Semantic coverage vs SportResearchSchema")
     _add_run(c)
     c.add_argument("--workspace", type=Path, default=None)
+    c.add_argument("--incremental", action="store_true")
+    c.add_argument("--verify-full", action="store_true")
+
+    hb = sub.add_parser("har-breakdown", help="Decompose a HAR into a safe structural receipt")
+    _add_run(hb)
+    hb.add_argument("--har", type=Path, required=True)
+    hb.add_argument("--prior", type=Path, default=None)
+    hb.add_argument("--workspace", type=Path, default=None)
+
+    ib = sub.add_parser("index-build", help="Build the local exact/semantic search index receipt")
+    _add_run(ib)
+    ib.add_argument("--workspace", type=Path, default=None)
+
+    sb = sub.add_parser("search-blueprint", help="Compile the sport-neutral public web-search blueprint")
+    _add_run(sb)
+    sb.add_argument("--workspace", type=Path, default=None)
+
+    cv = sub.add_parser("checkpoint-verify", help="Verify research and canonical checkpoint hashes")
+    _add_run(cv)
+    cv.add_argument("--workspace", type=Path, default=None)
 
     f = sub.add_parser("forecast", help="Run FeatureStore → freeze via the canonical Python engine")
     _add_run(f)
@@ -106,7 +153,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     try:
         if args.command == "doctor":
-            _print(doctor(release_manifest=args.release_manifest, workspace=args.workspace))
+            _print(doctor(release_manifest=args.release_manifest, workspace=args.workspace, run=args.run))
             return 0
         if args.command == "prepare":
             session = HostSession.prepare(
@@ -143,10 +190,36 @@ def main(argv: list[str] | None = None) -> int:
                 max_entities=args.max_entities,
                 max_dependent_offers=args.max_dependent_offers,
             ))
+        elif args.command == "research-batch":
+            _print(session.research_batch(
+                max_entities=args.max_entities,
+                max_dependent_offers=args.max_dependent_offers,
+            ))
+        elif args.command == "research-validate":
+            _print(session.research_validate(args.input))
+        elif args.command == "research-failure":
+            _print(session.record_research_failure(
+                action_id=args.action_id,
+                request_id=args.request_id,
+                source_id=args.source_id,
+                batch_id=args.batch_id,
+                code=args.code,
+                retryable=bool(args.retryable),
+                exclusion_scope=args.exclusion_scope,
+                safe_reason=args.safe_reason,
+            ))
         elif args.command == "evidence-import":
             _print(session.import_evidence(args.input))
         elif args.command == "coverage":
-            _print(session.coverage())
+            _print(session.coverage(incremental=bool(args.incremental), verify_full=bool(args.verify_full)))
+        elif args.command == "har-breakdown":
+            _print(session.har_breakdown(args.har, prior=args.prior))
+        elif args.command == "index-build":
+            _print(session.index_build())
+        elif args.command == "search-blueprint":
+            _print(session.search_blueprint())
+        elif args.command == "checkpoint-verify":
+            _print(session.checkpoint_verify())
         elif args.command == "forecast":
             result = session.forecast(research=args.research)
             _print({
@@ -173,7 +246,7 @@ def main(argv: list[str] | None = None) -> int:
     except FileNotFoundError as exc:
         print(str(exc), file=sys.stderr)
         return 2
-    except (CutoffRequired, ExactVersionMismatch, ValueError) as exc:
+    except (CutoffRequired, ExactVersionMismatch, RunBusyError, RunFenceError, BatchEnvelopeError, ValueError) as exc:
         print(str(exc), file=sys.stderr)
         return 2
 

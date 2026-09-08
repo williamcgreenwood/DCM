@@ -25,6 +25,8 @@ from dcm.research.acquisition import (
 from dcm.research.batch import build_next_research_batch
 from dcm.research.claims import conflict_ledger, dedupe
 from dcm.research.coverage import coverage_report, evaluate_request
+from dcm.research.action_state import eligible_action_ids, load_action_state
+from dcm.research.failures import load_failures
 from dcm.research.evidence_graph import build_evidence_graph
 from dcm.research.indexes import BoardIndexes, EvidenceIndexes
 from dcm.research.material_facts import facts_to_features, resolve_material_facts
@@ -318,14 +320,21 @@ def execute_source_aware_observations(
         },
     )
     evidence_idx = EvidenceIndexes(all_claims, telemetry=loop_tel)
+    state_path = dest / "research_action_state.json"
+    action_states = load_action_state(state_path)
+    failure_rows = load_failures(dest / "research_failures.jsonl")
+    current_action_rows = [row for row in (action_doc.get("actions") or []) if isinstance(row, dict)]
+    eligible = eligible_action_ids(current_action_rows, states=action_states, failures=failure_rows, run_id=dest.name)
+    excluded_action_ids = {str(row.get("actionId")) for row in current_action_rows if str(row.get("actionId") or "") not in eligible}
     rebuilt_actions = build_acquisition_actions(
         rows,
         requests,
         coverage=coverage,
         evidence=evidence_idx,
         telemetry=loop_tel,
+        excluded_action_ids=excluded_action_ids,
     )
-    rebuilt_schedule = schedule_acquisition_actions(rebuilt_actions, telemetry=loop_tel)
+    rebuilt_schedule = schedule_acquisition_actions(rebuilt_actions, telemetry=loop_tel, excluded_action_ids=excluded_action_ids)
     aa_graph = build_acquisition_action_graph(
         rebuilt_actions, schedule=rebuilt_schedule, telemetry=loop_tel
     )
@@ -337,6 +346,7 @@ def execute_source_aware_observations(
         coverage=coverage,
         rows=rows,
         max_entities=25,
+        excluded_action_ids=excluded_action_ids,
     )
     write_json(dest / "host_research_batch.json", next_batch)
     loop_telem = loop_tel.snapshot()
@@ -390,6 +400,15 @@ def execute_source_aware_observations(
         "conflicts": conflict_ledger(all_claims),
         "store": store.telemetry(),
         "stored": stored,
+        "changedClaimRefs": [
+            {
+                "semantic_scope": str(row.get("semantic_scope") or ""),
+                "scope_id": str(row.get("scope_id") or ""),
+                "claim_hash": str(row.get("claim_hash") or ""),
+            }
+            for row in claims
+            if isinstance(row, dict)
+        ],
         "indexTelemetry": index_telem,
         "hostInventedHashes": False,
         "emptyFieldCoverageCountsAsSuccess": False,

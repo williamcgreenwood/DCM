@@ -1,6 +1,6 @@
 {
-  "contentHash": "61c658e36bbb0a5a267365dc65177a7b7f442a498756275df4302e7cbb606103",
-  "moduleCount": 229,
+  "contentHash": "5d9ce399737eff6c78994266b9e195f3ea6e45d409774ee04876b4158ff21524",
+  "moduleCount": 241,
   "modules": [
     {
       "classes": 0,
@@ -2978,37 +2978,37 @@
       "classes": 0,
       "functions": 4,
       "path": "src/dcm/chat/cli.py",
-      "sha256": "714e736c720c949b850ef674976874d5187cdabdc8bf5a42c526d2af1d35ce66",
+      "sha256": "d44becd4ad32dd4e5e979f331d5f61797466b3e60dff4f62cbe29a90abc07ebf",
       "symbols": [
         {
           "doc": null,
-          "endLine": 16,
+          "endLine": 18,
           "kind": "function",
-          "line": 15,
+          "line": 17,
           "name": "_print",
           "qualname": "_print"
         },
         {
           "doc": null,
-          "endLine": 20,
+          "endLine": 22,
           "kind": "function",
-          "line": 19,
+          "line": 21,
           "name": "_add_run",
           "qualname": "_add_run"
         },
         {
           "doc": null,
-          "endLine": 101,
+          "endLine": 148,
           "kind": "function",
-          "line": 23,
+          "line": 25,
           "name": "build_parser",
           "qualname": "build_parser"
         },
         {
           "doc": null,
-          "endLine": 178,
+          "endLine": 251,
           "kind": "function",
-          "line": 104,
+          "line": 151,
           "name": "main",
           "qualname": "main"
         }
@@ -3019,7 +3019,7 @@
       "classes": 0,
       "functions": 0,
       "path": "src/dcm/chat/contracts.py",
-      "sha256": "d7ee3ba4f71c5547bbf3edf6dbfd2842c593f75ca58a5e64267c9cedbcaedc70",
+      "sha256": "f8af9fbb8cbe3f921a3540e606414002c4c0bbf801ef50da7156d9861abd3e12",
       "symbols": [],
       "workstream": "P7"
     },
@@ -3099,15 +3099,47 @@
     },
     {
       "classes": 0,
-      "functions": 1,
+      "functions": 5,
       "path": "src/dcm/chat/research_bridge.py",
-      "sha256": "93a64e1c7032f207d66aceb16e41847053618d4e95a4587e5e3434f4d3c599c8",
+      "sha256": "1afe9cecc41d077ba65f733d67c611cfdd3716a75ff92481a730482b0f36eb53",
       "symbols": [
         {
           "doc": null,
-          "endLine": 66,
+          "endLine": 44,
           "kind": "function",
-          "line": 15,
+          "line": 25,
+          "name": "_code_sha",
+          "qualname": "_code_sha"
+        },
+        {
+          "doc": null,
+          "endLine": 54,
+          "kind": "function",
+          "line": 47,
+          "name": "_har_sha",
+          "qualname": "_har_sha"
+        },
+        {
+          "doc": "Repair the missing bridge artifacts needed before external research.",
+          "endLine": 103,
+          "kind": "function",
+          "line": 57,
+          "name": "_ensure_research_prerequisites",
+          "qualname": "_ensure_research_prerequisites"
+        },
+        {
+          "doc": "Return an uncheckpointed active batch without selecting a replacement.",
+          "endLine": 150,
+          "kind": "function",
+          "line": 106,
+          "name": "_pending_active_batch",
+          "qualname": "_pending_active_batch"
+        },
+        {
+          "doc": null,
+          "endLine": 283,
+          "kind": "function",
+          "line": 153,
           "name": "next_research_batch",
           "qualname": "next_research_batch"
         }
@@ -3116,159 +3148,223 @@
     },
     {
       "classes": 1,
-      "functions": 18,
+      "functions": 26,
       "path": "src/dcm/chat/session.py",
-      "sha256": "ba0a9332f9e2d0fbb52c9f7d830d744e2ef7d5cf1eddb211710439247025256d",
+      "sha256": "a860c3ca462c339807dbc577f4c4846606418f9641693b9bb6071f80b5be0c11",
       "symbols": [
         {
           "doc": null,
-          "endLine": 40,
+          "endLine": 52,
           "kind": "function",
-          "line": 29,
+          "line": 41,
           "name": "_git_commit",
           "qualname": "_git_commit"
         },
         {
           "doc": null,
-          "endLine": 89,
+          "endLine": 113,
           "kind": "function",
-          "line": 43,
+          "line": 55,
           "name": "doctor",
           "qualname": "doctor"
         },
         {
           "doc": "One run directory, one Python probability engine.",
-          "endLine": 315,
+          "endLine": 574,
           "kind": "class",
-          "line": 92,
+          "line": 116,
           "name": "HostSession",
           "qualname": "HostSession"
         },
         {
           "doc": null,
-          "endLine": 97,
+          "endLine": 121,
           "kind": "method",
-          "line": 95,
+          "line": 119,
           "name": "__init__",
           "qualname": "HostSession.__init__"
         },
         {
           "doc": null,
-          "endLine": 104,
+          "endLine": 128,
           "kind": "method",
-          "line": 100,
+          "line": 124,
           "name": "open",
           "qualname": "HostSession.open"
         },
         {
           "doc": null,
-          "endLine": 136,
+          "endLine": 160,
           "kind": "method",
-          "line": 107,
+          "line": 131,
           "name": "prepare",
           "qualname": "HostSession.prepare"
         },
         {
           "doc": null,
-          "endLine": 139,
+          "endLine": 163,
           "kind": "method",
-          "line": 138,
+          "line": 162,
           "name": "_host_state",
           "qualname": "HostSession._host_state"
         },
         {
           "doc": null,
-          "endLine": 148,
+          "endLine": 172,
           "kind": "method",
-          "line": 141,
+          "line": 165,
           "name": "_save_host_state",
           "qualname": "HostSession._save_host_state"
         },
         {
           "doc": null,
-          "endLine": 183,
+          "endLine": 207,
           "kind": "method",
-          "line": 150,
+          "line": 174,
           "name": "_write_prepare_artifacts",
           "qualname": "HostSession._write_prepare_artifacts"
         },
         {
           "doc": null,
-          "endLine": 197,
+          "endLine": 221,
           "kind": "method",
-          "line": 185,
+          "line": 209,
           "name": "next_research_batch",
           "qualname": "HostSession.next_research_batch"
         },
         {
-          "doc": null,
-          "endLine": 206,
+          "doc": "Canonical durable batch command; next-research remains compatible.",
+          "endLine": 225,
           "kind": "method",
-          "line": 199,
+          "line": 223,
+          "name": "research_batch",
+          "qualname": "HostSession.research_batch"
+        },
+        {
+          "doc": null,
+          "endLine": 239,
+          "kind": "method",
+          "line": 227,
+          "name": "har_breakdown",
+          "qualname": "HostSession.har_breakdown"
+        },
+        {
+          "doc": null,
+          "endLine": 253,
+          "kind": "method",
+          "line": 241,
+          "name": "index_build",
+          "qualname": "HostSession.index_build"
+        },
+        {
+          "doc": "Compile the sport-neutral public-search fan-out plan for this run.",
+          "endLine": 272,
+          "kind": "method",
+          "line": 255,
+          "name": "search_blueprint",
+          "qualname": "HostSession.search_blueprint"
+        },
+        {
+          "doc": null,
+          "endLine": 311,
+          "kind": "method",
+          "line": 274,
+          "name": "research_validate",
+          "qualname": "HostSession.research_validate"
+        },
+        {
+          "doc": null,
+          "endLine": 411,
+          "kind": "method",
+          "line": 313,
           "name": "import_evidence",
           "qualname": "HostSession.import_evidence"
         },
         {
           "doc": null,
-          "endLine": 242,
+          "endLine": 454,
           "kind": "method",
-          "line": 208,
+          "line": 413,
           "name": "coverage",
           "qualname": "HostSession.coverage"
         },
         {
           "doc": null,
-          "endLine": 276,
+          "endLine": 465,
           "kind": "method",
-          "line": 244,
+          "line": 456,
+          "name": "record_research_failure",
+          "qualname": "HostSession.record_research_failure"
+        },
+        {
+          "doc": null,
+          "endLine": 475,
+          "kind": "method",
+          "line": 467,
+          "name": "checkpoint_verify",
+          "qualname": "HostSession.checkpoint_verify"
+        },
+        {
+          "doc": null,
+          "endLine": 501,
+          "kind": "method",
+          "line": 477,
+          "name": "_persist_research_checkpoint",
+          "qualname": "HostSession._persist_research_checkpoint"
+        },
+        {
+          "doc": null,
+          "endLine": 535,
+          "kind": "method",
+          "line": 503,
           "name": "forecast",
           "qualname": "HostSession.forecast"
         },
         {
           "doc": null,
-          "endLine": 283,
+          "endLine": 542,
           "kind": "method",
-          "line": 278,
+          "line": 537,
           "name": "report",
           "qualname": "HostSession.report"
         },
         {
           "doc": null,
-          "endLine": 299,
+          "endLine": 558,
           "kind": "method",
-          "line": 285,
+          "line": 544,
           "name": "resume",
           "qualname": "HostSession.resume"
         },
         {
           "doc": null,
-          "endLine": 304,
+          "endLine": 563,
           "kind": "method",
-          "line": 301,
+          "line": 560,
           "name": "audit",
           "qualname": "HostSession.audit"
         },
         {
           "doc": null,
-          "endLine": 309,
+          "endLine": 568,
           "kind": "method",
-          "line": 306,
+          "line": 565,
           "name": "archive",
           "qualname": "HostSession.archive"
         },
         {
           "doc": null,
-          "endLine": 315,
+          "endLine": 574,
           "kind": "method",
-          "line": 311,
+          "line": 570,
           "name": "settle",
           "qualname": "HostSession.settle"
         },
         {
           "doc": "Guarded CFB vertical slice. Fixture/bundle can freeze; file research returns the host loop.",
-          "endLine": 396,
+          "endLine": 655,
           "kind": "function",
-          "line": 318,
+          "line": 577,
           "name": "cfb_launch",
           "qualname": "cfb_launch"
         }
@@ -3279,37 +3375,37 @@
       "classes": 0,
       "functions": 4,
       "path": "src/dcm/chat/state.py",
-      "sha256": "b51efb24e1ee5cd7289ae699a2ab14a487850814a87d5b740ce595ddb25eff89",
+      "sha256": "dd7e868e2274f89e5940982122511352c51bfbd6c579e009cec80f783562f3d2",
       "symbols": [
         {
           "doc": null,
-          "endLine": 14,
+          "endLine": 15,
           "kind": "function",
-          "line": 13,
+          "line": 14,
           "name": "utc_now",
           "qualname": "utc_now"
         },
         {
           "doc": null,
-          "endLine": 20,
+          "endLine": 21,
           "kind": "function",
-          "line": 17,
+          "line": 18,
           "name": "read_json",
           "qualname": "read_json"
         },
         {
           "doc": null,
-          "endLine": 25,
+          "endLine": 40,
           "kind": "function",
-          "line": 23,
+          "line": 24,
           "name": "write_json",
           "qualname": "write_json"
         },
         {
           "doc": null,
-          "endLine": 43,
+          "endLine": 58,
           "kind": "function",
-          "line": 28,
+          "line": 43,
           "name": "default_host_state",
           "qualname": "default_host_state"
         }
@@ -7089,57 +7185,154 @@
     },
     {
       "classes": 0,
-      "functions": 6,
+      "functions": 7,
       "path": "src/dcm/research/acquisition.py",
-      "sha256": "9aed60dd826c3e465eee872796123251fc8369c7ff3acd37ff6d1b1af5b91501",
+      "sha256": "9dee1bcaa26e06eb6aed40e8515bea8e4da10f7e3e565bbcdb3c7f84860212c6",
       "symbols": [
         {
-          "doc": null,
-          "endLine": 49,
+          "doc": "Lazy greedy set cover using a requirement\u2192action reverse index.",
+          "endLine": 92,
           "kind": "function",
-          "line": 48,
+          "line": 49,
+          "name": "_scalable_weighted_set_cover",
+          "qualname": "_scalable_weighted_set_cover"
+        },
+        {
+          "doc": null,
+          "endLine": 96,
+          "kind": "function",
+          "line": 95,
           "name": "_req_id",
           "qualname": "_req_id"
         },
         {
           "doc": "Group reusable-entity requests into fan-out AcquisitionActions.",
-          "endLine": 228,
+          "endLine": 280,
           "kind": "function",
-          "line": 52,
+          "line": 99,
           "name": "build_acquisition_actions",
           "qualname": "build_acquisition_actions"
         },
         {
           "doc": "Live CELF selector with set-cover + constrained batch packing.",
-          "endLine": 355,
+          "endLine": 423,
           "kind": "function",
-          "line": 231,
+          "line": 283,
           "name": "schedule_acquisition_actions",
           "qualname": "schedule_acquisition_actions"
         },
         {
           "doc": null,
-          "endLine": 273,
+          "endLine": 338,
           "kind": "method",
-          "line": 265,
+          "line": 330,
           "name": "gain_fn",
           "qualname": "schedule_acquisition_actions.gain_fn"
         },
         {
           "doc": null,
-          "endLine": 276,
+          "endLine": 341,
           "kind": "method",
-          "line": 275,
+          "line": 340,
           "name": "cost_fn",
           "qualname": "schedule_acquisition_actions.cost_fn"
         },
         {
           "doc": "Persistable AcquisitionActionGraph: one action may cover many requirements/offers.",
-          "endLine": 454,
+          "endLine": 522,
           "kind": "function",
-          "line": 358,
+          "line": 426,
           "name": "build_acquisition_action_graph",
           "qualname": "build_acquisition_action_graph"
+        }
+      ],
+      "workstream": "P1"
+    },
+    {
+      "classes": 0,
+      "functions": 10,
+      "path": "src/dcm/research/action_state.py",
+      "sha256": "f6d5a1220b64ca8b3278ef850c0ff9693fa2800cdb02561770e053ea6a939702",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 54,
+          "kind": "function",
+          "line": 46,
+          "name": "_parse_time",
+          "qualname": "_parse_time"
+        },
+        {
+          "doc": null,
+          "endLine": 59,
+          "kind": "function",
+          "line": 57,
+          "name": "deterministic_backoff",
+          "qualname": "deterministic_backoff"
+        },
+        {
+          "doc": null,
+          "endLine": 69,
+          "kind": "function",
+          "line": 62,
+          "name": "transition",
+          "qualname": "transition"
+        },
+        {
+          "doc": null,
+          "endLine": 80,
+          "kind": "function",
+          "line": 72,
+          "name": "initial_action_state",
+          "qualname": "initial_action_state"
+        },
+        {
+          "doc": null,
+          "endLine": 105,
+          "kind": "function",
+          "line": 83,
+          "name": "load_action_state",
+          "qualname": "load_action_state"
+        },
+        {
+          "doc": null,
+          "endLine": 136,
+          "kind": "function",
+          "line": 108,
+          "name": "save_action_state",
+          "qualname": "save_action_state"
+        },
+        {
+          "doc": null,
+          "endLine": 148,
+          "kind": "function",
+          "line": 139,
+          "name": "apply_transition",
+          "qualname": "apply_transition"
+        },
+        {
+          "doc": null,
+          "endLine": 216,
+          "kind": "function",
+          "line": 151,
+          "name": "apply_failure",
+          "qualname": "apply_failure"
+        },
+        {
+          "doc": null,
+          "endLine": 233,
+          "kind": "function",
+          "line": 219,
+          "name": "_failure_applies",
+          "qualname": "_failure_applies"
+        },
+        {
+          "doc": "Return only actions safe to schedule at this instant.",
+          "endLine": 274,
+          "kind": "function",
+          "line": 236,
+          "name": "eligible_action_ids",
+          "qualname": "eligible_action_ids"
         }
       ],
       "workstream": "P1"
@@ -7924,7 +8117,7 @@
       "classes": 0,
       "functions": 5,
       "path": "src/dcm/research/batch.py",
-      "sha256": "fa80799145ee75d3ac5362e902706281b97a124c9b615f74239fd9d584f26322",
+      "sha256": "1783c4b5949ac9231808444521ea01331debc866d010f048003302fa4a7b8083",
       "symbols": [
         {
           "doc": null,
@@ -7960,11 +8153,148 @@
         },
         {
           "doc": null,
-          "endLine": 326,
+          "endLine": 334,
           "kind": "function",
           "line": 113,
           "name": "build_next_research_batch",
           "qualname": "build_next_research_batch"
+        }
+      ],
+      "workstream": "P1"
+    },
+    {
+      "classes": 3,
+      "functions": 13,
+      "path": "src/dcm/research/batch_store.py",
+      "sha256": "e1ba3faa66506d46ac0a1248adce785d1a37d5e58d3bddf6fd41897f4c00223e",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 17,
+          "kind": "class",
+          "line": 16,
+          "name": "BatchEnvelopeError",
+          "qualname": "BatchEnvelopeError"
+        },
+        {
+          "doc": null,
+          "endLine": 21,
+          "kind": "class",
+          "line": 20,
+          "name": "BatchEnvelopeOverwriteBlocked",
+          "qualname": "BatchEnvelopeOverwriteBlocked"
+        },
+        {
+          "doc": null,
+          "endLine": 25,
+          "kind": "class",
+          "line": 24,
+          "name": "CheckpointCasMismatch",
+          "qualname": "CheckpointCasMismatch"
+        },
+        {
+          "doc": null,
+          "endLine": 29,
+          "kind": "function",
+          "line": 28,
+          "name": "_canonical_bytes",
+          "qualname": "_canonical_bytes"
+        },
+        {
+          "doc": null,
+          "endLine": 40,
+          "kind": "function",
+          "line": 32,
+          "name": "_fsync_dir",
+          "qualname": "_fsync_dir"
+        },
+        {
+          "doc": "Create a file without replacing an existing path, even on a race.",
+          "endLine": 61,
+          "kind": "function",
+          "line": 43,
+          "name": "_atomic_create",
+          "qualname": "_atomic_create"
+        },
+        {
+          "doc": null,
+          "endLine": 72,
+          "kind": "function",
+          "line": 64,
+          "name": "_atomic_replace",
+          "qualname": "_atomic_replace"
+        },
+        {
+          "doc": null,
+          "endLine": 83,
+          "kind": "function",
+          "line": 75,
+          "name": "_identity",
+          "qualname": "_identity"
+        },
+        {
+          "doc": null,
+          "endLine": 121,
+          "kind": "function",
+          "line": 86,
+          "name": "make_batch_envelope",
+          "qualname": "make_batch_envelope"
+        },
+        {
+          "doc": null,
+          "endLine": 139,
+          "kind": "function",
+          "line": 124,
+          "name": "_validate_envelope",
+          "qualname": "_validate_envelope"
+        },
+        {
+          "doc": null,
+          "endLine": 143,
+          "kind": "function",
+          "line": 142,
+          "name": "load_batch",
+          "qualname": "load_batch"
+        },
+        {
+          "doc": "Seal once.  A repeat with the same identity returns the original bytes.",
+          "endLine": 164,
+          "kind": "function",
+          "line": 146,
+          "name": "seal_batch",
+          "qualname": "seal_batch"
+        },
+        {
+          "doc": null,
+          "endLine": 181,
+          "kind": "function",
+          "line": 167,
+          "name": "_envelope_args",
+          "qualname": "_envelope_args"
+        },
+        {
+          "doc": null,
+          "endLine": 185,
+          "kind": "function",
+          "line": 184,
+          "name": "_checkpoint_hash",
+          "qualname": "_checkpoint_hash"
+        },
+        {
+          "doc": null,
+          "endLine": 226,
+          "kind": "function",
+          "line": 188,
+          "name": "write_checkpoint_cas",
+          "qualname": "write_checkpoint_cas"
+        },
+        {
+          "doc": null,
+          "endLine": 234,
+          "kind": "function",
+          "line": 229,
+          "name": "verify_checkpoint",
+          "qualname": "verify_checkpoint"
         }
       ],
       "workstream": "P1"
@@ -8376,6 +8706,63 @@
       "workstream": "P1"
     },
     {
+      "classes": 1,
+      "functions": 5,
+      "path": "src/dcm/research/coverage_incremental.py",
+      "sha256": "010301e8dcc3c6b8681b8368ddbbefaf5f0dacbfc93602c6ab6f1c49b1ef01ff",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 12,
+          "kind": "class",
+          "line": 11,
+          "name": "IncrementalCoverageMismatch",
+          "qualname": "IncrementalCoverageMismatch"
+        },
+        {
+          "doc": null,
+          "endLine": 16,
+          "kind": "function",
+          "line": 15,
+          "name": "_request_id",
+          "qualname": "_request_id"
+        },
+        {
+          "doc": null,
+          "endLine": 20,
+          "kind": "function",
+          "line": 19,
+          "name": "_row_digest",
+          "qualname": "_row_digest"
+        },
+        {
+          "doc": null,
+          "endLine": 32,
+          "kind": "function",
+          "line": 23,
+          "name": "coverage_index_hash",
+          "qualname": "coverage_index_hash"
+        },
+        {
+          "doc": null,
+          "endLine": 48,
+          "kind": "function",
+          "line": 35,
+          "name": "_dirty_ids",
+          "qualname": "_dirty_ids"
+        },
+        {
+          "doc": "Evaluate only requests touched by changed claims, then reuse old rows.",
+          "endLine": 108,
+          "kind": "function",
+          "line": 51,
+          "name": "incremental_coverage_report",
+          "qualname": "incremental_coverage_report"
+        }
+      ],
+      "workstream": "P1"
+    },
+    {
       "classes": 0,
       "functions": 4,
       "path": "src/dcm/research/dependency_graph.py",
@@ -8749,6 +9136,79 @@
       "workstream": "P1"
     },
     {
+      "classes": 0,
+      "functions": 8,
+      "path": "src/dcm/research/failures.py",
+      "sha256": "6c51f523ed468c85f394d505654741bb5b27fe220c0a58fa2aa318d64c0066cd",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 52,
+          "kind": "function",
+          "line": 51,
+          "name": "utc_now",
+          "qualname": "utc_now"
+        },
+        {
+          "doc": null,
+          "endLine": 56,
+          "kind": "function",
+          "line": 55,
+          "name": "_without_hash",
+          "qualname": "_without_hash"
+        },
+        {
+          "doc": null,
+          "endLine": 69,
+          "kind": "function",
+          "line": 59,
+          "name": "_failure_identity",
+          "qualname": "_failure_identity"
+        },
+        {
+          "doc": "Build and validate one safe failure record.",
+          "endLine": 146,
+          "kind": "function",
+          "line": 72,
+          "name": "failure_record",
+          "qualname": "failure_record"
+        },
+        {
+          "doc": null,
+          "endLine": 164,
+          "kind": "function",
+          "line": 149,
+          "name": "_validate",
+          "qualname": "_validate"
+        },
+        {
+          "doc": null,
+          "endLine": 182,
+          "kind": "function",
+          "line": 167,
+          "name": "load_failures",
+          "qualname": "load_failures"
+        },
+        {
+          "doc": "Append a failure exactly once; conflicting reuse fails closed.",
+          "endLine": 205,
+          "kind": "function",
+          "line": 185,
+          "name": "append_failure",
+          "qualname": "append_failure"
+        },
+        {
+          "doc": null,
+          "endLine": 218,
+          "kind": "function",
+          "line": 208,
+          "name": "failure_ledger",
+          "qualname": "failure_ledger"
+        }
+      ],
+      "workstream": "P1"
+    },
+    {
       "classes": 1,
       "functions": 12,
       "path": "src/dcm/research/freshness.py",
@@ -9019,6 +9479,200 @@
           "line": 332,
           "name": "looks_like_gridiron_log",
           "qualname": "looks_like_gridiron_log"
+        }
+      ],
+      "workstream": "P1"
+    },
+    {
+      "classes": 1,
+      "functions": 9,
+      "path": "src/dcm/research/har_breakdown.py",
+      "sha256": "5de4eeb7e15b5db6620a143061c03e291947fa6f6a498a0ac4f23288475d5336",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 29,
+          "kind": "class",
+          "line": 28,
+          "name": "HarLimitError",
+          "qualname": "HarLimitError"
+        },
+        {
+          "doc": null,
+          "endLine": 33,
+          "kind": "function",
+          "line": 32,
+          "name": "_sha256",
+          "qualname": "_sha256"
+        },
+        {
+          "doc": "Read and validate a HAR without executing or persisting its content.",
+          "endLine": 74,
+          "kind": "function",
+          "line": 36,
+          "name": "safe_parse_har",
+          "qualname": "safe_parse_har"
+        },
+        {
+          "doc": null,
+          "endLine": 81,
+          "kind": "function",
+          "line": 77,
+          "name": "_route_digest",
+          "qualname": "_route_digest"
+        },
+        {
+          "doc": null,
+          "endLine": 117,
+          "kind": "function",
+          "line": 84,
+          "name": "_capture_summary",
+          "qualname": "_capture_summary"
+        },
+        {
+          "doc": null,
+          "endLine": 211,
+          "kind": "function",
+          "line": 120,
+          "name": "_relationships",
+          "qualname": "_relationships"
+        },
+        {
+          "doc": null,
+          "endLine": 237,
+          "kind": "function",
+          "line": 214,
+          "name": "_demand_summary",
+          "qualname": "_demand_summary"
+        },
+        {
+          "doc": "Summarize adapter-normalized records without persisting their values.",
+          "endLine": 265,
+          "kind": "function",
+          "line": 240,
+          "name": "_canonical_record_summary",
+          "qualname": "_canonical_record_summary"
+        },
+        {
+          "doc": null,
+          "endLine": 253,
+          "kind": "method",
+          "line": 251,
+          "name": "unique_digest",
+          "qualname": "_canonical_record_summary.unique_digest"
+        },
+        {
+          "doc": null,
+          "endLine": 343,
+          "kind": "function",
+          "line": 268,
+          "name": "build_har_breakdown",
+          "qualname": "build_har_breakdown"
+        }
+      ],
+      "workstream": "P1"
+    },
+    {
+      "classes": 0,
+      "functions": 12,
+      "path": "src/dcm/research/har_records.py",
+      "sha256": "8f637906f97a424b44cca2b288e41099f732d233c4dd2b86efac5ddd8336a212",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 39,
+          "kind": "function",
+          "line": 26,
+          "name": "type_class",
+          "qualname": "type_class"
+        },
+        {
+          "doc": "Return bounded shape-only paths, not values.",
+          "endLine": 62,
+          "kind": "function",
+          "line": 42,
+          "name": "schema_paths",
+          "qualname": "schema_paths"
+        },
+        {
+          "doc": null,
+          "endLine": 59,
+          "kind": "method",
+          "line": 46,
+          "name": "walk",
+          "qualname": "schema_paths.walk"
+        },
+        {
+          "doc": null,
+          "endLine": 67,
+          "kind": "function",
+          "line": 65,
+          "name": "schema_fingerprint",
+          "qualname": "schema_fingerprint"
+        },
+        {
+          "doc": null,
+          "endLine": 71,
+          "kind": "function",
+          "line": 70,
+          "name": "_keys",
+          "qualname": "_keys"
+        },
+        {
+          "doc": null,
+          "endLine": 95,
+          "kind": "function",
+          "line": 74,
+          "name": "record_family",
+          "qualname": "record_family"
+        },
+        {
+          "doc": null,
+          "endLine": 105,
+          "kind": "function",
+          "line": 98,
+          "name": "_identifier_digests",
+          "qualname": "_identifier_digests"
+        },
+        {
+          "doc": null,
+          "endLine": 127,
+          "kind": "function",
+          "line": 108,
+          "name": "_decode_body",
+          "qualname": "_decode_body"
+        },
+        {
+          "doc": null,
+          "endLine": 148,
+          "kind": "function",
+          "line": 130,
+          "name": "_walk_records",
+          "qualname": "_walk_records"
+        },
+        {
+          "doc": null,
+          "endLine": 145,
+          "kind": "method",
+          "line": 133,
+          "name": "walk",
+          "qualname": "_walk_records.walk"
+        },
+        {
+          "doc": null,
+          "endLine": 156,
+          "kind": "function",
+          "line": 151,
+          "name": "_route_digest",
+          "qualname": "_route_digest"
+        },
+        {
+          "doc": null,
+          "endLine": 205,
+          "kind": "function",
+          "line": 159,
+          "name": "build_record_units",
+          "qualname": "build_record_units"
         }
       ],
       "workstream": "P1"
@@ -9464,13 +10118,13 @@
       "classes": 0,
       "functions": 1,
       "path": "src/dcm/research/observation_execute.py",
-      "sha256": "f98baf98618fc77f40750c251fc9a7cf1ee931ef04f4e11d01071a3356be5bfd",
+      "sha256": "f4721f2b9d6cfa1869a66c0dc15bc7005a9a7f5b333b6236cb6e2ada46e7b55c",
       "symbols": [
         {
           "doc": "Import source-aware host observations and close coverage\u2192consumer contracts.",
-          "endLine": 421,
+          "endLine": 440,
           "kind": "function",
-          "line": 61,
+          "line": 63,
           "name": "execute_source_aware_observations",
           "qualname": "execute_source_aware_observations"
         }
@@ -10474,6 +11128,63 @@
     },
     {
       "classes": 1,
+      "functions": 5,
+      "path": "src/dcm/research/response.py",
+      "sha256": "c7b7fae66ea7b908149181f3ae735f5f2ac1280702e21cd1a982df00fd27d366",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 17,
+          "kind": "class",
+          "line": 16,
+          "name": "ResponseEnvelopeError",
+          "qualname": "ResponseEnvelopeError"
+        },
+        {
+          "doc": null,
+          "endLine": 26,
+          "kind": "function",
+          "line": 20,
+          "name": "_rows",
+          "qualname": "_rows"
+        },
+        {
+          "doc": "Parse either the Work response object or legacy JSONL observations.",
+          "endLine": 90,
+          "kind": "function",
+          "line": 29,
+          "name": "load_response",
+          "qualname": "load_response"
+        },
+        {
+          "doc": null,
+          "endLine": 107,
+          "kind": "function",
+          "line": 93,
+          "name": "_active_envelope",
+          "qualname": "_active_envelope"
+        },
+        {
+          "doc": "Fail closed when an explicit response envelope targets another batch.",
+          "endLine": 141,
+          "kind": "function",
+          "line": 110,
+          "name": "validate_response_binding",
+          "qualname": "validate_response_binding"
+        },
+        {
+          "doc": null,
+          "endLine": 165,
+          "kind": "function",
+          "line": 144,
+          "name": "validate_failure_payload",
+          "qualname": "validate_failure_payload"
+        }
+      ],
+      "workstream": "P1"
+    },
+    {
+      "classes": 1,
       "functions": 27,
       "path": "src/dcm/research/role_epoch.py",
       "sha256": "523696e2e5813fa8b1033df9a3ffe7a4913024049d72ff8b25df699b2d202b9f",
@@ -10706,6 +11417,143 @@
       "workstream": "P1"
     },
     {
+      "classes": 3,
+      "functions": 13,
+      "path": "src/dcm/research/run_lock.py",
+      "sha256": "943067ad7d50e2e60cedf5eccaf0fa97d8cd2d7d1306b6684854a1f5807c396d",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 26,
+          "kind": "class",
+          "line": 22,
+          "name": "RunBusyError",
+          "qualname": "RunBusyError"
+        },
+        {
+          "doc": null,
+          "endLine": 26,
+          "kind": "method",
+          "line": 25,
+          "name": "__init__",
+          "qualname": "RunBusyError.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 30,
+          "kind": "class",
+          "line": 29,
+          "name": "RunFenceError",
+          "qualname": "RunFenceError"
+        },
+        {
+          "doc": null,
+          "endLine": 34,
+          "kind": "function",
+          "line": 33,
+          "name": "_now_epoch",
+          "qualname": "_now_epoch"
+        },
+        {
+          "doc": null,
+          "endLine": 38,
+          "kind": "function",
+          "line": 37,
+          "name": "_now_iso",
+          "qualname": "_now_iso"
+        },
+        {
+          "doc": "Context manager for one run's mutating critical section.",
+          "endLine": 194,
+          "kind": "class",
+          "line": 41,
+          "name": "RunLock",
+          "qualname": "RunLock"
+        },
+        {
+          "doc": null,
+          "endLine": 53,
+          "kind": "method",
+          "line": 44,
+          "name": "__init__",
+          "qualname": "RunLock.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 65,
+          "kind": "method",
+          "line": 55,
+          "name": "_connect",
+          "qualname": "RunLock._connect"
+        },
+        {
+          "doc": null,
+          "endLine": 135,
+          "kind": "method",
+          "line": 67,
+          "name": "acquire",
+          "qualname": "RunLock.acquire"
+        },
+        {
+          "doc": null,
+          "endLine": 146,
+          "kind": "method",
+          "line": 137,
+          "name": "renew",
+          "qualname": "RunLock.renew"
+        },
+        {
+          "doc": null,
+          "endLine": 157,
+          "kind": "method",
+          "line": 148,
+          "name": "assert_fence",
+          "qualname": "RunLock.assert_fence"
+        },
+        {
+          "doc": null,
+          "endLine": 167,
+          "kind": "method",
+          "line": 159,
+          "name": "metadata",
+          "qualname": "RunLock.metadata"
+        },
+        {
+          "doc": null,
+          "endLine": 188,
+          "kind": "method",
+          "line": 169,
+          "name": "release",
+          "qualname": "RunLock.release"
+        },
+        {
+          "doc": null,
+          "endLine": 191,
+          "kind": "method",
+          "line": 190,
+          "name": "__enter__",
+          "qualname": "RunLock.__enter__"
+        },
+        {
+          "doc": null,
+          "endLine": 194,
+          "kind": "method",
+          "line": 193,
+          "name": "__exit__",
+          "qualname": "RunLock.__exit__"
+        },
+        {
+          "doc": "Explicitly record and remove an abandoned lease while holding the file lock.",
+          "endLine": 264,
+          "kind": "function",
+          "line": 197,
+          "name": "repair_stale_lease",
+          "qualname": "repair_stale_lease"
+        }
+      ],
+      "workstream": "P1"
+    },
+    {
       "classes": 0,
       "functions": 6,
       "path": "src/dcm/research/scopes.py",
@@ -10758,6 +11606,161 @@
           "line": 90,
           "name": "is_canonical_scope",
           "qualname": "is_canonical_scope"
+        }
+      ],
+      "workstream": "P1"
+    },
+    {
+      "classes": 0,
+      "functions": 2,
+      "path": "src/dcm/research/search_blueprint.py",
+      "sha256": "02b12cb0c5b10ec7247c2fe65d1ec02abe4d1136f6e7b239802c915b87296edf",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 28,
+          "kind": "function",
+          "line": 14,
+          "name": "compile_action_blueprint",
+          "qualname": "compile_action_blueprint"
+        },
+        {
+          "doc": null,
+          "endLine": 71,
+          "kind": "function",
+          "line": 31,
+          "name": "build_search_blueprint",
+          "qualname": "build_search_blueprint"
+        }
+      ],
+      "workstream": "P1"
+    },
+    {
+      "classes": 1,
+      "functions": 9,
+      "path": "src/dcm/research/search_engine.py",
+      "sha256": "735641bbd31f04277376649d83546231c16984d3158726dfd910de9bb7c4e71a",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 39,
+          "kind": "function",
+          "line": 38,
+          "name": "_tokens",
+          "qualname": "_tokens"
+        },
+        {
+          "doc": null,
+          "endLine": 49,
+          "kind": "function",
+          "line": 42,
+          "name": "_time",
+          "qualname": "_time"
+        },
+        {
+          "doc": null,
+          "endLine": 209,
+          "kind": "class",
+          "line": 52,
+          "name": "SearchEngine",
+          "qualname": "SearchEngine"
+        },
+        {
+          "doc": null,
+          "endLine": 65,
+          "kind": "method",
+          "line": 53,
+          "name": "__init__",
+          "qualname": "SearchEngine.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 96,
+          "kind": "method",
+          "line": 67,
+          "name": "_build",
+          "qualname": "SearchEngine._build"
+        },
+        {
+          "doc": null,
+          "endLine": 109,
+          "kind": "method",
+          "line": 99,
+          "name": "index_receipt",
+          "qualname": "SearchEngine.index_receipt"
+        },
+        {
+          "doc": null,
+          "endLine": 126,
+          "kind": "method",
+          "line": 111,
+          "name": "_eligible",
+          "qualname": "SearchEngine._eligible"
+        },
+        {
+          "doc": null,
+          "endLine": 147,
+          "kind": "method",
+          "line": 128,
+          "name": "duplicate_candidates",
+          "qualname": "SearchEngine.duplicate_candidates"
+        },
+        {
+          "doc": null,
+          "endLine": 209,
+          "kind": "method",
+          "line": 149,
+          "name": "search",
+          "qualname": "SearchEngine.search"
+        },
+        {
+          "doc": null,
+          "endLine": 188,
+          "kind": "method",
+          "line": 186,
+          "name": "similarity",
+          "qualname": "SearchEngine.search.similarity"
+        }
+      ],
+      "workstream": "P1"
+    },
+    {
+      "classes": 0,
+      "functions": 4,
+      "path": "src/dcm/research/search_query.py",
+      "sha256": "6e016f16884cfcee52f2b3bf7d40c31fa436b1e7fa248fcedff6c27c6bbe8c7e",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 25,
+          "kind": "function",
+          "line": 15,
+          "name": "_cutoff_date",
+          "qualname": "_cutoff_date"
+        },
+        {
+          "doc": null,
+          "endLine": 35,
+          "kind": "function",
+          "line": 28,
+          "name": "_terms",
+          "qualname": "_terms"
+        },
+        {
+          "doc": null,
+          "endLine": 88,
+          "kind": "function",
+          "line": 78,
+          "name": "_required_fields",
+          "qualname": "_required_fields"
+        },
+        {
+          "doc": null,
+          "endLine": 131,
+          "kind": "function",
+          "line": 91,
+          "name": "compile_query",
+          "qualname": "compile_query"
         }
       ],
       "workstream": "P1"
@@ -12175,6 +13178,47 @@
           "line": 495,
           "name": "snapshot",
           "qualname": "Dag.snapshot"
+        }
+      ],
+      "workstream": "P5-P14"
+    },
+    {
+      "classes": 0,
+      "functions": 4,
+      "path": "src/dcm/runtime/diagnostics.py",
+      "sha256": "44b76e3cbdfb08ad4a4bde8ea3128d473f5ff6a859bb87a18ba185f75672e3e5",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 42,
+          "kind": "function",
+          "line": 27,
+          "name": "_safe",
+          "qualname": "_safe"
+        },
+        {
+          "doc": null,
+          "endLine": 56,
+          "kind": "function",
+          "line": 45,
+          "name": "_exception_info",
+          "qualname": "_exception_info"
+        },
+        {
+          "doc": null,
+          "endLine": 85,
+          "kind": "function",
+          "line": 59,
+          "name": "build_diagnostics",
+          "qualname": "build_diagnostics"
+        },
+        {
+          "doc": null,
+          "endLine": 103,
+          "kind": "function",
+          "line": 88,
+          "name": "write_diagnostics",
+          "qualname": "write_diagnostics"
         }
       ],
       "workstream": "P5-P14"
@@ -14971,5 +16015,5 @@
   "parseErrors": [],
   "root": "src",
   "schema": "pillars_dcm.code_inventory.v1",
-  "symbolCount": 1617
+  "symbolCount": 1734
 }

@@ -7,82 +7,158 @@ concurrency:
 on:
   push:
     branches:
+      - main
       - chatgpt/v6-production-completion-20260828
       - grok/v6-live-har-production
       - integration/v6-chatgpt-runtime-20260829
       - integration/v6-ml-architecture-20260830
   pull_request:
+  merge_group:
+  workflow_dispatch:
 
 permissions:
   contents: read
 
+env:
+  DCM_FAST_WORLDS: "64"
+  DCM_SERIOUS_WORLDS: "128"
+  DCM_MAX_WORLDS: "256"
+
 jobs:
-  python-dcm:
+  package:
+    name: Package and CLI contract
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Install package from repo root
+      - name: Install package from repository root
         run: python -m pip install --upgrade pip && python -m pip install ".[dev]"
       - name: CLI smoke from clean cwd
-        working-directory: /tmp
-        run: pillars-dcm --help
-      - name: CLI module help
-        working-directory: /tmp
-        run: python -m dcm --help
-      - name: CLI pillars_dcm help
-        working-directory: /tmp
-        run: python -m pillars_dcm --help
-      - name: Host CLI help
-        working-directory: /tmp
-        run: |
-          dcm-host --help
-          python -m dcm.chat --help
-          dcm-host doctor
-      - name: Synthetic smoke
-        working-directory: /tmp
-        run: python -m dcm --synthetic --research fixture --cutoff-from-capture --out /tmp/dcm-smoke
-      - name: Test
-        env:
-          DCM_FAST_WORLDS: "64"
-          DCM_SERIOUS_WORLDS: "128"
-          DCM_MAX_WORLDS: "256"
-        run: pytest -q
-      - name: Algorithm constitution gates
-        run: |
-          python scripts/export_algorithm_registry.py --check
-          python benchmarks/algorithm_frontier/core_smoke.py
+        run: python scripts/ci/run_gate.py --name cli-clean-cwd --out /tmp/dcm-ci-diagnostics-package.json --cwd /tmp -- pillars-dcm --help
+      - name: Module CLI smoke
+        run: python scripts/ci/run_gate.py --name module-help --out /tmp/dcm-ci-diagnostics-package.json --cwd /tmp -- python -m dcm --help
+      - name: Host CLI smoke
+        run: python scripts/ci/run_gate.py --name host-help --out /tmp/dcm-ci-diagnostics-package.json --cwd /tmp -- bash -lc 'dcm-host --help && python -m dcm.chat --help && dcm-host doctor --format json'
+      - name: Synthetic end-to-end smoke
+        run: python scripts/ci/run_gate.py --name synthetic-smoke --out /tmp/dcm-ci-diagnostics-package.json --cwd /tmp -- python -m dcm --synthetic --research fixture --cutoff-from-capture --out /tmp/dcm-smoke
+      - name: Upload package diagnostics on failure
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: dcm-ci-diagnostics-${{ github.run_id }}-package-${{ github.run_attempt }}
+          path: /tmp/dcm-ci-diagnostics-package.json
+          if-no-files-found: warn
+
+  tests:
+    name: Full test suite
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install package from repository root
+        run: python -m pip install --upgrade pip && python -m pip install ".[dev]"
+      - name: Run pytest
+        run: python scripts/ci/run_gate.py --name pytest --out /tmp/dcm-ci-diagnostics-tests.json -- pytest -q
+      - name: Upload test diagnostics on failure
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: dcm-ci-diagnostics-${{ github.run_id }}-tests-${{ github.run_attempt }}
+          path: /tmp/dcm-ci-diagnostics-tests.json
+          if-no-files-found: warn
+
+  constitution:
+    name: Algorithm, policy, and governance gates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install package from repository root
+        run: python -m pip install --upgrade pip && python -m pip install ".[dev]"
+      - name: Algorithm registry consistency
+        run: python scripts/ci/run_gate.py --name algorithm-registry --out /tmp/dcm-ci-diagnostics-constitution.json -- python scripts/export_algorithm_registry.py --check
+      - name: Algorithm frontier smoke
+        run: python scripts/ci/run_gate.py --name algorithm-frontier --out /tmp/dcm-ci-diagnostics-constitution.json -- python benchmarks/algorithm_frontier/core_smoke.py
       - name: Permanent coding and prompt policy
-        run: python scripts/validate_dcm_policy.py
+        run: python scripts/ci/run_gate.py --name policy --out /tmp/dcm-ci-diagnostics-constitution.json -- python scripts/validate_dcm_policy.py
+      - name: Upload governance diagnostics on failure
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: dcm-ci-diagnostics-${{ github.run_id }}-constitution-${{ github.run_attempt }}
+          path: /tmp/dcm-ci-diagnostics-constitution.json
+          if-no-files-found: warn
+
+  inventory:
+    name: Generated inventory consistency
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
       - name: Code inventory stale-check
-        run: python scripts/build_code_inventory.py --check
+        run: python scripts/ci/run_gate.py --name code-inventory --out /tmp/dcm-ci-diagnostics-inventory.json -- python scripts/build_code_inventory.py --check
+      - name: Upload inventory diagnostics on failure
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: dcm-ci-diagnostics-${{ github.run_id }}-inventory-${{ github.run_attempt }}
+          path: /tmp/dcm-ci-diagnostics-inventory.json
+          if-no-files-found: warn
+
+  research-contract:
+    name: Durable batch-search contract
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install package from repository root
+        run: python -m pip install --upgrade pip && python -m pip install ".[dev]"
+      - name: Batch durability and HAR tests
+        run: python scripts/ci/run_gate.py --name batch-search-contract --out /tmp/dcm-ci-diagnostics-research-contract.json -- pytest -q tests/test_durable_batch_search_controls.py tests/test_har_breakdown_and_diagnostics.py tests/test_workflow_contract.py tests/test_host_native.py
+      - name: Host command contract
+        run: python scripts/ci/run_gate.py --name host-command-contract --out /tmp/dcm-ci-diagnostics-research-contract.json -- python -m dcm.chat --help
+      - name: Upload research-contract diagnostics on failure
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: dcm-ci-diagnostics-${{ github.run_id }}-research-contract-${{ github.run_attempt }}
+          path: /tmp/dcm-ci-diagnostics-research-contract.json
+          if-no-files-found: warn
+
+  performance:
+    name: Benchmark and profile smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install package from repository root
+        run: python -m pip install --upgrade pip && python -m pip install ".[dev]"
       - name: Benchmark smoke
-        env:
-          DCM_FAST_WORLDS: "32"
-          DCM_SERIOUS_WORLDS: "64"
-          DCM_MAX_WORLDS: "128"
-        run: |
-          python -m dcm.runtime.benchmark --sizes 100 1000 --out /tmp/dcm-benchmark
-          python - <<'PY'
-          import json
-          from pathlib import Path
-          report = json.loads(Path("/tmp/dcm-benchmark/benchmark_report.json").read_text())
-          assert report["hostPerformanceCertified"] is False
-          assert [r["boardRows"] for r in report["results"]] == [100, 1000]
-          assert all(r["rowsPerWallSecond"] > 0 for r in report["results"])
-          PY
+        run: >-
+          python scripts/ci/run_gate.py --name benchmark --out /tmp/dcm-ci-diagnostics-performance.json -- bash -lc
+          'python -m dcm.runtime.benchmark --sizes 100 1000 --out /tmp/dcm-benchmark &&
+          python -c "import json; from pathlib import Path; r=json.loads(Path(\"/tmp/dcm-benchmark/benchmark_report.json\").read_text()); assert r[\"hostPerformanceCertified\"] is False; assert [x[\"boardRows\"] for x in r[\"results\"]] == [100, 1000]; assert all(x[\"rowsPerWallSecond\"] > 0 for x in r[\"results\"] )"'
       - name: Baseline profile harness smoke
-        run: |
-          python benchmarks/baseline/profile_baseline.py --smoke --out /tmp/dcm-baseline-smoke --tag smoke
-          python - <<'PY'
-          import json
-          from pathlib import Path
-          report = json.loads(Path("/tmp/dcm-baseline-smoke/baseline_profile_smoke.json").read_text())
-          assert report["hostPerformanceCertified"] is False
-          assert report["schema"] == "pillars_dcm.baseline_profile.v1"
-          assert report["boardSizes"] == [100]
-          assert report["worldSizes"] == [64]
-          assert report["hotspots"]
-          PY
+        run: >-
+          python scripts/ci/run_gate.py --name baseline-profile --out /tmp/dcm-ci-diagnostics-performance.json -- bash -lc
+          'python benchmarks/baseline/profile_baseline.py --smoke --out /tmp/dcm-baseline-smoke --tag smoke &&
+          python -c "import json; from pathlib import Path; r=json.loads(Path(\"/tmp/dcm-baseline-smoke/baseline_profile_smoke.json\").read_text()); assert r[\"hostPerformanceCertified\"] is False; assert r[\"schema\"] == \"pillars_dcm.baseline_profile.v1\"; assert r[\"boardSizes\"] == [100]; assert r[\"worldSizes\"] == [64]; assert r[\"hotspots\"]"'
+      - name: Upload performance diagnostics on failure
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: dcm-ci-diagnostics-${{ github.run_id }}-performance-${{ github.run_attempt }}
+          path: /tmp/dcm-ci-diagnostics-performance.json
+          if-no-files-found: warn

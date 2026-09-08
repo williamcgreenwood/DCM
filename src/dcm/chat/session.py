@@ -7,6 +7,7 @@ to dcm.runner / dcm.settle.
 from __future__ import annotations
 
 import json
+import hashlib
 import subprocess
 from pathlib import Path
 from typing import Any
@@ -19,6 +20,17 @@ from dcm.chat.report import build_report
 from dcm.chat.research_bridge import next_research_batch
 from dcm.chat.state import default_host_state, read_json, utc_now, write_json
 from dcm.research.coverage import coverage_report
+from dcm.research.coverage_incremental import incremental_coverage_report
+from dcm.research.failures import append_failure, failure_record, load_failures
+from dcm.research.action_state import apply_failure, apply_transition, load_action_state, save_action_state, TERMINAL_STATES
+from dcm.research.batch_store import verify_checkpoint, write_checkpoint_cas
+from dcm.research.har_breakdown import build_har_breakdown
+from dcm.research.search_blueprint import build_search_blueprint
+from dcm.research.search_engine import SearchEngine
+from dcm.research.run_lock import RunLock
+from dcm.research.observation_typed import _load_observations, _match_action, _match_request, observation_to_typed_claim
+from dcm.research.response import load_response, validate_failure_payload, validate_response_binding
+from dcm.contracts.hashes import content_hash
 from dcm.research.source_catalog import catalog_summary, load_source_catalog
 from dcm.runner import run_dcm, DEFAULT_WORKSPACE
 from dcm.runtime.mount_v541 import mount_default
@@ -40,7 +52,7 @@ def _git_commit() -> str | None:
     return sha if proc.returncode == 0 and sha else None
 
 
-def doctor(*, release_manifest: Path | None = None, workspace: Path | None = None) -> dict[str, Any]:
+def doctor(*, release_manifest: Path | None = None, workspace: Path | None = None, run: Path | None = None) -> dict[str, Any]:
     workspace = Path(workspace) if workspace is not None else DEFAULT_WORKSPACE
     mount = mount_default(workspace)
     catalog = catalog_summary()
@@ -61,6 +73,16 @@ def doctor(*, release_manifest: Path | None = None, workspace: Path | None = Non
     except Exception as exc:  # doctor must still report identity
         constitution = {"error": str(exc)}
         blockers.append("ALGORITHM_CONSTITUTION_UNAVAILABLE")
+    run_state = None
+    if run is not None:
+        run_path = Path(run)
+        run_state = {
+            "path": str(run_path),
+            "exists": run_path.is_dir(),
+            "activeBatch": read_json(run_path / "active_research_batch.json") if run_path.is_dir() else None,
+            "researchCheckpoint": read_json(run_path / "research_checkpoint.json") if run_path.is_dir() else None,
+            "failureCount": len(load_failures(run_path / "research_failures.jsonl")) if run_path.is_dir() and (run_path / "research_failures.jsonl").is_file() else 0,
+        }
     return {
         "schema": "pillars_dcm.host_doctor.v1",
         "software": SOFTWARE,
@@ -82,8 +104,10 @@ def doctor(*, release_manifest: Path | None = None, workspace: Path | None = Non
         "productionRootCertified": False,
         "blockers": blockers,
         "releaseManifest": release or None,
+        "run": run_state,
         "commands": [
-            "doctor", "prepare", "next-research", "evidence-import", "coverage",
+            "doctor", "prepare", "next-research", "research-batch", "research-validate", "research-failure",
+            "evidence-import", "coverage", "har-breakdown", "index-build", "search-blueprint", "checkpoint-verify",
             "forecast", "report", "resume", "audit", "archive", "settle", "cfb-launch",
         ],
     }
@@ -196,16 +220,197 @@ class HostSession:
         )
         return batch
 
-    def import_evidence(self, observations: Path) -> dict[str, Any]:
-        result = import_observations(
-            self.dest,
-            Path(observations),
-            store_root=self.workspace / "dcm_v6" / "research_store",
-        )
-        self._save_host_state(lastCommand="evidence-import", lastImport=result.get("imported"))
+    def research_batch(self, *, max_entities: int = 25, max_dependent_offers: int = 500) -> dict[str, Any]:
+        """Canonical durable batch command; next-research remains compatible."""
+        return self.next_research_batch(max_entities=max_entities, max_dependent_offers=max_dependent_offers)
+
+    def har_breakdown(self, har: Path, *, prior: Path | None = None) -> dict[str, Any]:
+        with RunLock(self.dest, command="har-breakdown"):
+            board = read_json(self.dest / "board.json") or {}
+            requests = read_json(self.dest / "research_requests.json") or []
+            prior_body = read_json(prior) if prior else read_json(self.dest / "har_breakdown.json")
+            result = build_har_breakdown(
+                Path(har), run_id=self.dest.name, prior=prior_body if isinstance(prior_body, dict) else None,
+                board=board if isinstance(board, dict) else None,
+                requests=requests if isinstance(requests, list) else None,
+                output_path=self.dest / "har_breakdown.json",
+            )
+            self._save_host_state(lastCommand="har-breakdown", harSha256=result["receipt"].get("harSha256"))
+            return result["receipt"]
+
+    def index_build(self) -> dict[str, Any]:
+        with RunLock(self.dest, command="index-build"):
+            claims = read_json(self.dest / "evidence" / "claims.json") or []
+            board = read_json(self.dest / "board.json") or {}
+            rows = board.get("rows") if isinstance(board, dict) else []
+            docs = [dict(row, _kind="claim") for row in claims if isinstance(row, dict)]
+            docs.extend(dict(row, _kind="board") for row in (rows if isinstance(rows, list) else []) if isinstance(row, dict))
+            engine = SearchEngine(docs)
+            receipt = {**engine.index_receipt, "documentKinds": {"claims": len(claims) if isinstance(claims, list) else 0, "board": len(rows) if isinstance(rows, list) else 0}}
+            receipt["contentHash"] = content_hash(receipt)
+            write_json(self.dest / "search_index_receipt.json", receipt)
+            self._save_host_state(lastCommand="index-build", searchIndexHash=receipt.get("indexHash"))
+            return receipt
+
+    def search_blueprint(self) -> dict[str, Any]:
+        """Compile the sport-neutral public-search fan-out plan for this run."""
+        with RunLock(self.dest, command="search-blueprint"):
+            actions_doc = read_json(self.dest / "acquisition_actions.json") or {}
+            actions = actions_doc.get("actions") if isinstance(actions_doc, dict) else []
+            requests = read_json(self.dest / "research_requests.json") or []
+            board = read_json(self.dest / "board.json") or {}
+            freeze = read_json(self.dest / "freeze.json") or {}
+            cutoff = str((self._host_state() or {}).get("forecastCutoff") or freeze.get("forecastCutoff") or (board if isinstance(board, dict) else {}).get("forecastCutoff") or "")
+            blueprint = build_search_blueprint(
+                actions=[row for row in (actions or []) if isinstance(row, dict)],
+                requests=requests if isinstance(requests, list) else [],
+                cutoff=cutoff,
+                breakdown=read_json(self.dest / "har_breakdown.json"),
+            )
+            write_json(self.dest / "search_blueprint.json", blueprint)
+            self._save_host_state(lastCommand="search-blueprint", searchBlueprintHash=blueprint.get("blueprintHash"))
+            return blueprint
+
+    def research_validate(self, observations: Path) -> dict[str, Any]:
+        response = validate_response_binding(load_response(Path(observations)), self.dest)
+        requests = read_json(self.dest / "research_requests.json") or []
+        action_doc = read_json(self.dest / "acquisition_actions.json") or {}
+        actions = action_doc.get("actions") if isinstance(action_doc, dict) else []
+        actions = [row for row in actions if isinstance(row, dict)]
+        freeze = read_json(self.dest / "freeze.json") or {}
+        board = read_json(self.dest / "board.json") or {}
+        state = self._host_state()
+        cutoff = str(state.get("forecastCutoff") or freeze.get("forecastCutoff") or board.get("forecastCutoff") or "")
+        if not cutoff:
+            raise ValueError("FORECAST_CUTOFF_REQUIRED")
+        valid: list[dict[str, Any]] = []
+        rejected: list[dict[str, Any]] = []
+        for index, obs in enumerate(response.get("observations") or []):
+            try:
+                req = _match_request(obs, requests if isinstance(requests, list) else [])
+                action = _match_action(obs, actions, request=req)
+                claim = observation_to_typed_claim(obs, cutoff=cutoff, request=req, action=action)
+                valid.append({"index": index, "actionId": claim.get("action_id"), "scope": claim.get("semantic_scope"), "scopeId": claim.get("scope_id"), "claimHash": claim.get("claim_hash"), "sourceHash": claim.get("source_hash"), "fieldNames": sorted((claim.get("claim_value") or {}).keys()) if isinstance(claim.get("claim_value"), dict) else []})
+            except (ValueError, TypeError, KeyError) as exc:
+                rejected.append({"index": index, "code": "SCHEMA_INVALID", "error": str(exc)[:240]})
+        result = {
+            "schema": "pillars_dcm.research_validation.v1",
+            "cutoff": cutoff,
+            "input": str(Path(observations).name),
+            "validCount": len(valid),
+            "rejectedCount": len(rejected),
+            "valid": valid,
+            "rejected": rejected,
+            "hostComputedHashes": True,
+            "responseHash": response.get("responseHash"),
+            "bindingStatus": response.get("bindingStatus"),
+            "failureCount": int(response.get("failureCount") or 0),
+        }
+        result["contentHash"] = content_hash(result)
+        write_json(self.dest / "research_validation.json", result)
         return result
 
-    def coverage(self) -> dict[str, Any]:
+    def import_evidence(self, observations: Path) -> dict[str, Any]:
+        response = validate_response_binding(load_response(Path(observations)), self.dest)
+        with RunLock(self.dest, command="evidence-import"):
+            active = read_json(self.dest / "active_research_batch.json") or {}
+            bound_batch_id = str(response.get("batchId") or active.get("batchId") or "UNBOUND")
+            response_failure_errors: list[dict[str, Any]] = []
+            response_failures = response.get("failures") or []
+            states = load_action_state(self.dest / "research_action_state.json")
+            failure_path = self.dest / "research_failures.jsonl"
+            for index, raw_failure in enumerate(response_failures):
+                try:
+                    failure = validate_failure_payload(raw_failure)
+                    failure_key = failure.get("failureKey") or content_hash({
+                        "responseHash": response.get("responseHash"),
+                        "index": index,
+                        "actionId": failure.get("actionId"),
+                        "requestId": failure.get("requestId"),
+                        "sourceId": failure.get("sourceId"),
+                        "code": failure.get("code"),
+                        "missingFields": failure.get("missingFields"),
+                    })
+                    apply_failure(
+                        states,
+                        run_id=self.dest.name,
+                        batch_id=bound_batch_id,
+                        action_id=str(failure["actionId"]),
+                        request_id=failure.get("requestId"),
+                        source_id=failure.get("sourceId"),
+                        code=str(failure["code"]),
+                        retryable=bool(failure.get("retryable")),
+                        exclusion_scope=str(failure.get("exclusionScope") or "ATTEMPT_ONLY"),
+                        failure_path=failure_path,
+                        missing_fields=failure.get("missingFields") or [],
+                        source_attempts=failure.get("sourceAttempts") or [],
+                        safe_reason=failure.get("safeReason"),
+                        failure_key=failure_key,
+                    )
+                except (ValueError, TypeError, KeyError) as exc:
+                    response_failure_errors.append({"index": index, "code": "SCHEMA_INVALID", "error": str(exc)[:240]})
+            if states:
+                save_action_state(self.dest / "research_action_state.json", states)
+            result = import_observations(
+                self.dest, Path(observations), store_root=self.workspace / "dcm_v6" / "research_store",
+            )
+            state_path = self.dest / "research_action_state.json"
+            states = load_action_state(state_path)
+            actions_doc = read_json(self.dest / "acquisition_actions.json") or {}
+            action_by_id = {str(row.get("actionId")): row for row in (actions_doc.get("actions") or []) if isinstance(row, dict)}
+            coverage = read_json(self.dest / "evidence_coverage.json") or {}
+            coverage_by_id = {str(row.get("requestId") or ""): row for row in (coverage.get("requests") or []) if isinstance(row, dict)}
+            for fanout in result.get("fanouts") or []:
+                aid = str(fanout.get("actionId") or "")
+                if not aid:
+                    continue
+                row = dict(states.get(aid) or {"actionId": aid, "state": "PENDING", "attempt": 0})
+                current = str(row.get("state") or "PENDING")
+                if current == "PENDING":
+                    apply_transition(states, aid, "SELECTED")
+                    current = "SELECTED"
+                if current == "SELECTED":
+                    apply_transition(states, aid, "IN_FLIGHT")
+                    current = "IN_FLIGHT"
+                if current == "IN_FLIGHT":
+                    apply_transition(states, aid, "IMPORTING")
+                    current = "IMPORTING"
+                req_ids = [str(x) for x in (action_by_id.get(aid) or {}).get("requirementIds") or []]
+                complete = bool(req_ids) and all(bool((coverage_by_id.get(rid) or {}).get("complete")) for rid in req_ids)
+                target = "SUCCEEDED" if complete else "PARTIAL"
+                if current != target:
+                    apply_transition(states, aid, target)
+            if states:
+                save_action_state(state_path, states)
+            # Source-aware import already emits canonical changed claim refs.
+            # Preserve them; only derive the legacy shape when an older
+            # importer returned stored pointers instead.
+            changed_refs = result.get("changedClaimRefs") or []
+            if not changed_refs:
+                changed_refs = [
+                    {
+                        "semantic_scope": str(row.get("entityKind") or row.get("semantic_scope") or ""),
+                        "scope_id": str(row.get("entityId") or row.get("scope_id") or ""),
+                        "claim_hash": str(row.get("claimHash") or row.get("claim_hash") or ""),
+                    }
+                    for row in (result.get("stored") or [])
+                    if isinstance(row, dict)
+                ]
+            result["changedClaimRefs"] = changed_refs
+            write_json(self.dest / "last_import_claim_refs.json", result["changedClaimRefs"])
+            self._persist_research_checkpoint(active_batch_id=(read_json(self.dest / "active_research_batch.json") or {}).get("batchId"))
+            self._save_host_state(lastCommand="evidence-import", lastImport=result.get("imported"))
+            result["responseHash"] = response.get("responseHash")
+            result["bindingStatus"] = response.get("bindingStatus")
+            result["responseFailureCount"] = len(response_failures)
+            result["responseFailureErrors"] = response_failure_errors
+        # Create/seal the next immutable envelope after the current batch is
+        # checkpointed.  This is the repeatable hand-off to the next Work run.
+        next_batch = self.next_research_batch()
+        result["nextBatchId"] = next_batch.get("batchId")
+        return result
+
+    def coverage(self, *, incremental: bool = False, verify_full: bool = False) -> dict[str, Any]:
         requests = read_json(self.dest / "research_requests.json") or []
         claims = read_json(self.dest / "evidence" / "claims.json") or []
         if not claims:
@@ -213,7 +418,14 @@ class HostSession:
             if bundle.is_file():
                 from dcm.research.provider import BundleProvider
                 claims = BundleProvider(bundle).all_claims()
-        coverage = coverage_report(requests if isinstance(requests, list) else [], claims if isinstance(claims, list) else [])
+        request_rows = requests if isinstance(requests, list) else []
+        claim_rows = claims if isinstance(claims, list) else []
+        if incremental:
+            prior = read_json(self.dest / "evidence_coverage.json") or {}
+            changed = read_json(self.dest / "last_import_claim_refs.json") or claim_rows
+            coverage = incremental_coverage_report(request_rows, claim_rows, prior=prior if isinstance(prior, dict) else None, changed_claims=changed if isinstance(changed, list) else None, verify_full=verify_full)
+        else:
+            coverage = coverage_report(request_rows, claim_rows)
         batch = next_research_batch(
             self.dest,
             store_root=self.workspace / "dcm_v6" / "research_store",
@@ -240,6 +452,53 @@ class HostSession:
             productionSelectionPermitted=production_selection_permitted,
         )
         return payload
+
+    def record_research_failure(self, *, action_id: str, code: str, retryable: bool, request_id: str | None = None, source_id: str | None = None, batch_id: str | None = None, exclusion_scope: str = "ATTEMPT_ONLY", safe_reason: str | None = None) -> dict[str, Any]:
+        with RunLock(self.dest, command="research-failure"):
+            active = read_json(self.dest / "active_research_batch.json") or {}
+            batch_id = str(batch_id or active.get("batchId") or "UNBOUND")
+            path = self.dest / "research_failures.jsonl"
+            states = load_action_state(self.dest / "research_action_state.json")
+            row, failure = apply_failure(states, run_id=self.dest.name, batch_id=batch_id, action_id=action_id, request_id=request_id, source_id=source_id, code=code, retryable=retryable, exclusion_scope=exclusion_scope, failure_path=path, safe_reason=safe_reason)
+            save_action_state(self.dest / "research_action_state.json", states)
+            self._persist_research_checkpoint(active_batch_id=batch_id)
+            return {"schema": "pillars_dcm.research_failure_result.v1", "action": row, "failure": failure}
+
+    def checkpoint_verify(self) -> dict[str, Any]:
+        results = {}
+        research = self.dest / "research_checkpoint.json"
+        canonical = self.dest / "checkpoint.json"
+        if research.is_file():
+            results["research"] = verify_checkpoint(research)
+        if canonical.is_file():
+            results["canonical"] = {"path": str(canonical), "valid": bool(__import__("dcm.runtime.checkpoint", fromlist=["load_checkpoint"]).load_checkpoint(canonical))}
+        return {"schema": "pillars_dcm.checkpoint_verification.v1", "results": results, "valid": all(row.get("valid", False) for row in results.values()) if results else False}
+
+    def _persist_research_checkpoint(self, *, active_batch_id: str | None = None) -> dict[str, Any]:
+        path = self.dest / "research_checkpoint.json"
+        current = read_json(path) or {}
+        expected = str(current.get("checkpointHash") or "") or None
+        states = load_action_state(self.dest / "research_action_state.json")
+        terminal = TERMINAL_STATES
+        artifacts: dict[str, str] = {}
+        for name in ("active_research_batch.json", "research_action_state.json", "research_failures.jsonl", "evidence_coverage.json", "last_import_claim_refs.json"):
+            file = self.dest / name
+            if file.is_file():
+                artifacts[name] = hashlib.sha256(file.read_bytes()).hexdigest()
+        coverage = read_json(self.dest / "evidence_coverage.json") or {}
+        result = write_checkpoint_cas(
+            path,
+            expected_parent_sha=expected,
+            run_id=self.dest.name,
+            generation=int(current.get("generation") or 0) + 1,
+            active_batch_id=active_batch_id,
+            artifacts=artifacts,
+            completed_action_ids=[aid for aid, row in states.items() if row.get("state") == "SUCCEEDED"],
+            pending_action_ids=[aid for aid, row in states.items() if row.get("state") not in terminal],
+            failed_action_ids=[aid for aid, row in states.items() if str(row.get("state") or "").startswith(("FAILED_", "BLOCKED_"))],
+            coverage_sha=content_hash(coverage),
+        )
+        return result
 
     def forecast(self, *, research: str = "bundle") -> dict[str, Any]:
         state = self._host_state()
