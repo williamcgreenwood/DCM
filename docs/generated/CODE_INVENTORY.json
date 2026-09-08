@@ -1,6 +1,3 @@
-Warning: truncated output (original token count: 106667)
-Total output lines: 16019
-
 {
   "contentHash": "39b8ed1b05925b3c26aac811c52f0b44dbd8d475b01abbd52aa381fc475ec1e9",
   "moduleCount": 241,
@@ -7565,7 +7562,1010 @@ Total output lines: 16019
         },
         {
           "doc": null,
-          "endLine": …6667 tokens truncated…         "doc": null,
+          "endLine": 389,
+          "kind": "class",
+          "line": 335,
+          "name": "BasketballReferenceTeamGameLogAdapter",
+          "qualname": "BasketballReferenceTeamGameLogAdapter"
+        },
+        {
+          "doc": null,
+          "endLine": 342,
+          "kind": "method",
+          "line": 340,
+          "name": "__init__",
+          "qualname": "BasketballReferenceTeamGameLogAdapter.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 350,
+          "kind": "method",
+          "line": 344,
+          "name": "fetch",
+          "qualname": "BasketballReferenceTeamGameLogAdapter.fetch"
+        },
+        {
+          "doc": null,
+          "endLine": 389,
+          "kind": "method",
+          "line": 352,
+          "name": "normalize",
+          "qualname": "BasketballReferenceTeamGameLogAdapter.normalize"
+        },
+        {
+          "doc": null,
+          "endLine": 442,
+          "kind": "class",
+          "line": 392,
+          "name": "BasketballReferenceSplitAdapter",
+          "qualname": "BasketballReferenceSplitAdapter"
+        },
+        {
+          "doc": null,
+          "endLine": 399,
+          "kind": "method",
+          "line": 397,
+          "name": "__init__",
+          "qualname": "BasketballReferenceSplitAdapter.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 407,
+          "kind": "method",
+          "line": 401,
+          "name": "fetch",
+          "qualname": "BasketballReferenceSplitAdapter.fetch"
+        },
+        {
+          "doc": null,
+          "endLine": 442,
+          "kind": "method",
+          "line": 409,
+          "name": "normalize",
+          "qualname": "BasketballReferenceSplitAdapter.normalize"
+        },
+        {
+          "doc": null,
+          "endLine": 492,
+          "kind": "class",
+          "line": 445,
+          "name": "BasketballReferenceLineupAdapter",
+          "qualname": "BasketballReferenceLineupAdapter"
+        },
+        {
+          "doc": null,
+          "endLine": 452,
+          "kind": "method",
+          "line": 450,
+          "name": "__init__",
+          "qualname": "BasketballReferenceLineupAdapter.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 460,
+          "kind": "method",
+          "line": 454,
+          "name": "fetch",
+          "qualname": "BasketballReferenceLineupAdapter.fetch"
+        },
+        {
+          "doc": null,
+          "endLine": 492,
+          "kind": "method",
+          "line": 462,
+          "name": "normalize",
+          "qualname": "BasketballReferenceLineupAdapter.normalize"
+        },
+        {
+          "doc": null,
+          "endLine": 544,
+          "kind": "class",
+          "line": 495,
+          "name": "BasketballReferenceOnOffAdapter",
+          "qualname": "BasketballReferenceOnOffAdapter"
+        },
+        {
+          "doc": null,
+          "endLine": 502,
+          "kind": "method",
+          "line": 500,
+          "name": "__init__",
+          "qualname": "BasketballReferenceOnOffAdapter.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 510,
+          "kind": "method",
+          "line": 504,
+          "name": "fetch",
+          "qualname": "BasketballReferenceOnOffAdapter.fetch"
+        },
+        {
+          "doc": null,
+          "endLine": 544,
+          "kind": "method",
+          "line": 512,
+          "name": "normalize",
+          "qualname": "BasketballReferenceOnOffAdapter.normalize"
+        }
+      ],
+      "workstream": "P1"
+    },
+    {
+      "classes": 1,
+      "functions": 6,
+      "path": "src/dcm/research/adapters/espn_status.py",
+      "sha256": "0c98661fa9aaf00f1a73397b624afe198e2389f4bcba2b3d32a06590879db906",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 46,
+          "kind": "function",
+          "line": 37,
+          "name": "canonicalize_status",
+          "qualname": "canonicalize_status"
+        },
+        {
+          "doc": null,
+          "endLine": 56,
+          "kind": "function",
+          "line": 49,
+          "name": "_as_text",
+          "qualname": "_as_text"
+        },
+        {
+          "doc": null,
+          "endLine": 81,
+          "kind": "function",
+          "line": 59,
+          "name": "_parse_payload",
+          "qualname": "_parse_payload"
+        },
+        {
+          "doc": null,
+          "endLine": 154,
+          "kind": "class",
+          "line": 84,
+          "name": "ESPNStatusAdapter",
+          "qualname": "ESPNStatusAdapter"
+        },
+        {
+          "doc": null,
+          "endLine": 91,
+          "kind": "method",
+          "line": 89,
+          "name": "__init__",
+          "qualname": "ESPNStatusAdapter.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 120,
+          "kind": "method",
+          "line": 93,
+          "name": "fetch",
+          "qualname": "ESPNStatusAdapter.fetch"
+        },
+        {
+          "doc": null,
+          "endLine": 154,
+          "kind": "method",
+          "line": 122,
+          "name": "normalize",
+          "qualname": "ESPNStatusAdapter.normalize"
+        }
+      ],
+      "workstream": "P1"
+    },
+    {
+      "classes": 1,
+      "functions": 8,
+      "path": "src/dcm/research/adapters/html_tables.py",
+      "sha256": "4456a87ae1c5a5ef67b278c5a1459ead02104cab07928dc280d9eef7b2ebead3",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 23,
+          "kind": "function",
+          "line": 16,
+          "name": "unwrap_commented_tables",
+          "qualname": "unwrap_commented_tables"
+        },
+        {
+          "doc": null,
+          "endLine": 21,
+          "kind": "method",
+          "line": 17,
+          "name": "repl",
+          "qualname": "unwrap_commented_tables.repl"
+        },
+        {
+          "doc": null,
+          "endLine": 136,
+          "kind": "class",
+          "line": 26,
+          "name": "_TableParser",
+          "qualname": "_TableParser"
+        },
+        {
+          "doc": null,
+          "endLine": 45,
+          "kind": "method",
+          "line": 27,
+          "name": "__init__",
+          "qualname": "_TableParser.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 78,
+          "kind": "method",
+          "line": 47,
+          "name": "handle_starttag",
+          "qualname": "_TableParser.handle_starttag"
+        },
+        {
+          "doc": null,
+          "endLine": 132,
+          "kind": "method",
+          "line": 80,
+          "name": "handle_endtag",
+          "qualname": "_TableParser.handle_endtag"
+        },
+        {
+          "doc": null,
+          "endLine": 136,
+          "kind": "method",
+          "line": 134,
+          "name": "handle_data",
+          "qualname": "_TableParser.handle_data"
+        },
+        {
+          "doc": null,
+          "endLine": 143,
+          "kind": "function",
+          "line": 139,
+          "name": "extract_tables",
+          "qualname": "extract_tables"
+        },
+        {
+          "doc": null,
+          "endLine": 164,
+          "kind": "function",
+          "line": 146,
+          "name": "table_rows_as_dicts",
+          "qualname": "table_rows_as_dicts"
+        }
+      ],
+      "workstream": "P1"
+    },
+    {
+      "classes": 3,
+      "functions": 6,
+      "path": "src/dcm/research/adapters/official_league.py",
+      "sha256": "96ed5f009853c1dea3394b46839b23d62c180896e24c1831f77f76a30be3472c",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 23,
+          "kind": "function",
+          "line": 16,
+          "name": "_as_text",
+          "qualname": "_as_text"
+        },
+        {
+          "doc": null,
+          "endLine": 41,
+          "kind": "function",
+          "line": 26,
+          "name": "_games",
+          "qualname": "_games"
+        },
+        {
+          "doc": null,
+          "endLine": 78,
+          "kind": "function",
+          "line": 44,
+          "name": "_normalize_game",
+          "qualname": "_normalize_game"
+        },
+        {
+          "doc": null,
+          "endLine": 133,
+          "kind": "class",
+          "line": 81,
+          "name": "_OfficialScheduleAdapter",
+          "qualname": "_OfficialScheduleAdapter"
+        },
+        {
+          "doc": null,
+          "endLine": 86,
+          "kind": "method",
+          "line": 84,
+          "name": "__init__",
+          "qualname": "_OfficialScheduleAdapter.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 114,
+          "kind": "method",
+          "line": 88,
+          "name": "fetch",
+          "qualname": "_OfficialScheduleAdapter.fetch"
+        },
+        {
+          "doc": null,
+          "endLine": 133,
+          "kind": "method",
+          "line": 116,
+          "name": "normalize",
+          "qualname": "_OfficialScheduleAdapter.normalize"
+        },
+        {
+          "doc": null,
+          "endLine": 139,
+          "kind": "class",
+          "line": 136,
+          "name": "OfficialWNBAAdapter",
+          "qualname": "OfficialWNBAAdapter"
+        },
+        {
+          "doc": null,
+          "endLine": 145,
+          "kind": "class",
+          "line": 142,
+          "name": "OfficialNBAAdapter",
+          "qualname": "OfficialNBAAdapter"
+        }
+      ],
+      "workstream": "P1"
+    },
+    {
+      "classes": 1,
+      "functions": 5,
+      "path": "src/dcm/research/adapters/prizepicks.py",
+      "sha256": "320816d97117c75345b8774eb9dc835e3edf686003d25847f116493ff89bc18a",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 38,
+          "kind": "function",
+          "line": 15,
+          "name": "offer_fields_from_row",
+          "qualname": "offer_fields_from_row"
+        },
+        {
+          "doc": null,
+          "endLine": 93,
+          "kind": "class",
+          "line": 41,
+          "name": "PrizePicksOfferAdapter",
+          "qualname": "PrizePicksOfferAdapter"
+        },
+        {
+          "doc": null,
+          "endLine": 48,
+          "kind": "method",
+          "line": 46,
+          "name": "__init__",
+          "qualname": "PrizePicksOfferAdapter.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 59,
+          "kind": "method",
+          "line": 50,
+          "name": "fetch",
+          "qualname": "PrizePicksOfferAdapter.fetch"
+        },
+        {
+          "doc": null,
+          "endLine": 90,
+          "kind": "method",
+          "line": 61,
+          "name": "normalize",
+          "qualname": "PrizePicksOfferAdapter.normalize"
+        },
+        {
+          "doc": null,
+          "endLine": 93,
+          "kind": "method",
+          "line": 92,
+          "name": "normalize_rows",
+          "qualname": "PrizePicksOfferAdapter.normalize_rows"
+        }
+      ],
+      "workstream": "P1"
+    },
+    {
+      "classes": 2,
+      "functions": 7,
+      "path": "src/dcm/research/adapters/pro_football_reference.py",
+      "sha256": "22ed508c56adac434f4c516f648b97ef2766312a12f2093d102e5fc98f81f71d",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 35,
+          "kind": "function",
+          "line": 30,
+          "name": "_as_text",
+          "qualname": "_as_text"
+        },
+        {
+          "doc": null,
+          "endLine": 53,
+          "kind": "function",
+          "line": 38,
+          "name": "_pick_table",
+          "qualname": "_pick_table"
+        },
+        {
+          "doc": null,
+          "endLine": 62,
+          "kind": "function",
+          "line": 56,
+          "name": "_fetch_http",
+          "qualname": "_fetch_http"
+        },
+        {
+          "doc": null,
+          "endLine": 162,
+          "kind": "class",
+          "line": 65,
+          "name": "FootballReferenceGameLogAdapter",
+          "qualname": "FootballReferenceGameLogAdapter"
+        },
+        {
+          "doc": null,
+          "endLine": 72,
+          "kind": "method",
+          "line": 70,
+          "name": "__init__",
+          "qualname": "FootballReferenceGameLogAdapter.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 101,
+          "kind": "method",
+          "line": 74,
+          "name": "fetch",
+          "qualname": "FootballReferenceGameLogAdapter.fetch"
+        },
+        {
+          "doc": null,
+          "endLine": 146,
+          "kind": "method",
+          "line": 103,
+          "name": "normalize",
+          "qualname": "FootballReferenceGameLogAdapter.normalize"
+        },
+        {
+          "doc": null,
+          "endLine": 162,
+          "kind": "method",
+          "line": 148,
+          "name": "fetch_normalize",
+          "qualname": "FootballReferenceGameLogAdapter.fetch_normalize"
+        },
+        {
+          "doc": "Alias used by NFL hosts. Same parser as FootballReferenceGameLogAdapter.",
+          "endLine": 168,
+          "kind": "class",
+          "line": 165,
+          "name": "ProFootballReferenceAdapter",
+          "qualname": "ProFootballReferenceAdapter"
+        }
+      ],
+      "workstream": "P1"
+    },
+    {
+      "classes": 1,
+      "functions": 5,
+      "path": "src/dcm/research/authority.py",
+      "sha256": "2e5536babf38693c993f23b63c9dd74f444b18e2bf7ab445f7ab0a9e91d515c7",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 32,
+          "kind": "function",
+          "line": 22,
+          "name": "_parse",
+          "qualname": "_parse"
+        },
+        {
+          "doc": null,
+          "endLine": 51,
+          "kind": "function",
+          "line": 35,
+          "name": "classify_source",
+          "qualname": "classify_source"
+        },
+        {
+          "doc": null,
+          "endLine": 83,
+          "kind": "function",
+          "line": 54,
+          "name": "derive_quality",
+          "qualname": "derive_quality"
+        },
+        {
+          "doc": "Lookup table + derivation. Host never writes reliability/freshness as authority.",
+          "endLine": 93,
+          "kind": "class",
+          "line": 86,
+          "name": "SourceAuthorityRegistry",
+          "qualname": "SourceAuthorityRegistry"
+        },
+        {
+          "doc": null,
+          "endLine": 90,
+          "kind": "method",
+          "line": 89,
+          "name": "__init__",
+          "qualname": "SourceAuthorityRegistry.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 93,
+          "kind": "method",
+          "line": 92,
+          "name": "derive",
+          "qualname": "SourceAuthorityRegistry.derive"
+        }
+      ],
+      "workstream": "P1"
+    },
+    {
+      "classes": 0,
+      "functions": 5,
+      "path": "src/dcm/research/batch.py",
+      "sha256": "1783c4b5949ac9231808444521ea01331debc866d010f048003302fa4a7b8083",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 50,
+          "kind": "function",
+          "line": 40,
+          "name": "scheduler_score",
+          "qualname": "scheduler_score"
+        },
+        {
+          "doc": null,
+          "endLine": 61,
+          "kind": "function",
+          "line": 53,
+          "name": "_event_id_of",
+          "qualname": "_event_id_of"
+        },
+        {
+          "doc": null,
+          "endLine": 65,
+          "kind": "function",
+          "line": 64,
+          "name": "_request_id_of",
+          "qualname": "_request_id_of"
+        },
+        {
+          "doc": "Expose the minimum actionable context for a host acquisition.",
+          "endLine": 110,
+          "kind": "function",
+          "line": 77,
+          "name": "_host_task",
+          "qualname": "_host_task"
+        },
+        {
+          "doc": null,
+          "endLine": 334,
+          "kind": "function",
+          "line": 113,
+          "name": "build_next_research_batch",
+          "qualname": "build_next_research_batch"
+        }
+      ],
+      "workstream": "P1"
+    },
+    {
+      "classes": 3,
+      "functions": 13,
+      "path": "src/dcm/research/batch_store.py",
+      "sha256": "e1ba3faa66506d46ac0a1248adce785d1a37d5e58d3bddf6fd41897f4c00223e",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 17,
+          "kind": "class",
+          "line": 16,
+          "name": "BatchEnvelopeError",
+          "qualname": "BatchEnvelopeError"
+        },
+        {
+          "doc": null,
+          "endLine": 21,
+          "kind": "class",
+          "line": 20,
+          "name": "BatchEnvelopeOverwriteBlocked",
+          "qualname": "BatchEnvelopeOverwriteBlocked"
+        },
+        {
+          "doc": null,
+          "endLine": 25,
+          "kind": "class",
+          "line": 24,
+          "name": "CheckpointCasMismatch",
+          "qualname": "CheckpointCasMismatch"
+        },
+        {
+          "doc": null,
+          "endLine": 29,
+          "kind": "function",
+          "line": 28,
+          "name": "_canonical_bytes",
+          "qualname": "_canonical_bytes"
+        },
+        {
+          "doc": null,
+          "endLine": 40,
+          "kind": "function",
+          "line": 32,
+          "name": "_fsync_dir",
+          "qualname": "_fsync_dir"
+        },
+        {
+          "doc": "Create a file without replacing an existing path, even on a race.",
+          "endLine": 61,
+          "kind": "function",
+          "line": 43,
+          "name": "_atomic_create",
+          "qualname": "_atomic_create"
+        },
+        {
+          "doc": null,
+          "endLine": 72,
+          "kind": "function",
+          "line": 64,
+          "name": "_atomic_replace",
+          "qualname": "_atomic_replace"
+        },
+        {
+          "doc": null,
+          "endLine": 83,
+          "kind": "function",
+          "line": 75,
+          "name": "_identity",
+          "qualname": "_identity"
+        },
+        {
+          "doc": null,
+          "endLine": 121,
+          "kind": "function",
+          "line": 86,
+          "name": "make_batch_envelope",
+          "qualname": "make_batch_envelope"
+        },
+        {
+          "doc": null,
+          "endLine": 139,
+          "kind": "function",
+          "line": 124,
+          "name": "_validate_envelope",
+          "qualname": "_validate_envelope"
+        },
+        {
+          "doc": null,
+          "endLine": 143,
+          "kind": "function",
+          "line": 142,
+          "name": "load_batch",
+          "qualname": "load_batch"
+        },
+        {
+          "doc": "Seal once.  A repeat with the same identity returns the original bytes.",
+          "endLine": 164,
+          "kind": "function",
+          "line": 146,
+          "name": "seal_batch",
+          "qualname": "seal_batch"
+        },
+        {
+          "doc": null,
+          "endLine": 181,
+          "kind": "function",
+          "line": 167,
+          "name": "_envelope_args",
+          "qualname": "_envelope_args"
+        },
+        {
+          "doc": null,
+          "endLine": 185,
+          "kind": "function",
+          "line": 184,
+          "name": "_checkpoint_hash",
+          "qualname": "_checkpoint_hash"
+        },
+        {
+          "doc": null,
+          "endLine": 226,
+          "kind": "function",
+          "line": 188,
+          "name": "write_checkpoint_cas",
+          "qualname": "write_checkpoint_cas"
+        },
+        {
+          "doc": null,
+          "endLine": 234,
+          "kind": "function",
+          "line": 229,
+          "name": "verify_checkpoint",
+          "qualname": "verify_checkpoint"
+        }
+      ],
+      "workstream": "P1"
+    },
+    {
+      "classes": 1,
+      "functions": 7,
+      "path": "src/dcm/research/cache.py",
+      "sha256": "edbdc8115fbf38ca8ca299f67fa09f816bf847e3561d913d8ea6ca89157471e6",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 54,
+          "kind": "function",
+          "line": 34,
+          "name": "cache_identity",
+          "qualname": "cache_identity"
+        },
+        {
+          "doc": "Compatibility cache with optional durable SQLite backing.",
+          "endLine": 140,
+          "kind": "class",
+          "line": 57,
+          "name": "ResearchCache",
+          "qualname": "ResearchCache"
+        },
+        {
+          "doc": null,
+          "endLine": 71,
+          "kind": "method",
+          "line": 66,
+          "name": "__init__",
+          "qualname": "ResearchCache.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 100,
+          "kind": "method",
+          "line": 73,
+          "name": "put",
+          "qualname": "ResearchCache.put"
+        },
+        {
+          "doc": null,
+          "endLine": 124,
+          "kind": "method",
+          "line": 102,
+          "name": "get",
+          "qualname": "ResearchCache.get"
+        },
+        {
+          "doc": null,
+          "endLine": 127,
+          "kind": "method",
+          "line": 126,
+          "name": "hits",
+          "qualname": "ResearchCache.hits"
+        },
+        {
+          "doc": null,
+          "endLine": 136,
+          "kind": "method",
+          "line": 129,
+          "name": "snapshot",
+          "qualname": "ResearchCache.snapshot"
+        },
+        {
+          "doc": null,
+          "endLine": 140,
+          "kind": "method",
+          "line": 138,
+          "name": "close",
+          "qualname": "ResearchCache.close"
+        }
+      ],
+      "workstream": "P1"
+    },
+    {
+      "classes": 1,
+      "functions": 12,
+      "path": "src/dcm/research/cache_layers.py",
+      "sha256": "4792d94bc8451795206fb088b9d8b1dc3546da475b016c20e4e8e57d7e612b48",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 51,
+          "kind": "function",
+          "line": 43,
+          "name": "_key",
+          "qualname": "_key"
+        },
+        {
+          "doc": "Decode and verify a durable cache row before it becomes a reuse hit.",
+          "endLine": 71,
+          "kind": "function",
+          "line": 57,
+          "name": "_decode_cached_row",
+          "qualname": "_decode_cached_row"
+        },
+        {
+          "doc": "Open a durable L2 index, falling back without deleting corrupt bytes.",
+          "endLine": 119,
+          "kind": "function",
+          "line": 74,
+          "name": "_open_persistent_index",
+          "qualname": "_open_persistent_index"
+        },
+        {
+          "doc": "Exact-first reuse. Web acquisition is L6 and never the first lookup.",
+          "endLine": 367,
+          "kind": "class",
+          "line": 122,
+          "name": "ResearchCacheCascade",
+          "qualname": "ResearchCacheCascade"
+        },
+        {
+          "doc": null,
+          "endLine": 156,
+          "kind": "method",
+          "line": 125,
+          "name": "__init__",
+          "qualname": "ResearchCacheCascade.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 187,
+          "kind": "method",
+          "line": 158,
+          "name": "put",
+          "qualname": "ResearchCacheCascade.put"
+        },
+        {
+          "doc": null,
+          "endLine": 251,
+          "kind": "method",
+          "line": 189,
+          "name": "get",
+          "qualname": "ResearchCacheCascade.get"
+        },
+        {
+          "doc": "L4 bitemporal catalog: latest payload with asof <= as_of.",
+          "endLine": 279,
+          "kind": "method",
+          "line": 253,
+          "name": "get_asof",
+          "qualname": "ResearchCacheCascade.get_asof"
+        },
+        {
+          "doc": null,
+          "endLine": 313,
+          "kind": "method",
+          "line": 281,
+          "name": "disposition",
+          "qualname": "ResearchCacheCascade.disposition"
+        },
+        {
+          "doc": null,
+          "endLine": 341,
+          "kind": "method",
+          "line": 315,
+          "name": "snapshot",
+          "qualname": "ResearchCacheCascade.snapshot"
+        },
+        {
+          "doc": "Drop current-run/process/L2 rows; durable L5 remains unchanged.",
+          "endLine": 359,
+          "kind": "method",
+          "line": 343,
+          "name": "clear_ephemeral",
+          "qualname": "ResearchCacheCascade.clear_ephemeral"
+        },
+        {
+          "doc": null,
+          "endLine": 367,
+          "kind": "method",
+          "line": 361,
+          "name": "close",
+          "qualname": "ResearchCacheCascade.close"
+        },
+        {
+          "doc": null,
+          "endLine": 373,
+          "kind": "function",
+          "line": 370,
+          "name": "content_address_bytes",
+          "qualname": "content_address_bytes"
+        }
+      ],
+      "workstream": "P1"
+    },
+    {
+      "classes": 0,
+      "functions": 3,
+      "path": "src/dcm/research/claims.py",
+      "sha256": "357d7c9211022b669bf33e30dc2115cf2db269c9cb553b24d8f9a2c9cac3c72b",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 80,
+          "kind": "function",
+          "line": 11,
+          "name": "claim_record",
+          "qualname": "claim_record"
+        },
+        {
+          "doc": "Remove byte-logically identical claims without mutating hashed content.",
+          "endLine": 90,
+          "kind": "function",
+          "line": 83,
+          "name": "dedupe",
+          "qualname": "dedupe"
+        },
+        {
+          "doc": "Record divergent values separately from immutable EvidenceClaims.",
+          "endLine": 167,
+          "kind": "function",
+          "line": 93,
+          "name": "conflict_ledger",
+          "qualname": "conflict_ledger"
+        }
+      ],
+      "workstream": "P1"
+    },
+    {
+      "classes": 0,
+      "functions": 7,
+      "path": "src/dcm/research/classify.py",
+      "sha256": "5296c75a210b9eb4f3760c13b37d93fd882ad799db10624099b158e4f01fb68d",
+      "symbols": [
+        {
+          "doc": null,
+          "endLine": 56,
+          "kind": "function",
+          "line": 53,
+          "name": "_offered_sides_known",
+          "qualname": "_offered_sides_known"
+        },
+        {
+          "doc": null,
+          "endLine": 61,
+          "kind": "function",
+          "line": 59,
+          "name": "_is_live",
+          "qualname": "_is_live"
+        },
+        {
+          "doc": null,
+          "endLine": 73,
+          "kind": "function",
+          "line": 64,
+          "name": "_unsupported_market",
+          "qualname": "_unsupported_market"
+        },
+        {
+          "doc": "Selection/accounting state. Goblins extracted then excluded; live stays MODELED+blocked.",
+          "endLine": 103,
+          "kind": "function",
+          "line": 76,
+          "name": "accounting_classify",
+          "qualname": "accounting_classify"
+        },
+        {
+          "doc": "Return (deep_research?, class).",
+          "endLine": 148,
+          "kind": "function",
+          "line": 106,
+          "name": "research_disposition",
+          "qualname": "research_disposition"
+        },
+        {
+          "doc": null,
           "endLine": 186,
           "kind": "function",
           "line": 151,
