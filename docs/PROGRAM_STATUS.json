@@ -1,7 +1,7 @@
 {
   "schema": "pillars_dcm.program_status.v1",
-  "asOf": "2026-09-07T12:00:00+00:00",
-  "canonicalMain": "3b80d1c1dfc5f5c1663b67735d5ed0d4a8bb0d39",
+  "asOf": "2026-09-08T08:19:14+00:00",
+  "canonicalMain": "8044c459de29fe9c92db79906682fffd8dce6435",
   "learningRevision": "LR000000",
   "predictiveClaim": "NONE",
   "productionRootCertified": false,
@@ -9,12 +9,29 @@
   "cfbOperational": "PARTIAL_AWAITING_FRONTIER_RESEARCH",
   "recommendationEligible": false,
   "activeRun": "RUN_d3271703636992cc",
+  "activeRunProvenance": "LAST_RECORDED_NOT_REOPENED_IN_THIS_CLEAN_DOCUMENTATION_WORKTREE",
   "activeRunState": "AWAITING_FRONTIER_RESEARCH",
+  "repositoryReadback": {
+    "verifiedAt": "2026-09-08T08:19:14+00:00",
+    "main": "8044c459de29fe9c92db79906682fffd8dce6435",
+    "requiredCheck": "python-dcm",
+    "openPullRequestsBeforeThisPass": 0,
+    "startupChecks": {
+      "doctor": "PASS",
+      "compileall": "PASS",
+      "generatedInventory": "PASS",
+      "policy": "PASS",
+      "diffCheck": "PASS",
+      "pytest": "TOOL_UNAVAILABLE_IN_CONFIGURED_RUNTIME"
+    }
+  },
   "notes": [
     "Batch12 cleared PLAYER_STATUS_UNKNOWN",
     "Remaining material: opportunity primitives/logs; role soft/candidate fail-closed; Standard missing sides terminal",
     "PR #55 game_logs field-union fix is on main",
     "PR #56 established the DCM 6.1 CFB/NFL release contract on main",
-    "NFL league-keyed research-contract parity remains an unmerged, reviewable increment"
+    "NFL league-keyed research-contract parity is merged in PR #57 and DCM61-08 is VERIFIED",
+    "The last recorded operational run was not reopened by the 2026-09-08 documentation readback",
+    "Remaining CFB/NFL operational, predictive, production-root, and host-performance gates require their own receipts"
   ]
 }

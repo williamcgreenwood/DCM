@@ -2,25 +2,25 @@
   "schema": "pillars_dcm.work_state.v1",
   "checkpointId": "CP-20260905T103541Z-CFB-SEMANTIC-COVERAGE-SCHEDULER",
   "lastGreenCheckpointId": "CP-20260905T072000Z-CFB-HOST-SCOPE-BOUNDARY-MERGED",
-  "currentState": "CFB_CURRENT_HAR_SEMANTIC_COVERAGE_SCHEDULER_IMPLEMENTED",
+  "currentState": "WORK_CODEX_BATCH_ARCHITECTURE_EXECUTED",
   "honestCompletionState": "CFB_CURRENT_HAR_PARTIAL_EVIDENCE_NO_FINAL_FORECAST",
   "repository": "https://github.com/williamcgreenwood/DCM",
-  "branch": "codex/cfb-coverage-complete-scheduler-20260905",
+  "branch": "main",
   "baseBranch": "main",
-  "baseSha": "3267c6312dbac0844203b48abf81e1733025b7c0",
-  "startSha": "3267c6312dbac0844203b48abf81e1733025b7c0",
+  "baseSha": "8044c459de29fe9c92db79906682fffd8dce6435",
+  "startSha": "8044c459de29fe9c92db79906682fffd8dce6435",
   "checkpointCommitSha": null,
-  "updatedAtUtc": "2026-09-05T10:35:41Z",
-  "activeAtomicTask": "P0-CFB-COVERAGE-COMPLETION-20260905: make semantic current-run coverage authoritative in host research scheduling (implemented; promotion pending).",
-  "nextExactAction": "Complete exact-head validation and promotion of the semantic-coverage scheduler repair. Then acquire/import permitted evidence for the remaining 551 current-HAR requests and rerun coverage -> forecast; do not emit Top100/Top25 without final run artifacts.",
+  "updatedAtUtc": "2026-09-08T08:19:14Z",
+  "activeAtomicTask": "P0-DOCS-WORK-CODEX-BATCH-ARCHITECTURE-20260908: reconcile the master prompt and live repository handoff without reopening private-HAR state.",
+  "nextExactAction": "Promote the audit, Work/Codex execution prompt and public-safe status reconciliation through the normal protected workflow. Then use only a verified current run/checkpoint and permitted evidence for external CFB/NFL gates; do not emit Top100/Top25 without final run artifacts.",
   "lastValidation": {
-    "command": "targeted research/host/CFB suite, fresh-wheel current-HAR evidence import/readback, compileall, and generated inventory check",
+    "command": "dcm-host --help, dcm-host doctor, compileall, generated-inventory check, policy validation, diff --check, and bounded historical-run probes",
     "exitCode": 0,
-    "pytest": "24_TARGETED_TESTS_GREEN",
+    "pytest": "TOOL_UNAVAILABLE_IN_CONFIGURED_RUNTIME",
     "pullRequest": null,
-    "validatedHead": null,
+    "validatedHead": "8044c459de29fe9c92db79906682fffd8dce6435",
     "mergeCommit": null,
-    "inventory": "281 modules / 2017 symbols / 456979a0ee3ff4c7bdb67c4c29b9946e060adb3a32fb267cd373bfc687ddcfc5"
+    "inventory": "CHECK_PASS; exact generated inventory unchanged"
   },
   "har": {
     "sourceName": "CFB0905260254pst(3).har",
@@ -46,20 +46,22 @@
     "freezeSettlementLearning": "PARTIAL_EXTERNAL_EVIDENCE_REQUIRED",
     "performancePortabilityRelease": "ENGINEERING_BENCHMARKED_HOST_UNCERTIFIED",
     "hostScopeBoundary": "MERGED_VERIFIED",
-    "semanticCoverageScheduler": "IMPLEMENTED_PENDING_PROMOTION"
+    "semanticCoverageScheduler": "MERGED_VERIFIED_ON_MAIN"
   },
   "externalBlockers": [
     "remote sanitized 11113-row fixture is not present in the API-backed scratch mirror",
     "551 current-HAR evidence requests remain after one permitted official event observation was imported",
     "v5.4.1 canonical source/ledger bytes are not mounted",
     "prospective settlement/calibration evidence is not yet earned",
-    "production root and host-performance certification remain false"
+    "production root and host-performance certification remain false",
+    "configured runtime does not provide pytest",
+    "historical redacted run is not resumable from this checkout because its artifact root and board.json are unavailable"
   ],
   "drive": {
     "rootId": "1qKs9cIy9ta5ioOerej7IeVWloTQf8yvh",
     "folderRegistryFileId": "12xxCKT_-_LnkTj1jfOB7PidH2t1ZHw5k",
     "engineeringRunFolderId": "1JU33tTvbsEnE815BZF606czikeF4Ak2F"
   },
-  "recoveryCommand": "cd DCM && dcm-host resume --run-root <run-root> --run-id <run-id>",
+  "recoveryCommand": "python -m dcm.chat resume --run <RUN_ROOT>/<RUN_ID> --workspace <WORKSPACE>",
   "validationCommand": "python -m compileall -q artifacts/dcm_v6_workstream_ab && python scripts/build_code_inventory.py --check"
 }

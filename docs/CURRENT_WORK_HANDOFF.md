@@ -1,15 +1,18 @@
-# CURRENT WORK HANDOFF — CFB LIVE FRONTIER CLOSURE
+# CURRENT WORK HANDOFF — CHECKPOINTED DCM WORK/CODEX EXECUTION
 
-- **Timestamp:** `2026-09-07T12:00:00+00:00`
+- **Timestamp:** `2026-09-08T08:19:14+00:00`
 - **Constitution version:** `DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903`
 - **Active branch:** `main`
-- **Canonical main HEAD:** `3b80d1c1dfc5f5c1663b67735d5ed0d4a8bb0d39`
+- **Canonical main HEAD:** `8044c459de29fe9c92db79906682fffd8dce6435`
 - **Learning revision:** `LR000000`
 - **Predictive claim:** `NONE`
 - **Production root:** NOT CERTIFIED
 - **Host performance:** NOT CERTIFIED
 
-## Active operational run
+## Last recorded operational run
+
+This is the latest redacted run record, not a claim that the run was reopened during
+this clean documentation pass.
 - **runId:** `RUN_d3271703636992cc`
 - **path:** `<RUN_ROOT>/runs_kickoff/RUN_d3271703636992cc`
 - **workspace:** `<WORKSPACE>`
@@ -22,8 +25,13 @@
 - Flanagan operational log restore; `_merge` game_logs union PR in flight
 - PR #55 merged the game-log field-union correction; PR #56 merged the DCM 6.1
   CFB/NFL release contract
-- NFL league-keyed research-contract parity is the next reviewable engineering
-  increment; it is not NFL operational acceptance
+- NFL league-keyed research-contract parity is already merged in PR #57 and is not
+  an unmerged next step; it remains an engineering contract, not NFL operational
+  acceptance
+- PR #60 universal research contracts, PR #61 host receipt, PR #62 CFB research
+  acceptance, and PR #63 1,839-set acceptance are in current main history
+- The Work/Codex batch-research audit and executable prompt are being promoted in
+  this pass; they do not close any external research or predictive gate
 - Closure receipt/audit/checkpoint written under `<RUN_ROOT>` and `docs/`
 
 ## Do not
@@ -33,10 +41,17 @@
 - Force playables or freeze without gates
 
 ## Resume
+
+Resume only from a verified run/checkpoint whose HAR, configuration, code SHA and
+cutoff match. The current clean checkout does not contain the private current-HAR
+run root; do not recreate it or upload raw HAR material.
+
 ```bash
 python -m dcm.chat next-research --run <RUN_ROOT>/runs_kickoff/RUN_d3271703636992cc --workspace <WORKSPACE>
 ```
-Then cutoff-safe import → `forecast --research bundle` on the SAME run.
+Then perform cutoff-safe import and `forecast --research bundle` only on the same
+run after the external evidence is actually available. Do not emit Top100/Top25,
+freeze, settlement, or predictive claims without their gates.
 
 ## Review package
 - `docs/CFB_LIVE_CLOSURE_RECEIPT.json`
@@ -45,3 +60,5 @@ Then cutoff-safe import → `forecast --research bundle` on the SAME run.
 - `<RUN_ROOT>/opportunity_support_gap_audit.json`
 - `<RUN_ROOT>/playable_audit_packets.json`
 - `<RUN_ROOT>/CFB_LIVE_CHECKPOINT_MANIFEST.json`
+- `docs/audits/PILLARS_DCM_MASTER_PROMPT_AUDIT_20260908.md`
+- `docs/prompts/PILLARS_DCM_WORK_CODEX_EXECUTION_PROMPT_20260908.md`
