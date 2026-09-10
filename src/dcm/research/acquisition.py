@@ -355,6 +355,12 @@ def schedule_acquisition_actions(
         oids = [str(x) for x in (act.get("offerIds") or []) if x]
         budgeted = scope not in {"SPORT", "COMPETITION"}
         new_offers = [oid for oid in oids if oid not in covered_offers] if budgeted else []
+        # A single reusable action can fan out to more offers than the packet
+        # budget.  It must not be admitted merely because it is first in the
+        # CELF order: that would emit an over-budget worksheet and make the
+        # cap decorative.  Leave it for a later partitioned action/packet.
+        if budgeted and len(new_offers) > max_dependent_offers:
+            continue
         if selected and budgeted and (len(covered_offers) + len(new_offers) > max_dependent_offers):
             continue
         selected.append(aid)
