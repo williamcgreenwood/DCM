@@ -149,6 +149,7 @@ def observation_to_typed_claim(
     cutoff: str,
     request: dict[str, Any] | None = None,
     action: dict[str, Any] | None = None,
+    enforce_cutoff: bool = True,
 ) -> dict[str, Any]:
     """Validate a source-aware host observation and build an EvidenceClaim."""
     url = str(obs.get("sourceUrl") or obs.get("url") or "")
@@ -227,6 +228,6 @@ def observation_to_typed_claim(
         parser_version=parser_version,
         action_id=str(obs.get("actionId") or (action or {}).get("actionId") or "") or None,
         source_family=str(obs.get("sourceFamily") or (action or {}).get("sourceFamily") or "") or None,
+        enforce_cutoff=enforce_cutoff,
     )
-
 
