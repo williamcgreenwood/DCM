@@ -142,6 +142,82 @@ class RunDirector:
                 return candidate
         return self.run / "responses" / f"{batch_id}.response.json"
 
+    @staticmethod
+    def _batch_counts(batch: dict[str, Any]) -> tuple[int, int]:
+        """Return bounded action/entity and dependent-offer counts.
+
+        Older sealed envelopes did not persist a top-level dependent count.
+        Recompute it from the immutable action rows instead of silently
+        treating the missing value as zero.
+        """
+        actions = [row for row in (batch.get("actions") or []) if isinstance(row, dict)]
+        selected = int(batch.get("selectedCount") or len(actions))
+        raw_dependent = batch.get("dependentOfferCount")
+        if raw_dependent is None:
+            raw_dependent = batch.get("dependentOffers")
+        if raw_dependent is None:
+            raw_dependent = sum(
+                int(row.get("dependentOfferCount") or row.get("dependentPropCount") or 0)
+                for row in actions
+            )
+        return selected, int(raw_dependent or 0)
+
+    def _checkpoint_batch(self) -> tuple[dict[str, Any], dict[str, Any]]:
+        """Load the checkpoint and its active immutable envelope, if any."""
+        checkpoint = read_json(self.run / "research_checkpoint.json") or {}
+        if not isinstance(checkpoint, dict):
+            return {}, {}
+        batch_id = str(checkpoint.get("activeBatchId") or "")
+        if not batch_id:
+            return checkpoint, {}
+        path = self.run / "research_batches" / f"{batch_id}.json"
+        if not path.is_file():
+            raise DirectorStateError("CHECKPOINT_ACTIVE_BATCH_MISSING")
+        try:
+            return checkpoint, load_batch(path)
+        except (OSError, ValueError, TypeError) as exc:
+            raise DirectorStateError("CHECKPOINT_ACTIVE_BATCH_INVALID") from exc
+
+    def _reconcile_pointer(self, pointer: dict[str, Any], batch: dict[str, Any], *, checkpoint: dict[str, Any]) -> None:
+        """Move only the mutable pointer back to the checkpoint authority.
+
+        A previous side-effectful importer could publish a newer pointer before
+        the checkpoint CAS completed.  The immutable envelopes remain intact;
+        this repair makes the checkpoint-authoritative packet resumable and
+        leaves an auditable, sanitized reconciliation receipt.
+        """
+        old_id = str(pointer.get("batchId") or "")
+        new_id = str(batch.get("batchId") or "")
+        if not old_id or not new_id or old_id == new_id:
+            return
+        pointer_path = self.run / "active_research_batch.json"
+        receipt_path = self.run / "run_director_reconciliation.json"
+        receipt = {
+            "schema": "pillars_dcm.run_director.reconciliation.v1",
+            "runId": self.run.name,
+            "reason": "POINTER_AHEAD_OF_CHECKPOINT",
+            "checkpointHash": checkpoint.get("checkpointHash"),
+            "authoritativeBatchId": new_id,
+            "authoritativeBatchContentSha": batch.get("batchContentSha"),
+            "authoritativeEnvelope": f"research_batches/{new_id}.json",
+            "supersededPointerBatchId": old_id,
+            "supersededPointerBatchContentSha": pointer.get("batchContentSha"),
+            "supersededEnvelope": f"research_batches/{old_id}.json",
+            "immutableEnvelopesPreserved": True,
+            "productionSelectionChanged": False,
+            "predictiveClaim": "NONE",
+        }
+        with RunLock(self.run, command="director-reconcile") as lock:
+            write_json(pointer_path, {
+                "schema": "pillars_dcm.active_research_batch.v1",
+                "runId": self.run.name,
+                "batchId": new_id,
+                "batchContentSha": batch.get("batchContentSha"),
+                "envelopePath": f"research_batches/{new_id}.json",
+            })
+            write_json(receipt_path, receipt)
+            lock.assert_fence()
+
     def step(self) -> dict[str, Any]:
         state = self._load()
         phase = state["phase"]
@@ -166,7 +242,27 @@ class RunDirector:
 
         if phase == "SELECT_OR_RESUME_BATCH":
             pointer = read_json(self.run / "active_research_batch.json") or {}
-            if pointer.get("batchId"):
+            checkpoint, checkpoint_batch = self._checkpoint_batch()
+            pointer_id = str(pointer.get("batchId") or "")
+            checkpoint_id = str(checkpoint.get("activeBatchId") or "")
+            if pointer_id and checkpoint_id and pointer_id != checkpoint_id:
+                # The checkpoint is the authority.  A pointer that moved
+                # ahead of it is a recoverable legacy side effect, not a new
+                # batch to execute.
+                if not checkpoint_batch:
+                    raise DirectorStateError("ACTIVE_BATCH_DIVERGENCE")
+                self._reconcile_pointer(pointer, checkpoint_batch, checkpoint=checkpoint)
+                pointer = read_json(self.run / "active_research_batch.json") or {}
+
+            # Once the pointer's batch is already represented by the research
+            # checkpoint, selection must create/resume the *next* packet.  A
+            # director invocation must never wait on a completed batch again.
+            if pointer.get("batchId") and str(pointer.get("batchId")) == checkpoint_id:
+                batch = session.next_research_batch(
+                    max_entities=self.max_entities,
+                    max_dependent_offers=self.max_dependent_offers,
+                )
+            elif pointer.get("batchId"):
                 batch_id = str(pointer["batchId"])
                 envelope = Path(str(pointer.get("envelopePath") or self.run / "research_batches" / f"{batch_id}.json"))
                 if not envelope.is_absolute():
@@ -177,8 +273,7 @@ class RunDirector:
                     max_entities=self.max_entities,
                     max_dependent_offers=self.max_dependent_offers,
                 )
-            selected = int(batch.get("selectedCount") or len(batch.get("actions") or []))
-            dependent = int(batch.get("dependentOfferCount") or batch.get("dependentOffers") or 0)
+            selected, dependent = self._batch_counts(batch)
             if selected > self.max_entities or dependent > self.max_dependent_offers:
                 raise DirectorStateError("BATCH_CAP_EXCEEDED")
             state.update({"batchId": batch.get("batchId"), "batchContentSha": batch.get("batchContentSha"),

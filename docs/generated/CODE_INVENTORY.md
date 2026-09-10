@@ -3,9 +3,9 @@
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
 - Modules: **242**
-- Symbols: **1746**
+- Symbols: **1749**
 - Parse errors: **0**
-- Inventory hash: `664862f1ba3990eb80bac87268ecbae7c70861f61827ebb3461718e5192a14f3`
+- Inventory hash: `18be7b17c60db1e04eacac8af6a20d178f0be6a359d35b7ac49a1d51615a1cdb`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -205,7 +205,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P5-P14 | `src/dcm/runtime/perf.py` | 1 | 2 |
 | P5-P14 | `src/dcm/runtime/pipeline.py` | 0 | 2 |
 | P5-P14 | `src/dcm/runtime/readiness.py` | 0 | 1 |
-| P5-P14 | `src/dcm/runtime/run_director.py` | 2 | 10 |
+| P5-P14 | `src/dcm/runtime/run_director.py` | 2 | 13 |
 | P5-P14 | `src/dcm/runtime/schema_root.py` | 0 | 5 |
 | P5-P14 | `src/dcm/runtime/storage_router.py` | 3 | 12 |
 | P5-P14 | `src/dcm/runtime/store.py` | 1 | 4 |
@@ -707,10 +707,10 @@ _No class/function symbols._
 
 ### `src/dcm/chat/cli.py`
 
-- `function` **_print** L17
-- `function` **_add_run** L21
-- `function` **build_parser** L25
-- `function` **main** L164
+- `function` **_print** L18
+- `function` **_add_run** L22
+- `function` **build_parser** L26
+- `function` **main** L165
 
 ### `src/dcm/chat/contracts.py`
 
@@ -2406,8 +2406,11 @@ _No class/function symbols._
 - `method` **RunDirector.status** L103
 - `method` **RunDirector._next_command** L118
 - `method` **RunDirector._response_path** L130
-- `method` **RunDirector.step** L145
-- `method` **RunDirector.run_until_awaiting** L237
+- `method` **RunDirector._batch_counts** L146 — Return bounded action/entity and dependent-offer counts.
+- `method` **RunDirector._checkpoint_batch** L165 — Load the checkpoint and its active immutable envelope, if any.
+- `method` **RunDirector._reconcile_pointer** L181 — Move only the mutable pointer back to the checkpoint authority.
+- `method` **RunDirector.step** L221
+- `method` **RunDirector.run_until_awaiting** L332
 
 ### `src/dcm/runtime/schema_root.py`
 
