@@ -11,6 +11,7 @@ from dcm.chat.session import HostSession, doctor
 from dcm.runtime.cutoff import CutoffRequired
 from dcm.research.run_lock import RunBusyError, RunFenceError
 from dcm.research.batch_store import BatchEnvelopeError
+from dcm.runtime.run_director import DirectorStateError
 from dcm.version import ExactVersionMismatch
 
 
@@ -268,7 +269,7 @@ def main(argv: list[str] | None = None) -> int:
     except FileNotFoundError as exc:
         print(str(exc), file=sys.stderr)
         return 2
-    except (CutoffRequired, ExactVersionMismatch, RunBusyError, RunFenceError, BatchEnvelopeError, ValueError) as exc:
+    except (CutoffRequired, ExactVersionMismatch, RunBusyError, RunFenceError, BatchEnvelopeError, DirectorStateError, ValueError) as exc:
         print(str(exc), file=sys.stderr)
         return 2
 

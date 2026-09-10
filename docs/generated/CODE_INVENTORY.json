@@ -1,5 +1,5 @@
 {
-  "contentHash": "664862f1ba3990eb80bac87268ecbae7c70861f61827ebb3461718e5192a14f3",
+  "contentHash": "18be7b17c60db1e04eacac8af6a20d178f0be6a359d35b7ac49a1d51615a1cdb",
   "moduleCount": 242,
   "modules": [
     {
@@ -2978,37 +2978,37 @@
       "classes": 0,
       "functions": 4,
       "path": "src/dcm/chat/cli.py",
-      "sha256": "b576d7d06e34aff93d7b02093f78a9279dd12e740cc8a1752bdeb274f446b3ca",
+      "sha256": "3f2a1924784a31c60fe620638b77b33d5048550f6cc3acd3bcba39b378cd229d",
       "symbols": [
         {
           "doc": null,
-          "endLine": 18,
+          "endLine": 19,
           "kind": "function",
-          "line": 17,
+          "line": 18,
           "name": "_print",
           "qualname": "_print"
         },
         {
           "doc": null,
-          "endLine": 22,
+          "endLine": 23,
           "kind": "function",
-          "line": 21,
+          "line": 22,
           "name": "_add_run",
           "qualname": "_add_run"
         },
         {
           "doc": null,
-          "endLine": 161,
+          "endLine": 162,
           "kind": "function",
-          "line": 25,
+          "line": 26,
           "name": "build_parser",
           "qualname": "build_parser"
         },
         {
           "doc": null,
-          "endLine": 273,
+          "endLine": 274,
           "kind": "function",
-          "line": 164,
+          "line": 165,
           "name": "main",
           "qualname": "main"
         }
@@ -14004,9 +14004,9 @@
     },
     {
       "classes": 2,
-      "functions": 10,
+      "functions": 13,
       "path": "src/dcm/runtime/run_director.py",
-      "sha256": "53cf696db346d97b2d50719f120cc5327aac135a55b6c3d057eae3257fc95895",
+      "sha256": "74d9042af75c722d0dd1b85da9b97673bc0d44d21097a9f4797256571abb62e9",
       "symbols": [
         {
           "doc": "The durable director state cannot safely advance.",
@@ -14018,7 +14018,7 @@
         },
         {
           "doc": "Persisted one-transition-at-a-time research supervisor.",
-          "endLine": 244,
+          "endLine": 339,
           "kind": "class",
           "line": 41,
           "name": "RunDirector",
@@ -14089,18 +14089,42 @@
           "qualname": "RunDirector._response_path"
         },
         {
-          "doc": null,
-          "endLine": 235,
+          "doc": "Return bounded action/entity and dependent-offer counts.",
+          "endLine": 163,
           "kind": "method",
-          "line": 145,
+          "line": 146,
+          "name": "_batch_counts",
+          "qualname": "RunDirector._batch_counts"
+        },
+        {
+          "doc": "Load the checkpoint and its active immutable envelope, if any.",
+          "endLine": 179,
+          "kind": "method",
+          "line": 165,
+          "name": "_checkpoint_batch",
+          "qualname": "RunDirector._checkpoint_batch"
+        },
+        {
+          "doc": "Move only the mutable pointer back to the checkpoint authority.",
+          "endLine": 219,
+          "kind": "method",
+          "line": 181,
+          "name": "_reconcile_pointer",
+          "qualname": "RunDirector._reconcile_pointer"
+        },
+        {
+          "doc": null,
+          "endLine": 330,
+          "kind": "method",
+          "line": 221,
           "name": "step",
           "qualname": "RunDirector.step"
         },
         {
           "doc": null,
-          "endLine": 244,
+          "endLine": 339,
           "kind": "method",
-          "line": 237,
+          "line": 332,
           "name": "run_until_awaiting",
           "qualname": "RunDirector.run_until_awaiting"
         }
@@ -16120,5 +16144,5 @@
   "parseErrors": [],
   "root": "src",
   "schema": "pillars_dcm.code_inventory.v1",
-  "symbolCount": 1746
+  "symbolCount": 1749
 }

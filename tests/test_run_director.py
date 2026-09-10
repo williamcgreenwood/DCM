@@ -4,7 +4,10 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from dcm.runtime.run_director import RunDirector
+import pytest
+
+from dcm.research.batch_store import make_batch_envelope, seal_batch
+from dcm.runtime.run_director import DirectorStateError, RunDirector
 
 
 class FakeSession:
@@ -88,3 +91,61 @@ def test_import_and_coverage_never_select_next_batch(monkeypatch, tmp_path: Path
     assert director.step()["phase"] == "SELECT_OR_RESUME_BATCH"
     assert FakeSession.imports == [False]
     assert FakeSession.next_calls == 1
+
+
+def test_committed_pointer_selects_next_packet_instead_of_replaying(monkeypatch, tmp_path: Path):
+    FakeSession.next_calls = 0
+    run = _run(tmp_path)
+    completed = make_batch_envelope(
+        run_id=run.name,
+        actions=[{"actionId": "AA_DONE"}],
+        manifest_sha="manifest",
+        har_sha256="har",
+        forecast_cutoff="2026-09-08T00:00:00Z",
+        code_sha="code",
+    )
+    completed_path = run / "research_batches" / f"{completed['batchId']}.json"
+    seal_batch(completed_path, completed)
+    (run / "research_checkpoint.json").write_text(json.dumps({
+        "schema": "pillars_dcm.research_checkpoint.v2",
+        "runId": run.name,
+        "generation": 1,
+        "parentCheckpointSha": None,
+        "activeBatchId": completed["batchId"],
+        "artifacts": {},
+        "completedActionIds": ["AA_DONE"],
+        "pendingActionIds": [],
+        "failedActionIds": [],
+        "coverageSha": None,
+        "fence": None,
+        "checkpointHash": "checkpoint-done",
+    }), encoding="utf-8")
+    (run / "active_research_batch.json").write_text(json.dumps({
+        "schema": "pillars_dcm.active_research_batch.v1",
+        "runId": run.name,
+        "batchId": completed["batchId"],
+        "batchContentSha": completed["batchContentSha"],
+        "envelopePath": str(completed_path),
+    }), encoding="utf-8")
+    monkeypatch.setattr("dcm.runtime.run_director.HostSession.open", lambda *a, **k: FakeSession(a[0]))
+
+    result = RunDirector(run).run_until_awaiting()
+
+    assert result["phase"] == "AWAITING_RESPONSE"
+    assert result["batchId"] == "BATCH_ONE"
+    assert FakeSession.next_calls == 1
+
+
+def test_dependent_offer_cap_is_recomputed_for_legacy_envelope(monkeypatch, tmp_path: Path):
+    class OverBudgetSession(FakeSession):
+        def next_research_batch(self, **kwargs):
+            return {
+                "batchId": "BATCH_OVER",
+                "batchContentSha": "sha-over",
+                "selectedCount": 1,
+                "actions": [{"dependentPropCount": 251}],
+            }
+
+    monkeypatch.setattr("dcm.runtime.run_director.HostSession.open", lambda *a, **k: OverBudgetSession(a[0]))
+    with pytest.raises(DirectorStateError, match="BATCH_CAP_EXCEEDED"):
+        RunDirector(_run(tmp_path)).run_until_awaiting()
