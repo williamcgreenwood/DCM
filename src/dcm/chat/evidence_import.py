@@ -25,6 +25,7 @@ def _observation_execute():
 from dcm.research.provider import BundleProvider, _validate_source_url
 from dcm.research.research_store import ResearchStore
 from dcm.research.scopes import canonical_scope, lookup_scopes
+from dcm.research.test_mode import cutoff_enforced
 
 
 def _load_observations(path: Path) -> list[dict[str, Any]]:
@@ -75,9 +76,16 @@ def observation_to_claim(
     *,
     cutoff: str,
     request: dict[str, Any] | None = None,
+    enforce_cutoff: bool = True,
 ) -> dict[str, Any]:
     """Legacy entry: validate + convert one observation (rejects empty fields)."""
-    return _observation_execute().observation_to_typed_claim(obs, cutoff=cutoff, request=request, action=None)
+    return _observation_execute().observation_to_typed_claim(
+        obs,
+        cutoff=cutoff,
+        request=request,
+        action=None,
+        enforce_cutoff=enforce_cutoff,
+    )
 
 
 def import_observations(
@@ -125,12 +133,20 @@ def import_observations(
     )
     if not cutoff:
         raise ValueError("FORECAST_CUTOFF_REQUIRED")
+    enforce_cutoff = cutoff_enforced(dest)
     claims: list[dict[str, Any]] = []
     errors: list[dict[str, Any]] = []
     for i, obs in enumerate(observations):
         try:
             req = _match_request(obs, requests)
-            claims.append(observation_to_claim(obs, cutoff=cutoff, request=req))
+            claims.append(
+                observation_to_claim(
+                    obs,
+                    cutoff=cutoff,
+                    request=req,
+                    enforce_cutoff=enforce_cutoff,
+                )
+            )
         except (ValueError, TypeError, KeyError) as exc:
             errors.append({"index": i, "error": str(exc)})
     claims = dedupe(claims)
