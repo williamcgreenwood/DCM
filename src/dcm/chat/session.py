@@ -310,7 +310,7 @@ class HostSession:
         write_json(self.dest / "research_validation.json", result)
         return result
 
-    def import_evidence(self, observations: Path) -> dict[str, Any]:
+    def import_evidence(self, observations: Path, *, select_next: bool = True) -> dict[str, Any]:
         response = validate_response_binding(load_response(Path(observations)), self.dest)
         with RunLock(self.dest, command="evidence-import"):
             active = read_json(self.dest / "active_research_batch.json") or {}
@@ -406,11 +406,12 @@ class HostSession:
             result["responseFailureErrors"] = response_failure_errors
         # Create/seal the next immutable envelope after the current batch is
         # checkpointed.  This is the repeatable hand-off to the next Work run.
-        next_batch = self.next_research_batch()
-        result["nextBatchId"] = next_batch.get("batchId")
+        if select_next:
+            next_batch = self.next_research_batch()
+            result["nextBatchId"] = next_batch.get("batchId")
         return result
 
-    def coverage(self, *, incremental: bool = False, verify_full: bool = False) -> dict[str, Any]:
+    def coverage(self, *, incremental: bool = False, verify_full: bool = False, select_next: bool = True) -> dict[str, Any]:
         requests = read_json(self.dest / "research_requests.json") or []
         claims = read_json(self.dest / "evidence" / "claims.json") or []
         if not claims:
@@ -426,10 +427,12 @@ class HostSession:
             coverage = incremental_coverage_report(request_rows, claim_rows, prior=prior if isinstance(prior, dict) else None, changed_claims=changed if isinstance(changed, list) else None, verify_full=verify_full)
         else:
             coverage = coverage_report(request_rows, claim_rows)
-        batch = next_research_batch(
-            self.dest,
-            store_root=self.workspace / "dcm_v6" / "research_store",
-        )
+        batch = None
+        if select_next:
+            batch = next_research_batch(
+                self.dest,
+                store_root=self.workspace / "dcm_v6" / "research_store",
+            )
         modeling_permitted = bool(coverage.get("complete")) or bool(coverage.get("completeRequests"))
         mount = mount_default(self.workspace)
         production_selection_permitted = bool(coverage.get("complete")) and mount.get("state") == "HASH_VERIFIED_EXTRACTED"
@@ -437,13 +440,14 @@ class HostSession:
             **coverage,
             "modelingPermitted": modeling_permitted,
             "productionSelectionPermitted": production_selection_permitted,
-            "nextRecommendedBatch": {
+            "semanticRule": "Coverage means required SportResearchSchema fields exist, not merely that a request returned something.",
+        }
+        if batch is not None:
+            payload["nextRecommendedBatch"] = {
                 "selectedCount": batch.get("selectedCount"),
                 "unresolvedCount": batch.get("unresolvedCount"),
                 "eventBatchCount": batch.get("eventBatchCount"),
-            },
-            "semanticRule": "Coverage means required SportResearchSchema fields exist, not merely that a request returned something.",
-        }
+            }
         write_json(self.dest / "evidence_coverage.json", payload)
         self._save_host_state(
             lastCommand="coverage",

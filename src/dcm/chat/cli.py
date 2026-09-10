@@ -60,6 +60,19 @@ def build_parser() -> argparse.ArgumentParser:
     nb.add_argument("--max-dependent-offers", type=int, default=500)
     nb.add_argument("--workspace", type=Path, default=None)
 
+    ds = sub.add_parser("director-status", help="Show the durable one-arrow research director state")
+    _add_run(ds)
+    ds.add_argument("--workspace", type=Path, default=None)
+
+    dstep = sub.add_parser("director-step", help="Advance exactly one research director transition")
+    _add_run(dstep)
+    dstep.add_argument("--workspace", type=Path, default=None)
+
+    drun = sub.add_parser("director-run", help="Advance the director until it awaits a response")
+    _add_run(drun)
+    drun.add_argument("--workspace", type=Path, default=None)
+    drun.add_argument("--until", choices=["awaiting"], default="awaiting")
+
     e = sub.add_parser("evidence-import", help="Import simple host observations (engine hashes)")
     _add_run(e)
     e.add_argument("--input", type=Path, required=True)
@@ -195,6 +208,15 @@ def main(argv: list[str] | None = None) -> int:
                 max_entities=args.max_entities,
                 max_dependent_offers=args.max_dependent_offers,
             ))
+        elif args.command in {"director-status", "director-step", "director-run"}:
+            from dcm.runtime.run_director import RunDirector
+            director = RunDirector(args.run, workspace=args.workspace)
+            if args.command == "director-status":
+                _print(director.status())
+            elif args.command == "director-step":
+                _print(director.step())
+            else:
+                _print(director.run_until_awaiting())
         elif args.command == "research-validate":
             _print(session.research_validate(args.input))
         elif args.command == "research-failure":

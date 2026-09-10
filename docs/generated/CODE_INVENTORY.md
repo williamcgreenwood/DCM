@@ -2,10 +2,10 @@
 
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
-- Modules: **241**
-- Symbols: **1734**
+- Modules: **242**
+- Symbols: **1746**
 - Parse errors: **0**
-- Inventory hash: `5d9ce399737eff6c78994266b9e195f3ea6e45d409774ee04876b4158ff21524`
+- Inventory hash: `664862f1ba3990eb80bac87268ecbae7c70861f61827ebb3461718e5192a14f3`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -205,6 +205,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P5-P14 | `src/dcm/runtime/perf.py` | 1 | 2 |
 | P5-P14 | `src/dcm/runtime/pipeline.py` | 0 | 2 |
 | P5-P14 | `src/dcm/runtime/readiness.py` | 0 | 1 |
+| P5-P14 | `src/dcm/runtime/run_director.py` | 2 | 10 |
 | P5-P14 | `src/dcm/runtime/schema_root.py` | 0 | 5 |
 | P5-P14 | `src/dcm/runtime/storage_router.py` | 3 | 12 |
 | P5-P14 | `src/dcm/runtime/store.py` | 1 | 4 |
@@ -709,7 +710,7 @@ _No class/function symbols._
 - `function` **_print** L17
 - `function` **_add_run** L21
 - `function` **build_parser** L25
-- `function` **main** L151
+- `function` **main** L164
 
 ### `src/dcm/chat/contracts.py`
 
@@ -754,17 +755,17 @@ _No class/function symbols._
 - `method` **HostSession.search_blueprint** L255 — Compile the sport-neutral public-search fan-out plan for this run.
 - `method` **HostSession.research_validate** L274
 - `method` **HostSession.import_evidence** L313
-- `method` **HostSession.coverage** L413
-- `method` **HostSession.record_research_failure** L456
-- `method` **HostSession.checkpoint_verify** L467
-- `method` **HostSession._persist_research_checkpoint** L477
-- `method` **HostSession.forecast** L503
-- `method` **HostSession.report** L537
-- `method` **HostSession.resume** L544
-- `method` **HostSession.audit** L560
-- `method` **HostSession.archive** L565
-- `method` **HostSession.settle** L570
-- `function` **cfb_launch** L577 — Guarded CFB vertical slice. Fixture/bundle can freeze; file research returns the host loop.
+- `method` **HostSession.coverage** L414
+- `method` **HostSession.record_research_failure** L460
+- `method` **HostSession.checkpoint_verify** L471
+- `method` **HostSession._persist_research_checkpoint** L481
+- `method` **HostSession.forecast** L507
+- `method` **HostSession.report** L541
+- `method` **HostSession.resume** L548
+- `method` **HostSession.audit** L564
+- `method` **HostSession.archive** L569
+- `method` **HostSession.settle** L574
+- `function` **cfb_launch** L581 — Guarded CFB vertical slice. Fixture/bundle can freeze; file research returns the host loop.
 
 ### `src/dcm/chat/state.py`
 
@@ -2392,6 +2393,21 @@ _No class/function symbols._
 ### `src/dcm/runtime/readiness.py`
 
 - `function` **build_readiness** L7
+
+### `src/dcm/runtime/run_director.py`
+
+- `class` **DirectorStateError** L37 — The durable director state cannot safely advance.
+- `class` **RunDirector** L41 — Persisted one-transition-at-a-time research supervisor.
+- `method` **RunDirector.__init__** L44
+- `method` **RunDirector.state_path** L52
+- `method` **RunDirector._load** L55
+- `method` **RunDirector._save** L70
+- `method` **RunDirector._lease_status** L79
+- `method` **RunDirector.status** L103
+- `method` **RunDirector._next_command** L118
+- `method` **RunDirector._response_path** L130
+- `method` **RunDirector.step** L145
+- `method` **RunDirector.run_until_awaiting** L237
 
 ### `src/dcm/runtime/schema_root.py`
 
