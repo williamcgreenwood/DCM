@@ -3,9 +3,9 @@
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
 - Modules: **242**
-- Symbols: **1749**
+- Symbols: **1752**
 - Parse errors: **0**
-- Inventory hash: `18be7b17c60db1e04eacac8af6a20d178f0be6a359d35b7ac49a1d51615a1cdb`
+- Inventory hash: `415fb903dc66285acc60bd7180de5c55e1f662f65216af9473158baa65733179`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -53,7 +53,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P7 | `src/dcm/chat/contracts.py` | 0 | 0 |
 | P7 | `src/dcm/chat/evidence_import.py` | 0 | 6 |
 | P7 | `src/dcm/chat/report.py` | 0 | 1 |
-| P7 | `src/dcm/chat/research_bridge.py` | 0 | 5 |
+| P7 | `src/dcm/chat/research_bridge.py` | 0 | 6 |
 | P7 | `src/dcm/chat/session.py` | 1 | 26 |
 | P7 | `src/dcm/chat/state.py` | 0 | 4 |
 | UNMAPPED | `src/dcm/compact.py` | 4 | 20 |
@@ -205,7 +205,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P5-P14 | `src/dcm/runtime/perf.py` | 1 | 2 |
 | P5-P14 | `src/dcm/runtime/pipeline.py` | 0 | 2 |
 | P5-P14 | `src/dcm/runtime/readiness.py` | 0 | 1 |
-| P5-P14 | `src/dcm/runtime/run_director.py` | 2 | 13 |
+| P5-P14 | `src/dcm/runtime/run_director.py` | 2 | 15 |
 | P5-P14 | `src/dcm/runtime/schema_root.py` | 0 | 5 |
 | P5-P14 | `src/dcm/runtime/storage_router.py` | 3 | 12 |
 | P5-P14 | `src/dcm/runtime/store.py` | 1 | 4 |
@@ -736,6 +736,7 @@ _No class/function symbols._
 - `function` **_ensure_research_prerequisites** L57 — Repair the missing bridge artifacts needed before external research.
 - `function` **_pending_active_batch** L106 — Return an uncheckpointed active batch without selecting a replacement.
 - `function` **next_research_batch** L153
+- `method` **next_research_batch.row_league** L179
 
 ### `src/dcm/chat/session.py`
 
@@ -749,23 +750,23 @@ _No class/function symbols._
 - `method` **HostSession._save_host_state** L165
 - `method` **HostSession._write_prepare_artifacts** L174
 - `method` **HostSession.next_research_batch** L209
-- `method` **HostSession.research_batch** L223 — Canonical durable batch command; next-research remains compatible.
-- `method` **HostSession.har_breakdown** L227
-- `method` **HostSession.index_build** L241
-- `method` **HostSession.search_blueprint** L255 — Compile the sport-neutral public-search fan-out plan for this run.
-- `method` **HostSession.research_validate** L274
-- `method` **HostSession.import_evidence** L313
-- `method` **HostSession.coverage** L414
-- `method` **HostSession.record_research_failure** L460
-- `method` **HostSession.checkpoint_verify** L471
-- `method` **HostSession._persist_research_checkpoint** L481
-- `method` **HostSession.forecast** L507
-- `method` **HostSession.report** L541
-- `method` **HostSession.resume** L548
-- `method` **HostSession.audit** L564
-- `method` **HostSession.archive** L569
-- `method` **HostSession.settle** L574
-- `function` **cfb_launch** L581 — Guarded CFB vertical slice. Fixture/bundle can freeze; file research returns the host loop.
+- `method` **HostSession.research_batch** L225 — Canonical durable batch command; next-research remains compatible.
+- `method` **HostSession.har_breakdown** L231
+- `method` **HostSession.index_build** L245
+- `method` **HostSession.search_blueprint** L259 — Compile the sport-neutral public-search fan-out plan for this run.
+- `method` **HostSession.research_validate** L278
+- `method` **HostSession.import_evidence** L317
+- `method` **HostSession.coverage** L418
+- `method` **HostSession.record_research_failure** L464
+- `method` **HostSession.checkpoint_verify** L475
+- `method` **HostSession._persist_research_checkpoint** L485
+- `method` **HostSession.forecast** L511
+- `method` **HostSession.report** L545
+- `method` **HostSession.resume** L552
+- `method` **HostSession.audit** L568
+- `method` **HostSession.archive** L573
+- `method` **HostSession.settle** L578
+- `function` **cfb_launch** L585 — Guarded CFB vertical slice. Fixture/bundle can freeze; file research returns the host loop.
 
 ### `src/dcm/chat/state.py`
 
@@ -2396,21 +2397,23 @@ _No class/function symbols._
 
 ### `src/dcm/runtime/run_director.py`
 
-- `class` **DirectorStateError** L37 — The durable director state cannot safely advance.
-- `class` **RunDirector** L41 — Persisted one-transition-at-a-time research supervisor.
-- `method` **RunDirector.__init__** L44
-- `method` **RunDirector.state_path** L52
-- `method` **RunDirector._load** L55
-- `method` **RunDirector._save** L70
-- `method` **RunDirector._lease_status** L79
-- `method` **RunDirector.status** L103
-- `method` **RunDirector._next_command** L118
-- `method` **RunDirector._response_path** L130
-- `method` **RunDirector._batch_counts** L146 — Return bounded action/entity and dependent-offer counts.
-- `method` **RunDirector._checkpoint_batch** L165 — Load the checkpoint and its active immutable envelope, if any.
-- `method` **RunDirector._reconcile_pointer** L181 — Move only the mutable pointer back to the checkpoint authority.
-- `method` **RunDirector.step** L221
-- `method` **RunDirector.run_until_awaiting** L332
+- `class` **DirectorStateError** L38 — The durable director state cannot safely advance.
+- `class` **RunDirector** L42 — Persisted one-transition-at-a-time research supervisor.
+- `method` **RunDirector.__init__** L45
+- `method` **RunDirector.state_path** L55
+- `method` **RunDirector._load** L58
+- `method` **RunDirector._save** L73
+- `method` **RunDirector._lease_status** L82
+- `method` **RunDirector.status** L106
+- `method` **RunDirector._next_command** L121
+- `method` **RunDirector._response_path** L133
+- `method` **RunDirector._batch_counts** L149 — Return bounded action/entity and dependent-offer counts.
+- `method` **RunDirector._batch_leagues** L168
+- `method` **RunDirector._assert_packet_scope** L179
+- `method` **RunDirector._checkpoint_batch** L184 — Load the checkpoint and its active immutable envelope, if any.
+- `method` **RunDirector._reconcile_pointer** L200 — Move only the mutable pointer back to the checkpoint authority.
+- `method` **RunDirector.step** L240
+- `method` **RunDirector.run_until_awaiting** L354
 
 ### `src/dcm/runtime/schema_root.py`
 

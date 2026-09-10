@@ -1,5 +1,5 @@
 {
-  "contentHash": "18be7b17c60db1e04eacac8af6a20d178f0be6a359d35b7ac49a1d51615a1cdb",
+  "contentHash": "415fb903dc66285acc60bd7180de5c55e1f662f65216af9473158baa65733179",
   "moduleCount": 242,
   "modules": [
     {
@@ -3099,9 +3099,9 @@
     },
     {
       "classes": 0,
-      "functions": 5,
+      "functions": 6,
       "path": "src/dcm/chat/research_bridge.py",
-      "sha256": "1afe9cecc41d077ba65f733d67c611cfdd3716a75ff92481a730482b0f36eb53",
+      "sha256": "f1d42b7fff3784cb3f037d61e68eb2ad0138ff7d839cc3db9658b0c404f83018",
       "symbols": [
         {
           "doc": null,
@@ -3137,11 +3137,19 @@
         },
         {
           "doc": null,
-          "endLine": 283,
+          "endLine": 298,
           "kind": "function",
           "line": 153,
           "name": "next_research_batch",
           "qualname": "next_research_batch"
+        },
+        {
+          "doc": null,
+          "endLine": 181,
+          "kind": "method",
+          "line": 179,
+          "name": "row_league",
+          "qualname": "next_research_batch.row_league"
         }
       ],
       "workstream": "P7"
@@ -3150,7 +3158,7 @@
       "classes": 1,
       "functions": 26,
       "path": "src/dcm/chat/session.py",
-      "sha256": "332cc15e8ee0d4e2353b3a7390d1cf4baba9d3e3156426cf9726fac99c11e82f",
+      "sha256": "0bb7d374b21128e3130c8aa0df26f4f9adf2132db7b88abf3996474c5a107302",
       "symbols": [
         {
           "doc": null,
@@ -3170,7 +3178,7 @@
         },
         {
           "doc": "One run directory, one Python probability engine.",
-          "endLine": 578,
+          "endLine": 582,
           "kind": "class",
           "line": 116,
           "name": "HostSession",
@@ -3226,7 +3234,7 @@
         },
         {
           "doc": null,
-          "endLine": 221,
+          "endLine": 223,
           "kind": "method",
           "line": 209,
           "name": "next_research_batch",
@@ -3234,137 +3242,137 @@
         },
         {
           "doc": "Canonical durable batch command; next-research remains compatible.",
-          "endLine": 225,
+          "endLine": 229,
           "kind": "method",
-          "line": 223,
+          "line": 225,
           "name": "research_batch",
           "qualname": "HostSession.research_batch"
         },
         {
           "doc": null,
-          "endLine": 239,
+          "endLine": 243,
           "kind": "method",
-          "line": 227,
+          "line": 231,
           "name": "har_breakdown",
           "qualname": "HostSession.har_breakdown"
         },
         {
           "doc": null,
-          "endLine": 253,
+          "endLine": 257,
           "kind": "method",
-          "line": 241,
+          "line": 245,
           "name": "index_build",
           "qualname": "HostSession.index_build"
         },
         {
           "doc": "Compile the sport-neutral public-search fan-out plan for this run.",
-          "endLine": 272,
+          "endLine": 276,
           "kind": "method",
-          "line": 255,
+          "line": 259,
           "name": "search_blueprint",
           "qualname": "HostSession.search_blueprint"
         },
         {
           "doc": null,
-          "endLine": 311,
+          "endLine": 315,
           "kind": "method",
-          "line": 274,
+          "line": 278,
           "name": "research_validate",
           "qualname": "HostSession.research_validate"
         },
         {
           "doc": null,
-          "endLine": 412,
+          "endLine": 416,
           "kind": "method",
-          "line": 313,
+          "line": 317,
           "name": "import_evidence",
           "qualname": "HostSession.import_evidence"
         },
         {
           "doc": null,
-          "endLine": 458,
+          "endLine": 462,
           "kind": "method",
-          "line": 414,
+          "line": 418,
           "name": "coverage",
           "qualname": "HostSession.coverage"
         },
         {
           "doc": null,
-          "endLine": 469,
+          "endLine": 473,
           "kind": "method",
-          "line": 460,
+          "line": 464,
           "name": "record_research_failure",
           "qualname": "HostSession.record_research_failure"
         },
         {
           "doc": null,
-          "endLine": 479,
+          "endLine": 483,
           "kind": "method",
-          "line": 471,
+          "line": 475,
           "name": "checkpoint_verify",
           "qualname": "HostSession.checkpoint_verify"
         },
         {
           "doc": null,
-          "endLine": 505,
+          "endLine": 509,
           "kind": "method",
-          "line": 481,
+          "line": 485,
           "name": "_persist_research_checkpoint",
           "qualname": "HostSession._persist_research_checkpoint"
         },
         {
           "doc": null,
-          "endLine": 539,
+          "endLine": 543,
           "kind": "method",
-          "line": 507,
+          "line": 511,
           "name": "forecast",
           "qualname": "HostSession.forecast"
         },
         {
           "doc": null,
-          "endLine": 546,
+          "endLine": 550,
           "kind": "method",
-          "line": 541,
+          "line": 545,
           "name": "report",
           "qualname": "HostSession.report"
         },
         {
           "doc": null,
-          "endLine": 562,
+          "endLine": 566,
           "kind": "method",
-          "line": 548,
+          "line": 552,
           "name": "resume",
           "qualname": "HostSession.resume"
         },
         {
           "doc": null,
-          "endLine": 567,
+          "endLine": 571,
           "kind": "method",
-          "line": 564,
+          "line": 568,
           "name": "audit",
           "qualname": "HostSession.audit"
         },
         {
           "doc": null,
-          "endLine": 572,
+          "endLine": 576,
           "kind": "method",
-          "line": 569,
+          "line": 573,
           "name": "archive",
           "qualname": "HostSession.archive"
         },
         {
           "doc": null,
-          "endLine": 578,
+          "endLine": 582,
           "kind": "method",
-          "line": 574,
+          "line": 578,
           "name": "settle",
           "qualname": "HostSession.settle"
         },
         {
           "doc": "Guarded CFB vertical slice. Fixture/bundle can freeze; file research returns the host loop.",
-          "endLine": 659,
+          "endLine": 663,
           "kind": "function",
-          "line": 581,
+          "line": 585,
           "name": "cfb_launch",
           "qualname": "cfb_launch"
         }
@@ -14004,127 +14012,143 @@
     },
     {
       "classes": 2,
-      "functions": 13,
+      "functions": 15,
       "path": "src/dcm/runtime/run_director.py",
-      "sha256": "74d9042af75c722d0dd1b85da9b97673bc0d44d21097a9f4797256571abb62e9",
+      "sha256": "f609f36c3d37b1c45bd1616947d0c62cce1a50a760c886a02ef398b5d7696e5c",
       "symbols": [
         {
           "doc": "The durable director state cannot safely advance.",
-          "endLine": 38,
+          "endLine": 39,
           "kind": "class",
-          "line": 37,
+          "line": 38,
           "name": "DirectorStateError",
           "qualname": "DirectorStateError"
         },
         {
           "doc": "Persisted one-transition-at-a-time research supervisor.",
-          "endLine": 339,
+          "endLine": 361,
           "kind": "class",
-          "line": 41,
+          "line": 42,
           "name": "RunDirector",
           "qualname": "RunDirector"
         },
         {
           "doc": null,
-          "endLine": 49,
+          "endLine": 52,
           "kind": "method",
-          "line": 44,
+          "line": 45,
           "name": "__init__",
           "qualname": "RunDirector.__init__"
         },
         {
           "doc": null,
-          "endLine": 53,
+          "endLine": 56,
           "kind": "method",
-          "line": 52,
+          "line": 55,
           "name": "state_path",
           "qualname": "RunDirector.state_path"
         },
         {
           "doc": null,
-          "endLine": 68,
+          "endLine": 71,
           "kind": "method",
-          "line": 55,
+          "line": 58,
           "name": "_load",
           "qualname": "RunDirector._load"
         },
         {
           "doc": null,
-          "endLine": 77,
+          "endLine": 80,
           "kind": "method",
-          "line": 70,
+          "line": 73,
           "name": "_save",
           "qualname": "RunDirector._save"
         },
         {
           "doc": null,
-          "endLine": 101,
+          "endLine": 104,
           "kind": "method",
-          "line": 79,
+          "line": 82,
           "name": "_lease_status",
           "qualname": "RunDirector._lease_status"
         },
         {
           "doc": null,
-          "endLine": 116,
+          "endLine": 119,
           "kind": "method",
-          "line": 103,
+          "line": 106,
           "name": "status",
           "qualname": "RunDirector.status"
         },
         {
           "doc": null,
-          "endLine": 128,
+          "endLine": 131,
           "kind": "method",
-          "line": 118,
+          "line": 121,
           "name": "_next_command",
           "qualname": "RunDirector._next_command"
         },
         {
           "doc": null,
-          "endLine": 143,
+          "endLine": 146,
           "kind": "method",
-          "line": 130,
+          "line": 133,
           "name": "_response_path",
           "qualname": "RunDirector._response_path"
         },
         {
           "doc": "Return bounded action/entity and dependent-offer counts.",
-          "endLine": 163,
+          "endLine": 166,
           "kind": "method",
-          "line": 146,
+          "line": 149,
           "name": "_batch_counts",
           "qualname": "RunDirector._batch_counts"
         },
         {
-          "doc": "Load the checkpoint and its active immutable envelope, if any.",
-          "endLine": 179,
+          "doc": null,
+          "endLine": 177,
           "kind": "method",
-          "line": 165,
+          "line": 168,
+          "name": "_batch_leagues",
+          "qualname": "RunDirector._batch_leagues"
+        },
+        {
+          "doc": null,
+          "endLine": 182,
+          "kind": "method",
+          "line": 179,
+          "name": "_assert_packet_scope",
+          "qualname": "RunDirector._assert_packet_scope"
+        },
+        {
+          "doc": "Load the checkpoint and its active immutable envelope, if any.",
+          "endLine": 198,
+          "kind": "method",
+          "line": 184,
           "name": "_checkpoint_batch",
           "qualname": "RunDirector._checkpoint_batch"
         },
         {
           "doc": "Move only the mutable pointer back to the checkpoint authority.",
-          "endLine": 219,
+          "endLine": 238,
           "kind": "method",
-          "line": 181,
+          "line": 200,
           "name": "_reconcile_pointer",
           "qualname": "RunDirector._reconcile_pointer"
         },
         {
           "doc": null,
-          "endLine": 330,
+          "endLine": 352,
           "kind": "method",
-          "line": 221,
+          "line": 240,
           "name": "step",
           "qualname": "RunDirector.step"
         },
         {
           "doc": null,
-          "endLine": 339,
+          "endLine": 361,
           "kind": "method",
-          "line": 332,
+          "line": 354,
           "name": "run_until_awaiting",
           "qualname": "RunDirector.run_until_awaiting"
         }
@@ -16144,5 +16168,5 @@
   "parseErrors": [],
   "root": "src",
   "schema": "pillars_dcm.code_inventory.v1",
-  "symbolCount": 1749
+  "symbolCount": 1752
 }

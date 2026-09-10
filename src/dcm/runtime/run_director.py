@@ -21,6 +21,7 @@ from dcm.research.run_lock import RunLock
 
 DIRECTOR_SCHEMA = "pillars_dcm.run_director.v1"
 STATE_FILE = "run_director.json"
+DEFAULT_ALLOWED_LEAGUES = ("CFB", "NFL")
 PHASES = (
     "READ_CHECKPOINT",
     "READ_MANIFEST",
@@ -42,11 +43,13 @@ class RunDirector:
     """Persisted one-transition-at-a-time research supervisor."""
 
     def __init__(self, run: Path, *, workspace: Path | None = None,
-                 max_entities: int = 8, max_dependent_offers: int = 250) -> None:
+                 max_entities: int = 8, max_dependent_offers: int = 250,
+                 allowed_leagues: tuple[str, ...] = DEFAULT_ALLOWED_LEAGUES) -> None:
         self.run = Path(run)
         self.workspace = Path(workspace) if workspace is not None else None
         self.max_entities = min(8, max(4, int(max_entities)))
         self.max_dependent_offers = min(250, max(1, int(max_dependent_offers)))
+        self.allowed_leagues = tuple(sorted({str(value).upper() for value in allowed_leagues if str(value).strip()}))
 
     @property
     def state_path(self) -> Path:
@@ -162,6 +165,22 @@ class RunDirector:
             )
         return selected, int(raw_dependent or 0)
 
+    def _batch_leagues(self, batch: dict[str, Any]) -> set[str]:
+        leagues: set[str] = set()
+        for action in (batch.get("actions") or []):
+            if not isinstance(action, dict):
+                continue
+            context = action.get("context") if isinstance(action.get("context"), dict) else {}
+            value = action.get("league") or context.get("league")
+            if value:
+                leagues.add(str(value).upper())
+        return leagues
+
+    def _assert_packet_scope(self, batch: dict[str, Any]) -> None:
+        leagues = self._batch_leagues(batch)
+        if leagues and not leagues.issubset(set(self.allowed_leagues)):
+            raise DirectorStateError("PACKET_OUT_OF_SCOPE")
+
     def _checkpoint_batch(self) -> tuple[dict[str, Any], dict[str, Any]]:
         """Load the checkpoint and its active immutable envelope, if any."""
         checkpoint = read_json(self.run / "research_checkpoint.json") or {}
@@ -261,6 +280,7 @@ class RunDirector:
                 batch = session.next_research_batch(
                     max_entities=self.max_entities,
                     max_dependent_offers=self.max_dependent_offers,
+                    allowed_leagues=self.allowed_leagues,
                 )
             elif pointer.get("batchId"):
                 batch_id = str(pointer["batchId"])
@@ -272,7 +292,9 @@ class RunDirector:
                 batch = session.next_research_batch(
                     max_entities=self.max_entities,
                     max_dependent_offers=self.max_dependent_offers,
+                    allowed_leagues=self.allowed_leagues,
                 )
+            self._assert_packet_scope(batch)
             selected, dependent = self._batch_counts(batch)
             if selected > self.max_entities or dependent > self.max_dependent_offers:
                 raise DirectorStateError("BATCH_CAP_EXCEEDED")
@@ -339,4 +361,4 @@ class RunDirector:
                 return status
 
 
-__all__ = ["DIRECTOR_SCHEMA", "DirectorStateError", "RunDirector"]
+__all__ = ["DEFAULT_ALLOWED_LEAGUES", "DIRECTOR_SCHEMA", "DirectorStateError", "RunDirector"]
