@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from pathlib import Path
 import subprocess
-from typing import Any, Iterable
+from typing import Any, Iterable, Mapping
 
 from dcm.algorithms.selection import AlgorithmSelectionEngine
 from dcm.chat.state import read_json, write_json
@@ -16,6 +16,7 @@ from dcm.research.provider import BundleProvider
 from dcm.research.readiness import evaluate_research_os_readiness, persist_research_os_readiness, require_research_may_begin
 from dcm.research.research_store import ResearchStore, hydrate_reused_claims
 from dcm.research.run_lock import RunLock
+from dcm.research.response import _resolve_active_envelope_path
 from dcm.research.search_blueprint import build_search_blueprint
 from dcm.contracts.hashes import content_hash
 from dcm.runtime.checkpoint import load_checkpoint
@@ -115,9 +116,7 @@ def _pending_active_batch(dest: Path) -> dict[str, Any] | None:
     if not isinstance(pointer, dict) or not pointer.get("batchId"):
         return None
     batch_id = str(pointer.get("batchId"))
-    envelope_path = Path(str(pointer.get("envelopePath") or dest / "research_batches" / f"{batch_id}.json"))
-    if not envelope_path.is_absolute():
-        envelope_path = dest / envelope_path
+    envelope_path = _resolve_active_envelope_path(dest, pointer, batch_id)
     envelope = load_batch(envelope_path)
     if str(pointer.get("batchContentSha") or "") != str(envelope.get("batchContentSha") or ""):
         raise RuntimeError("ACTIVE_BATCH_POINTER_HASH_MISMATCH")
@@ -148,6 +147,72 @@ def _pending_active_batch(dest: Path) -> dict[str, Any] | None:
         "batchContentSha": envelope.get("batchContentSha"),
         "parentCheckpointSha": envelope.get("parentCheckpointSha"),
     }
+
+
+def _researcher_view(
+    actions: list[dict[str, Any]],
+    requests: list[dict[str, Any]],
+    packets: Mapping[str, Any] | None = None,
+) -> list[dict[str, Any]]:
+    """Project canonical identity into a readable, non-authoritative handoff."""
+    by_id = {
+        str(row.get("request_id") or row.get("requestId") or ""): row
+        for row in requests
+        if isinstance(row, Mapping)
+    }
+    identities: dict[str, dict[str, Any]] = {}
+    for collection, key in (
+        ("subjects", "subjectId"),
+        ("events", "eventId"),
+        ("affiliations", "affiliationId"),
+        ("counterparties", "counterpartyId"),
+    ):
+        for packet in (packets or {}).get(collection) or []:
+            if not isinstance(packet, Mapping) or not packet.get(key):
+                continue
+            detail = packet.get("sportSpecificPayload") if isinstance(packet.get("sportSpecificPayload"), Mapping) else {}
+            identity = detail.get("identity") if isinstance(detail.get("identity"), Mapping) else {}
+            identities[str(packet[key])] = {**dict(detail), **dict(identity), **dict(packet)}
+    projection: list[dict[str, Any]] = []
+    for action in actions:
+        request_ids = sorted(str(value) for value in (action.get("requirementIds") or []) if str(value))
+        rows = [by_id[request_id] for request_id in request_ids if request_id in by_id]
+        first = rows[0] if rows else {}
+        identity = identities.get(str(action.get("scopeId") or action.get("eventId") or ""), {})
+        label = next(
+            (
+                str(value)
+                for value in (
+                    identity.get("playerName"),
+                    identity.get("subjectName"),
+                    identity.get("eventLabel"),
+                    identity.get("label"),
+                    first.get("displayLabel"),
+                    first.get("entityName"),
+                    first.get("name"),
+                    first.get("eventLabel"),
+                    first.get("label"),
+                )
+                if value
+            ),
+            str(action.get("scopeId") or action.get("eventId") or action.get("actionId") or ""),
+        )
+        permitted = action.get("permittedSources") or action.get("sourceIds") or first.get("permittedSources") or first.get("sourceIds") or []
+        projection.append(
+            {
+                "actionId": str(action.get("actionId") or ""),
+                "requestIds": request_ids,
+                "displayLabel": label,
+                "league": action.get("league") or identity.get("league") or first.get("league"),
+                "sport": identity.get("sportFamily") or first.get("sportFamily") or first.get("sport") or action.get("sport"),
+                "eventLabel": action.get("eventLabel") or identity.get("eventLabel") or first.get("eventLabel"),
+                "affiliation": action.get("affiliation") or identity.get("team") or first.get("affiliation"),
+                "opponent": action.get("opponent") or identity.get("opponent") or first.get("opponent"),
+                "requiredFields": sorted({str(row.get("need")) for row in rows if row.get("need")}),
+                "permittedSources": [str(value) for value in permitted] if isinstance(permitted, list) else [],
+            }
+        )
+    return projection
 
 
 def next_research_batch(
@@ -246,6 +311,15 @@ def next_research_batch(
         )
         write_json(dest / "search_blueprint.json", blueprint)
         batch["searchBlueprintHash"] = blueprint.get("blueprintHash")
+        batch["researcherView"] = {
+            "schema": "pillars_dcm.researcher_batch_view.v1",
+            "immutableEnvelopeUnchanged": True,
+            "actions": _researcher_view(
+                actions_for_envelope,
+                requests,
+                read_json(dest / "universal_research_packets.json"),
+            ),
+        }
         envelope = make_batch_envelope(
             run_id=dest.name,
             actions=actions_for_envelope,
