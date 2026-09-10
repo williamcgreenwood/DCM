@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import sqlite3
 from pathlib import Path
 
 import pytest
@@ -164,3 +165,24 @@ def test_out_of_scope_packet_fails_closed(monkeypatch, tmp_path: Path):
     monkeypatch.setattr("dcm.runtime.run_director.HostSession.open", lambda *a, **k: OutOfScopeSession(a[0]))
     with pytest.raises(DirectorStateError, match="PACKET_OUT_OF_SCOPE"):
         RunDirector(_run(tmp_path)).run_until_awaiting()
+
+
+def test_status_reads_runlock_command_from_metadata(tmp_path: Path):
+    run = _run(tmp_path)
+    db = sqlite3.connect(run / "run_lock.sqlite3")
+    db.execute(
+        "CREATE TABLE writer_lease (run_id TEXT PRIMARY KEY, owner_token TEXT NOT NULL, "
+        "fence INTEGER NOT NULL, lease_until REAL NOT NULL, metadata_json TEXT NOT NULL)"
+    )
+    db.execute(
+        "INSERT INTO writer_lease VALUES (?,?,?,?,?)",
+        (run.name, "__released__", 7, 0.0, json.dumps({"command": "director-step", "released": True})),
+    )
+    db.commit()
+    db.close()
+
+    status = RunDirector(run).status()
+
+    assert status["lock"]["held"] is False
+    assert status["lock"]["command"] == "director-step"
+    assert status["lock"]["released"] is True
