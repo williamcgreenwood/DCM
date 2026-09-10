@@ -171,6 +171,26 @@ def test_idempotent_reimport_does_not_duplicate_claims(tmp_path: Path):
     assert second["claimCount"] == 1
 
 
+def test_minimal_import_persists_evidence_without_frontier_rebuild(tmp_path: Path):
+    """The director's short IMPORT transition must not run derived planning."""
+    dest, rows, planned, actions = _board_context(tmp_path)
+    event_action = next(a for a in actions["actions"] if a["scope"] == "EVENT")
+    obs_path = tmp_path / "event_obs.jsonl"
+    obs_path.write_text(json.dumps(_event_observation(event_action, typed=True)) + "\n", encoding="utf-8")
+
+    result = import_observations(dest, obs_path, refresh_frontier=False)
+
+    assert result["imported"] == 1
+    assert result["frontierRefreshDeferred"] is True
+    assert result["coverageAfterCompleteRequests"] >= 1
+    assert (dest / "evidence" / "claims.json").is_file()
+    assert (dest / "evidence_coverage.json").is_file()
+    # Frontier artifacts are owned by the explicit refresh step, not IMPORT.
+    assert not (dest / "material_facts.json").exists()
+    assert not (dest / "acquisition_schedule.json").exists()
+    assert not (dest / "host_research_batch.json").exists()
+
+
 def test_observation_to_claim_rejects_empty_data():
     with pytest.raises(ValueError, match="EMPTY_FIELD_COVERAGE"):
         observation_to_claim(
