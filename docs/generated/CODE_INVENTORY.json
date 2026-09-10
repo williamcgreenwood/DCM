@@ -1,5 +1,5 @@
 {
-  "contentHash": "415fb903dc66285acc60bd7180de5c55e1f662f65216af9473158baa65733179",
+  "contentHash": "b2463af5e3b7111afe279a3b4fb54915b20d2337918bebb1329a63da9c3ca460",
   "moduleCount": 242,
   "modules": [
     {
@@ -14014,7 +14014,7 @@
       "classes": 2,
       "functions": 15,
       "path": "src/dcm/runtime/run_director.py",
-      "sha256": "f609f36c3d37b1c45bd1616947d0c62cce1a50a760c886a02ef398b5d7696e5c",
+      "sha256": "738f9966004864bab9c6bda3b0e064d49b680a1b7a3b3579096bed2b95207981",
       "symbols": [
         {
           "doc": "The durable director state cannot safely advance.",
@@ -14026,7 +14026,7 @@
         },
         {
           "doc": "Persisted one-transition-at-a-time research supervisor.",
-          "endLine": 361,
+          "endLine": 365,
           "kind": "class",
           "line": 42,
           "name": "RunDirector",
@@ -14066,7 +14066,7 @@
         },
         {
           "doc": null,
-          "endLine": 104,
+          "endLine": 108,
           "kind": "method",
           "line": 82,
           "name": "_lease_status",
@@ -14074,81 +14074,81 @@
         },
         {
           "doc": null,
-          "endLine": 119,
+          "endLine": 123,
           "kind": "method",
-          "line": 106,
+          "line": 110,
           "name": "status",
           "qualname": "RunDirector.status"
         },
         {
           "doc": null,
-          "endLine": 131,
+          "endLine": 135,
           "kind": "method",
-          "line": 121,
+          "line": 125,
           "name": "_next_command",
           "qualname": "RunDirector._next_command"
         },
         {
           "doc": null,
-          "endLine": 146,
+          "endLine": 150,
           "kind": "method",
-          "line": 133,
+          "line": 137,
           "name": "_response_path",
           "qualname": "RunDirector._response_path"
         },
         {
           "doc": "Return bounded action/entity and dependent-offer counts.",
-          "endLine": 166,
+          "endLine": 170,
           "kind": "method",
-          "line": 149,
+          "line": 153,
           "name": "_batch_counts",
           "qualname": "RunDirector._batch_counts"
         },
         {
           "doc": null,
-          "endLine": 177,
+          "endLine": 181,
           "kind": "method",
-          "line": 168,
+          "line": 172,
           "name": "_batch_leagues",
           "qualname": "RunDirector._batch_leagues"
         },
         {
           "doc": null,
-          "endLine": 182,
+          "endLine": 186,
           "kind": "method",
-          "line": 179,
+          "line": 183,
           "name": "_assert_packet_scope",
           "qualname": "RunDirector._assert_packet_scope"
         },
         {
           "doc": "Load the checkpoint and its active immutable envelope, if any.",
-          "endLine": 198,
+          "endLine": 202,
           "kind": "method",
-          "line": 184,
+          "line": 188,
           "name": "_checkpoint_batch",
           "qualname": "RunDirector._checkpoint_batch"
         },
         {
           "doc": "Move only the mutable pointer back to the checkpoint authority.",
-          "endLine": 238,
+          "endLine": 242,
           "kind": "method",
-          "line": 200,
+          "line": 204,
           "name": "_reconcile_pointer",
           "qualname": "RunDirector._reconcile_pointer"
         },
         {
           "doc": null,
-          "endLine": 352,
+          "endLine": 356,
           "kind": "method",
-          "line": 240,
+          "line": 244,
           "name": "step",
           "qualname": "RunDirector.step"
         },
         {
           "doc": null,
-          "endLine": 361,
+          "endLine": 365,
           "kind": "method",
-          "line": 354,
+          "line": 358,
           "name": "run_until_awaiting",
           "qualname": "RunDirector.run_until_awaiting"
         }
