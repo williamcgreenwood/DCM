@@ -85,7 +85,11 @@ class RunDirector:
             return {"held": False}
         try:
             db = sqlite3.connect(f"file:{path}?mode=ro", uri=True, timeout=0.2)
-            row = db.execute("SELECT fence, lease_until, command, metadata_json FROM writer_lease WHERE run_id=?", (self.run.name,)).fetchone()
+            # ``command`` is part of the JSON metadata in the durable
+            # RunLock schema; it is not a standalone column.  Keep this
+            # read-only status path compatible with existing run databases
+            # instead of turning a healthy released lease into UNREADABLE.
+            row = db.execute("SELECT fence, lease_until, metadata_json FROM writer_lease WHERE run_id=?", (self.run.name,)).fetchone()
             db.close()
         except sqlite3.Error:
             return {"held": None, "state": "UNREADABLE"}
@@ -93,13 +97,13 @@ class RunDirector:
             return {"held": False}
         metadata = {}
         try:
-            metadata = json.loads(str(row[3] or "{}"))
+            metadata = json.loads(str(row[2] or "{}"))
         except json.JSONDecodeError:
             pass
         return {
             "held": float(row[1]) > __import__("time").time(),
             "fence": int(row[0]), "leaseUntil": float(row[1]),
-            "command": str(row[2]),
+            "command": str(metadata.get("command") or "unknown"),
             "released": bool(metadata.get("released")),
         }
 
