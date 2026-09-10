@@ -356,7 +356,10 @@ class HostSession:
             if states:
                 save_action_state(self.dest / "research_action_state.json", states)
             result = import_observations(
-                self.dest, Path(observations), store_root=self.workspace / "dcm_v6" / "research_store",
+                self.dest,
+                Path(observations),
+                store_root=self.workspace / "dcm_v6" / "research_store",
+                refresh_frontier=select_next,
             )
             state_path = self.dest / "research_action_state.json"
             states = load_action_state(state_path)
