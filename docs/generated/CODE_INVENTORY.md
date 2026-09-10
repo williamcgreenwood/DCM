@@ -2,10 +2,10 @@
 
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
-- Modules: **242**
-- Symbols: **1752**
+- Modules: **243**
+- Symbols: **1757**
 - Parse errors: **0**
-- Inventory hash: `de2bda393cf82306dd52fd984a299a843a9ee462a6fde3da890c34913d84d9c0`
+- Inventory hash: `1aafbafca1a7f54f7ed2f95b1aa3bb42466652976646eaaabd4dce85d45a2a30`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -53,7 +53,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P7 | `src/dcm/chat/contracts.py` | 0 | 0 |
 | P7 | `src/dcm/chat/evidence_import.py` | 0 | 6 |
 | P7 | `src/dcm/chat/report.py` | 0 | 1 |
-| P7 | `src/dcm/chat/research_bridge.py` | 0 | 6 |
+| P7 | `src/dcm/chat/research_bridge.py` | 0 | 7 |
 | P7 | `src/dcm/chat/session.py` | 1 | 26 |
 | P7 | `src/dcm/chat/state.py` | 0 | 4 |
 | UNMAPPED | `src/dcm/compact.py` | 4 | 20 |
@@ -168,7 +168,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P1 | `src/dcm/research/readiness.py` | 0 | 4 |
 | P1 | `src/dcm/research/requests.py` | 0 | 6 |
 | P1 | `src/dcm/research/research_store.py` | 1 | 29 |
-| P1 | `src/dcm/research/response.py` | 1 | 5 |
+| P1 | `src/dcm/research/response.py` | 1 | 6 |
 | P1 | `src/dcm/research/role_epoch.py` | 1 | 27 |
 | P1 | `src/dcm/research/run_lock.py` | 3 | 13 |
 | P1 | `src/dcm/research/scopes.py` | 0 | 6 |
@@ -181,6 +181,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P1 | `src/dcm/research/statepack.py` | 4 | 26 |
 | P1 | `src/dcm/research/subject_offer_set.py` | 1 | 10 |
 | P1 | `src/dcm/research/temporal.py` | 1 | 4 |
+| P1 | `src/dcm/research/test_mode.py` | 0 | 3 |
 | P1 | `src/dcm/research/universal_packets.py` | 0 | 7 |
 | P1 | `src/dcm/research/universal_plan.py` | 0 | 1 |
 | UNMAPPED | `src/dcm/runner.py` | 0 | 11 |
@@ -719,11 +720,11 @@ _No class/function symbols._
 ### `src/dcm/chat/evidence_import.py`
 
 - `function` **_observation_execute** L22
-- `function` **_load_observations** L30
-- `function` **_match_request** L60
-- `function` **observation_to_claim** L73 — Legacy entry: validate + convert one observation (rejects empty fields).
-- `function` **import_observations** L83
-- `function` **__getattr__** L188
+- `function` **_load_observations** L31
+- `function` **_match_request** L61
+- `function` **observation_to_claim** L74 — Legacy entry: validate + convert one observation (rejects empty fields).
+- `function` **import_observations** L91
+- `function` **__getattr__** L204
 
 ### `src/dcm/chat/report.py`
 
@@ -731,42 +732,43 @@ _No class/function symbols._
 
 ### `src/dcm/chat/research_bridge.py`
 
-- `function` **_code_sha** L25
-- `function` **_har_sha** L47
-- `function` **_ensure_research_prerequisites** L57 — Repair the missing bridge artifacts needed before external research.
-- `function` **_pending_active_batch** L106 — Return an uncheckpointed active batch without selecting a replacement.
-- `function` **next_research_batch** L153
-- `method` **next_research_batch.row_league** L179
+- `function` **_code_sha** L26
+- `function` **_har_sha** L48
+- `function` **_ensure_research_prerequisites** L58 — Repair the missing bridge artifacts needed before external research.
+- `function` **_pending_active_batch** L107 — Return an uncheckpointed active batch without selecting a replacement.
+- `function` **_researcher_view** L152 — Project canonical identity into a readable, non-authoritative handoff.
+- `function` **next_research_batch** L218
+- `method` **next_research_batch.row_league** L244
 
 ### `src/dcm/chat/session.py`
 
-- `function` **_git_commit** L41
-- `function` **doctor** L55
-- `class` **HostSession** L116 — One run directory, one Python probability engine.
-- `method` **HostSession.__init__** L119
-- `method` **HostSession.open** L124
-- `method` **HostSession.prepare** L131
-- `method` **HostSession._host_state** L162
-- `method` **HostSession._save_host_state** L165
-- `method` **HostSession._write_prepare_artifacts** L174
-- `method` **HostSession.next_research_batch** L209
-- `method` **HostSession.research_batch** L225 — Canonical durable batch command; next-research remains compatible.
-- `method` **HostSession.har_breakdown** L231
-- `method` **HostSession.index_build** L245
-- `method` **HostSession.search_blueprint** L259 — Compile the sport-neutral public-search fan-out plan for this run.
-- `method` **HostSession.research_validate** L278
-- `method` **HostSession.import_evidence** L317
-- `method` **HostSession.coverage** L421
-- `method` **HostSession.record_research_failure** L467
-- `method` **HostSession.checkpoint_verify** L478
-- `method` **HostSession._persist_research_checkpoint** L488
-- `method` **HostSession.forecast** L514
-- `method` **HostSession.report** L548
-- `method` **HostSession.resume** L555
-- `method` **HostSession.audit** L571
-- `method` **HostSession.archive** L576
-- `method` **HostSession.settle** L581
-- `function` **cfb_launch** L588 — Guarded CFB vertical slice. Fixture/bundle can freeze; file research returns the host loop.
+- `function` **_git_commit** L42
+- `function` **doctor** L56
+- `class` **HostSession** L117 — One run directory, one Python probability engine.
+- `method` **HostSession.__init__** L120
+- `method` **HostSession.open** L125
+- `method` **HostSession.prepare** L132
+- `method` **HostSession._host_state** L163
+- `method` **HostSession._save_host_state** L166
+- `method` **HostSession._write_prepare_artifacts** L175
+- `method` **HostSession.next_research_batch** L210
+- `method` **HostSession.research_batch** L226 — Canonical durable batch command; next-research remains compatible.
+- `method` **HostSession.har_breakdown** L232
+- `method` **HostSession.index_build** L246
+- `method` **HostSession.search_blueprint** L260 — Compile the sport-neutral public-search fan-out plan for this run.
+- `method` **HostSession.research_validate** L279
+- `method` **HostSession.import_evidence** L327
+- `method` **HostSession.coverage** L438
+- `method` **HostSession.record_research_failure** L491
+- `method` **HostSession.checkpoint_verify** L502
+- `method` **HostSession._persist_research_checkpoint** L512
+- `method` **HostSession.forecast** L538
+- `method` **HostSession.report** L572
+- `method` **HostSession.resume** L579
+- `method` **HostSession.audit** L595
+- `method` **HostSession.archive** L600
+- `method` **HostSession.settle** L605
+- `function` **cfb_launch** L612 — Guarded CFB vertical slice. Fixture/bundle can freeze; file research returns the host loop.
 
 ### `src/dcm/chat/state.py`
 
@@ -1393,16 +1395,16 @@ _No class/function symbols._
 
 ### `src/dcm/research/action_state.py`
 
-- `function` **_parse_time** L46
-- `function` **deterministic_backoff** L57
-- `function` **transition** L62
-- `function` **initial_action_state** L72
-- `function` **load_action_state** L83
-- `function` **save_action_state** L108
-- `function` **apply_transition** L139
-- `function` **apply_failure** L151
-- `function` **_failure_applies** L219
-- `function` **eligible_action_ids** L236 — Return only actions safe to schedule at this instant.
+- `function` **_parse_time** L51
+- `function` **deterministic_backoff** L62
+- `function` **transition** L67
+- `function` **initial_action_state** L77
+- `function` **load_action_state** L88
+- `function` **save_action_state** L113
+- `function` **apply_transition** L144
+- `function` **apply_failure** L156
+- `function` **_failure_applies** L224
+- `function` **eligible_action_ids** L241 — Return only actions safe to schedule at this instant.
 
 ### `src/dcm/research/adapters/__init__.py`
 
@@ -1576,8 +1578,8 @@ _No class/function symbols._
 ### `src/dcm/research/claims.py`
 
 - `function` **claim_record** L11
-- `function` **dedupe** L83 — Remove byte-logically identical claims without mutating hashed content.
-- `function` **conflict_ledger** L93 — Record divergent values separately from immutable EvidenceClaims.
+- `function` **dedupe** L91 — Remove byte-logically identical claims without mutating hashed content.
+- `function` **conflict_ledger** L101 — Record divergent values separately from immutable EvidenceClaims.
 
 ### `src/dcm/research/classify.py`
 
@@ -1818,7 +1820,7 @@ _No class/function symbols._
 
 ### `src/dcm/research/observation_execute.py`
 
-- `function` **execute_source_aware_observations** L63 — Import source-aware host observations and optionally refresh consumers.
+- `function` **execute_source_aware_observations** L64 — Import source-aware host observations and optionally refresh consumers.
 
 ### `src/dcm/research/observation_execute_support.py`
 
@@ -1971,8 +1973,9 @@ _No class/function symbols._
 - `function` **_rows** L20
 - `function` **load_response** L29 — Parse either the Work response object or legacy JSONL observations.
 - `function` **_active_envelope** L93
-- `function` **validate_response_binding** L110 — Fail closed when an explicit response envelope targets another batch.
-- `function` **validate_failure_payload** L144
+- `function` **_resolve_active_envelope_path** L108 — Resolve portable and legacy pointers exactly once.
+- `function` **validate_response_binding** L128 — Fail closed when an explicit response envelope targets another batch.
+- `function` **validate_failure_payload** L162
 
 ### `src/dcm/research/role_epoch.py`
 
@@ -2152,6 +2155,12 @@ _No class/function symbols._
 - `function` **_parse** L17
 - `function` **assert_not_after_cutoff** L24
 - `function` **filter_claims** L29
+
+### `src/dcm/research/test_mode.py`
+
+- `function` **load_test_mode** L19 — Load and validate a run-local test policy.
+- `function` **cutoff_enforced** L55 — Return whether source observations must satisfy the frozen cutoff.
+- `function` **production_eligible** L60 — Return whether this run's research may be used for production.
 
 ### `src/dcm/research/universal_packets.py`
 
@@ -2397,23 +2406,23 @@ _No class/function symbols._
 
 ### `src/dcm/runtime/run_director.py`
 
-- `class` **DirectorStateError** L38 — The durable director state cannot safely advance.
-- `class` **RunDirector** L42 — Persisted one-transition-at-a-time research supervisor.
-- `method` **RunDirector.__init__** L45
-- `method` **RunDirector.state_path** L55
-- `method` **RunDirector._load** L58
-- `method` **RunDirector._save** L73
-- `method` **RunDirector._lease_status** L82
-- `method` **RunDirector.status** L110
-- `method` **RunDirector._next_command** L125
-- `method` **RunDirector._response_path** L137
-- `method` **RunDirector._batch_counts** L153 — Return bounded action/entity and dependent-offer counts.
-- `method` **RunDirector._batch_leagues** L172
-- `method` **RunDirector._assert_packet_scope** L183
-- `method` **RunDirector._checkpoint_batch** L188 — Load the checkpoint and its active immutable envelope, if any.
-- `method` **RunDirector._reconcile_pointer** L204 — Move only the mutable pointer back to the checkpoint authority.
-- `method` **RunDirector.step** L244
-- `method` **RunDirector.run_until_awaiting** L358
+- `class` **DirectorStateError** L39 — The durable director state cannot safely advance.
+- `class` **RunDirector** L43 — Persisted one-transition-at-a-time research supervisor.
+- `method` **RunDirector.__init__** L46
+- `method` **RunDirector.state_path** L56
+- `method` **RunDirector._load** L59
+- `method` **RunDirector._save** L74
+- `method` **RunDirector._lease_status** L83
+- `method` **RunDirector.status** L111
+- `method` **RunDirector._next_command** L126
+- `method` **RunDirector._response_path** L138
+- `method` **RunDirector._batch_counts** L154 — Return bounded action/entity and dependent-offer counts.
+- `method` **RunDirector._batch_leagues** L173
+- `method` **RunDirector._assert_packet_scope** L184
+- `method` **RunDirector._checkpoint_batch** L189 — Load the checkpoint and its active immutable envelope, if any.
+- `method` **RunDirector._reconcile_pointer** L205 — Move only the mutable pointer back to the checkpoint authority.
+- `method` **RunDirector.step** L245
+- `method` **RunDirector.run_until_awaiting** L357
 
 ### `src/dcm/runtime/schema_root.py`
 
