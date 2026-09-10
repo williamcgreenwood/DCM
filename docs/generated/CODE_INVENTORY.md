@@ -5,7 +5,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 - Modules: **243**
 - Symbols: **1757**
 - Parse errors: **0**
-- Inventory hash: `1aafbafca1a7f54f7ed2f95b1aa3bb42466652976646eaaabd4dce85d45a2a30`
+- Inventory hash: `6eb0fc37fbd86bea1be28824ceac00df4052c7587f2c3864f1ec6af9a68bbe96`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -737,8 +737,8 @@ _No class/function symbols._
 - `function` **_ensure_research_prerequisites** L58 — Repair the missing bridge artifacts needed before external research.
 - `function` **_pending_active_batch** L107 — Return an uncheckpointed active batch without selecting a replacement.
 - `function` **_researcher_view** L152 — Project canonical identity into a readable, non-authoritative handoff.
-- `function` **next_research_batch** L218
-- `method` **next_research_batch.row_league** L244
+- `function` **next_research_batch** L237
+- `method` **next_research_batch.row_league** L263
 
 ### `src/dcm/chat/session.py`
 
