@@ -1,5 +1,5 @@
 {
-  "contentHash": "b2463af5e3b7111afe279a3b4fb54915b20d2337918bebb1329a63da9c3ca460",
+  "contentHash": "de2bda393cf82306dd52fd984a299a843a9ee462a6fde3da890c34913d84d9c0",
   "moduleCount": 242,
   "modules": [
     {
@@ -3027,7 +3027,7 @@
       "classes": 0,
       "functions": 6,
       "path": "src/dcm/chat/evidence_import.py",
-      "sha256": "4bd87b5734ed380a2378b7cab1ed3ffbbeb787648b3e36ea51a9f17f1280362e",
+      "sha256": "73a0893c6fd3709c4ddaf2292c0059bd60bbe08d517d28e282cf1bfb61f9e1aa",
       "symbols": [
         {
           "doc": null,
@@ -3063,7 +3063,7 @@
         },
         {
           "doc": null,
-          "endLine": 175,
+          "endLine": 177,
           "kind": "function",
           "line": 83,
           "name": "import_observations",
@@ -3071,9 +3071,9 @@
         },
         {
           "doc": null,
-          "endLine": 189,
+          "endLine": 191,
           "kind": "function",
-          "line": 186,
+          "line": 188,
           "name": "__getattr__",
           "qualname": "__getattr__"
         }
@@ -3158,7 +3158,7 @@
       "classes": 1,
       "functions": 26,
       "path": "src/dcm/chat/session.py",
-      "sha256": "0bb7d374b21128e3130c8aa0df26f4f9adf2132db7b88abf3996474c5a107302",
+      "sha256": "195601a51ef70d40537ad58955204e391f801f83eccf3985213a7e52b921c537",
       "symbols": [
         {
           "doc": null,
@@ -3178,7 +3178,7 @@
         },
         {
           "doc": "One run directory, one Python probability engine.",
-          "endLine": 582,
+          "endLine": 585,
           "kind": "class",
           "line": 116,
           "name": "HostSession",
@@ -3282,7 +3282,7 @@
         },
         {
           "doc": null,
-          "endLine": 416,
+          "endLine": 419,
           "kind": "method",
           "line": 317,
           "name": "import_evidence",
@@ -3290,89 +3290,89 @@
         },
         {
           "doc": null,
-          "endLine": 462,
+          "endLine": 465,
           "kind": "method",
-          "line": 418,
+          "line": 421,
           "name": "coverage",
           "qualname": "HostSession.coverage"
         },
         {
           "doc": null,
-          "endLine": 473,
+          "endLine": 476,
           "kind": "method",
-          "line": 464,
+          "line": 467,
           "name": "record_research_failure",
           "qualname": "HostSession.record_research_failure"
         },
         {
           "doc": null,
-          "endLine": 483,
+          "endLine": 486,
           "kind": "method",
-          "line": 475,
+          "line": 478,
           "name": "checkpoint_verify",
           "qualname": "HostSession.checkpoint_verify"
         },
         {
           "doc": null,
-          "endLine": 509,
+          "endLine": 512,
           "kind": "method",
-          "line": 485,
+          "line": 488,
           "name": "_persist_research_checkpoint",
           "qualname": "HostSession._persist_research_checkpoint"
         },
         {
           "doc": null,
-          "endLine": 543,
+          "endLine": 546,
           "kind": "method",
-          "line": 511,
+          "line": 514,
           "name": "forecast",
           "qualname": "HostSession.forecast"
         },
         {
           "doc": null,
-          "endLine": 550,
+          "endLine": 553,
           "kind": "method",
-          "line": 545,
+          "line": 548,
           "name": "report",
           "qualname": "HostSession.report"
         },
         {
           "doc": null,
-          "endLine": 566,
+          "endLine": 569,
           "kind": "method",
-          "line": 552,
+          "line": 555,
           "name": "resume",
           "qualname": "HostSession.resume"
         },
         {
           "doc": null,
-          "endLine": 571,
+          "endLine": 574,
           "kind": "method",
-          "line": 568,
+          "line": 571,
           "name": "audit",
           "qualname": "HostSession.audit"
         },
         {
           "doc": null,
-          "endLine": 576,
+          "endLine": 579,
           "kind": "method",
-          "line": 573,
+          "line": 576,
           "name": "archive",
           "qualname": "HostSession.archive"
         },
         {
           "doc": null,
-          "endLine": 582,
+          "endLine": 585,
           "kind": "method",
-          "line": 578,
+          "line": 581,
           "name": "settle",
           "qualname": "HostSession.settle"
         },
         {
           "doc": "Guarded CFB vertical slice. Fixture/bundle can freeze; file research returns the host loop.",
-          "endLine": 663,
+          "endLine": 666,
           "kind": "function",
-          "line": 585,
+          "line": 588,
           "name": "cfb_launch",
           "qualname": "cfb_launch"
         }
@@ -10126,11 +10126,11 @@
       "classes": 0,
       "functions": 1,
       "path": "src/dcm/research/observation_execute.py",
-      "sha256": "f4721f2b9d6cfa1869a66c0dc15bc7005a9a7f5b333b6236cb6e2ada46e7b55c",
+      "sha256": "6714dc6a90748acf72db2665b4e46f03346da81b756564f4c2dc2ce70db1da0b",
       "symbols": [
         {
-          "doc": "Import source-aware host observations and close coverage\u2192consumer contracts.",
-          "endLine": 440,
+          "doc": "Import source-aware host observations and optionally refresh consumers.",
+          "endLine": 500,
           "kind": "function",
           "line": 63,
           "name": "execute_source_aware_observations",

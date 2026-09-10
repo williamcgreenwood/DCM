@@ -85,6 +85,7 @@ def import_observations(
     observations_path: Path,
     *,
     store_root: Path | None = None,
+    refresh_frontier: bool = True,
 ) -> dict[str, Any]:
     dest = Path(dest)
     # Prefer the source-aware closed loop whenever the run has acquisition actions
@@ -107,6 +108,7 @@ def import_observations(
             dest,
             Path(observations_path),
             store_root=store_root,
+            refresh_frontier=refresh_frontier,
         )
 
     requests = read_json(dest / "research_requests.json") or []

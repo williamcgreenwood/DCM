@@ -5,7 +5,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 - Modules: **242**
 - Symbols: **1752**
 - Parse errors: **0**
-- Inventory hash: `b2463af5e3b7111afe279a3b4fb54915b20d2337918bebb1329a63da9c3ca460`
+- Inventory hash: `de2bda393cf82306dd52fd984a299a843a9ee462a6fde3da890c34913d84d9c0`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -723,7 +723,7 @@ _No class/function symbols._
 - `function` **_match_request** L60
 - `function` **observation_to_claim** L73 — Legacy entry: validate + convert one observation (rejects empty fields).
 - `function` **import_observations** L83
-- `function` **__getattr__** L186
+- `function` **__getattr__** L188
 
 ### `src/dcm/chat/report.py`
 
@@ -756,17 +756,17 @@ _No class/function symbols._
 - `method` **HostSession.search_blueprint** L259 — Compile the sport-neutral public-search fan-out plan for this run.
 - `method` **HostSession.research_validate** L278
 - `method` **HostSession.import_evidence** L317
-- `method` **HostSession.coverage** L418
-- `method` **HostSession.record_research_failure** L464
-- `method` **HostSession.checkpoint_verify** L475
-- `method` **HostSession._persist_research_checkpoint** L485
-- `method` **HostSession.forecast** L511
-- `method` **HostSession.report** L545
-- `method` **HostSession.resume** L552
-- `method` **HostSession.audit** L568
-- `method` **HostSession.archive** L573
-- `method` **HostSession.settle** L578
-- `function` **cfb_launch** L585 — Guarded CFB vertical slice. Fixture/bundle can freeze; file research returns the host loop.
+- `method` **HostSession.coverage** L421
+- `method` **HostSession.record_research_failure** L467
+- `method` **HostSession.checkpoint_verify** L478
+- `method` **HostSession._persist_research_checkpoint** L488
+- `method` **HostSession.forecast** L514
+- `method` **HostSession.report** L548
+- `method` **HostSession.resume** L555
+- `method` **HostSession.audit** L571
+- `method` **HostSession.archive** L576
+- `method` **HostSession.settle** L581
+- `function` **cfb_launch** L588 — Guarded CFB vertical slice. Fixture/bundle can freeze; file research returns the host loop.
 
 ### `src/dcm/chat/state.py`
 
@@ -1818,7 +1818,7 @@ _No class/function symbols._
 
 ### `src/dcm/research/observation_execute.py`
 
-- `function` **execute_source_aware_observations** L63 — Import source-aware host observations and close coverage→consumer contracts.
+- `function` **execute_source_aware_observations** L63 — Import source-aware host observations and optionally refresh consumers.
 
 ### `src/dcm/research/observation_execute_support.py`
 
