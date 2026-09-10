@@ -39,6 +39,11 @@ TRANSITIONS: dict[str, frozenset[str]] = {
     "IMPORTING": frozenset({"PARTIAL", "SUCCEEDED", "FAILED_RETRYABLE", "FAILED_PERMANENT", "BLOCKED_SCHEMA"}),
     "PARTIAL": frozenset({"SELECTED", "RESEARCH_PENDING", "IN_FLIGHT", "SUCCEEDED", "FAILED_RETRYABLE", "FAILED_PERMANENT"}),
     "FAILED_RETRYABLE": frozenset({"SELECTED", "RESEARCH_PENDING", "IN_FLIGHT", "FAILED_PERMANENT", "CANCELLED"}),
+    # A later packet may contain useful evidence plus a non-retryable missing
+    # field.  Evidence import can therefore reopen a terminal action as
+    # PARTIAL without making the failure itself retryable.
+    "FAILED_PERMANENT": frozenset({"PARTIAL"}),
+    "BLOCKED_CUTOFF": frozenset({"PARTIAL"}),
     "DEFERRED": frozenset({"SELECTED", "RESEARCH_PENDING", "IN_FLIGHT", "CANCELLED"}),
 }
 

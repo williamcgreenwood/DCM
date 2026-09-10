@@ -17,6 +17,7 @@ from dcm.chat.state import read_json, write_json
 from dcm.contracts.hashes import content_hash
 from dcm.research.batch_store import load_batch
 from dcm.research.run_lock import RunLock
+from dcm.research.response import _resolve_active_envelope_path
 
 
 DIRECTOR_SCHEMA = "pillars_dcm.run_director.v1"
@@ -288,9 +289,7 @@ class RunDirector:
                 )
             elif pointer.get("batchId"):
                 batch_id = str(pointer["batchId"])
-                envelope = Path(str(pointer.get("envelopePath") or self.run / "research_batches" / f"{batch_id}.json"))
-                if not envelope.is_absolute():
-                    envelope = self.run / envelope
+                envelope = _resolve_active_envelope_path(self.run, pointer, batch_id)
                 batch = load_batch(envelope)
             else:
                 batch = session.next_research_batch(

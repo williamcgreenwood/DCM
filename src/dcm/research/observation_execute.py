@@ -30,6 +30,7 @@ from dcm.research.failures import load_failures
 from dcm.research.evidence_graph import build_evidence_graph
 from dcm.research.indexes import BoardIndexes, EvidenceIndexes
 from dcm.research.material_facts import facts_to_features, resolve_material_facts
+from dcm.research.test_mode import cutoff_enforced, production_eligible
 from dcm.research.observation_execute_support import (
     _affected_rows,
     _build_counterparty_index,
@@ -90,6 +91,8 @@ def execute_source_aware_observations(
     )
     if not cutoff:
         raise ValueError("FORECAST_CUTOFF_REQUIRED")
+    enforce_cutoff = cutoff_enforced(dest)
+    run_production_eligible = production_eligible(dest)
     action_doc = read_json(dest / "acquisition_actions.json") or {}
     actions = list(action_doc.get("actions") or []) if isinstance(action_doc, dict) else []
     rows = board.get("rows") if isinstance(board, dict) else []
@@ -115,7 +118,13 @@ def execute_source_aware_observations(
         try:
             req = _match_request(obs, requests)
             action = _match_action(obs, actions, request=req)
-            claim = observation_to_typed_claim(obs, cutoff=cutoff, request=req, action=action)
+            claim = observation_to_typed_claim(
+                obs,
+                cutoff=cutoff,
+                request=req,
+                action=action,
+                enforce_cutoff=enforce_cutoff,
+            )
             # Pre-check: claim must actually move semantic coverage for its request.
             probe_claims = claims_before + claims + [claim]
             target_req = req
@@ -255,6 +264,8 @@ def execute_source_aware_observations(
             "hostInventedHashes": False,
             "emptyFieldCoverageCountsAsSuccess": False,
             "frontierRefreshDeferred": True,
+            "testOnlyCutoffBypass": not enforce_cutoff,
+            "productionEligible": run_production_eligible,
         }
         write_json(dest / "source_aware_import_result.json", minimal_result)
         return minimal_result
@@ -495,6 +506,8 @@ def execute_source_aware_observations(
             ),
             "celfCount": len(celf_rows),
         },
+        "testOnlyCutoffBypass": not enforce_cutoff,
+        "productionEligible": run_production_eligible,
     }
     write_json(dest / "source_aware_import_result.json", result)
     return result

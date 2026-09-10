@@ -32,10 +32,12 @@ def claim_record(
     parser_version: str | None = None,
     action_id: str | None = None,
     source_family: str | None = None,
+    enforce_cutoff: bool = True,
 ) -> dict[str, Any]:
-    assert_not_after_cutoff(observed_at, forecast_cutoff, field="observed_at")
-    if str(published_at).strip():
-        assert_not_after_cutoff(published_at, forecast_cutoff, field="published_at")
+    if enforce_cutoff:
+        assert_not_after_cutoff(observed_at, forecast_cutoff, field="observed_at")
+        if str(published_at).strip():
+            assert_not_after_cutoff(published_at, forecast_cutoff, field="published_at")
     body = {
         "source_id": source_id,
         "url": url,
@@ -73,6 +75,12 @@ def claim_record(
         body["actionId"] = str(action_id)
     if source_family:
         body["sourceFamily"] = str(source_family)
+    if not enforce_cutoff:
+        # This marker is part of the immutable claim hash.  It makes a
+        # historical integration observation visibly non-production even if a
+        # later consumer forgets to inspect the run policy.
+        body["testOnlyCutoffBypass"] = True
+        body["productionEligible"] = False
     body["source_hash"] = content_hash(
         {"source_id": source_id, "url": url, "published_at": published_at}
     )

@@ -98,13 +98,31 @@ def _active_envelope(run_dir: Path) -> dict[str, Any] | None:
     if not isinstance(pointer, Mapping) or not pointer.get("batchId"):
         raise ResponseEnvelopeError(f"{ResponseEnvelopeError.code}:ACTIVE_POINTER")
     batch_id = str(pointer["batchId"])
-    envelope_path = Path(str(pointer.get("envelopePath") or Path(run_dir) / "research_batches" / f"{batch_id}.json"))
-    if not envelope_path.is_absolute():
-        envelope_path = Path(run_dir) / envelope_path
+    envelope_path = _resolve_active_envelope_path(Path(run_dir), pointer, batch_id)
     envelope = load_batch(envelope_path)
     if str(pointer.get("batchContentSha") or "") != str(envelope.get("batchContentSha") or ""):
         raise ResponseEnvelopeError(f"{ResponseEnvelopeError.code}:ACTIVE_POINTER_HASH")
     return envelope
+
+
+def _resolve_active_envelope_path(run_dir: Path, pointer: Mapping[str, Any], batch_id: str) -> Path:
+    """Resolve portable and legacy pointers exactly once.
+
+    New pointers are run-relative (``research_batches/<id>.json``); older
+    runs may contain an absolute path or a cwd-relative path.  A missing or
+    stale pointer falls back to the canonical content-addressed location.
+    """
+    raw = str(pointer.get("envelopePath") or "")
+    canonical = Path(run_dir) / "research_batches" / f"{batch_id}.json"
+    if not raw:
+        return canonical
+    candidate = Path(raw)
+    if candidate.is_file():
+        return candidate
+    portable = Path(run_dir) / candidate
+    if not candidate.is_absolute() and portable.is_file():
+        return portable
+    return canonical
 
 
 def validate_response_binding(response: Mapping[str, Any], run_dir: Path) -> dict[str, Any]:
@@ -165,4 +183,4 @@ def validate_failure_payload(row: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
-__all__ = ["RESPONSE_SCHEMA", "ResponseEnvelopeError", "load_response", "validate_failure_payload", "validate_response_binding"]
+__all__ = ["RESPONSE_SCHEMA", "ResponseEnvelopeError", "load_response", "validate_failure_payload", "validate_response_binding", "_resolve_active_envelope_path"]
