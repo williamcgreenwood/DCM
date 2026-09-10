@@ -283,7 +283,20 @@ def build_next_research_batch(
         if live_selected:
             selected = live_selected
             batches = live_batches
-            offer_budget = int(schedule.get("dependentOfferBudgetUsed") or offer_budget)
+            # Recompute the receipt from the actions actually present in the
+            # host worksheet.  Scheduler telemetry may include CELF
+            # candidates that were later dropped by packing; exposing that
+            # candidate total made a valid packet look over-budget.
+            selected_offer_ids: set[str] = set()
+            for packed_batch in live_batches:
+                for action_id in packed_batch.get("actionIds") or []:
+                    action = actions_by_id.get(str(action_id)) or {}
+                    if str(action.get("scope") or "") in {"SPORT", "COMPETITION"}:
+                        continue
+                    selected_offer_ids.update(
+                        str(value) for value in action.get("offerIds") or [] if str(value)
+                    )
+            offer_budget = len(selected_offer_ids)
 
     return {
         "schema": "pillars_dcm.host_research_batch.v1",

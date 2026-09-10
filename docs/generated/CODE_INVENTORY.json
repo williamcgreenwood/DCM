@@ -1,5 +1,5 @@
 {
-  "contentHash": "1aafbafca1a7f54f7ed2f95b1aa3bb42466652976646eaaabd4dce85d45a2a30",
+  "contentHash": "0789d0008174b11157d9452bed5db8dda5a63b5ff57571fa950e8ece224a6da9",
   "moduleCount": 243,
   "modules": [
     {
@@ -3101,7 +3101,7 @@
       "classes": 0,
       "functions": 7,
       "path": "src/dcm/chat/research_bridge.py",
-      "sha256": "ec035914a668f59ebdde91852784ac01bd7c2077795b8d58a57008e98fe82107",
+      "sha256": "4cf080c7a1fe7899c5fb0d79c0ef8e4cd83cb743426f5a7f6600330c3094cd3a",
       "symbols": [
         {
           "doc": null,
@@ -3137,7 +3137,7 @@
         },
         {
           "doc": "Project canonical identity into a readable, non-authoritative handoff.",
-          "endLine": 215,
+          "endLine": 234,
           "kind": "function",
           "line": 152,
           "name": "_researcher_view",
@@ -3145,17 +3145,17 @@
         },
         {
           "doc": null,
-          "endLine": 372,
+          "endLine": 391,
           "kind": "function",
-          "line": 218,
+          "line": 237,
           "name": "next_research_batch",
           "qualname": "next_research_batch"
         },
         {
           "doc": null,
-          "endLine": 246,
+          "endLine": 265,
           "kind": "method",
-          "line": 244,
+          "line": 263,
           "name": "row_league",
           "qualname": "next_research_batch.row_league"
         }
@@ -7203,7 +7203,7 @@
       "classes": 0,
       "functions": 7,
       "path": "src/dcm/research/acquisition.py",
-      "sha256": "9dee1bcaa26e06eb6aed40e8515bea8e4da10f7e3e565bbcdb3c7f84860212c6",
+      "sha256": "a4c72639d504e7a0b2cecd8a1fdb2cabc7a0e00f2da90810cc1a07719ae9248c",
       "symbols": [
         {
           "doc": "Lazy greedy set cover using a requirement\u2192action reverse index.",
@@ -7231,7 +7231,7 @@
         },
         {
           "doc": "Live CELF selector with set-cover + constrained batch packing.",
-          "endLine": 423,
+          "endLine": 429,
           "kind": "function",
           "line": 283,
           "name": "schedule_acquisition_actions",
@@ -7255,9 +7255,9 @@
         },
         {
           "doc": "Persistable AcquisitionActionGraph: one action may cover many requirements/offers.",
-          "endLine": 522,
+          "endLine": 528,
           "kind": "function",
-          "line": 426,
+          "line": 432,
           "name": "build_acquisition_action_graph",
           "qualname": "build_acquisition_action_graph"
         }
@@ -8133,7 +8133,7 @@
       "classes": 0,
       "functions": 5,
       "path": "src/dcm/research/batch.py",
-      "sha256": "1783c4b5949ac9231808444521ea01331debc866d010f048003302fa4a7b8083",
+      "sha256": "71e2e4d7c662ea80a363c94f751a613910da6c8c0d791bce442a02e218ccb816",
       "symbols": [
         {
           "doc": null,
@@ -8169,7 +8169,7 @@
         },
         {
           "doc": null,
-          "endLine": 334,
+          "endLine": 347,
           "kind": "function",
           "line": 113,
           "name": "build_next_research_batch",

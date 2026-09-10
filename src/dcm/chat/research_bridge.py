@@ -175,10 +175,21 @@ def _researcher_view(
             identities[str(packet[key])] = {**dict(detail), **dict(identity), **dict(packet)}
     projection: list[dict[str, Any]] = []
     for action in actions:
-        request_ids = sorted(str(value) for value in (action.get("requirementIds") or []) if str(value))
+        context = action.get("context") if isinstance(action.get("context"), Mapping) else {}
+        request_ids = sorted(
+            {
+                str(value)
+                for value in (action.get("requirementIds") or [])
+                if str(value)
+            }
+            | ({str(action.get("requestId"))} if action.get("requestId") else set())
+        )
         rows = [by_id[request_id] for request_id in request_ids if request_id in by_id]
         first = rows[0] if rows else {}
-        identity = identities.get(str(action.get("scopeId") or action.get("eventId") or ""), {})
+        identity = identities.get(
+            str(action.get("scopeId") or action.get("eventId") or context.get("eventId") or ""),
+            {},
+        )
         label = next(
             (
                 str(value)
@@ -192,23 +203,31 @@ def _researcher_view(
                     first.get("name"),
                     first.get("eventLabel"),
                     first.get("label"),
+                    context.get("label"),
                 )
                 if value
             ),
             str(action.get("scopeId") or action.get("eventId") or action.get("actionId") or ""),
         )
-        permitted = action.get("permittedSources") or action.get("sourceIds") or first.get("permittedSources") or first.get("sourceIds") or []
+        permitted = (
+            action.get("permittedSources")
+            or action.get("sourceIds")
+            or action.get("sourceCandidates")
+            or first.get("permittedSources")
+            or first.get("sourceIds")
+            or []
+        )
         projection.append(
             {
                 "actionId": str(action.get("actionId") or ""),
                 "requestIds": request_ids,
                 "displayLabel": label,
-                "league": action.get("league") or identity.get("league") or first.get("league"),
-                "sport": identity.get("sportFamily") or first.get("sportFamily") or first.get("sport") or action.get("sport"),
-                "eventLabel": action.get("eventLabel") or identity.get("eventLabel") or first.get("eventLabel"),
-                "affiliation": action.get("affiliation") or identity.get("team") or first.get("affiliation"),
-                "opponent": action.get("opponent") or identity.get("opponent") or first.get("opponent"),
-                "requiredFields": sorted({str(row.get("need")) for row in rows if row.get("need")}),
+                "league": action.get("league") or context.get("league") or identity.get("league") or first.get("league"),
+                "sport": identity.get("sportFamily") or context.get("sportFamily") or first.get("sportFamily") or first.get("sport") or action.get("sport"),
+                "eventLabel": action.get("eventLabel") or context.get("label") or identity.get("eventLabel") or first.get("eventLabel"),
+                "affiliation": action.get("affiliation") or context.get("affiliation") or identity.get("team") or first.get("affiliation"),
+                "opponent": action.get("opponent") or context.get("opponent") or identity.get("opponent") or first.get("opponent"),
+                "requiredFields": sorted({str(row.get("need")) for row in rows if row.get("need")} | ({str(action.get("need"))} if action.get("need") else set())),
                 "permittedSources": [str(value) for value in permitted] if isinstance(permitted, list) else [],
             }
         )
