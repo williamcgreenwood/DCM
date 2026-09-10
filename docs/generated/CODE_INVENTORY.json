@@ -1,6 +1,6 @@
 {
-  "contentHash": "5d9ce399737eff6c78994266b9e195f3ea6e45d409774ee04876b4158ff21524",
-  "moduleCount": 241,
+  "contentHash": "664862f1ba3990eb80bac87268ecbae7c70861f61827ebb3461718e5192a14f3",
+  "moduleCount": 242,
   "modules": [
     {
       "classes": 0,
@@ -2978,7 +2978,7 @@
       "classes": 0,
       "functions": 4,
       "path": "src/dcm/chat/cli.py",
-      "sha256": "d44becd4ad32dd4e5e979f331d5f61797466b3e60dff4f62cbe29a90abc07ebf",
+      "sha256": "b576d7d06e34aff93d7b02093f78a9279dd12e740cc8a1752bdeb274f446b3ca",
       "symbols": [
         {
           "doc": null,
@@ -2998,7 +2998,7 @@
         },
         {
           "doc": null,
-          "endLine": 148,
+          "endLine": 161,
           "kind": "function",
           "line": 25,
           "name": "build_parser",
@@ -3006,9 +3006,9 @@
         },
         {
           "doc": null,
-          "endLine": 251,
+          "endLine": 273,
           "kind": "function",
-          "line": 151,
+          "line": 164,
           "name": "main",
           "qualname": "main"
         }
@@ -3150,7 +3150,7 @@
       "classes": 1,
       "functions": 26,
       "path": "src/dcm/chat/session.py",
-      "sha256": "a860c3ca462c339807dbc577f4c4846606418f9641693b9bb6071f80b5be0c11",
+      "sha256": "332cc15e8ee0d4e2353b3a7390d1cf4baba9d3e3156426cf9726fac99c11e82f",
       "symbols": [
         {
           "doc": null,
@@ -3170,7 +3170,7 @@
         },
         {
           "doc": "One run directory, one Python probability engine.",
-          "endLine": 574,
+          "endLine": 578,
           "kind": "class",
           "line": 116,
           "name": "HostSession",
@@ -3274,7 +3274,7 @@
         },
         {
           "doc": null,
-          "endLine": 411,
+          "endLine": 412,
           "kind": "method",
           "line": 313,
           "name": "import_evidence",
@@ -3282,89 +3282,89 @@
         },
         {
           "doc": null,
-          "endLine": 454,
+          "endLine": 458,
           "kind": "method",
-          "line": 413,
+          "line": 414,
           "name": "coverage",
           "qualname": "HostSession.coverage"
         },
         {
           "doc": null,
-          "endLine": 465,
+          "endLine": 469,
           "kind": "method",
-          "line": 456,
+          "line": 460,
           "name": "record_research_failure",
           "qualname": "HostSession.record_research_failure"
         },
         {
           "doc": null,
-          "endLine": 475,
+          "endLine": 479,
           "kind": "method",
-          "line": 467,
+          "line": 471,
           "name": "checkpoint_verify",
           "qualname": "HostSession.checkpoint_verify"
         },
         {
           "doc": null,
-          "endLine": 501,
+          "endLine": 505,
           "kind": "method",
-          "line": 477,
+          "line": 481,
           "name": "_persist_research_checkpoint",
           "qualname": "HostSession._persist_research_checkpoint"
         },
         {
           "doc": null,
-          "endLine": 535,
+          "endLine": 539,
           "kind": "method",
-          "line": 503,
+          "line": 507,
           "name": "forecast",
           "qualname": "HostSession.forecast"
         },
         {
           "doc": null,
-          "endLine": 542,
+          "endLine": 546,
           "kind": "method",
-          "line": 537,
+          "line": 541,
           "name": "report",
           "qualname": "HostSession.report"
         },
         {
           "doc": null,
-          "endLine": 558,
+          "endLine": 562,
           "kind": "method",
-          "line": 544,
+          "line": 548,
           "name": "resume",
           "qualname": "HostSession.resume"
         },
         {
           "doc": null,
-          "endLine": 563,
+          "endLine": 567,
           "kind": "method",
-          "line": 560,
+          "line": 564,
           "name": "audit",
           "qualname": "HostSession.audit"
         },
         {
           "doc": null,
-          "endLine": 568,
+          "endLine": 572,
           "kind": "method",
-          "line": 565,
+          "line": 569,
           "name": "archive",
           "qualname": "HostSession.archive"
         },
         {
           "doc": null,
-          "endLine": 574,
+          "endLine": 578,
           "kind": "method",
-          "line": 570,
+          "line": 574,
           "name": "settle",
           "qualname": "HostSession.settle"
         },
         {
           "doc": "Guarded CFB vertical slice. Fixture/bundle can freeze; file research returns the host loop.",
-          "endLine": 655,
+          "endLine": 659,
           "kind": "function",
-          "line": 577,
+          "line": 581,
           "name": "cfb_launch",
           "qualname": "cfb_launch"
         }
@@ -14003,6 +14003,111 @@
       "workstream": "P5-P14"
     },
     {
+      "classes": 2,
+      "functions": 10,
+      "path": "src/dcm/runtime/run_director.py",
+      "sha256": "53cf696db346d97b2d50719f120cc5327aac135a55b6c3d057eae3257fc95895",
+      "symbols": [
+        {
+          "doc": "The durable director state cannot safely advance.",
+          "endLine": 38,
+          "kind": "class",
+          "line": 37,
+          "name": "DirectorStateError",
+          "qualname": "DirectorStateError"
+        },
+        {
+          "doc": "Persisted one-transition-at-a-time research supervisor.",
+          "endLine": 244,
+          "kind": "class",
+          "line": 41,
+          "name": "RunDirector",
+          "qualname": "RunDirector"
+        },
+        {
+          "doc": null,
+          "endLine": 49,
+          "kind": "method",
+          "line": 44,
+          "name": "__init__",
+          "qualname": "RunDirector.__init__"
+        },
+        {
+          "doc": null,
+          "endLine": 53,
+          "kind": "method",
+          "line": 52,
+          "name": "state_path",
+          "qualname": "RunDirector.state_path"
+        },
+        {
+          "doc": null,
+          "endLine": 68,
+          "kind": "method",
+          "line": 55,
+          "name": "_load",
+          "qualname": "RunDirector._load"
+        },
+        {
+          "doc": null,
+          "endLine": 77,
+          "kind": "method",
+          "line": 70,
+          "name": "_save",
+          "qualname": "RunDirector._save"
+        },
+        {
+          "doc": null,
+          "endLine": 101,
+          "kind": "method",
+          "line": 79,
+          "name": "_lease_status",
+          "qualname": "RunDirector._lease_status"
+        },
+        {
+          "doc": null,
+          "endLine": 116,
+          "kind": "method",
+          "line": 103,
+          "name": "status",
+          "qualname": "RunDirector.status"
+        },
+        {
+          "doc": null,
+          "endLine": 128,
+          "kind": "method",
+          "line": 118,
+          "name": "_next_command",
+          "qualname": "RunDirector._next_command"
+        },
+        {
+          "doc": null,
+          "endLine": 143,
+          "kind": "method",
+          "line": 130,
+          "name": "_response_path",
+          "qualname": "RunDirector._response_path"
+        },
+        {
+          "doc": null,
+          "endLine": 235,
+          "kind": "method",
+          "line": 145,
+          "name": "step",
+          "qualname": "RunDirector.step"
+        },
+        {
+          "doc": null,
+          "endLine": 244,
+          "kind": "method",
+          "line": 237,
+          "name": "run_until_awaiting",
+          "qualname": "RunDirector.run_until_awaiting"
+        }
+      ],
+      "workstream": "P5-P14"
+    },
+    {
       "classes": 0,
       "functions": 5,
       "path": "src/dcm/runtime/schema_root.py",
@@ -16015,5 +16120,5 @@
   "parseErrors": [],
   "root": "src",
   "schema": "pillars_dcm.code_inventory.v1",
-  "symbolCount": 1734
+  "symbolCount": 1746
 }
