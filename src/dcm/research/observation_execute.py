@@ -65,12 +65,15 @@ def execute_source_aware_observations(
     observations_path: Path,
     *,
     store_root: Path | None = None,
+    refresh_frontier: bool = True,
 ) -> dict[str, Any]:
-    """Import source-aware host observations and close coverage→consumer contracts.
+    """Import source-aware host observations and optionally refresh consumers.
 
     Empty field coverage is rejected (does not count as success). Valid claims
-    recompute requirement coverage and ParameterSnapshot descendants for the
-    AcquisitionAction fanout.
+    always update the durable evidence bundle and requirement coverage. The
+    expensive descendant/material-fact/action rebuild is performed only when
+    ``refresh_frontier`` is true; RunDirector uses false for its short atomic
+    import and runs frontier refresh as a separate transition.
     """
     dest = Path(dest)
     requests = read_json(dest / "research_requests.json") or []
@@ -198,6 +201,63 @@ def execute_source_aware_observations(
                 as_of=cutoff,
             )
         )
+
+    if not refresh_frontier:
+        # The director's IMPORT transition must commit evidence and coverage
+        # without making a valid packet wait on the optional derived rebuild.
+        # Fanouts and action-state transitions are consumed by HostSession;
+        # preserve the same receipt keys as the full path for idempotent
+        # callers and audit tooling.
+        try:
+            indexes.close()
+        except Exception:
+            pass
+        closed_unique = list(dict.fromkeys(closed_request_ids))
+        minimal_result = {
+            "schema": "pillars_dcm.source_aware_import_result.v1",
+            "imported": len(claims),
+            "rejected": len(errors),
+            "errors": errors,
+            "bundlePath": str(bundle_path),
+            "claimCount": len(all_claims),
+            "coverageComplete": bool(coverage.get("complete")),
+            "coverageBeforeCompleteRequests": int(coverage_before.get("completeRequests") or 0),
+            "coverageAfterCompleteRequests": int(coverage.get("completeRequests") or 0),
+            "incompleteRequests": coverage.get("incompleteRequests"),
+            "closedRequestIds": closed_unique,
+            "contractsClosed": len(closed_unique),
+            "fanouts": fanouts,
+            "maxFanout": max((int(f.get("dependentOfferCount") or 0) for f in fanouts), default=0),
+            "oneSourceMultipleOffers": max((int(f.get("dependentOfferCount") or 0) for f in fanouts), default=0) > 1,
+            "parameterConsumerChanged": False,
+            "changedOfferCount": 0,
+            "ablation": {"parameterConsumerChanged": False, "changedOfferCount": 0, "changedOfferIds": []},
+            "consumer": {"materialOrFeatureChanged": False, "proven": []},
+            "materialOrFeatureConsumerChanged": False,
+            "probabilityOrGradeConsumerChanged": False,
+            "invalidatedDescendants": [],
+            "invalidationScopedToTouchedOffers": False,
+            "touchedOfferIds": [],
+            "sport": sport,
+            "conflicts": conflict_ledger(all_claims),
+            "store": store.telemetry(),
+            "stored": stored,
+            "changedClaimRefs": [
+                {
+                    "semantic_scope": str(row.get("semantic_scope") or ""),
+                    "scope_id": str(row.get("scope_id") or ""),
+                    "claim_hash": str(row.get("claim_hash") or ""),
+                }
+                for row in claims
+                if isinstance(row, dict)
+            ],
+            "indexTelemetry": None,
+            "hostInventedHashes": False,
+            "emptyFieldCoverageCountsAsSuccess": False,
+            "frontierRefreshDeferred": True,
+        }
+        write_json(dest / "source_aware_import_result.json", minimal_result)
+        return minimal_result
 
     # Changed-descendant recompute: only offers touched by imported actions.
     touched_rows: list[dict[str, Any]] = []
