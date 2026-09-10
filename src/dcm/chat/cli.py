@@ -61,6 +61,23 @@ def build_parser() -> argparse.ArgumentParser:
     nb.add_argument("--max-dependent-offers", type=int, default=500)
     nb.add_argument("--workspace", type=Path, default=None)
 
+    ff = sub.add_parser("research-funnel", help="Gate the price board and emit a deterministic research shortlist")
+    _add_run(ff)
+    ff.add_argument("--input", type=Path, default=None, help="Sanitized board JSON; defaults to <run>/board.json")
+    ff.add_argument("--must-include", type=Path, default=None, help="Optional JSON projection IDs from an external screen")
+    ff.add_argument("--max-shortlist", type=int, default=24)
+    ff.add_argument("--max-players-per-game", type=int, default=2)
+    ff.add_argument("--min-games", type=int, default=8)
+    ff.add_argument("--min-leagues", type=int, default=3)
+    ff.add_argument("--min-two-way", type=int, default=12)
+    ff.add_argument("--max-over-only", type=int, default=8)
+    ff.add_argument("--max-nfl", type=int, default=14)
+    ff.add_argument("--sf-lar-target", type=int, default=2)
+    ff.add_argument("--allow-missing-awt", action="store_true", help="Exploratory only; do not infer a side")
+    ff.add_argument("--allow-unknown-status", action="store_true", help="Exploratory only; accept rows without pre_game status")
+    ff.add_argument("--allow-nonstandard-modifier", action="store_true", help="Exploratory only; standard is the production default")
+    ff.add_argument("--workspace", type=Path, default=None)
+
     ds = sub.add_parser("director-status", help="Show the durable one-arrow research director state")
     _add_run(ds)
     ds.add_argument("--workspace", type=Path, default=None)
@@ -196,6 +213,26 @@ def main(argv: list[str] | None = None) -> int:
                 research=args.research,
                 bundle_path=args.bundle,
                 workspace=args.workspace,
+            ))
+            return 0
+        if args.command == "research-funnel":
+            from dcm.research.funnel import write_funnel_artifacts
+
+            _print(write_funnel_artifacts(
+                args.run,
+                input_path=args.input,
+                must_include_path=args.must_include,
+                max_shortlist=max(1, int(args.max_shortlist)),
+                max_players_per_game=max(1, int(args.max_players_per_game)),
+                min_games=max(0, int(args.min_games)),
+                min_leagues=max(0, int(args.min_leagues)),
+                min_two_way=max(0, int(args.min_two_way)),
+                max_over_only=max(0, int(args.max_over_only)),
+                max_nfl=max(0, int(args.max_nfl)),
+                sf_lar_target=max(0, int(args.sf_lar_target)),
+                require_allowed_wager_types=not bool(args.allow_missing_awt),
+                require_pregame_status=not bool(args.allow_unknown_status),
+                require_standard_modifier=not bool(args.allow_nonstandard_modifier),
             ))
             return 0
         session = HostSession.open(args.run, workspace=getattr(args, "workspace", None))
