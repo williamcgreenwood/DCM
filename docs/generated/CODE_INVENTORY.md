@@ -2,10 +2,10 @@
 
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
-- Modules: **243**
-- Symbols: **1757**
+- Modules: **244**
+- Symbols: **1794**
 - Parse errors: **0**
-- Inventory hash: `0789d0008174b11157d9452bed5db8dda5a63b5ff57571fa950e8ece224a6da9`
+- Inventory hash: `750ed170cf3e7014e29b3f6a1fe00a68845930e63f451e9bf8dd1925dccd4620`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -147,6 +147,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P1 | `src/dcm/research/evidence_graph.py` | 0 | 16 |
 | P1 | `src/dcm/research/failures.py` | 0 | 8 |
 | P1 | `src/dcm/research/freshness.py` | 1 | 12 |
+| P1 | `src/dcm/research/funnel.py` | 0 | 37 |
 | P1 | `src/dcm/research/gamelog.py` | 0 | 9 |
 | P1 | `src/dcm/research/gridiron_gamelog.py` | 0 | 9 |
 | P1 | `src/dcm/research/har_breakdown.py` | 1 | 9 |
@@ -711,7 +712,7 @@ _No class/function symbols._
 - `function` **_print** L18
 - `function` **_add_run** L22
 - `function` **build_parser** L26
-- `function` **main** L165
+- `function` **main** L182
 
 ### `src/dcm/chat/contracts.py`
 
@@ -1381,7 +1382,7 @@ _No class/function symbols._
 
 ### `src/dcm/research/__init__.py`
 
-- `function` **__getattr__** L41
+- `function` **__getattr__** L45
 
 ### `src/dcm/research/acquisition.py`
 
@@ -1701,6 +1702,46 @@ _No class/function symbols._
 - `function` **derive_freshness_inputs** L224
 - `function` **evaluate_freshness** L268
 - `function` **apply_adaptive_freshness** L348 — Refine a classify_delta result using derived timestamps. Never invent times.
+
+### `src/dcm/research/funnel.py`
+
+- `function` **_text** L72
+- `function` **_upper** L76
+- `function` **_nonempty** L80
+- `function` **_iso_timestamp** L90
+- `function` **_allowed_wager_value** L103
+- `function` **_side_flags** L109 — Return (higher, lower, metadata_present) without guessing sides.
+- `function` **_legal_side_class** L143
+- `function` **_market_text** L156
+- `function` **_market_is_combo** L160
+- `function` **_market_excluded** L172
+- `function` **_event_key** L179
+- `function` **_player_key** L183
+- `function` **_stat_key** L187
+- `function` **_line_value** L191
+- `function` **_projection_key** L200
+- `function` **_basic_gate_reasons** L204
+- `function` **_same_line_groups** L256
+- `function` **_merge_same_line** L268
+- `function` **_primary_hint** L288
+- `function` **_choose_primary** L292
+- `function` **_player_game_stat_key** L324
+- `function` **build_legal_universe** L328 — Apply structural gates and collapse alt lines to one primary row.
+- `function` **_is_sf_lar** L434
+- `function` **_game_id** L442
+- `function` **_stat_family** L446
+- `function` **_structural_key** L459
+- `function` **_row_summary** L476
+- `function` **_quota_state** L504
+- `function` **_quota_requirements** L524
+- `function` **quota_shortlist** L541 — Greedy, deterministic quota sampler with a visible leftover list.
+- `method` **quota_shortlist.can_add** L567
+- `method` **quota_shortlist.add** L586
+- `method` **quota_shortlist.add_from** L607
+- `function` **build_board_funnel** L712
+- `function` **write_funnel_artifacts** L780 — Run the funnel against a sanitized ``board.json`` and persist receipts.
+- `function` **_parser** L848
+- `function` **main** L863
 
 ### `src/dcm/research/gamelog.py`
 

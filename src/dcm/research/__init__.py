@@ -33,6 +33,10 @@ _EXPORTS = {
     "TemporalLeakError": ("dcm.research.temporal", "TemporalLeakError"),
     "assert_not_after_cutoff": ("dcm.research.temporal", "assert_not_after_cutoff"),
     "filter_claims": ("dcm.research.temporal", "filter_claims"),
+    "build_board_funnel": ("dcm.research.funnel", "build_board_funnel"),
+    "build_legal_universe": ("dcm.research.funnel", "build_legal_universe"),
+    "quota_shortlist": ("dcm.research.funnel", "quota_shortlist"),
+    "write_funnel_artifacts": ("dcm.research.funnel", "write_funnel_artifacts"),
 }
 
 __all__ = sorted(_EXPORTS)

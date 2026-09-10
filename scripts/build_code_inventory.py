@@ -161,7 +161,11 @@ def render_md(inv: dict[str, Any]) -> str:
 
 def serialize() -> tuple[str, str]:
     inv = build()
-    return json.dumps(inv, indent=2, sort_keys=True) + "\n", render_md(inv)
+    # Keep the machine-readable inventory compact.  It is consumed as a
+    # generated consistency artifact (the Markdown rendering remains the
+    # human-readable view), and compact UTF-8 avoids transport truncation in
+    # repository APIs while preserving deterministic key ordering.
+    return json.dumps(inv, sort_keys=True, separators=(",", ":")) + "\n", render_md(inv)
 
 
 def main() -> int:
