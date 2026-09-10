@@ -5,7 +5,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 - Modules: **243**
 - Symbols: **1757**
 - Parse errors: **0**
-- Inventory hash: `6eb0fc37fbd86bea1be28824ceac00df4052c7587f2c3864f1ec6af9a68bbe96`
+- Inventory hash: `0789d0008174b11157d9452bed5db8dda5a63b5ff57571fa950e8ece224a6da9`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -1391,7 +1391,7 @@ _No class/function symbols._
 - `function` **schedule_acquisition_actions** L283 — Live CELF selector with set-cover + constrained batch packing.
 - `method` **schedule_acquisition_actions.gain_fn** L330
 - `method` **schedule_acquisition_actions.cost_fn** L340
-- `function` **build_acquisition_action_graph** L426 — Persistable AcquisitionActionGraph: one action may cover many requirements/offers.
+- `function` **build_acquisition_action_graph** L432 — Persistable AcquisitionActionGraph: one action may cover many requirements/offers.
 
 ### `src/dcm/research/action_state.py`
 
