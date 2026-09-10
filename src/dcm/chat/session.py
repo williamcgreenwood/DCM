@@ -206,12 +206,14 @@ class HostSession:
             )
         )
 
-    def next_research_batch(self, *, max_entities: int = 25, max_dependent_offers: int = 500) -> dict[str, Any]:
+    def next_research_batch(self, *, max_entities: int = 25, max_dependent_offers: int = 500,
+                            allowed_leagues: tuple[str, ...] | None = None) -> dict[str, Any]:
         batch = next_research_batch(
             self.dest,
             max_entities=max_entities,
             max_dependent_offers=max_dependent_offers,
             store_root=self.workspace / "dcm_v6" / "research_store",
+            allowed_leagues=allowed_leagues,
         )
         state = self._host_state()
         self._save_host_state(
@@ -220,9 +222,11 @@ class HostSession:
         )
         return batch
 
-    def research_batch(self, *, max_entities: int = 25, max_dependent_offers: int = 500) -> dict[str, Any]:
+    def research_batch(self, *, max_entities: int = 25, max_dependent_offers: int = 500,
+                       allowed_leagues: tuple[str, ...] | None = None) -> dict[str, Any]:
         """Canonical durable batch command; next-research remains compatible."""
-        return self.next_research_batch(max_entities=max_entities, max_dependent_offers=max_dependent_offers)
+        return self.next_research_batch(max_entities=max_entities, max_dependent_offers=max_dependent_offers,
+                                        allowed_leagues=allowed_leagues)
 
     def har_breakdown(self, har: Path, *, prior: Path | None = None) -> dict[str, Any]:
         with RunLock(self.dest, command="har-breakdown"):

@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from pathlib import Path
 import subprocess
-from typing import Any
+from typing import Any, Iterable
 
 from dcm.algorithms.selection import AlgorithmSelectionEngine
 from dcm.chat.state import read_json, write_json
@@ -156,6 +156,7 @@ def next_research_batch(
     max_entities: int = 25,
     max_dependent_offers: int = 500,
     store_root: Path | None = None,
+    allowed_leagues: Iterable[str] | None = None,
 ) -> dict[str, Any]:
     dest = Path(dest)
     # Selection, state mutation, and envelope creation are one writer-owned
@@ -173,8 +174,20 @@ def next_research_batch(
         rows = board.get("rows") if isinstance(board, dict) else []
         requests = requests if isinstance(requests, list) else []
         rows = rows if isinstance(rows, list) else []
+        leagues = {str(value).upper() for value in (allowed_leagues or ()) if str(value).strip()}
+        if leagues:
+            def row_league(row: dict[str, Any]) -> str:
+                context = row.get("context") if isinstance(row.get("context"), dict) else {}
+                return str(row.get("league") or context.get("league") or "").upper()
+
+            # A missing league is not silently assigned to the cut.  The
+            # caller can widen the explicit allow-list for a later sport.
+            requests = [row for row in requests if row_league(row) in leagues]
+            rows = [row for row in rows if row_league(row) in leagues]
         action_doc = read_json(dest / "acquisition_actions.json") or {}
         action_rows = [row for row in (action_doc.get("actions") if isinstance(action_doc, dict) else []) if isinstance(row, dict)]
+        if leagues:
+            action_rows = [row for row in action_rows if str(row.get("league") or "").upper() in leagues]
         state_path = dest / "research_action_state.json"
         states = load_action_state(state_path)
         failures = load_failures(dest / "research_failures.jsonl")
@@ -208,6 +221,8 @@ def next_research_batch(
         acquired = int(batch.get("unresolvedCount") or 0)
         batch["storeTelemetry"] = store.telemetry(reused=reused, acquired=acquired)
         batch["hydratedClaimCount"] = len(reused_claims)
+        if leagues:
+            batch["allowedLeagues"] = sorted(leagues)
         selection = AlgorithmSelectionEngine().select(
             "RESEARCH_SCHEDULE", {"consumer": "dcm.chat.research_bridge.next_research_batch"},
         )

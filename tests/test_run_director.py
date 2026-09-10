@@ -149,3 +149,18 @@ def test_dependent_offer_cap_is_recomputed_for_legacy_envelope(monkeypatch, tmp_
     monkeypatch.setattr("dcm.runtime.run_director.HostSession.open", lambda *a, **k: OverBudgetSession(a[0]))
     with pytest.raises(DirectorStateError, match="BATCH_CAP_EXCEEDED"):
         RunDirector(_run(tmp_path)).run_until_awaiting()
+
+
+def test_out_of_scope_packet_fails_closed(monkeypatch, tmp_path: Path):
+    class OutOfScopeSession(FakeSession):
+        def next_research_batch(self, **kwargs):
+            return {
+                "batchId": "BATCH_MLB",
+                "batchContentSha": "sha-mlb",
+                "selectedCount": 1,
+                "actions": [{"context": {"league": "MLB"}}],
+            }
+
+    monkeypatch.setattr("dcm.runtime.run_director.HostSession.open", lambda *a, **k: OutOfScopeSession(a[0]))
+    with pytest.raises(DirectorStateError, match="PACKET_OUT_OF_SCOPE"):
+        RunDirector(_run(tmp_path)).run_until_awaiting()
