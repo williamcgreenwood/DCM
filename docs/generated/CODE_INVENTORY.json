@@ -1,5 +1,5 @@
 {
-  "contentHash": "1aafbafca1a7f54f7ed2f95b1aa3bb42466652976646eaaabd4dce85d45a2a30",
+  "contentHash": "6eb0fc37fbd86bea1be28824ceac00df4052c7587f2c3864f1ec6af9a68bbe96",
   "moduleCount": 243,
   "modules": [
     {
@@ -3101,7 +3101,7 @@
       "classes": 0,
       "functions": 7,
       "path": "src/dcm/chat/research_bridge.py",
-      "sha256": "ec035914a668f59ebdde91852784ac01bd7c2077795b8d58a57008e98fe82107",
+      "sha256": "4cf080c7a1fe7899c5fb0d79c0ef8e4cd83cb743426f5a7f6600330c3094cd3a",
       "symbols": [
         {
           "doc": null,
@@ -3137,7 +3137,7 @@
         },
         {
           "doc": "Project canonical identity into a readable, non-authoritative handoff.",
-          "endLine": 215,
+          "endLine": 234,
           "kind": "function",
           "line": 152,
           "name": "_researcher_view",
@@ -3145,17 +3145,17 @@
         },
         {
           "doc": null,
-          "endLine": 372,
+          "endLine": 391,
           "kind": "function",
-          "line": 218,
+          "line": 237,
           "name": "next_research_batch",
           "qualname": "next_research_batch"
         },
         {
           "doc": null,
-          "endLine": 246,
+          "endLine": 265,
           "kind": "method",
-          "line": 244,
+          "line": 263,
           "name": "row_league",
           "qualname": "next_research_batch.row_league"
         }
