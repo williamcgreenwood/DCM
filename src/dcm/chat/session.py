@@ -29,6 +29,7 @@ from dcm.research.search_blueprint import build_search_blueprint
 from dcm.research.search_engine import SearchEngine
 from dcm.research.run_lock import RunLock
 from dcm.research.observation_typed import _load_observations, _match_action, _match_request, observation_to_typed_claim
+from dcm.research.test_mode import cutoff_enforced, production_eligible
 from dcm.research.response import load_response, validate_failure_payload, validate_response_binding
 from dcm.contracts.hashes import content_hash
 from dcm.research.source_catalog import catalog_summary, load_source_catalog
@@ -287,13 +288,20 @@ class HostSession:
         cutoff = str(state.get("forecastCutoff") or freeze.get("forecastCutoff") or board.get("forecastCutoff") or "")
         if not cutoff:
             raise ValueError("FORECAST_CUTOFF_REQUIRED")
+        enforce_cutoff = cutoff_enforced(self.dest)
         valid: list[dict[str, Any]] = []
         rejected: list[dict[str, Any]] = []
         for index, obs in enumerate(response.get("observations") or []):
             try:
                 req = _match_request(obs, requests if isinstance(requests, list) else [])
                 action = _match_action(obs, actions, request=req)
-                claim = observation_to_typed_claim(obs, cutoff=cutoff, request=req, action=action)
+                claim = observation_to_typed_claim(
+                    obs,
+                    cutoff=cutoff,
+                    request=req,
+                    action=action,
+                    enforce_cutoff=enforce_cutoff,
+                )
                 valid.append({"index": index, "actionId": claim.get("action_id"), "scope": claim.get("semantic_scope"), "scopeId": claim.get("scope_id"), "claimHash": claim.get("claim_hash"), "sourceHash": claim.get("source_hash"), "fieldNames": sorted((claim.get("claim_value") or {}).keys()) if isinstance(claim.get("claim_value"), dict) else []})
             except (ValueError, TypeError, KeyError) as exc:
                 rejected.append({"index": index, "code": "SCHEMA_INVALID", "error": str(exc)[:240]})
@@ -309,6 +317,8 @@ class HostSession:
             "responseHash": response.get("responseHash"),
             "bindingStatus": response.get("bindingStatus"),
             "failureCount": int(response.get("failureCount") or 0),
+            "testOnlyCutoffBypass": not enforce_cutoff,
+            "productionEligible": production_eligible(self.dest),
         }
         result["contentHash"] = content_hash(result)
         write_json(self.dest / "research_validation.json", result)
@@ -321,11 +331,13 @@ class HostSession:
             bound_batch_id = str(response.get("batchId") or active.get("batchId") or "UNBOUND")
             response_failure_errors: list[dict[str, Any]] = []
             response_failures = response.get("failures") or []
+            response_failure_action_ids: set[str] = set()
             states = load_action_state(self.dest / "research_action_state.json")
             failure_path = self.dest / "research_failures.jsonl"
             for index, raw_failure in enumerate(response_failures):
                 try:
                     failure = validate_failure_payload(raw_failure)
+                    response_failure_action_ids.add(str(failure["actionId"]))
                     failure_key = failure.get("failureKey") or content_hash({
                         "responseHash": response.get("responseHash"),
                         "index": index,
@@ -384,7 +396,10 @@ class HostSession:
                     current = "IMPORTING"
                 req_ids = [str(x) for x in (action_by_id.get(aid) or {}).get("requirementIds") or []]
                 complete = bool(req_ids) and all(bool((coverage_by_id.get(rid) or {}).get("complete")) for rid in req_ids)
-                target = "SUCCEEDED" if complete else "PARTIAL"
+                # A mixed packet is useful but incomplete: preserve the typed
+                # failure and keep the action PARTIAL even when the generic
+                # event coverage rules are satisfied by the observation.
+                target = "PARTIAL" if aid in response_failure_action_ids or not complete else "SUCCEEDED"
                 if current != target:
                     apply_transition(states, aid, target)
             if states:
@@ -411,6 +426,8 @@ class HostSession:
             result["bindingStatus"] = response.get("bindingStatus")
             result["responseFailureCount"] = len(response_failures)
             result["responseFailureErrors"] = response_failure_errors
+            result["testOnlyCutoffBypass"] = not cutoff_enforced(self.dest)
+            result["productionEligible"] = production_eligible(self.dest)
         # Create/seal the next immutable envelope after the current batch is
         # checkpointed.  This is the repeatable hand-off to the next Work run.
         if select_next:
@@ -442,11 +459,18 @@ class HostSession:
             )
         modeling_permitted = bool(coverage.get("complete")) or bool(coverage.get("completeRequests"))
         mount = mount_default(self.workspace)
-        production_selection_permitted = bool(coverage.get("complete")) and mount.get("state") == "HASH_VERIFIED_EXTRACTED"
+        run_production_eligible = production_eligible(self.dest)
+        production_selection_permitted = (
+            bool(coverage.get("complete"))
+            and mount.get("state") == "HASH_VERIFIED_EXTRACTED"
+            and run_production_eligible
+        )
         payload = {
             **coverage,
             "modelingPermitted": modeling_permitted,
             "productionSelectionPermitted": production_selection_permitted,
+            "productionEligible": run_production_eligible,
+            "testOnlyCutoffBypass": not run_production_eligible,
             "semanticRule": "Coverage means required SportResearchSchema fields exist, not merely that a request returned something.",
         }
         if batch is not None:
