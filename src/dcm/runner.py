@@ -107,6 +107,12 @@ from dcm.selection.card_layers import (
     write_card_layer_files,
 )
 from dcm.selection.portfolio import build_card, exposure_report
+from dcm.selection.preselection import (
+    OUTLIER_MINIMUM_MARGIN_SIGMA,
+    OUTLIER_PRESELECTION_POLICY_VERSION,
+    assess_preselection,
+    research_flags_from_snapshot,
+)
 from dcm.version import (
     ExactVersionMismatch,
     LEARNING_REVISION,
@@ -1187,6 +1193,32 @@ def run_dcm(
         forced = row.get("side") if row.get("side") in evaluations else None
         chosen_side = forced or max(evaluations, key=lambda x: (evaluations[x]["evidenceSafeP"], evaluations[x]["lowerBound"]))
         ev = evaluations[chosen_side]
+        preselection = None
+        if str(row.get("sourceFormat") or "").upper() == "OUTLIER":
+            # Outlier is a preferred input format, but a close line is not
+            # allowed to become a selection merely because its board score is
+            # high. Run the cheap line-distance check first and require only
+            # the focused research fields for that candidate.
+            try:
+                minimum_margin = float(row.get("preselectionMinimumMarginSigma", OUTLIER_MINIMUM_MARGIN_SIGMA))
+            except (TypeError, ValueError):
+                minimum_margin = OUTLIER_MINIMUM_MARGIN_SIGMA
+            preselection = assess_preselection(
+                offered_line=row.get("line"),
+                projected_mean=dist.get("mean"),
+                projected_stddev=sd,
+                minimum_margin_sigma=minimum_margin,
+                research=research_flags_from_snapshot(snapshot, row),
+                modifier=row.get("modifier"),
+                target_book_offer_present=bool(row.get("targetBookOfferPresent", True)),
+                explicit_side=chosen_side,
+            )
+            if not preselection.may_select:
+                production_selectable = False
+                rec["blocker"] = rec.get("blocker") or f"OUTLIER_{preselection.state}"
+                rec["outlierPreselectionHold"] = True
+                rec["preselectionMissingResearch"] = list(preselection.missing_research)
+                rec["preselectionPolicyVersion"] = OUTLIER_PRESELECTION_POLICY_VERSION
         decision_audit = inverse_consistency_audit(row, evaluations, chosen_side)
         probability_diagnostic = probability_sanity_diagnostic(
             p_higher=dist.get("pHigher"), p_lower=dist.get("pLower"), p_push=dist.get("pPush"),
@@ -1255,6 +1287,16 @@ def run_dcm(
             "_selectionOutcomes": selection_outcomes,
             "_worldValues": list(values),
         })
+        if preselection is not None:
+            rec["preselection"] = preselection.as_dict()
+            rec["preselectionPolicy"] = {
+                "version": OUTLIER_PRESELECTION_POLICY_VERSION,
+                "minimumMarginSigma": minimum_margin,
+                "researchFields": sorted(preselection.missing_research or ("player_role", "availability", "recent_usage", "matchup", "current_line")),
+                "sourceFormat": "OUTLIER",
+            }
+            if not preselection.may_select:
+                rec["modeledPlayable"] = False
         rec = apply_hold_playable(rec, hold_ids)
         gate = status_start_hard_blocker(
             rec, cutoff=forecast_cutoff, snapshot=snapshot,
@@ -1574,6 +1616,8 @@ def run_dcm(
             "productionSelectable": p.get("productionSelectable", False),
             "modeledPlayable": p.get("modeledPlayable", False),
             "calibrationState": p.get("calibrationState"), "selectionScore": p.get("selectionScore"),
+            "preselection": p.get("preselection"), "preselectionPolicy": p.get("preselectionPolicy"),
+            "outlierPreselectionHold": p.get("outlierPreselectionHold", False),
             "parameterSnapshotHash": p.get("parameterSnapshotHash"),
             "topKInclusionP": p.get("topKInclusionP"), "rankStability": p.get("rankStability"),
             "posteriorRegret": p.get("posteriorRegret"),
