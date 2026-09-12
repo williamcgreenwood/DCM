@@ -3,6 +3,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from dcm.exclusions import permanent_subject_exclusion
+
 
 def build_readiness(
     *,
@@ -20,7 +22,7 @@ def build_readiness(
     offered_unknown = sum(
         not bool(row.get("offeredHigher")) and not bool(row.get("offeredLower"))
         for row in rows
-        if row.get("modifier") != "GOBLIN"
+        if row.get("modifier") != "GOBLIN" and permanent_subject_exclusion(row) is None
     )
     gates = [
         {

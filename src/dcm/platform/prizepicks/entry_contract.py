@@ -10,7 +10,7 @@ from dcm.contracts.schemas import (
     PickModifier,
     PickSide,
 )
-from dcm.selection.eligibility import reject_goblin_selection
+from dcm.selection.eligibility import reject_goblin_selection, reject_permanent_subject
 
 
 class EntryContractError(RuntimeError):
@@ -40,9 +40,14 @@ def build_entry_contract(
     if not displayed_minimum_guarantee_table_hash:
         raise EntryContractError(FailureCode.ENTRY_CONTRACT_INCOMPLETE, "MG table hash missing")
     for pick in picks:
+        # Permanent subject exclusions apply even to analytics-only Goblin
+        # construction; only the Goblin modifier itself may be opt-in there.
+        reject_permanent_subject(pick)
         if not pick.offered_side_verified:
             raise EntryContractError(FailureCode.OFFERED_SIDE_UNKNOWN, pick.projection_id)
         if pick.modifier == PickModifier.GOBLIN and not allow_goblin_for_analytics:
+            reject_goblin_selection(pick)
+        elif pick.modifier != PickModifier.GOBLIN:
             reject_goblin_selection(pick)
     display_payload = {
         "stake": stake,

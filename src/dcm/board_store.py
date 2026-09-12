@@ -19,6 +19,7 @@ from dcm.algorithms.telemetry import AlgorithmTelemetry
 from dcm.cfb.markets import ACTIVE_CFB_MARKETS
 from dcm.compact import CompactNumericBoard, DTYPE_ID
 from dcm.contracts.hashes import content_hash
+from dcm.exclusions import permanent_subject_exclusion
 
 SCHEMA_VERSION = "dcm.board_store.v1-20260906"
 SUPPORTED_CFB_MARKETS = ACTIVE_CFB_MARKETS
@@ -100,7 +101,12 @@ class BoardStore:
             digest = content_hash({"offer": oid, "line": row.get("line"), "market": market})
             self.content[digest] = oid
             self.eligibility.add(i)
-            if league == "CFB" and market in SUPPORTED_CFB_MARKETS and row.get("modifier") != "GOBLIN":
+            if (
+                league == "CFB"
+                and market in SUPPORTED_CFB_MARKETS
+                and row.get("modifier") != "GOBLIN"
+                and permanent_subject_exclusion(row) is None
+            ):
                 self.cfb_supported.add(i)
             self.bloom.add(oid)
             self.sqlite.execute(

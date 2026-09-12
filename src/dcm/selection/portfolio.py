@@ -5,6 +5,7 @@ from collections import Counter
 from math import sqrt
 from typing import Any
 
+from dcm.exclusions import permanent_subject_exclusion
 from dcm.selection.card_layers import is_modeled_playable
 
 COMPONENTS = {
@@ -96,7 +97,7 @@ def build_card(
         if len(card) >= max_size:
             break
         row = p["row"]
-        if row.get("modifier") == "GOBLIN" or p.get("grade") != "PLAYABLE":
+        if row.get("modifier") == "GOBLIN" or permanent_subject_exclusion(row) or p.get("grade") != "PLAYABLE":
             continue
         # Status/start hard gates: PLAYER_STATUS_UNCERTAIN / OUT / started event
         # cannot land on strict_card even if the caller skipped the qualified filter.

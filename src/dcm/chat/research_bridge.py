@@ -250,7 +250,43 @@ def next_research_batch(
         pending = _pending_active_batch(dest)
         if pending is not None:
             return pending
-        _ensure_research_prerequisites(dest)
+        readiness = _ensure_research_prerequisites(dest)
+        # A structurally valid capture may contain only auxiliary insights,
+        # schedule, or entity responses.  It has no legal board offers and
+        # therefore no research actions.  Treat that state as a deterministic
+        # terminal no-op instead of asking the external-research gate to
+        # authorize an empty acquisition batch (or throwing a misleading
+        # BOARD_GRAPH_INVALID error).  This never sets researchMayBegin=true.
+        requests_probe = read_json(dest / "research_requests.json") or []
+        action_probe = read_json(dest / "acquisition_actions.json") or {}
+        action_count = int(action_probe.get("actionCount") or 0) if isinstance(action_probe, dict) else 0
+        board_probe = read_json(dest / "board.json") or {}
+        rows_probe = board_probe.get("rows") if isinstance(board_probe, dict) else []
+        if not requests_probe and action_count == 0 and not rows_probe:
+            payload = {
+                "schema": "pillars_dcm.research_batch.v1",
+                "status": "NO_RESEARCH_CANDIDATES",
+                "reason": "NO_MARKET_ROWS",
+                "researchMayBegin": False,
+                "selectedActionIds": [],
+                "actions": [],
+                "readinessHash": readiness.get("contentHash"),
+                "contentHash": content_hash({
+                    "schema": "pillars_dcm.research_batch.v1",
+                    "status": "NO_RESEARCH_CANDIDATES",
+                    "reason": "NO_MARKET_ROWS",
+                    "researchMayBegin": False,
+                    "selectedActionIds": [],
+                    "actions": [],
+                    "readinessHash": readiness.get("contentHash"),
+                }),
+            }
+            write_json(dest / "host_research_batch.json", payload)
+            self_state = read_json(dest / "host_state.json") or {}
+            if isinstance(self_state, dict):
+                self_state.update({"lastCommand": "next-research", "lastResearchBatchStatus": payload["status"]})
+                write_json(dest / "host_state.json", self_state)
+            return payload
         require_research_may_begin(dest)
         requests = read_json(dest / "research_requests.json") or []
         coverage = read_json(dest / "evidence_coverage.json") or read_json(dest / "evidence" / "coverage.json") or {}

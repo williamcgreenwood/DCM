@@ -26,6 +26,7 @@ from typing import Any, Iterable, Mapping, Sequence
 
 from dcm.chat.state import read_json, write_json
 from dcm.contracts.hashes import content_hash
+from dcm.exclusions import permanent_subject_exclusion
 
 
 FUNNEL_SCHEMA = "pillars_dcm.research_funnel.v1"
@@ -227,6 +228,8 @@ def _basic_gate_reasons(
         reasons.append("MODIFIER_UNKNOWN")
     elif require_standard_modifier and modifier != "STANDARD":
         reasons.append("MODIFIER_MISSING")
+    if (excluded := permanent_subject_exclusion(row)):
+        reasons.append(excluded)
     board = _upper(row.get("boardId") or row.get("board_id"))
     if board not in FULL_GAME_BOARDS:
         reasons.append("DURATION_BOARD")

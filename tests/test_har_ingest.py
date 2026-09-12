@@ -119,6 +119,16 @@ def test_unknown_shape_fail_closed():
     assert "UNKNOWN_HAR_SHAPE" in ing["warnings"]
 
 
+def test_insights_capture_is_explicit_evidence_not_a_market_board():
+    ing = ingest_har({"insights": [{"opaque": "value"}], "nextPageToken": "opaque"})
+    assert ing["adapter"] == "INSIGHTS_EVIDENCE"
+    assert ing["rows"] == []
+    assert "NO_MARKET_ROWS_INSIGHTS_EVIDENCE" in ing["warnings"]
+    assert ing["evidencePayloads"][0]["kind"] == "INSIGHTS"
+    assert ing["evidencePayloads"][0]["itemCount"] == 1
+    assert "opaque" not in json.dumps(ing["evidencePayloads"])
+
+
 def test_mount_refuses_wrong_hash(tmp_path: Path):
     src = tmp_path / "Pillars_DCM_v5.4.1_COMPLETE_PROJECT_SOURCE.txt"
     src.write_text("not-the-canonical-bytes\n", encoding="utf-8")

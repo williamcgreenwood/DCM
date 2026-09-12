@@ -11,6 +11,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from dcm.exclusions import permanent_subject_exclusion
+
 # Explicit machine-state flag. Do not auto-promote; production-certified card
 # remains [] until this is accepted by a future root-of-trust migration.
 V6_ROOT_OF_TRUST_MIGRATION_ACCEPTED = False
@@ -36,6 +38,8 @@ MODELED_CARD_EXCLUDED_BLOCKERS = frozenset({
     "LIVE_OR_IN_PROGRESS_NOT_PRODUCTION",
     "UNKNOWN_STATUS_FAIL_CLOSED",
     "GOBLIN_SELECTION_FORBIDDEN",
+    "PLAYER_BRENNAN_PARACHEK_PERMANENTLY_EXCLUDED",
+    "PLAYER_CJ_CARR_PERMANENTLY_EXCLUDED",
     "UNSUPPORTED_FAIL_CLOSED",
     "OFFERED_SIDE_UNKNOWN",
     "PRIMITIVE_CONSERVATION_FAILURE",
@@ -153,6 +157,8 @@ def status_start_hard_blocker(
     row = p.get("row") if isinstance(p.get("row"), dict) else p
     row = row if isinstance(row, dict) else {}
     snap = _snapshot_of(p, snapshot)
+    if (excluded := permanent_subject_exclusion(row)):
+        return excluded
     blocker = p.get("blocker") or snap.get("blocker")
     if blocker in MODELED_CARD_EXCLUDED_BLOCKERS:
         return str(blocker)
@@ -184,6 +190,8 @@ def is_modeled_playable(
     4. QUESTIONABLE/DOUBTFUL — hard exclude from PLAYABLE (availability mixture is P2)
     """
     row = p.get("row") if isinstance(p.get("row"), dict) else p
+    if permanent_subject_exclusion(row if isinstance(row, dict) else {}):
+        return False
     if (row or {}).get("modifier") == "GOBLIN":
         return False
     if p.get("grade") != "PLAYABLE":
@@ -313,7 +321,7 @@ def build_directional_passes(
             continue
         if p.get("grade") == "PLAYABLE":
             continue
-        if (row or {}).get("modifier") == "GOBLIN":
+        if (row or {}).get("modifier") == "GOBLIN" or permanent_subject_exclusion(row or {}):
             continue
         out.append(compact_directional_row(p))
         if len(out) >= limit:

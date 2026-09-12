@@ -67,6 +67,8 @@ PACK_FILES = (
     "hashes",
     "accounting.json",
     "input_manifest.json",
+    "har_breakdown_manifest.json",
+    "captured_evidence_manifest.json",
     "frozen_forecast.json",
     "freeze.json",
     "frozen_forecast.sha256",

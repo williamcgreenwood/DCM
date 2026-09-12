@@ -148,7 +148,7 @@ def _index_har(
     obj: dict,
     *,
     source_hash: str,
-) -> tuple[list[dict], list[dict], dict[str, int], list[str]]:
+) -> tuple[list[dict], list[dict], dict[str, int], list[str], list[dict[str, Any]]]:
     log = obj.get("log") if isinstance(obj.get("log"), dict) else {}
     entries = log.get("entries") if isinstance(log.get("entries"), list) else []
     warnings: list[str] = []
@@ -164,10 +164,13 @@ def _index_har(
         "schema_failures": 0,
         "verified_empty_responses": 0,
         "successful_nonempty_responses": 0,
+        "decoded_evidence_bodies": 0,
+        "insights_payloads": 0,
     }
     seen_body: set[tuple[str, str]] = set()
     indexed: list[dict] = []
     attempts: list[dict] = []
+    evidence_payloads: list[dict[str, Any]] = []
 
     for ordinal, ent in enumerate(entries):
         if not isinstance(ent, dict):
@@ -193,7 +196,42 @@ def _index_har(
                 )
             )
             continue
-        if not url_allowlisted(url) or not _market_endpoint(url):
+        if not url_allowlisted(url):
+            continue
+
+        # Insights are a separate evidence surface, not a market board. Read
+        # only structural metadata here; never persist the response body or
+        # claim values without a typed evidence adapter.
+        if not _market_endpoint(url):
+            status = int(res.get("status") or 0)
+            if status < 200 or status >= 300:
+                continue
+            content = res.get("content") if isinstance(res.get("content"), dict) else {}
+            body = _decode_content(content)
+            if body is None:
+                continue
+            try:
+                payload = json.loads(body)
+            except json.JSONDecodeError:
+                continue
+            if isinstance(payload, dict) and isinstance(payload.get("insights"), list):
+                body_hash = sha256_text(body)
+                evidence_payloads.append(
+                    {
+                        "kind": "INSIGHTS",
+                        "requestScope": scope,
+                        "scopePath": path,
+                        "startedDateTime": started,
+                        "status": status,
+                        "responseHash": body_hash,
+                        "itemCount": len(payload["insights"]),
+                        "itemType": "list",
+                        "topLevelKeys": sorted(str(k) for k in payload.keys()),
+                        "nextPageTokenPresent": bool(payload.get("nextPageToken")),
+                    }
+                )
+                stats["decoded_evidence_bodies"] += 1
+                stats["insights_payloads"] += 1
             continue
 
         stats["allowlisted_endpoints"] += 1
@@ -245,9 +283,9 @@ def _index_har(
             e["bodyHash"], e["entryOrdinal"],
         )
     )
-    if not indexed and entries and not attempts:
+    if not indexed and entries and not attempts and not evidence_payloads:
         warnings.append("NO_ALLOWLISTED_MARKET_ENDPOINT")
-    return indexed, attempts, stats, warnings
+    return indexed, attempts, stats, warnings, evidence_payloads
 
 
 def _parse_payload(obj: Any) -> tuple[str, list[dict]] | None:
@@ -293,6 +331,7 @@ def ingest_har(raw: Any, *, raw_bytes: bytes | None = None) -> dict[str, Any]:
         "decoded_bodies": 0, "duplicate_bodies": 0, "secret_headers": 0,
         "http_failures": 0, "decode_failures": 0, "schema_failures": 0,
         "verified_empty_responses": 0, "successful_nonempty_responses": 0,
+        "decoded_evidence_bodies": 0, "insights_payloads": 0,
     }
     capture_start = capture_end = ""
     parser = PARSER_VERSION
@@ -300,9 +339,10 @@ def ingest_har(raw: Any, *, raw_bytes: bytes | None = None) -> dict[str, Any]:
     histories: dict[str, list[dict]] = {}
     timeline: list[dict] = []
     scope_attempts: list[dict[str, Any]] = []
+    evidence_payloads: list[dict[str, Any]] = []
 
     if isinstance(obj, dict) and isinstance(obj.get("log"), dict):
-        indexed, initial_attempts, index_stats, w = _index_har(obj, source_hash=har_sha256)
+        indexed, initial_attempts, index_stats, w, evidence_payloads = _index_har(obj, source_hash=har_sha256)
         warnings.extend(w)
         scope_attempts.extend(initial_attempts)
         all_times = [
@@ -417,6 +457,22 @@ def ingest_har(raw: Any, *, raw_bytes: bytes | None = None) -> dict[str, Any]:
                     response_hash=har_sha256, rows=tagged,
                 )
             )
+        elif isinstance(obj, dict) and isinstance(obj.get("insights"), list):
+            adapter = "INSIGHTS_EVIDENCE"
+            evidence_payloads.append(
+                {
+                    "kind": "INSIGHTS",
+                    "requestScope": "DIRECT",
+                    "scopePath": "DIRECT",
+                    "startedDateTime": "",
+                    "status": 200,
+                    "responseHash": har_sha256,
+                    "itemCount": len(obj["insights"]),
+                    "itemType": "list",
+                    "topLevelKeys": sorted(str(k) for k in obj.keys()),
+                    "nextPageTokenPresent": bool(obj.get("nextPageToken")),
+                }
+            )
 
     reconciled = reconcile_scope_attempts(scope_attempts)
     rows = reconciled["rows"]
@@ -436,7 +492,10 @@ def ingest_har(raw: Any, *, raw_bytes: bytes | None = None) -> dict[str, Any]:
     index_stats["selected_request_scopes"] = len(reconciled["scopeState"])
     index_stats["failed_refreshes_retained"] = len(reconciled["failedRefreshes"])
 
-    if not rows and not any(a["state"] == "SUCCESS_EMPTY_VERIFIED" for a in scope_attempts):
+    if not rows and evidence_payloads:
+        adapter = "INSIGHTS_EVIDENCE"
+        warnings.append("NO_MARKET_ROWS_INSIGHTS_EVIDENCE")
+    elif not rows and not any(a["state"] == "SUCCESS_EMPTY_VERIFIED" for a in scope_attempts):
         warnings.append("UNKNOWN_HAR_SHAPE")
     missing_sides = sum(not r.get("offeredHigher") and not r.get("offeredLower") for r in rows)
     if missing_sides:
@@ -457,6 +516,7 @@ def ingest_har(raw: Any, *, raw_bytes: bytes | None = None) -> dict[str, Any]:
         "rows": rows,
         "rowHistory": histories,
         "scopeAttempts": scope_attempts,
+        "evidencePayloads": evidence_payloads,
         "scopeState": reconciled["scopeState"],
         "failedRefreshes": reconciled["failedRefreshes"],
         "reconciliationHash": reconciled["reconciliationHash"],

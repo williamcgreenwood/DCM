@@ -128,8 +128,9 @@ def _status(outcome: Mapping[str, Any]) -> str:
     if raw:
         return "unknown"
     # Outlier's active flag describes an offer that is still on the board; it
-    # does not prove a player is available or that the event has started.
-    return "pre_game" if outcome.get("active") is True else "unknown"
+    # does not prove a player is available or that the event has started.  Do
+    # not promote an offer-state boolean into a game-state assertion.
+    return "unknown"
 
 
 def _resolve_side(outcome: Mapping[str, Any], offer: Mapping[str, Any] | None) -> tuple[str, bool, str]:
@@ -233,7 +234,8 @@ def _row(item: dict[str, Any], idx: int, *, target_book: str) -> dict[str, Any] 
         "outlierOrfScore": item.get("orfScore"), "outlierHitRates": item.get("stats") if isinstance(item.get("stats"), dict) else {},
         "sourceUpdatedAt": str(item.get("updatedAt") or outcome.get("updatedAt") or ""),
         "eventStartTime": str(outcome.get("eventStartTime") or outcome.get("startTime") or ""),
-        "status": status, "isLive": status in {"in_progress", "suspended"},
+        "status": status, "offerActive": outcome.get("active") is True,
+        "isLive": status in {"in_progress", "suspended"},
         "identityResolved": bool(player_id), "captureOrdinal": idx,
     }
 

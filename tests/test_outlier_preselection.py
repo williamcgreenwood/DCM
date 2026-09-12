@@ -2,6 +2,7 @@ from dcm.ingest.outlier import parse_outlier_payload
 from dcm.cfb.reports import cfb_top100_row
 from dcm.learning.outlier_patterns import summarize_leg_segments, validate_observation
 from dcm.research.funnel import build_legal_universe
+from dcm.exclusions import permanent_subject_exclusion
 from dcm.selection.preselection import assess_preselection, research_flags_from_snapshot
 
 
@@ -12,7 +13,10 @@ def test_outlier_requires_explicit_target_book_modifier_and_side():
     assert parsed[1][0]["side"] == "LESS"
     assert parsed[1][0]["modifier"] == "STANDARD"
     assert parsed[1][0]["allowedWagerTypes"] == ["LESS"]
-    assert parsed[1][0]["status"] == "pre_game"
+    # ``active`` means the offer is still listed, not that the event is
+    # confirmed pre-game.  The adapter must fail closed on missing game state.
+    assert parsed[1][0]["status"] == "unknown"
+    assert parsed[1][0]["offerActive"] is True
 
 
 def test_outlier_never_invents_lower_when_only_higher_is_captured():
@@ -53,6 +57,37 @@ def test_preselection_routes_close_line_to_targeted_research_and_goblin_is_termi
     assert close.state == "RESEARCH_REQUIRED_LINE_PROXIMITY" and close.may_select is False
     goblin = assess_preselection(offered_line=50, projected_mean=70, projected_stddev=10, minimum_margin_sigma=.25, research={}, explicit_side="MORE", modifier="GOBLIN")
     assert goblin.state == "EXCLUDED_GOBLIN"
+
+
+def test_permanent_subject_exclusions_are_exact_and_terminal():
+    parachek = {"playerId": "280607d805dbc22af844820dec5f5aa0091431dd", "playerName": "Brennan Parachek"}
+    carr = {"playerName": "C.J. Carr"}
+    assert permanent_subject_exclusion(parachek) == "PLAYER_BRENNAN_PARACHEK_PERMANENTLY_EXCLUDED"
+    assert permanent_subject_exclusion(carr) == "PLAYER_CJ_CARR_PERMANENTLY_EXCLUDED"
+    assert permanent_subject_exclusion({"playerName": "Shane Carr"}) is None
+    decision = assess_preselection(
+        offered_line=1.5,
+        projected_mean=4,
+        projected_stddev=1,
+        minimum_margin_sigma=.25,
+        research={},
+        explicit_side="MORE",
+        subject=parachek,
+    )
+    assert decision.state == "EXCLUDED_SUBJECT"
+
+
+def test_permanent_subject_exclusion_is_a_funnel_gate():
+    row = {
+        "projectionId": "excluded",
+        "league": "CFB", "eventId": "e", "playerId": "cecb9ae4f4ec5111f807d65da0fcdb529ae00d24",
+        "playerName": "C.J. Carr", "market": "pass_yds", "line": 250.5,
+        "modifier": "STANDARD", "targetBook": "PRIZEPICKS", "targetBookOfferPresent": True,
+        "status": "pre_game", "boardId": "FULL_GAME", "allowedWagerTypes": ["MORE"], "offeredHigher": True,
+    }
+    gate = build_legal_universe([row])
+    assert gate["legalRows"] == []
+    assert gate["gateExclusions"][0]["reason"] == "PLAYER_CJ_CARR_PERMANENTLY_EXCLUDED"
 
 
 def test_preselection_needs_player_and_matchup_research_after_robust_margin():
@@ -162,3 +197,9 @@ def test_pattern_analysis_excludes_slips_from_independent_leg_rate():
     assert len(summary) == 1 and summary[0].n == 2
     valid, missing = validate_observation({"observationId": "x", "decisionCutoff": "c", "projectionId": "p", "line": 1.5, "side": "MORE", "modifier": "GOBLIN", "targetBook": "PRIZEPICKS", "selected": False, "selectionState": "EXCLUDED_GOBLIN"})
     assert valid is False and "GOBLIN_SELECTION_FORBIDDEN" in missing
+    valid, missing = validate_observation({
+        "observationId": "x", "decisionCutoff": "c", "projectionId": "p", "line": 1.5,
+        "side": "MORE", "modifier": "STANDARD", "targetBook": "PRIZEPICKS", "selected": False,
+        "selectionState": "EXCLUDED_SUBJECT", "playerName": "Brennan Parachek",
+    })
+    assert valid is False and "PLAYER_BRENNAN_PARACHEK_PERMANENTLY_EXCLUDED" in missing

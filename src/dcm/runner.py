@@ -29,6 +29,7 @@ from dcm.cfb.rules import build_cfb_rules_snapshot
 from dcm.platform.prizepicks.platform_rules_authority import resolve_platform_rules_authority
 from dcm.research.material_facts import apply_hold_playable, facts_to_features, hold_playable_scope_ids, resolve_material_facts
 from dcm.contracts.hashes import content_hash
+from dcm.exclusions import permanent_subject_exclusion
 from dcm.identity.resolve import build_player_index, freeze_map, resolve_row
 from dcm.ingest.board import freeze_board, write_board
 from dcm.ingest.composite import compose_ingests
@@ -72,6 +73,7 @@ from dcm.research.provider import BundleProvider, FileProvider, FixtureProvider,
 from dcm.research.claims import dedupe
 from dcm.research.requests import plan_research
 from dcm.research.offer_metadata import recover_offer_metadata
+from dcm.research.har_breakdown import build_har_breakdown, safe_parse_har
 from dcm.runtime.checkpoint import load_checkpoint, write_checkpoint
 from dcm.runtime.capabilities import build_capability_manifest, persist_capability_manifest
 from dcm.runtime.cutoff import CutoffRequired, POLICY_DOC, resolve_forecast_cutoff
@@ -432,6 +434,54 @@ def run_dcm(
             + "\n",
             encoding="utf-8",
         )
+        # Persist a privacy-safe structural receipt for every supplied HAR.
+        # This is deliberately separate from board extraction: /insights,
+        # schedule, and entity payloads can inform topology/drift and indexing,
+        # but cannot be promoted to betting offers without trusted props[].
+        if not synthetic:
+            breakdown_dir = dest / "har_breakdowns"
+            breakdown_dir.mkdir(parents=True, exist_ok=True)
+            breakdown_receipts: list[dict[str, Any]] = []
+            breakdown_errors: list[dict[str, str]] = []
+            for source in sources:
+                try:
+                    parsed_info = safe_parse_har(source)
+                    source_sha = str(parsed_info["harSha256"])
+                    result = build_har_breakdown(
+                        source,
+                        run_id=run_id,
+                        board=board,
+                        requests=[],
+                        output_path=breakdown_dir / f"{source_sha}.json",
+                    )
+                    breakdown_receipts.append(dict(result["receipt"]))
+                except Exception as exc:  # record a typed local failure; never emit raw input
+                    breakdown_errors.append({"sourceName": source.name, "errorType": type(exc).__name__})
+            manifest = {
+                "schema": "pillars_dcm.har_breakdown_manifest.v1",
+                "runId": run_id,
+                "sourceMode": "CAPTURED_HAR" if len(sources) == 1 else "MULTI_HAR_COMPOSITE",
+                "sourceCount": len(sources),
+                "receipts": sorted(breakdown_receipts, key=lambda row: str(row.get("harSha256") or "")),
+                "errors": sorted(breakdown_errors, key=lambda row: str(row.get("sourceName") or "")),
+                "privacy": {"rawHarPersisted": False, "rawBodiesPersisted": False, "rawHeadersPersisted": False, "rawUrlsPersisted": False, "valuesPersisted": False},
+            }
+            manifest["contentHash"] = content_hash({k: v for k, v in manifest.items() if k != "contentHash"})
+            (dest / "har_breakdown_manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+            input_manifest_path = dest / "input_manifest.json"
+            input_manifest = json.loads(input_manifest_path.read_text(encoding="utf-8"))
+            input_manifest["harBreakdownManifestHash"] = manifest["contentHash"]
+            input_manifest["structuralEvidencePayloadCount"] = int((ingest.get("indexStats") or {}).get("evidence_payload_count") or len(ingest.get("evidencePayloads") or []))
+            input_manifest_path.write_text(json.dumps(input_manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+            evidence_manifest = {
+                "schema": "pillars_dcm.captured_evidence_manifest.v1",
+                "runId": run_id,
+                "sourceHarSha256s": sorted(str(value) for value in (ingest.get("contributingHarSha256s") or [har_sha])),
+                "payloads": [dict(item) for item in (ingest.get("evidencePayloads") or []) if isinstance(item, dict)],
+                "privacy": {"rawBodiesPersisted": False, "rawHeadersPersisted": False, "rawUrlsPersisted": False, "valuesPersisted": False},
+            }
+            evidence_manifest["contentHash"] = content_hash({k: v for k, v in evidence_manifest.items() if k != "contentHash"})
+            (dest / "captured_evidence_manifest.json").write_text(json.dumps(evidence_manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         (dest / "MOUNT_STATE.json").write_text(json.dumps(mount, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         schema_v2 = verify_schema_v2(workspace)
         schema_root = {**schema_root, "v2": schema_v2, "workingSchemaId": SCHEMA_V2_ID}
@@ -516,6 +566,13 @@ def run_dcm(
         acc = dict(board.get("accounting") or {})
         acc["classified"] = counts
         acc["goblins_excluded_from_selection"] = counts.get("EXCLUDED_GOBLIN", 0)
+        acc["permanently_excluded_subjects"] = sum(
+            1 for row in rows if permanent_subject_exclusion(row) is not None
+        )
+        acc["permanent_exclusion_terminal_overlap_goblin"] = sum(
+            1 for row in rows
+            if permanent_subject_exclusion(row) is not None and row.get("modifier") == "GOBLIN"
+        )
         acc["terminalAccounting"] = terminal
         acc["hostReceipt"] = receipt.as_dict()
         (dest / "accounting.json").write_text(json.dumps(acc, indent=2, sort_keys=True) + "\n", encoding="utf-8")
@@ -591,13 +648,19 @@ def run_dcm(
             json.dumps(coverage_report(planned["requests"], offer_recovery["claims"]), indent=2, sort_keys=True) + "\n",
             encoding="utf-8",
         )
-        prepare_cfb_research_os(
+        os_art = prepare_cfb_research_os(
             dest,
             rows,
             planned["requests"],
             coverage=None,
             telemetry=telemetry,
         )
+        # Keep the returned telemetry object authoritative in case a host
+        # adapter supplied/retained its own execution recorder.  This makes
+        # the account-only artifact reflect the actual index/graph/scheduler
+        # consumers rather than the pre-research HAR plan alone.
+        if isinstance(os_art, dict) and isinstance(os_art.get("telemetry"), AlgorithmTelemetry):
+            telemetry = os_art["telemetry"]
         host_plan = build_host_research_plan(
             planned["requests"],
             skipped=planned["skipped"],
@@ -615,6 +678,11 @@ def run_dcm(
         emit_packets_and_graph(
             dest, offer_sets=pop["offerSets"], claims=[], cutoff=forecast_cutoff, population=pop.get("manifest")
         )
+        # ``prepare_cfb_research_os`` executes the exact/hash/composite index,
+        # graph, cache and acquisition algorithms.  Persist telemetry only
+        # after that call; writing it earlier leaves an account-only run with
+        # a ceremonial plan-selection snapshot and hides the live consumers.
+        persist_algorithm_telemetry(dest, telemetry)
         ck = write_checkpoint(dest / "checkpoint.json", {
             "runId": run_id, "dcmVersion": SOFTWARE, "learningRevision": LEARNING_REVISION,
             "forecastCutoff": forecast_cutoff, "artifactRoot": str(dest),
@@ -1212,6 +1280,7 @@ def run_dcm(
                 modifier=row.get("modifier"),
                 target_book_offer_present=bool(row.get("targetBookOfferPresent", True)),
                 explicit_side=chosen_side,
+                subject=row,
             )
             if not preselection.may_select:
                 production_selectable = False
@@ -2063,6 +2132,9 @@ def run_dcm(
     blockers = []
     if excluded:
         blockers.append({"code": "GOBLIN_SELECTION_FORBIDDEN", "count": excluded})
+    permanent_excluded = sum(1 for row in rows if permanent_subject_exclusion(row) is not None)
+    if permanent_excluded:
+        blockers.append({"code": "PERMANENT_SUBJECT_EXCLUSION", "count": permanent_excluded})
     if unsupported:
         blockers.append({"code": "UNSUPPORTED_FAIL_CLOSED", "count": unsupported})
     if signal_errors:

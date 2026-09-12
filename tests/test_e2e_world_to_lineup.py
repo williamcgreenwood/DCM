@@ -35,6 +35,13 @@ def test_goblin_cannot_enter_production_contract():
     assert ei.value.code == FailureCode.GOBLIN_SELECTION_FORBIDDEN
 
 
+def test_permanent_subject_cannot_enter_production_contract():
+    excluded = nfl_pick("x", "280607d805dbc22af844820dec5f5aa0091431dd", "rec_yds", 40)
+    with pytest.raises(SelectionForbidden) as ei:
+        _entry([excluded])
+    assert ei.value.code == FailureCode.PERMANENT_SUBJECT_EXCLUSION
+
+
 def test_goblin_may_be_built_for_analytics_only():
     g = nfl_pick("g1", "NFL_WR_001", "rec_yds", 40, modifier="GOBLIN")
     contract = build_entry_contract(

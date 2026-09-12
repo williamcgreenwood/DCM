@@ -9,6 +9,7 @@ from typing import Any
 
 from dcm.model.worlds import MARKET_FROM_STATS
 from dcm.cfb.markets import ACTIVE_CFB_MARKETS
+from dcm.exclusions import permanent_subject_exclusion
 from dcm.sports.common.plugin import selection_state
 
 SUPPORTED_FAMILIES = {"basketball", "gridiron", "baseball"}
@@ -74,9 +75,16 @@ def _unsupported_market(row: dict[str, Any]) -> bool:
 
 
 def accounting_classify(row: dict[str, Any]) -> tuple[str, str | None]:
-    """Selection/accounting state. Goblins extracted then excluded; live stays MODELED+blocked."""
+    """Selection/accounting state after full-board accounting.
+
+    Goblins and operator-configured subjects are terminally excluded only
+    after the row has been counted. Live/unknown status remains modeled or
+    unresolved for accounting, but is never production-selectable.
+    """
     if row.get("modifier") == "GOBLIN":
         return "EXCLUDED_GOBLIN", "GOBLIN_SELECTION_FORBIDDEN"
+    if (excluded := permanent_subject_exclusion(row)):
+        return "UNRESOLVED", excluded
     if row.get("modifier") == "OTHER":
         return "UNRESOLVED", "MODIFIER_UNKNOWN"
     if row.get("side") == "UNKNOWN" and not row.get("offeredHigher") and not row.get("offeredLower"):
@@ -112,6 +120,8 @@ def research_disposition(row: dict[str, Any], *, research_shadow: bool = False) 
     """
     if row.get("modifier") == "GOBLIN":
         return False, SKIP_GOBLIN
+    if permanent_subject_exclusion(row):
+        return False, SKIP_UNRESOLVED
 
     family = str(row.get("sportFamily") or "")
     league = str(row.get("league") or "")

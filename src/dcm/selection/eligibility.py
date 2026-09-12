@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dcm.contracts.codes import FailureCode
 from dcm.contracts.schemas import EntryPickContract, PickModifier
+from dcm.exclusions import PERMANENT_EXCLUDED_PLAYER_IDS
 
 
 class SelectionForbidden(RuntimeError):
@@ -12,7 +13,16 @@ class SelectionForbidden(RuntimeError):
         self.code = code
 
 
+def reject_permanent_subject(pick: EntryPickContract) -> None:
+    if str(pick.player_id or "").strip().lower() in PERMANENT_EXCLUDED_PLAYER_IDS:
+        raise SelectionForbidden(
+            FailureCode.PERMANENT_SUBJECT_EXCLUSION,
+            f"permanently excluded subject {pick.player_id} cannot enter a production EntryContract",
+        )
+
+
 def reject_goblin_selection(pick: EntryPickContract) -> None:
+    reject_permanent_subject(pick)
     if pick.modifier == PickModifier.GOBLIN:
         raise SelectionForbidden(
             FailureCode.GOBLIN_SELECTION_FORBIDDEN,

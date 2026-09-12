@@ -102,6 +102,21 @@ def test_complementary_hars_union_and_reverse_input_order_is_invariant():
     assert ab["rows"] == ba["rows"]
 
 
+def test_composite_preserves_structural_evidence_payloads_order_independently():
+    a = _ing(_har(url="https://api.example.test/sportsdata/CFB/insights", at="2026-08-28T10:00:00Z", body={"insights": [{"id": 1}]}))
+    b = _ing(_har(url="https://api.example.test/sportsdata/CFB/insights", at="2026-08-28T11:00:00Z", body={"insights": [{"id": 2}]}))
+    # Keep the fixture focused on composite reconciliation; the production
+    # adapter supplies this same redacted shape for recognized insights.
+    a["evidencePayloads"] = [{"kind": "INSIGHTS", "startedDateTime": "2026-08-28T10:00:00Z", "responseHash": a["harSha256"]}]
+    b["evidencePayloads"] = [{"kind": "INSIGHTS", "startedDateTime": "2026-08-28T11:00:00Z", "responseHash": b["harSha256"]}]
+    ab = compose_ingests([a, b])
+    ba = compose_ingests([b, a])
+    assert len(ab["evidencePayloads"]) == 2
+    assert ab["evidencePayloads"] == ba["evidencePayloads"]
+    assert ab["indexStats"]["evidence_payload_count"] == 2
+    assert all("sourceHarSha256" in row for row in ab["evidencePayloads"])
+
+
 def test_scope_not_recaptured_retains_prior_valid_state():
     a = _ing(
         _har(
