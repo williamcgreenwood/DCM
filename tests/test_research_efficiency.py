@@ -126,3 +126,9 @@ def test_account_only_writes_bundle_oriented_plan(tmp_path: Path):
     assert 0 < len(reqs) < 18528
     assert plan["orientation"] == "BUNDLE"
     assert plan["skippedClasses"]["goblin"] == 1849
+    telemetry = json.loads((dest / "algorithm_execution_telemetry.json").read_text())
+    # Account-only still builds and consumes the exact-first research OS; its
+    # final telemetry must be written after that work, not just after plan
+    # selection.
+    assert telemetry["activatedAlgorithmCount"] > 0
+    assert telemetry["ceremonialViolations"] == []
