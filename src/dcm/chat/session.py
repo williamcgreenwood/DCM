@@ -250,8 +250,31 @@ class HostSession:
             rows = board.get("rows") if isinstance(board, dict) else []
             docs = [dict(row, _kind="claim") for row in claims if isinstance(row, dict)]
             docs.extend(dict(row, _kind="board") for row in (rows if isinstance(rows, list) else []) if isinstance(row, dict))
+            # Structural HAR receipts are safe, bounded documents.  They let
+            # exact/composite/BM25 indexes search capture topology and schema
+            # drift without indexing raw URLs, bodies, headers, or values.
+            breakdown_docs: list[dict[str, Any]] = []
+            manifest = read_json(self.dest / "har_breakdown_manifest.json") or {}
+            for receipt in (manifest.get("receipts") if isinstance(manifest, dict) else []) or []:
+                if isinstance(receipt, dict):
+                    breakdown_docs.append({**receipt, "_kind": "har_breakdown_receipt"})
+            for path in sorted((self.dest / "har_breakdowns").glob("*.json")) if (self.dest / "har_breakdowns").is_dir() else []:
+                if path.name == "har_breakdown_receipt.json":
+                    continue
+                body = read_json(path)
+                if isinstance(body, dict):
+                    breakdown_docs.append({
+                        "harSha256": body.get("har_sha256"),
+                        "recordFamilies": body.get("record_families") or {},
+                        "schemaFingerprints": body.get("schema_fingerprints") or {},
+                        "relationships": body.get("relationships") or {},
+                        "researchDemand": body.get("research_demand") or {},
+                        "algorithmIds": body.get("algorithmIds") or [],
+                        "_kind": "har_structural_breakdown",
+                    })
+            docs.extend(breakdown_docs)
             engine = SearchEngine(docs)
-            receipt = {**engine.index_receipt, "documentKinds": {"claims": len(claims) if isinstance(claims, list) else 0, "board": len(rows) if isinstance(rows, list) else 0}}
+            receipt = {**engine.index_receipt, "documentKinds": {"claims": len(claims) if isinstance(claims, list) else 0, "board": len(rows) if isinstance(rows, list) else 0, "harBreakdowns": len(breakdown_docs)}}
             receipt["contentHash"] = content_hash(receipt)
             write_json(self.dest / "search_index_receipt.json", receipt)
             self._save_host_state(lastCommand="index-build", searchIndexHash=receipt.get("indexHash"))

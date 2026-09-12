@@ -5,6 +5,7 @@ from collections import Counter
 from typing import Any
 
 from dcm.contracts.hashes import content_hash
+from dcm.exclusions import permanent_subject_exclusion
 from dcm.research.classify import accounting_classify, research_disposition
 from dcm.cfb.markets import ACTIVE_CFB_MARKETS, GUARDED_LAUNCH_MARKETS, NEWLY_ACTIVATED_MARKETS
 from dcm.sports.football.research_requirements import MARKET_REQUIREMENTS
@@ -26,8 +27,10 @@ def account_cfb_board(rows: list[dict[str, Any]]) -> dict[str, Any]:
     """
     cfb = [r for r in rows if _is_cfb(r)]
     goblins = [r for r in cfb if r.get("modifier") == "GOBLIN"]
+    permanently_excluded = [r for r in cfb if permanent_subject_exclusion(r)]
     non_goblins = [r for r in cfb if r.get("modifier") != "GOBLIN"]
     supported = [r for r in non_goblins if _market(r) in MARKET_REQUIREMENTS]
+    supported_after_permanent_exclusion = [r for r in supported if permanent_subject_exclusion(r) is None]
     unsupported = [r for r in non_goblins if _market(r) not in MARKET_REQUIREMENTS]
     classified: Counter[str] = Counter()
     disposition: Counter[str] = Counter()
@@ -53,8 +56,15 @@ def account_cfb_board(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "schema": "pillars_dcm.cfb_har_accounting.v1",
         "rawCfb": len(cfb),
         "goblin": len(goblins),
+        "permanentlyExcludedSubjects": len(permanently_excluded),
+        "permanentExclusionBlockers": dict(Counter(
+            permanent_subject_exclusion(r) for r in permanently_excluded
+            if permanent_subject_exclusion(r)
+        )),
         "nonGoblin": len(non_goblins),
         "supported": len(supported),
+        "supportedAfterPermanentExclusion": len(supported_after_permanent_exclusion),
+        "supportedPermanentlyExcluded": len(supported) - len(supported_after_permanent_exclusion),
         "supportedMarketDefinitions": sorted({_market(r) for r in supported if _market(r)}),
         "registeredMarketDefinitions": sorted(MARKET_REQUIREMENTS),
         "supportedNonGoblinOffers": len(supported),
@@ -76,6 +86,7 @@ def account_cfb_board(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "guardedLaunchMarkets": list(GUARDED_LAUNCH_MARKETS),
         "activeMarketDefinitions": list(ACTIVE_CFB_MARKETS),
         "goblinsExcludedFromSelectionAfterAccounting": True,
+        "permanentSubjectExclusionsAppliedAfterAccounting": True,
     }
     body["contentHash"] = content_hash({k: v for k, v in body.items() if k != "contentHash"})
     return body

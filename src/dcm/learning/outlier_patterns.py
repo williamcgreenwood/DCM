@@ -10,6 +10,8 @@ from dataclasses import dataclass
 from math import sqrt
 from typing import Any, Iterable, Mapping
 
+from dcm.exclusions import permanent_subject_exclusion
+
 REQUIRED_OBSERVATION_FIELDS = frozenset({"observationId", "decisionCutoff", "projectionId", "line", "side", "modifier", "targetBook", "selected", "selectionState"})
 
 
@@ -33,6 +35,8 @@ def validate_observation(row: Mapping[str, Any]) -> tuple[bool, tuple[str, ...]]
     missing = tuple(sorted(key for key in REQUIRED_OBSERVATION_FIELDS if row.get(key) in (None, "")))
     if str(row.get("modifier") or "").upper() == "GOBLIN":
         return False, tuple(sorted(set(missing) | {"GOBLIN_SELECTION_FORBIDDEN"}))
+    if (excluded := permanent_subject_exclusion(row)):
+        return False, tuple(sorted(set(missing) | {excluded}))
     return not missing, missing
 
 

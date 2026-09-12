@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from dcm.contracts.hashes import content_hash
+from dcm.exclusions import permanent_subject_exclusion
 from dcm.ingest.composite import reconcile_scope_attempts
 from dcm.ingest.wsab_bind import annotate_rows
 
@@ -93,6 +94,7 @@ def accounting_from_rows(rows: list[dict], *, asof: dict[str, int] | None = None
         "unique_offer_rows": len({r["projectionId"] for r in rows}),
         "standard_rows": n(lambda r: r.get("modifier") == "STANDARD"),
         "goblin_rows": n(lambda r: r.get("modifier") == "GOBLIN"),
+        "permanently_excluded_subject_rows": n(lambda r: permanent_subject_exclusion(r) is not None),
         "demon_rows": n(lambda r: r.get("modifier") == "DEMON"),
         "unknown_modifier_rows": n(lambda r: r.get("modifier") not in {"STANDARD", "GOBLIN", "DEMON"}),
         "unknown_side_rows": n(lambda r: not r.get("offeredHigher") and not r.get("offeredLower")),
@@ -114,7 +116,9 @@ def accounting_from_rows(rows: list[dict], *, asof: dict[str, int] | None = None
         "removed_rows": 0,
         "unresolved_rows": n(lambda r: r.get("market") in {"unknown", ""} or r.get("league") == "UNKNOWN"),
         "wsab_bound_rows": n(lambda r: r.get("wsabMarketBound")),
-        "final_model_population": n(lambda r: r.get("modifier") != "GOBLIN"),
+        "final_model_population": n(
+            lambda r: r.get("modifier") != "GOBLIN" and permanent_subject_exclusion(r) is None
+        ),
         "by_league": by_league,
         "by_sport": by_sport,
         "by_status": by_status,

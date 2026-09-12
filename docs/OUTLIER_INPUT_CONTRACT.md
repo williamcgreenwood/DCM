@@ -16,6 +16,32 @@ winning bet.
   `_dcm.targetBook`) to an explicit provider. The parser never silently
   switches providers.
 
+Outlier `active=true` is retained as `offerActive`; it is not a game-status
+assertion. If the capture does not provide an explicit pre-game/live/suspended
+status, the normalized row is `status=unknown` and remains fail-closed until a
+trusted event-status source resolves it.
+
+An Outlier HAR may also contain `/insights` responses. Those are classified as
+`INSIGHTS_EVIDENCE` when no market rows are present and only a structural
+summary (scope, response hash, item count, pagination flag, and top-level keys)
+is retained. The DCM does not turn opaque insight records into player facts or
+probabilities.
+
+When multiple HARs are supplied, the composite adapter preserves every
+redacted evidence payload with its source HAR digest and deterministic ordering.
+The runner writes `har_breakdown_manifest.json` plus one safe structural
+breakdown per source, and `captured_evidence_manifest.json`; raw bodies, URLs,
+headers, and values are never persisted. These artifacts are indexed alongside
+claims and board rows by `index-build` using the registered exact/composite,
+Boolean, BM25F/WAND, trie/Aho–Corasick, MinHash/SimHash/LSH, RRF, and MMR
+search paths. An index receipt proves indexing of structure only, not semantic
+research or a betting recommendation.
+
+If the complete capture contains no trusted market rows, accounting still
+completes and `next-research` returns the terminal
+`NO_RESEARCH_CANDIDATES`/`NO_MARKET_ROWS` batch. It keeps `researchMayBegin` false
+and performs no external acquisition.
+
 ## Exact offer semantics
 
 For each outcome the adapter preserves the source outcome ID, line, event,
@@ -40,6 +66,15 @@ Green Goblin is terminally excluded after accounting. It must not be modeled,
 researched as a candidate, ranked, selected, placed in a card, or used as an
 independent learning observation. Demon remains subject to its stricter
 policy. These rules are permanent and apply regardless of input format.
+
+The permanent subject denylist also excludes Brennan Parachek and C.J. Carr.
+The DCM matches their exact configured subject IDs or punctuation-normalized
+full names (`BRENNANPARACHEK` and `CJCARR`) after accounting, then applies a
+terminal exclusion before research, modeling, ranking, cards, and learning.
+This is an exact allow/deny policy: it does not fuzzy-match the surname Carr,
+does not exclude other players with similar names, and never invents an ID or
+name from a partial string. The policy is provider-independent and applies to
+Outlier, PrizePicks, and future input adapters.
 
 For Outlier rows that survive structural gates, the modeled runner applies the
 versioned `OUTLIER_PRESELECTION_V1` gate. It computes the directional model

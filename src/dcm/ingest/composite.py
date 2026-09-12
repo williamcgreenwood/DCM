@@ -254,6 +254,34 @@ def compose_ingests(ingests: list[dict[str, Any]]) -> dict[str, Any]:
         }
     )
 
+    # Structural /insights receipts are evidence even when they do not produce
+    # trusted board rows.  Preserve them across a composite run so downstream
+    # indexing and drift analysis can see every source deterministically.  The
+    # adapter intentionally carries only the already-redacted shape metadata;
+    # no response body, URL, or header is copied here.
+    evidence_payloads: list[dict[str, Any]] = []
+    for capture in captures:
+        source_hash = str(capture.get("harSha256") or "")
+        for payload in capture.get("evidencePayloads") or []:
+            if not isinstance(payload, dict):
+                continue
+            evidence_payloads.append({**dict(payload), "sourceHarSha256": source_hash})
+    evidence_payloads.sort(
+        key=lambda p: (
+            str(p.get("startedDateTime") or ""),
+            str(p.get("sourceHarSha256") or ""),
+            str(p.get("requestScope") or ""),
+            str(p.get("responseHash") or ""),
+            str(p.get("kind") or ""),
+        )
+    )
+    index_stats.update(
+        {
+            "evidence_payload_count": len(evidence_payloads),
+            "insights_payload_count": sum(1 for p in evidence_payloads if str(p.get("kind") or "").upper() == "INSIGHTS"),
+        }
+    )
+
     composite_id = content_hash(
         {
             "sourceHarSha256s": source_hashes,
@@ -275,6 +303,7 @@ def compose_ingests(ingests: list[dict[str, Any]]) -> dict[str, Any]:
         "timeline": lifecycle,
         "redactedSecrets": sum(int(i.get("redactedSecrets") or 0) for i in captures),
         "warnings": warnings,
+        "evidencePayloads": evidence_payloads,
         "indexStats": index_stats,
         "captureStart": min((str(i.get("captureStart") or "") for i in captures if i.get("captureStart")), default=""),
         "captureEnd": max((str(i.get("captureEnd") or "") for i in captures if i.get("captureEnd")), default=""),
