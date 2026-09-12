@@ -2,10 +2,10 @@
 
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
-- Modules: **246**
-- Symbols: **1817**
+- Modules: **247**
+- Symbols: **1821**
 - Parse errors: **0**
-- Inventory hash: `067510065b78e903f8c6dad826747b8059536d3ccebe23deec17881a69288f2c`
+- Inventory hash: `0a4c0e10684e8ff823a957a547eea78d2f36066d78bc0e99a89da0b876396c08`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -66,6 +66,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P0 | `src/dcm/contracts/schemas.py` | 25 | 16 |
 | P0 | `src/dcm/contracts/universal_entities.py` | 4 | 5 |
 | UNMAPPED | `src/dcm/dataset.py` | 0 | 0 |
+| UNMAPPED | `src/dcm/exclusions.py` | 0 | 3 |
 | UNMAPPED | `src/dcm/governance/__init__.py` | 0 | 0 |
 | UNMAPPED | `src/dcm/governance/requirement_ledger.py` | 0 | 4 |
 | P0 | `src/dcm/identity/__init__.py` | 0 | 0 |
@@ -215,7 +216,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P4 | `src/dcm/selection/__init__.py` | 0 | 0 |
 | P4 | `src/dcm/selection/card_layers.py` | 0 | 17 |
 | P4 | `src/dcm/selection/decision_integrity.py` | 1 | 6 |
-| P4 | `src/dcm/selection/eligibility.py` | 1 | 3 |
+| P4 | `src/dcm/selection/eligibility.py` | 1 | 4 |
 | P4 | `src/dcm/selection/portfolio.py` | 0 | 6 |
 | P4 | `src/dcm/selection/preselection.py` | 1 | 6 |
 | UNMAPPED | `src/dcm/settle.py` | 0 | 1 |
@@ -558,30 +559,30 @@ _No class/function symbols._
 
 ### `src/dcm/board_store.py`
 
-- `class` **BoardStore** L27 — Single-copy board with SoA indexes. No repeated full-board linear scans.
-- `method` **BoardStore.__init__** L30
-- `method` **BoardStore.row** L145
-- `method` **BoardStore.exact_offer** L150
-- `method` **BoardStore.offer_by_id_map** L164 — Legacy-compatible view: offer_id → audit row (same dict objects, no copy).
-- `method` **BoardStore.rows_for** L168
-- `method` **BoardStore.offer_ids_for** L171
-- `method` **BoardStore.row_ids_for_event** L176
-- `method` **BoardStore.row_ids_for_subject** L179
-- `method` **BoardStore.row_ids_for_affiliation** L182
-- `method` **BoardStore.row_ids_for_market** L185
-- `method` **BoardStore.offer_ids_for_event** L188
-- `method` **BoardStore.offer_ids_for_subject** L191
-- `method` **BoardStore.offer_ids_for_affiliation** L194
-- `method` **BoardStore.offer_ids_for_market** L197
-- `method` **BoardStore.legacy_string_indexes** L200 — BoardIndexes-compatible posting lists (string offer IDs).
-- `method` **BoardStore.lookup_composite** L210
-- `method` **BoardStore.sqlite_event_offers** L223
-- `method` **BoardStore.sqlite_has_payload_column** L235
-- `method` **BoardStore.might_have_offer** L240
-- `method` **BoardStore.mapping_audit** L243 — Stable ID mapping summary for audits / PROGRAM_STATUS.
-- `method` **BoardStore.close** L261
-- `function` **board_store_matches_index_semantics** L268 — Compare BoardStore lookups to BoardIndexes string-index semantics.
-- `method` **board_store_matches_index_semantics._same** L278
+- `class` **BoardStore** L28 — Single-copy board with SoA indexes. No repeated full-board linear scans.
+- `method` **BoardStore.__init__** L31
+- `method` **BoardStore.row** L151
+- `method` **BoardStore.exact_offer** L156
+- `method` **BoardStore.offer_by_id_map** L170 — Legacy-compatible view: offer_id → audit row (same dict objects, no copy).
+- `method` **BoardStore.rows_for** L174
+- `method` **BoardStore.offer_ids_for** L177
+- `method` **BoardStore.row_ids_for_event** L182
+- `method` **BoardStore.row_ids_for_subject** L185
+- `method` **BoardStore.row_ids_for_affiliation** L188
+- `method` **BoardStore.row_ids_for_market** L191
+- `method` **BoardStore.offer_ids_for_event** L194
+- `method` **BoardStore.offer_ids_for_subject** L197
+- `method` **BoardStore.offer_ids_for_affiliation** L200
+- `method` **BoardStore.offer_ids_for_market** L203
+- `method` **BoardStore.legacy_string_indexes** L206 — BoardIndexes-compatible posting lists (string offer IDs).
+- `method` **BoardStore.lookup_composite** L216
+- `method` **BoardStore.sqlite_event_offers** L229
+- `method` **BoardStore.sqlite_has_payload_column** L241
+- `method` **BoardStore.might_have_offer** L246
+- `method` **BoardStore.mapping_audit** L249 — Stable ID mapping summary for audits / PROGRAM_STATUS.
+- `method` **BoardStore.close** L267
+- `function` **board_store_matches_index_semantics** L274 — Compare BoardStore lookups to BoardIndexes string-index semantics.
+- `method` **board_store_matches_index_semantics._same** L284
 
 ### `src/dcm/cfb/__init__.py`
 
@@ -589,9 +590,9 @@ _No class/function symbols._
 
 ### `src/dcm/cfb/accounting.py`
 
-- `function` **_is_cfb** L13
-- `function` **_market** L17
-- `function` **account_cfb_board** L21 — Account every CFB offer, then classify Goblins / support / modelability gates.
+- `function` **_is_cfb** L14
+- `function` **_market** L18
+- `function` **account_cfb_board** L22 — Account every CFB offer, then classify Goblins / support / modelability gates.
 
 ### `src/dcm/cfb/champion.py`
 
@@ -905,6 +906,12 @@ _No class/function symbols._
 
 _No class/function symbols._
 
+### `src/dcm/exclusions.py`
+
+- `function` **normalize_subject_name** L27 — Normalize punctuation/spacing without fuzzy matching or name invention.
+- `function` **permanent_subject_exclusion** L32 — Return a terminal exclusion code for an exact configured subject.
+- `function` **is_permanently_excluded_subject** L42
+
 ### `src/dcm/governance/__init__.py`
 
 _No class/function symbols._
@@ -934,12 +941,12 @@ _No class/function symbols._
 
 ### `src/dcm/ingest/board.py`
 
-- `function` **_time** L18
-- `function` **rows_as_of** L29
-- `function` **accounting_from_rows** L75
-- `method` **accounting_from_rows.n** L76
-- `function` **freeze_board** L127 — Freeze the board.
-- `function` **write_board** L194
+- `function` **_time** L19
+- `function` **rows_as_of** L30
+- `function` **accounting_from_rows** L76
+- `method` **accounting_from_rows.n** L77
+- `function` **freeze_board** L131 — Freeze the board.
+- `function` **write_board** L198
 
 ### `src/dcm/ingest/composite.py`
 
@@ -962,9 +969,9 @@ _No class/function symbols._
 - `function` **_decode_content** L107
 - `function` **_attempt** L120
 - `function` **_index_har** L147
-- `function` **_parse_payload** L253
-- `function` **_verified_empty_payload** L265 — An empty response clears a scope only when the market collection is explicit.
-- `function` **ingest_har** L277 — Parse a HAR and retain every sanitized request-scope attempt.
+- `function` **_parse_payload** L291
+- `function` **_verified_empty_payload** L303 — An empty response clears a scope only when the market collection is explicit.
+- `function` **ingest_har** L315 — Parse a HAR and retain every sanitized request-scope attempt.
 
 ### `src/dcm/ingest/markets.py`
 
@@ -985,10 +992,10 @@ _No class/function symbols._
 - `function` **_book_offer** L96
 - `function` **_book_modifier** L110
 - `function` **_status** L120
-- `function` **_resolve_side** L135
-- `function` **_wager_types** L147
-- `function` **_row** L157
-- `function` **parse_outlier_payload** L241
+- `function` **_resolve_side** L136
+- `function` **_wager_types** L148
+- `function` **_row** L158
+- `function` **parse_outlier_payload** L243
 
 ### `src/dcm/ingest/prizepicks.py`
 
@@ -1057,11 +1064,11 @@ _No class/function symbols._
 
 ### `src/dcm/learning/outlier_patterns.py`
 
-- `class` **SegmentSummary** L17
-- `method` **SegmentSummary.as_dict** L26
-- `function` **validate_observation** L32
-- `function` **_wilson_lower** L39
-- `function` **summarize_leg_segments** L49 — Summarize settled independent legs only; any slip lineage is excluded.
+- `class` **SegmentSummary** L19
+- `method` **SegmentSummary.as_dict** L28
+- `function` **validate_observation** L34
+- `function` **_wilson_lower** L43
+- `function` **summarize_leg_segments** L53 — Summarize settled independent legs only; any slip lineage is excluded.
 
 ### `src/dcm/learning/postgame.py`
 
@@ -1333,7 +1340,7 @@ _No class/function symbols._
 - `class` **EntryContractError** L16
 - `method` **EntryContractError.__init__** L17
 - `function` **build_entry_contract** L22
-- `function` **pick** L82
+- `function` **pick** L87
 
 ### `src/dcm/platform/prizepicks/leaderboard.py`
 
@@ -1605,13 +1612,13 @@ _No class/function symbols._
 
 ### `src/dcm/research/classify.py`
 
-- `function` **_offered_sides_known** L53
-- `function` **_is_live** L59
-- `function` **_unsupported_market** L64
-- `function` **accounting_classify** L76 — Selection/accounting state. Goblins extracted then excluded; live stays MODELED+blocked.
-- `function` **research_disposition** L106 — Return (deep_research?, class).
-- `function` **classify_rows** L151
-- `function` **market_definition_id** L189
+- `function` **_offered_sides_known** L54
+- `function` **_is_live** L60
+- `function` **_unsupported_market** L65
+- `function` **accounting_classify** L77 — Selection/accounting state after full-board accounting.
+- `function` **research_disposition** L114 — Return (deep_research?, class).
+- `function` **classify_rows** L161
+- `function` **market_definition_id** L199
 
 ### `src/dcm/research/classify_runtime.py`
 
@@ -1726,43 +1733,43 @@ _No class/function symbols._
 
 ### `src/dcm/research/funnel.py`
 
-- `function` **_text** L72
-- `function` **_upper** L76
-- `function` **_nonempty** L80
-- `function` **_iso_timestamp** L90
-- `function` **_allowed_wager_value** L103
-- `function` **_side_flags** L109 — Return (higher, lower, metadata_present) without guessing sides.
-- `function` **_legal_side_class** L143
-- `function` **_market_text** L156
-- `function` **_market_is_combo** L160
-- `function` **_market_excluded** L172
-- `function` **_event_key** L179
-- `function` **_player_key** L183
-- `function` **_stat_key** L187
-- `function` **_line_value** L191
-- `function` **_projection_key** L200
-- `function` **_basic_gate_reasons** L204
-- `function` **_same_line_groups** L256 — Group only economically compatible duplicates.
-- `function` **_merge_same_line** L284
-- `function` **_primary_hint** L313
-- `function` **_choose_primary** L317
-- `function` **_player_game_stat_key** L349
-- `function` **build_legal_universe** L353 — Apply structural gates and collapse alt lines to one primary row.
-- `function` **_is_sf_lar** L459
-- `function` **_game_id** L467
-- `function` **_stat_family** L471
-- `function` **_structural_key** L484
-- `function` **_row_summary** L501
-- `function` **_quota_state** L529
-- `function` **_quota_requirements** L549
-- `function` **quota_shortlist** L566 — Greedy, deterministic quota sampler with a visible leftover list.
-- `method` **quota_shortlist.can_add** L592
-- `method` **quota_shortlist.add** L611
-- `method` **quota_shortlist.add_from** L632
-- `function` **build_board_funnel** L737
-- `function` **write_funnel_artifacts** L805 — Run the funnel against a sanitized ``board.json`` and persist receipts.
-- `function` **_parser** L873
-- `function` **main** L888
+- `function` **_text** L73
+- `function` **_upper** L77
+- `function` **_nonempty** L81
+- `function` **_iso_timestamp** L91
+- `function` **_allowed_wager_value** L104
+- `function` **_side_flags** L110 — Return (higher, lower, metadata_present) without guessing sides.
+- `function` **_legal_side_class** L144
+- `function` **_market_text** L157
+- `function` **_market_is_combo** L161
+- `function` **_market_excluded** L173
+- `function` **_event_key** L180
+- `function` **_player_key** L184
+- `function` **_stat_key** L188
+- `function` **_line_value** L192
+- `function` **_projection_key** L201
+- `function` **_basic_gate_reasons** L205
+- `function` **_same_line_groups** L259 — Group only economically compatible duplicates.
+- `function` **_merge_same_line** L287
+- `function` **_primary_hint** L316
+- `function` **_choose_primary** L320
+- `function` **_player_game_stat_key** L352
+- `function` **build_legal_universe** L356 — Apply structural gates and collapse alt lines to one primary row.
+- `function` **_is_sf_lar** L462
+- `function` **_game_id** L470
+- `function` **_stat_family** L474
+- `function` **_structural_key** L487
+- `function` **_row_summary** L504
+- `function` **_quota_state** L532
+- `function` **_quota_requirements** L552
+- `function` **quota_shortlist** L569 — Greedy, deterministic quota sampler with a visible leftover list.
+- `method` **quota_shortlist.can_add** L595
+- `method` **quota_shortlist.add** L614
+- `method` **quota_shortlist.add_from** L635
+- `function` **build_board_funnel** L740
+- `function` **write_funnel_artifacts** L808 — Run the funnel against a sanitized ``board.json`` and persist receipts.
+- `function` **_parser** L876
+- `function` **main** L891
 
 ### `src/dcm/research/gamelog.py`
 
@@ -2240,17 +2247,17 @@ _No class/function symbols._
 
 ### `src/dcm/runner.py`
 
-- `function` **_finalize_archive** L136 — Always write dest/audit/. Optionally copy+commit+push a GitHub pack.
-- `function` **_synthetic_path** L214
-- `function` **_run_id** L227
-- `function` **_git_commit_sha** L231 — Best-effort git HEAD. Never writes git config. Missing git is None, not a crash.
-- `function` **_default_model_config** L251
-- `function` **_active_calibration** L262
-- `function` **run_dcm** L271
-- `method` **run_dcm._snapshot_for** L910
-- `method` **run_dcm._resimulate_material** L1407
-- `method` **run_dcm.slim** L1598
-- `function` **main** L2168
+- `function` **_finalize_archive** L137 — Always write dest/audit/. Optionally copy+commit+push a GitHub pack.
+- `function` **_synthetic_path** L215
+- `function` **_run_id** L228
+- `function` **_git_commit_sha** L232 — Best-effort git HEAD. Never writes git config. Missing git is None, not a crash.
+- `function` **_default_model_config** L252
+- `function` **_active_calibration** L263
+- `function` **run_dcm** L272
+- `method` **run_dcm._snapshot_for** L929
+- `method` **run_dcm._resimulate_material** L1427
+- `method` **run_dcm.slim** L1618
+- `function` **main** L2191
 
 ### `src/dcm/runtime/__init__.py`
 
@@ -2464,7 +2471,7 @@ _No class/function symbols._
 
 ### `src/dcm/runtime/readiness.py`
 
-- `function` **build_readiness** L7
+- `function` **build_readiness** L9
 
 ### `src/dcm/runtime/run_director.py`
 
@@ -2526,23 +2533,23 @@ _No class/function symbols._
 
 ### `src/dcm/selection/card_layers.py`
 
-- `function` **_parse_utc** L74
-- `function` **_snapshot_of** L87
-- `function` **_player_status** L97
-- `function` **_tags** L105
-- `function` **_role_tag_excludes_playable** L110
-- `function` **event_started_before_cutoff** L121 — True when the event is live/suspended or start <= forecastDecisionCutoff.
-- `function` **started_event_blocker** L136
-- `function` **status_start_hard_blocker** L146 — Return the status/start blocker that keeps a row off modeled PLAYABLE.
-- `function` **is_modeled_playable** L172 — PLAYABLE-grade modeled row eligible for the strict card, ignoring production root.
-- `function` **apply_pre_freeze_status_start_gates** L199 — Final status/start strip immediately before portfolio freeze.
-- `function` **production_root_accepted** L224
-- `function` **production_certified_rows** L232
-- `function` **modeled_empty_card_reason** L242
-- `function` **layer_run_state** L261
-- `function` **compact_directional_row** L281
-- `function` **build_directional_passes** L297 — Strongest side for modeled non-PLAYABLE candidates not on the strict card.
-- `function` **write_card_layer_files** L324
+- `function` **_parse_utc** L78
+- `function` **_snapshot_of** L91
+- `function` **_player_status** L101
+- `function` **_tags** L109
+- `function` **_role_tag_excludes_playable** L114
+- `function` **event_started_before_cutoff** L125 — True when the event is live/suspended or start <= forecastDecisionCutoff.
+- `function` **started_event_blocker** L140
+- `function` **status_start_hard_blocker** L150 — Return the status/start blocker that keeps a row off modeled PLAYABLE.
+- `function` **is_modeled_playable** L178 — PLAYABLE-grade modeled row eligible for the strict card, ignoring production root.
+- `function` **apply_pre_freeze_status_start_gates** L207 — Final status/start strip immediately before portfolio freeze.
+- `function` **production_root_accepted** L232
+- `function` **production_certified_rows** L240
+- `function` **modeled_empty_card_reason** L250
+- `function` **layer_run_state** L269
+- `function` **compact_directional_row** L289
+- `function` **build_directional_passes** L305 — Strongest side for modeled non-PLAYABLE candidates not on the strict card.
+- `function` **write_card_layer_files** L332
 
 ### `src/dcm/selection/decision_integrity.py`
 
@@ -2556,29 +2563,30 @@ _No class/function symbols._
 
 ### `src/dcm/selection/eligibility.py`
 
-- `class` **SelectionForbidden** L9
-- `method` **SelectionForbidden.__init__** L10
-- `function` **reject_goblin_selection** L15
-- `function` **demon_requires_cushion** L23 — Red Demon is demotion-only: extra cushion must actually change the gate.
+- `class` **SelectionForbidden** L10
+- `method` **SelectionForbidden.__init__** L11
+- `function` **reject_permanent_subject** L16
+- `function` **reject_goblin_selection** L24
+- `function` **demon_requires_cushion** L33 — Red Demon is demotion-only: extra cushion must actually change the gate.
 
 ### `src/dcm/selection/portfolio.py`
 
-- `function` **_tags** L20
-- `function` **_composite_conflict** L24
-- `function` **_selection_correlation_reference** L30 — Pure-Python Pearson path (ChatGPT-native fallback / parity).
-- `function` **_selection_correlation** L44 — Pearson correlation of aligned simulated pick outcomes.
-- `function` **build_card** L79
-- `function` **exposure_report** L152
+- `function` **_tags** L21
+- `function` **_composite_conflict** L25
+- `function` **_selection_correlation_reference** L31 — Pure-Python Pearson path (ChatGPT-native fallback / parity).
+- `function` **_selection_correlation** L45 — Pearson correlation of aligned simulated pick outcomes.
+- `function` **build_card** L80
+- `function` **exposure_report** L153
 
 ### `src/dcm/selection/preselection.py`
 
-- `function` **_support_n** L13 — Coerce evidence support counts without allowing malformed captures to raise.
-- `class` **PreselectionDecision** L22
-- `method` **PreselectionDecision.may_select** L29
-- `method` **PreselectionDecision.as_dict** L32
-- `function` **_missing_research** L37
-- `function` **research_flags_from_snapshot** L42 — Project canonical evidence state into the small preselection contract.
-- `function` **assess_preselection** L78 — Apply safety order before direction/portfolio selection.
+- `function` **_support_n** L15 — Coerce evidence support counts without allowing malformed captures to raise.
+- `class` **PreselectionDecision** L24
+- `method` **PreselectionDecision.may_select** L31
+- `method` **PreselectionDecision.as_dict** L34
+- `function` **_missing_research** L39
+- `function` **research_flags_from_snapshot** L44 — Project canonical evidence state into the small preselection contract.
+- `function` **assess_preselection** L80 — Apply safety order before direction/portfolio selection.
 
 ### `src/dcm/settle.py`
 
