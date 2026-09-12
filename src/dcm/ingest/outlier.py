@@ -62,6 +62,22 @@ def _items(obj: dict[str, Any]) -> Iterable[dict[str, Any]]:
             yield from (item for item in value if isinstance(item, dict))
 
 
+def _looks_like_outlier_item(item: Mapping[str, Any]) -> bool:
+    """Accept current nested rows and the legacy flattened Outlier export.
+
+    The flattened fallback is intentionally narrow: a plain ``props`` list is
+    not enough to claim Outlier provenance, and JSON:API ``data`` objects are
+    never inspected by this adapter.
+    """
+    if isinstance(item.get("outcome"), Mapping):
+        return True
+    if any(key in item for key in ("orf", "orfScore", "bookOdds", "outcomeId", "outcomeAlias")):
+        return True
+    return bool(item.get("player") or item.get("athlete") or item.get("name")) and bool(
+        item.get("stat") or item.get("prop") or item.get("statType")
+    ) and any(item.get(key) is not None for key in ("line", "value", "number", "points"))
+
+
 def _target_book(obj: Mapping[str, Any], *, explicit: str | None) -> str:
     if explicit:
         return str(explicit).strip().upper() or TARGET_BOOK
@@ -139,19 +155,36 @@ def _wager_types(outcome: Mapping[str, Any], side: str) -> list[str] | str:
 
 
 def _row(item: dict[str, Any], idx: int, *, target_book: str) -> dict[str, Any] | None:
-    outcome = item.get("outcome") if isinstance(item.get("outcome"), dict) else item
-    line = _num(outcome.get("line"))
-    player_id = str(outcome.get("playerId") or item.get("playerId") or "")
-    outcome_id = str(outcome.get("outcomeId") or item.get("outcomeId") or "")
+    nested = item.get("outcome") if isinstance(item.get("outcome"), dict) else None
+    outcome = nested or item
+    line = _num(next((outcome.get(key) for key in ("line", "value", "number", "points") if outcome.get(key) is not None), None))
+    player_id = str(
+        outcome.get("playerId") or item.get("playerId") or item.get("player")
+        or item.get("athlete") or item.get("name") or ""
+    )
+    outcome_id = str(
+        outcome.get("outcomeId") or item.get("outcomeId") or item.get("id")
+        or item.get("projectionId") or f"OUTLIER_ROW_{idx}"
+    )
     if line is None or not player_id or not outcome_id:
         return None
-    raw_market = str(outcome.get("proposition") or outcome.get("market") or outcome.get("marketLabel") or "")
+    raw_market = str(
+        outcome.get("proposition") or outcome.get("market") or outcome.get("marketLabel")
+        or item.get("stat") or item.get("prop") or item.get("statType") or ""
+    )
     market, label = map_stat(raw_market)
-    league, sport = map_league(outcome.get("leagueId") or item.get("league"), None)
+    league, sport = map_league(outcome.get("leagueId") or item.get("league") or item.get("sport"), None)
     offer = _book_offer(outcome, target_book)
     props = offer.get("identifier", {}).get("bookProps", {}) if offer else {}
     props = props if isinstance(props, dict) else {}
     side, side_conflict, side_reason = _resolve_side(outcome, offer)
+    if side == "UNKNOWN" and not nested:
+        # Legacy flattened exports put side under the row rather than the
+        # nested outcome.  This is still an observed side, never an inverse.
+        legacy_side = _side(item.get("side") or item.get("direction") or item.get("position"))
+        if legacy_side != "UNKNOWN":
+            side = legacy_side
+            side_reason = "EXACT_CAPTURED_SIDE"
     offered_higher = side == "MORE"
     offered_lower = side == "LESS"
     wager_types = _wager_types(outcome, side)
@@ -177,11 +210,14 @@ def _row(item: dict[str, Any], idx: int, *, target_book: str) -> dict[str, Any] 
     status = _status(outcome)
     return {
         "projectionId": f"OUTLIER:{outcome_id}:{target_book}", "sourceProjectionId": outcome_id,
-        "sportFamily": sport, "league": league, "eventId": str(outcome.get("eventId") or ""),
-        "eventLabel": str(outcome.get("eventLabel") or ""), "playerId": player_id,
-        "playerName": str(item.get("playerName") or ""), "teamId": str(outcome.get("teamId") or ""),
-        "team": str(outcome.get("team") or ""), "opponentId": str(outcome.get("oppTeamId") or ""),
-        "opponent": str(outcome.get("opponent") or ""), "market": market,
+        "sportFamily": sport, "league": league,
+        "eventId": str(outcome.get("eventId") or item.get("eventId") or item.get("gameId") or ""),
+        "eventLabel": str(outcome.get("eventLabel") or item.get("event") or ""), "playerId": player_id,
+        "playerName": str(item.get("playerName") or item.get("player") or item.get("athlete") or item.get("name") or ""),
+        "teamId": str(outcome.get("teamId") or item.get("teamId") or item.get("team") or ""),
+        "team": str(outcome.get("team") or item.get("team") or ""),
+        "opponentId": str(outcome.get("oppTeamId") or item.get("opponentId") or item.get("opponent") or ""),
+        "opponent": str(outcome.get("opponent") or item.get("opponent") or ""), "market": market,
         "marketLabel": label if label != "UNKNOWN" else market_label(market, raw_market), "line": line,
         "side": side, "offeredHigher": offered_higher, "offeredLower": offered_lower,
         "allowedWagerTypes": wager_types, "sideConflict": side_conflict, "sideResolution": side_reason or "EXACT_CAPTURED_SIDE",
@@ -209,5 +245,9 @@ def parse_outlier_payload(obj: Any, *, target_book: str | None = None) -> tuple[
     if not items:
         return None
     selected_book = _target_book(obj, explicit=target_book)
-    rows = [row for index, item in enumerate(items) if (row := _row(item, index, target_book=selected_book))]
+    rows = [
+        row for index, item in enumerate(items)
+        if _looks_like_outlier_item(item)
+        and (row := _row(item, index, target_book=selected_book))
+    ]
     return (OUTLIER_SOURCE, rows) if rows else None
