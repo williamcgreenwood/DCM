@@ -29,6 +29,7 @@ from dcm.cfb.rules import build_cfb_rules_snapshot
 from dcm.platform.prizepicks.platform_rules_authority import resolve_platform_rules_authority
 from dcm.research.material_facts import apply_hold_playable, facts_to_features, hold_playable_scope_ids, resolve_material_facts
 from dcm.contracts.hashes import content_hash
+from dcm.exclusions import permanent_subject_exclusion
 from dcm.identity.resolve import build_player_index, freeze_map, resolve_row
 from dcm.ingest.board import freeze_board, write_board
 from dcm.ingest.composite import compose_ingests
@@ -516,6 +517,13 @@ def run_dcm(
         acc = dict(board.get("accounting") or {})
         acc["classified"] = counts
         acc["goblins_excluded_from_selection"] = counts.get("EXCLUDED_GOBLIN", 0)
+        acc["permanently_excluded_subjects"] = sum(
+            1 for row in rows if permanent_subject_exclusion(row) is not None
+        )
+        acc["permanent_exclusion_terminal_overlap_goblin"] = sum(
+            1 for row in rows
+            if permanent_subject_exclusion(row) is not None and row.get("modifier") == "GOBLIN"
+        )
         acc["terminalAccounting"] = terminal
         acc["hostReceipt"] = receipt.as_dict()
         (dest / "accounting.json").write_text(json.dumps(acc, indent=2, sort_keys=True) + "\n", encoding="utf-8")
@@ -591,13 +599,19 @@ def run_dcm(
             json.dumps(coverage_report(planned["requests"], offer_recovery["claims"]), indent=2, sort_keys=True) + "\n",
             encoding="utf-8",
         )
-        prepare_cfb_research_os(
+        os_art = prepare_cfb_research_os(
             dest,
             rows,
             planned["requests"],
             coverage=None,
             telemetry=telemetry,
         )
+        # Keep the returned telemetry object authoritative in case a host
+        # adapter supplied/retained its own execution recorder.  This makes
+        # the account-only artifact reflect the actual index/graph/scheduler
+        # consumers rather than the pre-research HAR plan alone.
+        if isinstance(os_art, dict) and isinstance(os_art.get("telemetry"), AlgorithmTelemetry):
+            telemetry = os_art["telemetry"]
         host_plan = build_host_research_plan(
             planned["requests"],
             skipped=planned["skipped"],
@@ -615,6 +629,11 @@ def run_dcm(
         emit_packets_and_graph(
             dest, offer_sets=pop["offerSets"], claims=[], cutoff=forecast_cutoff, population=pop.get("manifest")
         )
+        # ``prepare_cfb_research_os`` executes the exact/hash/composite index,
+        # graph, cache and acquisition algorithms.  Persist telemetry only
+        # after that call; writing it earlier leaves an account-only run with
+        # a ceremonial plan-selection snapshot and hides the live consumers.
+        persist_algorithm_telemetry(dest, telemetry)
         ck = write_checkpoint(dest / "checkpoint.json", {
             "runId": run_id, "dcmVersion": SOFTWARE, "learningRevision": LEARNING_REVISION,
             "forecastCutoff": forecast_cutoff, "artifactRoot": str(dest),
@@ -1212,6 +1231,7 @@ def run_dcm(
                 modifier=row.get("modifier"),
                 target_book_offer_present=bool(row.get("targetBookOfferPresent", True)),
                 explicit_side=chosen_side,
+                subject=row,
             )
             if not preselection.may_select:
                 production_selectable = False
@@ -2063,6 +2083,9 @@ def run_dcm(
     blockers = []
     if excluded:
         blockers.append({"code": "GOBLIN_SELECTION_FORBIDDEN", "count": excluded})
+    permanent_excluded = sum(1 for row in rows if permanent_subject_exclusion(row) is not None)
+    if permanent_excluded:
+        blockers.append({"code": "PERMANENT_SUBJECT_EXCLUSION", "count": permanent_excluded})
     if unsupported:
         blockers.append({"code": "UNSUPPORTED_FAIL_CLOSED", "count": unsupported})
     if signal_errors:
