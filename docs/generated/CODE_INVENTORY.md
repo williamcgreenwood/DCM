@@ -2,10 +2,10 @@
 
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
-- Modules: **247**
-- Symbols: **1821**
+- Modules: **248**
+- Symbols: **1828**
 - Parse errors: **0**
-- Inventory hash: `a75c56cfa220838dd01d0d33e804aa3db09aa9501db0f11382a6671d8268192a`
+- Inventory hash: `7db64181d83a92bdbb22c5c47c7338b3100d0ec99bdb05f533d2f09aa56664da`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -235,7 +235,8 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P3 | `src/dcm/sports/basketball/__init__.py` | 0 | 0 |
 | P3 | `src/dcm/sports/basketball/minimal.py` | 0 | 5 |
 | P3 | `src/dcm/sports/common/__init__.py` | 0 | 0 |
-| P3 | `src/dcm/sports/common/contract.py` | 2 | 11 |
+| P3 | `src/dcm/sports/common/catalog.py` | 1 | 5 |
+| P3 | `src/dcm/sports/common/contract.py` | 2 | 12 |
 | P3 | `src/dcm/sports/common/plugin.py` | 1 | 4 |
 | P3 | `src/dcm/sports/common/research_schema.py` | 1 | 7 |
 | P3 | `src/dcm/sports/football/__init__.py` | 0 | 0 |
@@ -975,10 +976,10 @@ _No class/function symbols._
 
 ### `src/dcm/ingest/markets.py`
 
-- `function` **_norm** L254
-- `function` **map_stat** L258 — Return (market_key, market_label). Unknown keys stay as a slug — fail closed later.
-- `function` **map_league** L269
-- `function` **market_label** L281
+- `function` **_norm** L306
+- `function` **map_stat** L310 — Return (market_key, market_label). Unknown keys stay as a slug — fail closed later.
+- `function` **map_league** L321
+- `function` **market_label** L333
 
 ### `src/dcm/ingest/outlier.py`
 
@@ -1612,13 +1613,13 @@ _No class/function symbols._
 
 ### `src/dcm/research/classify.py`
 
-- `function` **_offered_sides_known** L54
-- `function` **_is_live** L60
-- `function` **_unsupported_market** L65
-- `function` **accounting_classify** L77 — Selection/accounting state after full-board accounting.
-- `function` **research_disposition** L114 — Return (deep_research?, class).
-- `function` **classify_rows** L161
-- `function` **market_definition_id** L199
+- `function` **_offered_sides_known** L55
+- `function` **_is_live** L61
+- `function` **_unsupported_market** L66
+- `function` **accounting_classify** L78 — Selection/accounting state after full-board accounting.
+- `function` **research_disposition** L115 — Return (deep_research?, class).
+- `function` **classify_rows** L159
+- `function` **market_definition_id** L197
 
 ### `src/dcm/research/classify_runtime.py`
 
@@ -2132,12 +2133,12 @@ _No class/function symbols._
 
 ### `src/dcm/research/source_catalog.py`
 
-- `function` **_load_raw** L20
-- `function` **load_source_catalog** L31
-- `function` **sources_for** L46
-- `function` **estimated_cost** L85
-- `function` **catalog_summary** L96
-- `function` **source_health_seeds** L110 — Derive health-router seeds from the versioned capability catalog.
+- `function` **_load_raw** L21
+- `function` **load_source_catalog** L32
+- `function` **sources_for** L47
+- `function` **estimated_cost** L86
+- `function` **catalog_summary** L97
+- `function` **source_health_seeds** L111 — Derive health-router seeds from the versioned capability catalog.
 
 ### `src/dcm/research/source_health.py`
 
@@ -2205,17 +2206,17 @@ _No class/function symbols._
 
 ### `src/dcm/research/subject_offer_set.py`
 
-- `function` **_s** L16
-- `function` **_first** L20
-- `function` **_unique_strings** L28
-- `function` **canonical_subject_fields** L42 — Map platform/native fields into universal core fields.
-- `function` **universal_offer_from_row** L79
-- `class` **SubjectOfferSet** L104
-- `method` **SubjectOfferSet.set_id** L122
-- `method` **SubjectOfferSet.validate** L125
-- `method` **SubjectOfferSet.to_dict** L137
-- `function` **build_subject_offer_sets** L173
-- `function` **subject_offer_sets_document** L216
+- `function` **_s** L17
+- `function` **_first** L21
+- `function` **_unique_strings** L29
+- `function` **canonical_subject_fields** L43 — Map platform/native fields into universal core fields.
+- `function` **universal_offer_from_row** L85
+- `class` **SubjectOfferSet** L110
+- `method` **SubjectOfferSet.set_id** L128
+- `method` **SubjectOfferSet.validate** L137
+- `method` **SubjectOfferSet.to_dict** L149
+- `function` **build_subject_offer_sets** L185
+- `function` **subject_offer_sets_document** L233
 
 ### `src/dcm/research/temporal.py`
 
@@ -2243,7 +2244,7 @@ _No class/function symbols._
 
 ### `src/dcm/research/universal_plan.py`
 
-- `function` **build_universal_host_research_plan** L99
+- `function` **build_universal_host_research_plan** L101
 
 ### `src/dcm/runner.py`
 
@@ -2701,40 +2702,50 @@ _No class/function symbols._
 
 _No class/function symbols._
 
+### `src/dcm/sports/common/catalog.py`
+
+- `class` **SportProfile** L16
+- `method` **SportProfile.to_dict** L27
+- `function` **_register** L44
+- `function` **normalize_sport_id** L56
+- `function` **lookup_sport_profile** L61
+- `function` **require_sport_profile** L65
+
 ### `src/dcm/sports/common/contract.py`
 
-- `class` **ComponentBinding** L51
-- `method` **ComponentBinding.__post_init__** L57
-- `method` **ComponentBinding.resolve** L65 — Import the configured module/symbol. Missing is an explicit failure.
-- `method` **ComponentBinding.to_dict** L79
-- `class` **SportPluginContract** L92
-- `method` **SportPluginContract.__post_init__** L98
-- `method` **SportPluginContract.binding_map** L107
-- `method` **SportPluginContract.report** L110
-- `function` **register_contract** L152
-- `function` **get_contract** L156
-- `function` **require_contract** L160
-- `function` **contract_registry_document** L167
-- `function` **_b** L184
+- `class` **ComponentBinding** L53
+- `method` **ComponentBinding.__post_init__** L59
+- `method` **ComponentBinding.resolve** L67 — Import the configured module/symbol. Missing is an explicit failure.
+- `method` **ComponentBinding.to_dict** L81
+- `class` **SportPluginContract** L94
+- `method` **SportPluginContract.__post_init__** L100
+- `method` **SportPluginContract.binding_map** L109
+- `method` **SportPluginContract.report** L112
+- `function` **register_contract** L154
+- `function` **get_contract** L158
+- `function` **require_contract** L162
+- `function` **contract_registry_document** L169
+- `function` **_b** L186
+- `function` **_register_research_only_contract** L263 — Expose an honest, import-validated upgrade ledger for each known sport.
 
 ### `src/dcm/sports/common/plugin.py`
 
-- `class` **SportPluginManifest** L13
-- `function` **register** L28
-- `function` **lookup** L32
-- `function` **_cap** L36
-- `function` **selection_state** L53
+- `class` **SportPluginManifest** L15
+- `function` **register** L30
+- `function` **lookup** L34
+- `function` **_cap** L38
+- `function` **selection_state** L55
 
 ### `src/dcm/sports/common/research_schema.py`
 
-- `class` **SportResearchSchema** L19
-- `method` **SportResearchSchema.validate_contract** L38
-- `method` **SportResearchSchema.contract_complete** L70
-- `method` **SportResearchSchema.subject_requirements** L73
-- `method` **SportResearchSchema.context_requirements** L87
-- `function` **register_research_schema** L99
-- `function` **lookup_research_schema** L108
-- `function` **require_research_schema** L112
+- `class` **SportResearchSchema** L21
+- `method` **SportResearchSchema.validate_contract** L40
+- `method` **SportResearchSchema.contract_complete** L72
+- `method` **SportResearchSchema.subject_requirements** L75
+- `method` **SportResearchSchema.context_requirements** L89
+- `function` **register_research_schema** L101
+- `function` **lookup_research_schema** L110
+- `function` **require_research_schema** L114
 
 ### `src/dcm/sports/football/__init__.py`
 

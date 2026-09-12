@@ -34,7 +34,7 @@ def test_player_aliases_normalize_into_one_subject_offer_set():
     sets = build_subject_offer_sets(rows)
     assert len(sets) == 1
     item = sets[0]
-    assert item["setId"] == "SOS|PAIGE|E1"
+    assert item["setId"] == "SOS|basketball|WNBA|PAIGE|E1"
     assert item["subjectId"] == "PAIGE"
     assert item["subjectType"] == "PLAYER"
     assert item["subjectName"] == "Paige Bueckers"
@@ -104,3 +104,18 @@ def test_same_subject_different_events_remain_separate():
     sets = build_subject_offer_sets([row_a, row_b])
     assert {item["eventId"] for item in sets} == {"E1", "E2"}
     assert len(sets) == 2
+
+
+def test_same_provider_local_ids_across_sports_never_merge():
+    basketball = _player_row("a", "pts", 20.5)
+    motorsport = {
+        **basketball,
+        "projectionId": "race-a",
+        "sportFamily": "F1",
+        "league": "F1",
+        "market": "laps",
+    }
+    sets = build_subject_offer_sets([basketball, motorsport])
+    assert len(sets) == 2
+    assert len({item["setId"] for item in sets}) == 2
+    assert {item["subjectType"] for item in sets} == {"PLAYER", "DRIVER"}

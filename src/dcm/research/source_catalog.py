@@ -12,6 +12,7 @@ from typing import Any
 
 from dcm.contracts.hashes import content_hash
 from dcm.research.scopes import canonical_scope
+from dcm.sports.common.catalog import normalize_sport_id
 
 CATALOG_PATH = Path(__file__).resolve().parents[1] / "data" / "source_catalog.json"
 CATALOG_SCHEMA = "pillars_dcm.source_catalog.v1"
@@ -53,12 +54,12 @@ def sources_for(
 ) -> list[dict[str, Any]]:
     cat = catalog or load_source_catalog()
     kind = canonical_scope(entity_kind) if entity_kind else None
-    sport_l = str(sport or "").strip().lower()
+    sport_l = normalize_sport_id(sport)
     comp_u = str(competition or "").strip().upper()
     field_l = str(field or "").strip().lower()
     out: list[dict[str, Any]] = []
     for src in cat.get("sources") or []:
-        sports = [str(x).lower() for x in (src.get("sports") or [])]
+        sports = [normalize_sport_id(x) if str(x) != "*" else "*" for x in (src.get("sports") or [])]
         comps = [str(x).upper() for x in (src.get("competitions") or [])]
         kinds = [canonical_scope(x) for x in (src.get("entityKinds") or [])]
         fields = [str(x).lower() for x in (src.get("fields") or [])]
@@ -132,7 +133,7 @@ def source_health_seeds(
     seeds: list[dict[str, Any]] = []
     for source in sources_for(sport=sport, competition=competition, catalog=catalog):
         sid = str(source.get("sourceId") or "")
-        if not sid or sid == "prizepicks_offer":
+        if not sid or sid in {"outlier_offer", "prizepicks_offer"}:
             continue
         seeds.append({
             "sourceId": sid,

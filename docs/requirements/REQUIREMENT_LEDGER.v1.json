@@ -1,9 +1,9 @@
 {
   "schema": "pillars_dcm.requirement_ledger.v1",
   "ledger_version": "1.0.0",
-  "generated_at_utc": "2026-09-06T04:01:00Z",
-  "inspected_main_sha": "c01724382f478ddb4221a098e37e98f55fcd9ffe",
-  "inspected_main_note": "PR #35 src/dcm relocate merged; main protected",
+  "generated_at_utc": "2026-09-12T19:20:14Z",
+  "inspected_main_sha": "3d2625cc1f369d6e225120e1245e4b2cd5f690d2",
+  "inspected_main_note": "PR #78 Outlier slate audit merged; main protected",
   "adr_version": "ADR-REQ-LEDGER-V1-20260906",
   "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
   "status_values": [
@@ -51,17 +51,15 @@
     "by_status": {
       "EXTERNAL": 6,
       "IMPLEMENTED": 28,
-      "MISSING": 5,
       "N/A": 1,
-      "PARTIAL": 57,
+      "PARTIAL": 62,
       "SUPERSEDED": 1
     },
     "atomic_by_status": {
       "EXTERNAL": 6,
       "IMPLEMENTED": 28,
-      "MISSING": 5,
       "N/A": 1,
-      "PARTIAL": 15,
+      "PARTIAL": 20,
       "SUPERSEDED": 1
     },
     "cfb_critical_atomic": 35,
@@ -2455,17 +2453,17 @@
       "applicability": "tennis",
       "dependencies": [],
       "current_implementation": {
-        "producer": null,
-        "consumer": null,
-        "fallback": "UNSUPPORTED_FAIL_CLOSED accounting"
+        "producer": "src/dcm/sports/common/catalog.py / research_schema.py / contract.py",
+        "consumer": "universal Research OS host plan",
+        "fallback": "RESEARCH_ONLY_FAIL_CLOSED_MODELING"
       },
       "tests": [
         "tests/test_plugin_contract.py"
       ],
       "benchmark": null,
       "runtime_telemetry": [],
-      "status": "MISSING",
-      "blocker": "Outside CFB-first order; mixed-sport R1 not started for tennis",
+      "status": "PARTIAL",
+      "blocker": "Native MatchWorld, markets, conservation, settlement and chronological acceptance remain",
       "evidence_commit": null,
       "adr_version": "ADR-REQ-LEDGER-V1-20260906",
       "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
@@ -2482,17 +2480,17 @@
       "applicability": "combat",
       "dependencies": [],
       "current_implementation": {
-        "producer": null,
-        "consumer": null,
-        "fallback": "UNSUPPORTED_FAIL_CLOSED accounting"
+        "producer": "src/dcm/sports/common/catalog.py / research_schema.py / contract.py",
+        "consumer": "universal Research OS host plan",
+        "fallback": "RESEARCH_ONLY_FAIL_CLOSED_MODELING"
       },
       "tests": [
         "tests/test_plugin_contract.py"
       ],
       "benchmark": null,
       "runtime_telemetry": [],
-      "status": "MISSING",
-      "blocker": "Outside CFB-first order",
+      "status": "PARTIAL",
+      "blocker": "Native FightWorld/BoutWorld, markets, conservation, settlement and chronological acceptance remain",
       "evidence_commit": null,
       "adr_version": "ADR-REQ-LEDGER-V1-20260906",
       "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
@@ -2509,17 +2507,17 @@
       "applicability": "soccer",
       "dependencies": [],
       "current_implementation": {
-        "producer": null,
-        "consumer": null,
-        "fallback": "UNSUPPORTED_FAIL_CLOSED accounting"
+        "producer": "src/dcm/sports/common/catalog.py / research_schema.py / contract.py",
+        "consumer": "universal Research OS host plan",
+        "fallback": "RESEARCH_ONLY_FAIL_CLOSED_MODELING"
       },
       "tests": [
         "tests/test_plugin_contract.py"
       ],
       "benchmark": null,
       "runtime_telemetry": [],
-      "status": "MISSING",
-      "blocker": "Outside CFB-first order",
+      "status": "PARTIAL",
+      "blocker": "Native MatchWorld, competition markets, conservation, settlement and chronological acceptance remain",
       "evidence_commit": null,
       "adr_version": "ADR-REQ-LEDGER-V1-20260906",
       "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
@@ -2592,17 +2590,17 @@
       "applicability": "hockey",
       "dependencies": [],
       "current_implementation": {
-        "producer": null,
-        "consumer": null,
-        "fallback": "UNSUPPORTED_FAIL_CLOSED accounting"
+        "producer": "src/dcm/sports/common/catalog.py / research_schema.py / contract.py",
+        "consumer": "universal Research OS host plan",
+        "fallback": "RESEARCH_ONLY_FAIL_CLOSED_MODELING"
       },
       "tests": [
         "tests/test_plugin_contract.py"
       ],
       "benchmark": null,
       "runtime_telemetry": [],
-      "status": "MISSING",
-      "blocker": "Outside CFB-first order",
+      "status": "PARTIAL",
+      "blocker": "Native EventWorld, markets, conservation, settlement and chronological acceptance remain",
       "evidence_commit": null,
       "adr_version": "ADR-REQ-LEDGER-V1-20260906",
       "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
@@ -2619,17 +2617,17 @@
       "applicability": "multi-sport",
       "dependencies": [],
       "current_implementation": {
-        "producer": null,
-        "consumer": null,
-        "fallback": "account then fail-closed"
+        "producer": "src/dcm/sports/common/catalog.py / research_schema.py / contract.py",
+        "consumer": "ingest identity, SubjectOfferSet, universal Research OS host plan and plugin audit",
+        "fallback": "research/index/archive permitted; modeling and selection fail closed"
       },
       "tests": [
         "tests/test_e2e_runner.py"
       ],
       "benchmark": null,
       "runtime_telemetry": [],
-      "status": "MISSING",
-      "blocker": "Explicitly deferred behind CFB operational closure",
+      "status": "PARTIAL",
+      "blocker": "All declared families now have native research contracts; each still needs accepted physics, markets and settlement before promotion",
       "evidence_commit": null,
       "adr_version": "ADR-REQ-LEDGER-V1-20260906",
       "constitution_version": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",

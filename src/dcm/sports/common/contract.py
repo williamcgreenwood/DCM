@@ -14,6 +14,8 @@ from dataclasses import dataclass, field
 from importlib import import_module
 from typing import Any
 
+from dcm.sports.common.catalog import PROFILES, normalize_sport_id
+
 
 IMPLEMENTED = "IMPLEMENTED"
 PARTIAL = "PARTIAL"
@@ -150,11 +152,11 @@ REGISTRY: dict[str, SportPluginContract] = {}
 
 
 def register_contract(contract: SportPluginContract) -> None:
-    REGISTRY[contract.sport_id.lower()] = contract
+    REGISTRY[normalize_sport_id(contract.sport_id)] = contract
 
 
 def get_contract(sport_id: str) -> SportPluginContract | None:
-    return REGISTRY.get(str(sport_id or "").strip().lower())
+    return REGISTRY.get(normalize_sport_id(sport_id))
 
 
 def require_contract(sport_id: str) -> SportPluginContract:
@@ -256,6 +258,61 @@ register_contract(
         ),
     )
 )
+
+
+def _register_research_only_contract(sport_id: str) -> None:
+    """Expose an honest, import-validated upgrade ledger for each known sport.
+
+    This does not provide generic physics.  It lets ingestion and Research OS
+    consume the canonical sport profile/schema while the missing native world,
+    market and settlement components remain explicit blockers.
+    """
+    register_contract(
+        SportPluginContract(
+            sport_id=sport_id,
+            contract_version=f"{sport_id.upper()}_PLUGIN_CONTRACT_V1_2026-09-12",
+            declared_capability_state="RESEARCH_ONLY_FAIL_CLOSED_MODELING",
+            bindings=(
+                _b("IdentityContract", IMPLEMENTED, "dcm.contracts.universal_entities:SubjectRef"),
+                _b("ResearchSchema", IMPLEMENTED, "dcm.sports.common.research_schema:REGISTRY"),
+                _b(
+                    "SourceAdapterRegistry",
+                    PARTIAL,
+                    "dcm.research.adapters:SourceAdapter",
+                    "Universal host observations are supported; sport/competition source bindings need acceptance.",
+                ),
+                _b(
+                    "AvailabilityPolicy",
+                    PARTIAL,
+                    "dcm.model.availability:availability_mixture",
+                    "Generic availability states exist; native participation and DNP semantics are unverified.",
+                ),
+                _b(
+                    "FeatureSchema",
+                    PARTIAL,
+                    "dcm.ml.feature_store:FEATURE_FAMILIES",
+                    "Universal feature families exist; native normalized fields and lineage remain required.",
+                ),
+                _b(
+                    "MLModelRegistry",
+                    PARTIAL,
+                    "dcm.learning.registry:load_registry",
+                    "Governance registry exists; no sport-native trained champion is claimed.",
+                ),
+                _b(
+                    "CalibrationPolicy",
+                    PARTIAL,
+                    "dcm.learning.calibration:apply_calibration",
+                    "Chronological sport/market calibration is not earned at LR000000.",
+                ),
+            ),
+        )
+    )
+
+
+for _sport_id in sorted(PROFILES):
+    if _sport_id not in REGISTRY:
+        _register_research_only_contract(_sport_id)
 
 register_contract(
     SportPluginContract(
