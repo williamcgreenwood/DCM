@@ -3,9 +3,9 @@
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
 - Modules: **246**
-- Symbols: **1816**
+- Symbols: **1817**
 - Parse errors: **0**
-- Inventory hash: `166b4abd85b9dfbeea8c27652281c1f21dcdb31c484bf7bf32ac71044dd0a3e4`
+- Inventory hash: `067510065b78e903f8c6dad826747b8059536d3ccebe23deec17881a69288f2c`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -75,7 +75,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P0 | `src/dcm/ingest/composite.py` | 0 | 6 |
 | P0 | `src/dcm/ingest/har.py` | 0 | 13 |
 | P0 | `src/dcm/ingest/markets.py` | 0 | 4 |
-| P0 | `src/dcm/ingest/outlier.py` | 0 | 13 |
+| P0 | `src/dcm/ingest/outlier.py` | 0 | 14 |
 | P0 | `src/dcm/ingest/prizepicks.py` | 0 | 13 |
 | P0 | `src/dcm/ingest/sanitize.py` | 0 | 5 |
 | P0 | `src/dcm/ingest/wsab_bind.py` | 0 | 2 |
@@ -980,14 +980,15 @@ _No class/function symbols._
 - `function` **_alias_side** L37 — Read Outlier's compact ``o-``/``u-`` outcome alias when present.
 - `function` **_modifier** L47
 - `function` **_items** L58
-- `function` **_target_book** L65
-- `function` **_book_offer** L80
-- `function` **_book_modifier** L94
-- `function` **_status** L104
-- `function` **_resolve_side** L119
-- `function` **_wager_types** L131
-- `function` **_row** L141
-- `function` **parse_outlier_payload** L205
+- `function` **_looks_like_outlier_item** L65 — Accept current nested rows and the legacy flattened Outlier export.
+- `function` **_target_book** L81
+- `function` **_book_offer** L96
+- `function` **_book_modifier** L110
+- `function` **_status** L120
+- `function` **_resolve_side** L135
+- `function` **_wager_types** L147
+- `function` **_row** L157
+- `function` **parse_outlier_payload** L241
 
 ### `src/dcm/ingest/prizepicks.py`
 
