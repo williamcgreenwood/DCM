@@ -253,14 +253,30 @@ def _basic_gate_reasons(
     return reasons
 
 
-def _same_line_groups(rows: Iterable[Mapping[str, Any]]) -> dict[tuple[str, str, str, str, float], list[dict[str, Any]]]:
-    groups: dict[tuple[str, str, str, str, float], list[dict[str, Any]]] = defaultdict(list)
+def _same_line_groups(rows: Iterable[Mapping[str, Any]]) -> dict[tuple[str, str, str, str, float, str, str, bool, str, str], list[dict[str, Any]]]:
+    """Group only economically compatible duplicates.
+
+    Outlier captures can contain the same player/stat/line more than once for
+    different modifiers or because one outcome has the configured target book
+    while another does not.  Collapsing those rows together would let an
+    unavailable offer hide an available one (or let a Goblin/other modifier
+    contaminate Standard).  Provider, modifier, target-offer presence, period
+    and MarketDefinition therefore remain part of the deterministic key.
+    """
+    groups: dict[tuple[str, str, str, str, float, str, str, bool, str, str], list[dict[str, Any]]] = defaultdict(list)
     for raw in rows:
         row = dict(raw)
         line = _line_value(row)
         if line is None:
             continue
-        key = (_upper(row.get("league")), _event_key(row), _player_key(row), _stat_key(row), line)
+        key = (
+            _upper(row.get("league")), _event_key(row), _player_key(row), _stat_key(row), line,
+            _upper(row.get("modifier") or "OTHER"),
+            _upper(row.get("targetBook") or row.get("sourceBook")),
+            bool(row.get("targetBookOfferPresent")),
+            _upper(row.get("period") or row.get("boardId")),
+            _upper(row.get("marketDefinition") or row.get("marketDefinitionId")),
+        )
         groups[key].append(row)
     return groups
 
@@ -280,7 +296,16 @@ def _merge_same_line(rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     # authoritative for this sanitized row; no side is inferred from a line.
     awt_values = [_allowed_wager_value(r) for r in ordered if _nonempty(_allowed_wager_value(r))]
     if awt_values:
-        merged["allowedWagerTypes"] = awt_values[0] if len(awt_values) == 1 else sorted({_text(v) for v in awt_values})
+        flattened: list[str] = []
+        for value in awt_values:
+            if isinstance(value, Mapping):
+                flattened.extend(_upper(k) for k, enabled in value.items() if enabled)
+            elif isinstance(value, (list, tuple, set)):
+                flattened.extend(_upper(item) for item in value)
+            else:
+                flattened.append(_upper(value))
+        flattened = sorted({item for item in flattened if item})
+        merged["allowedWagerTypes"] = flattened[0] if len(flattened) == 1 else flattened
     merged["sideClass"] = _legal_side_class(merged)
     return merged
 
