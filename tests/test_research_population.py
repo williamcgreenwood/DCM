@@ -121,7 +121,7 @@ def test_account_only_emits_canonical_and_legacy_research_artifacts(tmp_path: Pa
 
     subject_sets = json.loads(subject_sets_path.read_text())
     assert subject_sets["setCount"] >= 1
-    assert subject_sets["schema"] == "pillars_dcm.subject_offer_sets.v1"
+    assert subject_sets["schema"] == "pillars_dcm.subject_offer_sets.v2"
 
     player_sets = json.loads(player_sets_path.read_text())
     assert player_sets["compatibilityOnly"] is True

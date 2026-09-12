@@ -1,4 +1,4 @@
-from dcm.sports.common.plugin import REGISTRY, UNSUPPORTED, lookup, selection_state
+from dcm.sports.common.plugin import REGISTRY, RESEARCH, UNSUPPORTED, lookup, selection_state
 
 
 def test_unknown_family_fail_closed():
@@ -25,5 +25,6 @@ def test_every_family_has_path_unit():
 
 def test_no_generic_esports_model():
     m = lookup("esports")
-    assert m.production_state == UNSUPPORTED
+    assert m.production_state == RESEARCH
     assert "CS2" in m.leagues
+    assert selection_state("esports", "CS2", "kills") == RESEARCH

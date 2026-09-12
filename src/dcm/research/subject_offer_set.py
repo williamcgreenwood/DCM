@@ -11,6 +11,7 @@ from typing import Any
 
 from dcm.contracts.hashes import content_hash
 from dcm.contracts.universal_entities import SubjectType, parse_subject_type
+from dcm.sports.common.catalog import lookup_sport_profile, normalize_sport_id
 
 
 def _s(value: Any) -> str:
@@ -46,11 +47,16 @@ def canonical_subject_fields(row: dict[str, Any]) -> dict[str, Any]:
     No downstream universal artifact is required to understand those aliases.
     """
     subject_id = _s(_first(row, "subjectId", "playerId"))
+    sport_id = normalize_sport_id(_first(row, "sportId", "sportFamily", "sport"))
+    profile = lookup_sport_profile(sport_id)
     explicit_type = _first(row, "subjectType")
-    default_type = SubjectType.PLAYER if row.get("playerId") else SubjectType.OTHER
+    default_type = (
+        profile.default_subject_type
+        if profile is not None
+        else (SubjectType.PLAYER if row.get("playerId") else SubjectType.OTHER)
+    )
     subject_type = parse_subject_type(explicit_type, default=default_type)
     subject_name = _s(_first(row, "subjectName", "playerName", "name", "subjectId", "playerId"))
-    sport_id = _s(_first(row, "sportId", "sportFamily", "sport"))
     competition_id = _s(_first(row, "competitionId", "competition", "league"))
     affiliation_id = _s(_first(row, "affiliationId", "teamId", "team")) or None
 
@@ -120,7 +126,13 @@ class SubjectOfferSet:
 
     @property
     def set_id(self) -> str:
-        return f"SOS|{self.subjectId}|{self.eventId}"
+        # Provider IDs are not globally unique across leagues/sports.  The
+        # canonical research identity must not merge an F1 driver, football
+        # player and esports subject merely because their local IDs match.
+        return (
+            f"SOS|{self.sportId}|{self.competitionId}|"
+            f"{self.subjectId}|{self.eventId}"
+        )
 
     def validate(self) -> None:
         if not self.subjectId:
@@ -171,7 +183,7 @@ class SubjectOfferSet:
 
 
 def build_subject_offer_sets(board_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    groups: dict[tuple[str, str], SubjectOfferSet] = {}
+    groups: dict[tuple[str, str, str, str], SubjectOfferSet] = {}
     for row in board_rows:
         if not isinstance(row, dict):
             continue
@@ -180,7 +192,12 @@ def build_subject_offer_sets(board_rows: list[dict[str, Any]]) -> list[dict[str,
         event_id = fields["eventId"]
         if not subject_id or not event_id:
             continue
-        key = (subject_id, event_id)
+        key = (
+            str(fields["sportId"]),
+            str(fields["competitionId"]),
+            subject_id,
+            event_id,
+        )
         if key not in groups:
             groups[key] = SubjectOfferSet(
                 subjectId=subject_id,
@@ -215,7 +232,7 @@ def build_subject_offer_sets(board_rows: list[dict[str, Any]]) -> list[dict[str,
 
 def subject_offer_sets_document(sets: list[dict[str, Any]]) -> dict[str, Any]:
     body = {
-        "schema": "pillars_dcm.subject_offer_sets.v1",
+        "schema": "pillars_dcm.subject_offer_sets.v2",
         "setCount": len(sets),
         "offerCount": sum(int(s.get("offerCount") or len(s.get("offers") or [])) for s in sets),
         "sets": sets,

@@ -57,12 +57,15 @@ def test_full_har_research_plan_far_below_legacy_20k():
 
     skipped = planned["skipped"]
     assert skipped["goblin"] == 1849
-    assert skipped["unsupported_sport"] >= 3000
+    # Known universal sport families are now explicit research-only rows, not
+    # mislabeled unknown sports. They remain excluded from production research
+    # unless research_shadow is enabled.
+    assert skipped["unsupported_sport"] >= 1
     assert skipped["live_or_in_progress"] >= 1
     # Demons no longer inflate side_unknown; Standard-missing remains.
     assert skipped["side_unknown"] >= 500
     assert skipped["side_unknown"] < 1000
-    assert skipped["shadow"] >= 1000
+    assert skipped["shadow"] >= 3000
     assert skipped["shadow_researched"] == 0
 
     offer_ids = {r["scope_id"] for r in requests if r["scope"] == "OFFER"}

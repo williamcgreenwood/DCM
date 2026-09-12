@@ -3,6 +3,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from dcm.sports.common.catalog import normalize_sport_id
+
 PRODUCTION = "PRODUCTION_SUPPORTED"
 SHADOW = "SHADOW_SUPPORTED"
 RESEARCH = "RESEARCH_ONLY"
@@ -26,11 +28,11 @@ CAPABILITIES: dict[tuple[str, str, str], str] = {}
 
 
 def register(m: SportPluginManifest) -> None:
-    REGISTRY[m.sport_family_id] = m
+    REGISTRY[normalize_sport_id(m.sport_family_id)] = m
 
 
 def lookup(family: str) -> SportPluginManifest | None:
-    return REGISTRY.get(family)
+    return REGISTRY.get(normalize_sport_id(family))
 
 
 def _cap(family: str, league: str, markets: tuple[str, ...], state: str) -> None:
@@ -51,7 +53,16 @@ _cap("combat", "UFC", ("sig_strikes", "takedowns", "fight_time"), RESEARCH)
 
 
 def selection_state(family: str, league: str, market: str) -> str:
-    return CAPABILITIES.get((family, league, market), UNSUPPORTED)
+    canonical = normalize_sport_id(family)
+    exact = CAPABILITIES.get((canonical, str(league or "").strip().upper(), market))
+    if exact is not None:
+        return exact
+    manifest = lookup(canonical)
+    # A research-only plugin may acquire/index facts for an unseen market so
+    # its exact definition can be resolved.  It still cannot model or select.
+    if manifest is not None and manifest.production_state == RESEARCH:
+        return RESEARCH
+    return UNSUPPORTED
 
 
 register(SportPluginManifest("gridiron", "1.3.0", ("NFL", "CFB", "NFLP", "CFL", "UFL"), "play/snap/route/target/dropback", ("snaps", "routes", "targets", "dropbacks", "carries"), PRODUCTION, known_unsupported=("CFL_REBOOT", "NFLP_PRESEASON", "DEF_TACKLES_PLAYABLE", "LONGEST_PLAY_MARKETS", "FANTASY_UNVERSIONED"), test_ids=("WSAB_BASELINE_46", "gridiron_p7_e2e"),))
@@ -66,4 +77,5 @@ for fam, unit, leagues in (
     ("australian_rules", "disposal", ("AFL",)), ("rugby", "phase/ruck", ("RU", "RL")),
     ("volleyball", "rally", ("INDOOR", "BEACH")), ("motorsport", "lap", ("F1", "NASCAR")),
 ):
-    register(SportPluginManifest(fam, "0.0.0", leagues, unit, (unit,), UNSUPPORTED))
+    register(SportPluginManifest(fam, "0.1.0", leagues, unit, (unit,), RESEARCH))
+register(SportPluginManifest("darts", "0.1.0", ("PDC",), "set/leg/visit", ("visits", "throws"), RESEARCH))

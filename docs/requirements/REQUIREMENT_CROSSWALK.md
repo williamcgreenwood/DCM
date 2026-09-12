@@ -26,9 +26,8 @@ Canonical machine ledger: [`REQUIREMENT_LEDGER.v1.json`](./REQUIREMENT_LEDGER.v1
 |---|---:|
 | EXTERNAL | 6 |
 | IMPLEMENTED | 28 |
-| MISSING | 5 |
 | N/A | 1 |
-| PARTIAL | 15 |
+| PARTIAL | 20 |
 | SUPERSEDED | 1 |
 
 ### All records by status (includes parents)
@@ -37,9 +36,8 @@ Canonical machine ledger: [`REQUIREMENT_LEDGER.v1.json`](./REQUIREMENT_LEDGER.v1
 |---|---:|
 | EXTERNAL | 6 |
 | IMPLEMENTED | 28 |
-| MISSING | 5 |
 | N/A | 1 |
-| PARTIAL | 57 |
+| PARTIAL | 62 |
 | SUPERSEDED | 1 |
 
 ## Top CFB closure blockers (HAR → evidence → model → card)

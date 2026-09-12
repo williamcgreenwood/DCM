@@ -1,6 +1,6 @@
 {
   "schema": "pillars_dcm.source_catalog.v1",
-  "catalogVersion": "2026-08-31",
+  "catalogVersion": "2026-09-12",
   "priorityOrder": [
     "official_structured",
     "configured_licensed_structured",
@@ -15,6 +15,32 @@
     "Live HTTP fetch is opt-in via DCM_LIVE_FETCH; CI uses fixture HTML/JSON."
   ],
   "sources": [
+    {
+      "sourceId": "outlier_offer",
+      "domain": "outlier.bet",
+      "adapterId": "outlier.offer",
+      "adapterVersion": "1.0.0",
+      "tier": "official_structured",
+      "authorityClass": "MARKET_AGGREGATOR",
+      "sports": ["*"],
+      "competitions": ["*"],
+      "entityKinds": ["OFFER", "MARKET_DEFINITION"],
+      "fields": ["line", "offered_sides", "modifier", "book_odds", "orf", "hit_rates", "source_updated_at"],
+      "access": "captured_har_only",
+      "media": ["har"],
+      "historicalDepth": "captured_market_snapshot",
+      "advancedMetrics": false,
+      "updateLatency": "capture",
+      "expectedFreshness": "this_har",
+      "rateLimit": "n/a",
+      "cost": 0.1,
+      "identifierStrategy": "outcome_id_plus_target_book",
+      "licensing": "sanitized_market_facts_only_never_raw_private_har",
+      "storagePolicy": "normalized_offer_snapshots_hashes_and_exact_side_availability",
+      "fallbackSourceIds": ["prizepicks_offer"],
+      "knownFailureModes": ["structural_capture_without_props", "target_book_absent", "side_unavailable", "stale_market_snapshot"],
+      "liveFetch": "never"
+    },
     {
       "sourceId": "official_nba",
       "domain": "nba.com",

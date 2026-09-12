@@ -23,7 +23,9 @@ def test_ledger_file_exists():
 def test_load_requirement_ledger_schema_and_statuses():
     doc = load_requirement_ledger(str(LEDGER))
     assert doc["schema"] == "pillars_dcm.requirement_ledger.v1"
-    assert doc["inspected_main_sha"].startswith("c017243")
+    inspected_sha = doc["inspected_main_sha"]
+    assert len(inspected_sha) == 40
+    assert all(char in "0123456789abcdef" for char in inspected_sha)
     assert len(doc["requirements"]) >= 50
     for row in doc["requirements"]:
         assert row["status"] in STATUS_VALUES

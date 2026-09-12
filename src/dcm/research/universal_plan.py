@@ -8,6 +8,8 @@ from __future__ import annotations
 from typing import Any
 
 from dcm.sports.common.research_schema import lookup_research_schema
+from dcm.sports.common.catalog import lookup_sport_profile, normalize_sport_id
+from dcm.research.source_catalog import load_source_catalog, sources_for
 
 
 ENTITY_ORDER = (
@@ -101,6 +103,7 @@ def build_universal_host_research_plan(
     *,
     subject_offer_sets: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
+    source_catalog = load_source_catalog()
     tasks: list[dict[str, Any]] = []
     for row in population.get("fanOut") or []:
         if not isinstance(row, dict):
@@ -109,8 +112,15 @@ def build_universal_host_research_plan(
         if entity_type not in RESEARCH_SCHEMA:
             continue
         spec = RESEARCH_SCHEMA[entity_type]
-        sport_id = str(row.get("sportId") or "").strip().lower()
+        sport_id = normalize_sport_id(row.get("sportId"))
         sport_schema = lookup_research_schema(sport_id) if sport_id else None
+        sport_profile = lookup_sport_profile(sport_id) if sport_id else None
+        source_candidates = sources_for(
+            sport=sport_id or None,
+            competition=str(row.get("competitionId") or "") or None,
+            entity_kind=entity_type,
+            catalog=source_catalog,
+        )
         task = {
             "entityType": entity_type,
             "entityId": row.get("entityId"),
@@ -118,7 +128,7 @@ def build_universal_host_research_plan(
             "priorityScore": row.get("fanOutPriority"),
             "requiredEvidence": list(spec["required"]),
             "researchQuestions": list(spec["questions"]),
-            "sportId": row.get("sportId"),
+            "sportId": sport_id or row.get("sportId"),
             "competitionId": row.get("competitionId"),
             "eventId": row.get("eventId"),
             "subjectId": row.get("subjectId"),
@@ -130,6 +140,20 @@ def build_universal_host_research_plan(
             "sportResearchSchemaVersion": (
                 sport_schema.schema_version if sport_schema is not None else None
             ),
+            "sportProfile": sport_profile.to_dict() if sport_profile is not None else None,
+            "sourceCandidates": [
+                {
+                    "sourceId": source.get("sourceId"),
+                    "adapterId": source.get("adapterId"),
+                    "tier": source.get("tier"),
+                    "authorityClass": source.get("authorityClass"),
+                    "fields": list(source.get("fields") or []),
+                    "cost": source.get("cost"),
+                    "fallbackSourceIds": list(source.get("fallbackSourceIds") or []),
+                    "liveFetch": source.get("liveFetch"),
+                }
+                for source in source_candidates
+            ],
         }
         if sport_schema is not None:
             if entity_type == "SUBJECT":
@@ -155,12 +179,15 @@ def build_universal_host_research_plan(
         "canonical": True,
         "researchHierarchy": list(ENTITY_ORDER),
         "taskCount": len(tasks),
+        "sourceCatalogVersion": source_catalog.get("catalogVersion"),
+        "sourceCatalogHash": source_catalog.get("contentHash"),
         "subjectOfferSetCount": len(subject_offer_sets or []),
         "priorityRule": "dependentOfferCount × informationImportance × freshnessNeed; research reusable entities once.",
         "semanticRule": "No player/team/minutes/etc. concept is required by the universal core; SportPlugin defines applicable fields.",
         "historyRule": "Acquire broad useful history first; derive recent windows from complete history; shrink small role-comparable samples.",
         "temporalRule": "Only evidence known at or before forecast cutoff may enter a frozen forecast.",
         "outputContract": "Structured EvidenceClaims with source lineage; no invented data, sample sizes, status or probability.",
+        "sourceRoutingRule": "Exact catalog capabilities first; host web discovery only after cheaper valid sources and cache are exhausted. Authority is claim-specific.",
         "tasks": tasks,
     }
     return body

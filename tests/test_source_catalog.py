@@ -14,6 +14,7 @@ def test_catalog_loads_and_is_hashed():
     assert summary["secretsInRepo"] is False
     assert summary["authenticatedRequired"] is False
     assert "prizepicks_offer" in summary["sourceIds"]
+    assert "outlier_offer" in summary["sourceIds"]
     assert "generic_web_search" in summary["sourceIds"]
 
 
@@ -29,6 +30,14 @@ def test_catalog_priority_official_before_search():
 def test_catalog_counterparty_basketball():
     ranked = sources_for(sport="basketball", entity_kind="COUNTERPARTY")
     assert any(s["sourceId"] == "basketball_reference" for s in ranked)
+
+
+def test_outlier_is_first_class_offer_source_but_not_player_research_authority():
+    offers = sources_for(sport="soccer", competition="MLS", entity_kind="OFFER")
+    assert offers[0]["sourceId"] == "outlier_offer"
+    subjects = sources_for(sport="soccer", competition="MLS", entity_kind="SUBJECT")
+    assert all(source["sourceId"] != "outlier_offer" for source in subjects)
+    assert any(source["sourceId"] == "generic_web_search" for source in subjects)
 
 
 def test_cfb_health_router_is_derived_from_cfb_catalog_capabilities():

@@ -9,6 +9,7 @@ from dcm.sports.common.contract import (
     contract_registry_document,
     require_contract,
 )
+from dcm.sports.common.catalog import PROFILES
 
 
 def test_registered_sport_plugin_bindings_resolve_but_partial_contracts_do_not_promote():
@@ -18,7 +19,7 @@ def test_registered_sport_plugin_bindings_resolve_but_partial_contracts_do_not_p
     assert document["productionCompleteSports"] == []
 
     reports = {row["sportId"]: row for row in document["sports"]}
-    assert set(reports) == {"basketball", "gridiron"}
+    assert set(reports) == set(PROFILES)
     for sport in ("basketball", "gridiron"):
         report = reports[sport]
         assert report["requiredComponentCount"] == len(REQUIRED_COMPONENTS)
@@ -47,4 +48,16 @@ def test_sport_plugin_contract_requires_every_named_component():
 
 def test_unknown_sport_plugin_contract_fails_closed():
     with pytest.raises(LookupError, match="SPORT_PLUGIN_CONTRACT_UNSUPPORTED"):
-        require_contract("motorsport")
+        require_contract("unknown_sport")
+
+
+def test_research_only_sports_are_registered_without_fake_model_promotion():
+    for sport in set(PROFILES) - {"basketball", "gridiron"}:
+        report = require_contract(sport).report(validate_imports=True)
+        assert report["declaredCapabilityState"] == "RESEARCH_ONLY_FAIL_CLOSED_MODELING"
+        assert report["universalProductionComplete"] is False
+        assert report["productionPromotionAllowedByContract"] is False
+        assert report["missingCount"] > 0
+        assert "EventWorldModel:MISSING" in report["blockers"]
+        assert "MarketDefinitionRegistry:MISSING" in report["blockers"]
+        assert "SettlementRules:MISSING" in report["blockers"]

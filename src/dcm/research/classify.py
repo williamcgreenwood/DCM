@@ -11,8 +11,9 @@ from dcm.model.worlds import MARKET_FROM_STATS
 from dcm.cfb.markets import ACTIVE_CFB_MARKETS
 from dcm.exclusions import permanent_subject_exclusion
 from dcm.sports.common.plugin import selection_state
+from dcm.sports.common.catalog import PROFILES, normalize_sport_id
 
-SUPPORTED_FAMILIES = {"basketball", "gridiron", "baseball"}
+SUPPORTED_FAMILIES = frozenset(PROFILES)
 PRODUCTION_LEAGUES = {"NBA", "WNBA", "NFL", "CFB"}
 SHADOW_LEAGUES = {"MLB"}
 
@@ -63,7 +64,7 @@ def _is_live(row: dict[str, Any]) -> bool:
 
 
 def _unsupported_market(row: dict[str, Any]) -> bool:
-    family = row.get("sportFamily") or ""
+    family = normalize_sport_id(row.get("sportFamily"))
     market = row.get("market")
     if family == "basketball" and market not in BASKETBALL_MARKETS:
         return True
@@ -93,12 +94,12 @@ def accounting_classify(row: dict[str, Any]) -> tuple[str, str | None]:
         return "UNRESOLVED", "PLAYER_ID_UNRESOLVED_NO_NAME_INFERENCE"
     if row.get("sportFamily") == "baseball" and row.get("market") == "hits_runs_rbi" and abs(float(row.get("line", 0)) - 0.5) < 1e-9:
         return "UNRESOLVED", "HALF_LINE_AVOID_BASEBALL_HRRBI_0_5"
-    family = row.get("sportFamily") or ""
+    family = normalize_sport_id(row.get("sportFamily"))
     cap = selection_state(family, row.get("league") or "", row.get("market") or "")
     if family not in SUPPORTED_FAMILIES or cap == "UNSUPPORTED_FAIL_CLOSED":
         return "UNSUPPORTED", "UNSUPPORTED_FAIL_CLOSED"
     if cap == "RESEARCH_ONLY":
-        return "MODELED", "RESEARCH_ONLY_NOT_SELECTABLE"
+        return "UNSUPPORTED", "RESEARCH_ONLY_NOT_SELECTABLE"
     if cap == "SHADOW_SUPPORTED":
         return "MODELED", "SHADOW_SUPPORTED_NOT_SELECTABLE"
     status = str(row.get("status") or "unknown")
@@ -123,14 +124,11 @@ def research_disposition(row: dict[str, Any], *, research_shadow: bool = False) 
     if permanent_subject_exclusion(row):
         return False, SKIP_UNRESOLVED
 
-    family = str(row.get("sportFamily") or "")
+    family = normalize_sport_id(row.get("sportFamily"))
     league = str(row.get("league") or "")
     cap = selection_state(family, league, str(row.get("market") or ""))
 
-    production_or_shadow = league in PRODUCTION_LEAGUES or league in SHADOW_LEAGUES
-    if family not in SUPPORTED_FAMILIES or not production_or_shadow or (
-        cap == "UNSUPPORTED_FAIL_CLOSED" and league not in PRODUCTION_LEAGUES | SHADOW_LEAGUES
-    ):
+    if family not in SUPPORTED_FAMILIES:
         return False, SKIP_UNSUPPORTED_SPORT
 
     if _is_live(row):
@@ -149,7 +147,7 @@ def research_disposition(row: dict[str, Any], *, research_shadow: bool = False) 
     if family == "baseball" and row.get("market") == "hits_runs_rbi" and abs(float(row.get("line", 0)) - 0.5) < 1e-9:
         return False, SKIP_UNRESOLVED
 
-    if cap == "SHADOW_SUPPORTED" or league in SHADOW_LEAGUES:
+    if cap in {"SHADOW_SUPPORTED", "RESEARCH_ONLY"} or league in SHADOW_LEAGUES:
         if research_shadow:
             return True, DEEP_SHADOW
         return False, SKIP_SHADOW
