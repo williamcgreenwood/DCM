@@ -73,6 +73,7 @@ from dcm.research.provider import BundleProvider, FileProvider, FixtureProvider,
 from dcm.research.claims import dedupe
 from dcm.research.requests import plan_research
 from dcm.research.offer_metadata import recover_offer_metadata
+from dcm.research.har_breakdown import build_har_breakdown, safe_parse_har
 from dcm.runtime.checkpoint import load_checkpoint, write_checkpoint
 from dcm.runtime.capabilities import build_capability_manifest, persist_capability_manifest
 from dcm.runtime.cutoff import CutoffRequired, POLICY_DOC, resolve_forecast_cutoff
@@ -433,6 +434,54 @@ def run_dcm(
             + "\n",
             encoding="utf-8",
         )
+        # Persist a privacy-safe structural receipt for every supplied HAR.
+        # This is deliberately separate from board extraction: /insights,
+        # schedule, and entity payloads can inform topology/drift and indexing,
+        # but cannot be promoted to betting offers without trusted props[].
+        if not synthetic:
+            breakdown_dir = dest / "har_breakdowns"
+            breakdown_dir.mkdir(parents=True, exist_ok=True)
+            breakdown_receipts: list[dict[str, Any]] = []
+            breakdown_errors: list[dict[str, str]] = []
+            for source in sources:
+                try:
+                    parsed_info = safe_parse_har(source)
+                    source_sha = str(parsed_info["harSha256"])
+                    result = build_har_breakdown(
+                        source,
+                        run_id=run_id,
+                        board=board,
+                        requests=[],
+                        output_path=breakdown_dir / f"{source_sha}.json",
+                    )
+                    breakdown_receipts.append(dict(result["receipt"]))
+                except Exception as exc:  # record a typed local failure; never emit raw input
+                    breakdown_errors.append({"sourceName": source.name, "errorType": type(exc).__name__})
+            manifest = {
+                "schema": "pillars_dcm.har_breakdown_manifest.v1",
+                "runId": run_id,
+                "sourceMode": "CAPTURED_HAR" if len(sources) == 1 else "MULTI_HAR_COMPOSITE",
+                "sourceCount": len(sources),
+                "receipts": sorted(breakdown_receipts, key=lambda row: str(row.get("harSha256") or "")),
+                "errors": sorted(breakdown_errors, key=lambda row: str(row.get("sourceName") or "")),
+                "privacy": {"rawHarPersisted": False, "rawBodiesPersisted": False, "rawHeadersPersisted": False, "rawUrlsPersisted": False, "valuesPersisted": False},
+            }
+            manifest["contentHash"] = content_hash({k: v for k, v in manifest.items() if k != "contentHash"})
+            (dest / "har_breakdown_manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+            input_manifest_path = dest / "input_manifest.json"
+            input_manifest = json.loads(input_manifest_path.read_text(encoding="utf-8"))
+            input_manifest["harBreakdownManifestHash"] = manifest["contentHash"]
+            input_manifest["structuralEvidencePayloadCount"] = int((ingest.get("indexStats") or {}).get("evidence_payload_count") or len(ingest.get("evidencePayloads") or []))
+            input_manifest_path.write_text(json.dumps(input_manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+            evidence_manifest = {
+                "schema": "pillars_dcm.captured_evidence_manifest.v1",
+                "runId": run_id,
+                "sourceHarSha256s": sorted(str(value) for value in (ingest.get("contributingHarSha256s") or [har_sha])),
+                "payloads": [dict(item) for item in (ingest.get("evidencePayloads") or []) if isinstance(item, dict)],
+                "privacy": {"rawBodiesPersisted": False, "rawHeadersPersisted": False, "rawUrlsPersisted": False, "valuesPersisted": False},
+            }
+            evidence_manifest["contentHash"] = content_hash({k: v for k, v in evidence_manifest.items() if k != "contentHash"})
+            (dest / "captured_evidence_manifest.json").write_text(json.dumps(evidence_manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         (dest / "MOUNT_STATE.json").write_text(json.dumps(mount, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         schema_v2 = verify_schema_v2(workspace)
         schema_root = {**schema_root, "v2": schema_v2, "workingSchemaId": SCHEMA_V2_ID}

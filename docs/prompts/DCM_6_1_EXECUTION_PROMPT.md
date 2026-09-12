@@ -53,10 +53,21 @@ a fabricated forecast for implementation.
    observations. Match Brennan/Carr only by their configured exact subject IDs
    or punctuation-normalized full names; never fuzzy-match a surname, infer a
    missing identity, or create an inverse side. Keep the excluded rows in the
-   accounting receipt and expose a typed exclusion blocker.
+   accounting receipt and expose a typed exclusion blocker. For every Outlier
+   or composite HAR, also run the safe structural breakdown path. Preserve
+   redacted `/insights`, schedule, and entity topology in
+   `har_breakdown_manifest.json` and `captured_evidence_manifest.json`; never
+   promote shape-only records into offers. `index-build` must consume these
+   receipts and report the registered exact/composite/Boolean/BM25F/WAND,
+   trie/Aho–Corasick, MinHash/SimHash/LSH, RRF, and MMR executions (or an
+   explicit typed not-applicable reason).
 7. Add content-addressed evidence reuse, idempotent restart, source lineage,
    cutoff evaluation, conflict/absence states, conserved event-world links,
-   immutable freeze, and append-only future-only settlement boundaries.
+   immutable freeze, and append-only future-only settlement boundaries. If
+   accounting yields zero trusted market rows, emit a terminal
+   `NO_RESEARCH_CANDIDATES` batch with `researchMayBegin=false`; do not call
+   external sources or weaken readiness gates to make an empty run look
+   successful.
 8. Run targeted tests, failure/temporal/determinism/restart tests, full suite,
    policy check, inventory check, fresh-install smoke, and representative
    benchmark. Record exact results and unresolved external gates.

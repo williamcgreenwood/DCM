@@ -27,6 +27,21 @@ summary (scope, response hash, item count, pagination flag, and top-level keys)
 is retained. The DCM does not turn opaque insight records into player facts or
 probabilities.
 
+When multiple HARs are supplied, the composite adapter preserves every
+redacted evidence payload with its source HAR digest and deterministic ordering.
+The runner writes `har_breakdown_manifest.json` plus one safe structural
+breakdown per source, and `captured_evidence_manifest.json`; raw bodies, URLs,
+headers, and values are never persisted. These artifacts are indexed alongside
+claims and board rows by `index-build` using the registered exact/composite,
+Boolean, BM25F/WAND, trie/Aho–Corasick, MinHash/SimHash/LSH, RRF, and MMR
+search paths. An index receipt proves indexing of structure only, not semantic
+research or a betting recommendation.
+
+If the complete capture contains no trusted market rows, accounting still
+completes and `next-research` returns the terminal
+`NO_RESEARCH_CANDIDATES`/`NO_MARKET_ROWS` batch. It keeps `researchMayBegin` false
+and performs no external acquisition.
+
 ## Exact offer semantics
 
 For each outcome the adapter preserves the source outcome ID, line, event,

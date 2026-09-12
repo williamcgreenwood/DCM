@@ -239,6 +239,15 @@ def test_uncheckpointed_active_pointer_cannot_be_advanced(tmp_path: Path):
     assert result["resumeRequired"] is True
 
 
+def test_empty_market_run_returns_terminal_no_research_candidate_batch(tmp_path: Path):
+    (tmp_path / "research_requests.json").write_text("[]", encoding="utf-8")
+    result = next_research_batch(tmp_path)
+    assert result["status"] == "NO_RESEARCH_CANDIDATES"
+    assert result["reason"] == "NO_MARKET_ROWS"
+    assert result["researchMayBegin"] is False
+    assert result["actions"] == []
+
+
 def test_checkpoint_compare_and_swap_and_hash_verification(tmp_path: Path):
     path = tmp_path / "research_checkpoint.json"
     first = write_checkpoint_cas(

@@ -5,7 +5,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 - Modules: **247**
 - Symbols: **1821**
 - Parse errors: **0**
-- Inventory hash: `0a4c0e10684e8ff823a957a547eea78d2f36066d78bc0e99a89da0b876396c08`
+- Inventory hash: `a75c56cfa220838dd01d0d33e804aa3db09aa9501db0f11382a6671d8268192a`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -742,7 +742,7 @@ _No class/function symbols._
 - `function` **_pending_active_batch** L107 — Return an uncheckpointed active batch without selecting a replacement.
 - `function` **_researcher_view** L152 — Project canonical identity into a readable, non-authoritative handoff.
 - `function` **next_research_batch** L237
-- `method` **next_research_batch.row_league** L263
+- `method` **next_research_batch.row_league** L299
 
 ### `src/dcm/chat/session.py`
 
@@ -759,20 +759,20 @@ _No class/function symbols._
 - `method` **HostSession.research_batch** L226 — Canonical durable batch command; next-research remains compatible.
 - `method` **HostSession.har_breakdown** L232
 - `method` **HostSession.index_build** L246
-- `method` **HostSession.search_blueprint** L260 — Compile the sport-neutral public-search fan-out plan for this run.
-- `method` **HostSession.research_validate** L279
-- `method` **HostSession.import_evidence** L327
-- `method` **HostSession.coverage** L438
-- `method` **HostSession.record_research_failure** L491
-- `method` **HostSession.checkpoint_verify** L502
-- `method` **HostSession._persist_research_checkpoint** L512
-- `method` **HostSession.forecast** L538
-- `method` **HostSession.report** L572
-- `method` **HostSession.resume** L579
-- `method` **HostSession.audit** L595
-- `method` **HostSession.archive** L600
-- `method` **HostSession.settle** L605
-- `function` **cfb_launch** L612 — Guarded CFB vertical slice. Fixture/bundle can freeze; file research returns the host loop.
+- `method` **HostSession.search_blueprint** L283 — Compile the sport-neutral public-search fan-out plan for this run.
+- `method` **HostSession.research_validate** L302
+- `method` **HostSession.import_evidence** L350
+- `method` **HostSession.coverage** L461
+- `method` **HostSession.record_research_failure** L514
+- `method` **HostSession.checkpoint_verify** L525
+- `method` **HostSession._persist_research_checkpoint** L535
+- `method` **HostSession.forecast** L561
+- `method` **HostSession.report** L595
+- `method` **HostSession.resume** L602
+- `method` **HostSession.audit** L618
+- `method` **HostSession.archive** L623
+- `method` **HostSession.settle** L628
+- `function` **cfb_launch** L635 — Guarded CFB vertical slice. Fixture/bundle can freeze; file research returns the host loop.
 
 ### `src/dcm/chat/state.py`
 
@@ -2247,17 +2247,17 @@ _No class/function symbols._
 
 ### `src/dcm/runner.py`
 
-- `function` **_finalize_archive** L137 — Always write dest/audit/. Optionally copy+commit+push a GitHub pack.
-- `function` **_synthetic_path** L215
-- `function` **_run_id** L228
-- `function` **_git_commit_sha** L232 — Best-effort git HEAD. Never writes git config. Missing git is None, not a crash.
-- `function` **_default_model_config** L252
-- `function` **_active_calibration** L263
-- `function` **run_dcm** L272
-- `method` **run_dcm._snapshot_for** L929
-- `method` **run_dcm._resimulate_material** L1427
-- `method` **run_dcm.slim** L1618
-- `function` **main** L2191
+- `function` **_finalize_archive** L138 — Always write dest/audit/. Optionally copy+commit+push a GitHub pack.
+- `function` **_synthetic_path** L216
+- `function` **_run_id** L229
+- `function` **_git_commit_sha** L233 — Best-effort git HEAD. Never writes git config. Missing git is None, not a crash.
+- `function` **_default_model_config** L253
+- `function` **_active_calibration** L264
+- `function` **run_dcm** L273
+- `method` **run_dcm._snapshot_for** L978
+- `method` **run_dcm._resimulate_material** L1476
+- `method` **run_dcm.slim** L1667
+- `function` **main** L2240
 
 ### `src/dcm/runtime/__init__.py`
 
@@ -2376,44 +2376,44 @@ _No class/function symbols._
 
 ### `src/dcm/runtime/github_archive.py`
 
-- `function` **scan_for_secrets** L129 — Return secret-like tokens found in file text. Empty list means clean.
-- `function` **git_identity** L173 — Author/committer identity for archive commits. Never requires git config.
-- `function` **_git_env** L180
-- `function` **certification_fields** L190 — Subset of audit flags for runner stdout, INDEX.jsonl, and manifests.
-- `function` **_now_utc** L202
-- `function` **_s** L206
-- `function` **_load_json** L212
-- `function` **_load_jsonl** L221
-- `function` **_write_json** L242
-- `function` **_looks_like_claim** L247
-- `function` **_read_claims** L253
-- `function` **_read_requests** L279
-- `function` **_read_card** L300
-- `function` **pick_to_requests** L312 — Match a slim() pick (or full row) onto planned research requests.
-- `function` **_covering_claims** L374
-- `function` **_player_logs_or_status_missing** L393
-- `function` **evaluate_pick_evidence** L414
-- `function` **_is_fixture_mode** L466
-- `function` **_is_manual_evidence** L475
-- `function` **_parse_iso** L479
-- `function` **_picks_coverage_complete** L491
-- `function` **_hash_certified_python_freeze** L513
-- `function` **_model_run_certified** L527
-- `function` **_evidence_coverage_certified** L550
-- `function` **_evidence_temporal** L557
-- `function` **_empty_card_reason** L589
-- `function` **compute_certification** L606 — Compute split canonical certification flags; no combined lock state.
-- `function` **locks_certified** L658 — Compatibility helper only; the combined value is not stored canonically.
-- `function` **_render_run_audit_md** L668
-- `function` **build_run_audit** L723
-- `function` **_is_forbidden** L886
-- `function` **_copy_file** L902
-- `function` **_file_sha256** L912
-- `function` **materialize_github_pack** L922
-- `function` **append_index** L1005
-- `function` **_git** L1015
-- `function` **_sanitize_git_error** L1026
-- `function` **push_to_github** L1038
+- `function` **scan_for_secrets** L131 — Return secret-like tokens found in file text. Empty list means clean.
+- `function` **git_identity** L175 — Author/committer identity for archive commits. Never requires git config.
+- `function` **_git_env** L182
+- `function` **certification_fields** L192 — Subset of audit flags for runner stdout, INDEX.jsonl, and manifests.
+- `function` **_now_utc** L204
+- `function` **_s** L208
+- `function` **_load_json** L214
+- `function` **_load_jsonl** L223
+- `function` **_write_json** L244
+- `function` **_looks_like_claim** L249
+- `function` **_read_claims** L255
+- `function` **_read_requests** L281
+- `function` **_read_card** L302
+- `function` **pick_to_requests** L314 — Match a slim() pick (or full row) onto planned research requests.
+- `function` **_covering_claims** L376
+- `function` **_player_logs_or_status_missing** L395
+- `function` **evaluate_pick_evidence** L416
+- `function` **_is_fixture_mode** L468
+- `function` **_is_manual_evidence** L477
+- `function` **_parse_iso** L481
+- `function` **_picks_coverage_complete** L493
+- `function` **_hash_certified_python_freeze** L515
+- `function` **_model_run_certified** L529
+- `function` **_evidence_coverage_certified** L552
+- `function` **_evidence_temporal** L559
+- `function` **_empty_card_reason** L591
+- `function` **compute_certification** L608 — Compute split canonical certification flags; no combined lock state.
+- `function` **locks_certified** L660 — Compatibility helper only; the combined value is not stored canonically.
+- `function` **_render_run_audit_md** L670
+- `function` **build_run_audit** L725
+- `function` **_is_forbidden** L888
+- `function` **_copy_file** L904
+- `function` **_file_sha256** L914
+- `function` **materialize_github_pack** L924
+- `function` **append_index** L1007
+- `function` **_git** L1017
+- `function` **_sanitize_git_error** L1028
+- `function` **push_to_github** L1040
 
 ### `src/dcm/runtime/governor.py`
 
