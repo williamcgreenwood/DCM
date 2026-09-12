@@ -251,12 +251,14 @@ def _index_har(
 
 
 def _parse_payload(obj: Any) -> tuple[str, list[dict]] | None:
-    pp = parse_prizepicks_payload(obj)
-    if pp:
-        return pp
+    # Outlier is the preferred capture format.  Its payload shape is strict
+    # enough that a PrizePicks JSON:API response will not be misclassified.
     out = parse_outlier_payload(obj)
     if out:
         return out
+    pp = parse_prizepicks_payload(obj)
+    if pp:
+        return pp
     return None
 
 
