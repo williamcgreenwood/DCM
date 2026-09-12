@@ -2,10 +2,10 @@
 
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
-- Modules: **244**
-- Symbols: **1794**
+- Modules: **246**
+- Symbols: **1816**
 - Parse errors: **0**
-- Inventory hash: `750ed170cf3e7014e29b3f6a1fe00a68845930e63f451e9bf8dd1925dccd4620`
+- Inventory hash: `166b4abd85b9dfbeea8c27652281c1f21dcdb31c484bf7bf32ac71044dd0a3e4`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -75,7 +75,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P0 | `src/dcm/ingest/composite.py` | 0 | 6 |
 | P0 | `src/dcm/ingest/har.py` | 0 | 13 |
 | P0 | `src/dcm/ingest/markets.py` | 0 | 4 |
-| P0 | `src/dcm/ingest/outlier.py` | 0 | 3 |
+| P0 | `src/dcm/ingest/outlier.py` | 0 | 13 |
 | P0 | `src/dcm/ingest/prizepicks.py` | 0 | 13 |
 | P0 | `src/dcm/ingest/sanitize.py` | 0 | 5 |
 | P0 | `src/dcm/ingest/wsab_bind.py` | 0 | 2 |
@@ -83,6 +83,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P6 | `src/dcm/learning/calibration.py` | 0 | 6 |
 | P6 | `src/dcm/learning/dataset.py` | 1 | 13 |
 | P6 | `src/dcm/learning/failure_class.py` | 0 | 3 |
+| P6 | `src/dcm/learning/outlier_patterns.py` | 1 | 4 |
 | P6 | `src/dcm/learning/postgame.py` | 0 | 13 |
 | P6 | `src/dcm/learning/registry.py` | 0 | 10 |
 | P6 | `src/dcm/learning/sidecar.py` | 0 | 5 |
@@ -216,6 +217,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P4 | `src/dcm/selection/decision_integrity.py` | 1 | 6 |
 | P4 | `src/dcm/selection/eligibility.py` | 1 | 3 |
 | P4 | `src/dcm/selection/portfolio.py` | 0 | 6 |
+| P4 | `src/dcm/selection/preselection.py` | 1 | 6 |
 | UNMAPPED | `src/dcm/settle.py` | 0 | 1 |
 | P15 | `src/dcm/signals/__init__.py` | 0 | 0 |
 | P15 | `src/dcm/signals/cfb_runtime.py` | 0 | 3 |
@@ -684,11 +686,11 @@ _No class/function symbols._
 - `function` **_support** L31
 - `function` **cfb_prop_flags** L37
 - `function` **cfb_top100_row** L68
-- `function` **rank_cfb_modeled** L118 — Filter CFB → heap partial Top-K → deterministic Timsort of the frontier.
-- `function` **cfb_top100_preliminary** L147
-- `function` **cfb_top25_final** L161
-- `function` **cfb_playables_final** L175
-- `function` **frontier_offer_ids** L211
+- `function` **rank_cfb_modeled** L132 — Filter CFB → heap partial Top-K → deterministic Timsort of the frontier.
+- `function` **cfb_top100_preliminary** L161
+- `function` **cfb_top25_final** L175
+- `function` **cfb_playables_final** L189
+- `function` **frontier_offer_ids** L225
 
 ### `src/dcm/cfb/rules.py`
 
@@ -961,8 +963,8 @@ _No class/function symbols._
 - `function` **_attempt** L120
 - `function` **_index_har** L147
 - `function` **_parse_payload** L253
-- `function` **_verified_empty_payload** L263 — An empty response clears a scope only when the market collection is explicit.
-- `function` **ingest_har** L275 — Parse a HAR and retain every sanitized request-scope attempt.
+- `function` **_verified_empty_payload** L265 — An empty response clears a scope only when the market collection is explicit.
+- `function` **ingest_har** L277 — Parse a HAR and retain every sanitized request-scope attempt.
 
 ### `src/dcm/ingest/markets.py`
 
@@ -973,9 +975,19 @@ _No class/function symbols._
 
 ### `src/dcm/ingest/outlier.py`
 
-- `function` **_num** L10
-- `function` **_row** L17
-- `function` **parse_outlier_payload** L63
+- `function` **_num** L21
+- `function` **_side** L28
+- `function` **_alias_side** L37 — Read Outlier's compact ``o-``/``u-`` outcome alias when present.
+- `function` **_modifier** L47
+- `function` **_items** L58
+- `function` **_target_book** L65
+- `function` **_book_offer** L80
+- `function` **_book_modifier** L94
+- `function` **_status** L104
+- `function` **_resolve_side** L119
+- `function` **_wager_types** L131
+- `function` **_row** L141
+- `function` **parse_outlier_payload** L205
 
 ### `src/dcm/ingest/prizepicks.py`
 
@@ -1041,6 +1053,14 @@ _No class/function symbols._
 - `function` **_f** L49
 - `function` **_blob** L57
 - `function` **classify_failure** L67 — Assign one failure class. Never authorizes a permanent model patch from one result.
+
+### `src/dcm/learning/outlier_patterns.py`
+
+- `class` **SegmentSummary** L17
+- `method` **SegmentSummary.as_dict** L26
+- `function` **validate_observation** L32
+- `function` **_wilson_lower** L39
+- `function` **summarize_leg_segments** L49 — Summarize settled independent legs only; any slip lineage is excluded.
 
 ### `src/dcm/learning/postgame.py`
 
@@ -1721,27 +1741,27 @@ _No class/function symbols._
 - `function` **_line_value** L191
 - `function` **_projection_key** L200
 - `function` **_basic_gate_reasons** L204
-- `function` **_same_line_groups** L256
-- `function` **_merge_same_line** L268
-- `function` **_primary_hint** L288
-- `function` **_choose_primary** L292
-- `function` **_player_game_stat_key** L324
-- `function` **build_legal_universe** L328 — Apply structural gates and collapse alt lines to one primary row.
-- `function` **_is_sf_lar** L434
-- `function` **_game_id** L442
-- `function` **_stat_family** L446
-- `function` **_structural_key** L459
-- `function` **_row_summary** L476
-- `function` **_quota_state** L504
-- `function` **_quota_requirements** L524
-- `function` **quota_shortlist** L541 — Greedy, deterministic quota sampler with a visible leftover list.
-- `method` **quota_shortlist.can_add** L567
-- `method` **quota_shortlist.add** L586
-- `method` **quota_shortlist.add_from** L607
-- `function` **build_board_funnel** L712
-- `function` **write_funnel_artifacts** L780 — Run the funnel against a sanitized ``board.json`` and persist receipts.
-- `function` **_parser** L848
-- `function` **main** L863
+- `function` **_same_line_groups** L256 — Group only economically compatible duplicates.
+- `function` **_merge_same_line** L284
+- `function` **_primary_hint** L313
+- `function` **_choose_primary** L317
+- `function` **_player_game_stat_key** L349
+- `function` **build_legal_universe** L353 — Apply structural gates and collapse alt lines to one primary row.
+- `function` **_is_sf_lar** L459
+- `function` **_game_id** L467
+- `function` **_stat_family** L471
+- `function` **_structural_key** L484
+- `function` **_row_summary** L501
+- `function` **_quota_state** L529
+- `function` **_quota_requirements** L549
+- `function` **quota_shortlist** L566 — Greedy, deterministic quota sampler with a visible leftover list.
+- `method` **quota_shortlist.can_add** L592
+- `method` **quota_shortlist.add** L611
+- `method` **quota_shortlist.add_from** L632
+- `function` **build_board_funnel** L737
+- `function` **write_funnel_artifacts** L805 — Run the funnel against a sanitized ``board.json`` and persist receipts.
+- `function` **_parser** L873
+- `function` **main** L888
 
 ### `src/dcm/research/gamelog.py`
 
@@ -2219,17 +2239,17 @@ _No class/function symbols._
 
 ### `src/dcm/runner.py`
 
-- `function` **_finalize_archive** L130 — Always write dest/audit/. Optionally copy+commit+push a GitHub pack.
-- `function` **_synthetic_path** L208
-- `function` **_run_id** L221
-- `function` **_git_commit_sha** L225 — Best-effort git HEAD. Never writes git config. Missing git is None, not a crash.
-- `function` **_default_model_config** L245
-- `function` **_active_calibration** L256
-- `function` **run_dcm** L265
-- `method` **run_dcm._snapshot_for** L904
-- `method` **run_dcm._resimulate_material** L1365
-- `method` **run_dcm.slim** L1556
-- `function` **main** L2124
+- `function` **_finalize_archive** L136 — Always write dest/audit/. Optionally copy+commit+push a GitHub pack.
+- `function` **_synthetic_path** L214
+- `function` **_run_id** L227
+- `function` **_git_commit_sha** L231 — Best-effort git HEAD. Never writes git config. Missing git is None, not a crash.
+- `function` **_default_model_config** L251
+- `function` **_active_calibration** L262
+- `function` **run_dcm** L271
+- `method` **run_dcm._snapshot_for** L910
+- `method` **run_dcm._resimulate_material** L1407
+- `method` **run_dcm.slim** L1598
+- `function` **main** L2168
 
 ### `src/dcm/runtime/__init__.py`
 
@@ -2548,6 +2568,16 @@ _No class/function symbols._
 - `function` **_selection_correlation** L44 — Pearson correlation of aligned simulated pick outcomes.
 - `function` **build_card** L79
 - `function` **exposure_report** L152
+
+### `src/dcm/selection/preselection.py`
+
+- `function` **_support_n** L13 — Coerce evidence support counts without allowing malformed captures to raise.
+- `class` **PreselectionDecision** L22
+- `method` **PreselectionDecision.may_select** L29
+- `method` **PreselectionDecision.as_dict** L32
+- `function` **_missing_research** L37
+- `function` **research_flags_from_snapshot** L42 — Project canonical evidence state into the small preselection contract.
+- `function` **assess_preselection** L78 — Apply safety order before direction/portfolio selection.
 
 ### `src/dcm/settle.py`
 
