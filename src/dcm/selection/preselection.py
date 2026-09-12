@@ -5,6 +5,8 @@ from dataclasses import dataclass
 from math import isfinite
 from typing import Any, Mapping
 
+from dcm.exclusions import permanent_subject_exclusion
+
 REQUIRED_RESEARCH = frozenset({"player_role", "availability", "recent_usage", "matchup", "current_line"})
 OUTLIER_PRESELECTION_POLICY_VERSION = "OUTLIER_PRESELECTION_V1"
 OUTLIER_MINIMUM_MARGIN_SIGMA = 0.25
@@ -78,7 +80,8 @@ def research_flags_from_snapshot(snapshot: Mapping[str, Any] | None, row: Mappin
 def assess_preselection(*, offered_line: Any, projected_mean: Any, projected_stddev: Any,
                         minimum_margin_sigma: Any, research: Mapping[str, Any] | None,
                         modifier: Any = "STANDARD", target_book_offer_present: bool = True,
-                        explicit_side: Any = "UNKNOWN") -> PreselectionDecision:
+                        explicit_side: Any = "UNKNOWN",
+                        subject: Mapping[str, Any] | None = None) -> PreselectionDecision:
     """Apply safety order before direction/portfolio selection.
 
     ``minimum_margin_sigma`` is supplied by a versioned market-specific policy;
@@ -86,6 +89,8 @@ def assess_preselection(*, offered_line: Any, projected_mean: Any, projected_std
     """
     if str(modifier or "").upper() == "GOBLIN":
         return PreselectionDecision("EXCLUDED_GOBLIN", "GOBLIN_SELECTION_FORBIDDEN", None, ())
+    if (excluded := permanent_subject_exclusion(subject)):
+        return PreselectionDecision("EXCLUDED_SUBJECT", excluded, None, ())
     if str(modifier or "").upper() != "STANDARD":
         return PreselectionDecision("BLOCKED_MODIFIER", "TARGET_MODIFIER_NOT_STANDARD", None, ())
     if not target_book_offer_present:
