@@ -19,6 +19,7 @@ dev = ["pytest>=8.0"]
 pillars-dcm = "dcm.runner:main"
 dcm = "dcm.runner:main"
 dcm-host = "dcm.chat.cli:main"
+dcm-insight-settle = "dcm.insight_settle:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

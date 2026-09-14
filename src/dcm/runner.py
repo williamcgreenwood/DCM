@@ -71,6 +71,7 @@ from dcm.research.coverage import coverage_report
 from dcm.research.host_plan import build_host_research_plan
 from dcm.research.provider import BundleProvider, FileProvider, FixtureProvider, collect, write_bundle
 from dcm.research.claims import dedupe
+from dcm.research.insight_queue import build_research_queue
 from dcm.research.requests import plan_research
 from dcm.research.offer_metadata import recover_offer_metadata
 from dcm.research.har_breakdown import build_har_breakdown, safe_parse_har
@@ -434,6 +435,110 @@ def run_dcm(
             + "\n",
             encoding="utf-8",
         )
+        # Typed Outlier Insights are a separate, privacy-safe research input.
+        # Persist each normalized claim and deterministic queue partition, but
+        # never persist the HAR body, URL, headers, cookies, or free-form text.
+        insight_claims = [
+            dict(row) for row in (ingest.get("insightClaims") or [])
+            if isinstance(row, dict)
+        ]
+        if insight_claims:
+            insight_queue = build_research_queue(insight_claims)
+            claims_path = dest / "insights_claims.jsonl"
+            with claims_path.open("w", encoding="utf-8") as claim_file:
+                for claim in sorted(
+                    insight_claims,
+                    key=lambda row: (
+                        str(row.get("sourceHarSha256") or ""),
+                        str(row.get("sourceBodyHash") or ""),
+                        str(row.get("rowOrdinal") or 0),
+                        str(row.get("claimId") or ""),
+                    ),
+                ):
+                    claim_file.write(json.dumps(claim, sort_keys=True, separators=(",", ":")) + "\n")
+            (dest / "insights_research_queue.json").write_text(
+                json.dumps(insight_queue, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+            by_source: dict[str, list[dict[str, Any]]] = {}
+            for claim in insight_claims:
+                by_source.setdefault(str(claim.get("sourceHarSha256") or "UNKNOWN"), []).append(claim)
+            source_claim_dir = dest / "insights_by_source"
+            source_claim_dir.mkdir(parents=True, exist_ok=True)
+            source_rows = []
+            for source_hash, source_claims in sorted(by_source.items()):
+                source_queue = build_research_queue(source_claims)
+                source_claim_path = source_claim_dir / f"{source_hash}.jsonl"
+                with source_claim_path.open("w", encoding="utf-8") as source_file:
+                    for claim in sorted(
+                        source_claims,
+                        key=lambda row: (
+                            str(row.get("sourceBodyHash") or ""),
+                            str(row.get("rowOrdinal") or 0),
+                            str(row.get("claimId") or ""),
+                        ),
+                    ):
+                        source_file.write(json.dumps(claim, sort_keys=True, separators=(",", ":")) + "\n")
+                source_rows.append(
+                    {
+                        "sourceHarSha256": source_hash,
+                        "claimCount": len(source_claims),
+                        "queueAccounting": source_queue["accounting"],
+                        "bodyHashes": sorted({str(row.get("sourceBodyHash") or "") for row in source_claims}),
+                        "claimArchivePath": f"insights_by_source/{source_hash}.jsonl",
+                    }
+                )
+            source_manifest = {
+                "schema": "pillars_dcm.outlier_insights_source_manifest.v1",
+                "runId": run_id,
+                "sourceCount": len(source_rows),
+                "sources": source_rows,
+                "privacy": {
+                    "rawHarPersisted": False,
+                    "rawBodiesPersisted": False,
+                    "rawHeadersPersisted": False,
+                    "rawUrlsPersisted": False,
+                    "freeFormInsightTextPersisted": False,
+                },
+            }
+            source_manifest["contentHash"] = content_hash(
+                {key: value for key, value in source_manifest.items() if key != "contentHash"}
+            )
+            (dest / "insights_source_manifest.json").write_text(
+                json.dumps(source_manifest, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+            settlement_manifest = {
+                "schema": "pillars_dcm.outlier_insights_settlement_manifest.v1",
+                "adapterVersion": "OUTLIER_INSIGHTS_SETTLEMENT_V1_2026-09-14",
+                "runId": run_id,
+                "claimCount": len(insight_claims),
+                "status": "AWAITING_AUTHORITATIVE_OUTCOMES",
+                "settledCount": 0,
+                "trainingEligibleCount": 0,
+                "ledgerPath": "insight_settlement_ledger.jsonl",
+                "trainingBoundary": "FUTURE_ONLY_AFTER_EXACT_SETTLEMENT",
+                "contentHash": content_hash(
+                    {
+                        "runId": run_id,
+                        "claimCount": len(insight_claims),
+                        "status": "AWAITING_AUTHORITATIVE_OUTCOMES",
+                    }
+                ),
+            }
+            (dest / "insight_settlement_manifest.json").write_text(
+                json.dumps(settlement_manifest, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+            input_manifest_path = dest / "input_manifest.json"
+            input_manifest = json.loads(input_manifest_path.read_text(encoding="utf-8"))
+            input_manifest["insightsClaimCount"] = len(insight_claims)
+            input_manifest["insightsQueueAccountingHash"] = insight_queue["accounting"]["contentHash"]
+            input_manifest["insightsSourceManifestHash"] = source_manifest["contentHash"]
+            input_manifest_path.write_text(
+                json.dumps(input_manifest, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
         # Persist a privacy-safe structural receipt for every supplied HAR.
         # This is deliberately separate from board extraction: /insights,
         # schedule, and entity payloads can inform topology/drift and indexing,

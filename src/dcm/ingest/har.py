@@ -14,6 +14,7 @@ from typing import Any
 from urllib.parse import parse_qsl, quote, unquote, urlsplit
 
 from dcm.ingest.composite import reconcile_scope_attempts
+from dcm.ingest.insights import merge_insight_claims, parse_insights_payload
 from dcm.ingest.outlier import parse_outlier_payload
 from dcm.ingest.prizepicks import parse_prizepicks_payload
 from dcm.ingest.sanitize import count_secrets, redact_headers, url_allowlisted, url_denied
@@ -148,7 +149,7 @@ def _index_har(
     obj: dict,
     *,
     source_hash: str,
-) -> tuple[list[dict], list[dict], dict[str, int], list[str], list[dict[str, Any]]]:
+) -> tuple[list[dict], list[dict], dict[str, int], list[str], list[dict[str, Any]], list[dict[str, Any]]]:
     log = obj.get("log") if isinstance(obj.get("log"), dict) else {}
     entries = log.get("entries") if isinstance(log.get("entries"), list) else []
     warnings: list[str] = []
@@ -166,11 +167,17 @@ def _index_har(
         "successful_nonempty_responses": 0,
         "decoded_evidence_bodies": 0,
         "insights_payloads": 0,
+        "insights_rows_accounted": 0,
+        "insights_typed_claims": 0,
+        "insights_player_prop_rows": 0,
+        "insights_team_market_rows": 0,
+        "insights_pagination_incomplete": 0,
     }
     seen_body: set[tuple[str, str]] = set()
     indexed: list[dict] = []
     attempts: list[dict] = []
     evidence_payloads: list[dict[str, Any]] = []
+    insight_claims: list[dict[str, Any]] = []
 
     for ordinal, ent in enumerate(entries):
         if not isinstance(ent, dict):
@@ -199,9 +206,9 @@ def _index_har(
         if not url_allowlisted(url):
             continue
 
-        # Insights are a separate evidence surface, not a market board. Read
-        # only structural metadata here; never persist the response body or
-        # claim values without a typed evidence adapter.
+        # Insights are a separate evidence surface, not a market board. The
+        # typed adapter emits bounded semantic claims; it never persists the
+        # response body or request credentials.
         if not _market_endpoint(url):
             status = int(res.get("status") or 0)
             if status < 200 or status >= 300:
@@ -216,6 +223,15 @@ def _index_har(
                 continue
             if isinstance(payload, dict) and isinstance(payload.get("insights"), list):
                 body_hash = sha256_text(body)
+                typed, accounting = parse_insights_payload(
+                    payload,
+                    source_har_sha256=source_hash,
+                    source_body_hash=body_hash,
+                    source_snapshot_time=started,
+                    request_scope=scope,
+                    entry_ordinal=ordinal,
+                )
+                insight_claims.extend(typed)
                 evidence_payloads.append(
                     {
                         "kind": "INSIGHTS",
@@ -228,10 +244,20 @@ def _index_har(
                         "itemType": "list",
                         "topLevelKeys": sorted(str(k) for k in payload.keys()),
                         "nextPageTokenPresent": bool(payload.get("nextPageToken")),
+                        "nextPageTokenState": accounting["paginationState"],
+                        "typedAdapterVersion": accounting["adapterVersion"],
+                        "typedClaimCount": accounting["typedClaimCount"],
+                        "accounting": accounting,
                     }
                 )
                 stats["decoded_evidence_bodies"] += 1
                 stats["insights_payloads"] += 1
+                stats["insights_rows_accounted"] += int(accounting["itemCount"])
+                stats["insights_typed_claims"] += int(accounting["typedClaimCount"])
+                stats["insights_player_prop_rows"] += int(accounting["dispositions"].get("PLAYER_PROP_CANDIDATE", 0))
+                stats["insights_team_market_rows"] += int(accounting["dispositions"].get("TEAM_MARKET_ACCOUNTED", 0))
+                if accounting["paginationState"] == "NONEMPTY":
+                    stats["insights_pagination_incomplete"] += 1
             continue
 
         stats["allowlisted_endpoints"] += 1
@@ -285,7 +311,7 @@ def _index_har(
     )
     if not indexed and entries and not attempts and not evidence_payloads:
         warnings.append("NO_ALLOWLISTED_MARKET_ENDPOINT")
-    return indexed, attempts, stats, warnings, evidence_payloads
+    return indexed, attempts, stats, warnings, evidence_payloads, insight_claims
 
 
 def _parse_payload(obj: Any) -> tuple[str, list[dict]] | None:
@@ -332,6 +358,9 @@ def ingest_har(raw: Any, *, raw_bytes: bytes | None = None) -> dict[str, Any]:
         "http_failures": 0, "decode_failures": 0, "schema_failures": 0,
         "verified_empty_responses": 0, "successful_nonempty_responses": 0,
         "decoded_evidence_bodies": 0, "insights_payloads": 0,
+        "insights_rows_accounted": 0, "insights_typed_claims": 0,
+        "insights_player_prop_rows": 0, "insights_team_market_rows": 0,
+        "insights_pagination_incomplete": 0,
     }
     capture_start = capture_end = ""
     parser = PARSER_VERSION
@@ -340,9 +369,10 @@ def ingest_har(raw: Any, *, raw_bytes: bytes | None = None) -> dict[str, Any]:
     timeline: list[dict] = []
     scope_attempts: list[dict[str, Any]] = []
     evidence_payloads: list[dict[str, Any]] = []
+    insight_claims: list[dict[str, Any]] = []
 
     if isinstance(obj, dict) and isinstance(obj.get("log"), dict):
-        indexed, initial_attempts, index_stats, w, evidence_payloads = _index_har(obj, source_hash=har_sha256)
+        indexed, initial_attempts, index_stats, w, evidence_payloads, insight_claims = _index_har(obj, source_hash=har_sha256)
         warnings.extend(w)
         scope_attempts.extend(initial_attempts)
         all_times = [
@@ -459,6 +489,15 @@ def ingest_har(raw: Any, *, raw_bytes: bytes | None = None) -> dict[str, Any]:
             )
         elif isinstance(obj, dict) and isinstance(obj.get("insights"), list):
             adapter = "INSIGHTS_EVIDENCE"
+            typed, accounting = parse_insights_payload(
+                obj,
+                source_har_sha256=har_sha256,
+                source_body_hash=har_sha256,
+                source_snapshot_time="",
+                request_scope="DIRECT",
+                entry_ordinal=0,
+            )
+            insight_claims.extend(typed)
             evidence_payloads.append(
                 {
                     "kind": "INSIGHTS",
@@ -471,8 +510,20 @@ def ingest_har(raw: Any, *, raw_bytes: bytes | None = None) -> dict[str, Any]:
                     "itemType": "list",
                     "topLevelKeys": sorted(str(k) for k in obj.keys()),
                     "nextPageTokenPresent": bool(obj.get("nextPageToken")),
+                    "nextPageTokenState": accounting["paginationState"],
+                    "typedAdapterVersion": accounting["adapterVersion"],
+                    "typedClaimCount": accounting["typedClaimCount"],
+                    "accounting": accounting,
                 }
             )
+            index_stats["decoded_evidence_bodies"] += 1
+            index_stats["insights_payloads"] += 1
+            index_stats["insights_rows_accounted"] += int(accounting["itemCount"])
+            index_stats["insights_typed_claims"] += int(accounting["typedClaimCount"])
+            index_stats["insights_player_prop_rows"] += int(accounting["dispositions"].get("PLAYER_PROP_CANDIDATE", 0))
+            index_stats["insights_team_market_rows"] += int(accounting["dispositions"].get("TEAM_MARKET_ACCOUNTED", 0))
+            if accounting["paginationState"] == "NONEMPTY":
+                index_stats["insights_pagination_incomplete"] += 1
 
     reconciled = reconcile_scope_attempts(scope_attempts)
     rows = reconciled["rows"]
@@ -500,6 +551,8 @@ def ingest_har(raw: Any, *, raw_bytes: bytes | None = None) -> dict[str, Any]:
     missing_sides = sum(not r.get("offeredHigher") and not r.get("offeredLower") for r in rows)
     if missing_sides:
         warnings.append(f"{missing_sides} offers have no verified offered side and fail closed")
+    if index_stats.get("insights_pagination_incomplete", 0):
+        warnings.append("INSIGHTS_PAGINATION_INCOMPLETE_FAIL_CLOSED")
     if synthetic:
         adapter = "SYNTHETIC"
         parser = "HAR_SYNTHETIC_V2"
@@ -509,6 +562,7 @@ def ingest_har(raw: Any, *, raw_bytes: bytes | None = None) -> dict[str, Any]:
         parser = "HAR_UNKNOWN"
 
     redacted += index_stats.get("secret_headers", 0)
+    _, insight_accounting = merge_insight_claims([insight_claims])
     return {
         "adapter": adapter,
         "parserVersion": parser,
@@ -517,6 +571,8 @@ def ingest_har(raw: Any, *, raw_bytes: bytes | None = None) -> dict[str, Any]:
         "rowHistory": histories,
         "scopeAttempts": scope_attempts,
         "evidencePayloads": evidence_payloads,
+        "insightClaims": insight_claims,
+        "insightAccounting": insight_accounting,
         "scopeState": reconciled["scopeState"],
         "failedRefreshes": reconciled["failedRefreshes"],
         "reconciliationHash": reconciled["reconciliationHash"],
