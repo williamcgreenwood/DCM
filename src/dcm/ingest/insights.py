@@ -311,6 +311,16 @@ def canonical_insight_record(
         "reportedHitRate": reported_hit_rate,
         "historicalSignalOnly": True,
         "books": books,
+        "observedBookOffers": [
+            {
+                "book": item["book"], "odds": item["odds"], "decimal": item["decimal"],
+                "side": direction, "line": line, "modifier": item["modifier"],
+                "periodLabel": _text(row.get("periodLabel"), limit=64),
+                "captureTime": _text(source_snapshot_time, limit=64),
+                "state": "OBSERVED_INSIGHT_NOT_CURRENT_BOARD",
+            }
+            for item in books
+        ],
         "bookCount": len(books),
         "modifierCounts": dict(sorted(modifier_counts.items())),
         "splits": _split_summary(row),
