@@ -10,11 +10,13 @@ from __future__ import annotations
 import base64
 import hashlib
 import json
+import re
 from typing import Any
 from urllib.parse import parse_qsl, quote, unquote, urlsplit
 
 from dcm.ingest.composite import reconcile_scope_attempts
 from dcm.ingest.insights import merge_insight_claims, parse_insights_payload
+from dcm.ingest.insight_context import enrich_insight_claims
 from dcm.ingest.outlier import parse_outlier_payload
 from dcm.ingest.prizepicks import parse_prizepicks_payload
 from dcm.ingest.sanitize import count_secrets, redact_headers, url_allowlisted, url_denied
@@ -172,12 +174,14 @@ def _index_har(
         "insights_player_prop_rows": 0,
         "insights_team_market_rows": 0,
         "insights_pagination_incomplete": 0,
+        "insights_identity_verified": 0, "insights_identity_cached": 0, "insights_identity_unresolved": 0,
     }
     seen_body: set[tuple[str, str]] = set()
     indexed: list[dict] = []
     attempts: list[dict] = []
     evidence_payloads: list[dict[str, Any]] = []
     insight_claims: list[dict[str, Any]] = []
+    context_pages: list[dict[str, Any]] = []
 
     for ordinal, ent in enumerate(entries):
         if not isinstance(ent, dict):
@@ -211,7 +215,8 @@ def _index_har(
         # response body or request credentials.
         if not _market_endpoint(url):
             status = int(res.get("status") or 0)
-            if status < 200 or status >= 300:
+            context_match = re.fullmatch(r"/sportsdata/leagues/([^/]+)/(entities|schedule)/?", path, re.IGNORECASE)
+            if (status < 200 or status >= 300) and not (status == 304 and context_match):
                 continue
             content = res.get("content") if isinstance(res.get("content"), dict) else {}
             body = _decode_content(content)
@@ -221,6 +226,11 @@ def _index_har(
                 payload = json.loads(body)
             except json.JSONDecodeError:
                 continue
+            if context_match and isinstance(payload, dict):
+                context_pages.append({
+                    "league": context_match.group(1).upper(), "kind": context_match.group(2).lower(),
+                    "payload": payload, "httpStatus": status,
+                })
             if isinstance(payload, dict) and isinstance(payload.get("insights"), list):
                 body_hash = sha256_text(body)
                 typed, accounting = parse_insights_payload(
@@ -311,6 +321,12 @@ def _index_har(
     )
     if not indexed and entries and not attempts and not evidence_payloads:
         warnings.append("NO_ALLOWLISTED_MARKET_ENDPOINT")
+    if insight_claims:
+        insight_claims, identity_accounting = enrich_insight_claims(insight_claims, context_pages)
+        states = identity_accounting.get("states") or {}
+        stats["insights_identity_verified"] = int(states.get("VERIFIED_HAR_LOCAL", 0))
+        stats["insights_identity_cached"] = int(states.get("HAR_ALIAS_CACHED_UNVERIFIED", 0))
+        stats["insights_identity_unresolved"] = int(states.get("UNRESOLVED_HAR_IDENTITY", 0))
     return indexed, attempts, stats, warnings, evidence_payloads, insight_claims
 
 
