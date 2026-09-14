@@ -72,6 +72,7 @@ from dcm.research.host_plan import build_host_research_plan
 from dcm.research.provider import BundleProvider, FileProvider, FixtureProvider, collect, write_bundle
 from dcm.research.claims import dedupe
 from dcm.research.insight_queue import build_research_queue
+from dcm.research.insight_bridge import plan_insight_host_research
 from dcm.research.requests import plan_research
 from dcm.research.offer_metadata import recover_offer_metadata
 from dcm.research.har_breakdown import build_har_breakdown, safe_parse_har
@@ -442,6 +443,14 @@ def run_dcm(
             dict(row) for row in (ingest.get("insightClaims") or [])
             if isinstance(row, dict)
         ]
+        insight_bridge = plan_insight_host_research(insight_claims, forecast_cutoff) if insight_claims else {
+            "schema": "pillars_dcm.insight_research_director_bridge.v1",
+            "researchRows": [], "requests": [],
+            "accounting": {"inputClaimCount": 0, "researchProjectionCount": 0, "requestCount": 0, "blocked": {}, "productionSelectionPermitted": False},
+        }
+        (dest / "insights_host_bridge.json").write_text(
+            json.dumps(insight_bridge, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+        )
         if insight_claims:
             insight_queue = build_research_queue(insight_claims)
             claims_path = dest / "insights_claims.jsonl"
@@ -714,6 +723,11 @@ def run_dcm(
         }
         (dest / "freeze.json").write_text(json.dumps(freeze, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         planned = plan_research(rows, forecast_cutoff, research_shadow=research_shadow)
+        # Insight claims are research-only projections.  They reuse the existing
+        # director request contract without becoming board offers or selections.
+        insight_requests = list((insight_bridge or {}).get("requests") or [])
+        if insight_requests:
+            planned["requests"] = list(planned["requests"]) + insight_requests
         (dest / "research_requests.json").write_text(
             json.dumps(planned["requests"], indent=2) + "\n", encoding="utf-8"
         )
@@ -755,7 +769,7 @@ def run_dcm(
         )
         os_art = prepare_cfb_research_os(
             dest,
-            rows,
+            rows + list((insight_bridge or {}).get("researchRows") or []),
             planned["requests"],
             coverage=None,
             telemetry=telemetry,
