@@ -2,10 +2,10 @@
 
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
-- Modules: **248**
-- Symbols: **1828**
+- Modules: **252**
+- Symbols: **1868**
 - Parse errors: **0**
-- Inventory hash: `7db64181d83a92bdbb22c5c47c7338b3100d0ec99bdb05f533d2f09aa56664da`
+- Inventory hash: `ff99e5ede2d50862741446f756234603db74d51b3d25400864098dcd8ef33137`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -75,15 +75,18 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P0 | `src/dcm/ingest/board.py` | 0 | 6 |
 | P0 | `src/dcm/ingest/composite.py` | 0 | 6 |
 | P0 | `src/dcm/ingest/har.py` | 0 | 13 |
+| P0 | `src/dcm/ingest/insights.py` | 0 | 15 |
 | P0 | `src/dcm/ingest/markets.py` | 0 | 4 |
 | P0 | `src/dcm/ingest/outlier.py` | 0 | 14 |
 | P0 | `src/dcm/ingest/prizepicks.py` | 0 | 13 |
 | P0 | `src/dcm/ingest/sanitize.py` | 0 | 5 |
 | P0 | `src/dcm/ingest/wsab_bind.py` | 0 | 2 |
+| UNMAPPED | `src/dcm/insight_settle.py` | 0 | 4 |
 | P6 | `src/dcm/learning/__init__.py` | 0 | 0 |
 | P6 | `src/dcm/learning/calibration.py` | 0 | 6 |
 | P6 | `src/dcm/learning/dataset.py` | 1 | 13 |
 | P6 | `src/dcm/learning/failure_class.py` | 0 | 3 |
+| P6 | `src/dcm/learning/insight_settlement.py` | 0 | 10 |
 | P6 | `src/dcm/learning/outlier_patterns.py` | 1 | 4 |
 | P6 | `src/dcm/learning/postgame.py` | 0 | 13 |
 | P6 | `src/dcm/learning/registry.py` | 0 | 10 |
@@ -157,6 +160,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P1 | `src/dcm/research/historical_gap.py` | 0 | 4 |
 | P1 | `src/dcm/research/host_plan.py` | 0 | 1 |
 | P1 | `src/dcm/research/indexes.py` | 2 | 19 |
+| P1 | `src/dcm/research/insight_queue.py` | 0 | 11 |
 | P1 | `src/dcm/research/lineup.py` | 0 | 3 |
 | P1 | `src/dcm/research/material_facts.py` | 0 | 20 |
 | P1 | `src/dcm/research/observation_execute.py` | 0 | 1 |
@@ -951,28 +955,46 @@ _No class/function symbols._
 
 ### `src/dcm/ingest/composite.py`
 
-- `function` **_time** L19
-- `function` **_attempt_key** L32
-- `function` **_row_key** L42
-- `function` **_changed_states** L54
-- `function` **reconcile_scope_attempts** L72 — Select latest successful response independently for every canonical request scope.
-- `function` **compose_ingests** L162 — Compose captures by latest successful response per canonical request scope.
+- `function` **_time** L20
+- `function` **_attempt_key** L33
+- `function` **_row_key** L43
+- `function` **_changed_states** L55
+- `function` **reconcile_scope_attempts** L73 — Select latest successful response independently for every canonical request scope.
+- `function` **compose_ingests** L163 — Compose captures by latest successful response per canonical request scope.
 
 ### `src/dcm/ingest/har.py`
 
-- `function` **sha256_bytes** L33
-- `function` **sha256_text** L37
-- `function` **_is_volatile_query_key** L41
-- `function` **canonical_request_scope** L46 — Hash only response-population-defining request semantics.
-- `function` **_scope_path** L79
-- `function` **_market_endpoint** L83
-- `function` **_as_object** L88
-- `function` **_decode_content** L107
-- `function` **_attempt** L120
-- `function` **_index_har** L147
-- `function` **_parse_payload** L291
-- `function` **_verified_empty_payload** L303 — An empty response clears a scope only when the market collection is explicit.
-- `function` **ingest_har** L315 — Parse a HAR and retain every sanitized request-scope attempt.
+- `function` **sha256_bytes** L34
+- `function` **sha256_text** L38
+- `function` **_is_volatile_query_key** L42
+- `function` **canonical_request_scope** L47 — Hash only response-population-defining request semantics.
+- `function` **_scope_path** L80
+- `function` **_market_endpoint** L84
+- `function` **_as_object** L89
+- `function` **_decode_content** L108
+- `function` **_attempt** L121
+- `function` **_index_har** L148
+- `function` **_parse_payload** L317
+- `function` **_verified_empty_payload** L329 — An empty response clears a scope only when the market collection is explicit.
+- `function` **ingest_har** L341 — Parse a HAR and retain every sanitized request-scope attempt.
+
+### `src/dcm/ingest/insights.py`
+
+- `function` **pagination_state** L35 — Return a tri-state token status; truthiness alone loses terminal-null.
+- `function` **_text** L45
+- `function` **_number** L51
+- `function` **_bool_list** L63
+- `function` **_direction** L69 — Classify Higher/Lower separately from team Home/Away outcomes.
+- `function` **_event_summary** L97
+- `function` **_history_summary** L121
+- `function` **_subject_name** L149
+- `function` **_book_summary** L164
+- `function` **_split_summary** L192
+- `function` **_disposition** L210
+- `function` **canonical_insight_record** L239 — Build one bounded immutable record without retaining the source body.
+- `function` **summarize_insight_claims** L329
+- `function` **parse_insights_payload** L366 — Parse one response page; a nonempty token is retained and fail-closed.
+- `function` **merge_insight_claims** L402 — Deduplicate exact snapshots while preserving changed snapshots and conflicts.
 
 ### `src/dcm/ingest/markets.py`
 
@@ -1027,6 +1049,13 @@ _No class/function symbols._
 - `function` **_cfb_official_names** L26
 - `function` **annotate_rows** L39
 
+### `src/dcm/insight_settle.py`
+
+- `function` **_jsonl** L24
+- `function` **_outcomes** L35
+- `function` **_file_hash** L52
+- `function` **main** L56
+
 ### `src/dcm/learning/__init__.py`
 
 _No class/function symbols._
@@ -1062,6 +1091,19 @@ _No class/function symbols._
 - `function` **_f** L49
 - `function` **_blob** L57
 - `function` **classify_failure** L67 — Assign one failure class. Never authorizes a permanent model patch from one result.
+
+### `src/dcm/learning/insight_settlement.py`
+
+- `function` **_text** L26
+- `function` **_num** L30
+- `function` **_time** L38
+- `function` **_key_parts** L49
+- `function` **_outcome_key** L60
+- `function` **_parse_explicit_result** L65
+- `function` **_compare** L74
+- `function` **build_insight_settlement** L84 — Grade one claim only when identity and settlement semantics are exact.
+- `function` **settle_insight_population** L166 — Settle every supplied claim; selected/parlay legs are not a special subset.
+- `function` **append_insight_settlements** L219 — Append immutable settlement records to the existing DCM sidecar.
 
 ### `src/dcm/learning/outlier_patterns.py`
 
@@ -1859,6 +1901,20 @@ _No class/function symbols._
 - `method` **EvidenceIndexes.close** L407
 - `function` **requirement_offer_bitmaps** L414 — Reverse index Requirement → Offers as Python bitsets plus id lists.
 
+### `src/dcm/research/insight_queue.py`
+
+- `function` **_finite** L25
+- `function` **wilson_lower_bound** L33 — Wilson 95% lower bound for a historical signal, not a next-game p.
+- `function` **_quantile** L44
+- `function` **_history_values** L57
+- `function` **_line_diagnostics** L69
+- `function` **_modifier_state** L108
+- `function` **_league_state** L128
+- `function` **score_research_attention** L139 — Score research value with transparent, bounded components.
+- `function` **queue_record** L199
+- `function` **_diversified_frontier** L242 — Avoid turning one player/event's correlated props into a fake frontier.
+- `function` **build_research_queue** L286 — Account the full claim universe, then emit Top-100/Top-25 attention lists.
+
 ### `src/dcm/research/lineup.py`
 
 - `function` **_f** L20
@@ -2248,17 +2304,17 @@ _No class/function symbols._
 
 ### `src/dcm/runner.py`
 
-- `function` **_finalize_archive** L138 — Always write dest/audit/. Optionally copy+commit+push a GitHub pack.
-- `function` **_synthetic_path** L216
-- `function` **_run_id** L229
-- `function` **_git_commit_sha** L233 — Best-effort git HEAD. Never writes git config. Missing git is None, not a crash.
-- `function` **_default_model_config** L253
-- `function` **_active_calibration** L264
-- `function` **run_dcm** L273
-- `method` **run_dcm._snapshot_for** L978
-- `method` **run_dcm._resimulate_material** L1476
-- `method` **run_dcm.slim** L1667
-- `function` **main** L2240
+- `function` **_finalize_archive** L139 — Always write dest/audit/. Optionally copy+commit+push a GitHub pack.
+- `function` **_synthetic_path** L217
+- `function` **_run_id** L230
+- `function` **_git_commit_sha** L234 — Best-effort git HEAD. Never writes git config. Missing git is None, not a crash.
+- `function` **_default_model_config** L254
+- `function` **_active_calibration** L265
+- `function` **run_dcm** L274
+- `method` **run_dcm._snapshot_for** L1083
+- `method` **run_dcm._resimulate_material** L1581
+- `method` **run_dcm.slim** L1772
+- `function` **main** L2345
 
 ### `src/dcm/runtime/__init__.py`
 

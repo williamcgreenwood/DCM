@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from typing import Any
 
 from dcm.contracts.hashes import content_hash
+from dcm.ingest.insights import merge_insight_claims
 
 SUCCESS_STATES = {"SUCCESS_NONEMPTY", "SUCCESS_EMPTY_VERIFIED"}
 FAILURE_STATES = {
@@ -282,6 +283,23 @@ def compose_ingests(ingests: list[dict[str, Any]]) -> dict[str, Any]:
         }
     )
 
+    insight_claims, insight_accounting = merge_insight_claims(
+        [
+            [dict(row) for row in (capture.get("insightClaims") or []) if isinstance(row, dict)]
+            for capture in captures
+        ]
+    )
+    index_stats.update(
+        {
+            "insights_typed_claims": len(insight_claims),
+            "insights_unique_ids": int(insight_accounting.get("uniqueInsightIds") or 0),
+            "insights_changed_ids": int(insight_accounting.get("changedInsightIds") or 0),
+            "insights_pagination_incomplete": sum(
+                1 for claim in insight_claims if not bool(claim.get("paginationComplete"))
+            ),
+        }
+    )
+
     composite_id = content_hash(
         {
             "sourceHarSha256s": source_hashes,
@@ -304,6 +322,8 @@ def compose_ingests(ingests: list[dict[str, Any]]) -> dict[str, Any]:
         "redactedSecrets": sum(int(i.get("redactedSecrets") or 0) for i in captures),
         "warnings": warnings,
         "evidencePayloads": evidence_payloads,
+        "insightClaims": insight_claims,
+        "insightAccounting": insight_accounting,
         "indexStats": index_stats,
         "captureStart": min((str(i.get("captureStart") or "") for i in captures if i.get("captureStart")), default=""),
         "captureEnd": max((str(i.get("captureEnd") or "") for i in captures if i.get("captureEnd")), default=""),
