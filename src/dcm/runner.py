@@ -292,6 +292,7 @@ def run_dcm(
     repo_root: Path | None = None,
 ) -> dict[str, Any]:
     input_boundary_records: list[dict[str, Any]] = []
+    insight_bridge: dict[str, Any] = {}
     if resume:
         ck = load_checkpoint(resume)
         output_root = Path(ck["artifactRoot"])
@@ -311,6 +312,11 @@ def run_dcm(
         synthetic = bool(ingest_meta.get("synthetic", board.get("synthetic", False)))
         run_id = ck["runId"]
         dest = output_root
+        insight_bridge_path = dest / "insights_host_bridge.json"
+        if insight_bridge_path.is_file():
+            loaded_bridge = json.loads(insight_bridge_path.read_text(encoding="utf-8"))
+            if isinstance(loaded_bridge, dict):
+                insight_bridge = loaded_bridge
         model_config_path = dest / "MODEL_CONFIG.json"
         calibration_state_path = dest / "CALIBRATION_STATE.json"
         if not model_config_path.is_file():
@@ -795,7 +801,12 @@ def run_dcm(
             dest, rows, planned=planned, cutoff=forecast_cutoff, research_shadow=research_shadow
         )
         emit_packets_and_graph(
-            dest, offer_sets=pop["offerSets"], claims=[], cutoff=forecast_cutoff, population=pop.get("manifest")
+            dest,
+            offer_sets=pop["offerSets"],
+            claims=[],
+            cutoff=forecast_cutoff,
+            population=pop.get("manifest"),
+            verified_insight_event_packets=list((insight_bridge or {}).get("eventPackets") or []),
         )
         # ``prepare_cfb_research_os`` executes the exact/hash/composite index,
         # graph, cache and acquisition algorithms.  Persist telemetry only
@@ -970,6 +981,7 @@ def run_dcm(
     emitted = emit_packets_and_graph(
         dest, offer_sets=pop["offerSets"], claims=bundle.get("claims") or [], cutoff=forecast_cutoff,
         population=pop.get("manifest"),
+        verified_insight_event_packets=list((insight_bridge or {}).get("eventPackets") or []),
     )
     team_packet_map = {str(p.get("teamId")): p for p in (emitted.get("teamPackets") or []) if p.get("teamId")}
     event_packet_map = {str(p.get("eventId")): p for p in (emitted.get("eventPackets") or []) if p.get("eventId")}

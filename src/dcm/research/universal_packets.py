@@ -93,6 +93,7 @@ def _wrap_event(event_packet: dict[str, Any]) -> dict[str, Any]:
     body = {
         "schema": "pillars_dcm.event_research_packet_universal.v1",
         "eventId": _s(event_packet.get("eventId")),
+        "eventLabel": _s(event_packet.get("label")),
         "competitionId": _s(event_packet.get("league")),
         "sportId": _s(event_packet.get("sportFamily")),
         "scheduledStart": event_packet.get("scheduledStart"),
