@@ -5,7 +5,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 - Modules: **254**
 - Symbols: **1876**
 - Parse errors: **0**
-- Inventory hash: `3eee434f32688285dfbea813cae3245c9655976b526a46dbfacf0e68d4e6e53e`
+- Inventory hash: `23d187623f8c376fa1d706b8f556d52c58dc0a811474823889b54a7b4ff030dc`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -984,10 +984,10 @@ _No class/function symbols._
 
 - `function` **_text** L15
 - `function` **_items** L19
-- `function` **_team** L32
-- `function` **_player** L41
-- `function` **_event** L51
-- `function` **enrich_insight_claims** L65 — Attach exact same-HAR entity/schedule context and emit only bounded fields.
+- `function` **_team** L40
+- `function` **_player** L49
+- `function` **_event** L59
+- `function` **enrich_insight_claims** L73 — Attach exact same-HAR entity/schedule context and emit only bounded fields.
 
 ### `src/dcm/ingest/insights.py`
 

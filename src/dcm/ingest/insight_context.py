@@ -23,9 +23,17 @@ def _items(payload: dict[str, Any], *names: str) -> list[dict[str, Any]]:
             return [row for row in value if isinstance(row, dict)]
         if isinstance(value, dict) and isinstance(value.get("items"), list):
             return [row for row in value["items"] if isinstance(row, dict)]
-    data = payload.get("data")
-    if isinstance(data, dict):
-        return _items(data, *names)
+    # Outlier's same-HAR entity response is a cacheable 304 payload with the
+    # usable collection nested under ``content``.  Treat these wrappers the
+    # same as ``data`` so an otherwise exact entity/schedule join cannot
+    # silently become an empty research plan.  This remains bounded to the
+    # named collections above; it never performs fuzzy discovery.
+    for wrapper in ("data", "content", "result", "response"):
+        nested = payload.get(wrapper)
+        if isinstance(nested, dict):
+            items = _items(nested, *names)
+            if items:
+                return items
     return []
 
 
