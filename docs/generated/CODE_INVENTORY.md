@@ -2,10 +2,10 @@
 
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
-- Modules: **252**
-- Symbols: **1868**
+- Modules: **254**
+- Symbols: **1876**
 - Parse errors: **0**
-- Inventory hash: `ff99e5ede2d50862741446f756234603db74d51b3d25400864098dcd8ef33137`
+- Inventory hash: `3eee434f32688285dfbea813cae3245c9655976b526a46dbfacf0e68d4e6e53e`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -75,6 +75,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P0 | `src/dcm/ingest/board.py` | 0 | 6 |
 | P0 | `src/dcm/ingest/composite.py` | 0 | 6 |
 | P0 | `src/dcm/ingest/har.py` | 0 | 13 |
+| P0 | `src/dcm/ingest/insight_context.py` | 0 | 6 |
 | P0 | `src/dcm/ingest/insights.py` | 0 | 15 |
 | P0 | `src/dcm/ingest/markets.py` | 0 | 4 |
 | P0 | `src/dcm/ingest/outlier.py` | 0 | 14 |
@@ -160,6 +161,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P1 | `src/dcm/research/historical_gap.py` | 0 | 4 |
 | P1 | `src/dcm/research/host_plan.py` | 0 | 1 |
 | P1 | `src/dcm/research/indexes.py` | 2 | 19 |
+| P1 | `src/dcm/research/insight_bridge.py` | 0 | 2 |
 | P1 | `src/dcm/research/insight_queue.py` | 0 | 11 |
 | P1 | `src/dcm/research/lineup.py` | 0 | 3 |
 | P1 | `src/dcm/research/material_facts.py` | 0 | 20 |
@@ -964,19 +966,28 @@ _No class/function symbols._
 
 ### `src/dcm/ingest/har.py`
 
-- `function` **sha256_bytes** L34
-- `function` **sha256_text** L38
-- `function` **_is_volatile_query_key** L42
-- `function` **canonical_request_scope** L47 — Hash only response-population-defining request semantics.
-- `function` **_scope_path** L80
-- `function` **_market_endpoint** L84
-- `function` **_as_object** L89
-- `function` **_decode_content** L108
-- `function` **_attempt** L121
-- `function` **_index_har** L148
-- `function` **_parse_payload** L317
-- `function` **_verified_empty_payload** L329 — An empty response clears a scope only when the market collection is explicit.
-- `function` **ingest_har** L341 — Parse a HAR and retain every sanitized request-scope attempt.
+- `function` **sha256_bytes** L36
+- `function` **sha256_text** L40
+- `function` **_is_volatile_query_key** L44
+- `function` **canonical_request_scope** L49 — Hash only response-population-defining request semantics.
+- `function` **_scope_path** L82
+- `function` **_market_endpoint** L86
+- `function` **_as_object** L91
+- `function` **_decode_content** L110
+- `function` **_attempt** L123
+- `function` **_index_har** L150
+- `function` **_parse_payload** L333
+- `function` **_verified_empty_payload** L345 — An empty response clears a scope only when the market collection is explicit.
+- `function` **ingest_har** L357 — Parse a HAR and retain every sanitized request-scope attempt.
+
+### `src/dcm/ingest/insight_context.py`
+
+- `function` **_text** L15
+- `function` **_items** L19
+- `function` **_team** L32
+- `function` **_player** L41
+- `function` **_event** L51
+- `function` **enrich_insight_claims** L65 — Attach exact same-HAR entity/schedule context and emit only bounded fields.
 
 ### `src/dcm/ingest/insights.py`
 
@@ -992,9 +1003,9 @@ _No class/function symbols._
 - `function` **_split_summary** L192
 - `function` **_disposition** L210
 - `function` **canonical_insight_record** L239 — Build one bounded immutable record without retaining the source body.
-- `function` **summarize_insight_claims** L329
-- `function` **parse_insights_payload** L366 — Parse one response page; a nonempty token is retained and fail-closed.
-- `function` **merge_insight_claims** L402 — Deduplicate exact snapshots while preserving changed snapshots and conflicts.
+- `function` **summarize_insight_claims** L339
+- `function` **parse_insights_payload** L376 — Parse one response page; a nonempty token is retained and fail-closed.
+- `function` **merge_insight_claims** L412 — Deduplicate exact snapshots while preserving changed snapshots and conflicts.
 
 ### `src/dcm/ingest/markets.py`
 
@@ -1901,6 +1912,11 @@ _No class/function symbols._
 - `method` **EvidenceIndexes.close** L407
 - `function` **requirement_offer_bitmaps** L414 — Reverse index Requirement → Offers as Python bitsets plus id lists.
 
+### `src/dcm/research/insight_bridge.py`
+
+- `function` **_request** L17
+- `function` **plan_insight_host_research** L36 — Create reusable EVENT/AFFILIATION/COUNTERPARTY/SUBJECT jobs.
+
 ### `src/dcm/research/insight_queue.py`
 
 - `function` **_finite** L25
@@ -2304,17 +2320,17 @@ _No class/function symbols._
 
 ### `src/dcm/runner.py`
 
-- `function` **_finalize_archive** L139 — Always write dest/audit/. Optionally copy+commit+push a GitHub pack.
-- `function` **_synthetic_path** L217
-- `function` **_run_id** L230
-- `function` **_git_commit_sha** L234 — Best-effort git HEAD. Never writes git config. Missing git is None, not a crash.
-- `function` **_default_model_config** L254
-- `function` **_active_calibration** L265
-- `function` **run_dcm** L274
-- `method` **run_dcm._snapshot_for** L1083
-- `method` **run_dcm._resimulate_material** L1581
-- `method` **run_dcm.slim** L1772
-- `function` **main** L2345
+- `function` **_finalize_archive** L140 — Always write dest/audit/. Optionally copy+commit+push a GitHub pack.
+- `function` **_synthetic_path** L218
+- `function` **_run_id** L231
+- `function` **_git_commit_sha** L235 — Best-effort git HEAD. Never writes git config. Missing git is None, not a crash.
+- `function` **_default_model_config** L255
+- `function` **_active_calibration** L266
+- `function` **run_dcm** L275
+- `method` **run_dcm._snapshot_for** L1097
+- `method` **run_dcm._resimulate_material** L1595
+- `method` **run_dcm.slim** L1786
+- `function` **main** L2359
 
 ### `src/dcm/runtime/__init__.py`
 

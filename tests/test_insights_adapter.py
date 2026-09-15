@@ -11,6 +11,8 @@ from dcm.ingest.insights import (
 )
 from dcm.learning.insight_settlement import append_insight_settlements, settle_insight_population
 from dcm.research.insight_queue import build_research_queue
+from dcm.ingest.insight_context import enrich_insight_claims
+from dcm.research.insight_bridge import plan_insight_host_research
 
 
 def _row(*, position: str = "OVER", label: str = "Over") -> dict:
@@ -172,3 +174,42 @@ def test_settlement_append_is_idempotent(tmp_path: Path) -> None:
     assert first["appended"] == 1
     assert second["appended"] == 0
     assert len((tmp_path / "insight_settlement_ledger.jsonl").read_text().splitlines()) == 1
+
+
+def test_same_har_context_join_emits_director_jobs_without_offer_promotion() -> None:
+    claims, _ = parse_insights_payload(
+        {"insights": [_row()], "nextPageToken": None},
+        source_har_sha256="har-hash", source_body_hash="body-hash",
+        source_snapshot_time="2026-09-14T00:00:00Z",
+    )
+    joined, accounting = enrich_insight_claims(claims, [
+        {"league": "NFL", "kind": "entities", "httpStatus": 200, "payload": {
+            "players": [{"playerId": "p-1", "fullName": "Player One", "teamId": "t-1", "status": "ACTIVE"}],
+        }},
+        {"league": "NFL", "kind": "schedule", "httpStatus": 200, "payload": {
+            "events": [{"eventId": "e-1", "scheduledTime": "2026-09-15T20:00:00Z",
+                        "home": {"teamId": "t-1", "alias": "HOM"},
+                        "away": {"teamId": "t-2", "alias": "AWY"}}],
+        }},
+    ])
+    assert accounting["states"]["VERIFIED_HAR_LOCAL"] == 1
+    claim = joined[0]
+    assert claim["harIdentityState"] == "VERIFIED_HAR_LOCAL"
+    assert claim["observedBookOffers"][0]["state"] == "OBSERVED_INSIGHT_NOT_CURRENT_BOARD"
+    bridge = plan_insight_host_research(joined, "2026-09-14T12:00:00Z")
+    assert bridge["accounting"]["researchProjectionCount"] == 1
+    assert bridge["accounting"]["productionSelectionPermitted"] is False
+    assert {request["scope"] for request in bridge["requests"]} == {
+        "EVENT", "AFFILIATION", "COUNTERPARTY", "SUBJECT"
+    }
+
+
+def test_unresolved_har_identity_never_emits_a_director_job() -> None:
+    claims, _ = parse_insights_payload(
+        {"insights": [_row()], "nextPageToken": None},
+        source_har_sha256="har-hash", source_body_hash="body-hash",
+    )
+    joined, _ = enrich_insight_claims(claims, [])
+    bridge = plan_insight_host_research(joined, "2026-09-14T12:00:00Z")
+    assert bridge["requests"] == []
+    assert bridge["accounting"]["blocked"]["HAR_IDENTITY_UNRESOLVED"] == 1
