@@ -184,7 +184,9 @@ def test_same_har_context_join_emits_director_jobs_without_offer_promotion() -> 
     )
     joined, accounting = enrich_insight_claims(claims, [
         {"league": "NFL", "kind": "entities", "httpStatus": 200, "payload": {
-            "players": [{"playerId": "p-1", "fullName": "Player One", "teamId": "t-1", "status": "ACTIVE"}],
+            "content": {"teams": [{"team": {"teamId": "t-1"}, "players": [
+                {"playerId": "p-1", "fullName": "Player One", "status": "ACTIVE"},
+            ]}]},
         }},
         {"league": "NFL", "kind": "schedule", "httpStatus": 200, "payload": {
             "events": [{"eventId": "e-1", "scheduledTime": "2026-09-15T20:00:00Z",
