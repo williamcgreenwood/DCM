@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+from dcm.contracts.hashes import content_hash
 from dcm.ml.feature_store import persist_feature_store
 from dcm.research.dependency_graph import build_research_dependency_graph
 from dcm.research.entity_graph import build_entity_graph
@@ -27,6 +28,36 @@ def _write(path: Path, payload: dict[str, Any]) -> dict[str, Any]:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=2, sort_keys=True, ensure_ascii=True) + "\n", encoding="utf-8")
     return payload
+
+
+def _merge_verified_insight_events(
+    entities: dict[str, Any], event_packets: list[dict[str, Any]] | None,
+) -> dict[str, Any]:
+    """Add safe same-HAR event context without treating it as external evidence."""
+    existing = {
+        str(packet.get("eventId") or ""): packet
+        for packet in (entities.get("events") or [])
+        if isinstance(packet, dict) and packet.get("eventId")
+    }
+    for packet in event_packets or []:
+        if not isinstance(packet, dict):
+            continue
+        event_id = str(packet.get("eventId") or "")
+        if not event_id or event_id in existing:
+            continue
+        # This producer accepts only the bounded, explicitly marked bridge packet.
+        if packet.get("schema") != "pillars_dcm.event_research_packet.v1":
+            continue
+        if packet.get("contextSource") != "SAME_HAR_ENTITIES_SCHEDULE":
+            continue
+        if packet.get("rawHarPersisted") is not False or packet.get("freeFormInsightTextPersisted") is not False:
+            continue
+        existing[event_id] = dict(packet)
+    body = dict(entities)
+    body["events"] = [existing[event_id] for event_id in sorted(existing)]
+    body["eventPacketCount"] = len(body["events"])
+    body["contentHash"] = content_hash({key: value for key, value in body.items() if key != "contentHash"})
+    return body
 
 
 def emit_offer_sets_and_manifest(
@@ -93,12 +124,16 @@ def emit_packets_and_graph(
     claims: list[dict[str, Any]] | None = None,
     cutoff: str = "",
     population: dict[str, Any] | None = None,
+    verified_insight_event_packets: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     packets = build_packets_for_offer_sets(offer_sets, claims=claims or [], as_of=cutoff)
     pack_doc = _write(Path(dest) / "player_research_packets.json", packets_document(packets))
     graph = build_evidence_graph(claims or [], offer_sets, packets)
     graph_doc = _write(Path(dest) / "evidence_graph.json", graph)
-    entities = build_entity_packets(offer_sets, claims=claims or [], as_of=cutoff, population=population)
+    entities = _merge_verified_insight_events(
+        build_entity_packets(offer_sets, claims=claims or [], as_of=cutoff, population=population),
+        verified_insight_event_packets,
+    )
     _write(
         Path(dest) / "team_research_packets.json",
         {

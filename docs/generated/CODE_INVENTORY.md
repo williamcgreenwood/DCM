@@ -3,9 +3,9 @@
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
 - Modules: **254**
-- Symbols: **1876**
+- Symbols: **1881**
 - Parse errors: **0**
-- Inventory hash: `23d187623f8c376fa1d706b8f556d52c58dc0a811474823889b54a7b4ff030dc`
+- Inventory hash: `992d8b3f700fe6ae01981c37a36e8c695511b49fde1fb90eb813d1cf6e1ff75a`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -147,7 +147,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P1 | `src/dcm/research/coverage.py` | 0 | 11 |
 | P1 | `src/dcm/research/coverage_incremental.py` | 1 | 5 |
 | P1 | `src/dcm/research/dependency_graph.py` | 0 | 4 |
-| P1 | `src/dcm/research/emit.py` | 0 | 4 |
+| P1 | `src/dcm/research/emit.py` | 0 | 5 |
 | P1 | `src/dcm/research/entity_graph.py` | 0 | 4 |
 | P1 | `src/dcm/research/entity_packets.py` | 0 | 13 |
 | P1 | `src/dcm/research/evidence_graph.py` | 0 | 16 |
@@ -161,7 +161,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P1 | `src/dcm/research/historical_gap.py` | 0 | 4 |
 | P1 | `src/dcm/research/host_plan.py` | 0 | 1 |
 | P1 | `src/dcm/research/indexes.py` | 2 | 19 |
-| P1 | `src/dcm/research/insight_bridge.py` | 0 | 2 |
+| P1 | `src/dcm/research/insight_bridge.py` | 0 | 6 |
 | P1 | `src/dcm/research/insight_queue.py` | 0 | 11 |
 | P1 | `src/dcm/research/lineup.py` | 0 | 3 |
 | P1 | `src/dcm/research/material_facts.py` | 0 | 20 |
@@ -1711,10 +1711,11 @@ _No class/function symbols._
 
 ### `src/dcm/research/emit.py`
 
-- `function` **_write** L26
-- `function` **emit_offer_sets_and_manifest** L32
-- `function` **emit_packets_and_graph** L89
-- `function` **emit_player_centric_research** L212 — Backward-compatible entrypoint; universal artifacts are emitted first.
+- `function` **_write** L27
+- `function` **_merge_verified_insight_events** L33 — Add safe same-HAR event context without treating it as external evidence.
+- `function` **emit_offer_sets_and_manifest** L63
+- `function` **emit_packets_and_graph** L120
+- `function` **emit_player_centric_research** L247 — Backward-compatible entrypoint; universal artifacts are emitted first.
 
 ### `src/dcm/research/entity_graph.py`
 
@@ -1914,8 +1915,12 @@ _No class/function symbols._
 
 ### `src/dcm/research/insight_bridge.py`
 
-- `function` **_request** L17
-- `function` **plan_insight_host_research** L36 — Create reusable EVENT/AFFILIATION/COUNTERPARTY/SUBJECT jobs.
+- `function` **_label** L17 — Return a bounded structured label; never forward Insight free text.
+- `function` **_team_label** L22
+- `function` **_event_context** L26 — Build the only safe EventResearchPacket projection of joined HAR context.
+- `function` **_request_labels** L61
+- `function` **_request** L87
+- `function` **plan_insight_host_research** L106 — Create reusable EVENT/AFFILIATION/COUNTERPARTY/SUBJECT jobs.
 
 ### `src/dcm/research/insight_queue.py`
 
@@ -2311,8 +2316,8 @@ _No class/function symbols._
 - `function` **_wrap_affiliation** L49
 - `function` **_wrap_counterparty** L75
 - `function` **_wrap_event** L92
-- `function` **_wrap_environment** L114
-- `function` **build_universal_packets** L132
+- `function` **_wrap_environment** L115
+- `function` **build_universal_packets** L133
 
 ### `src/dcm/research/universal_plan.py`
 
@@ -2327,10 +2332,10 @@ _No class/function symbols._
 - `function` **_default_model_config** L255
 - `function` **_active_calibration** L266
 - `function` **run_dcm** L275
-- `method` **run_dcm._snapshot_for** L1097
-- `method` **run_dcm._resimulate_material** L1595
-- `method` **run_dcm.slim** L1786
-- `function` **main** L2359
+- `method` **run_dcm._snapshot_for** L1109
+- `method` **run_dcm._resimulate_material** L1607
+- `method` **run_dcm.slim** L1798
+- `function` **main** L2371
 
 ### `src/dcm/runtime/__init__.py`
 

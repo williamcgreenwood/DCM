@@ -13,6 +13,9 @@ from dcm.learning.insight_settlement import append_insight_settlements, settle_i
 from dcm.research.insight_queue import build_research_queue
 from dcm.ingest.insight_context import enrich_insight_claims
 from dcm.research.insight_bridge import plan_insight_host_research
+from dcm.research.emit import emit_packets_and_graph
+from dcm.research.batch import _host_task
+from dcm.chat.research_bridge import _researcher_view
 
 
 def _row(*, position: str = "OVER", label: str = "Over") -> dict:
@@ -204,6 +207,56 @@ def test_same_har_context_join_emits_director_jobs_without_offer_promotion() -> 
     assert {request["scope"] for request in bridge["requests"]} == {
         "EVENT", "AFFILIATION", "COUNTERPARTY", "SUBJECT"
     }
+    requests = {request["scope"]: request for request in bridge["requests"]}
+    assert requests["EVENT"]["eventLabel"] == "AWY @ HOM"
+    assert requests["AFFILIATION"]["affiliation"] == "HOM"
+    assert requests["COUNTERPARTY"]["opponent"] == "AWY"
+    assert requests["SUBJECT"]["affiliation"] == "HOM"
+    assert requests["SUBJECT"]["opponent"] == "AWY"
+
+
+def test_verified_har_context_emits_bounded_event_packet_and_sealed_view(tmp_path: Path) -> None:
+    claims, _ = parse_insights_payload(
+        {"insights": [_row()], "nextPageToken": None},
+        source_har_sha256="har-hash", source_body_hash="body-hash",
+        source_snapshot_time="2026-09-14T00:00:00Z",
+    )
+    joined, _ = enrich_insight_claims(claims, [
+        {"league": "NFL", "kind": "entities", "httpStatus": 200, "payload": {
+            "content": {"teams": [{"team": {"teamId": "t-1"}, "players": [
+                {"playerId": "p-1", "fullName": "Player One", "status": "ACTIVE"},
+            ]}]},
+        }},
+        {"league": "NFL", "kind": "schedule", "httpStatus": 200, "payload": {
+            "events": [{"eventId": "e-1", "scheduledTime": "2026-09-15T20:00:00Z",
+                        "home": {"teamId": "t-1", "alias": "HOM"},
+                        "away": {"teamId": "t-2", "alias": "AWY"}}],
+        }},
+    ])
+    bridge = plan_insight_host_research(joined, "2026-09-14T12:00:00Z")
+    emitted = emit_packets_and_graph(
+        tmp_path,
+        offer_sets=[],
+        claims=[],
+        cutoff="2026-09-14T12:00:00Z",
+        verified_insight_event_packets=bridge["eventPackets"],
+    )
+    event = emitted["eventPackets"][0]
+    assert event["label"] == "AWY @ HOM"
+    assert event["homeTeam"] == "HOM"
+    assert event["awayTeam"] == "AWY"
+    assert event["contextSource"] == "SAME_HAR_ENTITIES_SCHEDULE"
+    assert event["rawHarPersisted"] is False
+    assert event["freeFormInsightTextPersisted"] is False
+    assert "this must not be persisted" not in json.dumps(event)
+    universal = emitted["universalPackets"]
+    assert universal["events"][0]["eventLabel"] == "AWY @ HOM"
+    request = next(row for row in bridge["requests"] if row["scope"] == "EVENT")
+    action = _host_task(request, action={"actionId": "AA_EVENT_e-1", "scope": "EVENT"})
+    view = _researcher_view([action], [request], universal)
+    assert view[0]["displayLabel"] == "AWY @ HOM"
+    assert view[0]["eventLabel"] == "AWY @ HOM"
+    assert "this must not be persisted" not in json.dumps(view)
 
 
 def test_unresolved_har_identity_never_emits_a_director_job() -> None:
