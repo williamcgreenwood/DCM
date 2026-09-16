@@ -5,7 +5,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 - Modules: **256**
 - Symbols: **1910**
 - Parse errors: **0**
-- Inventory hash: `26e305e5066c5283ada5fe8094accb5a01967861efefcbc2626a2628915f5163`
+- Inventory hash: `55b398dd2dcc2bbf73f433e2296ae1ce7b95d4f2e058f076aaeced8a834e78a0`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -2244,12 +2244,12 @@ _No class/function symbols._
 - `function` **_load_raw** L21
 - `function` **load_source_catalog** L32
 - `function` **sources_for** L47
-- `function` **estimated_cost** L89
-- `function` **catalog_summary** L100
-- `function` **source_health_seeds** L114 — Derive health-router seeds from the versioned capability catalog.
-- `function` **normalize_competition_id** L181 — Normalize league/competition tokens for catalog matching.
-- `function` **sport_family_for_league** L187 — Map a league/competition token onto a sportFamily id.
-- `function` **candidate_sources_for_sport** L198 — Return sport-correct catalog sources for acquisition routing.
+- `function` **estimated_cost** L86
+- `function` **catalog_summary** L97
+- `function` **source_health_seeds** L111 — Derive health-router seeds from the versioned capability catalog.
+- `function` **normalize_competition_id** L178 — Normalize league/competition tokens for catalog matching.
+- `function` **sport_family_for_league** L184 — Map a league/competition token onto a sportFamily id.
+- `function` **candidate_sources_for_sport** L195 — Return sport-correct catalog sources for acquisition routing.
 
 ### `src/dcm/research/source_health.py`
 
