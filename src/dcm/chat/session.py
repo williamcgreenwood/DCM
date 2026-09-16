@@ -107,7 +107,7 @@ def doctor(*, release_manifest: Path | None = None, workspace: Path | None = Non
         "releaseManifest": release or None,
         "run": run_state,
         "commands": [
-            "doctor", "prepare", "next-research", "research-batch", "research-validate", "research-failure",
+            "doctor", "run-slate", "prepare", "next-research", "research-batch", "research-validate", "research-failure",
             "evidence-import", "coverage", "har-breakdown", "index-build", "search-blueprint", "checkpoint-verify",
             "forecast", "report", "resume", "audit", "archive", "settle", "cfb-launch",
         ],
@@ -250,6 +250,21 @@ class HostSession:
             rows = board.get("rows") if isinstance(board, dict) else []
             docs = [dict(row, _kind="claim") for row in claims if isinstance(row, dict)]
             docs.extend(dict(row, _kind="board") for row in (rows if isinstance(rows, list) else []) if isinstance(row, dict))
+            # Insights are a separate canonical claim stream from the ordinary
+            # evidence bundle.  They are still bounded, hashed documents and
+            # must be consumed by the same local search/index receipt; leaving
+            # them out makes a successful Insights run invisible to search.
+            insight_claims: list[dict[str, Any]] = []
+            insight_path = self.dest / "insights_claims.jsonl"
+            if insight_path.is_file():
+                for line in insight_path.read_text(encoding="utf-8").splitlines():
+                    try:
+                        row = json.loads(line)
+                    except json.JSONDecodeError:
+                        continue
+                    if isinstance(row, dict):
+                        insight_claims.append(row)
+            docs.extend(dict(row, _kind="insight") for row in insight_claims)
             # Structural HAR receipts are safe, bounded documents.  They let
             # exact/composite/BM25 indexes search capture topology and schema
             # drift without indexing raw URLs, bodies, headers, or values.
@@ -274,7 +289,7 @@ class HostSession:
                     })
             docs.extend(breakdown_docs)
             engine = SearchEngine(docs)
-            receipt = {**engine.index_receipt, "documentKinds": {"claims": len(claims) if isinstance(claims, list) else 0, "board": len(rows) if isinstance(rows, list) else 0, "harBreakdowns": len(breakdown_docs)}}
+            receipt = {**engine.index_receipt, "documentKinds": {"claims": len(claims) if isinstance(claims, list) else 0, "insights": len(insight_claims), "board": len(rows) if isinstance(rows, list) else 0, "harBreakdowns": len(breakdown_docs)}}
             receipt["contentHash"] = content_hash(receipt)
             write_json(self.dest / "search_index_receipt.json", receipt)
             self._save_host_state(lastCommand="index-build", searchIndexHash=receipt.get("indexHash"))

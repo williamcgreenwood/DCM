@@ -24,6 +24,9 @@ INSIGHTS_ADAPTER_VERSION = "OUTLIER_INSIGHTS_ADAPTER_V1_2026-09-14"
 PAGINATION_ABSENT = "ABSENT"
 PAGINATION_TERMINAL_NULL = "TERMINAL_NULL"
 PAGINATION_NONEMPTY = "NONEMPTY"
+PAGINATION_MALFORMED = "MALFORMED"
+PAGINATION_INCOMPLETE = "INCOMPLETE"
+_PAGINATION_COMPLETE_STATES = {PAGINATION_ABSENT, PAGINATION_TERMINAL_NULL}
 
 _HIGHER = {"OVER", "HIGHER", "MORE", "ABOVE"}
 _LOWER = {"UNDER", "LOWER", "LESS", "BELOW"}
@@ -33,12 +36,22 @@ _MODIFIERS = {"STANDARD", "GOBLIN", "DEMON", "UNKNOWN"}
 
 
 def pagination_state(payload: dict[str, Any]) -> str:
-    """Return a tri-state token status; truthiness alone loses terminal-null."""
+    """Return an explicit pagination state without treating malformed data as complete."""
+    if not isinstance(payload, dict):
+        return PAGINATION_MALFORMED
+    marker = payload.get("pagination")
+    if marker is not None:
+        if not isinstance(marker, dict):
+            return PAGINATION_MALFORMED
+        if marker.get("complete") is False:
+            return PAGINATION_INCOMPLETE
     if "nextPageToken" not in payload:
         return PAGINATION_ABSENT
     token = payload.get("nextPageToken")
     if token is None or str(token).strip() == "":
         return PAGINATION_TERMINAL_NULL
+    if not isinstance(token, str):
+        return PAGINATION_MALFORMED
     return PAGINATION_NONEMPTY
 
 
@@ -283,7 +296,7 @@ def canonical_insight_record(
         "rowOrdinal": int(row_ordinal),
         "pageNumber": int(page_number),
         "paginationState": page_state,
-        "paginationComplete": page_state != PAGINATION_NONEMPTY,
+        "paginationComplete": page_state in _PAGINATION_COMPLETE_STATES,
         "subjectType": subject_type,
         "subjectId": player_id if subject_type == "PLAYER" else team_id,
         "subjectName": _subject_name(row),
@@ -356,7 +369,7 @@ def summarize_insight_claims(
         "typedClaimCount": len(claims),
         "uniqueInsightIds": len({str(row.get("insightId") or "") for row in claims if row.get("insightId")}),
         "paginationState": page_state,
-        "paginationComplete": page_state != PAGINATION_NONEMPTY,
+        "paginationComplete": page_state in _PAGINATION_COMPLETE_STATES,
         "dispositions": dict(sorted(dispositions.items())),
         "subjects": dict(sorted(subjects.items())),
         "directions": dict(sorted(directions.items())),
@@ -383,9 +396,12 @@ def parse_insights_payload(
     entry_ordinal: int = 0,
     page_number: int = 1,
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
-    """Parse one response page; a nonempty token is retained and fail-closed."""
+    """Parse one response page; malformed and unconsumed pages fail closed."""
+    payload = payload if isinstance(payload, dict) else {}
     rows = payload.get("insights") if isinstance(payload.get("insights"), list) else []
     state = pagination_state(payload)
+    if "insights" in payload and not isinstance(payload.get("insights"), list):
+        state = PAGINATION_MALFORMED
     claims = [
         canonical_insight_record(
             row,
