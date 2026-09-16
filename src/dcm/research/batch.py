@@ -68,7 +68,9 @@ def _request_id_of(request: dict[str, Any]) -> str:
 _HOST_CONTEXT_EXCLUDED = frozenset({
     "request_id", "scope", "scope_id", "need", "forecast_cutoff",
     "priority_score", "dependent_prop_count", "hierarchy_rank",
-    "dependent_offer_ids", "acquire", "uncertaintyReduction",
+    "dependent_offer_ids", "dependent_claim_ids", "insightClaimIds",
+    "dependentOfferCount", "dependentClaimCount", "researchOnly",
+    "offerVerificationState", "acquire", "uncertaintyReduction",
     "estimatedCost", "schedulerScore", "deltaClass", "knownMissing",
     "coverageComplete",
 })
@@ -99,6 +101,22 @@ def _host_task(request: dict[str, Any], *, action: dict[str, Any] | None = None)
         "dependentPropCount": request.get("dependent_prop_count"),
         "eventId": request.get("eventId"),
         "knownMissing": request.get("knownMissing") or [],
+        "dependentOfferCount": int(action.get("dependentOfferCount") or request.get("dependentOfferCount") or 0),
+        "dependentClaimCount": int(action.get("dependentClaimCount") or request.get("dependentClaimCount") or len(request.get("dependent_claim_ids") or request.get("insightClaimIds") or [])),
+        "dependentClaimIds": [
+            str(value) for value in (
+                action.get("claimIds")
+                or request.get("dependent_claim_ids")
+                or request.get("insightClaimIds")
+                or []
+            ) if str(value)
+        ],
+        "researchOnly": bool(
+            action.get("researchOnly")
+            or request.get("researchOnly")
+            or request.get("offerVerificationState") == "NOT_A_BOARD_OFFER"
+        ),
+        "offerVerificationState": request.get("offerVerificationState"),
         "context": context,
         "sourceFamily": action.get("sourceFamily"),
         "sourceCandidates": list(action.get("sourceCandidates") or []),
@@ -206,16 +224,27 @@ def build_next_research_batch(
             ),
         )
         take = group_sorted[:remaining]
-        dep = sum(int(r.get("dependent_prop_count") or 0) for r in take)
-        if offer_budget and offer_budget + dep > max_dependent_offers:
+        dep_offers = sum(
+            int(r.get("dependentOfferCount") or 0)
+            if r.get("dependentOfferCount") is not None
+            else (0 if r.get("researchOnly") or r.get("dependent_claim_ids") or r.get("insightClaimIds") else int(r.get("dependent_prop_count") or 0))
+            for r in take
+        )
+        dep_claims = sum(
+            int(r.get("dependentClaimCount") or len(r.get("dependent_claim_ids") or r.get("insightClaimIds") or []))
+            for r in take
+        )
+        if offer_budget and offer_budget + dep_offers > max_dependent_offers:
             continue
         selected.extend(take)
-        offer_budget += dep
+        offer_budget += dep_offers
         batches.append(
             {
                 "eventId": event_id,
                 "entityCount": len(take),
-                "dependentOfferCount": dep,
+                "dependentOfferCount": dep_offers,
+                "dependentClaimCount": dep_claims,
+                "researchOnly": any(bool(r.get("researchOnly")) for r in take),
                 "tasks": [
                     {
                         "requestId": r.get("request_id"),
@@ -225,6 +254,10 @@ def build_next_research_batch(
                         "deltaClass": r.get("deltaClass"),
                         "schedulerScore": r.get("schedulerScore"),
                         "dependentPropCount": r.get("dependent_prop_count"),
+                        "dependentOfferCount": int(r.get("dependentOfferCount") or 0),
+                        "dependentClaimCount": int(r.get("dependentClaimCount") or len(r.get("dependent_claim_ids") or r.get("insightClaimIds") or [])),
+                        "researchOnly": bool(r.get("researchOnly") or r.get("offerVerificationState") == "NOT_A_BOARD_OFFER"),
+                        "dependentClaimIds": [str(value) for value in (r.get("dependent_claim_ids") or r.get("insightClaimIds") or []) if str(value)],
                         "knownMissing": r.get("knownMissing") or [],
                         "researchOnce": True,
                     }
@@ -276,6 +309,8 @@ def build_next_research_batch(
                     "eventId": batch.get("eventId"),
                     "entityCount": len(tasks),
                     "dependentOfferCount": batch.get("dependentOfferCount"),
+                    "dependentClaimCount": batch.get("dependentClaimCount", 0),
+                    "researchOnly": bool(batch.get("researchOnly")),
                     "actionIds": batch.get("actionIds"),
                     "tasks": tasks,
                 }
@@ -319,6 +354,9 @@ def build_next_research_batch(
         "reusedCount": len(reused),
         "eventBatchCount": len(batches),
         "dependentOfferBudgetUsed": offer_budget,
+        "dependentClaimCountUsed": sum(
+            int(batch.get("dependentClaimCount") or 0) for batch in batches
+        ),
         "stopWhen": "coverage closed or additional research cannot change production eligibility enough to justify cost",
         "hostInstruction": (
             "Research reusable entities once. Do not invent hashes, reliability, "

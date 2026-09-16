@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from dcm.research.source_catalog import catalog_summary, load_source_catalog, source_health_seeds, sources_for
-from dcm.research.source_health import default_cfb_source_health
+from dcm.research.source_health import default_cfb_source_health, default_research_source_health
 
 
 def test_catalog_loads_and_is_hashed():
@@ -51,3 +51,17 @@ def test_cfb_health_router_is_derived_from_cfb_catalog_capabilities():
     environment_route = health.route(claim_type="ENVIRONMENT", sport="CFB")
     assert event_route[0] == "CFB_OFFICIAL_GAMEBOOK"
     assert environment_route[0] == "CFB_WEATHER"
+
+
+def test_universal_health_router_does_not_cross_route_sports():
+    health = default_research_source_health()
+    assert health.route(claim_type="EVENT", sport="CFB")[0] == "CFB_OFFICIAL_GAMEBOOK"
+    assert health.route(claim_type="EVENT", sport="NCAAFB")[0] == "CFB_OFFICIAL_GAMEBOOK"
+    assert health.route(claim_type="EVENT", sport="NFL")[0] == "NFL_OFFICIAL"
+    assert health.route(claim_type="EVENT", sport="WNBA")[0] == "WNBA_OFFICIAL"
+    for sport in ("MLB", "SOCCER"):
+        route = health.route(claim_type="EVENT", sport=sport)
+        assert route
+        assert "CFB_WEATHER" not in route
+        assert "CFB_OFFICIAL_GAMEBOOK" not in route
+        assert "CFB_SPORTS_REFERENCE" not in route

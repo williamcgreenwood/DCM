@@ -53,6 +53,9 @@ def _event_context(event: dict[str, Any], *, league: str, family: str, cutoff: s
         "thin": True,
         "priorUsedAsResearch": False,
         "dependentOfferCount": 0,
+        "dependentClaimCount": 0,
+        "researchOnly": True,
+        "offerVerificationState": "NOT_A_BOARD_OFFER",
     }
     body["contentHash"] = content_hash({key: value for key, value in body.items() if key != "contentHash"})
     return body
@@ -88,13 +91,18 @@ def _request(
     *, scope: str, scope_id: str, need: str, cutoff: str, claims: list[dict[str, Any]],
     extra: dict[str, Any],
 ) -> dict[str, Any]:
+    claim_ids = sorted(str(c.get("claimId") or "") for c in claims if str(c.get("claimId") or ""))
     record = {
         "scope": scope, "scope_id": scope_id, "need": need,
         "forecast_cutoff": cutoff, "dependent_prop_count": len(claims),
+        "dependent_claim_ids": claim_ids,
+        "dependentClaimCount": len(claim_ids),
+        "dependentOfferCount": 0,
         "priority_score": float(len(claims)), "hierarchy_rank": SCOPE_RANK.get(scope, 99),
         "sourceClass": "INDEPENDENT_PLAYER_PERFORMANCE_OR_EVENT_CONTEXT",
         "offerVerificationState": "NOT_A_BOARD_OFFER",
-        "insightClaimIds": sorted(str(c.get("claimId") or "") for c in claims),
+        "researchOnly": True,
+        "insightClaimIds": claim_ids,
         **extra,
     }
     record["request_id"] = "REQ_" + content_hash(
@@ -166,9 +174,12 @@ def plan_insight_host_research(claims: list[dict[str, Any]], cutoff: str) -> dic
         "schema": "pillars_dcm.insight_research_director_bridge.v1",
         "researchRows": [
             {
-                "projectionId": str(c.get("claimId") or ""), "eventId": str(c["harIdentity"]["event"].get("id") or ""),
+                "claimId": str(c.get("claimId") or ""), "eventId": str(c["harIdentity"]["event"].get("id") or ""),
                 "playerId": str(c["harIdentity"]["player"].get("id") or ""), "teamId": str(c["harIdentity"]["player"].get("teamId") or ""),
                 "league": str(c.get("leagueId") or "").upper(), "sportFamily": _FAMILY.get(str(c.get("leagueId") or "").upper(), ""),
+                "subjectName": _label(c.get("subjectName")),
+                "researchOnly": True,
+                "offerVerificationState": "NOT_A_BOARD_OFFER",
             } for c in eligible
         ],
         "requests": requests,
@@ -282,3 +293,102 @@ def insights_offer_snapshots(claims: list[dict[str, Any]]) -> dict[str, Any]:
     }
     out["contentHash"] = content_hash({k: v for k, v in out.items() if k != "contentHash"})
     return out
+def build_insight_research_graph(bridge: dict[str, Any] | None) -> dict[str, Any]:
+    """Build a non-offer graph for the Insights research population.
+
+    Insights are research signals, not platform offers.  They therefore cannot
+    be represented as ``Offer`` nodes in the board or universal dependency
+    graph.  This companion graph preserves the same reusable event/team/player
+    relationships while making the research-only boundary explicit.
+    """
+    bridge = bridge if isinstance(bridge, dict) else {}
+    nodes: dict[str, dict[str, Any]] = {}
+    edges: dict[tuple[str, str, str], dict[str, Any]] = {}
+
+    def add_node(kind: str, entity_id: Any, **attrs: Any) -> str:
+        value = _label(entity_id, limit=160)
+        if not value:
+            return ""
+        node_id = f"{kind}:{value}"
+        node = nodes.setdefault(node_id, {"id": node_id, "type": kind, "entityId": value})
+        for key, item in attrs.items():
+            if item not in (None, "", [], {}) and node.get(key) in (None, "", [], {}):
+                node[key] = item
+        return node_id
+
+    def add_edge(kind: str, source: str, target: str) -> None:
+        if not source or not target:
+            return
+        key = (kind, source, target)
+        edges.setdefault(key, {"type": kind, "from": source, "to": target})
+
+    for packet in bridge.get("eventPackets") or []:
+        if not isinstance(packet, dict):
+            continue
+        event_id = str(packet.get("eventId") or "")
+        event_node = add_node(
+            "Event", event_id, label=packet.get("label"), league=packet.get("league"),
+            sportFamily=packet.get("sportFamily"), scheduledStart=packet.get("scheduledStart"),
+        )
+        competition_node = add_node("Competition", packet.get("league"), sportFamily=packet.get("sportFamily"))
+        sport_node = add_node("Sport", packet.get("sportFamily"))
+        add_edge("member_of", event_node, competition_node)
+        add_edge("member_of", competition_node, sport_node)
+        for kind, id_key, label_key in (
+            ("Affiliation", "homeTeamId", "homeTeam"),
+            ("Affiliation", "awayTeamId", "awayTeam"),
+        ):
+            team_node = add_node(kind, packet.get(id_key), name=packet.get(label_key), league=packet.get("league"))
+            add_edge("participates_in", team_node, event_node)
+
+    scope_kind = {
+        "EVENT": "Event",
+        "AFFILIATION": "Affiliation",
+        "COUNTERPARTY": "Counterparty",
+        "SUBJECT": "Subject",
+    }
+    claim_count = 0
+    request_count = 0
+    for request in bridge.get("requests") or []:
+        if not isinstance(request, dict):
+            continue
+        request_id = str(request.get("request_id") or request.get("requestId") or "")
+        request_node = add_node(
+            "ResearchRequirement", request_id, scope=request.get("scope"),
+            need=request.get("need"), researchOnly=True,
+        )
+        request_count += bool(request_node)
+        entity_node = add_node(
+            scope_kind.get(str(request.get("scope") or "").upper(), "ResearchEntity"),
+            request.get("scope_id"),
+            eventId=request.get("eventId"),
+            league=request.get("league"),
+            label=request.get("eventLabel") or request.get("subjectName") or request.get("affiliation") or request.get("opponent"),
+            researchOnly=True,
+        )
+        add_edge("requires", request_node, entity_node)
+        claim_ids = request.get("dependent_claim_ids") or request.get("insightClaimIds") or []
+        for claim_id in claim_ids:
+            claim_node = add_node("InsightClaim", claim_id, researchOnly=True, offerVerificationState="NOT_A_BOARD_OFFER")
+            if claim_node:
+                claim_count += 1
+                add_edge("drives", claim_node, request_node)
+        event_id = str(request.get("eventId") or "")
+        if event_id:
+            add_edge("contextualized_by", request_node, add_node("Event", event_id))
+
+    body = {
+        "schema": "pillars_dcm.insight_research_dependency_graph.v1",
+        "researchOnly": True,
+        "platformOfferCount": 0,
+        "requestCount": int(request_count),
+        "claimCount": len({node_id for node_id, node in nodes.items() if node.get("type") == "InsightClaim"}),
+        "nodeCount": len(nodes),
+        "edgeCount": len(edges),
+        "nodes": sorted(nodes.values(), key=lambda row: str(row.get("id") or "")),
+        "edges": sorted(edges.values(), key=lambda row: (str(row.get("type") or ""), str(row.get("from") or ""), str(row.get("to") or ""))),
+        "reuseLaw": "Research each reusable Insights event, affiliation, counterparty, and subject once; retain claim fan-out without creating platform offers.",
+        "productionSelectionPermitted": False,
+    }
+    body["contentHash"] = content_hash({key: value for key, value in body.items() if key != "contentHash"})
+    return body

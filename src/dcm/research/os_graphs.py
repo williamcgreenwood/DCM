@@ -55,6 +55,21 @@ def _attach_dependents(requests: list[dict[str, Any]], rows: list[dict[str, Any]
     out: list[dict[str, Any]] = []
     for req in requests:
         rec = dict(req)
+        explicit_claims = [
+            str(value)
+            for value in (rec.get("dependent_claim_ids") or rec.get("insightClaimIds") or [])
+            if str(value)
+        ]
+        if explicit_claims:
+            # Research signals are not board offers. Preserve their fan-out as
+            # claim references and keep the offer dependency set empty.
+            rec["dependent_claim_ids"] = list(dict.fromkeys(explicit_claims))
+            rec["dependent_offer_ids"] = []
+            rec["dependent_prop_count"] = len(rec["dependent_claim_ids"])
+            rec["dependentClaimCount"] = len(rec["dependent_claim_ids"])
+            rec["dependentOfferCount"] = 0
+            out.append(rec)
+            continue
         scope = canonical_scope(str(rec.get("scope") or ""))
         sid = str(rec.get("scope_id") or "")
         dependents: list[str] = []
@@ -80,6 +95,9 @@ def _attach_dependents(requests: list[dict[str, Any]], rows: list[dict[str, Any]
             dependents = [sid] if sid else []
         rec["dependent_offer_ids"] = list(dict.fromkeys(dependents))
         rec["dependent_prop_count"] = len(rec["dependent_offer_ids"]) or int(rec.get("dependent_prop_count") or 0)
+        rec["dependent_claim_ids"] = []
+        rec["dependentClaimCount"] = 0
+        rec["dependentOfferCount"] = len(rec["dependent_offer_ids"])
         out.append(rec)
     return out
 
@@ -244,6 +262,8 @@ def build_requirement_graph(
     edges: list[tuple[str, str]] = []
     reverse_req_offers: dict[str, list[str]] = {}
     reverse_offer_reqs: dict[str, list[str]] = defaultdict(list)
+    reverse_req_claims: dict[str, list[str]] = {}
+    reverse_claim_reqs: dict[str, list[str]] = defaultdict(list)
     by_scope: dict[str, list[str]] = defaultdict(list)
 
     for rec in reqs:
@@ -258,13 +278,20 @@ def build_requirement_graph(
             "scope": scope,
             "scopeId": rec.get("scope_id"),
             "need": rec.get("need"),
-            "dependentOfferCount": rec.get("dependent_prop_count"),
+            "dependentOfferCount": len(rec.get("dependent_offer_ids") or []),
+            "dependentPropCount": rec.get("dependent_prop_count"),
             "dependentOfferIds": rec.get("dependent_offer_ids") or [],
+            "dependentClaimCount": len(rec.get("dependent_claim_ids") or []),
+            "dependentClaimIds": rec.get("dependent_claim_ids") or [],
+            "researchOnly": bool(rec.get("researchOnly") or rec.get("offerVerificationState") == "NOT_A_BOARD_OFFER"),
             "hierarchyRank": SCOPE_RANK.get(scope, 99),
         }
         reverse_req_offers[rid] = list(rec.get("dependent_offer_ids") or [])
+        reverse_req_claims[rid] = list(rec.get("dependent_claim_ids") or [])
         for oid in reverse_req_offers[rid]:
             reverse_offer_reqs[oid].append(rid)
+        for claim_id in reverse_req_claims[rid]:
+            reverse_claim_reqs[claim_id].append(rid)
         by_scope[scope].append(nid)
 
     # Prerequisite edges by scope, bound to matching event/affiliation where possible.
@@ -276,6 +303,7 @@ def build_requirement_graph(
         extra = rec if isinstance(rec, dict) else {}
         event_id = str(extra.get("eventId") or extra.get("event_id") or "")
         child_offers = set(rec.get("dependent_offer_ids") or [])
+        child_claims = set(rec.get("dependent_claim_ids") or [])
         for parent_scope in SCOPE_PREREQS.get(scope, ()):
             for parent_nid in scope_to_nodes.get(parent_scope, ()):
                 parent = nodes[parent_nid]
@@ -285,6 +313,9 @@ def build_requirement_graph(
                     if event_id and parent_sid not in {event_id, f"env:{event_id}"}:
                         continue
                 elif parent_scope not in {"SPORT", "COMPETITION"}:
+                    parent_claims = set(parent.get("dependentClaimIds") or [])
+                    if child_claims and parent_claims and child_claims.isdisjoint(parent_claims):
+                        continue
                     if child_offers and parent_offers and child_offers.isdisjoint(parent_offers):
                         continue
                 edges.append((parent_nid, src))
@@ -317,6 +348,8 @@ def build_requirement_graph(
         "reverseIndexes": {
             "requirementToOffers": reverse_req_offers,
             "offerToRequirements": dict(reverse_offer_reqs),
+            "requirementToClaims": reverse_req_claims,
+            "claimToRequirements": dict(reverse_claim_reqs),
         },
         "requests": reqs,
     }
