@@ -231,7 +231,7 @@ def _index_har(
                     "league": context_match.group(1).upper(), "kind": context_match.group(2).lower(),
                     "payload": payload, "httpStatus": status,
                 })
-            if isinstance(payload, dict) and isinstance(payload.get("insights"), list):
+            if isinstance(payload, dict) and "insights" in payload:
                 body_hash = sha256_text(body)
                 typed, accounting = parse_insights_payload(
                     payload,
@@ -250,8 +250,8 @@ def _index_har(
                         "startedDateTime": started,
                         "status": status,
                         "responseHash": body_hash,
-                        "itemCount": len(payload["insights"]),
-                        "itemType": "list",
+                        "itemCount": len(payload["insights"]) if isinstance(payload.get("insights"), list) else 0,
+                        "itemType": type(payload.get("insights")).__name__,
                         "topLevelKeys": sorted(str(k) for k in payload.keys()),
                         "nextPageTokenPresent": bool(payload.get("nextPageToken")),
                         "nextPageTokenState": accounting["paginationState"],
@@ -266,7 +266,7 @@ def _index_har(
                 stats["insights_typed_claims"] += int(accounting["typedClaimCount"])
                 stats["insights_player_prop_rows"] += int(accounting["dispositions"].get("PLAYER_PROP_CANDIDATE", 0))
                 stats["insights_team_market_rows"] += int(accounting["dispositions"].get("TEAM_MARKET_ACCOUNTED", 0))
-                if accounting["paginationState"] == "NONEMPTY":
+                if not bool(accounting.get("paginationComplete")):
                     stats["insights_pagination_incomplete"] += 1
             continue
 
@@ -503,7 +503,7 @@ def ingest_har(raw: Any, *, raw_bytes: bytes | None = None) -> dict[str, Any]:
                     response_hash=har_sha256, rows=tagged,
                 )
             )
-        elif isinstance(obj, dict) and isinstance(obj.get("insights"), list):
+        elif isinstance(obj, dict) and "insights" in obj:
             adapter = "INSIGHTS_EVIDENCE"
             typed, accounting = parse_insights_payload(
                 obj,
@@ -522,8 +522,8 @@ def ingest_har(raw: Any, *, raw_bytes: bytes | None = None) -> dict[str, Any]:
                     "startedDateTime": "",
                     "status": 200,
                     "responseHash": har_sha256,
-                    "itemCount": len(obj["insights"]),
-                    "itemType": "list",
+                    "itemCount": len(obj["insights"]) if isinstance(obj.get("insights"), list) else 0,
+                    "itemType": type(obj.get("insights")).__name__,
                     "topLevelKeys": sorted(str(k) for k in obj.keys()),
                     "nextPageTokenPresent": bool(obj.get("nextPageToken")),
                     "nextPageTokenState": accounting["paginationState"],
@@ -538,7 +538,7 @@ def ingest_har(raw: Any, *, raw_bytes: bytes | None = None) -> dict[str, Any]:
             index_stats["insights_typed_claims"] += int(accounting["typedClaimCount"])
             index_stats["insights_player_prop_rows"] += int(accounting["dispositions"].get("PLAYER_PROP_CANDIDATE", 0))
             index_stats["insights_team_market_rows"] += int(accounting["dispositions"].get("TEAM_MARKET_ACCOUNTED", 0))
-            if accounting["paginationState"] == "NONEMPTY":
+            if not bool(accounting.get("paginationComplete")):
                 index_stats["insights_pagination_incomplete"] += 1
 
     reconciled = reconcile_scope_attempts(scope_attempts)

@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from dcm.chat.session import HostSession, doctor
+from dcm.chat.slate import run_slate
 from dcm.runtime.cutoff import CutoffRequired
 from dcm.research.run_lock import RunBusyError, RunFenceError
 from dcm.research.batch_store import BatchEnvelopeError
@@ -48,6 +49,21 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--synthetic", action="store_true")
     p.add_argument("--workspace", type=Path, default=None)
     p.add_argument("--research-shadow", action="store_true")
+
+    sl = sub.add_parser(
+        "run-slate",
+        aliases=["run"],
+        help="Execute an explicit research prompt across independent HARs and their reconciled union",
+    )
+    sl.add_argument("--prompt", "--execution-prompt", dest="prompt", type=Path, required=True)
+    sl.add_argument("--har", action="append", default=[], type=Path)
+    sl.add_argument("--input", action="append", default=[], type=Path)
+    sl.add_argument("--run-root", type=Path, required=True)
+    sl.add_argument("--cutoff", default=None)
+    sl.add_argument("--cutoff-from-capture", action="store_true")
+    sl.add_argument("--workspace", type=Path, required=True)
+    sl.add_argument("--observations", type=Path, default=None)
+    sl.add_argument("--no-research-shadow", dest="research_shadow", action="store_false", default=True)
 
     n = sub.add_parser("next-research", help="Next optimized reusable-entity research batch")
     _add_run(n)
@@ -202,6 +218,18 @@ def main(argv: list[str] | None = None) -> int:
                 "runId": session.dest.name,
                 "hostState": str(session.dest / "host_state.json"),
             })
+            return 0
+        if args.command in {"run-slate", "run"}:
+            _print(run_slate(
+                inputs=[*args.har, *args.input],
+                run_root=args.run_root,
+                prompt=args.prompt,
+                cutoff=args.cutoff,
+                cutoff_from_capture=bool(args.cutoff_from_capture),
+                workspace=args.workspace,
+                research_shadow=bool(args.research_shadow),
+                observations=args.observations,
+            ))
             return 0
         if args.command == "cfb-launch":
             from dcm.chat.session import cfb_launch

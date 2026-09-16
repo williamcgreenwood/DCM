@@ -3,6 +3,7 @@ from __future__ import annotations
 
 HOST_COMMANDS = (
     "doctor",
+    "run-slate",
     "prepare",
     "next-research",
     "research-batch",

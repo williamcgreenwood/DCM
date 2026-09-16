@@ -2,10 +2,10 @@
 
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
-- Modules: **254**
-- Symbols: **1881**
+- Modules: **255**
+- Symbols: **1897**
 - Parse errors: **0**
-- Inventory hash: `992d8b3f700fe6ae01981c37a36e8c695511b49fde1fb90eb813d1cf6e1ff75a`
+- Inventory hash: `e5b168f40c1b66b2c935e352f6f09a694eea05ea8b55cccf9771db62dcdb671d`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -55,6 +55,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P7 | `src/dcm/chat/report.py` | 0 | 1 |
 | P7 | `src/dcm/chat/research_bridge.py` | 0 | 7 |
 | P7 | `src/dcm/chat/session.py` | 1 | 26 |
+| P7 | `src/dcm/chat/slate.py` | 0 | 16 |
 | P7 | `src/dcm/chat/state.py` | 0 | 4 |
 | UNMAPPED | `src/dcm/compact.py` | 4 | 20 |
 | P0 | `src/dcm/contracts/__init__.py` | 0 | 0 |
@@ -719,10 +720,10 @@ _No class/function symbols._
 
 ### `src/dcm/chat/cli.py`
 
-- `function` **_print** L18
-- `function` **_add_run** L22
-- `function` **build_parser** L26
-- `function` **main** L182
+- `function` **_print** L19
+- `function` **_add_run** L23
+- `function` **build_parser** L27
+- `function` **main** L198
 
 ### `src/dcm/chat/contracts.py`
 
@@ -766,20 +767,39 @@ _No class/function symbols._
 - `method` **HostSession.research_batch** L226 — Canonical durable batch command; next-research remains compatible.
 - `method` **HostSession.har_breakdown** L232
 - `method` **HostSession.index_build** L246
-- `method` **HostSession.search_blueprint** L283 — Compile the sport-neutral public-search fan-out plan for this run.
-- `method` **HostSession.research_validate** L302
-- `method` **HostSession.import_evidence** L350
-- `method` **HostSession.coverage** L461
-- `method` **HostSession.record_research_failure** L514
-- `method` **HostSession.checkpoint_verify** L525
-- `method` **HostSession._persist_research_checkpoint** L535
-- `method` **HostSession.forecast** L561
-- `method` **HostSession.report** L595
-- `method` **HostSession.resume** L602
-- `method` **HostSession.audit** L618
-- `method` **HostSession.archive** L623
-- `method` **HostSession.settle** L628
-- `function` **cfb_launch** L635 — Guarded CFB vertical slice. Fixture/bundle can freeze; file research returns the host loop.
+- `method` **HostSession.search_blueprint** L298 — Compile the sport-neutral public-search fan-out plan for this run.
+- `method` **HostSession.research_validate** L317
+- `method` **HostSession.import_evidence** L365
+- `method` **HostSession.coverage** L476
+- `method` **HostSession.record_research_failure** L529
+- `method` **HostSession.checkpoint_verify** L540
+- `method` **HostSession._persist_research_checkpoint** L550
+- `method` **HostSession.forecast** L576
+- `method` **HostSession.report** L610
+- `method` **HostSession.resume** L617
+- `method` **HostSession.audit** L633
+- `method` **HostSession.archive** L638
+- `method` **HostSession.settle** L643
+- `function` **cfb_launch** L650 — Guarded CFB vertical slice. Fixture/bundle can freeze; file research returns the host loop.
+
+### `src/dcm/chat/slate.py`
+
+- `function` **_sha256_bytes** L94
+- `function` **_sha256_file** L98
+- `function` **_write_json** L102
+- `function` **_write_jsonl** L110
+- `function` **_read_jsonl** L117
+- `function` **_safe_error** L131
+- `function` **_prompt_metadata** L137
+- `function` **_sport_hint** L157
+- `function` **_ordered_inputs** L165
+- `function` **_repo_head** L183
+- `function` **_source_summary** L198
+- `function` **_safe_claim** L282 — Drop accidental free-form/raw fields if an adapter ever supplies one.
+- `method` **_safe_claim.clean** L286
+- `function` **_step** L300
+- `function` **_write_terminal_artifacts** L324
+- `function` **run_slate** L494 — Run independent captures, the reconciled union, and safe terminal receipts.
 
 ### `src/dcm/chat/state.py`
 
@@ -991,21 +1011,21 @@ _No class/function symbols._
 
 ### `src/dcm/ingest/insights.py`
 
-- `function` **pagination_state** L35 — Return a tri-state token status; truthiness alone loses terminal-null.
-- `function` **_text** L45
-- `function` **_number** L51
-- `function` **_bool_list** L63
-- `function` **_direction** L69 — Classify Higher/Lower separately from team Home/Away outcomes.
-- `function` **_event_summary** L97
-- `function` **_history_summary** L121
-- `function` **_subject_name** L149
-- `function` **_book_summary** L164
-- `function` **_split_summary** L192
-- `function` **_disposition** L210
-- `function` **canonical_insight_record** L239 — Build one bounded immutable record without retaining the source body.
-- `function` **summarize_insight_claims** L339
-- `function` **parse_insights_payload** L376 — Parse one response page; a nonempty token is retained and fail-closed.
-- `function` **merge_insight_claims** L412 — Deduplicate exact snapshots while preserving changed snapshots and conflicts.
+- `function` **pagination_state** L38 — Return an explicit pagination state without treating malformed data as complete.
+- `function` **_text** L58
+- `function` **_number** L64
+- `function` **_bool_list** L76
+- `function` **_direction** L82 — Classify Higher/Lower separately from team Home/Away outcomes.
+- `function` **_event_summary** L110
+- `function` **_history_summary** L134
+- `function` **_subject_name** L162
+- `function` **_book_summary** L177
+- `function` **_split_summary** L205
+- `function` **_disposition** L223
+- `function` **canonical_insight_record** L252 — Build one bounded immutable record without retaining the source body.
+- `function` **summarize_insight_claims** L352
+- `function` **parse_insights_payload** L389 — Parse one response page; malformed and unconsumed pages fail closed.
+- `function` **merge_insight_claims** L428 — Deduplicate exact snapshots while preserving changed snapshots and conflicts.
 
 ### `src/dcm/ingest/markets.py`
 
