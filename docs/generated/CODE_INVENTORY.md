@@ -2,10 +2,10 @@
 
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
-- Modules: **256**
-- Symbols: **1915**
+- Modules: **257**
+- Symbols: **1930**
 - Parse errors: **0**
-- Inventory hash: `a013cb4ca85c2afb21c2fbd15089ff6fed01a86199c98c6a48fe30ae4cf42647`
+- Inventory hash: `73a9b5e5108c58e9f502433ead511009ae3bfbf2aa3e1a7dadfe0809c3741230`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -57,6 +57,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P7 | `src/dcm/chat/research_bridge.py` | 0 | 7 |
 | P7 | `src/dcm/chat/session.py` | 1 | 26 |
 | P7 | `src/dcm/chat/slate.py` | 0 | 16 |
+| P7 | `src/dcm/chat/slate_autonomous.py` | 0 | 15 |
 | P7 | `src/dcm/chat/state.py` | 0 | 4 |
 | UNMAPPED | `src/dcm/compact.py` | 4 | 20 |
 | P0 | `src/dcm/contracts/__init__.py` | 0 | 0 |
@@ -732,7 +733,7 @@ _No class/function symbols._
 - `function` **_print** L19
 - `function` **_add_run** L23
 - `function` **build_parser** L27
-- `function` **main** L198
+- `function` **main** L207
 
 ### `src/dcm/chat/contracts.py`
 
@@ -793,22 +794,40 @@ _No class/function symbols._
 
 ### `src/dcm/chat/slate.py`
 
-- `function` **_sha256_bytes** L99
-- `function` **_sha256_file** L103
-- `function` **_write_json** L107
-- `function` **_write_jsonl** L115
-- `function` **_read_jsonl** L122
-- `function` **_safe_error** L136
-- `function` **_prompt_metadata** L142
-- `function` **_sport_hint** L162
-- `function` **_ordered_inputs** L170
-- `function` **_repo_head** L188
-- `function` **_source_summary** L203
-- `function` **_safe_claim** L287 — Drop accidental free-form/raw fields if an adapter ever supplies one.
-- `method` **_safe_claim.clean** L291
-- `function` **_step** L305
-- `function` **_write_terminal_artifacts** L329
-- `function` **run_slate** L549 — Run independent captures, the reconciled union, and safe terminal receipts.
+- `function` **_sha256_bytes** L105
+- `function` **_sha256_file** L109
+- `function` **_write_json** L113
+- `function` **_write_jsonl** L121
+- `function` **_read_jsonl** L128
+- `function` **_safe_error** L142
+- `function` **_prompt_metadata** L148
+- `function` **_sport_hint** L168
+- `function` **_ordered_inputs** L176
+- `function` **_repo_head** L194
+- `function` **_source_summary** L209
+- `function` **_safe_claim** L293 — Drop accidental free-form/raw fields if an adapter ever supplies one.
+- `method` **_safe_claim.clean** L297
+- `function` **_step** L311
+- `function` **_write_terminal_artifacts** L335
+- `function` **run_slate** L581 — Run independent captures, the reconciled union, and HAR-only autonomous closure.
+
+### `src/dcm/chat/slate_autonomous.py`
+
+- `function` **_parse_time** L53
+- `function` **_now_iso** L64
+- `function` **insights_line_side_count** L68
+- `function` **classify_claim_event_timing** L86 — Return FINAL, FUTURE, or UNKNOWN without inventing a result.
+- `function` **iter_strings** L121
+- `function` **_is_required_board_har_ask** L133
+- `function` **receipt_requires_board_har** L145 — True when a receipt treats a board HAR as a required operator ask.
+- `function` **operator_contract** L173 — HAR-only operator contract fragment for execution receipts.
+- `function` **_phase** L216
+- `function` **_load_outcomes** L222
+- `function` **_drive_research** L241 — Schedule host research; never require a board HAR.
+- `function` **_drive_settle** L289 — Settle FINAL claims when outcomes exist; defer FUTURE without a HAR ask.
+- `function` **_drive_train** L408
+- `function` **_drive_playables** L425
+- `function` **advance_autonomous_closure** L445 — Advance research → settle → train → playables with typed states.
 
 ### `src/dcm/chat/state.py`
 
@@ -1026,15 +1045,15 @@ _No class/function symbols._
 - `function` **_bool_list** L76
 - `function` **_direction** L82 — Classify Higher/Lower separately from team Home/Away outcomes.
 - `function` **_event_summary** L110
-- `function` **_history_summary** L134
-- `function` **_subject_name** L162
-- `function` **_book_summary** L177
-- `function` **_split_summary** L205
-- `function` **_disposition** L223
-- `function` **canonical_insight_record** L252 — Build one bounded immutable record without retaining the source body.
-- `function` **summarize_insight_claims** L352
-- `function` **parse_insights_payload** L389 — Parse one response page; malformed and unconsumed pages fail closed.
-- `function` **merge_insight_claims** L428 — Deduplicate exact snapshots while preserving changed snapshots and conflicts.
+- `function` **_history_summary** L135
+- `function` **_subject_name** L163
+- `function` **_book_summary** L178
+- `function` **_split_summary** L206
+- `function` **_disposition** L224
+- `function` **canonical_insight_record** L253 — Build one bounded immutable record without retaining the source body.
+- `function` **summarize_insight_claims** L353
+- `function` **parse_insights_payload** L390 — Parse one response page; malformed and unconsumed pages fail closed.
+- `function` **merge_insight_claims** L429 — Deduplicate exact snapshots while preserving changed snapshots and conflicts.
 
 ### `src/dcm/ingest/markets.py`
 
@@ -1967,8 +1986,8 @@ _No class/function symbols._
 - `function` **_league_state** L128
 - `function` **score_research_attention** L139 — Score research value with transparent, bounded components.
 - `function` **queue_record** L199
-- `function` **_diversified_frontier** L262 — Avoid turning one player/event's correlated props into a fake frontier.
-- `function` **build_research_queue** L306 — Account the full claim universe, then emit Top-100/Top-25 attention lists.
+- `function` **_diversified_frontier** L265 — Avoid turning one player/event's correlated props into a fake frontier.
+- `function` **build_research_queue** L309 — Account the full claim universe, then emit Top-100/Top-25 attention lists.
 
 ### `src/dcm/research/lineup.py`
 

@@ -36,14 +36,23 @@ live-board freshness or completion.
   limitation; PR #64's remote `python-dcm` workflow, including the full test,
   constitution, policy, inventory, benchmark, and profile steps, completed green.
 
+## HAR-only autonomous closure (software)
+
+Insights HARs with exact line+side are the platform capture. `run-slate --autonomous`
+(default) continues research → settle → train → playables with typed states.
+Do **not** ask the operator for a second current board HAR. Optional board HAR
+must not block Top100/Top25. `CURRENT_OFFER_MISSING` is informational only when
+Insights line+side is also absent. Predictive claim remains `NONE`; LR remains
+`LR000000` until chronological labels actually earn a revision.
+
 ## Next
 
-Use a verified current run/checkpoint and permitted current evidence for the remaining
-external CFB/NFL gates. Do not restart the private HAR from this checkout, fabricate
-operational evidence, or publish a final forecast, Top100/Top25, freeze, settlement,
-predictive claim, production-root certification, or host-performance certification
-without the corresponding receipts.
+Supply HARs (Insights captures are sufficient). Continue host research observations
+and, when events are FINAL, join authoritative outcomes for settlement. Do not
+restart the private HAR from this checkout, fabricate operational evidence, or
+publish a final forecast, freeze, predictive claim, production-root certification,
+or host-performance certification without the corresponding receipts.
 
 ```bash
-python -m dcm.chat next-research --run <RUN_ROOT>/runs_kickoff/RUN_d3271703636992cc --workspace <WORKSPACE>
+python -m dcm.chat run-slate --prompt <PROMPT> --har <INSIGHTS.har> --run-root <RUN_ROOT> --workspace <WORKSPACE>
 ```

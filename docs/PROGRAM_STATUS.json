@@ -34,6 +34,7 @@
     "NFL league-keyed research-contract parity is merged in PR #57 and DCM61-08 is VERIFIED",
     "PR #64 merged the audit and Work/Codex execution prompt at 96bc0e5c5bd2be874c7a84aaf29144248679d646",
     "The last recorded operational run was not reopened by the 2026-09-08 documentation readback",
-    "Remaining CFB/NFL operational, predictive, production-root, and host-performance gates require their own receipts"
+    "Remaining CFB/NFL operational, predictive, production-root, and host-performance gates require their own receipts",
+    "HAR-only autonomous closure: Insights HARs with line+side are the platform capture; run-slate --autonomous continues research->settle->train->playables; never require a second board HAR; CURRENT_OFFER_MISSING is informational only; LR000000 / predictive NONE unchanged"
   ]
 }

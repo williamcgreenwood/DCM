@@ -136,7 +136,15 @@ def test_explicit_prompt_slate_runs_each_capture_and_union(tmp_path: Path) -> No
     assert receipt["platform"]["github"] == "PENDING_REMOTE_READBACK"
     assert receipt["status"]["predictive"] == "PREDICTIVE_NOT_EARNED"
     assert receipt["contentHash"] == content_hash({k: v for k, v in receipt.items() if k != "contentHash"})
-    assert "next-event probabilities" in (root / "audit_report.md").read_text(encoding="utf-8")
+    assert receipt["boardHarRequired"] is False
+    assert receipt["requiredOperatorAsks"] == []
+    assert receipt["nextRequiredOperatorInput"] == "NONE"
+    assert [row["name"] for row in receipt["autonomousPhases"]] == ["RESEARCH", "SETTLE", "TRAIN", "PLAYABLES"]
+    top25 = json.loads((root / "top25.json").read_text(encoding="utf-8"))
+    assert top25["boardOfferCount"] == 0
+    assert len(top25["rows"]) > 0
+    audit = (root / "audit_report.md").read_text(encoding="utf-8")
+    assert "optional board HAR is not a required next" in audit
 
     composite_dirs = list((root / "composite_run").glob("RUN_*/"))
     assert len(composite_dirs) == 1
