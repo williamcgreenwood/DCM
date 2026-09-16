@@ -24,7 +24,8 @@ from dcm.contracts.hashes import content_hash
 from dcm.research.indexes import EvidenceIndexes
 from dcm.research.os_graphs import _attach_dependents
 from dcm.research.scopes import SCOPE_RANK, canonical_scope
-from dcm.research.source_health import SourceHealthRegistry, default_gridiron_source_health
+from dcm.research.source_health import SourceHealthRegistry, default_universal_source_health
+from dcm.research.source_catalog import normalize_competition_id, sport_family_for_league
 from dcm.research.coverage import evaluate_request
 from dcm.sports.football.research_requirements import market_requirements
 
@@ -109,7 +110,7 @@ def build_acquisition_actions(
 ) -> dict[str, Any]:
     """Group reusable-entity requests into fan-out AcquisitionActions."""
     tel = telemetry or AlgorithmTelemetry()
-    health = source_health or default_gridiron_source_health()
+    health = source_health or default_universal_source_health()
     reqs = _attach_dependents(list(requests or []), rows)
     excluded = {str(value) for value in (excluded_action_ids or set()) if str(value)}
     coverage_by_id = {
@@ -217,8 +218,15 @@ def build_acquisition_actions(
         act["offerIds"] = list(dict.fromkeys(act["offerIds"]))
         act["dependentOfferCount"] = len(act["offerIds"])
         act["requirementCount"] = len(act["requirementIds"])
-        candidates = health.route(claim_type=str(act.get("scope") or "SUBJECT"), sport=league)
+        route_sport = normalize_competition_id(league) or str(act.get("sportFamily") or "").upper()
+        candidates = health.route(claim_type=str(act.get("scope") or "SUBJECT"), sport=route_sport)
+        # Sport-correctness guard: never keep CFB_WEATHER for non-CFB actions.
+        if route_sport not in {"CFB", "NCAAFB", "CFB1H"}:
+            candidates = [sid for sid in candidates if sid != "CFB_WEATHER"]
+        if not candidates:
+            candidates = ["WEB_SEARCH"]
         act["sourceCandidates"] = candidates
+        act["sportFamily"] = sport_family_for_league(route_sport, fallback=act.get("sportFamily"))
         act["sourceId"] = candidates[0] if candidates else None
         p_success: float | None = None
         authority = 0.8

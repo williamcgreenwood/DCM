@@ -2,10 +2,10 @@
 
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
-- Modules: **255**
-- Symbols: **1897**
+- Modules: **256**
+- Symbols: **1910**
 - Parse errors: **0**
-- Inventory hash: `e5b168f40c1b66b2c935e352f6f09a694eea05ea8b55cccf9771db62dcdb671d`
+- Inventory hash: `55b398dd2dcc2bbf73f433e2296ae1ce7b95d4f2e058f076aaeced8a834e78a0`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -22,6 +22,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P16 | `src/dcm/algorithms/grouping.py` | 1 | 17 |
 | P16 | `src/dcm/algorithms/indexing.py` | 8 | 37 |
 | P16 | `src/dcm/algorithms/ml_families.py` | 0 | 13 |
+| P16 | `src/dcm/algorithms/pipeline_constitution.py` | 1 | 4 |
 | P16 | `src/dcm/algorithms/registry.py` | 0 | 15 |
 | P16 | `src/dcm/algorithms/scheduling.py` | 1 | 12 |
 | P16 | `src/dcm/algorithms/searching.py` | 4 | 43 |
@@ -162,7 +163,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P1 | `src/dcm/research/historical_gap.py` | 0 | 4 |
 | P1 | `src/dcm/research/host_plan.py` | 0 | 1 |
 | P1 | `src/dcm/research/indexes.py` | 2 | 19 |
-| P1 | `src/dcm/research/insight_bridge.py` | 0 | 6 |
+| P1 | `src/dcm/research/insight_bridge.py` | 0 | 8 |
 | P1 | `src/dcm/research/insight_queue.py` | 0 | 11 |
 | P1 | `src/dcm/research/lineup.py` | 0 | 3 |
 | P1 | `src/dcm/research/material_facts.py` | 0 | 20 |
@@ -185,8 +186,8 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P1 | `src/dcm/research/search_blueprint.py` | 0 | 2 |
 | P1 | `src/dcm/research/search_engine.py` | 1 | 9 |
 | P1 | `src/dcm/research/search_query.py` | 0 | 4 |
-| P1 | `src/dcm/research/source_catalog.py` | 0 | 6 |
-| P1 | `src/dcm/research/source_health.py` | 1 | 19 |
+| P1 | `src/dcm/research/source_catalog.py` | 0 | 9 |
+| P1 | `src/dcm/research/source_health.py` | 1 | 22 |
 | P1 | `src/dcm/research/staged.py` | 0 | 5 |
 | P1 | `src/dcm/research/statepack.py` | 4 | 26 |
 | P1 | `src/dcm/research/subject_offer_set.py` | 1 | 10 |
@@ -439,6 +440,14 @@ _No class/function symbols._
 - `function` **_solve** L188
 - `function` **not_active_challenger** L206
 
+### `src/dcm/algorithms/pipeline_constitution.py`
+
+- `class` **PipelineConstitutionGate** L52 — Evaluate/select REQUIRED_CORE algorithms per Insights/HAR pipeline stage.
+- `method` **PipelineConstitutionGate.__init__** L55
+- `method` **PipelineConstitutionGate.evaluate_stage** L59
+- `method` **PipelineConstitutionGate.evaluate_pipeline** L102 — Evaluate every constitution stage. Fail-closed on ceremonial ACTIVE.
+- `function` **evaluate_insights_har_pipeline** L159 — Convenience entrypoint used by run-slate / Insights prepare.
+
 ### `src/dcm/algorithms/registry.py`
 
 - `function` **_candidates** L20
@@ -651,9 +660,9 @@ _No class/function symbols._
 - `function` **_frontier_fingerprint** L65
 - `function` **_load_json** L69
 - `function` **prepare_cfb_research_os** L79 — Emit graphs, indexes, and live AcquisitionActions BEFORE web acquisition.
-- `function` **attach_cfb_prop_flags** L400
-- `function` **emit_cfb_forecast_artifacts** L409
-- `function` **persist_algorithm_telemetry** L602
+- `function` **attach_cfb_prop_flags** L414
+- `function` **emit_cfb_forecast_artifacts** L423
+- `function` **persist_algorithm_telemetry** L616
 
 ### `src/dcm/cfb/markets.py`
 
@@ -784,22 +793,22 @@ _No class/function symbols._
 
 ### `src/dcm/chat/slate.py`
 
-- `function` **_sha256_bytes** L94
-- `function` **_sha256_file** L98
-- `function` **_write_json** L102
-- `function` **_write_jsonl** L110
-- `function` **_read_jsonl** L117
-- `function` **_safe_error** L131
-- `function` **_prompt_metadata** L137
-- `function` **_sport_hint** L157
-- `function` **_ordered_inputs** L165
-- `function` **_repo_head** L183
-- `function` **_source_summary** L198
-- `function` **_safe_claim** L282 — Drop accidental free-form/raw fields if an adapter ever supplies one.
-- `method` **_safe_claim.clean** L286
-- `function` **_step** L300
-- `function` **_write_terminal_artifacts** L324
-- `function` **run_slate** L494 — Run independent captures, the reconciled union, and safe terminal receipts.
+- `function` **_sha256_bytes** L99
+- `function` **_sha256_file** L103
+- `function` **_write_json** L107
+- `function` **_write_jsonl** L115
+- `function` **_read_jsonl** L122
+- `function` **_safe_error** L136
+- `function` **_prompt_metadata** L142
+- `function` **_sport_hint** L162
+- `function` **_ordered_inputs** L170
+- `function` **_repo_head** L188
+- `function` **_source_summary** L203
+- `function` **_safe_claim** L287 — Drop accidental free-form/raw fields if an adapter ever supplies one.
+- `method` **_safe_claim.clean** L291
+- `function` **_step** L305
+- `function` **_write_terminal_artifacts** L329
+- `function` **run_slate** L549 — Run independent captures, the reconciled union, and safe terminal receipts.
 
 ### `src/dcm/chat/state.py`
 
@@ -1488,13 +1497,13 @@ _No class/function symbols._
 
 ### `src/dcm/research/acquisition.py`
 
-- `function` **_scalable_weighted_set_cover** L49 — Lazy greedy set cover using a requirement→action reverse index.
-- `function` **_req_id** L95
-- `function` **build_acquisition_actions** L99 — Group reusable-entity requests into fan-out AcquisitionActions.
-- `function` **schedule_acquisition_actions** L283 — Live CELF selector with set-cover + constrained batch packing.
-- `method` **schedule_acquisition_actions.gain_fn** L330
-- `method` **schedule_acquisition_actions.cost_fn** L340
-- `function` **build_acquisition_action_graph** L432 — Persistable AcquisitionActionGraph: one action may cover many requirements/offers.
+- `function` **_scalable_weighted_set_cover** L50 — Lazy greedy set cover using a requirement→action reverse index.
+- `function` **_req_id** L96
+- `function` **build_acquisition_actions** L100 — Group reusable-entity requests into fan-out AcquisitionActions.
+- `function` **schedule_acquisition_actions** L291 — Live CELF selector with set-cover + constrained batch packing.
+- `method` **schedule_acquisition_actions.gain_fn** L338
+- `method` **schedule_acquisition_actions.cost_fn** L348
+- `function` **build_acquisition_action_graph** L440 — Persistable AcquisitionActionGraph: one action may cover many requirements/offers.
 
 ### `src/dcm/research/action_state.py`
 
@@ -1941,6 +1950,8 @@ _No class/function symbols._
 - `function` **_request_labels** L61
 - `function` **_request** L87
 - `function` **plan_insight_host_research** L106 — Create reusable EVENT/AFFILIATION/COUNTERPARTY/SUBJECT jobs.
+- `function` **_finite_line** L184
+- `function` **insights_offer_snapshots** L194 — Promote Insights claims with exact line + HIGHER/LOWER into offer-equivalent snapshots.
 
 ### `src/dcm/research/insight_queue.py`
 
@@ -1953,8 +1964,8 @@ _No class/function symbols._
 - `function` **_league_state** L128
 - `function` **score_research_attention** L139 — Score research value with transparent, bounded components.
 - `function` **queue_record** L199
-- `function` **_diversified_frontier** L242 — Avoid turning one player/event's correlated props into a fake frontier.
-- `function` **build_research_queue** L286 — Account the full claim universe, then emit Top-100/Top-25 attention lists.
+- `function` **_diversified_frontier** L262 — Avoid turning one player/event's correlated props into a fake frontier.
+- `function` **build_research_queue** L306 — Account the full claim universe, then emit Top-100/Top-25 attention lists.
 
 ### `src/dcm/research/lineup.py`
 
@@ -2236,29 +2247,35 @@ _No class/function symbols._
 - `function` **estimated_cost** L86
 - `function` **catalog_summary** L97
 - `function` **source_health_seeds** L111 — Derive health-router seeds from the versioned capability catalog.
+- `function` **normalize_competition_id** L178 — Normalize league/competition tokens for catalog matching.
+- `function` **sport_family_for_league** L184 — Map a league/competition token onto a sportFamily id.
+- `function` **candidate_sources_for_sport** L195 — Return sport-correct catalog sources for acquisition routing.
 
 ### `src/dcm/research/source_health.py`
 
-- `function` **_now** L17
-- `function` **_iso** L21
-- `function` **_parse_ts** L25
-- `class` **SourceHealthRegistry** L43 — Claim-specific source routing with circuit breakers and bounded fallbacks.
-- `method` **SourceHealthRegistry.__init__** L46
-- `method` **SourceHealthRegistry._ensure** L66
-- `method` **SourceHealthRegistry._now** L119
-- `method` **SourceHealthRegistry._set_success_probability** L125
-- `method` **SourceHealthRegistry.success_probability** L132
-- `method` **SourceHealthRegistry._refresh_circuit** L140
-- `method` **SourceHealthRegistry.record_success** L150
-- `method` **SourceHealthRegistry.record_failure** L171
-- `method` **SourceHealthRegistry.fallbacks** L188 — Traverse fallbackSourceIds, skipping currently OPEN circuits.
-- `method` **SourceHealthRegistry.route** L207 — Prefer official/structured, then stats, then reporting, search last.
-- `method` **SourceHealthRegistry.snapshot** L240
-- `method` **SourceHealthRegistry.load_snapshot** L260 — Overlay persisted counters/circuits onto the live catalog. Never invent 0.85.
-- `function` **persist_cfb_source_health** L284 — Write the live source-health snapshot so later research passes restore it.
-- `function` **load_cfb_source_health** L299 — Restore persisted source-health counters/circuits. Missing file → default catalog.
-- `function` **default_gridiron_source_health** L320 — League-keyed gridiron router derived from the source-capability catalog.
-- `function` **default_cfb_source_health** L351 — Backward-compatible CFB-only router.
+- `function` **_now** L22
+- `function` **_iso** L26
+- `function` **_parse_ts** L30
+- `class` **SourceHealthRegistry** L48 — Claim-specific source routing with circuit breakers and bounded fallbacks.
+- `method` **SourceHealthRegistry.__init__** L51
+- `method` **SourceHealthRegistry._ensure** L71
+- `method` **SourceHealthRegistry._now** L124
+- `method` **SourceHealthRegistry._set_success_probability** L130
+- `method` **SourceHealthRegistry.success_probability** L137
+- `method` **SourceHealthRegistry._refresh_circuit** L145
+- `method` **SourceHealthRegistry.record_success** L155
+- `method` **SourceHealthRegistry.record_failure** L176
+- `method` **SourceHealthRegistry.fallbacks** L193 — Traverse fallbackSourceIds, skipping currently OPEN circuits.
+- `method` **SourceHealthRegistry.route** L212 — Prefer official/structured, then stats, then reporting, search last.
+- `method` **SourceHealthRegistry.snapshot** L264
+- `method` **SourceHealthRegistry.load_snapshot** L284 — Overlay persisted counters/circuits onto the live catalog. Never invent 0.85.
+- `function` **persist_cfb_source_health** L308 — Write the live source-health snapshot so later research passes restore it.
+- `function` **load_cfb_source_health** L323 — Restore persisted source-health counters/circuits. Missing file → universal catalog.
+- `function` **default_gridiron_source_health** L347 — League-keyed gridiron router derived from the source-capability catalog.
+- `function` **default_cfb_source_health** L358 — Backward-compatible CFB-only router.
+- `function` **_seed_rows_for_competition** L398
+- `function` **default_sport_source_health** L433 — Sport-correct source router derived from the capability catalog.
+- `function` **default_universal_source_health** L449 — Multi-league router for mixed Insights/HAR boards.
 
 ### `src/dcm/research/staged.py`
 
@@ -2352,10 +2369,10 @@ _No class/function symbols._
 - `function` **_default_model_config** L255
 - `function` **_active_calibration** L266
 - `function` **run_dcm** L275
-- `method` **run_dcm._snapshot_for** L1109
-- `method` **run_dcm._resimulate_material** L1607
-- `method` **run_dcm.slim** L1798
-- `function` **main** L2371
+- `method` **run_dcm._snapshot_for** L1114
+- `method` **run_dcm._resimulate_material** L1612
+- `method` **run_dcm.slim** L1803
+- `function` **main** L2376
 
 ### `src/dcm/runtime/__init__.py`
 

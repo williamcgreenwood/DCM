@@ -236,6 +236,26 @@ def queue_record(claim: dict[str, Any], *, rank: int) -> dict[str, Any]:
         "probability": None,
         **score,
         "blockers": sorted(set(blocked)),
+        "offerBacking": (
+            "INSIGHTS_OFFER_BACKED"
+            if (
+                _finite(claim.get("line")) is not None
+                and str(claim.get("directionClass") or "") == "HIGHER_LOWER"
+                and str(claim.get("direction") or "") in {"HIGHER", "LOWER"}
+            )
+            else "CURRENT_OFFER_MISSING"
+        ),
+        "candidateClass": (
+            "RESEARCH_CANDIDATE"
+            if (
+                _finite(claim.get("line")) is not None
+                and str(claim.get("directionClass") or "") == "HIGHER_LOWER"
+                and str(claim.get("direction") or "") in {"HIGHER", "LOWER"}
+            )
+            else "FAIL_CLOSED_MISSING_SIDE_OR_LINE"
+        ),
+        "predictiveClaim": "NONE",
+        "learningRevision": "LR000000",
     }
 
 
@@ -301,7 +321,10 @@ def build_research_queue(claims: Iterable[dict[str, Any]], *, top_n: int = 100, 
     for index, row in enumerate(scored, 1):
         row["rank"] = index
     queued = [row for row in scored if row["researchState"] == "RESEARCH_QUEUE"]
-    top100 = queued[: max(0, int(top_n))]
+    offer_backed = [row for row in queued if row.get("offerBacking") == "INSIGHTS_OFFER_BACKED"]
+    # Insights-backed Top100/Top25 fill from line+side claims even when boardOfferCount=0.
+    top100_pool = offer_backed or queued
+    top100 = top100_pool[: max(0, int(top_n))]
     top25 = top100[: max(0, int(top_preview))]
     production_blockers = {
         "PAGINATION_INCOMPLETE",
@@ -329,6 +352,7 @@ def build_research_queue(claims: Iterable[dict[str, Any]], *, top_n: int = 100, 
         "queuedClaimCount": len(queued),
         "top100Count": len(top100),
         "top25Count": len(top25),
+        "insightsOfferBackedCount": len(offer_backed),
         "productionQueueCount": len(production_queue),
         "productionTop100Count": len(top100_production),
         "productionTop25Count": len(top25_production),
@@ -359,6 +383,7 @@ def build_research_queue(claims: Iterable[dict[str, Any]], *, top_n: int = 100, 
         "rows": scored,
         "top100": top100,
         "top25": top25,
+        "insightsTop25": top25,
         "diversifiedTop25": diversified_top25,
         "productionTop100": top100_production,
         "productionTop25": top25_production,

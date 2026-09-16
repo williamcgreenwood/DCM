@@ -72,7 +72,7 @@ from dcm.research.host_plan import build_host_research_plan
 from dcm.research.provider import BundleProvider, FileProvider, FixtureProvider, collect, write_bundle
 from dcm.research.claims import dedupe
 from dcm.research.insight_queue import build_research_queue
-from dcm.research.insight_bridge import plan_insight_host_research
+from dcm.research.insight_bridge import insights_offer_snapshots, plan_insight_host_research
 from dcm.research.requests import plan_research
 from dcm.research.offer_metadata import recover_offer_metadata
 from dcm.research.har_breakdown import build_har_breakdown, safe_parse_har
@@ -473,6 +473,11 @@ def run_dcm(
                     claim_file.write(json.dumps(claim, sort_keys=True, separators=(",", ":")) + "\n")
             (dest / "insights_research_queue.json").write_text(
                 json.dumps(insight_queue, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+            offer_snapshots = insights_offer_snapshots(insight_claims)
+            (dest / "insights_offer_snapshots.json").write_text(
+                json.dumps(offer_snapshots, indent=2, sort_keys=True) + "\n",
                 encoding="utf-8",
             )
             by_source: dict[str, list[dict[str, Any]]] = {}

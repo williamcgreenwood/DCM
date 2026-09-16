@@ -83,7 +83,7 @@ def test_universal_host_plan_includes_sport_specific_subject_requirements():
     assert motorsport["sportProfile"]["harvestStrategy"].startswith("session_classification")
     assert motorsport["sportSpecificRequirements"]["minimumSupport"]["role_comparable_history"] >= 3
     assert any(source["sourceId"] == "generic_web_search" for source in motorsport["sourceCandidates"])
-    assert plan["sourceCatalogVersion"] == "2026-09-12"
+    assert plan["sourceCatalogVersion"] == "2026-09-16"
     assert plan["sourceCatalogHash"]
 
 

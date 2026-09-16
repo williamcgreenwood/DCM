@@ -15,10 +15,15 @@ import subprocess
 from pathlib import Path
 from typing import Any, Callable, Iterable
 
+from dcm.algorithms.pipeline_constitution import (
+    PIPELINE_CONSTITUTION_ID,
+    evaluate_insights_har_pipeline,
+)
 from dcm.chat.session import HostSession
 from dcm.chat.state import read_json
 from dcm.contracts.hashes import content_hash
 from dcm.ingest.insights import merge_insight_claims
+from dcm.research.insight_bridge import insights_offer_snapshots
 from dcm.runtime.input_boundary import inspect_input_boundary
 from dcm.version import LEARNING_REVISION, PREDICTIVE_CLAIM, SOFTWARE
 
@@ -421,19 +426,68 @@ def _write_terminal_artifacts(
     _write_json(root / "prediction_candidates.json", prediction)
     paths.append("prediction_candidates.json")
 
+    offer_doc = insights_offer_snapshots(list(claims))
+    _write_json(root / "insights_offer_snapshots.json", offer_doc)
+    paths.append("insights_offer_snapshots.json")
+
+    # Insights-backed Top25 remains populated when line+side exist even if boardOfferCount=0.
+    insights_top25 = [dict(row) for row in top25 if row.get("offerBacking") == "INSIGHTS_OFFER_BACKED"]
+    if not insights_top25:
+        insights_top25 = list(top25)
+    for row in insights_top25:
+        row.setdefault("offerBacking", "INSIGHTS_OFFER_BACKED")
+        row.setdefault("candidateClass", "RESEARCH_CANDIDATE")
+        row["predictiveClaim"] = PREDICTIVE_CLAIM
+        row["learningRevision"] = LEARNING_REVISION
+        row["productionEligible"] = False
+        row["probability"] = None
+
     top25_artifact = {
         "schema": "pillars_dcm.top25_research_preview.v1",
         "status": "RESEARCH_ONLY",
         "probabilityStatus": "NONE",
         "productionSelectionPermitted": False,
-        "rows": top25,
+        "offerBacking": "INSIGHTS_OFFER_BACKED" if insights_top25 else ("CURRENT_OFFER_MISSING" if board_offer_count == 0 else "BOARD_OFFER"),
+        "candidateClass": "RESEARCH_CANDIDATE",
+        "boardOfferCount": int(board_offer_count),
+        "insightsOfferCount": int(offer_doc.get("insightsOfferCount") or 0),
+        "rows": insights_top25,
         "diversifiedRows": [dict(row) for row in (queue.get("diversifiedTop25") or []) if isinstance(row, dict)] if isinstance(queue, dict) else [],
+        "predictiveClaim": PREDICTIVE_CLAIM,
+        "learningRevision": LEARNING_REVISION,
+        "note": (
+            "Insights line+side claims back research Top25; CURRENT_OFFER_MISSING "
+            "does not wipe Insights-backed rows. Playables remain fail-closed without production model."
+        ),
     }
     top25_artifact["contentHash"] = content_hash(top25_artifact)
     _write_json(root / "top25.json", top25_artifact)
     paths.append("top25.json")
 
-    line_buffer = "status,reason,eligibleCount\nABSTAINED,NO_VERIFIED_CURRENT_BOARD_OFFERS,0\n"
+    playables = {
+        "schema": "pillars_dcm.playables.v1",
+        "count": 0,
+        "ABSTAINED": True,
+        "reason": "PRODUCTION_MODEL_GATES_NOT_MET" if insights_top25 else "CURRENT_OFFER_MISSING",
+        "boardOfferCount": int(board_offer_count),
+        "insightsTop25Count": len(insights_top25),
+        "rows": [],
+        "predictiveClaim": PREDICTIVE_CLAIM,
+        "learningRevision": LEARNING_REVISION,
+        "note": "Playables may be 0 while Insights-backed Top25 is non-empty.",
+    }
+    playables["contentHash"] = content_hash(playables)
+    _write_json(root / "playables.json", playables)
+    paths.append("playables.json")
+
+    line_buffer = (
+        "status,reason,eligibleCount\n"
+        + (
+            "ABSTAINED,NO_VERIFIED_CURRENT_BOARD_OFFERS,0\n"
+            if board_offer_count == 0
+            else "ABSTAINED,RESEARCH_NOT_COMPLETE,0\n"
+        )
+    )
     (root / "line_buffer_report.csv").write_text(line_buffer, encoding="utf-8")
     paths.append("line_buffer_report.csv")
 
@@ -477,9 +531,10 @@ def _write_terminal_artifacts(
         f"- Canonical Insight claims: `{len(claims)}`",
         f"- Trusted current board offers: `{int(board_offer_count)}`",
         f"- Research queue Top 100: `{len(top100)}`",
-        f"- Research preview Top 25: `{len(top25)}`",
+        f"- Research preview Top 25: `{len(insights_top25)}` (Insights-offer-backed)",
+        f"- Insights offer snapshots: `{int(offer_doc.get('insightsOfferCount') or 0)}`",
         "- Probability status: `NONE`",
-        "- Production selection: `ABSTAINED`",
+        "- Production selection: `ABSTAINED` (playables may be 0)",
         "- Raw HAR/body/header/URL persistence: `FALSE`",
         "",
         "The queue is an attention allocator. Historical Insights fields are not "
@@ -692,6 +747,34 @@ def run_slate(
         coverage=coverage,
     )
 
+    pipeline_gate = evaluate_insights_har_pipeline(
+        context={
+            "boardOfferCount": board_offer_count,
+            "claimCount": len(canonical_claims),
+            "top100Count": len((queue.get("top100") or []) if isinstance(queue, dict) else []),
+            "top25Count": len((queue.get("top25") or []) if isinstance(queue, dict) else []),
+            "consumer": "dcm.chat.slate.run_slate",
+        }
+    )
+    _write_json(root / "pipeline_constitution_receipt.json", pipeline_gate)
+    capability_manifest = {
+        "schema": "pillars_dcm.capability_manifest.v1",
+        "pipelineConstitutionId": PIPELINE_CONSTITUTION_ID,
+        "activatedAlgorithmIds": list(pipeline_gate.get("activatedAlgorithmIds") or []),
+        "stageOrder": list(pipeline_gate.get("stageOrder") or []),
+        "valid": bool(pipeline_gate.get("valid")),
+        "blockers": list(pipeline_gate.get("blockers") or []),
+        "predictiveClaim": PREDICTIVE_CLAIM,
+        "learningRevision": LEARNING_REVISION,
+        "consumers": {
+            str(row.get("stage")): row.get("consumer")
+            for row in (pipeline_gate.get("stages") or [])
+            if isinstance(row, dict)
+        },
+    }
+    capability_manifest["contentHash"] = content_hash(capability_manifest)
+    _write_json(root / "capability_manifest.json", capability_manifest)
+
     artifact_paths = [
         path for path in sorted(root.iterdir(), key=lambda path: path.name)
         if path.is_file() and path.name not in {"execution_receipt.json", "run_manifest.json"}
@@ -721,7 +804,16 @@ def run_slate(
         "classification": "IMPLEMENTATION_INFERENCE" if composite_session else "EXTERNAL_BLOCKED",
         "implementation": {
             "status": "IMPLEMENTED",
-            "requirementIds": ["R-HAR-ACCOUNTING", "R-INSIGHTS-TYPED", "R-RESEARCH-QUEUE", "R-PRIVACY-BOUNDARY"],
+            "requirementIds": [
+                "R-HAR-ACCOUNTING",
+                "R-INSIGHTS-TYPED",
+                "R-RESEARCH-QUEUE",
+                "R-PRIVACY-BOUNDARY",
+                "R-INSIGHTS-HAR-PIPELINE-CONSTITUTION",
+            ],
+            "pipelineConstitutionId": PIPELINE_CONSTITUTION_ID,
+            "pipelineConstitutionHash": pipeline_gate.get("contentHash"),
+            "activatedAlgorithmIds": list(pipeline_gate.get("activatedAlgorithmIds") or []),
             "changedFiles": [],
             "producerConsumerTests": ["index-build consumes insights_claims.jsonl", "pagination malformed/incomplete fails closed"],
         },
@@ -813,6 +905,9 @@ def run_slate(
         "boardOfferCount": board_offer_count,
         "queueTop100Count": len((queue.get("top100") or []) if isinstance(queue, dict) else []),
         "queueTop25Count": len((queue.get("top25") or []) if isinstance(queue, dict) else []),
+        "insightsOfferCount": int((read_json(root / "insights_offer_snapshots.json") or {}).get("insightsOfferCount") or 0),
+        "pipelineConstitutionId": PIPELINE_CONSTITUTION_ID,
+        "pipelineConstitutionValid": bool(pipeline_gate.get("valid")),
         "productionSelectionPermitted": False,
         "probabilityStatus": "NONE",
         "executionReceipt": str(root / "execution_receipt.json"),

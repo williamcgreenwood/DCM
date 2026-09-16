@@ -5,7 +5,12 @@ from datetime import datetime, timedelta, timezone
 from typing import Any, Callable, Mapping
 
 from dcm.contracts.hashes import content_hash
-from dcm.research.source_catalog import source_health_seeds
+from dcm.research.source_catalog import (
+    candidate_sources_for_sport,
+    normalize_competition_id,
+    source_health_seeds,
+    sport_family_for_league,
+)
 
 CIRCUIT_CLOSED = "CLOSED"
 CIRCUIT_OPEN = "OPEN"
@@ -232,9 +237,28 @@ class SourceHealthRegistry:
         for sid in skipped_open:
             for fb in self.fallbacks(sid, now=now):
                 if fb not in out:
+                    # Fallbacks must still be sport-legal for the requested sport.
+                    fb_row = self._ensure(fb)
+                    sports = {str(item).upper() for item in (fb_row.get("sports") or [])}
+                    if sport and sports and str(sport).upper() not in sports and "*" not in sports:
+                        continue
                     out.append(fb)
         if not out:
-            out = [sid for sid, row in self._state.items() if row["circuitState"] != CIRCUIT_OPEN]
+            # Never dump wrong-sport sources (e.g. CFB_WEATHER for MLB). Prefer
+            # wildcard / unscoped sources such as WEB_SEARCH.
+            sport_u = str(sport or "").upper()
+            wild: list[str] = []
+            for sid, row in self._state.items():
+                if row["circuitState"] == CIRCUIT_OPEN:
+                    continue
+                sports = {str(item).upper() for item in (row.get("sports") or [])}
+                if not sports or "*" in sports or (sport_u and sport_u in sports):
+                    wild.append(sid)
+            out = wild or ["WEB_SEARCH"]
+        # Hard rule: CFB_WEATHER is never primary for non-CFB subjects.
+        sport_u = str(sport or "").upper()
+        if sport_u and sport_u not in {"CFB", "NCAAFB", "CFB1H"} and out and out[0] == "CFB_WEATHER":
+            out = [sid for sid in out if sid != "CFB_WEATHER"] or ["WEB_SEARCH"]
         return out
 
     def snapshot(self) -> dict[str, Any]:
@@ -297,11 +321,14 @@ def persist_cfb_source_health(health: SourceHealthRegistry, dest) -> dict[str, A
 
 
 def load_cfb_source_health(path=None) -> SourceHealthRegistry:
-    """Restore persisted source-health counters/circuits. Missing file → default catalog."""
+    """Restore persisted source-health counters/circuits. Missing file → universal catalog.
+
+    Historically CFB-named; Insights/multi-sport runs require sport-correct seeds.
+    """
     import json
     from pathlib import Path
 
-    health = default_cfb_source_health()
+    health = default_universal_source_health()
     if path is None:
         return health
     p = Path(path)
@@ -323,31 +350,127 @@ def default_gridiron_source_health(league: str | None = None) -> SourceHealthReg
     With no league supplied, include both production football catalogs so a
     mixed-board scheduler still chooses only sources declared for each action.
     """
-    stable_ids = {
-        "cfb_official_athletics": "CFB_OFFICIAL_GAMEBOOK",
-        "college_football_reference": "CFB_SPORTS_REFERENCE",
-        "open_meteo_weather": "CFB_WEATHER",
-        "espn_status": "CFB_STATUS",
-        "generic_web_search": "WEB_SEARCH",
-        "official_nfl": "NFL_OFFICIAL",
-        "pro_football_reference": "NFL_PRO_FOOTBALL_REFERENCE",
-    }
-    leagues = (str(league).upper(),) if league else ("CFB", "NFL")
-    seeds: list[dict[str, Any]] = []
-    for competition in leagues:
-        for source in source_health_seeds(sport="gridiron", competition=competition):
-            row = dict(source)
-            catalog_id = str(row.get("sourceId") or "")
-            row["catalogSourceId"] = catalog_id
-            row["sourceId"] = stable_ids.get(catalog_id, catalog_id)
-            row["fallbackSourceIds"] = [
-                stable_ids.get(str(fallback), str(fallback))
-                for fallback in (row.get("fallbackSourceIds") or [])
-            ]
-            seeds.append(row)
-    return SourceHealthRegistry({"sources": seeds})
+    if league:
+        return default_sport_source_health(league=str(league).upper(), sport_family="gridiron")
+    return default_universal_source_health(["CFB", "NFL"])
 
 
 def default_cfb_source_health() -> SourceHealthRegistry:
     """Backward-compatible CFB-only router."""
     return default_gridiron_source_health("CFB")
+
+
+_STABLE_SOURCE_IDS = {
+    "cfb_official_athletics": "CFB_OFFICIAL_GAMEBOOK",
+    "college_football_reference": "CFB_SPORTS_REFERENCE",
+    "open_meteo_weather": "CFB_WEATHER",
+    "espn_status": "CFB_STATUS",
+    "generic_web_search": "WEB_SEARCH",
+    "official_nfl": "NFL_OFFICIAL",
+    "pro_football_reference": "NFL_PRO_FOOTBALL_REFERENCE",
+    "official_wnba": "WNBA_OFFICIAL",
+    "official_nba": "NBA_OFFICIAL",
+    "basketball_reference": "BASKETBALL_REFERENCE",
+    "official_mlb": "MLB_OFFICIAL",
+    "baseball_reference": "BASEBALL_REFERENCE",
+    "official_soccer": "SOCCER_OFFICIAL",
+    "outlier_offer": "OUTLIER_OFFER",
+    "prizepicks_offer": "PRIZEPICKS_OFFER",
+}
+
+_AUTHORITY = {
+    "cfb_official_athletics": {"EVENT": 100, "AFFILIATION": 90, "SUBJECT": 80, "COUNTERPARTY": 80},
+    "college_football_reference": {"SUBJECT": 85, "AFFILIATION": 80, "EVENT": 60},
+    "open_meteo_weather": {"ENVIRONMENT": 90, "EVENT": 50},
+    "espn_status": {"SUBJECT": 70, "EVENT": 75, "ENVIRONMENT": 40},
+    "generic_web_search": {"SUBJECT": 20, "EVENT": 20, "AFFILIATION": 20, "COUNTERPARTY": 20, "ENVIRONMENT": 20},
+    "official_nfl": {"EVENT": 100, "SUBJECT": 90, "AFFILIATION": 85, "COUNTERPARTY": 85},
+    "pro_football_reference": {"SUBJECT": 85, "AFFILIATION": 80, "EVENT": 65},
+    "official_wnba": {"EVENT": 100, "SUBJECT": 90, "AFFILIATION": 85, "COUNTERPARTY": 85},
+    "official_nba": {"EVENT": 100, "SUBJECT": 90, "AFFILIATION": 85, "COUNTERPARTY": 85},
+    "basketball_reference": {"SUBJECT": 85, "AFFILIATION": 80, "COUNTERPARTY": 80, "EVENT": 60},
+    "official_mlb": {"EVENT": 100, "SUBJECT": 90, "AFFILIATION": 85, "COUNTERPARTY": 85},
+    "baseball_reference": {"SUBJECT": 85, "AFFILIATION": 80, "COUNTERPARTY": 80, "EVENT": 60},
+    "official_soccer": {"EVENT": 100, "SUBJECT": 85, "AFFILIATION": 80, "COUNTERPARTY": 80},
+}
+
+
+def _seed_rows_for_competition(sport: str, competition: str) -> list[dict[str, Any]]:
+    seeds: list[dict[str, Any]] = []
+    for source in source_health_seeds(sport=sport, competition=competition):
+        row = dict(source)
+        catalog_id = str(row.get("sourceId") or "")
+        row["catalogSourceId"] = catalog_id
+        row["sourceId"] = _STABLE_SOURCE_IDS.get(catalog_id, catalog_id)
+        row["authorityByClaimType"] = _AUTHORITY.get(catalog_id, row.get("authorityByClaimType") or {})
+        row["sports"] = [normalize_competition_id(competition)]
+        row["fallbackSourceIds"] = [
+            _STABLE_SOURCE_IDS.get(str(fallback), str(fallback))
+            for fallback in (row.get("fallbackSourceIds") or [])
+        ]
+        # CFB_WEATHER is CFB-only; never seed it for other competitions.
+        if row["sourceId"] == "CFB_WEATHER" and normalize_competition_id(competition) not in {"CFB", "NCAAFB"}:
+            continue
+        seeds.append(row)
+    if not any(str(r.get("sourceId")) == "WEB_SEARCH" for r in seeds):
+        seeds.append({
+            "sourceId": "WEB_SEARCH",
+            "catalogSourceId": "generic_web_search",
+            "adapter": "host.web_search",
+            "domain": "*",
+            "authorityByClaimType": _AUTHORITY["generic_web_search"],
+            "sports": [normalize_competition_id(competition)] if competition else ["*"],
+            "fields": ["*"],
+            "cost": 3.0,
+            "expectedFreshness": 0.4,
+            "rateLimit": None,
+            "knownFailureModes": [],
+            "fallbackSourceIds": [],
+        })
+    return seeds
+
+
+def default_sport_source_health(
+    *,
+    league: str | None = None,
+    sport_family: str | None = None,
+) -> SourceHealthRegistry:
+    """Sport-correct source router derived from the capability catalog."""
+    competition = normalize_competition_id(league) if league else ""
+    family = sport_family_for_league(competition, fallback=sport_family) if (competition or sport_family) else ""
+    if not competition and not family:
+        return default_universal_source_health()
+    if not family:
+        family = sport_family_for_league(competition)
+    seeds = _seed_rows_for_competition(family, competition or family.upper())
+    return SourceHealthRegistry({"sources": seeds})
+
+
+def default_universal_source_health(leagues: list[str] | None = None) -> SourceHealthRegistry:
+    """Multi-league router for mixed Insights/HAR boards."""
+    default_leagues = leagues or ["CFB", "NFL", "WNBA", "NBA", "MLB", "SOCCER"]
+    seeds: list[dict[str, Any]] = []
+    seen: set[tuple[str, str]] = set()
+    for league in default_leagues:
+        competition = normalize_competition_id(league)
+        family = sport_family_for_league(competition)
+        for row in _seed_rows_for_competition(family, competition):
+            key = (str(row.get("sourceId") or ""), competition)
+            if key in seen:
+                continue
+            seen.add(key)
+            seeds.append(row)
+    # Deduplicate identical sourceIds by merging sports lists.
+    merged: dict[str, dict[str, Any]] = {}
+    for row in seeds:
+        sid = str(row.get("sourceId") or "")
+        if sid not in merged:
+            merged[sid] = dict(row)
+            merged[sid]["sports"] = list(row.get("sports") or [])
+        else:
+            sports = list(merged[sid].get("sports") or [])
+            for token in row.get("sports") or []:
+                if token not in sports:
+                    sports.append(token)
+            merged[sid]["sports"] = sports
+    return SourceHealthRegistry({"sources": list(merged.values())})
