@@ -29,6 +29,11 @@ from dcm.algorithms.registry import (
     require_algorithm,
 )
 from dcm.algorithms.selection import AlgorithmSelectionEngine
+from dcm.algorithms.pipeline_constitution import (
+    PIPELINE_CONSTITUTION_ID,
+    PipelineConstitutionGate,
+    evaluate_insights_har_pipeline,
+)
 
 __all__ = [
     "ALGORITHM_CONSTITUTION_VERSION",
@@ -37,6 +42,9 @@ __all__ = [
     "AlgorithmRecord",
     "AlgorithmSelection",
     "AlgorithmSelectionEngine",
+    "PIPELINE_CONSTITUTION_ID",
+    "PipelineConstitutionGate",
+    "evaluate_insights_har_pipeline",
     "HarAlgorithmExecutionPlan",
     "algorithm_registry_sha256",
     "build_har_algorithm_execution_plan",

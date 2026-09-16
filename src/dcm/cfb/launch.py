@@ -161,12 +161,26 @@ def prepare_cfb_research_os(
     else:
         evidence = None
         reused = int(prev_state.get("reusedEvidenceScopes") or 0)
-    routed = {
-        "EVENT": health.route(claim_type="EVENT", sport="CFB"),
-        "SUBJECT": health.route(claim_type="SUBJECT", sport="CFB"),
-        "AFFILIATION": health.route(claim_type="AFFILIATION", sport="CFB"),
-        "ENVIRONMENT": health.route(claim_type="ENVIRONMENT", sport="CFB"),
-    }
+    # Prefer the dominant league on the board; fall back to a multi-sport route map.
+    from collections import Counter
+    from dcm.research.source_catalog import normalize_competition_id
+    league_counts = Counter(
+        normalize_competition_id(str(r.get("league") or r.get("leagueId") or ""))
+        for r in (rows or [])
+        if str(r.get("league") or r.get("leagueId") or "").strip()
+    )
+    dominant = league_counts.most_common(1)[0][0] if league_counts else "CFB"
+    route_leagues = sorted({dominant, *[c for c, _n in league_counts.most_common(4) if c]})
+    routed = {}
+    for claim_type in ("EVENT", "SUBJECT", "AFFILIATION", "ENVIRONMENT"):
+        merged: list[str] = []
+        for league_token in route_leagues:
+            for sid in health.route(claim_type=claim_type, sport=league_token or dominant):
+                if sid not in merged:
+                    if sid == "CFB_WEATHER" and (league_token or dominant) not in {"CFB", "NCAAFB"}:
+                        continue
+                    merged.append(sid)
+        routed[claim_type] = merged or health.route(claim_type=claim_type, sport=dominant)
     routing = persist_cfb_source_health(health, dest)
     routing["routedByClaimType"] = routed
     _write(dest / "source_health.json", routing)

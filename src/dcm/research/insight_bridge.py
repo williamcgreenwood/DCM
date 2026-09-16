@@ -179,3 +179,106 @@ def plan_insight_host_research(claims: list[dict[str, Any]], cutoff: str) -> dic
             "productionSelectionPermitted": False,
         },
     }
+
+
+def _finite_line(value: Any) -> float | None:
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return None
+    if number != number:  # NaN
+        return None
+    return number
+
+
+def insights_offer_snapshots(claims: list[dict[str, Any]]) -> dict[str, Any]:
+    """Promote Insights claims with exact line + HIGHER/LOWER into offer-equivalent snapshots.
+
+    These are research-only InsightsOfferSnapshots.  They do not invent the
+    opposite side, do not become BoardOffers, and never flip predictiveClaim.
+    Missing side / missing line fail-closes that claim.
+    """
+    snapshots: list[dict[str, Any]] = []
+    blocked: defaultdict[str, int] = defaultdict(int)
+    for claim in claims:
+        if not isinstance(claim, dict):
+            blocked["NOT_A_CLAIM"] += 1
+            continue
+        if claim.get("disposition") != "PLAYER_PROP_CANDIDATE":
+            blocked["NOT_PLAYER_PROP_CANDIDATE"] += 1
+            continue
+        line = _finite_line(claim.get("line"))
+        direction = str(claim.get("direction") or "").upper()
+        direction_class = str(claim.get("directionClass") or "")
+        if line is None:
+            blocked["MISSING_LINE"] += 1
+            continue
+        if direction_class != "HIGHER_LOWER" or direction not in {"HIGHER", "LOWER"}:
+            blocked["MISSING_SIDE"] += 1
+            continue
+        identity = claim.get("harIdentity") if isinstance(claim.get("harIdentity"), dict) else {}
+        player = identity.get("player") if isinstance(identity.get("player"), dict) else {}
+        event = identity.get("event") if isinstance(identity.get("event"), dict) else {}
+        league = str(claim.get("leagueId") or "").upper()
+        family = _FAMILY.get(league, "")
+        offered_higher = direction == "HIGHER"
+        offered_lower = direction == "LOWER"
+        body = {
+            "schema": "pillars_dcm.insights_offer_snapshot.v1",
+            "offerKind": "INSIGHTS_OFFER_SNAPSHOT",
+            "candidateClass": "RESEARCH_CANDIDATE",
+            "offerBacking": "INSIGHTS_OFFER_BACKED",
+            "boardOffer": False,
+            "productionSelectionPermitted": False,
+            "predictiveClaim": "NONE",
+            "learningRevision": "LR000000",
+            "claimId": claim.get("claimId"),
+            "insightId": claim.get("insightId"),
+            "projectionId": str(claim.get("claimId") or claim.get("insightId") or ""),
+            "subjectId": str(player.get("id") or claim.get("subjectId") or claim.get("playerId") or ""),
+            "subjectName": _label(player.get("name") or claim.get("subjectName")),
+            "playerId": str(player.get("id") or claim.get("playerId") or ""),
+            "teamId": str(player.get("teamId") or claim.get("teamId") or ""),
+            "eventId": str(event.get("id") or (claim.get("event") or {}).get("eventId") or ""),
+            "league": league,
+            "leagueId": league,
+            "sportFamily": family,
+            "market": _label(claim.get("proposition") or claim.get("marketType"), limit=64).lower(),
+            "proposition": claim.get("proposition"),
+            "line": line,
+            "side": direction,
+            "direction": direction,
+            "offeredHigher": offered_higher,
+            "offeredLower": offered_lower,
+            "offeredMore": offered_higher,
+            "offeredLess": offered_lower,
+            "modifier": "STANDARD",
+            "status": "pre_game",
+            "isLive": False,
+            "sourceAdapter": "INSIGHTS_EVIDENCE",
+            "harIdentityState": claim.get("harIdentityState"),
+            "sourceHarSha256": claim.get("sourceHarSha256"),
+            "sourceBodyHash": claim.get("sourceBodyHash"),
+        }
+        body["contentHash"] = content_hash({k: v for k, v in body.items() if k != "contentHash"})
+        snapshots.append(body)
+    snapshots.sort(key=lambda row: (str(row.get("league") or ""), str(row.get("claimId") or "")))
+    out = {
+        "schema": "pillars_dcm.insights_offer_snapshots.v1",
+        "offerKind": "INSIGHTS_OFFER_SNAPSHOT",
+        "candidateClass": "RESEARCH_CANDIDATE",
+        "offerBacking": "INSIGHTS_OFFER_BACKED",
+        "boardOfferCount": 0,
+        "insightsOfferCount": len(snapshots),
+        "snapshots": snapshots,
+        "accounting": {
+            "inputClaimCount": len(claims),
+            "snapshotCount": len(snapshots),
+            "blocked": dict(sorted(blocked.items())),
+            "productionSelectionPermitted": False,
+            "predictiveClaim": "NONE",
+            "learningRevision": "LR000000",
+        },
+    }
+    out["contentHash"] = content_hash({k: v for k, v in out.items() if k != "contentHash"})
+    return out

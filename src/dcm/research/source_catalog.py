@@ -55,7 +55,7 @@ def sources_for(
     cat = catalog or load_source_catalog()
     kind = canonical_scope(entity_kind) if entity_kind else None
     sport_l = normalize_sport_id(sport)
-    comp_u = str(competition or "").strip().upper()
+    comp_u = normalize_competition_id(competition)
     field_l = str(field or "").strip().lower()
     out: list[dict[str, Any]] = []
     for src in cat.get("sources") or []:
@@ -150,3 +150,82 @@ def source_health_seeds(
             "fallbackSourceIds": list(source.get("fallbackSourceIds") or []),
         })
     return seeds
+
+
+# League / competition aliases used when routing acquisition sources.
+_LEAGUE_ALIASES = {
+    "NCAAFB": "CFB",
+    "CFB1H": "CFB",
+    "COLLEGE_FOOTBALL": "CFB",
+}
+
+_SPORT_FAMILY_BY_LEAGUE = {
+    "NFL": "gridiron",
+    "CFB": "gridiron",
+    "NCAAFB": "gridiron",
+    "CFB1H": "gridiron",
+    "NBA": "basketball",
+    "WNBA": "basketball",
+    "MLB": "baseball",
+    "SOCCER": "soccer",
+    "MLS": "soccer",
+    "EPL": "soccer",
+    "UCL": "soccer",
+    "NHL": "hockey",
+}
+
+
+def normalize_competition_id(competition: str | None) -> str:
+    """Normalize league/competition tokens for catalog matching."""
+    token = str(competition or "").strip().upper()
+    return _LEAGUE_ALIASES.get(token, token)
+
+
+def sport_family_for_league(league: str | None, *, fallback: str | None = None) -> str:
+    """Map a league/competition token onto a sportFamily id."""
+    token = str(league or "").strip().upper()
+    family = _SPORT_FAMILY_BY_LEAGUE.get(token)
+    if family:
+        return family
+    if fallback:
+        return normalize_sport_id(fallback)
+    return normalize_sport_id(token)
+
+
+def candidate_sources_for_sport(
+    *,
+    league: str | None = None,
+    sport_family: str | None = None,
+    entity_kind: str | None = None,
+    field: str | None = None,
+    catalog: dict[str, Any] | None = None,
+) -> list[dict[str, Any]]:
+    """Return sport-correct catalog sources for acquisition routing.
+
+    Never returns CFB-only weather/athletics sources for non-CFB leagues.
+    """
+    competition = normalize_competition_id(league)
+    family = sport_family_for_league(competition, fallback=sport_family)
+    ranked = sources_for(
+        sport=family or None,
+        competition=competition or None,
+        entity_kind=entity_kind,
+        field=field,
+        catalog=catalog,
+    )
+    if competition and competition not in {"CFB", "NCAAFB"}:
+        ranked = [
+            src for src in ranked
+            if str(src.get("sourceId") or "") != "open_meteo_weather"
+            or competition in {str(x).upper() for x in (src.get("competitions") or [])}
+        ]
+        # Hard rule: CFB athletics/reference never primary for non-CFB.
+        ranked = [
+            src for src in ranked
+            if str(src.get("sourceId") or "") not in {
+                "cfb_official_athletics",
+                "college_football_reference",
+            }
+            or competition in {str(x).upper() for x in (src.get("competitions") or [])}
+        ]
+    return ranked
