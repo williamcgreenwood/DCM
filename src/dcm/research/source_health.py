@@ -17,6 +17,11 @@ CIRCUIT_OPEN = "OPEN"
 CIRCUIT_HALF_OPEN = "HALF_OPEN"
 FAILURE_THRESHOLD = 3
 OPEN_COOLDOWN = timedelta(seconds=300)
+_SPORT_ROUTE_ALIASES = {
+    "NCAAFB": "CFB",
+    "CFB1H": "CFB",
+    "COLLEGE_FOOTBALL": "CFB",
+}
 
 
 def _now() -> datetime:
@@ -216,12 +221,14 @@ class SourceHealthRegistry:
         HALF_OPEN circuits are eligible for a single trial request.
         """
         now = self._now()
+        route_sport = _SPORT_ROUTE_ALIASES.get(str(sport or "").upper(), str(sport or "").upper())
         ranked: list[tuple[int, float, str]] = []
         skipped_open: list[str] = []
         half_open_used = False
         for sid, row in self._state.items():
             self._refresh_circuit(row, now=now)
-            if sport and row["sports"] and str(sport).upper() not in {str(item).upper() for item in row["sports"]}:
+            allowed_sports = {str(item).upper() for item in (row.get("sports") or [])}
+            if route_sport and allowed_sports and "*" not in allowed_sports and route_sport not in allowed_sports:
                 continue
             if row["circuitState"] == CIRCUIT_OPEN:
                 skipped_open.append(sid)
@@ -240,13 +247,13 @@ class SourceHealthRegistry:
                     # Fallbacks must still be sport-legal for the requested sport.
                     fb_row = self._ensure(fb)
                     sports = {str(item).upper() for item in (fb_row.get("sports") or [])}
-                    if sport and sports and str(sport).upper() not in sports and "*" not in sports:
+                    if route_sport and sports and route_sport not in sports and "*" not in sports:
                         continue
                     out.append(fb)
         if not out:
             # Never dump wrong-sport sources (e.g. CFB_WEATHER for MLB). Prefer
             # wildcard / unscoped sources such as WEB_SEARCH.
-            sport_u = str(sport or "").upper()
+            sport_u = route_sport
             wild: list[str] = []
             for sid, row in self._state.items():
                 if row["circuitState"] == CIRCUIT_OPEN:
@@ -256,7 +263,7 @@ class SourceHealthRegistry:
                     wild.append(sid)
             out = wild or ["WEB_SEARCH"]
         # Hard rule: CFB_WEATHER is never primary for non-CFB subjects.
-        sport_u = str(sport or "").upper()
+        sport_u = route_sport
         if sport_u and sport_u not in {"CFB", "NCAAFB", "CFB1H"} and out and out[0] == "CFB_WEATHER":
             out = [sid for sid in out if sid != "CFB_WEATHER"] or ["WEB_SEARCH"]
         return out
@@ -474,3 +481,13 @@ def default_universal_source_health(leagues: list[str] | None = None) -> SourceH
                     sports.append(token)
             merged[sid]["sports"] = sports
     return SourceHealthRegistry({"sources": list(merged.values())})
+
+
+def default_research_source_health() -> SourceHealthRegistry:
+    """Compatibility alias for the catalog-derived universal router."""
+    return default_universal_source_health()
+
+
+def load_research_source_health(path=None) -> SourceHealthRegistry:
+    """Compatibility alias for the universal persisted source-health loader."""
+    return load_cfb_source_health(path)

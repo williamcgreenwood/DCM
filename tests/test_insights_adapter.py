@@ -13,9 +13,13 @@ from dcm.learning.insight_settlement import append_insight_settlements, settle_i
 from dcm.research.insight_queue import build_research_queue
 from dcm.ingest.insight_context import enrich_insight_claims
 from dcm.research.insight_bridge import plan_insight_host_research
+from dcm.research.insight_bridge import build_insight_research_graph
 from dcm.research.emit import emit_packets_and_graph
 from dcm.research.batch import _host_task
+from dcm.research.batch import build_next_research_batch
+from dcm.research.acquisition import build_acquisition_action_graph, build_acquisition_actions, schedule_acquisition_actions
 from dcm.chat.research_bridge import _researcher_view
+from dcm.research.readiness import evaluate_research_os_readiness
 
 
 def _row(*, position: str = "OVER", label: str = "Over") -> dict:
@@ -268,3 +272,64 @@ def test_unresolved_har_identity_never_emits_a_director_job() -> None:
     bridge = plan_insight_host_research(joined, "2026-09-14T12:00:00Z")
     assert bridge["requests"] == []
     assert bridge["accounting"]["blocked"]["HAR_IDENTITY_UNRESOLVED"] == 1
+
+
+def test_insights_research_graph_and_actions_never_create_board_offers() -> None:
+    claims, _ = parse_insights_payload(
+        {"insights": [_row()], "nextPageToken": None},
+        source_har_sha256="har-hash", source_body_hash="body-hash",
+        source_snapshot_time="2026-09-14T00:00:00Z",
+    )
+    joined, _ = enrich_insight_claims(claims, [
+        {"league": "NFL", "kind": "entities", "httpStatus": 200, "payload": {
+            "content": {"teams": [{"team": {"teamId": "t-1"}, "players": [
+                {"playerId": "p-1", "fullName": "Player One", "status": "ACTIVE"},
+            ]}]},
+        }},
+        {"league": "NFL", "kind": "schedule", "httpStatus": 200, "payload": {
+            "events": [{"eventId": "e-1", "scheduledTime": "2026-09-15T20:00:00Z",
+                        "home": {"teamId": "t-1", "alias": "HOM"},
+                        "away": {"teamId": "t-2", "alias": "AWY"}}],
+        }},
+    ])
+    bridge = plan_insight_host_research(joined, "2026-09-14T12:00:00Z")
+    signal_graph = build_insight_research_graph(bridge)
+    actions = build_acquisition_actions([], bridge["requests"])
+    schedule = schedule_acquisition_actions(actions)
+    action_graph = build_acquisition_action_graph(actions, schedule=schedule)
+
+    assert signal_graph["researchOnly"] is True
+    assert signal_graph["platformOfferCount"] == 0
+    assert signal_graph["claimCount"] == 1
+    assert actions["actionCount"] == 4
+    assert all(action["offerIds"] == [] for action in actions["actions"])
+    assert all(action["claimIds"] == [claims[0]["claimId"]] for action in actions["actions"])
+    assert all(action["researchOnly"] is True for action in actions["actions"])
+    assert action_graph["offerCount"] == 0
+    assert action_graph["claimCount"] == 1
+    assert any(edge["type"] == "covers_claim" for edge in action_graph["edges"])
+    assert schedule["dependentOfferBudgetUsed"] == 0
+    assert schedule["dependentClaimCountUsed"] > 0
+
+    batch = build_next_research_batch(bridge["requests"], rows=[], max_entities=25)
+    assert batch["selectedCount"] == 4
+    assert batch["dependentOfferBudgetUsed"] == 0
+    assert batch["dependentClaimCountUsed"] > 0
+    assert all(task["researchOnly"] is True for task in batch["tasks"])
+    assert all(task["dependentOfferCount"] == 0 for task in batch["tasks"])
+
+    readiness = evaluate_research_os_readiness(
+        board_graph={"contentHash": "empty-board", "nodeCount": 0},
+        market_demand_graph={"contentHash": "empty-demand", "definitionCount": 0},
+        requirement_graph={"contentHash": "signal-req", "nodeCount": 4, "topoOk": True},
+        indexes_meta={"contentHash": "empty-index", "offerCount": 0},
+        reused_evidence_scopes=0,
+        acquisition_actions=actions,
+        source_routing={"valid": True},
+        research_signal_graph=signal_graph,
+        research_only=True,
+    )
+    assert readiness["researchMayBegin"] is True
+    assert readiness["researchMode"] == "INSIGHTS_RESEARCH_ONLY"
+    assert readiness["prerequisites"]["boardGraphValid"] is False
+    assert "BOARD_GRAPH_INVALID" not in readiness["blockers"]

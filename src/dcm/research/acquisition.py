@@ -165,6 +165,8 @@ def build_acquisition_actions(
                 }.get(scope, "generic"),
                 "requirementIds": [],
                 "offerIds": [],
+                "claimIds": [],
+                "researchOnly": False,
                 "eventId": rec.get("eventId") or (sid if scope in {"EVENT", "ENVIRONMENT"} else None),
                 "league": str(rec.get("league") or "").upper(),
                 "cfbFanoutPriority": CFB_ACTION_ORDER.get(scope, 9),
@@ -177,6 +179,13 @@ def build_acquisition_actions(
         for oid in rec.get("dependent_offer_ids") or []:
             if oid not in act["offerIds"]:
                 act["offerIds"].append(oid)
+        claim_ids = rec.get("dependent_claim_ids") or rec.get("insightClaimIds") or []
+        for claim_id in claim_ids:
+            claim_id = str(claim_id)
+            if claim_id and claim_id not in act["claimIds"]:
+                act["claimIds"].append(claim_id)
+        if rec.get("researchOnly") or rec.get("offerVerificationState") == "NOT_A_BOARD_OFFER" or claim_ids:
+            act["researchOnly"] = True
 
     offer_map = {str(r.get("projectionId") or ""): r for r in rows}
     for act in actions.values():
@@ -187,13 +196,15 @@ def build_acquisition_actions(
         act["needsRushDefense"] = any(bool((requirements.get(m) or {}).get("needs_rush_defense")) for m in markets)
         act["weatherApplicable"] = any(m in WEATHER_APPLICABLE_MARKETS for m in markets)
         offer_n = max(1, len(act["offerIds"]))
+        claim_n = len(act["claimIds"])
+        fanout_n = max(1, len(act["offerIds"]) + claim_n)
         # SPORT/COMPETITION are one-shot context. Counting every dependent offer
         # as mass lets them dominate CELF and blow the batch offer budget.
         mass = 1.0 if act["scope"] in {"SPORT", "COMPETITION"} else float(offer_n)
         frontier_n = len(set(act["offerIds"]) & (frontier_offer_ids or set()))
         act["weight"] = round(
             requirement_weight(
-                dependent_offer_mass=mass,
+                dependent_offer_mass=(float(fanout_n) if act["researchOnly"] else mass),
                 criticality=1.0 if act["scope"] in {"EVENT", "AFFILIATION", "SUBJECT"} else 0.6,
                 information_importance=max(0.1, 1.0 - 0.08 * int(act["cfbFanoutPriority"])),
                 freshness_urgency=1.0 if act["scope"] in {"EVENT", "ENVIRONMENT", "SUBJECT"} else 0.5,
@@ -216,7 +227,10 @@ def build_acquisition_actions(
         )
         act["requirementIds"] = list(dict.fromkeys(act["requirementIds"]))
         act["offerIds"] = list(dict.fromkeys(act["offerIds"]))
+        act["claimIds"] = list(dict.fromkeys(act["claimIds"]))
         act["dependentOfferCount"] = len(act["offerIds"])
+        act["dependentClaimCount"] = len(act["claimIds"])
+        act["fanoutCount"] = act["dependentOfferCount"] + act["dependentClaimCount"]
         act["requirementCount"] = len(act["requirementIds"])
         route_sport = normalize_competition_id(league) or str(act.get("sportFamily") or "").upper()
         candidates = health.route(claim_type=str(act.get("scope") or "SUBJECT"), sport=route_sport)
@@ -259,6 +273,7 @@ def build_acquisition_actions(
     reverse_action_req = {aid: list(act["requirementIds"]) for aid, act in actions.items()}
     reverse_req_action: dict[str, list[str]] = defaultdict(list)
     reverse_action_offer = {aid: list(act["offerIds"]) for aid, act in actions.items()}
+    reverse_action_claim = {aid: list(act["claimIds"]) for aid, act in actions.items()}
     for aid, req_ids in reverse_action_req.items():
         for rid in req_ids:
             reverse_req_action[rid].append(aid)
@@ -271,12 +286,15 @@ def build_acquisition_actions(
         "actionCount": len(actions),
         "requirementCount": len(reqs),
         "completeRequirementCount": len(complete_ids),
+        "offerCount": len({oid for act in actions.values() for oid in act["offerIds"]}),
+        "claimCount": len({claim_id for act in actions.values() for claim_id in act["claimIds"]}),
         "actions": sorted(actions.values(), key=lambda a: (int(a["cfbFanoutPriority"]), -float(a["weight"]), str(a["actionId"]))),
         "hyperedges": {k: list(v) for k, v in hg.edge_members.items()},
         "reverseIndexes": {
             "actionToRequirements": reverse_action_req,
             "requirementToActions": dict(reverse_req_action),
             "actionToOffers": reverse_action_offer,
+            "actionToClaims": reverse_action_claim,
         },
         "reusedEvidenceLookup": bool(evidence is not None),
         "excludedActionIds": sorted(excluded),
@@ -398,6 +416,8 @@ def schedule_acquisition_actions(
                 "actionIds": aids,
                 "entityCount": len(aids),
                 "dependentOfferCount": sum(int(actions[a].get("dependentOfferCount") or 0) for a in aids),
+                "dependentClaimCount": sum(int(actions[a].get("dependentClaimCount") or 0) for a in aids),
+                "researchOnly": any(bool(actions[a].get("researchOnly")) for a in aids),
                 "tasks": [
                     {
                         "actionId": t["actionId"],
@@ -406,6 +426,9 @@ def schedule_acquisition_actions(
                         "scopeId": t["scopeId"],
                         "sourceFamily": t["sourceFamily"],
                         "dependentOfferCount": t["dependentOfferCount"],
+                        "dependentClaimCount": t.get("dependentClaimCount", 0),
+                        "researchOnly": bool(t.get("researchOnly")),
+                        "claimIds": list(t.get("claimIds") or []),
                         "weight": t["weight"],
                         "researchOnce": True,
                     }
@@ -426,6 +449,9 @@ def schedule_acquisition_actions(
         "selectedCount": len(packed),
         "unresolvedActionCount": len(actions),
         "dependentOfferBudgetUsed": offer_budget,
+        "dependentClaimCountUsed": sum(
+            int(actions[aid].get("dependentClaimCount") or 0) for aid in packed
+        ),
         "maxActions": max_actions,
         "maxDependentOffers": max_dependent_offers,
         "excludedActionIds": sorted(excluded),
@@ -443,10 +469,10 @@ def build_acquisition_action_graph(
     schedule: Mapping[str, Any] | dict[str, Any] | None = None,
     telemetry: AlgorithmTelemetry | None = None,
 ) -> dict[str, Any]:
-    """Persistable AcquisitionActionGraph: one action may cover many requirements/offers.
+    """Persistable AcquisitionActionGraph: one action may cover many requirements.
 
-    Separate from RequirementGraph. Nodes are AcquisitionAction / Requirement / Offer;
-    edges are covers (action→requirement) and satisfies (action→offer). Selected
+    Separate from RequirementGraph. Board work uses Offer nodes; Insights-only
+    work uses InsightClaim nodes and never creates platform offers. Selected
     actions from the live CELF schedule are marked when schedule is supplied.
     """
     tel = telemetry or AlgorithmTelemetry()
@@ -458,6 +484,7 @@ def build_acquisition_action_graph(
     edges: list[dict[str, Any]] = []
     seen_req: set[str] = set()
     seen_offer: set[str] = set()
+    seen_claim: set[str] = set()
     for act in actions:
         aid = str(act.get("actionId") or "")
         if not aid:
@@ -473,6 +500,9 @@ def build_acquisition_action_graph(
                 "sourceId": act.get("sourceId"),
                 "requirementCount": int(act.get("requirementCount") or len(act.get("requirementIds") or [])),
                 "dependentOfferCount": int(act.get("dependentOfferCount") or len(act.get("offerIds") or [])),
+                "dependentClaimCount": int(act.get("dependentClaimCount") or len(act.get("claimIds") or [])),
+                "fanoutCount": int(act.get("fanoutCount") or 0),
+                "researchOnly": bool(act.get("researchOnly")),
                 "weight": act.get("weight"),
                 "expectedGain": act.get("expectedGain"),
                 "selected": aid in selected,
@@ -494,6 +524,20 @@ def build_acquisition_action_graph(
                 seen_offer.add(oid)
                 nodes.append({"id": f"Offer:{oid}", "type": "Offer", "offerId": oid})
             edges.append({"type": "satisfies", "from": f"AcquisitionAction:{aid}", "to": f"Offer:{oid}"})
+        for claim_id in act.get("claimIds") or []:
+            claim_id = str(claim_id)
+            if not claim_id:
+                continue
+            if claim_id not in seen_claim:
+                seen_claim.add(claim_id)
+                nodes.append({
+                    "id": f"InsightClaim:{claim_id}",
+                    "type": "InsightClaim",
+                    "claimId": claim_id,
+                    "researchOnly": True,
+                    "offerVerificationState": "NOT_A_BOARD_OFFER",
+                })
+            edges.append({"type": "covers_claim", "from": f"AcquisitionAction:{aid}", "to": f"InsightClaim:{claim_id}"})
 
     hg = hypergraph_from_bundles({str(a.get("actionId")): list(a.get("requirementIds") or []) for a in actions if a.get("actionId")})
     tel.record(
@@ -522,6 +566,7 @@ def build_acquisition_action_graph(
         "actionCount": len(actions),
         "requirementCount": len(seen_req),
         "offerCount": len(seen_offer),
+        "claimCount": len(seen_claim),
         "selectedActionIds": sorted(selected),
         "celfActionIds": celf_ids,
         "setCoverActionIds": set_cover_ids,
@@ -530,7 +575,7 @@ def build_acquisition_action_graph(
         "nodes": sorted(nodes, key=lambda r: str(r["id"])),
         "edges": sorted(edges, key=lambda r: (r["type"], r["from"], r["to"])),
         "reverseIndexes": dict(action_doc.get("reverseIndexes") or {}),
-        "note": "ResearchRequirement nodes are covered by AcquisitionActions; one action may satisfy many requirements/offers.",
+        "note": "ResearchRequirement nodes are covered by AcquisitionActions; board actions may satisfy offers, while Insights actions cover claims without creating offers.",
     }
     body["contentHash"] = content_hash({k: v for k, v in body.items() if k != "contentHash"})
     return body

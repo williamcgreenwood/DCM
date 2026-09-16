@@ -72,7 +72,7 @@ from dcm.research.host_plan import build_host_research_plan
 from dcm.research.provider import BundleProvider, FileProvider, FixtureProvider, collect, write_bundle
 from dcm.research.claims import dedupe
 from dcm.research.insight_queue import build_research_queue
-from dcm.research.insight_bridge import insights_offer_snapshots, plan_insight_host_research
+from dcm.research.insight_bridge import build_insight_research_graph, insights_offer_snapshots, plan_insight_host_research
 from dcm.research.requests import plan_research
 from dcm.research.offer_metadata import recover_offer_metadata
 from dcm.research.har_breakdown import build_har_breakdown, safe_parse_har
@@ -737,6 +737,11 @@ def run_dcm(
         # Insight claims are research-only projections.  They reuse the existing
         # director request contract without becoming board offers or selections.
         insight_requests = list((insight_bridge or {}).get("requests") or [])
+        insight_research_graph = (
+            build_insight_research_graph(insight_bridge)
+            if insight_requests
+            else None
+        )
         if insight_requests:
             planned["requests"] = list(planned["requests"]) + insight_requests
         (dest / "research_requests.json").write_text(
@@ -780,10 +785,11 @@ def run_dcm(
         )
         os_art = prepare_cfb_research_os(
             dest,
-            rows + list((insight_bridge or {}).get("researchRows") or []),
+            rows,
             planned["requests"],
             coverage=None,
             telemetry=telemetry,
+            research_signal_graph=insight_research_graph,
         )
         # Keep the returned telemetry object authoritative in case a host
         # adapter supplied/retained its own execution recorder.  This makes

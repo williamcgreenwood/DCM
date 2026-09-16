@@ -37,7 +37,7 @@ from dcm.research.indexes import BoardIndexes, EvidenceIndexes
 from dcm.research.material_facts import facts_to_features, resolve_material_facts
 from dcm.research.os_graphs import persist_research_os_graphs
 from dcm.research.readiness import evaluate_research_os_readiness, persist_research_os_readiness
-from dcm.research.source_health import load_cfb_source_health, persist_cfb_source_health
+from dcm.research.source_health import load_research_source_health, persist_cfb_source_health
 from dcm.runtime.drive_catalog import DriveObjectCatalog
 
 
@@ -85,6 +85,7 @@ def prepare_cfb_research_os(
     coverage: dict[str, Any] | None = None,
     telemetry: AlgorithmTelemetry | None = None,
     frontier_offer_ids_set: set[str] | None = None,
+    research_signal_graph: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Emit graphs, indexes, and live AcquisitionActions BEFORE web acquisition.
 
@@ -93,6 +94,10 @@ def prepare_cfb_research_os(
     """
     dest = Path(dest)
     tel = telemetry or AlgorithmTelemetry()
+    signal_graph = research_signal_graph if isinstance(research_signal_graph, dict) else _load_json(dest / "insight_research_graph.json") or {}
+    if signal_graph:
+        _write(dest / "insight_research_graph.json", signal_graph)
+    research_only = bool(signal_graph.get("researchOnly"))
     accounting = _write(dest / "CFB_HAR_ACCOUNTING.json", account_cfb_board(rows))
     raw_labels = [str(r.get("marketLabel") or r.get("statType") or r.get("market") or "") for r in rows if str(r.get("league") or "").upper() == "CFB"]
     inventory = _write(dest / "CFB_MARKET_INVENTORY.json", inventory_raw_labels([x for x in raw_labels if x]))
@@ -137,7 +142,7 @@ def prepare_cfb_research_os(
         indexes.requirement_bitmaps(requests)
         graphs = persist_research_os_graphs(dest, rows, requests, telemetry=tel, indexes=indexes)
         skip_static = False
-    health = load_cfb_source_health(dest)
+    health = load_research_source_health(dest)
     seen_path = dest / "source_health_seen_claims.json"
     seen_body = _load_json(seen_path) or {}
     seen_hashes = set(seen_body.get("claimHashes") or [])
@@ -172,7 +177,7 @@ def prepare_cfb_research_os(
     dominant = league_counts.most_common(1)[0][0] if league_counts else "CFB"
     route_leagues = sorted({dominant, *[c for c, _n in league_counts.most_common(4) if c]})
     routed = {}
-    for claim_type in ("EVENT", "SUBJECT", "AFFILIATION", "ENVIRONMENT"):
+    for claim_type in ("EVENT", "SUBJECT", "AFFILIATION", "COUNTERPARTY", "ENVIRONMENT"):
         merged: list[str] = []
         for league_token in route_leagues:
             for sid in health.route(claim_type=claim_type, sport=league_token or dominant):
@@ -181,8 +186,21 @@ def prepare_cfb_research_os(
                         continue
                     merged.append(sid)
         routed[claim_type] = merged or health.route(claim_type=claim_type, sport=dominant)
+    leagues = sorted({
+        str(req.get("league") or "").upper()
+        for req in requests
+        if isinstance(req, dict) and str(req.get("league") or "").strip()
+    } or {"CFB"})
+    routed_by_league = {
+        league: {
+            scope: health.route(claim_type=scope, sport=league)
+            for scope in ("EVENT", "SUBJECT", "AFFILIATION", "COUNTERPARTY", "ENVIRONMENT")
+        }
+        for league in leagues
+    }
     routing = persist_cfb_source_health(health, dest)
     routing["routedByClaimType"] = routed
+    routing["routedByLeagueClaimType"] = routed_by_league
     _write(dest / "source_health.json", routing)
     if skip_dynamic:
         facts = _load_json(dest / "material_facts.json") or resolve_material_facts(claims or [], cutoff=None)
@@ -305,6 +323,8 @@ def prepare_cfb_research_os(
             reused_evidence_scopes=reused,
             acquisition_actions=actions,
             source_routing=routing,
+            research_signal_graph=signal_graph,
+            research_only=research_only,
         )
     else:
         actions = build_acquisition_actions(
@@ -361,6 +381,8 @@ def prepare_cfb_research_os(
             reused_evidence_scopes=reused,
             acquisition_actions=actions,
             source_routing=routing,
+            research_signal_graph=signal_graph,
+            research_only=research_only,
         )
         persist_research_os_readiness(dest, readiness)
     if indexes is not None:
@@ -392,6 +414,8 @@ def prepare_cfb_research_os(
         "acquisitionActions": actions,
         "acquisitionSchedule": schedule,
         "acquisitionActionGraph": aa_graph,
+        "insightResearchGraph": signal_graph,
+        "researchOnly": research_only,
         "reusedEvidenceScopes": reused,
         "readiness": readiness,
         "materialFacts": facts,

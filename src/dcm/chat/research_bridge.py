@@ -18,6 +18,8 @@ from dcm.research.research_store import ResearchStore, hydrate_reused_claims
 from dcm.research.run_lock import RunLock
 from dcm.research.response import _resolve_active_envelope_path
 from dcm.research.search_blueprint import build_search_blueprint
+from dcm.research.insight_bridge import build_insight_research_graph
+from dcm.research.source_health import load_research_source_health
 from dcm.contracts.hashes import content_hash
 from dcm.runtime.checkpoint import load_checkpoint
 from dcm.version import SOFTWARE
@@ -71,9 +73,58 @@ def _ensure_research_prerequisites(dest: Path) -> dict[str, Any]:
     rows = rows if isinstance(rows, list) else []
     coverage = read_json(dest / "evidence_coverage.json") or read_json(dest / "evidence" / "coverage.json") or {}
     coverage = coverage if isinstance(coverage, dict) else {}
+    insight_bridge = read_json(dest / "insights_host_bridge.json") or {}
+    insight_bridge = insight_bridge if isinstance(insight_bridge, dict) else {}
+    insight_requests = [
+        request for request in (insight_bridge.get("requests") or [])
+        if isinstance(request, dict)
+    ]
+    signal_graph = read_json(dest / "insight_research_graph.json") or {}
+    if insight_requests and (
+        not isinstance(signal_graph, dict)
+        or signal_graph.get("schema") != "pillars_dcm.insight_research_dependency_graph.v1"
+        or signal_graph.get("contentHash") is None
+    ):
+        signal_graph = build_insight_research_graph(insight_bridge)
+        write_json(dest / "insight_research_graph.json", signal_graph)
     action_doc = read_json(dest / "acquisition_actions.json") or {}
-    if not isinstance(action_doc, dict) or int(action_doc.get("actionCount") or 0) == 0 and requests:
-        action_doc = build_acquisition_actions(rows, requests, coverage=coverage)
+    action_rows = [
+        row for row in (action_doc.get("actions") or [] if isinstance(action_doc, dict) else [])
+        if isinstance(row, dict)
+    ]
+    signal_request_ids = {
+        str(request.get("request_id") or request.get("requestId") or "")
+        for request in insight_requests
+        if str(request.get("request_id") or request.get("requestId") or "")
+    }
+    signal_action_request_ids = {
+        str(request_id)
+        for action in action_rows
+        if action.get("researchOnly") or action.get("claimIds")
+        for request_id in (action.get("requirementIds") or [])
+        if str(request_id)
+    }
+    stale_signal_actions = bool(
+        insight_requests
+        and (
+            not signal_request_ids.issubset(signal_action_request_ids)
+            or any(
+                bool(action.get("researchOnly")) and bool(action.get("offerIds"))
+                for action in action_rows
+            )
+        )
+    )
+    if (
+        not isinstance(action_doc, dict)
+        or (int(action_doc.get("actionCount") or 0) == 0 and requests)
+        or stale_signal_actions
+    ):
+        action_doc = build_acquisition_actions(
+            rows,
+            requests,
+            coverage=coverage,
+            source_health=load_research_source_health(dest),
+        )
         schedule = schedule_acquisition_actions(action_doc)
         action_graph = build_acquisition_action_graph(action_doc, schedule=schedule)
         write_json(dest / "acquisition_actions.json", action_doc)
@@ -99,6 +150,8 @@ def _ensure_research_prerequisites(dest: Path) -> dict[str, Any]:
         reused_evidence_scopes=reused_scopes,
         acquisition_actions=action_doc,
         source_routing=read_json(dest / "source_health.json"),
+        research_signal_graph=signal_graph,
+        research_only=bool(insight_requests),
     )
     persist_research_os_readiness(dest, readiness)
     return readiness

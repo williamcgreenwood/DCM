@@ -34,6 +34,8 @@ def evaluate_research_os_readiness(
     reused_evidence_scopes: int | None,
     acquisition_actions: Mapping[str, Any] | None,
     source_routing: Mapping[str, Any] | None = None,
+    research_signal_graph: Mapping[str, Any] | None = None,
+    research_only: bool = False,
 ) -> dict[str, Any]:
     blockers: list[str] = []
     board_ok = bool(board_graph and board_graph.get("contentHash") and int(board_graph.get("nodeCount") or 0) > 0)
@@ -49,9 +51,25 @@ def evaluate_research_os_readiness(
     )
     routing = source_routing if isinstance(source_routing, Mapping) else {}
     routing_ok = bool(routing.get("valid", True)) and "circuitOpenAll" not in set(routing.get("blockers") or [])
+    signal = research_signal_graph if isinstance(research_signal_graph, Mapping) else {}
+    signal_payload = {key: value for key, value in signal.items() if key != "contentHash"}
+    signal_hash_ok = bool(
+        signal
+        and signal.get("schema") == "pillars_dcm.insight_research_dependency_graph.v1"
+        and signal.get("researchOnly") is True
+        and int(signal.get("platformOfferCount") or 0) == 0
+        and int(signal.get("nodeCount") or 0) > 0
+        and int(signal.get("requestCount") or 0) > 0
+        and signal.get("productionSelectionPermitted") is False
+        and signal.get("contentHash")
+        and str(signal.get("contentHash")) == content_hash(signal_payload)
+    )
+    signal_mode = bool(research_only and signal_hash_ok)
 
-    if not board_ok:
+    if not board_ok and not signal_mode:
         blockers.append("BOARD_GRAPH_INVALID")
+    if research_only and not signal_hash_ok:
+        blockers.append("INSIGHT_RESEARCH_GRAPH_INVALID")
     if not demand_ok:
         blockers.append("MARKET_DEMAND_GRAPH_INVALID")
     if not req_ok:
@@ -81,6 +99,11 @@ def evaluate_research_os_readiness(
             "acquisitionActionsCreated": actions_ok,
             "sourceRoutingValid": routing_ok,
         },
+        "researchMode": "INSIGHTS_RESEARCH_ONLY" if research_only else "BOARD_RESEARCH",
+        "researchOnly": bool(research_only),
+        "researchSignalGraphValid": signal_hash_ok,
+        "boardGraphRequired": not bool(research_only),
+        "authorizationBasis": "VALID_INSIGHT_RESEARCH_GRAPH" if signal_mode else "VALID_BOARD_RESEARCH_GRAPH",
         "blockers": blockers,
         "requiredPrerequisites": list(REQUIRED_PREREQS),
         "note": "Only this artifact may authorize researchMayBegin=true. The AlgorithmExecutionPlan is created false.",
