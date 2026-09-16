@@ -114,6 +114,7 @@ def _event_summary(row: dict[str, Any]) -> dict[str, Any]:
     return {
         "eventId": _text(row.get("eventId") or event.get("eventId"), limit=128),
         "scheduledTime": _text(event.get("scheduledTime"), limit=64),
+        "status": _text(event.get("status") or row.get("eventStatus") or event.get("gameStatus"), limit=48),
         "timezone": _text(event.get("timezone"), limit=64),
         "week": _text(event.get("week"), limit=32),
         "year": _text(event.get("year"), limit=16),

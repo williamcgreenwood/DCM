@@ -236,6 +236,9 @@ def queue_record(claim: dict[str, Any], *, rank: int) -> dict[str, Any]:
         "probability": None,
         **score,
         "blockers": sorted(set(blocked)),
+        # CURRENT_OFFER_MISSING is informational for this claim only: it means
+        # the Insights row itself lacks exact line+side. It is never a required
+        # operator ask for a second platform board HAR.
         "offerBacking": (
             "INSIGHTS_OFFER_BACKED"
             if (

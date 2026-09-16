@@ -63,6 +63,15 @@ def build_parser() -> argparse.ArgumentParser:
     sl.add_argument("--cutoff-from-capture", action="store_true")
     sl.add_argument("--workspace", type=Path, required=True)
     sl.add_argument("--observations", type=Path, default=None)
+    sl.add_argument("--outcomes", type=Path, default=None, help="Optional normalized outcomes JSON for autonomous settle")
+    sl.add_argument(
+        "--autonomous",
+        dest="autonomous",
+        action="store_true",
+        default=True,
+        help="Advance research→settle→train→playables without asking for a board HAR (default on)",
+    )
+    sl.add_argument("--no-autonomous", dest="autonomous", action="store_false")
     sl.add_argument("--no-research-shadow", dest="research_shadow", action="store_false", default=True)
 
     n = sub.add_parser("next-research", help="Next optimized reusable-entity research batch")
@@ -208,7 +217,7 @@ def main(argv: list[str] | None = None) -> int:
                 input_paths=args.input,
                 run_root=args.run_root,
                 cutoff=args.cutoff,
-                cutoff_from_capture=args.cutoff_from_capture,
+                cutoff_from_capture=bool(args.cutoff_from_capture or not args.cutoff),
                 workspace=args.workspace,
                 synthetic=args.synthetic,
                 research_shadow=args.research_shadow,
@@ -225,10 +234,12 @@ def main(argv: list[str] | None = None) -> int:
                 run_root=args.run_root,
                 prompt=args.prompt,
                 cutoff=args.cutoff,
-                cutoff_from_capture=bool(args.cutoff_from_capture),
+                cutoff_from_capture=bool(args.cutoff_from_capture or not args.cutoff),
                 workspace=args.workspace,
                 research_shadow=bool(args.research_shadow),
                 observations=args.observations,
+                autonomous=bool(getattr(args, "autonomous", True)),
+                outcomes=getattr(args, "outcomes", None),
             ))
             return 0
         if args.command == "cfb-launch":

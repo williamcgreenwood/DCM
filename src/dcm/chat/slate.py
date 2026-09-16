@@ -20,6 +20,12 @@ from dcm.algorithms.pipeline_constitution import (
     evaluate_insights_har_pipeline,
 )
 from dcm.chat.session import HostSession
+from dcm.chat.slate_autonomous import (
+    AUTONOMOUS_PHASE_ORDER,
+    advance_autonomous_closure,
+    operator_contract,
+    receipt_requires_board_har,
+)
 from dcm.chat.state import read_json
 from dcm.contracts.hashes import content_hash
 from dcm.ingest.insights import merge_insight_claims
@@ -335,6 +341,7 @@ def _write_terminal_artifacts(
     board_offer_count: int,
     source_hashes: list[str],
     coverage: dict[str, Any],
+    autonomous: dict[str, Any] | None = None,
 ) -> list[str]:
     queue_accounting = queue.get("accounting") if isinstance(queue, dict) else {}
     queue_accounting = queue_accounting if isinstance(queue_accounting, dict) else {}
@@ -397,14 +404,23 @@ def _write_terminal_artifacts(
         _write_json(packet_dir / f"event_{packet_hash}.json", packet)
         paths.append(f"research_packets/event_{packet_hash}.json")
 
+    offer_doc_preview = insights_offer_snapshots(list(claims))
+    insights_offer_count = int(offer_doc_preview.get("insightsOfferCount") or 0)
+    insights_backed = bool(insights_offer_count)
     feature_snapshot = {
         "schema": "pillars_dcm.feature_snapshot.v1",
-        "status": "BLOCKED_NO_VERIFIED_MARKET_OFFERS",
+        "status": "RESEARCH_ONLY_INSIGHTS_OFFER_BACKED" if insights_backed else "ABSTAINED_NO_INSIGHTS_LINE_SIDE",
         "featureCount": 0,
         "inputClaimCount": len(claims),
         "boardOfferCount": int(board_offer_count),
+        "insightsOfferCount": insights_offer_count,
         "probabilityStatus": "NONE",
-        "reasonCodes": ["NO_VERIFIED_CURRENT_BOARD_OFFERS", "INSIGHTS_ARE_HISTORICAL_SIGNAL_ONLY"],
+        "reasonCodes": (
+            ["INSIGHTS_OFFER_BACKED_RESEARCH_ONLY", "PRODUCTION_MODEL_GATES_NOT_MET"]
+            if insights_backed
+            else ["INSIGHTS_LINE_SIDE_MISSING", "PRODUCTION_MODEL_GATES_NOT_MET"]
+        ),
+        "boardHarRequired": False,
     }
     feature_snapshot["contentHash"] = content_hash(feature_snapshot)
     _write_json(root / "feature_snapshot.json", feature_snapshot)
@@ -416,8 +432,9 @@ def _write_terminal_artifacts(
         "rows": [],
         "productionSelectionPermitted": False,
         "predictiveClaim": PREDICTIVE_CLAIM,
+        "boardHarRequired": False,
         "reasonCodes": [
-            "NO_VERIFIED_CURRENT_BOARD_OFFERS" if board_offer_count == 0 else "RESEARCH_NOT_COMPLETE",
+            "INSIGHTS_OFFER_BACKED_RESEARCH_ONLY" if insights_backed else "INSIGHTS_LINE_SIDE_MISSING",
             "NO_CALIBRATED_LABELS",
             "PREDICTIVE_CLAIM_NONE",
         ],
@@ -426,7 +443,7 @@ def _write_terminal_artifacts(
     _write_json(root / "prediction_candidates.json", prediction)
     paths.append("prediction_candidates.json")
 
-    offer_doc = insights_offer_snapshots(list(claims))
+    offer_doc = offer_doc_preview
     _write_json(root / "insights_offer_snapshots.json", offer_doc)
     paths.append("insights_offer_snapshots.json")
 
@@ -455,9 +472,11 @@ def _write_terminal_artifacts(
         "diversifiedRows": [dict(row) for row in (queue.get("diversifiedTop25") or []) if isinstance(row, dict)] if isinstance(queue, dict) else [],
         "predictiveClaim": PREDICTIVE_CLAIM,
         "learningRevision": LEARNING_REVISION,
+        "boardHarRequired": False,
         "note": (
-            "Insights line+side claims back research Top25; CURRENT_OFFER_MISSING "
-            "does not wipe Insights-backed rows. Playables remain fail-closed without production model."
+            "Insights line+side claims back research Top25 even when boardOfferCount=0. "
+            "CURRENT_OFFER_MISSING is informational only when no Insights line+side exists. "
+            "Playables remain fail-closed without a production model. Optional board HAR is not required."
         ),
     }
     top25_artifact["contentHash"] = content_hash(top25_artifact)
@@ -468,13 +487,14 @@ def _write_terminal_artifacts(
         "schema": "pillars_dcm.playables.v1",
         "count": 0,
         "ABSTAINED": True,
-        "reason": "PRODUCTION_MODEL_GATES_NOT_MET" if insights_top25 else "CURRENT_OFFER_MISSING",
+        "reason": "PRODUCTION_MODEL_GATES_NOT_MET" if insights_top25 else "INSIGHTS_LINE_SIDE_MISSING",
         "boardOfferCount": int(board_offer_count),
         "insightsTop25Count": len(insights_top25),
         "rows": [],
         "predictiveClaim": PREDICTIVE_CLAIM,
         "learningRevision": LEARNING_REVISION,
-        "note": "Playables may be 0 while Insights-backed Top25 is non-empty.",
+        "boardHarRequired": False,
+        "note": "Playables may be 0 while Insights-backed Top25 is non-empty. Optional board HAR is not a blocker.",
     }
     playables["contentHash"] = content_hash(playables)
     _write_json(root / "playables.json", playables)
@@ -483,9 +503,9 @@ def _write_terminal_artifacts(
     line_buffer = (
         "status,reason,eligibleCount\n"
         + (
-            "ABSTAINED,NO_VERIFIED_CURRENT_BOARD_OFFERS,0\n"
-            if board_offer_count == 0
-            else "ABSTAINED,RESEARCH_NOT_COMPLETE,0\n"
+            "ABSTAINED,PRODUCTION_MODEL_GATES_NOT_MET,0\n"
+            if insights_backed
+            else "ABSTAINED,INSIGHTS_LINE_SIDE_MISSING,0\n"
         )
     )
     (root / "line_buffer_report.csv").write_text(line_buffer, encoding="utf-8")
@@ -503,22 +523,33 @@ def _write_terminal_artifacts(
             "completeRequests": int(coverage.get("completeRequests") or 0),
             "incompleteRequests": int(coverage.get("incompleteRequests") or 0),
         },
-        "reasonCodes": ["INSIGHTS_ARE_HISTORICAL_SIGNAL_ONLY", "NO_VERIFIED_CURRENT_BOARD_OFFERS"],
+        "reasonCodes": (
+            ["INSIGHTS_OFFER_BACKED_RESEARCH_ONLY", "PRODUCTION_MODEL_GATES_NOT_MET"]
+            if insights_backed
+            else ["INSIGHTS_LINE_SIDE_MISSING", "PRODUCTION_MODEL_GATES_NOT_MET"]
+        ),
+        "boardHarRequired": False,
     }
     model_report["contentHash"] = content_hash(model_report)
     _write_json(root / "model_report.json", model_report)
     paths.append("model_report.json")
 
-    settlement = {
-        "schema": "pillars_dcm.settlement_queue.v1",
-        "status": "AWAITING_AUTHORITATIVE_OUTCOMES",
-        "claimCount": len(claims),
-        "settledCount": 0,
-        "trainingEligibleCount": 0,
-        "exactIdentityRequired": True,
-        "futureOnlyLearning": True,
-        "outcomes": [],
-    }
+    settlement = dict((autonomous or {}).get("settlement") or {})
+    if not settlement:
+        settlement = {
+            "schema": "pillars_dcm.settlement_queue.v1",
+            "status": "AWAITING_AUTHORITATIVE_OUTCOMES",
+            "claimCount": len(claims),
+            "settledCount": 0,
+            "trainingEligibleCount": 0,
+            "exactIdentityRequired": True,
+            "futureOnlyLearning": True,
+            "outcomesInvented": False,
+            "boardHarRequired": False,
+            "outcomes": [],
+        }
+    settlement.setdefault("boardHarRequired", False)
+    settlement.setdefault("outcomesInvented", False)
     settlement["contentHash"] = content_hash(settlement)
     _write_json(root / "settlement_queue.json", settlement)
     paths.append("settlement_queue.json")
@@ -537,9 +568,10 @@ def _write_terminal_artifacts(
         "- Production selection: `ABSTAINED` (playables may be 0)",
         "- Raw HAR/body/header/URL persistence: `FALSE`",
         "",
-        "The queue is an attention allocator. Historical Insights fields are not "
-        "next-event probabilities, and no card is published without an exact "
-        "current offer, evidence coverage, calibration, and production-root gate.",
+        "The queue is an attention allocator. Insights HARs with exact line+side "
+        "are the platform capture; an optional board HAR is not a required next "
+        "step. Playables remain fail-closed without evidence coverage, "
+        "calibration, and the production-root gate. Do not invent outcomes.",
     ]
     (root / "audit_report.md").write_text("\n".join(audit_lines) + "\n", encoding="utf-8")
     paths.append("audit_report.md")
@@ -556,8 +588,12 @@ def run_slate(
     workspace: Path,
     research_shadow: bool = True,
     observations: Path | None = None,
+    autonomous: bool = True,
+    outcomes: Path | None = None,
 ) -> dict[str, Any]:
-    """Run independent captures, the reconciled union, and safe terminal receipts."""
+    """Run independent captures, the reconciled union, and HAR-only autonomous closure."""
+    if not cutoff and not cutoff_from_capture:
+        cutoff_from_capture = True
     ordered = _ordered_inputs(inputs)
     prompt_meta = _prompt_metadata(Path(prompt))
     root = Path(run_root)
@@ -737,6 +773,49 @@ def run_slate(
     census["contentHash"] = content_hash({k: v for k, v in census.items() if k != "contentHash"})
     _write_json(root / "har_census.json", census)
 
+    queue_top25 = [row for row in ((queue.get("top25") or []) if isinstance(queue, dict) else []) if isinstance(row, dict)]
+    insights_top25_count = len(
+        [row for row in queue_top25 if row.get("offerBacking") == "INSIGHTS_OFFER_BACKED"] or queue_top25
+    )
+    research_queue_selected = 0
+    for row in steps:
+        if row.get("name") == "RESEARCH_QUEUE":
+            research_queue_selected = int(row.get("selectedCount") or 0)
+    offer_preview = insights_offer_snapshots(canonical_claims)
+    insights_offer_count = int(offer_preview.get("insightsOfferCount") or 0)
+    autonomous_doc: dict[str, Any] | None = None
+    if autonomous:
+        autonomous_doc = advance_autonomous_closure(
+            session=composite_session,
+            claims=canonical_claims,
+            board_offer_count=board_offer_count,
+            insights_offer_count=insights_offer_count,
+            insights_top25_count=insights_top25_count,
+            cutoff=effective_cutoff,
+            observations_imported=observations is not None and import_result is not None,
+            research_queue_selected=research_queue_selected,
+            outcomes=Path(outcomes) if outcomes is not None else None,
+        )
+        _write_json(root / "autonomous_closure.json", autonomous_doc)
+    else:
+        autonomous_doc = {
+            "schema": "pillars_dcm.autonomous_closure.v1",
+            "enabled": False,
+            "phaseOrder": list(AUTONOMOUS_PHASE_ORDER),
+            "phases": [],
+            "operatorContract": operator_contract(
+                board_offer_count=board_offer_count,
+                insights_offer_count=insights_offer_count,
+                claim_count=len(canonical_claims),
+            ),
+            "deferredJobs": [],
+            "boardHarRequired": False,
+            "requiredOperatorAsks": [],
+            "nextRequiredOperatorInput": "NONE",
+            "predictiveClaim": PREDICTIVE_CLAIM,
+            "learningRevision": LEARNING_REVISION,
+        }
+
     _write_terminal_artifacts(
         root,
         composite_dest=composite_session.dest if composite_session else None,
@@ -745,6 +824,7 @@ def run_slate(
         board_offer_count=board_offer_count,
         source_hashes=sorted(union_hashes),
         coverage=coverage,
+        autonomous=autonomous_doc,
     )
 
     pipeline_gate = evaluate_insights_har_pipeline(
@@ -785,14 +865,17 @@ def run_slate(
         for path in artifact_paths
         if path.is_file()
     }
+    autonomous_phases = list((autonomous_doc or {}).get("phases") or [])
+    settle_status = next((row.get("status") for row in autonomous_phases if row.get("name") == "SETTLE"), "AWAITING_AUTHORITATIVE_OUTCOMES")
     phase_status = [
         {"name": "PROMPT_AUDIT", "status": "COMPLETE", "promptSha256": prompt_meta["sha256"]},
         {"name": "ACCOUNT_EACH_HAR", "status": "COMPLETE" if all(row.get("status") == "ACCOUNTED" for row in source_records) else "PARTIAL"},
         {"name": "RECONCILE_UNION", "status": "COMPLETE" if composite_session else "FAILED"},
         *steps,
         {"name": "TOP100_RESEARCH_QUEUE", "status": "COMPLETE" if queue else "ABSTAINED"},
-        {"name": "PREDICTION_AND_SELECTION", "status": "ABSTAINED", "reason": "NO_PRODUCTION_ELIGIBILITY"},
-        {"name": "SETTLEMENT_AND_LEARNING", "status": "PENDING_AUTHORITATIVE_OUTCOMES"},
+        {"name": "PREDICTION_AND_SELECTION", "status": "ABSTAINED", "reason": "NO_PRODUCTION_ELIGIBILITY", "boardHarRequired": False},
+        {"name": "SETTLEMENT_AND_LEARNING", "status": settle_status, "boardHarRequired": False},
+        *autonomous_phases,
     ]
     source_inventory_hash = census["contentHash"]
     receipt = {
@@ -810,6 +893,7 @@ def run_slate(
                 "R-RESEARCH-QUEUE",
                 "R-PRIVACY-BOUNDARY",
                 "R-INSIGHTS-HAR-PIPELINE-CONSTITUTION",
+                "R-HAR-ONLY-AUTONOMOUS-CLOSURE",
             ],
             "pipelineConstitutionId": PIPELINE_CONSTITUTION_ID,
             "pipelineConstitutionHash": pipeline_gate.get("contentHash"),
@@ -821,11 +905,16 @@ def run_slate(
             "runId": composite_session.dest.name if composite_session else None,
             "batchId": None,
             "actions": {
-                "completed": ["account_each_har", "reconcile_union", "build_research_queue"],
-                "pending": ["OFFICIAL_RESEARCH_OBSERVATIONS"] if observations is None else [],
+                "completed": ["account_each_har", "reconcile_union", "build_research_queue", "autonomous_closure"],
+                "pending": (
+                    ["HOST_RESEARCH_OBSERVATIONS_IMPORT_PATH"]
+                    if observations is None
+                    else []
+                ),
                 "failed": [row.get("name") for row in phase_status if row.get("status") == "FAILED"],
                 "reused": [],
             },
+            "boardHarRequired": False,
             "observationCount": int((import_result or {}).get("imported") or 0),
             "importedClaimCount": int((import_result or {}).get("imported") or 0),
             "rejectedObservationCount": int((import_result or {}).get("rejected") or 0),
@@ -872,8 +961,18 @@ def run_slate(
         "artifacts": artifact_hashes,
         "privacy": dict(_PRIVACY),
         "phaseStatus": phase_status,
+        "autonomous": True if autonomous else False,
+        "autonomousPhases": autonomous_phases,
+        "autonomousPhaseOrder": list(AUTONOMOUS_PHASE_ORDER),
+        "operatorContract": (autonomous_doc or {}).get("operatorContract"),
+        "deferredJobs": list((autonomous_doc or {}).get("deferredJobs") or []),
+        "boardHarRequired": False,
+        "requiredOperatorAsks": [],
+        "nextRequiredOperatorInput": "NONE",
         "contentHash": None,
     }
+    if receipt_requires_board_har(receipt):
+        raise RuntimeError("HAR_ONLY_CONTRACT_VIOLATION: execution receipt required a board HAR")
     receipt["contentHash"] = content_hash({k: v for k, v in receipt.items() if k != "contentHash"})
     _write_json(root / "execution_receipt.json", receipt)
     manifest = {
@@ -910,6 +1009,10 @@ def run_slate(
         "pipelineConstitutionValid": bool(pipeline_gate.get("valid")),
         "productionSelectionPermitted": False,
         "probabilityStatus": "NONE",
+        "autonomous": bool(autonomous),
+        "autonomousPhases": autonomous_phases,
+        "boardHarRequired": False,
+        "nextRequiredOperatorInput": "NONE",
         "executionReceipt": str(root / "execution_receipt.json"),
         "runManifest": str(root / "run_manifest.json"),
         "contentHash": manifest["contentHash"],

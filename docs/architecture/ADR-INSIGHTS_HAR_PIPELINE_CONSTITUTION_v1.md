@@ -30,6 +30,15 @@ execution. A stage that claims ACTIVE without a real consumer is illegal.
 4. Acquisition/source catalog routing is sport-correct (MLB→baseball, NFL→football,
    NCAAFB/CFB→gridiron, WNBA→basketball, SOCCER→soccer). `CFB_WEATHER` is never
    primary for non-CFB subjects.
+5. HAR-only operator contract: Insights captures with exact line+side are the
+   platform capture. `run-slate --autonomous` (default) continues
+   cutoff-from-capture → host research scheduling → evidence import → settle
+   FINAL events when outcomes can be joined → future-only training if labels
+   suffice (else `LR000000`) → Playables 0–6 after gates. An optional board HAR
+   must not block Top100/Top25 or this loop. Never invent outcomes/sides/
+   probabilities. Never emit “provide a current platform board/HAR” as a
+   required operator ask. `CURRENT_OFFER_MISSING` is informational only when
+   Insights line+side is also absent.
 
 ## Stage map (REQUIRED_CORE problem classes)
 
@@ -52,4 +61,6 @@ execution. A stage that claims ACTIVE without a real consumer is illegal.
 - `run_slate` / Insights prepare invoke the gate and persist the receipt in
   `execution_receipt` / `capability_manifest` surfaces.
 - Predictive claim remains `NONE`; learning revision remains `LR000000`.
+- Execution receipts carry `autonomousPhases` (`RESEARCH` → `SETTLE` →
+  `TRAIN` → `PLAYABLES`) with typed states and `boardHarRequired=false`.
 - Supersession requires a later ADR + benchmarks.
