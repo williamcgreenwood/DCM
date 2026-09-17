@@ -226,7 +226,12 @@ class RunDirector:
             raw_dependent = batch.get("dependentOffers")
         if raw_dependent is None:
             raw_dependent = sum(
-                int(row.get("dependentOfferCount") or row.get("dependentOffers") or 0)
+                int(
+                    row.get("dependentOfferCount")
+                    or row.get("dependentOffers")
+                    or row.get("dependentPropCount")
+                    or 0
+                )
                 for row in actions
             )
         # Insights claims are research workload, not a board-offer budget. A
