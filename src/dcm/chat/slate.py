@@ -28,6 +28,7 @@ from dcm.chat.slate_autonomous import (
 )
 from dcm.chat.state import read_json
 from dcm.chat.har_only_controller import enhance_slate_result, internal_order
+from dcm.paths import default_workspace as _default_workspace
 from dcm.contracts.hashes import content_hash
 from dcm.ingest.insights import merge_insight_claims
 from dcm.research.insight_bridge import insights_offer_snapshots
@@ -1020,14 +1021,21 @@ def _legacy_run_slate(
     }
 
 
+def _repository_prompt() -> Path:
+    candidate = Path(__file__).resolve().parents[3] / "docs" / "prompts" / "PILLARS_DCM_WORK_CODEX_EXECUTION_PROMPT_20260908.md"
+    if not candidate.is_file():
+        raise FileNotFoundError("CANONICAL_EXECUTION_PROMPT_NOT_FOUND")
+    return candidate
+
+
 def run_slate(
     *,
     inputs: Iterable[Path],
     run_root: Path,
-    prompt: Path,
+    prompt: Path | None = None,
     cutoff: str | None = None,
     cutoff_from_capture: bool = False,
-    workspace: Path,
+    workspace: Path | None = None,
     research_shadow: bool = True,
     observations: Path | None = None,
     autonomous: bool = True,
@@ -1035,13 +1043,15 @@ def run_slate(
 ) -> dict[str, Any]:
     """Run the legacy producer and then apply the HAR-only closure controller."""
     ordered = internal_order(inputs)
+    prompt_path = Path(prompt) if prompt is not None else _repository_prompt()
+    workspace_path = Path(workspace) if workspace is not None else _default_workspace()
     result = _legacy_run_slate(
         inputs=ordered,
-        run_root=run_root,
-        prompt=prompt,
+        run_root=Path(run_root),
+        prompt=prompt_path,
         cutoff=cutoff,
         cutoff_from_capture=cutoff_from_capture,
-        workspace=workspace,
+        workspace=workspace_path,
         research_shadow=research_shadow,
         observations=observations,
         autonomous=autonomous,
