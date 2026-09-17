@@ -3,9 +3,9 @@
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
 - Modules: **259**
-- Symbols: **1960**
+- Symbols: **1961**
 - Parse errors: **0**
-- Inventory hash: `95fb4f333ef9c2f30577a42037e4abf08394def0f91280ae38d58df6934b10b1`
+- Inventory hash: `4b9784f3aa46cc5abceb4ac20f20148b07beb3a9dcf81bf39a0efd7137cb16dd`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -57,7 +57,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P7 | `src/dcm/chat/report.py` | 0 | 1 |
 | P7 | `src/dcm/chat/research_bridge.py` | 0 | 7 |
 | P7 | `src/dcm/chat/session.py` | 1 | 29 |
-| P7 | `src/dcm/chat/slate.py` | 0 | 17 |
+| P7 | `src/dcm/chat/slate.py` | 0 | 18 |
 | P7 | `src/dcm/chat/slate_autonomous.py` | 0 | 19 |
 | P7 | `src/dcm/chat/state.py` | 0 | 4 |
 | UNMAPPED | `src/dcm/compact.py` | 4 | 20 |
@@ -819,23 +819,24 @@ _No class/function symbols._
 
 ### `src/dcm/chat/slate.py`
 
-- `function` **_sha256_bytes** L106
-- `function` **_sha256_file** L110
-- `function` **_write_json** L114
-- `function` **_write_jsonl** L122
-- `function` **_read_jsonl** L129
-- `function` **_safe_error** L143
-- `function` **_prompt_metadata** L149
-- `function` **_sport_hint** L169
-- `function` **_ordered_inputs** L177
-- `function` **_repo_head** L195
-- `function` **_source_summary** L210
-- `function` **_safe_claim** L294 — Drop accidental free-form/raw fields if an adapter ever supplies one.
-- `method` **_safe_claim.clean** L298
-- `function` **_step** L312
-- `function` **_write_terminal_artifacts** L336
-- `function` **_legacy_run_slate** L582 — Run independent captures, the reconciled union, and HAR-only autonomous closure.
-- `function` **run_slate** L1023 — Run the legacy producer and then apply the HAR-only closure controller.
+- `function` **_sha256_bytes** L107
+- `function` **_sha256_file** L111
+- `function` **_write_json** L115
+- `function` **_write_jsonl** L123
+- `function` **_read_jsonl** L130
+- `function` **_safe_error** L144
+- `function` **_prompt_metadata** L150
+- `function` **_sport_hint** L170
+- `function` **_ordered_inputs** L178
+- `function` **_repo_head** L196
+- `function` **_source_summary** L211
+- `function` **_safe_claim** L295 — Drop accidental free-form/raw fields if an adapter ever supplies one.
+- `method` **_safe_claim.clean** L299
+- `function` **_step** L313
+- `function` **_write_terminal_artifacts** L337
+- `function` **_legacy_run_slate** L583 — Run independent captures, the reconciled union, and HAR-only autonomous closure.
+- `function` **_repository_prompt** L1024
+- `function` **run_slate** L1031 — Run the legacy producer and then apply the HAR-only closure controller.
 
 ### `src/dcm/chat/slate_autonomous.py`
 
