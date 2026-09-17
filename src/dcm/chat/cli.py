@@ -55,13 +55,13 @@ def build_parser() -> argparse.ArgumentParser:
         aliases=["run"],
         help="Execute an explicit research prompt across independent HARs and their reconciled union",
     )
-    sl.add_argument("--prompt", "--execution-prompt", dest="prompt", type=Path, required=True)
+    sl.add_argument("--prompt", "--execution-prompt", dest="prompt", type=Path, default=None, help="Optional prompt; defaults to the repository canonical execution prompt")
     sl.add_argument("--har", action="append", default=[], type=Path)
     sl.add_argument("--input", action="append", default=[], type=Path)
-    sl.add_argument("--run-root", type=Path, required=True)
+    sl.add_argument("--run-root", type=Path, default=Path("dcm_v6/RUNS"))
     sl.add_argument("--cutoff", default=None)
     sl.add_argument("--cutoff-from-capture", action="store_true")
-    sl.add_argument("--workspace", type=Path, required=True)
+    sl.add_argument("--workspace", type=Path, default=None)
     sl.add_argument("--observations", type=Path, default=None)
     sl.add_argument("--outcomes", type=Path, default=None, help="Optional normalized outcomes JSON for autonomous settle")
     sl.add_argument(
