@@ -18,7 +18,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 
-from dcm.chat.state import read_json
+from dcm.chat.state import read_json, write_json
 from dcm.contracts.hashes import content_hash
 from dcm.learning.insight_settlement import (
     append_insight_settlements,
@@ -238,6 +238,54 @@ def _load_outcomes(path: Path | None) -> list[dict[str, Any]]:
     raise ValueError("OUTCOMES_MUST_BE_LIST_OR_OUTCOMES_MAP")
 
 
+def _persist_settlement_artifacts(destination: Path, rows: Iterable[Mapping[str, Any]]) -> dict[str, Any]:
+    """Persist Insights settlements through the normal learning inputs.
+
+    The Insights sidecar remains canonical.  The generic learning consumers
+    also read ``settlements.jsonl``/``settlement.json``; these are synchronized
+    projections of the same append-only records, not a manually supplied
+    outcome source.
+    """
+    destination = Path(destination)
+    destination.mkdir(parents=True, exist_ok=True)
+    incoming = [dict(row) for row in rows if isinstance(row, Mapping)]
+    path = destination / "settlements.jsonl"
+    existing: list[dict[str, Any]] = []
+    existing_hashes: set[str] = set()
+    if path.is_file():
+        for line in path.read_text(encoding="utf-8").splitlines():
+            try:
+                value = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if not isinstance(value, Mapping):
+                continue
+            row = dict(value)
+            key = str(row.get("recordHash") or row.get("settlementId") or content_hash(row))
+            existing_hashes.add(key)
+            existing.append(row)
+    appended = 0
+    with path.open("a", encoding="utf-8") as handle:
+        for row in incoming:
+            key = str(row.get("recordHash") or row.get("settlementId") or content_hash(row))
+            if key in existing_hashes:
+                continue
+            handle.write(json.dumps(row, sort_keys=True, separators=(",", ":")) + "\n")
+            existing_hashes.add(key)
+            existing.append(row)
+            appended += 1
+    write_json(destination / "settlement.json", existing)
+    return {
+        "appendOnly": True,
+        "appended": appended,
+        "existing": len(incoming) - appended,
+        "ledgerPath": "settlements.jsonl",
+        "snapshotPath": "settlement.json",
+        "rowCount": len(existing),
+        "contentHash": content_hash(existing),
+    }
+
+
 def _drive_research(
     session: Any | None,
     *,
@@ -357,6 +405,7 @@ def _drive_settle(
         )
         dest = Path(session.dest) if session is not None else None
         append_result = None
+        settlement_projection = None
         if dest is not None:
             append_result = append_insight_settlements(
                 dest,
@@ -365,6 +414,7 @@ def _drive_settle(
                 decision_cutoff=cutoff,
                 learning_revision=LEARNING_REVISION,
             )
+            settlement_projection = _persist_settlement_artifacts(dest, result.get("ledger") or [])
         settlement_doc.update(
             {
                 "status": "SETTLED_AVAILABLE_FINAL",
@@ -372,6 +422,7 @@ def _drive_settle(
                 "trainingEligibleCount": int(result.get("trainingEligibleCount") or 0),
                 "results": result.get("results") or {},
                 "append": append_result,
+                "settlementProjection": settlement_projection,
                 "adapterVersion": result.get("adapterVersion"),
                 "contentHash": result.get("contentHash"),
                 "ledger": result.get("ledger") or [],
@@ -429,6 +480,19 @@ def _chatgpt_research_action(
         "responsePath": f"responses/{batch_id}.response.json" if batch_id else "responses/response.json",
         "requestIds": sorted({str(value) for value in request_ids if str(value)}),
         "requiredFields": sorted({str(value) for value in required_fields if str(value)}),
+        "offerRevalidation": {
+            "status": "REQUIRED_FOR_PRODUCTION_SELECTION",
+            "responseField": "offerRevalidations",
+            "requiredFields": [
+                "claimId_or_projectionId", "eventId", "subjectId", "proposition",
+                "periodLabel", "line", "direction", "marketDefinitionId",
+                "settlementRuleHash", "eventStatus", "sourceId", "sourceUrl",
+                "sourceHash", "authority", "retrievedAt",
+            ],
+            "sourcePolicy": "APPROVED_CURRENT_OFFER_SOURCE_OR_PLATFORM_CAPTURE",
+            "unavailableCode": "OFFER_REVALIDATION_UNAVAILABLE",
+            "noBoardHarAsk": True,
+        },
         "responseSchema": "pillars_dcm.research_response.v1",
         "sourcePolicy": "OFFICIAL_OR_APPROVED_PUBLIC_SOURCES_WITH_URL_HASH_RETRIEVAL_TIME",
         "operatorInputRequired": False,
@@ -484,15 +548,66 @@ def _finite_number(value: Any) -> float | None:
     return parsed if parsed == parsed and abs(parsed) != float("inf") else None
 
 
-def _training_evaluation_rows(settlement_doc: Mapping[str, Any]) -> list[dict[str, Any]]:
+def _historical_settlement_rows(session: Any | None) -> list[dict[str, Any]]:
+    """Load immutable settled labels already present in this run.
+
+    The Insights sidecar is the durable source for later training.  The
+    wrapper records written to ``learning_ledger.jsonl`` are unwrapped here so
+    a resumed run can train from prior settled labels without asking the
+    operator to provide a model-input file.
+    """
+    if session is None:
+        return []
+    root = Path(session.dest)
+    paths = (root / "insight_settlement_ledger.jsonl", root / "settlements.jsonl", root / "learning_ledger.jsonl")
+    rows: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for path in paths:
+        if not path.is_file():
+            continue
+        for line in path.read_text(encoding="utf-8").splitlines():
+            try:
+                raw = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if not isinstance(raw, Mapping):
+                continue
+            value = raw.get("payload") if isinstance(raw.get("payload"), Mapping) else raw
+            row = dict(value)
+            key = str(row.get("recordHash") or row.get("settlementId") or "")
+            if not key:
+                key = content_hash({
+                    "claimId": row.get("claimId"),
+                    "result": row.get("result") or row.get("settlement"),
+                    "decisionCutoff": row.get("decisionCutoff") or raw.get("cutoff"),
+                })
+            if key in seen:
+                continue
+            seen.add(key)
+            rows.append(row)
+    return rows
+
+
+def _training_evaluation_rows(
+    settlement_doc: Mapping[str, Any],
+    historical_rows: Iterable[Mapping[str, Any]] = (),
+) -> list[dict[str, Any]]:
     """Project only exact, settled labels with an already-produced probability."""
     rows: list[dict[str, Any]] = []
-    for source in (settlement_doc.get("ledger") or settlement_doc.get("trainingRows") or []):
+    sources = list(settlement_doc.get("ledger") or settlement_doc.get("trainingRows") or [])
+    sources.extend(row for row in historical_rows if isinstance(row, Mapping))
+    seen: set[str] = set()
+    for source in sources:
         if not isinstance(source, Mapping) or not source.get("trainingEligible"):
             continue
         result = str(source.get("result") or "").upper()
         if result not in {"WIN", "LOSS", "PUSH"}:
             continue
+        source_key = str(source.get("recordHash") or source.get("settlementId") or source.get("claimId") or "")
+        if source_key and source_key in seen:
+            continue
+        if source_key:
+            seen.add(source_key)
         p = None
         for key in ("calibratedP", "selectedP", "predictionP", "modelP", "p"):
             p = _finite_number(source.get(key))
@@ -500,10 +615,13 @@ def _training_evaluation_rows(settlement_doc: Mapping[str, Any]) -> list[dict[st
                 break
         if p is None:
             continue
+        binary = 1 if result == "WIN" else 0 if result == "LOSS" else None
         rows.append({
             **dict(source),
             "result": result,
             "labelSplit": "supervised",
+            "binaryOutcome": binary,
+            "forecastP": p,
             "selectedP": p,
             "decisionCutoff": source.get("decisionCutoff") or source.get("recordedAt"),
         })
@@ -511,7 +629,17 @@ def _training_evaluation_rows(settlement_doc: Mapping[str, Any]) -> list[dict[st
 
 
 def _drive_train(settlement_doc: Mapping[str, Any], *, session: Any | None = None) -> dict[str, Any]:
-    labels = int(settlement_doc.get("trainingEligibleCount") or 0)
+    historical_rows = _historical_settlement_rows(session)
+    current_labels = [
+        row for row in (settlement_doc.get("ledger") or settlement_doc.get("trainingRows") or [])
+        if isinstance(row, Mapping) and row.get("trainingEligible")
+    ]
+    historical_labels = [row for row in historical_rows if row.get("trainingEligible")]
+    label_keys = {
+        str(row.get("recordHash") or row.get("settlementId") or row.get("claimId") or content_hash(row))
+        for row in [*current_labels, *historical_labels]
+    }
+    labels = len(label_keys)
     extra: dict[str, Any] = {
         "trainingEligibleCount": labels,
         "minTrainingLabels": MIN_TRAINING_LABELS,
@@ -521,12 +649,14 @@ def _drive_train(settlement_doc: Mapping[str, Any], *, session: Any | None = Non
         "modelPathAttempted": False,
         "predictiveCertified": False,
         "productionRootCertified": False,
+        "historicalLabelCount": len(historical_labels),
     }
     if labels <= 0:
         return _phase("TRAIN", "SKIPPED_NO_SETTLEMENT", **extra)
     if labels < MIN_TRAINING_LABELS:
         return _phase("TRAIN", "SKIPPED_INSUFFICIENT_LABELS", **extra)
-    rows = _training_evaluation_rows(settlement_doc)
+    rows = _training_evaluation_rows(settlement_doc, historical_rows)
+    extra["modelInputCount"] = len(rows)
     if not rows:
         return _phase("TRAIN", "SKIPPED_NO_MODEL_INPUTS", reason="SETTLED_LABELS_HAVE_NO_FROZEN_PROBABILITY", **extra)
     extra["modelPathAttempted"] = True
@@ -536,6 +666,25 @@ def _drive_train(settlement_doc: Mapping[str, Any], *, session: Any | None = Non
 
         walkforward = run_walkforward(rows)
         calibration = evaluate_calibration_readiness(rows)
+        dataset_hash = content_hash(rows)
+        extra["trainingDatasetCount"] = len(rows)
+        extra["trainingDatasetHash"] = dataset_hash
+        if session is not None:
+            dataset_path = Path(session.dest) / "training_dataset.jsonl"
+            dataset_path.write_text(
+                "".join(json.dumps(row, sort_keys=True, ensure_ascii=True) + "\n" for row in rows),
+                encoding="utf-8",
+            )
+            dataset_manifest = {
+                "schema": "pillars_dcm.insights_training_dataset.v1",
+                "rowCount": len(rows),
+                "supervisedCount": sum(row.get("binaryOutcome") in {0, 1} for row in rows),
+                "source": "APPEND_ONLY_SETTLED_INSIGHTS_LABELS",
+                "contentHash": dataset_hash,
+                "inventedLabels": False,
+                "learningRevision": LEARNING_REVISION,
+            }
+            write_json(Path(session.dest) / "training_dataset_manifest.json", dataset_manifest)
         extra.update({
             "statusDetail": walkforward.get("status"),
             "walkforward": walkforward,
@@ -602,7 +751,7 @@ def advance_autonomous_closure(
     outcomes: Path | None = None,
     model_result: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Advance research → settle → train → playables with typed states."""
+    """Advance research → settle → train → rank/select/freeze with typed states."""
     insight_bridge = {}
     if session is not None:
         insight_bridge = read_json(Path(session.dest) / "insights_host_bridge.json") or {}
@@ -622,11 +771,45 @@ def advance_autonomous_closure(
         outcomes_path=outcomes,
     )
     train = _drive_train(settlement_doc, session=session)
-    playables = _drive_playables(
-        insights_top25_count=insights_top25_count,
-        board_offer_count=board_offer_count,
-        model_result=model_result or train,
-    )
+    selection_state: dict[str, Any] = {}
+    if session is not None and Path(session.dest).is_dir():
+        try:
+            from dcm.chat.insight_closure import refresh_insight_pipeline_files
+
+            queue = read_json(Path(session.dest) / "insights_research_queue.json") or {}
+            coverage = read_json(Path(session.dest) / "evidence_coverage.json") or {}
+            selection_state = refresh_insight_pipeline_files(
+                Path(session.dest),
+                claims=claims,
+                queue=queue,
+                coverage=coverage,
+                model_result=model_result or train,
+                board_offer_count=board_offer_count,
+            )
+        except Exception as exc:  # typed selection boundary; retain abstention
+            selection_state = {
+                "error": type(exc).__name__,
+                "errorCode": str(exc)[:180],
+            }
+    selection = selection_state.get("selection") if isinstance(selection_state, Mapping) else None
+    if isinstance(selection, Mapping) and isinstance(selection.get("playables"), Mapping):
+        playables = {
+            "name": "PLAYABLES",
+            **dict(selection["playables"]),
+            "insightsTop25Count": int(selection.get("productionTop25Count") or insights_top25_count),
+            "boardOfferCount": int(board_offer_count),
+            "modelPathAttempted": bool(selection.get("modelPathAttempted")),
+            "predictiveCertified": bool(train.get("predictiveCertified")),
+            "productionRootCertified": bool(train.get("productionRootCertified")),
+            "predictiveClaim": PREDICTIVE_CLAIM,
+            "note": "Production selection is the ranked, constrained Insights consumer; zero is a valid gate result.",
+        }
+    else:
+        playables = _drive_playables(
+            insights_top25_count=insights_top25_count,
+            board_offer_count=board_offer_count,
+            model_result=model_result or train,
+        )
     phases = [research, settle_phase, train, playables]
     contract = operator_contract(
         board_offer_count=board_offer_count,
@@ -642,6 +825,10 @@ def advance_autonomous_closure(
         "deferredJobs": deferred,
         "settlement": settlement_doc,
         "model": train,
+        "top100": selection_state.get("top100") if isinstance(selection_state, Mapping) else None,
+        "eventWorld": selection_state.get("eventWorld") if isinstance(selection_state, Mapping) else None,
+        "selection": selection,
+        "freeze": selection_state.get("freeze") if isinstance(selection_state, Mapping) else None,
         "boardHarRequired": False,
         "requiredOperatorAsks": [],
         "nextRequiredOperatorInput": "NONE",

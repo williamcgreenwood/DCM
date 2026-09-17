@@ -290,7 +290,13 @@ def build_capture_diff(
             {
                 "sport": sport,
                 "captures": [
-                    {key: value["capture"].get(key) for key in ("captureId", "sha256", "filename", "captureStart", "captureEnd", "claimCount")}
+                    {
+                        **{
+                            key: value["capture"].get(key)
+                            for key in ("captureId", "sha256", "filename", "captureStart", "captureEnd")
+                        },
+                        "claimCount": value["capture"].get("insightClaimCount") or value["capture"].get("claimCount"),
+                    }
                     for value in values
                 ],
             }
@@ -393,6 +399,19 @@ def _capability_matrix(claims: list[dict[str, Any]], board_count: int, autonomou
     train = str((phases.get("TRAIN") or {}).get("status") or "NOT_EXECUTED")
     playables = str((phases.get("PLAYABLES") or {}).get("status") or "NOT_EXECUTED")
     complete = bool(coverage.get("complete"))
+    selection = autonomous.get("selection") if isinstance(autonomous.get("selection"), Mapping) else {}
+    if not selection and composite is not None:
+        loaded_selection = read_json(Path(composite) / "insight_selection.json")
+        selection = loaded_selection if isinstance(loaded_selection, Mapping) else {}
+    current_offers = read_json(Path(composite) / "current_offer_snapshots.json") if composite is not None else {}
+    current_offer_count = int(current_offers.get("snapshotCount") or len(current_offers.get("snapshots") or [])) if isinstance(current_offers, Mapping) else 0
+    production_top100_count = int(selection.get("productionTop100Count") or 0)
+    production_top25_count = int(selection.get("productionTop25Count") or 0)
+    playable_count = int(selection.get("playableCount") or (selection.get("playables") or {}).get("count") or 0)
+    model = autonomous.get("model") if isinstance(autonomous.get("model"), Mapping) else {}
+    model_path_attempted = bool(model.get("modelPathAttempted"))
+    predictive_certified = bool(model.get("predictiveCertified"))
+    root_certified = bool(model.get("productionRootCertified"))
     names = [
         ("HAR", "dcm.ingest.har", "slate", "COMPLETE" if composite else "FAILED"),
         ("PER_FILE_ACCOUNTING", "dcm.runtime.input_boundary", "har_census.json", "COMPLETE" if composite else "PARTIAL"),
@@ -411,20 +430,25 @@ def _capability_matrix(claims: list[dict[str, Any]], board_count: int, autonomou
         ("EVENTWORLD_FEATURES", "dcm.model.event_world_joint", "feature_snapshot.json", "COMPLETE" if complete else "BLOCKED_COVERAGE_INCOMPLETE"),
         ("SETTLEMENT", "dcm.learning.insight_settlement", "settlement_queue.json", settle),
         ("TRAINING_CALIBRATION", "dcm.learning.walkforward", "model_report.json", train),
-        ("RANKING", "dcm.model.ranking", "top25.json", "READY_AFTER_MODEL" if train in {"SHADOW_EVALUATED", "CERTIFIED"} else "BLOCKED_MODEL"),
-        ("SELECTION", "dcm.selection.card_layers", "playables.json", playables),
-        ("FROZEN_PREDICTIONS", "dcm.runtime.freeze", "freeze.json", "COMPLETE" if playables == "SELECTED" else "NOT_EARNED"),
+        ("RANKING", "dcm.model.ranking", "top100.json", "COMPLETE" if production_top100_count else "BLOCKED_MODEL_OR_GATES"),
+        ("SELECTION", "dcm.selection.card_layers", "top25.json", "COMPLETE" if production_top25_count else "ABSTAINED_GATES_NOT_MET"),
+        ("FROZEN_PREDICTIONS", "dcm.runtime.freeze", "insights_frozen_predictions.json", "COMPLETE" if str((selection.get("freeze") or {}).get("status") or "") == "FROZEN" else "NOT_EARNED"),
         ("AUTHORITATIVE_SETTLEMENT", "dcm.learning.postgame", "settlement.json", "READY" if settle == "SETTLED" else "DEFERRED_UNTIL_FINAL"),
         ("POSTGAME_LEARNING", "dcm.learning.registry", "CALIBRATION_STATE.json", "SHADOW_ONLY" if settle == "SETTLED" else "DEFERRED_UNTIL_SETTLEMENT"),
     ]
     blockers = []
-    if board_count <= 0:
+    if current_offer_count <= 0:
         blockers.append("OFFER_REVALIDATION_UNAVAILABLE")
     if not complete:
         blockers.append("EVIDENCE_COVERAGE_INCOMPLETE")
-    if not (autonomous.get("model") or {}).get("modelPathAttempted"):
+    if not model_path_attempted:
         blockers.append("MODEL_PATH_NOT_EXECUTED")
-    blockers.append("PRODUCTION_ROOT_NOT_CERTIFIED")
+    if not predictive_certified:
+        blockers.append("MODEL_NOT_CERTIFIED")
+    if settle != "SETTLED":
+        blockers.append("AUTHORITATIVE_OUTCOMES_PENDING")
+    if not root_certified:
+        blockers.append("PRODUCTION_ROOT_NOT_CERTIFIED")
     payload = {
         "schema": "pillars_dcm.capability_matrix.v1",
         "producerConsumerOrder": [row[0] for row in names],
@@ -434,7 +458,11 @@ def _capability_matrix(claims: list[dict[str, Any]], board_count: int, autonomou
         ],
         "blockers": sorted(set(blockers)),
         "boardOfferCount": board_count,
+        "currentOfferRevalidationCount": current_offer_count,
         "insightsClaimCount": len(claims),
+        "productionTop100Count": production_top100_count,
+        "productionTop25Count": production_top25_count,
+        "playableCount": playable_count,
         "operatorInputRequired": False,
         "boardHarRequired": False,
         "predictiveClaim": "NONE",
@@ -449,11 +477,15 @@ def _closure_state(claims: list[dict[str, Any]], queue: Mapping[str, Any], cover
     settle = str((phases.get("SETTLE") or {}).get("status") or "")
     train = str((phases.get("TRAIN") or {}).get("status") or "")
     playable = phases.get("PLAYABLES") or {}
+    selection = autonomous.get("selection") if isinstance(autonomous.get("selection"), Mapping) else {}
+    current_offer_count = int(selection.get("currentOfferRevalidationCount") or 0)
+    production_top100_count = int(selection.get("productionTop100Count") or 0)
+    production_top25_count = int(selection.get("productionTop25Count") or 0)
     selected = str(playable.get("status") or "") in {"SELECTED", "ABSTAINED_GATES_NOT_MET"}
     predictive = bool((autonomous.get("model") or {}).get("predictiveCertified"))
     root_certified = bool((autonomous.get("model") or {}).get("productionRootCertified"))
     blockers = set()
-    if board_count <= 0:
+    if current_offer_count <= 0:
         blockers.add("OFFER_REVALIDATION_UNAVAILABLE")
     if not coverage.get("complete"):
         blockers.add("EVIDENCE_COVERAGE_INCOMPLETE")
@@ -480,6 +512,9 @@ def _closure_state(claims: list[dict[str, Any]], queue: Mapping[str, Any], cover
         "boardHarRequired": False,
         "captureAuthorityStatus": capture.get("status"),
         "playables": {"status": playable.get("status"), "count": int(playable.get("count") or 0), "reason": playable.get("reason")},
+        "productionTop100": {"count": production_top100_count, "status": "EMITTED" if production_top100_count else "BLOCKED"},
+        "productionTop25": {"count": production_top25_count, "status": "EMITTED" if production_top25_count else "BLOCKED"},
+        "currentOfferRevalidationCount": current_offer_count,
         "blockers": sorted(blockers),
         "explanation": "Insights line+side capture is valid research evidence. A zero board-offer count only means no exact /projections rows were observed; it never requests another HAR. Production playables remain zero until offer revalidation, evidence, settlement, calibration, and production-root gates are independently earned.",
     }
@@ -570,21 +605,52 @@ def enhance_slate_result(root: Path, inputs: Iterable[Path], result: Mapping[str
 
     top25_path = root / "top25.json"
     top25 = read_json(top25_path) or {}
+    autonomous = read_json(root / "autonomous_closure.json") or {}
+    selection = autonomous.get("selection") if isinstance(autonomous, Mapping) and isinstance(autonomous.get("selection"), Mapping) else {}
+    selected_top25 = [dict(row) for row in (selection.get("productionTop25") or []) if isinstance(row, Mapping)]
+    selected_playables = selection.get("playables") if isinstance(selection.get("playables"), Mapping) else {}
+    current_offer_doc = read_json(root / "current_offer_snapshots.json") or {}
+    current_offer_count = int(current_offer_doc.get("snapshotCount") or len(current_offer_doc.get("snapshots") or [])) if isinstance(current_offer_doc, Mapping) else 0
     rows = [dict(row) for row in (top25.get("rows") or []) if isinstance(row, Mapping)]
-    for row in rows:
-        # Only reclassify the Insights-only branch. A board-backed row must
-        # remain available to the real model/ranking/selection consumers.
-        if board_count <= 0 or row.get("offerBacking") == "INSIGHTS_OFFER_BACKED":
-            row["offerBacking"] = "INSIGHTS_OFFER_BACKED"
-            row["candidateClass"] = "RESEARCH_CANDIDATE"
-            row["probability"] = None
-            row["productionEligible"] = False
+    if selected_top25:
+        rows = selected_top25
+        top25.update({
+            "status": "PRODUCTION_SELECTED",
+            "rows": rows,
+            "productionTop25": rows,
+            "productionTop25Count": len(rows),
+            "boardOfferCount": board_count,
+            "insightsOfferCount": insight_count,
+            "productionSelectionPermitted": True,
+            "probabilityStatus": "AVAILABLE",
+            "boardHarRequired": False,
+        })
+    else:
+        for row in rows:
+            # Only reclassify the Insights-only branch. A board-backed row must
+            # remain available to the real model/ranking/selection consumers.
+            if board_count <= 0 or row.get("offerBacking") == "INSIGHTS_OFFER_BACKED":
+                row["offerBacking"] = "INSIGHTS_OFFER_BACKED"
+                row["candidateClass"] = "RESEARCH_CANDIDATE"
+                row["probability"] = None
+                row["productionEligible"] = False
+        if rows:
+            top25.update({"status": "RESEARCH_ONLY", "rows": rows, "boardOfferCount": board_count, "insightsOfferCount": insight_count, "productionSelectionPermitted": False, "probabilityStatus": "NONE", "boardHarRequired": False})
     if rows:
-        top25.update({"status": "RESEARCH_ONLY", "rows": rows, "boardOfferCount": board_count, "insightsOfferCount": insight_count, "productionSelectionPermitted": False, "probabilityStatus": "NONE", "boardHarRequired": False})
         top25["contentHash"] = content_hash({key: value for key, value in top25.items() if key != "contentHash"})
         _write(root / "top25.json", top25)
     playables = read_json(root / "playables.json") or {}
-    if board_count <= 0:
+    if selected_playables:
+        playables = dict(selected_playables)
+        playables.update({
+            "count": len(playables.get("rows") or []),
+            "ABSTAINED": not bool(playables.get("rows")),
+            "boardOfferCount": board_count,
+            "insightsTop25Count": len(selected_top25),
+            "boardHarRequired": False,
+            "predictiveClaim": (autonomous.get("model") or {}).get("predictiveClaim") or "NONE",
+        })
+    elif board_count <= 0 and current_offer_count <= 0:
         playables.update({
             "count": 0,
             "ABSTAINED": True,
@@ -605,9 +671,12 @@ def enhance_slate_result(root: Path, inputs: Iterable[Path], result: Mapping[str
     playables.update({"boardOfferCount": board_count, "insightsTop25Count": len(rows), "boardHarRequired": False})
     playables["contentHash"] = content_hash({key: value for key, value in playables.items() if key != "contentHash"})
     _write(root / "playables.json", playables)
-    selection_permitted = bool(playables.get("productionSelectionPermitted"))
+    # Top25 permission belongs to the Top25 selector.  A separate playable
+    # card may still be empty because its tighter portfolio limits yield no
+    # six-leg card; do not erase a valid production Top25 in that case.
+    selection_permitted = bool(selected_top25) or bool(playables.get("productionSelectionPermitted"))
     feature = read_json(root / "feature_snapshot.json") or {}
-    feature.update({"boardOfferCount": board_count, "insightsOfferCount": insight_count, "probabilityStatus": "NONE" if not selection_permitted else feature.get("probabilityStatus") or "AVAILABLE", "productionSelectionPermitted": selection_permitted, "reasonCodes": (["INSIGHTS_OFFER_BACKED_RESEARCH_ONLY", "OFFER_REVALIDATION_UNAVAILABLE"] if insight_count and board_count <= 0 else ["INSIGHTS_LINE_SIDE_MISSING", "OFFER_REVALIDATION_UNAVAILABLE"] if board_count <= 0 else ["PRODUCTION_MODEL_GATES_NOT_MET"] if not selection_permitted else []), "boardHarRequired": False})
+    feature.update({"boardOfferCount": board_count, "insightsOfferCount": insight_count, "currentOfferRevalidationCount": current_offer_count, "probabilityStatus": "NONE" if not selection_permitted else feature.get("probabilityStatus") or "AVAILABLE", "productionSelectionPermitted": selection_permitted, "reasonCodes": (["INSIGHTS_OFFER_BACKED_RESEARCH_ONLY", "OFFER_REVALIDATION_UNAVAILABLE"] if insight_count and current_offer_count <= 0 else ["INSIGHTS_LINE_SIDE_MISSING", "OFFER_REVALIDATION_UNAVAILABLE"] if current_offer_count <= 0 else ["PRODUCTION_MODEL_GATES_NOT_MET"] if not selection_permitted else []), "boardHarRequired": False})
     feature["contentHash"] = content_hash({key: value for key, value in feature.items() if key != "contentHash"})
     _write(root / "feature_snapshot.json", feature)
 
@@ -624,7 +693,6 @@ def enhance_slate_result(root: Path, inputs: Iterable[Path], result: Mapping[str
         action = {"schema": "pillars_dcm.autonomous_next_action.v1", "type": "CHATGPT_RESEARCH_RESPONSE" if queue else "NONE", "owner": "CHATGPT" if queue else "DCM", "status": "READY" if queue else "TERMINAL", "operatorInputRequired": False, "noBoardHarAsk": True, "boardHarRequired": False, "nextCommand": "autonomous-resume"}
     action = _root_action(action, root, composite)
     _write(root / "next_action.json", action)
-    autonomous = read_json(root / "autonomous_closure.json") or {}
     phases = [row for row in (autonomous.get("phases") or []) if isinstance(row, Mapping)]
     research_phase = next((row for row in phases if row.get("name") == "RESEARCH"), {})
     receipt = read_json(root / "execution_receipt.json") or {}
@@ -633,8 +701,34 @@ def enhance_slate_result(root: Path, inputs: Iterable[Path], result: Mapping[str
     receipt["requiredOperatorAsks"] = []
     receipt["nextRequiredOperatorInput"] = "NONE"
     receipt.setdefault("research", {})["batchId"] = action.get("batchId")
-    receipt["research"]["actions"] = {**(receipt.get("research", {}).get("actions") or {}), "pending": [] if research_phase.get("status") in {"IMPORTED", "COMPLETE_NO_FURTHER_BATCH"} else ["CHATGPT_RESEARCH_EXECUTION"]}
+    receipt["research"]["actions"] = {
+        **(receipt.get("research", {}).get("actions") or {}),
+        "pending": [] if action.get("type") == "NONE" else ["CHATGPT_RESEARCH_EXECUTION"],
+    }
     receipt.setdefault("status", {})["universal"] = "COMPLETE_MIXED_SPORT_ROUTING" if composite else "PARTIAL"
+    receipt["productionTop100Count"] = len(selection.get("productionTop100") or [])
+    receipt["productionTop25Count"] = len(selected_top25)
+    receipt["productionSelectionPermitted"] = selection_permitted
+    receipt["probabilityStatus"] = "AVAILABLE" if selected_top25 else "NONE"
+    receipt["currentOfferRevalidationCount"] = current_offer_count
+    receipt["status"]["predictive"] = (
+        "PREDICTIVE_CERTIFIED" if bool((autonomous.get("model") or {}).get("predictiveCertified"))
+        else "PREDICTIVE_NOT_EARNED"
+    )
+    receipt["phaseStatus"] = [
+        {
+            **dict(row),
+            "status": (
+                "COMPLETE" if len(selection.get("productionTop100") or []) else "ABSTAINED"
+            ),
+            "productionTop100Count": len(selection.get("productionTop100") or []),
+            "productionTop25Count": len(selected_top25),
+        }
+        if isinstance(row, Mapping) and row.get("name") == "PREDICTION_AND_SELECTION"
+        else dict(row)
+        for row in (receipt.get("phaseStatus") or [])
+        if isinstance(row, Mapping)
+    ]
     receipt["captureAuthority"] = capture_authority
     receipt["captureDiffPath"] = "capture_diff.json"
     receipt["bitemporalClaimsPath"] = "bitemporal_claims.json"
@@ -650,7 +744,7 @@ def enhance_slate_result(root: Path, inputs: Iterable[Path], result: Mapping[str
     _write(root / "closure_state.json", closure)
     output = dict(result)
     model_state = autonomous.get("model") if isinstance(autonomous.get("model"), Mapping) else {}
-    output.update({"sourceCount": len(raw_sources), "sources": raw_sources, "canonicalClaimCount": canonical_claim_count, "boardOfferCount": board_count, "insightsOfferCount": insight_count, "productionSelectionPermitted": selection_permitted, "probabilityStatus": "NONE" if not selection_permitted else "AVAILABLE", "modelPathAttempted": bool(model_state.get("modelPathAttempted")), "autonomous": True, "nextAction": action, "captureAuthority": capture_authority, "closureState": closure, "captureDiff": str(root / "capture_diff.json")})
+    output.update({"sourceCount": len(raw_sources), "sources": raw_sources, "canonicalClaimCount": canonical_claim_count, "boardOfferCount": board_count, "insightsOfferCount": insight_count, "productionTop100Count": len(selection.get("productionTop100") or []), "productionTop25Count": len(selected_top25), "productionSelectionPermitted": selection_permitted, "probabilityStatus": "AVAILABLE" if selected_top25 else "NONE", "modelPathAttempted": bool(model_state.get("modelPathAttempted")), "autonomous": True, "nextAction": action, "captureAuthority": capture_authority, "closureState": closure, "captureDiff": str(root / "capture_diff.json")})
     output["contentHash"] = content_hash({key: value for key, value in output.items() if key != "contentHash"})
     return output
 

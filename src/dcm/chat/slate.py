@@ -349,6 +349,38 @@ def _write_terminal_artifacts(
     queue_accounting = queue_accounting if isinstance(queue_accounting, dict) else {}
     top100 = [dict(row) for row in (queue.get("top100") or []) if isinstance(row, dict)] if isinstance(queue, dict) else []
     top25 = [dict(row) for row in (queue.get("top25") or []) if isinstance(row, dict)] if isinstance(queue, dict) else []
+    autonomous_body = autonomous if isinstance(autonomous, dict) else {}
+    selection_state = autonomous_body.get("selection") if isinstance(autonomous_body.get("selection"), dict) else {}
+    selection_top100 = [dict(row) for row in (selection_state.get("productionTop100") or []) if isinstance(row, dict)]
+    selection_top25 = [dict(row) for row in (selection_state.get("productionTop25") or []) if isinstance(row, dict)]
+    selection_playables = selection_state.get("playables") if isinstance(selection_state.get("playables"), dict) else {}
+    selection_freeze = selection_state.get("freeze") if isinstance(selection_state.get("freeze"), dict) else {}
+    autonomous_model = autonomous_body.get("model") if isinstance(autonomous_body.get("model"), dict) else {}
+    event_world = autonomous_body.get("eventWorld") if isinstance(autonomous_body.get("eventWorld"), dict) else {}
+    current_offer_doc = read_json(composite_dest / "current_offer_snapshots.json") if composite_dest else {}
+    current_offer_doc = current_offer_doc if isinstance(current_offer_doc, dict) else {}
+    current_offer_rows = [
+        dict(row) for row in (current_offer_doc.get("snapshots") or [])
+        if isinstance(row, dict)
+    ]
+    current_offer_count = int(current_offer_doc.get("snapshotCount") or len(current_offer_rows))
+    if not current_offer_doc:
+        current_offer_doc = {
+            "schema": "pillars_dcm.offer_revalidation.v1",
+            "status": "UNAVAILABLE",
+            "blocker": "OFFER_REVALIDATION_UNAVAILABLE",
+            "validCount": 0,
+            "rejectedCount": 0,
+            "appendedCount": 0,
+            "snapshotCount": 0,
+            "snapshots": [],
+            "blockers": {"OFFER_REVALIDATION_UNAVAILABLE": 1},
+            "boardHarRequired": False,
+            "productionSelectionPermitted": False,
+        }
+        current_offer_doc["contentHash"] = content_hash(
+            {key: value for key, value in current_offer_doc.items() if key != "contentHash"}
+        )
     unresolved: list[dict[str, Any]] = []
     for claim in claims:
         reasons: list[str] = []
@@ -373,6 +405,9 @@ def _write_terminal_artifacts(
             )
     unresolved.sort(key=lambda row: (str(row.get("claimId") or ""), str(row.get("sourceHarSha256") or "")))
 
+    offer_doc_preview = insights_offer_snapshots(list(claims))
+    insights_offer_count = int(offer_doc_preview.get("insightsOfferCount") or 0)
+    insights_backed = bool(insights_offer_count)
     paths = ["canonical_claims.jsonl", "unresolved_claims.jsonl", "research_queue_top100.json"]
     _write_jsonl(root / "canonical_claims.jsonl", (_safe_claim(row) for row in sorted(claims, key=lambda row: str(row.get("claimId") or ""))))
     _write_jsonl(root / "unresolved_claims.jsonl", unresolved)
@@ -389,11 +424,41 @@ def _write_terminal_artifacts(
             "probabilityStatus": "NONE",
             "selectionStatus": "RESEARCH_ONLY",
             "productionSelectionPermitted": False,
+            "productionTop100Count": len(selection_top100),
+            "productionTop25Count": len(selection_top25),
         },
         "contentHash": None,
     }
     queue_artifact["contentHash"] = content_hash({k: v for k, v in queue_artifact.items() if k != "contentHash"})
     _write_json(root / "research_queue_top100.json", queue_artifact)
+
+    # This is the explicit consumer boundary between the research Top-100 and
+    # the later model/ranking path.  It is intentionally separate from the
+    # legacy queue artifact so a research priority score can never be mistaken
+    # for a forecast probability.
+    top100_state = autonomous_body.get("top100") if isinstance(autonomous_body.get("top100"), dict) else {}
+    top100_artifact = {
+        **top100_state,
+        "schema": "pillars_dcm.production_top100.v1",
+        "stage": "TOP100",
+        "researchRows": [dict(row) for row in (top100_state.get("rows") or top100) if isinstance(row, dict)],
+        "productionTop100": selection_top100,
+        "productionTop100Count": len(selection_top100),
+        "productionEligible": bool(selection_top100),
+        "boardOfferCount": int(board_offer_count),
+        "insightsOfferCount": int(offer_doc_preview.get("insightsOfferCount") or 0),
+        "currentOfferRevalidationCount": current_offer_count,
+        "boardHarRequired": False,
+    }
+    top100_artifact["rows"] = top100_artifact["researchRows"]
+    top100_artifact.setdefault(
+        "status",
+        "READY_FOR_TOP25_GATES" if selection_top100 else "RESEARCH_IN_PROGRESS",
+    )
+    top100_artifact.setdefault("blockerCounts", {})
+    top100_artifact["contentHash"] = content_hash({k: v for k, v in top100_artifact.items() if k != "contentHash"})
+    _write_json(root / "top100.json", top100_artifact)
+    paths.append("top100.json")
 
     packet_dir = root / "research_packets"
     packet_dir.mkdir(parents=True, exist_ok=True)
@@ -406,19 +471,24 @@ def _write_terminal_artifacts(
         _write_json(packet_dir / f"event_{packet_hash}.json", packet)
         paths.append(f"research_packets/event_{packet_hash}.json")
 
-    offer_doc_preview = insights_offer_snapshots(list(claims))
-    insights_offer_count = int(offer_doc_preview.get("insightsOfferCount") or 0)
-    insights_backed = bool(insights_offer_count)
     feature_snapshot = {
         "schema": "pillars_dcm.feature_snapshot.v1",
-        "status": "RESEARCH_ONLY_INSIGHTS_OFFER_BACKED" if insights_backed else "ABSTAINED_NO_INSIGHTS_LINE_SIDE",
-        "featureCount": 0,
+        "status": (
+            "FEATURES_READY_FOR_MODEL" if bool((coverage or {}).get("complete"))
+            else "RESEARCH_ONLY_INSIGHTS_OFFER_BACKED" if insights_backed
+            else "ABSTAINED_NO_INSIGHTS_LINE_SIDE"
+        ),
+        "featureCount": int(event_world.get("worldCount") or 0) if event_world else 0,
+        "eventWorldCount": int(event_world.get("worldCount") or 0) if event_world else 0,
+        "eventWorldState": event_world.get("worlds") and "SHARED_CONTEXT_INDEXED" or "NOT_AVAILABLE",
         "inputClaimCount": len(claims),
         "boardOfferCount": int(board_offer_count),
         "insightsOfferCount": insights_offer_count,
-        "probabilityStatus": "NONE",
+        "probabilityStatus": "AVAILABLE" if selection_top25 else "NONE",
         "reasonCodes": (
-            ["INSIGHTS_OFFER_BACKED_RESEARCH_ONLY", "PRODUCTION_MODEL_GATES_NOT_MET"]
+            list(sorted((selection_state.get("blockerCounts") or {}).keys()))
+            if selection_state.get("blockerCounts")
+            else ["INSIGHTS_OFFER_BACKED_RESEARCH_ONLY", "PRODUCTION_MODEL_GATES_NOT_MET"]
             if insights_backed
             else ["INSIGHTS_LINE_SIDE_MISSING", "PRODUCTION_MODEL_GATES_NOT_MET"]
         ),
@@ -430,15 +500,14 @@ def _write_terminal_artifacts(
 
     prediction = {
         "schema": "pillars_dcm.prediction_candidates.v1",
-        "status": "ABSTAINED",
-        "rows": [],
-        "productionSelectionPermitted": False,
-        "predictiveClaim": PREDICTIVE_CLAIM,
+        "status": "READY_FOR_SELECTION" if selection_top100 else "ABSTAINED",
+        "rows": selection_top100,
+        "productionSelectionPermitted": bool(selection_state.get("productionSelectionPermitted")),
+        "predictiveClaim": autonomous_model.get("predictiveClaim") or PREDICTIVE_CLAIM,
         "boardHarRequired": False,
         "reasonCodes": [
-            "INSIGHTS_OFFER_BACKED_RESEARCH_ONLY" if insights_backed else "INSIGHTS_LINE_SIDE_MISSING",
-            "NO_CALIBRATED_LABELS",
-            "PREDICTIVE_CLAIM_NONE",
+            *list(sorted((selection_state.get("blockerCounts") or {}).keys())),
+            *([] if selection_top100 else ["NO_PRODUCTION_RANKED_CANDIDATES"]),
         ],
     }
     prediction["contentHash"] = content_hash(prediction)
@@ -448,6 +517,14 @@ def _write_terminal_artifacts(
     offer_doc = offer_doc_preview
     _write_json(root / "insights_offer_snapshots.json", offer_doc)
     paths.append("insights_offer_snapshots.json")
+    if event_world:
+        _write_json(root / "insight_event_worlds.json", event_world)
+        paths.append("insight_event_worlds.json")
+    if selection_state:
+        _write_json(root / "insight_selection.json", selection_state)
+        paths.append("insight_selection.json")
+    _write_json(root / "current_offer_snapshots.json", current_offer_doc)
+    paths.append("current_offer_snapshots.json")
 
     # Insights-backed Top25 remains populated when line+side exist even if boardOfferCount=0.
     insights_top25 = [dict(row) for row in top25 if row.get("offerBacking") == "INSIGHTS_OFFER_BACKED"]
@@ -463,78 +540,74 @@ def _write_terminal_artifacts(
 
     top25_artifact = {
         "schema": "pillars_dcm.top25_research_preview.v1",
-        "status": "RESEARCH_ONLY",
-        "probabilityStatus": "NONE",
-        "productionSelectionPermitted": False,
+        "status": "PRODUCTION_SELECTED" if selection_top25 else "RESEARCH_ONLY",
+        "probabilityStatus": "AVAILABLE" if selection_top25 else "NONE",
+        "productionSelectionPermitted": bool(selection_state.get("productionSelectionPermitted")),
         "offerBacking": "INSIGHTS_OFFER_BACKED" if insights_top25 else ("CURRENT_OFFER_MISSING" if board_offer_count == 0 else "BOARD_OFFER"),
         "candidateClass": "RESEARCH_CANDIDATE",
         "boardOfferCount": int(board_offer_count),
         "insightsOfferCount": int(offer_doc.get("insightsOfferCount") or 0),
-        "rows": insights_top25,
+        "rows": selection_top25 or insights_top25,
+        "researchPreview": insights_top25,
+        "productionTop25": selection_top25,
+        "productionTop25Count": len(selection_top25),
         "diversifiedRows": [dict(row) for row in (queue.get("diversifiedTop25") or []) if isinstance(row, dict)] if isinstance(queue, dict) else [],
-        "predictiveClaim": PREDICTIVE_CLAIM,
+        "predictiveClaim": autonomous_model.get("predictiveClaim") or PREDICTIVE_CLAIM,
         "learningRevision": LEARNING_REVISION,
         "boardHarRequired": False,
         "note": (
             "Insights line+side claims back research Top25 even when boardOfferCount=0. "
             "CURRENT_OFFER_MISSING is informational only when no Insights line+side exists. "
-            "Playables remain fail-closed without a production model. Optional board HAR is not required."
+            "Production Top25 is emitted only after exact revalidation and all model gates. Optional board HAR is not required."
         ),
     }
     top25_artifact["contentHash"] = content_hash(top25_artifact)
     _write_json(root / "top25.json", top25_artifact)
     paths.append("top25.json")
 
-    playables = {
-        "schema": "pillars_dcm.playables.v1",
-        "count": 0,
-        "ABSTAINED": True,
-        "reason": "PRODUCTION_MODEL_GATES_NOT_MET" if insights_top25 else "INSIGHTS_LINE_SIDE_MISSING",
+    if selection_playables:
+        playables = dict(selection_playables)
+        playables.setdefault("schema", "pillars_dcm.playables.v1")
+        playables.setdefault("ABSTAINED", not bool(playables.get("rows")))
+        playables.setdefault("predictiveClaim", autonomous_model.get("predictiveClaim") or PREDICTIVE_CLAIM)
+        playables.setdefault("learningRevision", LEARNING_REVISION)
+        playables.setdefault("note", "No filler: the production selector emits only genuinely qualified rows.")
+    else:
+        playables = {
+            "schema": "pillars_dcm.playables.v1",
+            "count": 0,
+            "ABSTAINED": True,
+            "reason": "PRODUCTION_MODEL_GATES_NOT_MET" if insights_top25 else "INSIGHTS_LINE_SIDE_MISSING",
+            "boardOfferCount": int(board_offer_count),
+            "insightsTop25Count": len(insights_top25),
+            "rows": [],
+            "predictiveClaim": PREDICTIVE_CLAIM,
+            "learningRevision": LEARNING_REVISION,
+            "boardHarRequired": False,
+            "note": "Playables may be 0 while Insights-backed Top25 is non-empty. Optional board HAR is not a blocker.",
+        }
+    playables.update({
         "boardOfferCount": int(board_offer_count),
-        "insightsTop25Count": len(insights_top25),
-        "rows": [],
-        "predictiveClaim": PREDICTIVE_CLAIM,
-        "learningRevision": LEARNING_REVISION,
+        "insightsTop25Count": len(selection_top25 or insights_top25),
         "boardHarRequired": False,
-        "note": "Playables may be 0 while Insights-backed Top25 is non-empty. Optional board HAR is not a blocker.",
-    }
+    })
     playables["contentHash"] = content_hash(playables)
     _write_json(root / "playables.json", playables)
     paths.append("playables.json")
 
+    line_buffer_reason = (
+        "SELECTED"
+        if selection_playables
+        else str(selection_playables.get("reason") or "PRODUCTION_MODEL_GATES_NOT_MET")
+        if selection_state
+        else "PRODUCTION_MODEL_GATES_NOT_MET" if insights_backed else "INSIGHTS_LINE_SIDE_MISSING"
+    )
     line_buffer = (
         "status,reason,eligibleCount\n"
-        + (
-            "ABSTAINED,PRODUCTION_MODEL_GATES_NOT_MET,0\n"
-            if insights_backed
-            else "ABSTAINED,INSIGHTS_LINE_SIDE_MISSING,0\n"
-        )
+        f"{'SELECTED' if selection_playables else 'ABSTAINED'},{line_buffer_reason},{len(selection_playables.get('rows') or []) if selection_playables else 0}\n"
     )
     (root / "line_buffer_report.csv").write_text(line_buffer, encoding="utf-8")
     paths.append("line_buffer_report.csv")
-
-    model_report = {
-        "schema": "pillars_dcm.model_report.v1",
-        "status": "NOT_RUN_RESEARCH_ONLY",
-        "predictiveClaim": PREDICTIVE_CLAIM,
-        "learningRevision": LEARNING_REVISION,
-        "labels": {"settled": 0, "trainingEligible": 0},
-        "calibration": {"status": "NOT_EARNED"},
-        "coverage": {
-            "requested": int(coverage.get("requested") or 0),
-            "completeRequests": int(coverage.get("completeRequests") or 0),
-            "incompleteRequests": int(coverage.get("incompleteRequests") or 0),
-        },
-        "reasonCodes": (
-            ["INSIGHTS_OFFER_BACKED_RESEARCH_ONLY", "PRODUCTION_MODEL_GATES_NOT_MET"]
-            if insights_backed
-            else ["INSIGHTS_LINE_SIDE_MISSING", "PRODUCTION_MODEL_GATES_NOT_MET"]
-        ),
-        "boardHarRequired": False,
-    }
-    model_report["contentHash"] = content_hash(model_report)
-    _write_json(root / "model_report.json", model_report)
-    paths.append("model_report.json")
 
     settlement = dict((autonomous or {}).get("settlement") or {})
     if not settlement:
@@ -550,11 +623,61 @@ def _write_terminal_artifacts(
             "boardHarRequired": False,
             "outcomes": [],
         }
+    train_phase = next(
+        (row for row in (autonomous_body.get("phases") or [])
+         if isinstance(row, dict) and row.get("name") == "TRAIN"),
+        {},
+    )
+    calibration = train_phase.get("calibrationReadiness") if isinstance(train_phase.get("calibrationReadiness"), dict) else {}
+    model_report_detail = train_phase.get("modelReport") if isinstance(train_phase.get("modelReport"), dict) else {}
+    model_reason_codes = sorted((selection_state.get("blockerCounts") or {}).keys()) if selection_state else []
+    if not model_reason_codes and not bool(train_phase.get("modelPathAttempted")):
+        model_reason_codes = ["MODEL_PATH_NOT_EXECUTED"]
+    model_report = {
+        "schema": "pillars_dcm.model_report.v1",
+        "status": str(train_phase.get("status") or "NOT_RUN_RESEARCH_ONLY"),
+        "predictiveClaim": autonomous_model.get("predictiveClaim") or PREDICTIVE_CLAIM,
+        "learningRevision": LEARNING_REVISION,
+        "modelPathAttempted": bool(train_phase.get("modelPathAttempted")),
+        "predictiveCertified": bool(train_phase.get("predictiveCertified")),
+        "productionRootCertified": bool(train_phase.get("productionRootCertified")),
+        "labels": {
+            "settled": int(settlement.get("settledCount") or 0),
+            "trainingEligible": int(settlement.get("trainingEligibleCount") or 0),
+            "modelInputs": int(train_phase.get("modelInputCount") or 0),
+        },
+        "trainingDatasetCount": int(train_phase.get("trainingDatasetCount") or 0),
+        "calibration": calibration or {"status": "NOT_EARNED"},
+        "walkforward": train_phase.get("walkforward") or model_report_detail,
+        "coverage": {
+            "requested": int(coverage.get("requested") or 0),
+            "completeRequests": int(coverage.get("completeRequests") or 0),
+            "incompleteRequests": int(coverage.get("incompleteRequests") or 0),
+        },
+        "reasonCodes": model_reason_codes or (["PRODUCTION_MODEL_GATES_NOT_MET"] if insights_backed else ["INSIGHTS_LINE_SIDE_MISSING"]),
+        "boardHarRequired": False,
+    }
+    model_report["contentHash"] = content_hash(model_report)
+    _write_json(root / "model_report.json", model_report)
+    paths.append("model_report.json")
+
     settlement.setdefault("boardHarRequired", False)
     settlement.setdefault("outcomesInvented", False)
     settlement["contentHash"] = content_hash(settlement)
     _write_json(root / "settlement_queue.json", settlement)
     paths.append("settlement_queue.json")
+    # Expose the same settled population through the generic learning
+    # filenames.  The composite sidecar is append-only; these outer files are
+    # safe projections so downstream training/audit consumers do not need a
+    # private operator-created settlement input.
+    settled_snapshot = read_json(composite_dest / "settlement.json") if composite_dest else None
+    if isinstance(settled_snapshot, list):
+        _write_json(root / "settlement.json", settled_snapshot)
+        paths.append("settlement.json")
+    settled_ledger = composite_dest / "settlements.jsonl" if composite_dest else None
+    if settled_ledger is not None and settled_ledger.is_file():
+        (root / "settlements.jsonl").write_text(settled_ledger.read_text(encoding="utf-8"), encoding="utf-8")
+        paths.append("settlements.jsonl")
 
     audit_lines = [
         "# DCM explicit-prompt slate audit",
@@ -565,9 +688,12 @@ def _write_terminal_artifacts(
         f"- Trusted current board offers: `{int(board_offer_count)}`",
         f"- Research queue Top 100: `{len(top100)}`",
         f"- Research preview Top 25: `{len(insights_top25)}` (Insights-offer-backed)",
+        f"- Production Top 100: `{len(selection_top100)}`",
+        f"- Production Top 25: `{len(selection_top25)}`",
         f"- Insights offer snapshots: `{int(offer_doc.get('insightsOfferCount') or 0)}`",
-        "- Probability status: `NONE`",
-        "- Production selection: `ABSTAINED` (playables may be 0)",
+        f"- Current offer revalidations: `{current_offer_count}`",
+        f"- Probability status: `{'AVAILABLE' if selection_top25 else 'NONE'}`",
+        f"- Production selection: `{'SELECTED' if selection_top25 else 'ABSTAINED'}` (playables may be 0)",
         "- Raw HAR/body/header/URL persistence: `FALSE`",
         "",
         "The queue is an attention allocator. Insights HARs with exact line+side "
@@ -927,13 +1053,34 @@ def _legacy_run_slate(
     }
     autonomous_phases = list((autonomous_doc or {}).get("phases") or [])
     settle_status = next((row.get("status") for row in autonomous_phases if row.get("name") == "SETTLE"), "AWAITING_AUTHORITATIVE_OUTCOMES")
+    closure_selection = (
+        (autonomous_doc or {}).get("selection")
+        if isinstance((autonomous_doc or {}).get("selection"), dict)
+        else {}
+    )
+    closure_top100 = [
+        row for row in (closure_selection.get("productionTop100") or [])
+        if isinstance(row, Mapping)
+    ]
+    closure_top25 = [
+        row for row in (closure_selection.get("productionTop25") or [])
+        if isinstance(row, Mapping)
+    ]
+    selection_phase = {
+        "name": "PREDICTION_AND_SELECTION",
+        "status": "COMPLETE" if closure_top100 else "ABSTAINED",
+        "reason": None if closure_top100 else "NO_PRODUCTION_ELIGIBILITY",
+        "productionTop100Count": len(closure_top100),
+        "productionTop25Count": len(closure_top25),
+        "boardHarRequired": False,
+    }
     phase_status = [
         {"name": "PROMPT_AUDIT", "status": "COMPLETE", "promptSha256": prompt_meta["sha256"]},
         {"name": "ACCOUNT_EACH_HAR", "status": "COMPLETE" if all(row.get("status") == "ACCOUNTED" for row in source_records) else "PARTIAL"},
         {"name": "RECONCILE_UNION", "status": "COMPLETE" if composite_session else "FAILED"},
         *steps,
         {"name": "TOP100_RESEARCH_QUEUE", "status": "COMPLETE" if queue else "ABSTAINED"},
-        {"name": "PREDICTION_AND_SELECTION", "status": "ABSTAINED", "reason": "NO_PRODUCTION_ELIGIBILITY", "boardHarRequired": False},
+        selection_phase,
         {"name": "SETTLEMENT_AND_LEARNING", "status": settle_status, "boardHarRequired": False},
         *autonomous_phases,
     ]

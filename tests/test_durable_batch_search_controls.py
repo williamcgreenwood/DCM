@@ -159,6 +159,28 @@ def test_response_envelope_is_bound_to_the_active_immutable_batch(tmp_path: Path
         validate_response_binding(load_response(response_path), tmp_path)
 
 
+def test_offer_only_response_is_allowed_without_a_replacement_batch_or_har(tmp_path: Path):
+    response_path = tmp_path / "current-offer.json"
+    response_path.write_text(json.dumps({
+        "schema": "pillars_dcm.research_response.v1",
+        "offerRevalidations": [{
+            "claimId": "INSIGHT:i-1:hash",
+            "line": 4.5,
+            "direction": "HIGHER",
+            "sourceId": "approved-offer-source",
+            "sourceUrl": "https://example.com/offer",
+            "sourceHash": "offer-hash",
+            "authority": "APPROVED_PLATFORM_SOURCE",
+            "retrievedAt": "2026-09-17T21:51:00Z",
+        }],
+    }), encoding="utf-8")
+
+    response = validate_response_binding(load_response(response_path), tmp_path)
+
+    assert response["bindingStatus"] == "OFFER_ONLY"
+    assert response["batchId"] is None
+
+
 def test_failure_append_is_idempotent_and_conflicts_fail_closed(tmp_path: Path):
     path = tmp_path / "failures.jsonl"
     record = failure_record(

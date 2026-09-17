@@ -370,6 +370,13 @@ class HostSession:
 
     def import_evidence(self, observations: Path, *, select_next: bool = True) -> dict[str, Any]:
         response = validate_response_binding(load_response(Path(observations)), self.dest)
+        host_state = self._host_state()
+        board_for_cutoff = read_json(self.dest / "board.json") or {}
+        cutoff = str(
+            host_state.get("forecastCutoff")
+            or (board_for_cutoff.get("forecastCutoff") if isinstance(board_for_cutoff, dict) else "")
+            or ""
+        )
         with RunLock(self.dest, command="evidence-import"):
             active = read_json(self.dest / "active_research_batch.json") or {}
             bound_batch_id = str(response.get("batchId") or active.get("batchId") or "UNBOUND")
@@ -470,6 +477,8 @@ class HostSession:
             result["bindingStatus"] = response.get("bindingStatus")
             result["responseFailureCount"] = len(response_failures)
             result["responseFailureErrors"] = response_failure_errors
+            if response.get("offerRevalidations"):
+                result["offerRevalidation"] = self._import_offer_revalidations(response, cutoff=cutoff)
             result["testOnlyCutoffBypass"] = not cutoff_enforced(self.dest)
             result["productionEligible"] = production_eligible(self.dest)
         # Create/seal the next immutable envelope after the current batch is
@@ -478,6 +487,35 @@ class HostSession:
             next_batch = self.next_research_batch()
             result["nextBatchId"] = next_batch.get("batchId")
         return result
+
+    def _import_offer_revalidations(self, response: dict[str, Any], *, cutoff: str) -> dict[str, Any]:
+        """Import offer observations from a bound ChatGPT response."""
+        from dcm.research.insight_bridge import insights_offer_snapshots
+        from dcm.research.offer_revalidation import import_offer_revalidations
+
+        claim_rows: list[dict[str, Any]] = []
+        claim_path = self.dest / "insights_claims.jsonl"
+        if claim_path.is_file():
+            for line in claim_path.read_text(encoding="utf-8").splitlines():
+                try:
+                    claim = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                if isinstance(claim, dict):
+                    claim_rows.append(claim)
+        offer_doc = import_offer_revalidations(
+            self.dest,
+            response.get("offerRevalidations") or [],
+            snapshots=(insights_offer_snapshots(claim_rows).get("snapshots") or []),
+            cutoff=cutoff,
+        )
+        return {
+            "status": offer_doc.get("status"),
+            "validCount": offer_doc.get("validCount"),
+            "rejectedCount": offer_doc.get("rejectedCount"),
+            "snapshotCount": offer_doc.get("snapshotCount"),
+            "blockers": offer_doc.get("blockers"),
+        }
 
     def coverage(self, *, incremental: bool = False, verify_full: bool = False, select_next: bool = True) -> dict[str, Any]:
         requests = read_json(self.dest / "research_requests.json") or []
@@ -583,6 +621,97 @@ class HostSession:
         candidate = self.dest.parent.parent if self.dest.parent.name == "composite_run" else self.dest
         return candidate if candidate.is_dir() else self.dest
 
+    def _insight_claims(self) -> list[dict[str, Any]]:
+        path = self.dest / "insights_claims.jsonl"
+        rows: list[dict[str, Any]] = []
+        if not path.is_file():
+            return rows
+        for line in path.read_text(encoding="utf-8").splitlines():
+            try:
+                row = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if isinstance(row, dict):
+                rows.append(row)
+        return rows
+
+    def _refresh_autonomous_artifacts(
+        self,
+        *,
+        outcomes: Path | None = None,
+        observations_imported: bool = False,
+    ) -> dict[str, Any]:
+        """Recompute all autonomous consumers after any imported response."""
+        from dcm.chat.har_only_controller import (
+            _capability_matrix,
+            _closure_state,
+        )
+        from dcm.chat.slate import _write_terminal_artifacts
+        from dcm.chat.slate_autonomous import advance_autonomous_closure
+
+        claims = self._insight_claims()
+        queue = read_json(self.dest / "insights_research_queue.json") or {}
+        board = read_json(self.dest / "board.json") or {}
+        coverage = read_json(self.dest / "evidence_coverage.json") or {}
+        board_count = len(board.get("rows") or []) if isinstance(board, dict) else 0
+        state = self._host_state()
+        cutoff = str(state.get("forecastCutoff") or (board.get("forecastCutoff") if isinstance(board, dict) else "") or "") or None
+        offer_doc = read_json(self.dest / "insights_offer_snapshots.json") or {}
+        offer_snapshots = offer_doc.get("snapshots") if isinstance(offer_doc, dict) else []
+        if not isinstance(offer_snapshots, list) or not offer_snapshots:
+            from dcm.research.insight_bridge import insights_offer_snapshots
+            offer_snapshots = insights_offer_snapshots(claims).get("snapshots") or []
+        autonomous = advance_autonomous_closure(
+            session=self,
+            claims=claims,
+            board_offer_count=board_count,
+            insights_offer_count=len(offer_snapshots),
+            insights_top25_count=len((queue.get("top25") or []) if isinstance(queue, dict) else []),
+            cutoff=cutoff,
+            observations_imported=observations_imported,
+            research_queue_selected=0,
+            outcomes=outcomes,
+        )
+        write_json(self.dest / "autonomous_closure.json", autonomous)
+
+        root = self._outer_slate_root()
+        census = read_json(root / "har_census.json") or {}
+        source_hashes = [
+            str(value)
+            for value in ((census.get("union") or {}).get("sourceHarSha256s") or [])
+            if str(value)
+        ]
+        _write_terminal_artifacts(
+            root,
+            composite_dest=self.dest,
+            queue=queue if isinstance(queue, dict) else {},
+            claims=claims,
+            board_offer_count=board_count,
+            source_hashes=source_hashes,
+            coverage=coverage if isinstance(coverage, dict) else {},
+            autonomous=autonomous,
+        )
+        write_json(root / "autonomous_closure.json", autonomous)
+        phases = {str(row.get("name")): row for row in (autonomous.get("phases") or []) if isinstance(row, dict)}
+        write_json(
+            root / "capability_matrix.json",
+            _capability_matrix(claims, board_count, autonomous, coverage if isinstance(coverage, dict) else {}, self.dest),
+        )
+        capture = read_json(root / "capture_authority.json") or {}
+        write_json(
+            root / "closure_state.json",
+            _closure_state(
+                claims,
+                queue if isinstance(queue, dict) else {},
+                coverage if isinstance(coverage, dict) else {},
+                autonomous,
+                [row for row in (census.get("sources") or []) if isinstance(row, dict)],
+                board_count,
+                capture if isinstance(capture, dict) else {},
+            ),
+        )
+        return autonomous
+
     def next_action(self) -> dict[str, Any]:
         """Return the next autonomous ChatGPT/DCM action without asking the operator."""
         from dcm.chat.slate_autonomous import _chatgpt_settlement_action
@@ -630,87 +759,186 @@ class HostSession:
         return action
 
     def autonomous_resume(self, response: Path | None = None) -> dict[str, Any]:
-        """Consume ChatGPT's sealed response and continue all independent phases."""
-        from dcm.chat.slate_autonomous import (
-            _chatgpt_settlement_action,
-            _drive_playables,
-            _drive_settle,
-            _drive_train,
-        )
+        """Consume sealed ChatGPT work and run the closure loop to its boundary.
+
+        A response is an immutable batch result, not a signal to return control
+        to the operator.  This method consumes every already-available response
+        in sequence, refreshes research/coverage/settlement/model/selection
+        artifacts after each import, and stops only at the next sealed ChatGPT
+        action or a typed terminal state.
+        """
         from dcm.runtime.run_director import RunDirector
 
         supplied = Path(response) if response is not None else None
-        parsed: dict[str, Any] | None = None
+        processed_paths: set[str] = set()
+        processed_batches: list[str] = []
+        response_results: list[dict[str, Any]] = []
+        observations_imported = False
+        outcome_response: dict[str, Any] | None = None
+        outcome_path: Path | None = None
+
+        def _seal_research_response(parsed: dict[str, Any], source: Path) -> Path:
+            active = read_json(self.dest / "active_research_batch.json") or {}
+            batch_id = str(parsed.get("batchId") or active.get("batchId") or "")
+            if not batch_id:
+                raise ValueError("RESEARCH_RESPONSE_BATCH_REQUIRED")
+            sealed = self.dest / "responses" / f"{batch_id}.response.json"
+            sealed.parent.mkdir(parents=True, exist_ok=True)
+            if source.resolve() != sealed.resolve():
+                sealed.write_bytes(source.read_bytes())
+            return sealed
+
+        def _save_outcomes(parsed: dict[str, Any]) -> Path:
+            target = self.dest / "responses" / "outcomes" / f"{parsed.get('responseHash')}.response.json"
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(
+                json.dumps({
+                    "schema": parsed.get("schema") or "pillars_dcm.research_response.v1",
+                    "runId": parsed.get("runId"),
+                    "outcomes": parsed.get("outcomes") or [],
+                }, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+            return target
+
+        # A caller may pass the response directly.  Offer-only responses are
+        # supplemental current-market evidence and must not be fed to the
+        # research director as an empty observation batch.
         if supplied is not None:
             parsed = validate_response_binding(load_response(supplied), self.dest)
             if parsed.get("observations") or parsed.get("failures"):
-                active = read_json(self.dest / "active_research_batch.json") or {}
-                batch_id = str(parsed.get("batchId") or active.get("batchId") or "")
-                if not batch_id:
-                    raise ValueError("RESEARCH_RESPONSE_BATCH_REQUIRED")
-                sealed = self.dest / "responses" / f"{batch_id}.response.json"
-                sealed.parent.mkdir(parents=True, exist_ok=True)
-                if supplied.resolve() != sealed.resolve():
-                    sealed.write_bytes(supplied.read_bytes())
-                else:
-                    sealed = supplied
-                # The director now owns validation/import/checkpoint transitions.
-                director_status = RunDirector(self.dest, workspace=self.workspace).run_until_awaiting()
-            else:
-                director_status = RunDirector(self.dest, workspace=self.workspace).status()
-        else:
-            director_status = RunDirector(self.dest, workspace=self.workspace).run_until_awaiting()
+                _seal_research_response(parsed, supplied)
+                processed_paths.add(str(supplied.resolve()))
+                if parsed.get("batchId"):
+                    processed_batches.append(str(parsed["batchId"]))
+                observations_imported = True
+            if parsed.get("offerRevalidations") and not (parsed.get("observations") or parsed.get("failures")):
+                state = self._host_state()
+                board = read_json(self.dest / "board.json") or {}
+                cutoff = str(state.get("forecastCutoff") or (board.get("forecastCutoff") if isinstance(board, dict) else "") or "")
+                with RunLock(self.dest, command="offer-revalidation"):
+                    offer_result = self._import_offer_revalidations(parsed, cutoff=cutoff)
+                response_results.append({"responseHash": parsed.get("responseHash"), "offerRevalidation": offer_result})
+            if parsed.get("outcomes"):
+                outcome_response = parsed
+                outcome_path = _save_outcomes(parsed)
 
-        outcome_result: dict[str, Any] | None = None
-        if parsed is not None and parsed.get("outcomes"):
-            claims: list[dict[str, Any]] = []
-            claim_path = self.dest / "insights_claims.jsonl"
-            if claim_path.is_file():
-                for line in claim_path.read_text(encoding="utf-8").splitlines():
-                    try:
-                        row = json.loads(line)
-                    except json.JSONDecodeError:
-                        continue
-                    if isinstance(row, dict):
-                        claims.append(row)
-            state = self._host_state()
-            board = read_json(self.dest / "board.json") or {}
-            cutoff = str(state.get("forecastCutoff") or board.get("forecastCutoff") or "") or None
-            outcomes_path = self.dest / "responses" / "outcomes" / f"{parsed.get('responseHash')}.response.json"
-            outcomes_path.parent.mkdir(parents=True, exist_ok=True)
-            outcomes_path.write_text(
-                json.dumps({"outcomes": parsed.get("outcomes") or []}, indent=2, sort_keys=True) + "\n",
-                encoding="utf-8",
-            )
-            settle_phase, settlement_doc, deferred = _drive_settle(
-                session=self,
-                claims=claims,
-                cutoff=cutoff,
-                outcomes_path=outcomes_path,
-            )
-            write_json(self.dest / "settlement_queue.json", settlement_doc)
-            train = _drive_train(settlement_doc, session=self)
-            playable = _drive_playables(
-                insights_top25_count=len(read_json(self.dest / "top25.json").get("rows") or []) if isinstance(read_json(self.dest / "top25.json"), dict) else 0,
-                board_offer_count=len((board if isinstance(board, dict) else {}).get("rows") or []),
-                model_result=train,
-            )
+        director = RunDirector(self.dest, workspace=self.workspace)
+        director_status = director.run_until_awaiting()
+        # Consume every response that is already sealed.  If none is present,
+        # the returned READY action is the next ChatGPT-owned action; it is not
+        # an operator request and never mentions another HAR.
+        batch_loop_limit_reached = False
+        for _ in range(64):
+            if director_status.get("phase") != "AWAITING_RESPONSE":
+                break
+            raw_path = director_status.get("responsePath")
+            response_path = Path(str(raw_path)) if raw_path else None
+            if response_path is not None and not response_path.is_absolute():
+                response_path = self.dest / response_path
+            if response_path is None or not response_path.is_file():
+                break
+            path_key = str(response_path.resolve())
+            if path_key in processed_paths:
+                break
+            parsed_batch = validate_response_binding(load_response(response_path), self.dest)
+            # A supplemental-only response is never a director response; keep
+            # it out of the director path and persist its typed offer result.
+            if parsed_batch.get("offerRevalidations") and not (parsed_batch.get("observations") or parsed_batch.get("failures")):
+                state = self._host_state()
+                board = read_json(self.dest / "board.json") or {}
+                cutoff = str(state.get("forecastCutoff") or (board.get("forecastCutoff") if isinstance(board, dict) else "") or "")
+                with RunLock(self.dest, command="offer-revalidation"):
+                    offer_result = self._import_offer_revalidations(parsed_batch, cutoff=cutoff)
+                response_results.append({"responseHash": parsed_batch.get("responseHash"), "offerRevalidation": offer_result})
+                processed_paths.add(path_key)
+                break
+            processed_paths.add(path_key)
+            if parsed_batch.get("batchId"):
+                processed_batches.append(str(parsed_batch["batchId"]))
+            observations_imported = observations_imported or bool(parsed_batch.get("observations") or parsed_batch.get("failures"))
+            director_status = director.run_until_awaiting()
+            # Refresh the consumer artifacts at every durable import boundary
+            # so Top100, coverage, EventWorld, selection diagnostics, and the
+            # typed next action never lag behind the evidence that DCM just
+            # accepted.  The final refresh below also incorporates outcomes.
+            if observations_imported:
+                self._refresh_autonomous_artifacts(observations_imported=True)
+            response_results.append({
+                "responseHash": parsed_batch.get("responseHash"),
+                "batchId": parsed_batch.get("batchId"),
+                "observationCount": int(parsed_batch.get("observationCount") or 0),
+                "failureCount": int(parsed_batch.get("failureCount") or 0),
+                "offerRevalidationCount": int(parsed_batch.get("offerRevalidationCount") or 0),
+                "directorPhase": director_status.get("phase"),
+            })
+        else:
+            # A hard bound protects a malformed host from spinning forever,
+            # but it is a typed retryable blocker—not an operator request and
+            # never a request for another HAR.
+            batch_loop_limit_reached = str(director_status.get("phase") or "") == "AWAITING_RESPONSE"
+
+        if batch_loop_limit_reached:
+            write_json(self.dest / "autonomous_blockers.json", {
+                "schema": "pillars_dcm.autonomous_blockers.v1",
+                "blockers": [{
+                    "code": "RESEARCH_BATCH_LOOP_LIMIT_REACHED",
+                    "retryable": True,
+                    "operatorInputRequired": False,
+                    "boardHarRequired": False,
+                    "nextCommand": "autonomous-resume",
+                    "limit": 64,
+                }],
+            })
+
+        # Outcome responses can arrive after the research director has reached
+        # TERMINAL.  Discover only the explicit outcome response location; do
+        # not synthesize outcomes or fetch a replacement capture.
+        if outcome_response is None:
+            candidates = [self.dest / "responses" / "outcomes.response.json"]
+            candidates.extend(sorted((self.dest / "responses" / "outcomes").glob("*.response.json")) if (self.dest / "responses" / "outcomes").is_dir() else [])
+            for candidate in candidates:
+                if not candidate.is_file():
+                    continue
+                parsed_outcome = validate_response_binding(load_response(candidate), self.dest)
+                if parsed_outcome.get("outcomes"):
+                    outcome_response = parsed_outcome
+                    outcome_path = candidate
+                    break
+
+        autonomous = self._refresh_autonomous_artifacts(
+            outcomes=outcome_path,
+            observations_imported=observations_imported,
+        )
+        if outcome_response is not None:
             outcome_result = {
-                "phase": settle_phase,
-                "settlement": settlement_doc,
-                "train": train,
-                "playables": playable,
-                "deferredJobs": deferred,
-                "responseHash": parsed.get("responseHash"),
+                "phase": next((row for row in (autonomous.get("phases") or []) if row.get("name") == "SETTLE"), {}),
+                "settlement": autonomous.get("settlement"),
+                "train": autonomous.get("model"),
+                "playables": next((row for row in (autonomous.get("phases") or []) if row.get("name") == "PLAYABLES"), {}),
+                "deferredJobs": autonomous.get("deferredJobs") or [],
+                "responseHash": outcome_response.get("responseHash"),
             }
             write_json(self.dest / "autonomous_outcomes.json", outcome_result)
-            director_status = {**director_status, "phase": "TERMINAL" if not deferred else director_status.get("phase")}
+        else:
+            outcome_result = None
         action = self.next_action()
         result = {
             "schema": "pillars_dcm.autonomous_resume.v1",
             "runId": self.dest.name,
             "director": director_status,
             "outcomes": outcome_result,
+            "autonomous": {
+                "phaseOrder": autonomous.get("phaseOrder"),
+                "phases": autonomous.get("phases"),
+                "selection": autonomous.get("selection"),
+                "freeze": autonomous.get("freeze"),
+            },
+            "processedBatchIds": processed_batches,
+            "processedResponses": response_results,
+            "batchLoopLimit": 64,
+            "batchLoopLimitReached": batch_loop_limit_reached,
+            "typedBlockers": (["RESEARCH_BATCH_LOOP_LIMIT_REACHED"] if batch_loop_limit_reached else []),
             "nextAction": action,
             "operatorInputRequired": False,
             "noBoardHarAsk": True,

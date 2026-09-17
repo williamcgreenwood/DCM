@@ -140,6 +140,7 @@ class RunDirector:
             actions = [row for row in (batch.get("actions") or []) if isinstance(row, dict)]
             request_ids: list[str] = []
             required_fields: list[str] = []
+            candidate_claim_ids: list[str] = []
 
             def append_values(target: list[str], value: Any) -> None:
                 # Sealed task rows use singular requestId/need fields, while
@@ -164,6 +165,14 @@ class RunDirector:
                 for key in ("requiredFields", "required_fields", "need",
                             "knownMissing", "missingFields", "missing_fields"):
                     append_values(required_fields, action.get(key))
+                for key in ("dependentClaimIds", "dependent_claim_ids", "claimIds", "claim_ids"):
+                    append_values(candidate_claim_ids, action.get(key))
+            offer_fields = [
+                "claimId_or_projectionId", "eventId", "subjectId", "proposition",
+                "periodLabel", "line", "direction", "marketDefinitionId",
+                "settlementRuleHash", "eventStatus", "sourceId", "sourceUrl",
+                "sourceHash", "authority", "retrievedAt",
+            ]
             response_path = f"responses/{batch_id}.response.json" if batch_id else "responses/response.json"
             return {
                 **base,
@@ -176,6 +185,15 @@ class RunDirector:
                 "responsePath": response_path,
                 "requestIds": request_ids,
                 "requiredFields": required_fields,
+                "offerRevalidation": {
+                    "status": "REQUIRED_FOR_PRODUCTION_SELECTION",
+                    "candidateClaimIds": candidate_claim_ids,
+                    "responseField": "offerRevalidations",
+                    "requiredFields": offer_fields,
+                    "sourcePolicy": "APPROVED_CURRENT_OFFER_SOURCE_OR_PLATFORM_CAPTURE",
+                    "unavailableCode": "OFFER_REVALIDATION_UNAVAILABLE",
+                    "noBoardHarAsk": True,
+                },
                 "responseSchema": "pillars_dcm.research_response.v1",
                 "sourcePolicy": "OFFICIAL_OR_APPROVED_PUBLIC_SOURCES_WITH_URL_HASH_RETRIEVAL_TIME",
                 "nextCommand": "autonomous-resume",
