@@ -125,6 +125,7 @@ def test_explicit_prompt_slate_runs_each_capture_and_union(tmp_path: Path) -> No
     assert result["boardOfferCount"] == 0
     assert result["productionSelectionPermitted"] is False
     assert result["probabilityStatus"] == "NONE"
+    assert result["nextAction"]["boardHarRequired"] is False
 
     root = tmp_path / "slate"
     census = json.loads((root / "har_census.json").read_text(encoding="utf-8"))
