@@ -188,3 +188,34 @@ def test_status_reads_runlock_command_from_metadata(tmp_path: Path):
     assert status["lock"]["held"] is False
     assert status["lock"]["command"] == "director-step"
     assert status["lock"]["released"] is True
+
+def test_next_action_exposes_singular_task_ids_and_research_needs(tmp_path: Path):
+    run = _run(tmp_path)
+    batch_dir = run / "research_batches"
+    batch_dir.mkdir()
+    (batch_dir / "BATCH_PACKET.json").write_text(json.dumps({
+        "actions": [
+            {
+                "actionId": "AA_ONE",
+                "requestId": "REQ_ONE",
+                "need": "identity",
+                "knownMissing": ["availability"],
+            },
+            {
+                "actionId": "AA_TWO",
+                "requestIds": ["REQ_TWO"],
+                "requiredFields": ["schedule"],
+            },
+        ],
+    }), encoding="utf-8")
+
+    action = RunDirector(run)._next_action({
+        "phase": "AWAITING_RESPONSE",
+        "batchId": "BATCH_PACKET",
+        "batchContentSha": "packet-sha",
+    })
+
+    assert action["requestIds"] == ["REQ_ONE", "REQ_TWO"]
+    assert action["requiredFields"] == ["identity", "availability", "schedule"]
+    assert action["operatorInputRequired"] is False
+    assert action["noBoardHarAsk"] is True
