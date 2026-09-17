@@ -22,7 +22,7 @@ from dcm.research.response import _resolve_active_envelope_path
 
 DIRECTOR_SCHEMA = "pillars_dcm.run_director.v1"
 STATE_FILE = "run_director.json"
-DEFAULT_ALLOWED_LEAGUES = ("CFB", "NFL")
+DEFAULT_ALLOWED_LEAGUES = ("CFB", "NFL", "WNBA", "NBA", "MLB", "SOCCER", "NHL")
 PHASES = (
     "READ_CHECKPOINT",
     "READ_MANIFEST",
@@ -119,8 +119,69 @@ class RunDirector:
             "batchContentSha": state.get("batchContentSha"),
             "responsePath": state.get("responsePath"),
             "nextCommand": self._next_command(state),
+            "nextAction": self._next_action(state),
             "lock": self._lease_status(),
             "lastError": state.get("lastError"),
+        }
+
+    def _next_action(self, state: dict[str, Any]) -> dict[str, Any]:
+        """Expose the next ChatGPT/DCM action as a durable, machine-readable handoff."""
+        phase = str(state.get("phase") or "")
+        base = {
+            "schema": "pillars_dcm.autonomous_next_action.v1",
+            "runId": self.run.name,
+            "operatorInputRequired": False,
+            "noBoardHarAsk": True,
+            "boardHarRequired": False,
+        }
+        if phase == "AWAITING_RESPONSE":
+            batch_id = str(state.get("batchId") or "")
+            batch = read_json(self.run / "research_batches" / f"{batch_id}.json") or {}
+            actions = [row for row in (batch.get("actions") or []) if isinstance(row, dict)]
+            request_ids: list[str] = []
+            required_fields: list[str] = []
+            for action in actions:
+                for value in action.get("requestIds") or action.get("request_ids") or []:
+                    if str(value) and str(value) not in request_ids:
+                        request_ids.append(str(value))
+                for value in action.get("requiredFields") or action.get("required_fields") or []:
+                    if str(value) and str(value) not in required_fields:
+                        required_fields.append(str(value))
+            response_path = f"responses/{batch_id}.response.json" if batch_id else "responses/response.json"
+            return {
+                **base,
+                "type": "CHATGPT_RESEARCH_RESPONSE",
+                "owner": "CHATGPT",
+                "status": "READY",
+                "batchId": batch_id or None,
+                "batchContentSha": state.get("batchContentSha"),
+                "packetPath": f"research_batches/{batch_id}.json" if batch_id else None,
+                "responsePath": response_path,
+                "requestIds": request_ids,
+                "requiredFields": required_fields,
+                "responseSchema": "pillars_dcm.research_response.v1",
+                "sourcePolicy": "OFFICIAL_OR_APPROVED_PUBLIC_SOURCES_WITH_URL_HASH_RETRIEVAL_TIME",
+                "nextCommand": "autonomous-resume",
+                "note": (
+                    "ChatGPT executes the sealed research packet, validates exact "
+                    "identity and cutoff, then submits the response. Never invent a "
+                    "claim and never request another board HAR."
+                ),
+            }
+        if phase == "TERMINAL":
+            return {
+                **base,
+                "type": "NONE",
+                "owner": "DCM",
+                "status": "TERMINAL",
+                "nextCommand": "none",
+            }
+        return {
+            **base,
+            "type": "DCM_DIRECTOR_CONTINUE",
+            "owner": "DCM",
+            "status": "READY",
+            "nextCommand": "director-step",
         }
 
     def _next_command(self, state: dict[str, Any]) -> str:
@@ -128,7 +189,7 @@ class RunDirector:
         if phase == "READ_CHECKPOINT": return "director-step"
         if phase == "READ_MANIFEST": return "director-step"
         if phase == "SELECT_OR_RESUME_BATCH": return "director-step"
-        if phase == "AWAITING_RESPONSE": return "place response at the sealed responsePath"
+        if phase == "AWAITING_RESPONSE": return "autonomous-resume"
         if phase == "VALIDATE": return "director-step"
         if phase == "IMPORT": return "director-step"
         if phase == "COVERAGE": return "director-step"
@@ -165,9 +226,19 @@ class RunDirector:
             raw_dependent = batch.get("dependentOffers")
         if raw_dependent is None:
             raw_dependent = sum(
-                int(row.get("dependentOfferCount") or row.get("dependentPropCount") or 0)
+                int(row.get("dependentOfferCount") or row.get("dependentOffers") or 0)
                 for row in actions
             )
+        # Insights claims are research workload, not a board-offer budget. A
+        # packet may fan out over many captured claims while exact /projections
+        # offers remain zero.
+        research_only = bool(batch.get("researchOnly"))
+        dependent_claims = int(batch.get("dependentClaimCount") or 0)
+        if dependent_claims or research_only or any(
+            row.get("researchOnly") or row.get("dependentClaimCount") or row.get("dependentClaimIds")
+            for row in actions
+        ):
+            raw_dependent = 0
         return selected, int(raw_dependent or 0)
 
     def _batch_leagues(self, batch: dict[str, Any]) -> set[str]:
