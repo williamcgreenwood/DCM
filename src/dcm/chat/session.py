@@ -109,7 +109,7 @@ def doctor(*, release_manifest: Path | None = None, workspace: Path | None = Non
         "commands": [
             "doctor", "run-slate", "prepare", "next-research", "research-batch", "research-validate", "research-failure",
             "evidence-import", "coverage", "har-breakdown", "index-build", "search-blueprint", "checkpoint-verify",
-            "forecast", "report", "resume", "audit", "archive", "settle", "cfb-launch",
+            "autonomous-next", "autonomous-resume", "forecast", "report", "resume", "audit", "archive", "settle", "cfb-launch",
         ],
     }
 
@@ -126,6 +126,12 @@ class HostSession:
         dest = Path(run)
         if not dest.is_dir():
             raise FileNotFoundError(f"HOST_RUN_NOT_FOUND:{dest}")
+        # run-slate returns an outer receipt directory. ChatGPT commands may
+        # receive either that wrapper or the inner composite HostSession run.
+        if not (dest / "host_state.json").is_file():
+            candidates = sorted(dest.glob("composite_run/RUN_*/host_state.json"))
+            if len(candidates) == 1:
+                dest = candidates[0].parent
         return cls(dest, workspace=workspace)
 
     @classmethod
@@ -573,6 +579,150 @@ class HostSession:
         )
         return result
 
+    def _outer_slate_root(self) -> Path:
+        candidate = self.dest.parent.parent if self.dest.parent.name == "composite_run" else self.dest
+        return candidate if candidate.is_dir() else self.dest
+
+    def next_action(self) -> dict[str, Any]:
+        """Return the next autonomous ChatGPT/DCM action without asking the operator."""
+        from dcm.chat.slate_autonomous import _chatgpt_settlement_action
+        from dcm.runtime.run_director import RunDirector
+
+        action: dict[str, Any] = {}
+        try:
+            action = dict(RunDirector(self.dest, workspace=self.workspace).status().get("nextAction") or {})
+        except Exception as exc:  # typed durable state, not a manual ask
+            action = {
+                "schema": "pillars_dcm.autonomous_next_action.v1",
+                "type": "DCM_TYPED_BLOCKER",
+                "owner": "DCM",
+                "status": "BLOCKED",
+                "code": type(exc).__name__,
+                "operatorInputRequired": False,
+                "noBoardHarAsk": True,
+                "boardHarRequired": False,
+                "nextCommand": "autonomous-resume",
+            }
+        settlement = read_json(self.dest / "settlement_queue.json") or {}
+        if action.get("type") in {"NONE", "DCM_DIRECTOR_CONTINUE", None} and settlement:
+            claims = []
+            claim_path = self.dest / "insights_claims.jsonl"
+            if claim_path.is_file():
+                for line in claim_path.read_text(encoding="utf-8").splitlines():
+                    try:
+                        row = json.loads(line)
+                    except json.JSONDecodeError:
+                        continue
+                    if isinstance(row, dict):
+                        claims.append(row)
+            state = self._host_state()
+            board = read_json(self.dest / "board.json") or {}
+            cutoff = str(state.get("forecastCutoff") or board.get("forecastCutoff") or "") or None
+            action = _chatgpt_settlement_action(run_id=self.dest.name, claims=claims, cutoff=cutoff)
+        action.setdefault("operatorInputRequired", False)
+        action.setdefault("noBoardHarAsk", True)
+        action.setdefault("boardHarRequired", False)
+        action["contentHash"] = content_hash({key: value for key, value in action.items() if key != "contentHash"})
+        write_json(self.dest / "next_action.json", action)
+        outer = self._outer_slate_root()
+        if outer != self.dest:
+            write_json(outer / "next_action.json", action)
+        return action
+
+    def autonomous_resume(self, response: Path | None = None) -> dict[str, Any]:
+        """Consume ChatGPT's sealed response and continue all independent phases."""
+        from dcm.chat.slate_autonomous import (
+            _chatgpt_settlement_action,
+            _drive_playables,
+            _drive_settle,
+            _drive_train,
+        )
+        from dcm.runtime.run_director import RunDirector
+
+        supplied = Path(response) if response is not None else None
+        parsed: dict[str, Any] | None = None
+        if supplied is not None:
+            parsed = validate_response_binding(load_response(supplied), self.dest)
+            if parsed.get("observations") or parsed.get("failures"):
+                active = read_json(self.dest / "active_research_batch.json") or {}
+                batch_id = str(parsed.get("batchId") or active.get("batchId") or "")
+                if not batch_id:
+                    raise ValueError("RESEARCH_RESPONSE_BATCH_REQUIRED")
+                sealed = self.dest / "responses" / f"{batch_id}.response.json"
+                sealed.parent.mkdir(parents=True, exist_ok=True)
+                if supplied.resolve() != sealed.resolve():
+                    sealed.write_bytes(supplied.read_bytes())
+                else:
+                    sealed = supplied
+                # The director now owns validation/import/checkpoint transitions.
+                director_status = RunDirector(self.dest, workspace=self.workspace).run_until_awaiting()
+            else:
+                director_status = RunDirector(self.dest, workspace=self.workspace).status()
+        else:
+            director_status = RunDirector(self.dest, workspace=self.workspace).run_until_awaiting()
+
+        outcome_result: dict[str, Any] | None = None
+        if parsed is not None and parsed.get("outcomes"):
+            claims: list[dict[str, Any]] = []
+            claim_path = self.dest / "insights_claims.jsonl"
+            if claim_path.is_file():
+                for line in claim_path.read_text(encoding="utf-8").splitlines():
+                    try:
+                        row = json.loads(line)
+                    except json.JSONDecodeError:
+                        continue
+                    if isinstance(row, dict):
+                        claims.append(row)
+            state = self._host_state()
+            board = read_json(self.dest / "board.json") or {}
+            cutoff = str(state.get("forecastCutoff") or board.get("forecastCutoff") or "") or None
+            outcomes_path = self.dest / "responses" / "outcomes" / f"{parsed.get('responseHash')}.response.json"
+            outcomes_path.parent.mkdir(parents=True, exist_ok=True)
+            outcomes_path.write_text(
+                json.dumps({"outcomes": parsed.get("outcomes") or []}, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+            settle_phase, settlement_doc, deferred = _drive_settle(
+                session=self,
+                claims=claims,
+                cutoff=cutoff,
+                outcomes_path=outcomes_path,
+            )
+            write_json(self.dest / "settlement_queue.json", settlement_doc)
+            train = _drive_train(settlement_doc, session=self)
+            playable = _drive_playables(
+                insights_top25_count=len(read_json(self.dest / "top25.json").get("rows") or []) if isinstance(read_json(self.dest / "top25.json"), dict) else 0,
+                board_offer_count=len((board if isinstance(board, dict) else {}).get("rows") or []),
+                model_result=train,
+            )
+            outcome_result = {
+                "phase": settle_phase,
+                "settlement": settlement_doc,
+                "train": train,
+                "playables": playable,
+                "deferredJobs": deferred,
+                "responseHash": parsed.get("responseHash"),
+            }
+            write_json(self.dest / "autonomous_outcomes.json", outcome_result)
+            director_status = {**director_status, "phase": "TERMINAL" if not deferred else director_status.get("phase")}
+        action = self.next_action()
+        result = {
+            "schema": "pillars_dcm.autonomous_resume.v1",
+            "runId": self.dest.name,
+            "director": director_status,
+            "outcomes": outcome_result,
+            "nextAction": action,
+            "operatorInputRequired": False,
+            "noBoardHarAsk": True,
+            "boardHarRequired": False,
+        }
+        result["contentHash"] = content_hash(result)
+        write_json(self.dest / "autonomous_resume.json", result)
+        outer = self._outer_slate_root()
+        if outer != self.dest:
+            write_json(outer / "autonomous_resume.json", result)
+        return result
+
     def forecast(self, *, research: str = "bundle") -> dict[str, Any]:
         state = self._host_state()
         if not state.get("coverageEvaluated"):
@@ -580,6 +730,8 @@ class HostSession:
         # Hydrate still-valid persistent claims into the run bundle before resume.
         next_research_batch(
             self.dest,
+            max_entities=8,
+            max_dependent_offers=250,
             store_root=self.workspace / "dcm_v6" / "research_store",
         )
         ck = self.dest / "checkpoint.json"

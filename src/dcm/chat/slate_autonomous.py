@@ -374,6 +374,7 @@ def _drive_settle(
                 "append": append_result,
                 "adapterVersion": result.get("adapterVersion"),
                 "contentHash": result.get("contentHash"),
+                "ledger": result.get("ledger") or [],
             }
         )
         extra.update(
@@ -405,28 +406,169 @@ def _drive_settle(
     return _phase("SETTLE", "AWAITING_AUTHORITATIVE_OUTCOMES", **extra), settlement_doc, deferred
 
 
-def _drive_train(settlement_doc: Mapping[str, Any]) -> dict[str, Any]:
+
+def _chatgpt_research_action(
+    *,
+    run_id: str,
+    batch_id: str | None,
+    batch_content_sha: str | None,
+    packet_path: str | None,
+    request_ids: Iterable[str] = (),
+    required_fields: Iterable[str] = (),
+) -> dict[str, Any]:
+    """Describe the durable research handoff; the operator has no manual step."""
+    return {
+        "schema": "pillars_dcm.autonomous_next_action.v1",
+        "type": "CHATGPT_RESEARCH_RESPONSE",
+        "owner": "CHATGPT",
+        "status": "READY" if batch_id else "WAITING",
+        "runId": run_id,
+        "batchId": batch_id,
+        "batchContentSha": batch_content_sha,
+        "packetPath": packet_path,
+        "responsePath": f"responses/{batch_id}.response.json" if batch_id else "responses/response.json",
+        "requestIds": sorted({str(value) for value in request_ids if str(value)}),
+        "requiredFields": sorted({str(value) for value in required_fields if str(value)}),
+        "responseSchema": "pillars_dcm.research_response.v1",
+        "sourcePolicy": "OFFICIAL_OR_APPROVED_PUBLIC_SOURCES_WITH_URL_HASH_RETRIEVAL_TIME",
+        "operatorInputRequired": False,
+        "noBoardHarAsk": True,
+        "boardHarRequired": False,
+        "nextCommand": "autonomous-resume",
+        "note": "ChatGPT researches the packet and submits evidence; unresolved facts become typed failures, never guesses or another board-HAR request.",
+    }
+
+
+def _chatgpt_settlement_action(
+    *,
+    run_id: str,
+    claims: Iterable[Mapping[str, Any]],
+    cutoff: str | None,
+) -> dict[str, Any]:
+    rows = [row for row in claims if isinstance(row, Mapping)]
+    timing = [classify_claim_event_timing(row, cutoff=cutoff) for row in rows]
+    final_count = timing.count("FINAL")
+    return {
+        "schema": "pillars_dcm.autonomous_next_action.v1",
+        "type": "CHATGPT_OUTCOME_RESEARCH",
+        "owner": "CHATGPT",
+        "status": "READY" if final_count else "WAITING_FOR_EVENT_FINAL",
+        "runId": run_id,
+        "packetPath": "settlement_queue.json",
+        "responsePath": "responses/outcomes.response.json",
+        "responseSchema": "pillars_dcm.research_response.v1",
+        "outcomeSchema": "outcome_observation.v1",
+        "claimCount": len(rows),
+        "finalClaimCount": final_count,
+        "futureClaimCount": timing.count("FUTURE"),
+        "unknownClaimCount": timing.count("UNKNOWN"),
+        "requiredFields": [
+            "eventId", "subjectId", "proposition", "periodLabel", "line",
+            "direction", "observedValue_or_result", "sourceId", "sourceUrl",
+            "sourceHash", "authority", "retrievedAt", "publishedAt",
+        ],
+        "sourcePolicy": "OFFICIAL_OR_APPROVED_AUTHORITATIVE_OUTCOME_SOURCES",
+        "operatorInputRequired": False,
+        "noBoardHarAsk": True,
+        "boardHarRequired": False,
+        "nextCommand": "autonomous-resume",
+        "note": "Fetch authoritative outcomes after final status and settle every eligible claim; unresolved or conflicting outcomes stay typed and are never invented.",
+    }
+
+
+def _finite_number(value: Any) -> float | None:
+    try:
+        parsed = float(value)
+    except (TypeError, ValueError):
+        return None
+    return parsed if parsed == parsed and abs(parsed) != float("inf") else None
+
+
+def _training_evaluation_rows(settlement_doc: Mapping[str, Any]) -> list[dict[str, Any]]:
+    """Project only exact, settled labels with an already-produced probability."""
+    rows: list[dict[str, Any]] = []
+    for source in (settlement_doc.get("ledger") or settlement_doc.get("trainingRows") or []):
+        if not isinstance(source, Mapping) or not source.get("trainingEligible"):
+            continue
+        result = str(source.get("result") or "").upper()
+        if result not in {"WIN", "LOSS", "PUSH"}:
+            continue
+        p = None
+        for key in ("calibratedP", "selectedP", "predictionP", "modelP", "p"):
+            p = _finite_number(source.get(key))
+            if p is not None and 0.0 <= p <= 1.0:
+                break
+        if p is None:
+            continue
+        rows.append({
+            **dict(source),
+            "result": result,
+            "labelSplit": "supervised",
+            "selectedP": p,
+            "decisionCutoff": source.get("decisionCutoff") or source.get("recordedAt"),
+        })
+    return rows
+
+
+def _drive_train(settlement_doc: Mapping[str, Any], *, session: Any | None = None) -> dict[str, Any]:
     labels = int(settlement_doc.get("trainingEligibleCount") or 0)
-    extra = {
+    extra: dict[str, Any] = {
         "trainingEligibleCount": labels,
         "minTrainingLabels": MIN_TRAINING_LABELS,
         "learningRevision": LEARNING_REVISION,
         "predictiveClaim": PREDICTIVE_CLAIM,
         "boardHarRequired": False,
+        "modelPathAttempted": False,
+        "predictiveCertified": False,
+        "productionRootCertified": False,
     }
     if labels <= 0:
         return _phase("TRAIN", "SKIPPED_NO_SETTLEMENT", **extra)
     if labels < MIN_TRAINING_LABELS:
         return _phase("TRAIN", "SKIPPED_INSUFFICIENT_LABELS", **extra)
-    # Labels exist, but this increment does not invent a calibrated model.
-    return _phase("TRAIN", "SKIPPED_CALIBRATION_NOT_EARNED", **extra)
+    rows = _training_evaluation_rows(settlement_doc)
+    if not rows:
+        return _phase("TRAIN", "SKIPPED_NO_MODEL_INPUTS", reason="SETTLED_LABELS_HAVE_NO_FROZEN_PROBABILITY", **extra)
+    extra["modelPathAttempted"] = True
+    try:
+        from dcm.learning.calibration import evaluate_calibration_readiness
+        from dcm.learning.walkforward import run_walkforward
+
+        walkforward = run_walkforward(rows)
+        calibration = evaluate_calibration_readiness(rows)
+        extra.update({
+            "statusDetail": walkforward.get("status"),
+            "walkforward": walkforward,
+            "calibrationReadiness": calibration,
+            "modelReport": walkforward,
+        })
+        return _phase("TRAIN", "SHADOW_EVALUATED", **extra)
+    except Exception as exc:  # typed model boundary; do not fabricate a model
+        return _phase(
+            "TRAIN",
+            "FAILED_MODEL_EVALUATION",
+            reason="MODEL_EVALUATION_ERROR",
+            errorType=type(exc).__name__,
+            errorCode=str(exc)[:180],
+            **extra,
+        )
 
 
 def _drive_playables(
     *,
     insights_top25_count: int,
     board_offer_count: int,
+    model_result: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
+    model = model_result if isinstance(model_result, Mapping) else {}
+    model_ready = str(model.get("status") or "") in {"CERTIFIED", "PRODUCTION_CERTIFIED"}
+    root_ready = bool(model.get("productionRootCertified"))
+    if int(board_offer_count) <= 0:
+        reason = "OFFER_REVALIDATION_UNAVAILABLE"
+    elif not model_ready or not root_ready:
+        reason = "PRODUCTION_MODEL_GATES_NOT_MET"
+    else:
+        reason = "SELECTION_INPUTS_NOT_FROZEN"
     return _phase(
         "PLAYABLES",
         "ABSTAINED_GATES_NOT_MET",
@@ -434,10 +576,15 @@ def _drive_playables(
         insightsTop25Count=int(insights_top25_count),
         boardOfferCount=int(board_offer_count),
         productionSelectionPermitted=False,
+        modelPathAttempted=bool(model.get("modelPathAttempted")),
+        predictiveCertified=bool(model.get("predictiveCertified")),
+        productionRootCertified=root_ready,
+        reason=reason,
         boardHarRequired=False,
         note=(
-            "Playables 0–6 only after production gates. Insights-backed Top25 "
-            "must still fill when line+side exist, including boardOfferCount=0."
+            "Playables are selected only by the production selector after exact "
+            "offer revalidation, evidence, settlement, calibrated model, and "
+            "root certification. Insights Top25 remains research-only when board=0."
         ),
     )
 
@@ -453,6 +600,7 @@ def advance_autonomous_closure(
     observations_imported: bool,
     research_queue_selected: int,
     outcomes: Path | None = None,
+    model_result: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Advance research → settle → train → playables with typed states."""
     insight_bridge = {}
@@ -473,10 +621,11 @@ def advance_autonomous_closure(
         cutoff=cutoff,
         outcomes_path=outcomes,
     )
-    train = _drive_train(settlement_doc)
+    train = _drive_train(settlement_doc, session=session)
     playables = _drive_playables(
         insights_top25_count=insights_top25_count,
         board_offer_count=board_offer_count,
+        model_result=model_result or train,
     )
     phases = [research, settle_phase, train, playables]
     contract = operator_contract(
@@ -492,6 +641,7 @@ def advance_autonomous_closure(
         "operatorContract": contract,
         "deferredJobs": deferred,
         "settlement": settlement_doc,
+        "model": train,
         "boardHarRequired": False,
         "requiredOperatorAsks": [],
         "nextRequiredOperatorInput": "NONE",

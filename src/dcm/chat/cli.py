@@ -116,6 +116,15 @@ def build_parser() -> argparse.ArgumentParser:
     drun.add_argument("--workspace", type=Path, default=None)
     drun.add_argument("--until", choices=["awaiting"], default="awaiting")
 
+    an = sub.add_parser("autonomous-next", help="Show the next ChatGPT/DCM action for an existing run")
+    _add_run(an)
+    an.add_argument("--workspace", type=Path, default=None)
+
+    ar = sub.add_parser("autonomous-resume", help="Consume a ChatGPT research/outcome response and continue the autonomous controller")
+    _add_run(ar)
+    ar.add_argument("--response", type=Path, default=None)
+    ar.add_argument("--workspace", type=Path, default=None)
+
     e = sub.add_parser("evidence-import", help="Import simple host observations (engine hashes)")
     _add_run(e)
     e.add_argument("--input", type=Path, required=True)
@@ -275,7 +284,11 @@ def main(argv: list[str] | None = None) -> int:
             ))
             return 0
         session = HostSession.open(args.run, workspace=getattr(args, "workspace", None))
-        if args.command == "next-research":
+        if args.command == "autonomous-next":
+            _print(session.next_action())
+        elif args.command == "autonomous-resume":
+            _print(session.autonomous_resume(args.response))
+        elif args.command == "next-research":
             _print(session.next_research_batch(
                 max_entities=args.max_entities,
                 max_dependent_offers=args.max_dependent_offers,
@@ -287,7 +300,7 @@ def main(argv: list[str] | None = None) -> int:
             ))
         elif args.command in {"director-status", "director-step", "director-run"}:
             from dcm.runtime.run_director import RunDirector
-            director = RunDirector(args.run, workspace=args.workspace)
+            director = RunDirector(session.dest, workspace=args.workspace)
             if args.command == "director-status":
                 _print(director.status())
             elif args.command == "director-step":

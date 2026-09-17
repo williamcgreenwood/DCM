@@ -65,6 +65,7 @@ from dcm.model.worlds import generate_event_contexts, simulate_player_worlds, va
 from dcm.research.cache import ResearchCache
 from dcm.research.classify import accounting_classify as _classify
 from dcm.runtime.host_contract import build_terminal_accounting
+from dcm.runtime.capture_authority import build_capture_authority
 from dcm.research.emit import emit_offer_sets_and_manifest, emit_packets_and_graph
 from dcm.research.evidence_graph import attach_runtime_lineage
 from dcm.research.coverage import coverage_report
@@ -293,6 +294,7 @@ def run_dcm(
 ) -> dict[str, Any]:
     input_boundary_records: list[dict[str, Any]] = []
     insight_bridge: dict[str, Any] = {}
+    capture_authority: dict[str, Any] = {}
     if resume:
         ck = load_checkpoint(resume)
         output_root = Path(ck["artifactRoot"])
@@ -312,6 +314,19 @@ def run_dcm(
         synthetic = bool(ingest_meta.get("synthetic", board.get("synthetic", False)))
         run_id = ck["runId"]
         dest = output_root
+        authority_path = dest / "capture_authority.json"
+        if authority_path.is_file():
+            try:
+                capture_authority = json.loads(authority_path.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError):
+                capture_authority = {}
+        if not capture_authority:
+            capture_authority = build_capture_authority(
+                synthetic=synthetic,
+                accepted=True,
+                source_count=len(ingest_meta.get("sourceHarSha256s") or [har_sha]),
+                source_hashes=ingest_meta.get("sourceHarSha256s") or [har_sha],
+            )
         insight_bridge_path = dest / "insights_host_bridge.json"
         if insight_bridge_path.is_file():
             loaded_bridge = json.loads(insight_bridge_path.read_text(encoding="utf-8"))
@@ -418,6 +433,13 @@ def run_dcm(
         calibration_cells = calibration_state.get("cells") or {}
         board = freeze_board(ingest, mount=mount, cutoff=forecast_cutoff, asof_policy="account_capture")
         write_board(board, dest / "board.json")
+        capture_authority = build_capture_authority(
+            source_paths=[SYNTHETIC] if synthetic else sources,
+            synthetic=synthetic,
+            accepted=True,
+            source_count=len(sources) if not synthetic else 1,
+            source_hashes=ingest.get("contributingHarSha256s") or [har_sha],
+        )
         (dest / "input_manifest.json").write_text(
             json.dumps(
                 {
@@ -435,11 +457,16 @@ def run_dcm(
                         else "CAPTURED_HAR"
                     ),
                     "inputBoundaryHash": boundary_manifest["contentHash"],
+                    "captureAuthorityHash": capture_authority["contentHash"],
                 },
                 indent=2,
                 sort_keys=True,
             )
             + "\n",
+            encoding="utf-8",
+        )
+        (dest / "capture_authority.json").write_text(
+            json.dumps(capture_authority, indent=2, sort_keys=True) + "\n",
             encoding="utf-8",
         )
         # Typed Outlier Insights are a separate, privacy-safe research input.
@@ -636,6 +663,8 @@ def run_dcm(
             har_sha256=har_sha,
         )
         persist_capability_manifest(dest, capability_manifest)
+    if capture_authority:
+        capability_manifest["captureAuthority"] = capture_authority
     capability_manifest.setdefault("inputBoundary", {})["safeRecords"] = input_boundary_records
     capability_manifest["inputBoundary"]["boundaryManifestHash"] = str(
         (locals().get("boundary_manifest") or {}).get("contentHash") or ""

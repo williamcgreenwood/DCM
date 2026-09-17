@@ -2,10 +2,10 @@
 
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
-- Modules: **257**
-- Symbols: **1930**
+- Modules: **259**
+- Symbols: **1960**
 - Parse errors: **0**
-- Inventory hash: `73a9b5e5108c58e9f502433ead511009ae3bfbf2aa3e1a7dadfe0809c3741230`
+- Inventory hash: `bc458a0b91a7d8d3dc806e0eaf3313ef458d5c55b647b6609539f4074ed6ce8d`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -53,11 +53,12 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P7 | `src/dcm/chat/cli.py` | 0 | 4 |
 | P7 | `src/dcm/chat/contracts.py` | 0 | 0 |
 | P7 | `src/dcm/chat/evidence_import.py` | 0 | 6 |
+| P7 | `src/dcm/chat/har_only_controller.py` | 0 | 17 |
 | P7 | `src/dcm/chat/report.py` | 0 | 1 |
 | P7 | `src/dcm/chat/research_bridge.py` | 0 | 7 |
-| P7 | `src/dcm/chat/session.py` | 1 | 26 |
-| P7 | `src/dcm/chat/slate.py` | 0 | 16 |
-| P7 | `src/dcm/chat/slate_autonomous.py` | 0 | 15 |
+| P7 | `src/dcm/chat/session.py` | 1 | 29 |
+| P7 | `src/dcm/chat/slate.py` | 0 | 17 |
+| P7 | `src/dcm/chat/slate_autonomous.py` | 0 | 19 |
 | P7 | `src/dcm/chat/state.py` | 0 | 4 |
 | UNMAPPED | `src/dcm/compact.py` | 4 | 20 |
 | P0 | `src/dcm/contracts/__init__.py` | 0 | 0 |
@@ -201,6 +202,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P5-P14 | `src/dcm/runtime/archive_receipt.py` | 1 | 7 |
 | P5-P14 | `src/dcm/runtime/benchmark.py` | 0 | 4 |
 | P5-P14 | `src/dcm/runtime/capabilities.py` | 0 | 4 |
+| P5-P14 | `src/dcm/runtime/capture_authority.py` | 0 | 4 |
 | P5-P14 | `src/dcm/runtime/checkpoint.py` | 0 | 3 |
 | P5-P14 | `src/dcm/runtime/checkpoint_outbox.py` | 0 | 4 |
 | P5-P14 | `src/dcm/runtime/checkpoint_reconciliation.py` | 0 | 2 |
@@ -218,7 +220,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P5-P14 | `src/dcm/runtime/perf.py` | 1 | 2 |
 | P5-P14 | `src/dcm/runtime/pipeline.py` | 0 | 2 |
 | P5-P14 | `src/dcm/runtime/readiness.py` | 0 | 1 |
-| P5-P14 | `src/dcm/runtime/run_director.py` | 2 | 15 |
+| P5-P14 | `src/dcm/runtime/run_director.py` | 2 | 16 |
 | P5-P14 | `src/dcm/runtime/schema_root.py` | 0 | 5 |
 | P5-P14 | `src/dcm/runtime/storage_router.py` | 3 | 12 |
 | P5-P14 | `src/dcm/runtime/store.py` | 1 | 4 |
@@ -733,7 +735,7 @@ _No class/function symbols._
 - `function` **_print** L19
 - `function` **_add_run** L23
 - `function` **build_parser** L27
-- `function` **main** L207
+- `function` **main** L216
 
 ### `src/dcm/chat/contracts.py`
 
@@ -747,6 +749,26 @@ _No class/function symbols._
 - `function` **observation_to_claim** L74 — Legacy entry: validate + convert one observation (rejects empty fields).
 - `function` **import_observations** L91
 - `function` **__getattr__** L204
+
+### `src/dcm/chat/har_only_controller.py`
+
+- `function` **_write** L27
+- `function` **_sha** L32
+- `function` **_har_times** L36
+- `function` **_sport** L60
+- `function` **internal_order** L68
+- `function` **_event_id** L86
+- `function` **_subject_id** L91
+- `function` **_status** L96
+- `function` **_key** L101
+- `function` **_projection** L114
+- `function` **_change** L137
+- `function` **build_capture_diff** L151
+- `function` **_read_claims** L310
+- `function` **_root_action** L324
+- `function` **_capability_matrix** L340
+- `function` **_closure_state** L397
+- `function` **enhance_slate_result** L441
 
 ### `src/dcm/chat/report.py`
 
@@ -769,47 +791,51 @@ _No class/function symbols._
 - `class` **HostSession** L117 — One run directory, one Python probability engine.
 - `method` **HostSession.__init__** L120
 - `method` **HostSession.open** L125
-- `method` **HostSession.prepare** L132
-- `method` **HostSession._host_state** L163
-- `method` **HostSession._save_host_state** L166
-- `method` **HostSession._write_prepare_artifacts** L175
-- `method` **HostSession.next_research_batch** L210
-- `method` **HostSession.research_batch** L226 — Canonical durable batch command; next-research remains compatible.
-- `method` **HostSession.har_breakdown** L232
-- `method` **HostSession.index_build** L246
-- `method` **HostSession.search_blueprint** L298 — Compile the sport-neutral public-search fan-out plan for this run.
-- `method` **HostSession.research_validate** L317
-- `method` **HostSession.import_evidence** L365
-- `method` **HostSession.coverage** L476
-- `method` **HostSession.record_research_failure** L529
-- `method` **HostSession.checkpoint_verify** L540
-- `method` **HostSession._persist_research_checkpoint** L550
-- `method` **HostSession.forecast** L576
-- `method` **HostSession.report** L610
-- `method` **HostSession.resume** L617
-- `method` **HostSession.audit** L633
-- `method` **HostSession.archive** L638
-- `method` **HostSession.settle** L643
-- `function` **cfb_launch** L650 — Guarded CFB vertical slice. Fixture/bundle can freeze; file research returns the host loop.
+- `method` **HostSession.prepare** L138
+- `method` **HostSession._host_state** L169
+- `method` **HostSession._save_host_state** L172
+- `method` **HostSession._write_prepare_artifacts** L181
+- `method` **HostSession.next_research_batch** L216
+- `method` **HostSession.research_batch** L232 — Canonical durable batch command; next-research remains compatible.
+- `method` **HostSession.har_breakdown** L238
+- `method` **HostSession.index_build** L252
+- `method` **HostSession.search_blueprint** L304 — Compile the sport-neutral public-search fan-out plan for this run.
+- `method` **HostSession.research_validate** L323
+- `method` **HostSession.import_evidence** L371
+- `method` **HostSession.coverage** L482
+- `method` **HostSession.record_research_failure** L535
+- `method` **HostSession.checkpoint_verify** L546
+- `method` **HostSession._persist_research_checkpoint** L556
+- `method` **HostSession._outer_slate_root** L582
+- `method` **HostSession.next_action** L586 — Return the next autonomous ChatGPT/DCM action without asking the operator.
+- `method` **HostSession.autonomous_resume** L632 — Consume ChatGPT's sealed response and continue all independent phases.
+- `method` **HostSession.forecast** L726
+- `method` **HostSession.report** L762
+- `method` **HostSession.resume** L769
+- `method` **HostSession.audit** L785
+- `method` **HostSession.archive** L790
+- `method` **HostSession.settle** L795
+- `function` **cfb_launch** L802 — Guarded CFB vertical slice. Fixture/bundle can freeze; file research returns the host loop.
 
 ### `src/dcm/chat/slate.py`
 
-- `function` **_sha256_bytes** L105
-- `function` **_sha256_file** L109
-- `function` **_write_json** L113
-- `function` **_write_jsonl** L121
-- `function` **_read_jsonl** L128
-- `function` **_safe_error** L142
-- `function` **_prompt_metadata** L148
-- `function` **_sport_hint** L168
-- `function` **_ordered_inputs** L176
-- `function` **_repo_head** L194
-- `function` **_source_summary** L209
-- `function` **_safe_claim** L293 — Drop accidental free-form/raw fields if an adapter ever supplies one.
-- `method` **_safe_claim.clean** L297
-- `function` **_step** L311
-- `function` **_write_terminal_artifacts** L335
-- `function` **run_slate** L581 — Run independent captures, the reconciled union, and HAR-only autonomous closure.
+- `function` **_sha256_bytes** L106
+- `function` **_sha256_file** L110
+- `function` **_write_json** L114
+- `function` **_write_jsonl** L122
+- `function` **_read_jsonl** L129
+- `function` **_safe_error** L143
+- `function` **_prompt_metadata** L149
+- `function` **_sport_hint** L169
+- `function` **_ordered_inputs** L177
+- `function` **_repo_head** L195
+- `function` **_source_summary** L210
+- `function` **_safe_claim** L294 — Drop accidental free-form/raw fields if an adapter ever supplies one.
+- `method` **_safe_claim.clean** L298
+- `function` **_step** L312
+- `function` **_write_terminal_artifacts** L336
+- `function` **_legacy_run_slate** L582 — Run independent captures, the reconciled union, and HAR-only autonomous closure.
+- `function` **run_slate** L1023 — Run the legacy producer and then apply the HAR-only closure controller.
 
 ### `src/dcm/chat/slate_autonomous.py`
 
@@ -825,9 +851,13 @@ _No class/function symbols._
 - `function` **_load_outcomes** L222
 - `function` **_drive_research** L241 — Schedule host research; never require a board HAR.
 - `function` **_drive_settle** L289 — Settle FINAL claims when outcomes exist; defer FUTURE without a HAR ask.
-- `function` **_drive_train** L408
-- `function` **_drive_playables** L425
-- `function` **advance_autonomous_closure** L445 — Advance research → settle → train → playables with typed states.
+- `function` **_chatgpt_research_action** L410 — Describe the durable research handoff; the operator has no manual step.
+- `function` **_chatgpt_settlement_action** L442
+- `function` **_finite_number** L479
+- `function` **_training_evaluation_rows** L487 — Project only exact, settled labels with an already-produced probability.
+- `function` **_drive_train** L513
+- `function` **_drive_playables** L557
+- `function` **advance_autonomous_closure** L592 — Advance research → settle → train → playables with typed states.
 
 ### `src/dcm/chat/state.py`
 
@@ -1161,8 +1191,8 @@ _No class/function symbols._
 - `function` **_parse_explicit_result** L65
 - `function` **_compare** L74
 - `function` **build_insight_settlement** L84 — Grade one claim only when identity and settlement semantics are exact.
-- `function` **settle_insight_population** L166 — Settle every supplied claim; selected/parlay legs are not a special subset.
-- `function` **append_insight_settlements** L219 — Append immutable settlement records to the existing DCM sidecar.
+- `function` **settle_insight_population** L179 — Settle every supplied claim; selected/parlay legs are not a special subset.
+- `function` **append_insight_settlements** L232 — Append immutable settlement records to the existing DCM sidecar.
 
 ### `src/dcm/learning/outlier_patterns.py`
 
@@ -2172,10 +2202,10 @@ _No class/function symbols._
 - `class` **ResponseEnvelopeError** L16
 - `function` **_rows** L20
 - `function` **load_response** L29 — Parse either the Work response object or legacy JSONL observations.
-- `function` **_active_envelope** L93
-- `function` **_resolve_active_envelope_path** L108 — Resolve portable and legacy pointers exactly once.
-- `function` **validate_response_binding** L128 — Fail closed when an explicit response envelope targets another batch.
-- `function` **validate_failure_payload** L162
+- `function` **_active_envelope** L97
+- `function` **_resolve_active_envelope_path** L112 — Resolve portable and legacy pointers exactly once.
+- `function` **validate_response_binding** L132 — Fail closed when an explicit response envelope targets another batch.
+- `function` **validate_failure_payload** L178
 
 ### `src/dcm/research/role_epoch.py`
 
@@ -2386,17 +2416,17 @@ _No class/function symbols._
 
 ### `src/dcm/runner.py`
 
-- `function` **_finalize_archive** L140 — Always write dest/audit/. Optionally copy+commit+push a GitHub pack.
-- `function` **_synthetic_path** L218
-- `function` **_run_id** L231
-- `function` **_git_commit_sha** L235 — Best-effort git HEAD. Never writes git config. Missing git is None, not a crash.
-- `function` **_default_model_config** L255
-- `function` **_active_calibration** L266
-- `function` **run_dcm** L275
-- `method` **run_dcm._snapshot_for** L1120
-- `method` **run_dcm._resimulate_material** L1618
-- `method` **run_dcm.slim** L1809
-- `function` **main** L2382
+- `function` **_finalize_archive** L141 — Always write dest/audit/. Optionally copy+commit+push a GitHub pack.
+- `function` **_synthetic_path** L219
+- `function` **_run_id** L232
+- `function` **_git_commit_sha** L236 — Best-effort git HEAD. Never writes git config. Missing git is None, not a crash.
+- `function` **_default_model_config** L256
+- `function` **_active_calibration** L267
+- `function` **run_dcm** L276
+- `method` **run_dcm._snapshot_for** L1149
+- `method` **run_dcm._resimulate_material** L1647
+- `method` **run_dcm.slim** L1838
+- `function` **main** L2411
 
 ### `src/dcm/runtime/__init__.py`
 
@@ -2426,6 +2456,13 @@ _No class/function symbols._
 - `function` **_file_descriptor** L28
 - `function` **build_capability_manifest** L44
 - `function` **persist_capability_manifest** L104
+
+### `src/dcm/runtime/capture_authority.py`
+
+- `function` **_sha256** L20
+- `function` **build_capture_authority** L24
+- `function` **capture_gate_status** L68
+- `function` **_content_hash** L78
 
 ### `src/dcm/runtime/checkpoint.py`
 
@@ -2622,15 +2659,16 @@ _No class/function symbols._
 - `method` **RunDirector._save** L74
 - `method` **RunDirector._lease_status** L83
 - `method` **RunDirector.status** L111
-- `method` **RunDirector._next_command** L126
-- `method` **RunDirector._response_path** L138
-- `method` **RunDirector._batch_counts** L154 — Return bounded action/entity and dependent-offer counts.
-- `method` **RunDirector._batch_leagues** L173
-- `method` **RunDirector._assert_packet_scope** L184
-- `method` **RunDirector._checkpoint_batch** L189 — Load the checkpoint and its active immutable envelope, if any.
-- `method` **RunDirector._reconcile_pointer** L205 — Move only the mutable pointer back to the checkpoint authority.
-- `method` **RunDirector.step** L245
-- `method` **RunDirector.run_until_awaiting** L357
+- `method` **RunDirector._next_action** L127 — Expose the next ChatGPT/DCM action as a durable, machine-readable handoff.
+- `method` **RunDirector._next_command** L187
+- `method` **RunDirector._response_path** L199
+- `method` **RunDirector._batch_counts** L215 — Return bounded action/entity and dependent-offer counts.
+- `method` **RunDirector._batch_leagues** L249
+- `method` **RunDirector._assert_packet_scope** L260
+- `method` **RunDirector._checkpoint_batch** L265 — Load the checkpoint and its active immutable envelope, if any.
+- `method` **RunDirector._reconcile_pointer** L281 — Move only the mutable pointer back to the checkpoint authority.
+- `method` **RunDirector.step** L321
+- `method` **RunDirector.run_until_awaiting** L433
 
 ### `src/dcm/runtime/schema_root.py`
 

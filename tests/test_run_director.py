@@ -152,8 +152,8 @@ def test_dependent_offer_cap_is_recomputed_for_legacy_envelope(monkeypatch, tmp_
         RunDirector(_run(tmp_path)).run_until_awaiting()
 
 
-def test_out_of_scope_packet_fails_closed(monkeypatch, tmp_path: Path):
-    class OutOfScopeSession(FakeSession):
+def test_mixed_sport_packet_is_in_scope(monkeypatch, tmp_path: Path):
+    class MixedSportSession(FakeSession):
         def next_research_batch(self, **kwargs):
             return {
                 "batchId": "BATCH_MLB",
@@ -162,9 +162,11 @@ def test_out_of_scope_packet_fails_closed(monkeypatch, tmp_path: Path):
                 "actions": [{"context": {"league": "MLB"}}],
             }
 
-    monkeypatch.setattr("dcm.runtime.run_director.HostSession.open", lambda *a, **k: OutOfScopeSession(a[0]))
-    with pytest.raises(DirectorStateError, match="PACKET_OUT_OF_SCOPE"):
-        RunDirector(_run(tmp_path)).run_until_awaiting()
+    monkeypatch.setattr("dcm.runtime.run_director.HostSession.open", lambda *a, **k: MixedSportSession(a[0]))
+    result = RunDirector(_run(tmp_path)).run_until_awaiting()
+    assert result["phase"] == "AWAITING_RESPONSE"
+    assert result["nextAction"]["type"] == "CHATGPT_RESEARCH_RESPONSE"
+    assert result["nextAction"]["boardHarRequired"] is False
 
 
 def test_status_reads_runlock_command_from_metadata(tmp_path: Path):
