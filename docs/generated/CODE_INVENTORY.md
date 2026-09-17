@@ -2,10 +2,10 @@
 
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
-- Modules: **259**
-- Symbols: **1967**
+- Modules: **261**
+- Symbols: **1996**
 - Parse errors: **0**
-- Inventory hash: `10518726d4b202ca480bcae63561b03c1310f53b49fd2878678359ccd2c648d3`
+- Inventory hash: `78226da8cc808001a6db6bebf042478edc678c2a490de2a9cc361d7d2b616285`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -54,11 +54,12 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P7 | `src/dcm/chat/contracts.py` | 0 | 0 |
 | P7 | `src/dcm/chat/evidence_import.py` | 0 | 6 |
 | P7 | `src/dcm/chat/har_only_controller.py` | 0 | 19 |
+| P7 | `src/dcm/chat/insight_closure.py` | 0 | 12 |
 | P7 | `src/dcm/chat/report.py` | 0 | 1 |
 | P7 | `src/dcm/chat/research_bridge.py` | 0 | 7 |
-| P7 | `src/dcm/chat/session.py` | 1 | 29 |
+| P7 | `src/dcm/chat/session.py` | 1 | 34 |
 | P7 | `src/dcm/chat/slate.py` | 0 | 18 |
-| P7 | `src/dcm/chat/slate_autonomous.py` | 0 | 19 |
+| P7 | `src/dcm/chat/slate_autonomous.py` | 0 | 21 |
 | P7 | `src/dcm/chat/state.py` | 0 | 4 |
 | UNMAPPED | `src/dcm/compact.py` | 4 | 20 |
 | P0 | `src/dcm/contracts/__init__.py` | 0 | 0 |
@@ -173,6 +174,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P1 | `src/dcm/research/observation_execute_support.py` | 0 | 10 |
 | P1 | `src/dcm/research/observation_typed.py` | 0 | 7 |
 | P1 | `src/dcm/research/offer_metadata.py` | 0 | 1 |
+| P1 | `src/dcm/research/offer_revalidation.py` | 1 | 9 |
 | P1 | `src/dcm/research/os_graphs.py` | 0 | 8 |
 | P1 | `src/dcm/research/player_offer_set.py` | 1 | 6 |
 | P1 | `src/dcm/research/player_packet.py` | 0 | 13 |
@@ -764,13 +766,28 @@ _No class/function symbols._
 - `function` **_projection** L114
 - `function` **_change** L137
 - `function` **build_capture_diff** L151
-- `function` **_read_claims** L310
-- `function` **_read_claim_projections** L324 — Read only fields needed for bitemporal diffing.
-- `function` **_claim_counts** L353 — Return total claims and valid exact line/side claim count by streaming.
-- `function` **_root_action** L373
-- `function` **_capability_matrix** L389
-- `function` **_closure_state** L446
-- `function` **enhance_slate_result** L490
+- `function` **_read_claims** L316
+- `function` **_read_claim_projections** L330 — Read only fields needed for bitemporal diffing.
+- `function` **_claim_counts** L359 — Return total claims and valid exact line/side claim count by streaming.
+- `function` **_root_action** L379
+- `function` **_capability_matrix** L395
+- `function` **_closure_state** L474
+- `function` **enhance_slate_result** L525
+
+### `src/dcm/chat/insight_closure.py`
+
+- `function` **_text** L28
+- `function` **_number** L32
+- `function` **_request_ids** L42
+- `function` **_coverage_map** L64
+- `function` **build_top100_artifact** L72 — Turn the deterministic research queue into an auditable Top-100 stage.
+- `function` **build_event_worlds** L140 — Build a safe shared event context index for Insights descendants.
+- `function` **_prediction_rows** L196
+- `function` **_model_is_promoted** L216
+- `function` **_future** L227
+- `function` **_candidate_row** L242
+- `function` **evaluate_insight_selection** L255 — Consume Insights snapshots through ranking, gates, constraints, freeze.
+- `function` **refresh_insight_pipeline_files** L483 — Persist the inner consumer artifacts and return the full state.
 
 ### `src/dcm/chat/report.py`
 
@@ -804,20 +821,25 @@ _No class/function symbols._
 - `method` **HostSession.search_blueprint** L304 — Compile the sport-neutral public-search fan-out plan for this run.
 - `method` **HostSession.research_validate** L323
 - `method` **HostSession.import_evidence** L371
-- `method` **HostSession.coverage** L482
-- `method` **HostSession.record_research_failure** L535
-- `method` **HostSession.checkpoint_verify** L546
-- `method` **HostSession._persist_research_checkpoint** L556
-- `method` **HostSession._outer_slate_root** L582
-- `method` **HostSession.next_action** L586 — Return the next autonomous ChatGPT/DCM action without asking the operator.
-- `method` **HostSession.autonomous_resume** L632 — Consume ChatGPT's sealed response and continue all independent phases.
-- `method` **HostSession.forecast** L726
-- `method` **HostSession.report** L762
-- `method` **HostSession.resume** L769
-- `method` **HostSession.audit** L785
-- `method` **HostSession.archive** L790
-- `method` **HostSession.settle** L795
-- `function` **cfb_launch** L802 — Guarded CFB vertical slice. Fixture/bundle can freeze; file research returns the host loop.
+- `method` **HostSession._import_offer_revalidations** L491 — Import offer observations from a bound ChatGPT response.
+- `method` **HostSession.coverage** L520
+- `method` **HostSession.record_research_failure** L573
+- `method` **HostSession.checkpoint_verify** L584
+- `method` **HostSession._persist_research_checkpoint** L594
+- `method` **HostSession._outer_slate_root** L620
+- `method` **HostSession._insight_claims** L624
+- `method` **HostSession._refresh_autonomous_artifacts** L638 — Recompute all autonomous consumers after any imported response.
+- `method` **HostSession.next_action** L715 — Return the next autonomous ChatGPT/DCM action without asking the operator.
+- `method` **HostSession.autonomous_resume** L761 — Consume sealed ChatGPT work and run the closure loop to its boundary.
+- `method` **HostSession.autonomous_resume._seal_research_response** L780
+- `method` **HostSession.autonomous_resume._save_outcomes** L791
+- `method` **HostSession.forecast** L954
+- `method` **HostSession.report** L990
+- `method` **HostSession.resume** L997
+- `method` **HostSession.audit** L1013
+- `method` **HostSession.archive** L1018
+- `method` **HostSession.settle** L1023
+- `function` **cfb_launch** L1030 — Guarded CFB vertical slice. Fixture/bundle can freeze; file research returns the host loop.
 
 ### `src/dcm/chat/slate.py`
 
@@ -836,9 +858,9 @@ _No class/function symbols._
 - `method` **_safe_claim.clean** L299
 - `function` **_step** L313
 - `function` **_write_terminal_artifacts** L337
-- `function` **_legacy_run_slate** L583 — Run independent captures, the reconciled union, and HAR-only autonomous closure.
-- `function` **_repository_prompt** L1082
-- `function` **run_slate** L1089 — Run the legacy producer and then apply the HAR-only closure controller.
+- `function` **_legacy_run_slate** L709 — Run independent captures, the reconciled union, and HAR-only autonomous closure.
+- `function` **_repository_prompt** L1229
+- `function` **run_slate** L1236 — Run the legacy producer and then apply the HAR-only closure controller.
 
 ### `src/dcm/chat/slate_autonomous.py`
 
@@ -852,15 +874,17 @@ _No class/function symbols._
 - `function` **operator_contract** L173 — HAR-only operator contract fragment for execution receipts.
 - `function` **_phase** L216
 - `function` **_load_outcomes** L222
-- `function` **_drive_research** L241 — Schedule host research; never require a board HAR.
-- `function` **_drive_settle** L289 — Settle FINAL claims when outcomes exist; defer FUTURE without a HAR ask.
-- `function` **_chatgpt_research_action** L410 — Describe the durable research handoff; the operator has no manual step.
-- `function` **_chatgpt_settlement_action** L442
-- `function` **_finite_number** L479
-- `function` **_training_evaluation_rows** L487 — Project only exact, settled labels with an already-produced probability.
-- `function` **_drive_train** L513
-- `function` **_drive_playables** L557
-- `function` **advance_autonomous_closure** L592 — Advance research → settle → train → playables with typed states.
+- `function` **_persist_settlement_artifacts** L241 — Persist Insights settlements through the normal learning inputs.
+- `function` **_drive_research** L289 — Schedule host research; never require a board HAR.
+- `function` **_drive_settle** L337 — Settle FINAL claims when outcomes exist; defer FUTURE without a HAR ask.
+- `function` **_chatgpt_research_action** L461 — Describe the durable research handoff; the operator has no manual step.
+- `function` **_chatgpt_settlement_action** L506
+- `function` **_finite_number** L543
+- `function` **_historical_settlement_rows** L551 — Load immutable settled labels already present in this run.
+- `function` **_training_evaluation_rows** L591 — Project only exact, settled labels with an already-produced probability.
+- `function` **_drive_train** L631
+- `function` **_drive_playables** L706
+- `function` **advance_autonomous_closure** L741 — Advance research → settle → train → rank/select/freeze with typed states.
 
 ### `src/dcm/chat/state.py`
 
@@ -2005,9 +2029,9 @@ _No class/function symbols._
 - `function` **plan_insight_host_research** L114 — Create reusable EVENT/AFFILIATION/COUNTERPARTY/SUBJECT jobs.
 - `function` **_finite_line** L195
 - `function` **insights_offer_snapshots** L205 — Promote Insights claims with exact line + HIGHER/LOWER into offer-equivalent snapshots.
-- `function` **build_insight_research_graph** L296 — Build a non-offer graph for the Insights research population.
-- `method` **build_insight_research_graph.add_node** L308
-- `method` **build_insight_research_graph.add_edge** L319
+- `function` **build_insight_research_graph** L299 — Build a non-offer graph for the Insights research population.
+- `method` **build_insight_research_graph.add_node** L311
+- `method` **build_insight_research_graph.add_edge** L322
 
 ### `src/dcm/research/insight_queue.py`
 
@@ -2082,6 +2106,19 @@ _No class/function symbols._
 ### `src/dcm/research/offer_metadata.py`
 
 - `function` **recover_offer_metadata** L19 — Return HAR-backed claims, counts, and exact unresolved reasons.
+
+### `src/dcm/research/offer_revalidation.py`
+
+- `class` **OfferRevalidationError** L26 — A current-offer observation is not safe to consume.
+- `function` **_text** L30
+- `function` **_number** L34
+- `function` **_time** L44
+- `function` **_key** L55
+- `function` **_snapshot_key** L67
+- `function` **_known_by_id** L71
+- `function` **validate_offer_revalidation** L83 — Return one canonical current-offer snapshot or raise a typed error.
+- `function` **import_offer_revalidations** L177 — Validate and persist current offers without overwriting prior versions.
+- `function` **load_current_offers** L252
 
 ### `src/dcm/research/os_graphs.py`
 
@@ -2206,10 +2243,10 @@ _No class/function symbols._
 - `class` **ResponseEnvelopeError** L16
 - `function` **_rows** L20
 - `function` **load_response** L29 — Parse either the Work response object or legacy JSONL observations.
-- `function` **_active_envelope** L97
-- `function` **_resolve_active_envelope_path** L112 — Resolve portable and legacy pointers exactly once.
-- `function` **validate_response_binding** L132 — Fail closed when an explicit response envelope targets another batch.
-- `function` **validate_failure_payload** L178
+- `function` **_active_envelope** L103
+- `function` **_resolve_active_envelope_path** L118 — Resolve portable and legacy pointers exactly once.
+- `function` **validate_response_binding** L138 — Fail closed when an explicit response envelope targets another batch.
+- `function` **validate_failure_payload** L198
 
 ### `src/dcm/research/role_epoch.py`
 
@@ -2666,16 +2703,16 @@ _No class/function symbols._
 - `method` **RunDirector._lease_status** L83
 - `method` **RunDirector.status** L111
 - `method` **RunDirector._next_action** L127 — Expose the next ChatGPT/DCM action as a durable, machine-readable handoff.
-- `method` **RunDirector._next_action.append_values** L144
-- `method` **RunDirector._next_command** L204
-- `method` **RunDirector._response_path** L216
-- `method` **RunDirector._batch_counts** L232 — Return bounded action/entity and dependent-offer counts.
-- `method` **RunDirector._batch_leagues** L266
-- `method` **RunDirector._assert_packet_scope** L277
-- `method` **RunDirector._checkpoint_batch** L282 — Load the checkpoint and its active immutable envelope, if any.
-- `method` **RunDirector._reconcile_pointer** L298 — Move only the mutable pointer back to the checkpoint authority.
-- `method` **RunDirector.step** L338
-- `method` **RunDirector.run_until_awaiting** L450
+- `method` **RunDirector._next_action.append_values** L145
+- `method` **RunDirector._next_command** L222
+- `method` **RunDirector._response_path** L234
+- `method` **RunDirector._batch_counts** L250 — Return bounded action/entity and dependent-offer counts.
+- `method` **RunDirector._batch_leagues** L284
+- `method` **RunDirector._assert_packet_scope** L295
+- `method` **RunDirector._checkpoint_batch** L300 — Load the checkpoint and its active immutable envelope, if any.
+- `method` **RunDirector._reconcile_pointer** L316 — Move only the mutable pointer back to the checkpoint authority.
+- `method` **RunDirector.step** L356
+- `method` **RunDirector.run_until_awaiting** L468
 
 ### `src/dcm/runtime/schema_root.py`
 

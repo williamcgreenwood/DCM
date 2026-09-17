@@ -4,6 +4,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from dcm.chat.session import HostSession
 from dcm.chat.slate import run_slate
 from dcm.chat.slate_autonomous import (
     AUTONOMOUS_PHASE_ORDER,
@@ -163,6 +164,39 @@ def test_insights_only_slate_receipt_has_no_board_har_required_blocker(tmp_path:
     dumped = json.dumps(receipt)
     assert "Provide a current platform board" not in dumped
     assert "current board HAR" not in dumped.lower() or "do not" in dumped.lower()
+
+    # Exercise the real ChatGPT host boundary with a supplemental current
+    # offer response.  It must import without a batch and refresh the same
+    # run's selection artifacts; no replacement HAR is part of this path.
+    composite_id = json.loads((root / "run_manifest.json").read_text(encoding="utf-8"))["compositeRunId"]
+    inner = root / "composite_run" / composite_id
+    snapshot = json.loads((inner / "insights_offer_snapshots.json").read_text(encoding="utf-8"))["snapshots"][0]
+    offer_response = tmp_path / "current_offer_response.json"
+    offer_response.write_text(json.dumps({
+        "schema": "pillars_dcm.research_response.v1",
+        "offerRevalidations": [{
+            "claimId": snapshot["claimId"],
+            "projectionId": snapshot.get("projectionId"),
+            "eventId": snapshot["eventId"],
+            "subjectId": snapshot["subjectId"],
+            "proposition": snapshot["proposition"],
+            "periodLabel": snapshot.get("periodLabel") or "",
+            "line": snapshot["line"],
+            "direction": snapshot["direction"],
+            "eventStatus": "PRE_GAME",
+            "scheduledTime": snapshot.get("scheduledTime"),
+            "marketDefinitionId": "NFL_RECEPTIONS_FULL_GAME_V1",
+            "settlementRuleHash": "test-rule-hash",
+            "sourceId": "approved-current-offer",
+            "sourceUrl": "https://example.com/current-offer",
+            "sourceHash": "current-offer-hash",
+            "authority": "APPROVED_PLATFORM_SOURCE",
+            "retrievedAt": "2026-09-17T21:50:00Z",
+        }],
+    }), encoding="utf-8")
+    resumed = HostSession.open(root, workspace=tmp_path / "runtime").autonomous_resume(offer_response)
+    assert resumed["processedResponses"][0]["offerRevalidation"]["status"] == "AVAILABLE"
+    assert resumed["boardHarRequired"] is False
 
 
 def test_missing_side_still_fail_closes_and_does_not_fill_insights_offers() -> None:

@@ -58,12 +58,16 @@ def load_response(path: Path) -> dict[str, Any]:
     metadata: dict[str, Any] = {}
     failures: list[dict[str, Any]] = []
     outcomes: list[dict[str, Any]] = []
-    if isinstance(parsed, Mapping) and ("observations" in parsed or "failures" in parsed or "outcomes" in parsed or parsed.get("schema") == RESPONSE_SCHEMA):
+    offer_revalidations: list[dict[str, Any]] = []
+    if isinstance(parsed, Mapping) and ("observations" in parsed or "failures" in parsed or "outcomes" in parsed or "offerRevalidations" in parsed or "offerSnapshots" in parsed or parsed.get("schema") == RESPONSE_SCHEMA):
         if parsed.get("schema") not in (None, RESPONSE_SCHEMA):
             raise ResponseEnvelopeError(f"{ResponseEnvelopeError.code}:SCHEMA")
         observations = _rows(parsed, field="observations")
         failures = _rows(parsed, field="failures")
         outcomes = _rows(parsed, field="outcomes")
+        offer_revalidations = _rows(parsed, field="offerRevalidations")
+        if not offer_revalidations:
+            offer_revalidations = _rows(parsed, field="offerSnapshots")
         for key in ("runId", "batchId", "batchContentSha", "checkpointSha"):
             if parsed.get(key) not in (None, ""):
                 metadata[key] = str(parsed[key])
@@ -86,11 +90,13 @@ def load_response(path: Path) -> dict[str, Any]:
         "observations": observations,
         "failures": failures,
         "outcomes": outcomes,
+        "offerRevalidations": offer_revalidations,
     }
     body["responseHash"] = content_hash(body)
     body["observationCount"] = len(observations)
     body["failureCount"] = len(failures)
     body["outcomeCount"] = len(outcomes)
+    body["offerRevalidationCount"] = len(offer_revalidations)
     return body
 
 
@@ -134,17 +140,18 @@ def validate_response_binding(response: Mapping[str, Any], run_dir: Path) -> dic
     response = dict(response)
     envelope = _active_envelope(Path(run_dir))
     explicit = any(response.get(key) not in (None, "") for key in ("runId", "batchId", "batchContentSha"))
-    outcome_only = bool(response.get("outcomes")) and not response.get("observations") and not response.get("failures")
-    if response.get("schema") == RESPONSE_SCHEMA and not response.get("batchId") and not outcome_only:
+    outcome_only = bool(response.get("outcomes")) and not response.get("observations") and not response.get("failures") and not response.get("offerRevalidations")
+    offer_only = bool(response.get("offerRevalidations")) and not response.get("observations") and not response.get("failures") and not response.get("outcomes")
+    if response.get("schema") == RESPONSE_SCHEMA and not response.get("batchId") and not outcome_only and not offer_only:
         raise ResponseEnvelopeError(f"{ResponseEnvelopeError.code}:BATCH_ID_REQUIRED")
     if explicit:
-        if envelope is None and not outcome_only:
+        if envelope is None and not outcome_only and not offer_only:
             raise ResponseEnvelopeError(f"{ResponseEnvelopeError.code}:NO_ACTIVE_BATCH")
         if response.get("runId") not in (None, "", str(run_dir.name)):
             raise ResponseEnvelopeError(f"{ResponseEnvelopeError.code}:RUN_MISMATCH")
-        if str(response.get("batchId") or "") != str(envelope.get("batchId") or ""):
+        if not offer_only and str(response.get("batchId") or "") != str(envelope.get("batchId") or ""):
             raise ResponseEnvelopeError(f"{ResponseEnvelopeError.code}:BATCH_MISMATCH")
-        if response.get("batchContentSha") not in (None, "", str(envelope.get("batchContentSha") or "")):
+        if not offer_only and response.get("batchContentSha") not in (None, "", str(envelope.get("batchContentSha") or "")):
             raise ResponseEnvelopeError(f"{ResponseEnvelopeError.code}:BATCH_CONTENT_MISMATCH")
     observation_mismatches: list[str] = []
     for index, observation in enumerate(response.get("observations") or []):
@@ -170,7 +177,20 @@ def validate_response_binding(response: Mapping[str, Any], run_dir: Path) -> dic
             outcome_mismatches.append(f"{index}:batch")
     if outcome_mismatches:
         raise ResponseEnvelopeError(f"{ResponseEnvelopeError.code}:OUTCOME_BINDING:{','.join(outcome_mismatches[:20])}")
-    response["bindingStatus"] = "BOUND" if explicit else "OUTCOME_ONLY" if outcome_only else "LEGACY_UNBOUND_COMPATIBILITY"
+    offer_mismatches: list[str] = []
+    for index, offer in enumerate(response.get("offerRevalidations") or []):
+        if not isinstance(offer, Mapping):
+            offer_mismatches.append(str(index))
+            continue
+        if offer.get("runId") not in (None, "", str(run_dir.name)):
+            offer_mismatches.append(f"{index}:run")
+        if envelope is not None and offer.get("batchId") not in (None, "", str(envelope.get("batchId") or "")):
+            offer_mismatches.append(f"{index}:batch")
+        if envelope is not None and offer.get("batchContentSha") not in (None, "", str(envelope.get("batchContentSha") or "")):
+            offer_mismatches.append(f"{index}:content")
+    if offer_mismatches:
+        raise ResponseEnvelopeError(f"{ResponseEnvelopeError.code}:OFFER_BINDING:{','.join(offer_mismatches[:20])}")
+    response["bindingStatus"] = "BOUND" if explicit and not offer_only else "OFFER_ONLY" if offer_only else "OUTCOME_ONLY" if outcome_only else "LEGACY_UNBOUND_COMPATIBILITY"
     response["boundBatchId"] = str(envelope.get("batchId")) if envelope else None
     return response
 
