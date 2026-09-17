@@ -321,6 +321,55 @@ def _read_claims(path: Path) -> list[dict[str, Any]]:
     return rows
 
 
+def _read_claim_projections(path: Path) -> list[dict[str, Any]]:
+    """Read only fields needed for bitemporal diffing.
+
+    Full Insights claims contain repeated identity/context payloads. The diff
+    ledger only needs canonical-key and change fields, so retaining those
+    payloads for every source while the union is finalized is unnecessary
+    memory pressure on large multi-HAR drops.
+    """
+    if not path.is_file():
+        return []
+    fields = (
+        "claimId", "claimHash", "insightId", "leagueId", "league", "eventId",
+        "event", "subjectId", "playerId", "teamId", "player", "marketId",
+        "proposition", "marketType", "periodLabel", "modifier", "line",
+        "direction", "side", "eventStatus", "sourceBodyHash", "sourceHarSha256",
+    )
+    rows: list[dict[str, Any]] = []
+    with path.open(encoding="utf-8") as handle:
+        for line in handle:
+            try:
+                value = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if not isinstance(value, dict):
+                continue
+            rows.append({key: value[key] for key in fields if key in value})
+    return rows
+
+
+def _claim_counts(path: Path) -> tuple[int, int]:
+    """Return total claims and valid exact line/side claim count by streaming."""
+    if not path.is_file():
+        return 0, 0
+    total = 0
+    line_side = 0
+    with path.open(encoding="utf-8") as handle:
+        for line in handle:
+            try:
+                value = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if not isinstance(value, dict):
+                continue
+            total += 1
+            if value.get("line") is not None and str(value.get("direction") or "").upper() in {"HIGHER", "LOWER"}:
+                line_side += 1
+    return total, line_side
+
+
 def _root_action(action: Mapping[str, Any], root: Path, composite: Path | None) -> dict[str, Any]:
     body = dict(action)
     body["operatorInputRequired"] = False
@@ -461,17 +510,34 @@ def enhance_slate_result(root: Path, inputs: Iterable[Path], result: Mapping[str
     claims_by_source: list[list[dict[str, Any]]] = []
     for row in raw_sources:
         run_id = str(row.get("runId") or "")
-        claims_by_source.append(_read_claims(root / "source_runs" / run_id / "insights_claims.jsonl"))
+        claims_by_source.append(_read_claim_projections(root / "source_runs" / run_id / "insights_claims.jsonl"))
     unique_hashes = sorted({str(row.get("sha256") or "") for row in raw_sources if row.get("sha256")})
-    canonical_claims = _read_claims(root / "composite_run" / str((read_json(root / "run_manifest.json") or {}).get("compositeRunId") or "") / "insights_claims.jsonl")
-    if not canonical_claims:
-        canonical_claims = _read_claims(root / "canonical_claims.jsonl")
-    board = read_json(root / "composite_run" / str((read_json(root / "run_manifest.json") or {}).get("compositeRunId") or "") / "board.json") or {}
+    manifest = read_json(root / "run_manifest.json") or {}
+    composite_id = str(manifest.get("compositeRunId") or "")
+    composite_root = root / "composite_run" / composite_id
+    canonical_path = composite_root / "insights_claims.jsonl"
+    if not canonical_path.is_file():
+        canonical_path = root / "canonical_claims.jsonl"
+    canonical_claim_count, insight_count = _claim_counts(canonical_path)
+    # Keep a small fallback list only when the canonical stream is absent; the
+    # normal path uses counts and queue rows, not a second full claim copy.
+    canonical_claims: list[dict[str, Any]] = []
+    board = read_json(composite_root / "board.json") or {}
     board_count = len(board.get("rows") or []) if isinstance(board, dict) else int(result.get("boardOfferCount") or 0)
-    queue = read_json(root / "composite_run" / str((read_json(root / "run_manifest.json") or {}).get("compositeRunId") or "") / "insights_research_queue.json") or {}
+    queue = read_json(composite_root / "insights_research_queue.json") or {}
     coverage = read_json(root / "composite_run" / str((read_json(root / "run_manifest.json") or {}).get("compositeRunId") or "") / "evidence_coverage.json") or {}
-    if not canonical_claims:
+    if canonical_claim_count == 0:
         canonical_claims = [dict(row) for row in (queue.get("top100") or []) if isinstance(row, Mapping)]
+        canonical_claim_count = len(canonical_claims)
+        insight_count = sum(
+            1 for row in canonical_claims
+            if row.get("line") is not None and str(row.get("direction") or "").upper() in {"HIGHER", "LOWER"}
+        )
+    elif not canonical_claims:
+        # Downstream closure/capability code needs only a non-empty population
+        # and its cardinality here; the full canonical stream remains on disk
+        # and has already been consumed by the legacy terminal artifact pass.
+        canonical_claims = [{} for _ in range(canonical_claim_count)]
     diff = build_capture_diff(raw_sources, claims_by_source)
     _write(root / "har_census.json", {**census, "sourceCount": len(raw_sources), "sources": raw_sources, "union": {**(census.get("union") or {}), "sourceHarSha256s": unique_hashes, "canonicalClaimCount": len(canonical_claims), "boardOfferCount": board_count}, "contentHash": None})
     census = read_json(root / "har_census.json") or {}
@@ -505,7 +571,6 @@ def enhance_slate_result(root: Path, inputs: Iterable[Path], result: Mapping[str
     top25_path = root / "top25.json"
     top25 = read_json(top25_path) or {}
     rows = [dict(row) for row in (top25.get("rows") or []) if isinstance(row, Mapping)]
-    insight_count = len([row for row in canonical_claims if row.get("line") is not None and str(row.get("direction") or "").upper() in {"HIGHER", "LOWER"}])
     for row in rows:
         # Only reclassify the Insights-only branch. A board-backed row must
         # remain available to the real model/ranking/selection consumers.
@@ -585,7 +650,7 @@ def enhance_slate_result(root: Path, inputs: Iterable[Path], result: Mapping[str
     _write(root / "closure_state.json", closure)
     output = dict(result)
     model_state = autonomous.get("model") if isinstance(autonomous.get("model"), Mapping) else {}
-    output.update({"sourceCount": len(raw_sources), "sources": raw_sources, "canonicalClaimCount": len(canonical_claims), "boardOfferCount": board_count, "insightsOfferCount": insight_count, "productionSelectionPermitted": selection_permitted, "probabilityStatus": "NONE" if not selection_permitted else "AVAILABLE", "modelPathAttempted": bool(model_state.get("modelPathAttempted")), "autonomous": True, "nextAction": action, "captureAuthority": capture_authority, "closureState": closure, "captureDiff": str(root / "capture_diff.json")})
+    output.update({"sourceCount": len(raw_sources), "sources": raw_sources, "canonicalClaimCount": canonical_claim_count, "boardOfferCount": board_count, "insightsOfferCount": insight_count, "productionSelectionPermitted": selection_permitted, "probabilityStatus": "NONE" if not selection_permitted else "AVAILABLE", "modelPathAttempted": bool(model_state.get("modelPathAttempted")), "autonomous": True, "nextAction": action, "captureAuthority": capture_authority, "closureState": closure, "captureDiff": str(root / "capture_diff.json")})
     output["contentHash"] = content_hash({key: value for key, value in output.items() if key != "contentHash"})
     return output
 
