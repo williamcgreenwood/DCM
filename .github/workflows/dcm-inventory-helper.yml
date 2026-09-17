@@ -1,0 +1,28 @@
+name: DCM inventory artifact helper
+
+on:
+  push:
+    branches:
+      - feat/har-only-autonomous-controller-20260917
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Generate inventory
+        run: python scripts/build_code_inventory.py --write
+      - name: Upload generated inventory
+        uses: actions/upload-artifact@v4
+        with:
+          name: dcm-generated-inventory
+          path: |
+            docs/generated/CODE_INVENTORY.json
+            docs/generated/CODE_INVENTORY.md
