@@ -27,6 +27,7 @@ from dcm.chat.slate_autonomous import (
     receipt_requires_board_har,
 )
 from dcm.chat.state import read_json
+from dcm.chat.har_only_controller import enhance_slate_result, internal_order
 from dcm.contracts.hashes import content_hash
 from dcm.ingest.insights import merge_insight_claims
 from dcm.research.insight_bridge import insights_offer_snapshots
@@ -578,7 +579,7 @@ def _write_terminal_artifacts(
     return paths
 
 
-def run_slate(
+def _legacy_run_slate(
     *,
     inputs: Iterable[Path],
     run_root: Path,
@@ -1017,6 +1018,36 @@ def run_slate(
         "runManifest": str(root / "run_manifest.json"),
         "contentHash": manifest["contentHash"],
     }
+
+
+def run_slate(
+    *,
+    inputs: Iterable[Path],
+    run_root: Path,
+    prompt: Path,
+    cutoff: str | None = None,
+    cutoff_from_capture: bool = False,
+    workspace: Path,
+    research_shadow: bool = True,
+    observations: Path | None = None,
+    autonomous: bool = True,
+    outcomes: Path | None = None,
+) -> dict[str, Any]:
+    """Run the legacy producer and then apply the HAR-only closure controller."""
+    ordered = internal_order(inputs)
+    result = _legacy_run_slate(
+        inputs=ordered,
+        run_root=run_root,
+        prompt=prompt,
+        cutoff=cutoff,
+        cutoff_from_capture=cutoff_from_capture,
+        workspace=workspace,
+        research_shadow=research_shadow,
+        observations=observations,
+        autonomous=autonomous,
+        outcomes=outcomes,
+    )
+    return enhance_slate_result(Path(run_root), ordered, result)
 
 
 __all__ = ["EXECUTION_RECEIPT_SCHEMA", "SLATE_SCHEMA", "SLATE_VERSION", "run_slate"]
