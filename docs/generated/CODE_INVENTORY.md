@@ -5,7 +5,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 - Modules: **259**
 - Symbols: **1960**
 - Parse errors: **0**
-- Inventory hash: `df9bd7ad0536379f25446d576ec96993b3ebed6239058af59ca34fa17e85bf23`
+- Inventory hash: `bc458a0b91a7d8d3dc806e0eaf3313ef458d5c55b647b6609539f4074ed6ce8d`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -2663,12 +2663,12 @@ _No class/function symbols._
 - `method` **RunDirector._next_command** L187
 - `method` **RunDirector._response_path** L199
 - `method` **RunDirector._batch_counts** L215 — Return bounded action/entity and dependent-offer counts.
-- `method` **RunDirector._batch_leagues** L244
-- `method` **RunDirector._assert_packet_scope** L255
-- `method` **RunDirector._checkpoint_batch** L260 — Load the checkpoint and its active immutable envelope, if any.
-- `method` **RunDirector._reconcile_pointer** L276 — Move only the mutable pointer back to the checkpoint authority.
-- `method` **RunDirector.step** L316
-- `method` **RunDirector.run_until_awaiting** L428
+- `method` **RunDirector._batch_leagues** L249
+- `method` **RunDirector._assert_packet_scope** L260
+- `method` **RunDirector._checkpoint_batch** L265 — Load the checkpoint and its active immutable envelope, if any.
+- `method` **RunDirector._reconcile_pointer** L281 — Move only the mutable pointer back to the checkpoint authority.
+- `method` **RunDirector.step** L321
+- `method` **RunDirector.run_until_awaiting** L433
 
 ### `src/dcm/runtime/schema_root.py`
 
