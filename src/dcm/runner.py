@@ -11,6 +11,7 @@ Live web research is FileProvider after the operator writes evidence/.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import statistics
 import subprocess
@@ -32,7 +33,7 @@ from dcm.contracts.hashes import content_hash
 from dcm.exclusions import permanent_subject_exclusion
 from dcm.identity.resolve import build_player_index, freeze_map, resolve_row
 from dcm.ingest.board import freeze_board, write_board
-from dcm.ingest.composite import compose_ingests
+from dcm.ingest.composite import compose_ingest_stream
 from dcm.ingest.har import ingest_har
 from dcm.model.distributions import from_worlds
 from dcm.model.explanation import (
@@ -233,6 +234,29 @@ def _run_id(har_sha: str, cutoff: str) -> str:
     return "RUN_" + content_hash({"har": har_sha, "cutoff": cutoff, "sw": SOFTWARE})[:16]
 
 
+def _har_capture_sort_key(path: Path) -> tuple[datetime, str]:
+    """Return the deterministic internal-HAR ordering key without ingesting it."""
+    values: list[datetime] = []
+    try:
+        payload = json.loads(Path(path).read_text(encoding="utf-8"))
+        entries = ((payload.get("log") or {}).get("entries") or []) if isinstance(payload, dict) else []
+        for entry in entries:
+            if not isinstance(entry, dict):
+                continue
+            raw = str(entry.get("startedDateTime") or "")
+            if not raw:
+                continue
+            try:
+                parsed = datetime.fromisoformat(raw.replace("Z", "+00:00"))
+            except ValueError:
+                continue
+            values.append(parsed if parsed.tzinfo else parsed.replace(tzinfo=timezone.utc))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError, AttributeError):
+        values = []
+    capture_end = max(values).astimezone(timezone.utc) if values else datetime.min.replace(tzinfo=timezone.utc)
+    return capture_end, hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
 def _git_commit_sha(workspace: Path) -> str | None:
     """Best-effort git HEAD. Never writes git config. Missing git is None, not a crash."""
     try:
@@ -390,17 +414,25 @@ def run_dcm(
             raw = json.loads(SYNTHETIC.read_text(encoding="utf-8"))
             raw_bytes = SYNTHETIC.read_bytes()
             input_boundary_records.append(inspect_input_boundary(SYNTHETIC, raw_bytes=raw_bytes))
-            ingests = [ingest_har(raw, raw_bytes=raw_bytes)]
+            ingest = ingest_har(raw, raw_bytes=raw_bytes)
         else:
             sources = list(input_paths or ([] if input_path is None else [input_path]))
             if not sources or any(not p.is_file() for p in sources):
                 raise FileNotFoundError("HAR missing. Pass one or more --input values or --synthetic.")
-            ingests = []
-            for source in sources:
-                raw_bytes = source.read_bytes()
-                input_boundary_records.append(inspect_input_boundary(source, raw_bytes=raw_bytes))
-                ingests.append(ingest_har(raw_bytes, raw_bytes=raw_bytes))
-        ingest = compose_ingests(ingests) if len(ingests) > 1 else ingests[0]
+            # A multi-HAR capture can contain tens of thousands of typed
+            # Insights claims.  Parse and compose one source at a time so the
+            # runner does not retain every full parsed HAR plus the composite
+            # at once.  The ordering key is derived from internal HAR entry
+            # times; filenames are never used as capture timestamps.
+            ordered_sources = sorted(sources, key=_har_capture_sort_key)
+
+            def _ingest_stream():
+                for source in ordered_sources:
+                    raw_bytes = source.read_bytes()
+                    input_boundary_records.append(inspect_input_boundary(source, raw_bytes=raw_bytes))
+                    yield ingest_har(raw_bytes, raw_bytes=raw_bytes)
+
+            ingest = compose_ingest_stream(_ingest_stream()) if len(sources) > 1 else next(_ingest_stream())
         # The HAR's own provenance marker is authoritative for fixture versus
         # captured execution.  Tests and callers may select a fixture research
         # provider without passing --synthetic; never run live-only recovery
