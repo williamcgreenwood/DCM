@@ -2,7 +2,8 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from typing import Any
+from itertools import chain
+from typing import Any, Iterable
 
 from dcm.contracts.hashes import content_hash
 from dcm.ingest.insights import merge_insight_claims
@@ -330,3 +331,212 @@ def compose_ingests(ingests: list[dict[str, Any]]) -> dict[str, Any]:
         "synthetic": any(bool(i.get("synthetic")) for i in captures),
         "v5Decoder": "NOT_MOUNTED",
     }
+
+
+def compose_ingest_stream(ingests: Iterable[dict[str, Any]]) -> dict[str, Any]:
+    """Compose already chronologically ordered ingests without retaining inputs.
+
+    ``run_dcm`` can receive a large multi-HAR drop.  Materializing every
+    parsed HAR before composing it duplicates the full Insights claim stream
+    in memory and can terminate the host before the composite run is written.
+    This variant consumes one parsed ingest at a time while retaining only the
+    reconciled board state, immutable scope attempts, redacted structural
+    receipts, and one deduplicated canonical Insights claim per snapshot.
+
+    The caller must order the stream by the same ``captureEnd`` then
+    ``harSha256`` key used by :func:`compose_ingests`.
+    """
+    iterator = iter(ingests)
+    try:
+        first = next(iterator)
+    except StopIteration as exc:
+        raise ValueError("NO_HAR_CAPTURES") from exc
+    try:
+        second = next(iterator)
+    except StopIteration:
+        return dict(first)
+
+    cumulative: list[dict[str, Any]] = []
+    previous: dict[str, dict[str, Any]] = {}
+    lifecycle: list[dict[str, Any]] = []
+    merged_history: dict[str, list[dict[str, Any]]] = {}
+    source_hashes: list[str] = []
+    warnings: set[str] = set()
+    index_stats: dict[str, int] = {}
+    evidence_payloads: list[dict[str, Any]] = []
+    insight_by_key: dict[str, dict[str, Any]] = {}
+    insight_by_id: dict[str, set[str]] = {}
+    exact_duplicates = 0
+    capture_count = 0
+    redacted_secrets = 0
+    capture_starts: list[str] = []
+    capture_ends: list[str] = []
+    any_synthetic = False
+
+    for capture in chain((first, second), iterator):
+        capture_count += 1
+        source_hash = str(capture.get("harSha256") or "")
+        source_hashes.append(source_hash)
+        if capture.get("captureStart"):
+            capture_starts.append(str(capture["captureStart"]))
+        if capture.get("captureEnd"):
+            capture_ends.append(str(capture["captureEnd"]))
+        redacted_secrets += int(capture.get("redactedSecrets") or 0)
+        warnings.update(str(value) for value in (capture.get("warnings") or []) if str(value))
+        any_synthetic = any_synthetic or bool(capture.get("synthetic"))
+
+        for key, value in (capture.get("indexStats") or {}).items():
+            if isinstance(value, int):
+                index_stats[key] = index_stats.get(key, 0) + value
+
+        capture_attempts = [dict(a) for a in (capture.get("scopeAttempts") or [])]
+        cumulative.extend(capture_attempts)
+        for pid, history in (capture.get("rowHistory") or {}).items():
+            merged_history.setdefault(str(pid), []).extend(
+                dict(item) for item in history if isinstance(item, dict)
+            )
+
+        current_result = reconcile_scope_attempts(cumulative)
+        current = {
+            str(row["projectionId"]): row for row in current_result["rows"]
+        }
+        successful_scopes = {
+            str(attempt.get("requestScope"))
+            for attempt in capture_attempts
+            if str(attempt.get("state")) in SUCCESS_STATES
+        }
+        failed_scopes = {
+            str(attempt.get("requestScope"))
+            for attempt in capture_attempts
+            if str(attempt.get("state")) in FAILURE_STATES
+        }
+        for projection_id in sorted(set(previous) | set(current)):
+            old, new = previous.get(projection_id), current.get(projection_id)
+            if old is None and new is not None:
+                states = ["ADDED"]
+            elif old is not None and new is None:
+                states = (
+                    ["REMOVED_BY_IDENTICAL_SCOPE_REFRESH"]
+                    if str(old.get("requestScope")) in successful_scopes
+                    else ["AMBIGUOUS_SCOPE_GAP"]
+                )
+            elif old is not None and new is not None:
+                scope = str(new.get("requestScope") or old.get("requestScope") or "")
+                if _row_key(old) == _row_key(new):
+                    if scope in failed_scopes and scope not in successful_scopes:
+                        states = ["FAILED_REFRESH_PRIOR_RETAINED"]
+                    elif scope not in successful_scopes:
+                        states = ["SCOPE_NOT_RECAPTURED_RETAINED"]
+                    else:
+                        states = ["REFRESHED_UNCHANGED"]
+                else:
+                    states = _changed_states(old, new)
+            else:
+                continue
+            lifecycle.append(
+                {
+                    "captureSequence": capture_count,
+                    "sourceHarSha256": source_hash,
+                    "projectionId": projection_id,
+                    "states": states,
+                    "previousLine": old.get("line") if old else None,
+                    "currentLine": new.get("line") if new else None,
+                    "requestScope": (new or old).get("requestScope") if (new or old) else "",
+                }
+            )
+        previous = current
+
+        for claim in (capture.get("insightClaims") or []):
+            if not isinstance(claim, dict):
+                continue
+            key = str(claim.get("claimId") or claim.get("claimHash") or content_hash(claim))
+            if key in insight_by_key:
+                exact_duplicates += 1
+            insight_by_key.setdefault(key, dict(claim))
+            insight_id = str(claim.get("insightId") or "")
+            if insight_id:
+                insight_by_id.setdefault(insight_id, set()).add(key)
+
+        for payload in capture.get("evidencePayloads") or []:
+            if isinstance(payload, dict):
+                evidence_payloads.append({**dict(payload), "sourceHarSha256": source_hash})
+
+    final = reconcile_scope_attempts(cumulative)
+    insight_claims = [insight_by_key[key] for key in sorted(insight_by_key)]
+    insight_accounting = {
+        "schema": "pillars_dcm.outlier_insight_composite_accounting.v1",
+        "typedClaimCount": len(insight_claims),
+        "uniqueInsightIds": len(insight_by_id),
+        "exactDuplicateSnapshotsRemoved": exact_duplicates,
+        "changedInsightIds": sum(1 for keys in insight_by_id.values() if len(keys) > 1),
+        "paginationComplete": all(bool(claim.get("paginationComplete")) for claim in insight_claims),
+        "contentHash": content_hash(insight_claims),
+    }
+    for history in merged_history.values():
+        history.sort(
+            key=lambda row: (
+                str(row.get("sourceSnapshotTime") or ""),
+                str(row.get("sourceUpdatedAt") or ""),
+                str(row.get("sourceBodyHash") or ""),
+            )
+        )
+    source_hashes = sorted(source_hashes)
+    evidence_payloads.sort(
+        key=lambda payload: (
+            str(payload.get("startedDateTime") or ""),
+            str(payload.get("sourceHarSha256") or ""),
+            str(payload.get("requestScope") or ""),
+            str(payload.get("responseHash") or ""),
+            str(payload.get("kind") or ""),
+        )
+    )
+    index_stats.update(
+        {
+            "capture_count": capture_count,
+            "composite_scope_count": len(final["scopeState"]),
+            "failed_refreshes_retained": len(final["failedRefreshes"]),
+            "unique_projection_ids": len(final["rows"]),
+            "evidence_payload_count": len(evidence_payloads),
+            "insights_payload_count": sum(
+                1
+                for payload in evidence_payloads
+                if str(payload.get("kind") or "").upper() == "INSIGHTS"
+            ),
+            "insights_typed_claims": len(insight_claims),
+            "insights_unique_ids": int(insight_accounting["uniqueInsightIds"]),
+            "insights_changed_ids": int(insight_accounting["changedInsightIds"]),
+            "insights_pagination_incomplete": sum(
+                1 for claim in insight_claims if not bool(claim.get("paginationComplete"))
+            ),
+        }
+    )
+    composite_id = content_hash(
+        {"sourceHarSha256s": source_hashes, "reconciliationHash": final["reconciliationHash"]}
+    )
+    return {
+        "adapter": "MULTI_HAR_COMPOSITE",
+        "parserVersion": "HAR_COMPOSITE_V1_2026-08-29",
+        "harSha256": composite_id,
+        "compositeCaptureId": composite_id,
+        "contributingHarSha256s": source_hashes,
+        "rows": final["rows"],
+        "rowHistory": merged_history,
+        "scopeAttempts": sorted(cumulative, key=_attempt_key),
+        "scopeState": final["scopeState"],
+        "failedRefreshes": final["failedRefreshes"],
+        "reconciliationHash": final["reconciliationHash"],
+        "timeline": lifecycle,
+        "redactedSecrets": redacted_secrets,
+        "warnings": sorted(warnings),
+        "evidencePayloads": evidence_payloads,
+        "insightClaims": insight_claims,
+        "insightAccounting": insight_accounting,
+        "indexStats": index_stats,
+        "captureStart": min(capture_starts, default=""),
+        "captureEnd": max(capture_ends, default=""),
+        "synthetic": any_synthetic,
+        "v5Decoder": "NOT_MOUNTED",
+    }
+
+
+__all__ = ["compose_ingests", "compose_ingest_stream", "reconcile_scope_attempts"]
