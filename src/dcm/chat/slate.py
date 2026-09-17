@@ -602,6 +602,10 @@ def _legacy_run_slate(
     root.mkdir(parents=True, exist_ok=True)
     boundaries = {str(path.resolve()): inspect_input_boundary(path) for path in ordered}
     source_records: list[dict[str, Any]] = []
+    # Keep only counts while the composite runner is ingesting the same
+    # captures. Retaining every full source claim list here duplicates the
+    # multi-HAR Insights stream and can prevent final receipt creation.
+    source_claim_counts: list[int] = []
     source_claim_lists: list[list[dict[str, Any]]] = []
     successful_sources: list[Path] = []
 
@@ -618,7 +622,9 @@ def _legacy_run_slate(
                 research_shadow=research_shadow,
             )
             successful_sources.append(path)
-            source_claim_lists.append(_read_jsonl(session.dest / "insights_claims.jsonl"))
+            source_claim_counts.append(
+                int((read_json(session.dest / "input_manifest.json") or {}).get("insightsClaimCount") or 0)
+            )
         except Exception as exc:  # noqa: BLE001 — continue accounting for remaining captures
             error = _safe_error(exc)
         source_records.append(
@@ -644,7 +650,21 @@ def _legacy_run_slate(
 
     source_hashes = [str(row.get("sha256") or "") for row in source_records if row.get("sha256")]
     union_hashes = [str(row.get("sha256") or "") for row in source_records if row.get("runId") and row.get("sha256")]
-    merged_claims, merged_accounting = merge_insight_claims(source_claim_lists) if source_claim_lists else ([], {})
+    merged_claims: list[dict[str, Any]] = []
+    merged_accounting: dict[str, Any] = {}
+    if composite_session is None and source_records:
+        # Only materialize a full fallback merge when the canonical composite
+        # failed. A successful composite must not retain both representations.
+        source_claim_lists = [
+            _read_jsonl(
+                root / "source_runs" / str(row.get("runId") or "") / "insights_claims.jsonl"
+            )
+            for row in source_records
+            if row.get("runId")
+        ]
+        merged_claims, merged_accounting = (
+            merge_insight_claims(source_claim_lists) if source_claim_lists else ([], {})
+        )
     queue: dict[str, Any] = {}
     board_offer_count = 0
     composite_summary: dict[str, Any] = {
@@ -677,7 +697,22 @@ def _legacy_run_slate(
 
         steps.append(_step("INDEX", composite_session.index_build))
         steps.append(_step("SEARCH_BLUEPRINT", composite_session.search_blueprint))
-        steps.append(_step("RESEARCH_QUEUE", lambda: composite_session.next_research_batch(max_entities=25)))
+        # The durable autonomous director deliberately owns a small, bounded
+        # host packet (8 reusable entities / 250 dependent board offers).  Do
+        # not create a larger compatibility batch here and then hand it to the
+        # director: that leaves an active 25-item packet which the director
+        # correctly rejects as over-budget before ChatGPT can receive it.
+        # Top-100 remains the full research-priority artifact; this is only the
+        # first executable packet in the autonomous loop.
+        steps.append(
+            _step(
+                "RESEARCH_QUEUE",
+                lambda: composite_session.next_research_batch(
+                    max_entities=8,
+                    max_dependent_offers=250,
+                ),
+            )
+        )
         steps.append(_step("COVERAGE", lambda: composite_session.coverage(select_next=False)))
         steps.append(_step("CHECKPOINT_VERIFY", composite_session.checkpoint_verify))
         coverage = read_json(composite_session.dest / "evidence_coverage.json") or {}
@@ -702,6 +737,25 @@ def _legacy_run_slate(
     canonical_claims = [_safe_claim(row) for row in canonical_claims]
     if not canonical_claims and merged_claims:
         canonical_claims = [_safe_claim(row) for row in merged_claims]
+    if composite_session is not None:
+        insight_ids: dict[str, set[str]] = {}
+        for claim in canonical_claims:
+            insight_id = str(claim.get("insightId") or "")
+            if insight_id:
+                insight_ids.setdefault(insight_id, set()).add(
+                    str(claim.get("claimId") or claim.get("claimHash") or content_hash(claim))
+                )
+        merged_accounting = {
+            "schema": "pillars_dcm.outlier_insight_composite_accounting.v1",
+            "typedClaimCount": len(canonical_claims),
+            "uniqueInsightIds": len(insight_ids),
+            "exactDuplicateSnapshotsRemoved": max(
+                0, sum(source_claim_counts) - len(canonical_claims)
+            ),
+            "changedInsightIds": sum(1 for keys in insight_ids.values() if len(keys) > 1),
+            "paginationComplete": all(bool(claim.get("paginationComplete")) for claim in canonical_claims),
+            "contentHash": content_hash(canonical_claims),
+        }
     if composite_session is not None and not coverage:
         coverage = read_json(composite_session.dest / "evidence_coverage.json") or {}
     if not isinstance(coverage, dict):
@@ -764,10 +818,14 @@ def _legacy_run_slate(
             "runId": composite_session.dest.name if composite_session else None,
             "sourceHarSha256s": sorted(union_hashes),
             "canonicalClaimCount": len(canonical_claims),
-            "sourceClaimCountSum": sum(len(rows) for rows in source_claim_lists),
+            "sourceClaimCountSum": (
+                sum(source_claim_counts)
+                if composite_session
+                else sum(len(rows) for rows in source_claim_lists)
+            ),
             "changedOrDuplicateAccounting": merged_accounting,
             "boardOfferCount": int(board_offer_count),
-            "reconciliationState": "RECONCILED" if composite_session and set(str(row.get("claimId") or "") for row in canonical_claims) == set(str(row.get("claimId") or "") for row in merged_claims) else "UNION_FALLBACK_OR_FAILED",
+            "reconciliationState": "RECONCILED" if composite_session else "UNION_FALLBACK_OR_FAILED",
         },
         "privacy": dict(_PRIVACY),
         "contentHash": None,
