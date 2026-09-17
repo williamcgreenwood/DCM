@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 from dcm.ingest.board import rows_as_of
-from dcm.ingest.composite import compose_ingests
+from dcm.ingest.composite import compose_ingest_stream, compose_ingests
 from dcm.ingest.har import canonical_request_scope, ingest_har
+from dcm.runner import _har_capture_sort_key
 
 
 def _row(pid: str, line: float = 10.5) -> dict:
@@ -100,6 +102,52 @@ def test_complementary_hars_union_and_reverse_input_order_is_invariant():
     assert ab["harSha256"] == ba["harSha256"]
     assert ab["reconciliationHash"] == ba["reconciliationHash"]
     assert ab["rows"] == ba["rows"]
+
+
+def test_streamed_composition_matches_materialized_composition():
+    a = _ing(
+        _har(
+            url="https://api.prizepicks.com/projections?page=1",
+            at="2026-08-28T10:00:00Z",
+            rows=[_row("p1")],
+        )
+    )
+    b = _ing(
+        _har(
+            url="https://api.prizepicks.com/projections?page=2",
+            at="2026-08-28T11:00:00Z",
+            rows=[_row("p2")],
+        )
+    )
+    expected = compose_ingests([a, b])
+    actual = compose_ingest_stream(iter([a, b]))
+    assert actual["harSha256"] == expected["harSha256"]
+    assert actual["reconciliationHash"] == expected["reconciliationHash"]
+    assert actual["rows"] == expected["rows"]
+    assert actual["scopeAttempts"] == expected["scopeAttempts"]
+    assert actual["timeline"] == expected["timeline"]
+
+
+def test_streamed_insight_merge_matches_materialized_merge():
+    a = _ing(_har(url="https://api.example.test/sportsdata/NFL/insights", at="2026-08-28T10:00:00Z", body={"insights": []}))
+    b = _ing(_har(url="https://api.example.test/sportsdata/NFL/insights", at="2026-08-28T11:00:00Z", body={"insights": []}))
+    a["insightClaims"] = [{"claimId": "c1", "insightId": "i1", "claimHash": "h1"}]
+    b["insightClaims"] = [
+        {"claimId": "c1", "insightId": "i1", "claimHash": "h1"},
+        {"claimId": "c2", "insightId": "i1", "claimHash": "h2"},
+    ]
+    expected = compose_ingests([a, b])
+    actual = compose_ingest_stream(iter([a, b]))
+    assert actual["insightClaims"] == expected["insightClaims"]
+    assert actual["insightAccounting"] == expected["insightAccounting"]
+
+
+def test_har_capture_sort_key_uses_internal_entry_time_not_filename(tmp_path: Path):
+    earlier = tmp_path / "999-later-name.har"
+    later = tmp_path / "000-earlier-name.har"
+    earlier.write_text(json.dumps(_har(url="https://api.example.test/a", at="2026-08-28T10:00:00Z")), encoding="utf-8")
+    later.write_text(json.dumps(_har(url="https://api.example.test/b", at="2026-08-28T11:00:00Z")), encoding="utf-8")
+    assert sorted([later, earlier], key=_har_capture_sort_key) == [earlier, later]
 
 
 def test_composite_preserves_structural_evidence_payloads_order_independently():
