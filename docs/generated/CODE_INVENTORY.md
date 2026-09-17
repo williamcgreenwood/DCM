@@ -3,9 +3,9 @@
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
 - Modules: **259**
-- Symbols: **1962**
+- Symbols: **1967**
 - Parse errors: **0**
-- Inventory hash: `ca2351dc83c2481b8c2068d5fd2f118b9a03e65097e05183387f90664e6209a4`
+- Inventory hash: `10518726d4b202ca480bcae63561b03c1310f53b49fd2878678359ccd2c648d3`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -53,7 +53,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P7 | `src/dcm/chat/cli.py` | 0 | 4 |
 | P7 | `src/dcm/chat/contracts.py` | 0 | 0 |
 | P7 | `src/dcm/chat/evidence_import.py` | 0 | 6 |
-| P7 | `src/dcm/chat/har_only_controller.py` | 0 | 17 |
+| P7 | `src/dcm/chat/har_only_controller.py` | 0 | 19 |
 | P7 | `src/dcm/chat/report.py` | 0 | 1 |
 | P7 | `src/dcm/chat/research_bridge.py` | 0 | 7 |
 | P7 | `src/dcm/chat/session.py` | 1 | 29 |
@@ -77,7 +77,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P0 | `src/dcm/identity/resolve.py` | 0 | 5 |
 | P0 | `src/dcm/ingest/__init__.py` | 0 | 0 |
 | P0 | `src/dcm/ingest/board.py` | 0 | 6 |
-| P0 | `src/dcm/ingest/composite.py` | 0 | 6 |
+| P0 | `src/dcm/ingest/composite.py` | 0 | 7 |
 | P0 | `src/dcm/ingest/har.py` | 0 | 13 |
 | P0 | `src/dcm/ingest/insight_context.py` | 0 | 6 |
 | P0 | `src/dcm/ingest/insights.py` | 0 | 15 |
@@ -197,7 +197,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P1 | `src/dcm/research/test_mode.py` | 0 | 3 |
 | P1 | `src/dcm/research/universal_packets.py` | 0 | 7 |
 | P1 | `src/dcm/research/universal_plan.py` | 0 | 1 |
-| UNMAPPED | `src/dcm/runner.py` | 0 | 11 |
+| UNMAPPED | `src/dcm/runner.py` | 0 | 13 |
 | P5-P14 | `src/dcm/runtime/__init__.py` | 0 | 0 |
 | P5-P14 | `src/dcm/runtime/archive_receipt.py` | 1 | 7 |
 | P5-P14 | `src/dcm/runtime/benchmark.py` | 0 | 4 |
@@ -765,10 +765,12 @@ _No class/function symbols._
 - `function` **_change** L137
 - `function` **build_capture_diff** L151
 - `function` **_read_claims** L310
-- `function` **_root_action** L324
-- `function` **_capability_matrix** L340
-- `function` **_closure_state** L397
-- `function` **enhance_slate_result** L441
+- `function` **_read_claim_projections** L324 — Read only fields needed for bitemporal diffing.
+- `function` **_claim_counts** L353 — Return total claims and valid exact line/side claim count by streaming.
+- `function` **_root_action** L373
+- `function` **_capability_matrix** L389
+- `function` **_closure_state** L446
+- `function` **enhance_slate_result** L490
 
 ### `src/dcm/chat/report.py`
 
@@ -835,8 +837,8 @@ _No class/function symbols._
 - `function` **_step** L313
 - `function` **_write_terminal_artifacts** L337
 - `function` **_legacy_run_slate** L583 — Run independent captures, the reconciled union, and HAR-only autonomous closure.
-- `function` **_repository_prompt** L1024
-- `function` **run_slate** L1031 — Run the legacy producer and then apply the HAR-only closure controller.
+- `function` **_repository_prompt** L1082
+- `function` **run_slate** L1089 — Run the legacy producer and then apply the HAR-only closure controller.
 
 ### `src/dcm/chat/slate_autonomous.py`
 
@@ -1036,12 +1038,13 @@ _No class/function symbols._
 
 ### `src/dcm/ingest/composite.py`
 
-- `function` **_time** L20
-- `function` **_attempt_key** L33
-- `function` **_row_key** L43
-- `function` **_changed_states** L55
-- `function` **reconcile_scope_attempts** L73 — Select latest successful response independently for every canonical request scope.
-- `function` **compose_ingests** L163 — Compose captures by latest successful response per canonical request scope.
+- `function` **_time** L21
+- `function` **_attempt_key** L34
+- `function` **_row_key** L44
+- `function` **_changed_states** L56
+- `function` **reconcile_scope_attempts** L74 — Select latest successful response independently for every canonical request scope.
+- `function` **compose_ingests** L164 — Compose captures by latest successful response per canonical request scope.
+- `function` **compose_ingest_stream** L336 — Compose already chronologically ordered ingests without retaining inputs.
 
 ### `src/dcm/ingest/har.py`
 
@@ -2417,17 +2420,19 @@ _No class/function symbols._
 
 ### `src/dcm/runner.py`
 
-- `function` **_finalize_archive** L141 — Always write dest/audit/. Optionally copy+commit+push a GitHub pack.
-- `function` **_synthetic_path** L219
-- `function` **_run_id** L232
-- `function` **_git_commit_sha** L236 — Best-effort git HEAD. Never writes git config. Missing git is None, not a crash.
-- `function` **_default_model_config** L256
-- `function` **_active_calibration** L267
-- `function` **run_dcm** L276
-- `method` **run_dcm._snapshot_for** L1149
-- `method` **run_dcm._resimulate_material** L1647
-- `method` **run_dcm.slim** L1838
-- `function` **main** L2411
+- `function` **_finalize_archive** L142 — Always write dest/audit/. Optionally copy+commit+push a GitHub pack.
+- `function` **_synthetic_path** L220
+- `function` **_run_id** L233
+- `function` **_har_capture_sort_key** L237 — Return the deterministic internal-HAR ordering key without ingesting it.
+- `function` **_git_commit_sha** L260 — Best-effort git HEAD. Never writes git config. Missing git is None, not a crash.
+- `function` **_default_model_config** L280
+- `function` **_active_calibration** L291
+- `function` **run_dcm** L300
+- `method` **run_dcm._ingest_stream** L429
+- `method` **run_dcm._snapshot_for** L1181
+- `method` **run_dcm._resimulate_material** L1679
+- `method` **run_dcm.slim** L1870
+- `function` **main** L2443
 
 ### `src/dcm/runtime/__init__.py`
 
