@@ -140,13 +140,30 @@ class RunDirector:
             actions = [row for row in (batch.get("actions") or []) if isinstance(row, dict)]
             request_ids: list[str] = []
             required_fields: list[str] = []
+
+            def append_values(target: list[str], value: Any) -> None:
+                # Sealed task rows use singular requestId/need fields, while
+                # older envelopes and grouped scheduler rows may use plural
+                # aliases.  Normalize both shapes at the durable handoff so
+                # ChatGPT always sees the actual work selected by DCM.
+                if isinstance(value, (list, tuple, set)):
+                    values = value
+                elif value not in (None, ""):
+                    values = [value]
+                else:
+                    values = []
+                for item in values:
+                    normalized = str(item)
+                    if normalized and normalized not in target:
+                        target.append(normalized)
+
             for action in actions:
-                for value in action.get("requestIds") or action.get("request_ids") or []:
-                    if str(value) and str(value) not in request_ids:
-                        request_ids.append(str(value))
-                for value in action.get("requiredFields") or action.get("required_fields") or []:
-                    if str(value) and str(value) not in required_fields:
-                        required_fields.append(str(value))
+                for key in ("requestIds", "request_ids", "requirementIds",
+                            "requirement_ids", "requestId", "request_id"):
+                    append_values(request_ids, action.get(key))
+                for key in ("requiredFields", "required_fields", "need",
+                            "knownMissing", "missingFields", "missing_fields"):
+                    append_values(required_fields, action.get(key))
             response_path = f"responses/{batch_id}.response.json" if batch_id else "responses/response.json"
             return {
                 **base,

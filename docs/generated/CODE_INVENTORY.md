@@ -3,9 +3,9 @@
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
 - Modules: **259**
-- Symbols: **1961**
+- Symbols: **1962**
 - Parse errors: **0**
-- Inventory hash: `4b9784f3aa46cc5abceb4ac20f20148b07beb3a9dcf81bf39a0efd7137cb16dd`
+- Inventory hash: `ca2351dc83c2481b8c2068d5fd2f118b9a03e65097e05183387f90664e6209a4`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -220,7 +220,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P5-P14 | `src/dcm/runtime/perf.py` | 1 | 2 |
 | P5-P14 | `src/dcm/runtime/pipeline.py` | 0 | 2 |
 | P5-P14 | `src/dcm/runtime/readiness.py` | 0 | 1 |
-| P5-P14 | `src/dcm/runtime/run_director.py` | 2 | 16 |
+| P5-P14 | `src/dcm/runtime/run_director.py` | 2 | 17 |
 | P5-P14 | `src/dcm/runtime/schema_root.py` | 0 | 5 |
 | P5-P14 | `src/dcm/runtime/storage_router.py` | 3 | 12 |
 | P5-P14 | `src/dcm/runtime/store.py` | 1 | 4 |
@@ -2661,15 +2661,16 @@ _No class/function symbols._
 - `method` **RunDirector._lease_status** L83
 - `method` **RunDirector.status** L111
 - `method` **RunDirector._next_action** L127 — Expose the next ChatGPT/DCM action as a durable, machine-readable handoff.
-- `method` **RunDirector._next_command** L187
-- `method` **RunDirector._response_path** L199
-- `method` **RunDirector._batch_counts** L215 — Return bounded action/entity and dependent-offer counts.
-- `method` **RunDirector._batch_leagues** L249
-- `method` **RunDirector._assert_packet_scope** L260
-- `method` **RunDirector._checkpoint_batch** L265 — Load the checkpoint and its active immutable envelope, if any.
-- `method` **RunDirector._reconcile_pointer** L281 — Move only the mutable pointer back to the checkpoint authority.
-- `method` **RunDirector.step** L321
-- `method` **RunDirector.run_until_awaiting** L433
+- `method` **RunDirector._next_action.append_values** L144
+- `method` **RunDirector._next_command** L204
+- `method` **RunDirector._response_path** L216
+- `method` **RunDirector._batch_counts** L232 — Return bounded action/entity and dependent-offer counts.
+- `method` **RunDirector._batch_leagues** L266
+- `method` **RunDirector._assert_packet_scope** L277
+- `method` **RunDirector._checkpoint_batch** L282 — Load the checkpoint and its active immutable envelope, if any.
+- `method` **RunDirector._reconcile_pointer** L298 — Move only the mutable pointer back to the checkpoint authority.
+- `method` **RunDirector.step** L338
+- `method` **RunDirector.run_until_awaiting** L450
 
 ### `src/dcm/runtime/schema_root.py`
 
