@@ -507,20 +507,42 @@ def enhance_slate_result(root: Path, inputs: Iterable[Path], result: Mapping[str
     rows = [dict(row) for row in (top25.get("rows") or []) if isinstance(row, Mapping)]
     insight_count = len([row for row in canonical_claims if row.get("line") is not None and str(row.get("direction") or "").upper() in {"HIGHER", "LOWER"}])
     for row in rows:
-        row["offerBacking"] = "INSIGHTS_OFFER_BACKED"
-        row["candidateClass"] = "RESEARCH_CANDIDATE"
-        row["probability"] = None
-        row["productionEligible"] = False
+        # Only reclassify the Insights-only branch. A board-backed row must
+        # remain available to the real model/ranking/selection consumers.
+        if board_count <= 0 or row.get("offerBacking") == "INSIGHTS_OFFER_BACKED":
+            row["offerBacking"] = "INSIGHTS_OFFER_BACKED"
+            row["candidateClass"] = "RESEARCH_CANDIDATE"
+            row["probability"] = None
+            row["productionEligible"] = False
     if rows:
         top25.update({"status": "RESEARCH_ONLY", "rows": rows, "boardOfferCount": board_count, "insightsOfferCount": insight_count, "productionSelectionPermitted": False, "probabilityStatus": "NONE", "boardHarRequired": False})
         top25["contentHash"] = content_hash({key: value for key, value in top25.items() if key != "contentHash"})
         _write(root / "top25.json", top25)
     playables = read_json(root / "playables.json") or {}
-    playables.update({"count": 0, "ABSTAINED": True, "rows": [], "reason": "OFFER_REVALIDATION_UNAVAILABLE" if board_count <= 0 else "PRODUCTION_MODEL_GATES_NOT_MET", "boardOfferCount": board_count, "insightsTop25Count": len(rows), "productionSelectionPermitted": False, "predictiveClaim": "NONE", "boardHarRequired": False})
+    if board_count <= 0:
+        playables.update({
+            "count": 0,
+            "ABSTAINED": True,
+            "rows": [],
+            "reason": "OFFER_REVALIDATION_UNAVAILABLE",
+            "productionSelectionPermitted": False,
+            "predictiveClaim": "NONE",
+        })
+    else:
+        # Preserve a real selector's result. If it has not run, expose the
+        # typed model/root gate instead of manufacturing a second zero path.
+        playables.setdefault("count", len(playables.get("rows") or []))
+        playables.setdefault("rows", [])
+        playables.setdefault("reason", "PRODUCTION_MODEL_GATES_NOT_MET")
+        playables["ABSTAINED"] = not bool(playables.get("rows"))
+        playables["productionSelectionPermitted"] = bool(playables.get("productionSelectionPermitted"))
+        playables.setdefault("predictiveClaim", "NONE")
+    playables.update({"boardOfferCount": board_count, "insightsTop25Count": len(rows), "boardHarRequired": False})
     playables["contentHash"] = content_hash({key: value for key, value in playables.items() if key != "contentHash"})
     _write(root / "playables.json", playables)
+    selection_permitted = bool(playables.get("productionSelectionPermitted"))
     feature = read_json(root / "feature_snapshot.json") or {}
-    feature.update({"boardOfferCount": board_count, "insightsOfferCount": insight_count, "probabilityStatus": "NONE", "productionSelectionPermitted": False, "reasonCodes": ["INSIGHTS_OFFER_BACKED_RESEARCH_ONLY", "OFFER_REVALIDATION_UNAVAILABLE"] if insight_count else ["INSIGHTS_LINE_SIDE_MISSING", "OFFER_REVALIDATION_UNAVAILABLE"], "boardHarRequired": False})
+    feature.update({"boardOfferCount": board_count, "insightsOfferCount": insight_count, "probabilityStatus": "NONE" if not selection_permitted else feature.get("probabilityStatus") or "AVAILABLE", "productionSelectionPermitted": selection_permitted, "reasonCodes": (["INSIGHTS_OFFER_BACKED_RESEARCH_ONLY", "OFFER_REVALIDATION_UNAVAILABLE"] if insight_count and board_count <= 0 else ["INSIGHTS_LINE_SIDE_MISSING", "OFFER_REVALIDATION_UNAVAILABLE"] if board_count <= 0 else ["PRODUCTION_MODEL_GATES_NOT_MET"] if not selection_permitted else []), "boardHarRequired": False})
     feature["contentHash"] = content_hash({key: value for key, value in feature.items() if key != "contentHash"})
     _write(root / "feature_snapshot.json", feature)
 
@@ -562,7 +584,8 @@ def enhance_slate_result(root: Path, inputs: Iterable[Path], result: Mapping[str
     closure = _closure_state(canonical_claims, queue, coverage if isinstance(coverage, Mapping) else {}, autonomous, raw_sources, board_count, capture_authority)
     _write(root / "closure_state.json", closure)
     output = dict(result)
-    output.update({"sourceCount": len(raw_sources), "sources": raw_sources, "canonicalClaimCount": len(canonical_claims), "boardOfferCount": board_count, "insightsOfferCount": insight_count, "productionSelectionPermitted": False, "probabilityStatus": "NONE", "modelPathAttempted": False, "autonomous": True, "nextAction": action, "captureAuthority": capture_authority, "closureState": closure, "captureDiff": str(root / "capture_diff.json")})
+    model_state = autonomous.get("model") if isinstance(autonomous.get("model"), Mapping) else {}
+    output.update({"sourceCount": len(raw_sources), "sources": raw_sources, "canonicalClaimCount": len(canonical_claims), "boardOfferCount": board_count, "insightsOfferCount": insight_count, "productionSelectionPermitted": selection_permitted, "probabilityStatus": "NONE" if not selection_permitted else "AVAILABLE", "modelPathAttempted": bool(model_state.get("modelPathAttempted")), "autonomous": True, "nextAction": action, "captureAuthority": capture_authority, "closureState": closure, "captureDiff": str(root / "capture_diff.json")})
     output["contentHash"] = content_hash({key: value for key, value in output.items() if key != "contentHash"})
     return output
 
