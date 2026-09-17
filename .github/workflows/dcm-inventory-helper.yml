@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - feat/har-only-autonomous-controller-20260917
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
