@@ -1,0 +1,1 @@
+# See workspace artifact for generated provenance design.\n# This repository copy records the contract; source PDF/OCR remains in Drive.\n
