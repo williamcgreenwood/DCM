@@ -24,6 +24,35 @@ If sub-models are used for extraction, classification, or cross-checks, only use
 
 ---
 
+## Mandatory input-provenance bundle — every PDF, screenshot, and prompt
+
+For **every** user-provided PDF or screenshot set, create a new append-only `SourcePackage` before analysis. Saving only a summary is a failure. The package must include:
+
+```text
+original/<original filename>                 # immutable uploaded bytes when Drive accepts them
+source_metadata.json                         # file ID/name/MIME/pages/bytes/SHA-256/upload time
+rendered_pages/page-0001.png …               # lossless or documented archival render
+ocr/ocr_pages.jsonl                          # page, bounding boxes, tokens, confidence, engine/version
+extraction/layout_objects.jsonl              # cards/tables/crops and page coordinates
+extraction/offers_raw.jsonl                  # one faithful raw observation per detected offer
+board/offers_normalized.jsonl                # canonical event/player/market/direction/line/price records
+board/ResearchPopulationManifest.json        # counts, duplicates, ambiguity, terminal reasons
+prompts/<prompt_id>.md                       # exact prompt text, immutable hash, model/runtime/version
+logs/events.jsonl                            # append-only action, source-pull, error, decision, and timing ledger
+logs/research_queue.jsonl                    # queued requirement/action/priority/coverage/VOI and outcome
+indexes/source_catalog.sqlite                # local retrieval index; Drive manifest exposes only IDs and hashes
+indexes/aliases.jsonl and indexes/fts_manifest.json
+receipts/ArchiveReceipt.json                 # upload/readback status and exact Drive object IDs
+```
+
+Treat screenshot pages and original documents as first-class evidence, not temporary inputs. Compute a SHA-256 before processing and after each derived artifact. Preserve the original filename, page/crop coordinates, extraction-engine/configuration version, OCR confidence, and parent hashes. Do not overwrite a prior extraction or prompt: append a revision with `supersedes` and maintain the old artifact for audit.
+
+Upload the original PDF to Google Drive when its size and policy permit. If Drive rejects or limits it, preserve the source hash and exact failure in the receipt, upload a verified archival rendering/compressed derivative, and mark the original `PRIMARY_SOURCE_LOCAL_OR_EXTERNAL_PENDING`; never claim the original was archived when it was not. Save every prompt actually used—system/workflow prompt, user request, extraction prompt, research prompt, model configuration, and final-card prompt—as immutable prompt records linked to the run and produced artifacts.
+
+Use a content-addressed retrieval cascade: exact SHA-256/ID → SQLite B-tree canonical keys → aliases/Aho-Corasick → FTS/BM25 → parent/requirement graph → MinHash/SimHash near-duplicate review → vector/semantic retrieval only under governance → targeted source retrieval. Use deterministic sorting keys and bitemporal append-only records. Group evidence by event/team/player/market and use weighted set-cover or submodular marginal-gain scheduling for research actions; use ML only for versioned, calibrated, chronologically evaluated forecasting, never to invent missing extraction fields or silently mutate archive records.
+
+---
+
 ## Non-negotiable separation of time and purpose
 
 Create two bitemporal tracks and never mix them:
@@ -39,7 +68,7 @@ Classify every audit fact as exactly one of: `KNOWN_AND_USED`, `KNOWN_NOT_ACQUIR
 
 ## Stage 0 — integrity, extraction, and complete board accounting
 
-1. Hash the original PDF (SHA-256), record byte size/page count, retain immutable source identity, and render/OCR each page. Preserve original page and crop references.
+1. Create the `SourcePackage`, hash the original PDF (SHA-256), record byte size/page count, retain immutable source identity, and render/OCR each page. Preserve original page and crop references.
 2. Extract **every visible offer**, not just every player. Normalize the exact event, kickoff time/timezone, league, home/away, market, period, player/team, direction (Higher/Lower), line, price, platform, and screenshot page/crop.
 3. Build stable IDs: `run_id`, `source_id`, `event_id`, `team_id`, `player_id`, `market_id`, `offer_id`, `evidence_id`, and `forecast_id`. Use canonical aliases; do not silently merge ambiguous names.
 4. Deduplicate using exact canonical keys first, then MinHash/SimHash only as a review candidate. Mark superseded lines; never overwrite an observation.
@@ -184,6 +213,8 @@ DCM/ResearchRuns/YYYY-MM-DD/<run_id>/
 ```
 
 For every artifact persist: SHA-256, byte size, semantic type, source URL/identity, observed_at, valid_from, valid_to, cutoff time, producer version/commit, parent hashes, and retention tier. Maintain `drive_catalog.sqlite`/manifest with exact Drive IDs and content-hash mapping. A Drive object becomes canonical only after upload and metadata/readback verification. Write an immutable `ArchiveReceipt` stating `PRIMARY_COMMITTED`, partial, or failed; do not claim success if a large raw PDF cannot upload.
+
+At closeout, verify that the Drive package contains the original or documented fallback derivative, all page/crop references, OCR/layout/raw/normalized extractions, every prompt used, queue/operation logs, freeze/settlement/audit outputs, hashes, and a retrieval manifest. Emit a package-level Merkle-style root over artifact hashes and list the exact parent-child lineage. This package is the required starting point for all later audits, comparisons, retraining, and retrieval.
 
 Use GitHub only for versioned code, schemas, tests, migrations, registries, ADRs, and compact content-addressed pointers. Never commit raw PDFs, screenshot packets, HAR files, account data, mutable odds dumps, or private research. If code changes are needed, branch from `integration/v6-ml-architecture-20260830`, run relevant tests, and open a **draft** PR with hashes and receipt references. Do not merge or alter main. If this run is audit-only, do not create code churn.
 
