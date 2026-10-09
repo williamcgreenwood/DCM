@@ -163,39 +163,6 @@ jobs:
           path: /tmp/dcm-ci-diagnostics-performance.json
           if-no-files-found: warn
 
-  inventory_regen_diagnostic:
-    name: Inventory regeneration diagnostic
-    permissions:
-      contents: write
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.head_ref }}
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - name: Regenerate inventory with official generator
-        run: python scripts/build_code_inventory.py --write
-      - name: Commit regenerated inventory to task branch
-        run: |
-          if git diff --quiet -- docs/generated/CODE_INVENTORY.json docs/generated/CODE_INVENTORY.md; then
-            echo "inventory already current"
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/generated/CODE_INVENTORY.json docs/generated/CODE_INVENTORY.md
-          git commit -m "chore: regenerate code inventory"
-          git push origin HEAD:${{ github.head_ref }}
-      - name: Upload regenerated inventory
-        uses: actions/upload-artifact@v4
-        with:
-          name: regenerated-code-inventory-${{ github.run_id }}-${{ github.run_attempt }}
-          path: |
-            docs/generated/CODE_INVENTORY.json
-            docs/generated/CODE_INVENTORY.md
-
   # The repository's protected branch historically requires the check named
   # `python-dcm`. Keep that stable required-check identity while exposing the
   # individual gate jobs above for actionable diagnostics.
