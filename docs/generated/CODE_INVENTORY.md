@@ -2,10 +2,10 @@
 
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
-- Modules: **263**
-- Symbols: **2022**
+- Modules: **266**
+- Symbols: **2046**
 - Parse errors: **0**
-- Inventory hash: `22de8d7eb95e7e1f30496de834a81ffb08a5662b7e1177756cca860010cdc3b5`
+- Inventory hash: `703c2c962450a9cccb9bfa26bce935b195a507ec2acd1eee36a6db2b1c791259`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -43,6 +43,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | UNMAPPED | `src/dcm/cfb/launch.py` | 0 | 9 |
 | UNMAPPED | `src/dcm/cfb/markets.py` | 0 | 9 |
 | UNMAPPED | `src/dcm/cfb/opportunity_ledger.py` | 0 | 8 |
+| UNMAPPED | `src/dcm/cfb/opportunity_state.py` | 1 | 5 |
 | UNMAPPED | `src/dcm/cfb/recompute.py` | 0 | 1 |
 | UNMAPPED | `src/dcm/cfb/refresh.py` | 0 | 2 |
 | UNMAPPED | `src/dcm/cfb/reports.py` | 0 | 11 |
@@ -109,6 +110,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P2-P4 | `src/dcm/model/explanation.py` | 0 | 14 |
 | P2-P4 | `src/dcm/model/grade.py` | 0 | 1 |
 | P2-P4 | `src/dcm/model/gridiron_models.py` | 3 | 14 |
+| P2-P4 | `src/dcm/model/hierarchical_distribution.py` | 1 | 5 |
 | P2-P4 | `src/dcm/model/line_surface.py` | 0 | 4 |
 | P2-P4 | `src/dcm/model/market_derive.py` | 1 | 8 |
 | P2-P4 | `src/dcm/model/parameters.py` | 0 | 13 |
@@ -267,6 +269,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P3 | `src/dcm/sports/football/settlement_map.py` | 0 | 3 |
 | UNMAPPED | `src/dcm/validation/__init__.py` | 0 | 0 |
 | UNMAPPED | `src/dcm/validation/conservation_harness.py` | 1 | 2 |
+| UNMAPPED | `src/dcm/validation/predictive_acceptance.py` | 1 | 11 |
 | UNMAPPED | `src/dcm/version.py` | 1 | 6 |
 | UNMAPPED | `src/pillars_dcm/__init__.py` | 0 | 0 |
 | UNMAPPED | `src/pillars_dcm/__main__.py` | 0 | 0 |
@@ -638,9 +641,9 @@ _No class/function symbols._
 
 ### `src/dcm/cfb/event_worlds.py`
 
-- `function` **cfb_teammate_groups** L23
-- `function` **simulate_joint_cfb_event_worlds_reference** L43 — Portable pure-Python joint CFB EventWorld (mandatory fallback path).
-- `function` **simulate_joint_cfb_event_worlds** L200 — Shared team plays/pass-rate/rush-rate → residual-aware player opportunity.
+- `function` **cfb_teammate_groups** L24
+- `function` **simulate_joint_cfb_event_worlds_reference** L44 — Portable pure-Python joint CFB EventWorld (mandatory fallback path).
+- `function` **simulate_joint_cfb_event_worlds** L201 — Shared team plays/pass-rate/rush-rate → residual-aware player opportunity.
 
 ### `src/dcm/cfb/event_worlds_numpy.py`
 
@@ -693,6 +696,15 @@ _No class/function symbols._
 - `function` **allocate_team_opportunity** L175 — Return per-player counts plus residual buckets.
 - `function` **_pool_mean_cap_for_total** L243 — Return (mean, allocate_cap, fallback) matching estimate_opportunity_share math.
 - `function` **allocate_team_opportunity_fast** L306 — Hot-path allocation without per-call content_hash / shareEstimates bodies.
+
+### `src/dcm/cfb/opportunity_state.py`
+
+- `class` **CFBStateOpportunity** L21
+- `method` **CFBStateOpportunity.to_dict** L28
+- `function` **_clip** L40
+- `function` **normalize_state_probabilities** L44
+- `function` **spread_state_prior** L52 — Smooth pregame script prior from team-perspective spread.
+- `function` **state_opportunity** L72
 
 ### `src/dcm/cfb/recompute.py`
 
@@ -1392,6 +1404,15 @@ _No class/function symbols._
 - `class` **TeamEventModel** L367 — Team plays / pass-rate / rush-rate / pace plus opponent pass/rush defense.
 - `method` **TeamEventModel.fit** L377
 - `method` **TeamEventModel.fit._first** L391
+
+### `src/dcm/model/hierarchical_distribution.py`
+
+- `class` **HierarchicalFit** L21
+- `method` **HierarchicalFit.to_dict** L33
+- `function` **effective_sample_size** L50
+- `function` **_finite** L65
+- `function` **fit_hierarchical_distribution** L77
+- `function` **uncertainty_interval** L145
 
 ### `src/dcm/model/line_surface.py`
 
@@ -3091,6 +3112,21 @@ _No class/function symbols._
 - `class` **HarnessCase** L19
 - `function` **_valid_spec** L25
 - `function` **run_football_harness** L136
+
+### `src/dcm/validation/predictive_acceptance.py`
+
+- `class` **GateResult** L19
+- `method` **GateResult.passed** L26
+- `method` **GateResult.to_dict** L29
+- `function` **_f** L38
+- `function` **_binary_rows** L46
+- `function` **_proper_scores** L62
+- `function` **_unique** L85
+- `function` **domain2_cfb_predictive_acceptance** L89
+- `function` **domain3_distribution_calibration_acceptance** L131
+- `function` **domain4_covariance_portfolio_acceptance** L162
+- `function` **domain6_model_promotion_acceptance** L202
+- `function` **predictive_superiority_claim** L263
 
 ### `src/dcm/version.py`
 

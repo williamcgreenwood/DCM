@@ -44,6 +44,7 @@ def wilson_lower_bound(successes: float, n: int, z: float = 1.6448536269514722) 
 def probability_bundle(
     *, raw_selected_p: float, n_worlds: int, support_n: int, data_quality: float,
     ood_risk: float, volatility: float, synthetic: bool,
+    hierarchical_epistemic_sd: float | None = None,
 ) -> dict[str, float | str]:
     safe = evidence_safe_probability(
         raw_selected_p, support_n=support_n, data_quality=data_quality,
@@ -51,6 +52,10 @@ def probability_bundle(
     )
     mc_se = math.sqrt(max(0.0, raw_selected_p * (1.0 - raw_selected_p)) / max(1, n_worlds))
     epistemic = min(0.45, (1.0 - min(1.0, support_n / 12.0)) * 0.20 + (1.0 - data_quality) * 0.15 + ood_risk * 0.15)
+    if hierarchical_epistemic_sd is not None and math.isfinite(float(hierarchical_epistemic_sd)):
+        # Convert model-scale posterior uncertainty into a bounded probability-risk contribution.
+        # It widens risk; it never manufactures confidence or a forecast probability.
+        epistemic = min(0.45, max(epistemic, min(0.45, abs(float(hierarchical_epistemic_sd)) * 0.05)))
     aleatoric = min(1.0, max(0.0, volatility))
     # Split-conformal is a challenger until chronological unseen settlement data
     # earns calibration. It must not widen a production lower bound at LR000000.

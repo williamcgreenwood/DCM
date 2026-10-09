@@ -17,6 +17,7 @@ from typing import Any
 
 from dcm.cfb.event_world_backend import backend_meta, resolve_event_world_backend
 from dcm.cfb.opportunity_ledger import KICKER_ROLES, allocate_team_opportunity
+from dcm.cfb.opportunity_state import STATE_VERSION, state_opportunity
 from dcm.model.worlds import _clip, _nonneg_int_gauss, _p, _rng, sample_football
 
 
@@ -210,18 +211,39 @@ def simulate_joint_cfb_event_worlds(
     ``backend``: ``None`` (default numpy when available), ``\"numpy\"``, or ``\"reference\"``.
     Env override: ``DCM_EVENTWORLD_BACKEND``.
     """
+    normalized_contexts: list[dict[str, Any]] = []
+    for raw in event_contexts or [{}]:
+        ctx = dict(raw or {})
+        state = state_opportunity(
+            base_pass_rate=float(ctx.get("pass_rate") or 0.55),
+            state_probabilities=ctx.get("scoreStateProbabilities"),
+            spread=ctx.get("spread"),
+            opponent_rush_defense_z=float(ctx.get("opponentRushDefenseZ") or 0.0),
+            time_remaining_fraction=float(ctx.get("timeRemainingFraction") or 0.5),
+            wind_mph=ctx.get("windMph"),
+            support_n=int(ctx.get("stateSupportN") or 0),
+        )
+        ctx["pass_rate"] = state.expected_pass_rate
+        ctx["starter_participation"] = state.starter_participation
+        ctx["stateEpistemicUncertainty"] = state.epistemic_uncertainty
+        ctx["scoreStateProbabilities"] = dict(state.state_probabilities)
+        normalized_contexts.append(ctx)
+
     chosen = resolve_event_world_backend(backend)
     if chosen == "numpy":
         from dcm.cfb.event_worlds_numpy import simulate_joint_cfb_event_worlds_numpy
 
         out = simulate_joint_cfb_event_worlds_numpy(
-            specs, n=n, seed=seed, event_contexts=event_contexts
+            specs, n=n, seed=seed, event_contexts=normalized_contexts
         )
+        out["meta"]["stateOpportunityVersion"] = STATE_VERSION
         # Keep public surface to worlds + meta only (SoA is an internal accel aid).
         return {"worlds": out["worlds"], "meta": out["meta"]}
-    return simulate_joint_cfb_event_worlds_reference(
-        specs, n=n, seed=seed, event_contexts=event_contexts
+    out = simulate_joint_cfb_event_worlds_reference(
+        specs, n=n, seed=seed, event_contexts=normalized_contexts
     )
+    out["meta"]["stateOpportunityVersion"] = STATE_VERSION
+    return out
 
 
 # Conceptual public alias used in Phase 11 docs / host call sites.
