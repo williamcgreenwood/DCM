@@ -165,8 +165,8 @@ def test_acceptance_ladder_can_report_pass_when_predeclared_evidence_is_supplied
     } for i in range(200)]
     d4 = domain4_covariance_portfolio_acceptance(portfolios)
 
-    challenger = _prediction_rows(240, p=0.60, outcome_rate=0.60, start=start)
-    champion = _prediction_rows(240, p=0.50, outcome_rate=0.60, start=start)
+    challenger = _prediction_rows(248, p=0.60, outcome_rate=0.60, start=start)
+    champion = _prediction_rows(248, p=0.50, outcome_rate=0.60, start=start)
     d6 = domain6_model_promotion_acceptance(challenger, champion)
 
     assert d2.status == "PASS"
