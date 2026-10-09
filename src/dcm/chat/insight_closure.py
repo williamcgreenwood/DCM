@@ -17,6 +17,7 @@ from dcm.contracts.hashes import content_hash
 from dcm.model.ranking import rank_candidates
 from dcm.research.insight_bridge import insights_offer_snapshots
 from dcm.research.offer_revalidation import UNAVAILABLE, load_current_offers
+from dcm.runtime.lineage_integrity import FreezeMember, LineageHalt, LineageStore, offer_is_fresh
 from dcm.selection.portfolio import build_card
 
 
@@ -281,6 +282,8 @@ def evaluate_insight_selection(
     predictions = _prediction_rows(model, dest)
     root_certified = bool(model.get("productionRootCertified"))
     promoted = _model_is_promoted({**model, "productionRootCertified": root_certified})
+    model_snapshot_id = _text(model.get("modelSnapshotId"), 256)
+    prompt_hash = _text(model.get("promptHash"), 256)
     ranked_inputs: list[dict[str, Any]] = []
     diagnostics: list[dict[str, Any]] = []
     blocker_counts: Counter[str] = Counter()
@@ -295,6 +298,16 @@ def evaluate_insight_selection(
             blockers.append(UNAVAILABLE)
         elif offer.get("state") != "VALID":
             blockers.append("OFFER_REVALIDATION_INVALID")
+        else:
+            decision_time = (
+                prediction.get("forecastCutoff")
+                or model.get("forecastCutoff")
+                or offer.get("retrievedAt")
+            )
+            if not decision_time or not offer_is_fresh(offer, decision_time=str(decision_time)):
+                blockers.append("OFFER_REVALIDATION_STALE")
+            if not offer.get("lineSnapshotId"):
+                blockers.append("LINE_SNAPSHOT_ID_MISSING")
         if not req_cov or not all(bool(row.get("complete")) for row in req_cov):
             blockers.append("EVIDENCE_COVERAGE_INCOMPLETE")
         # Revalidation can carry a fresher status/time than the original
@@ -306,6 +319,15 @@ def evaluate_insight_selection(
             blockers.append("EVENT_NOT_FUTURE")
         if not prediction:
             blockers.append("MODEL_PROBABILITY_UNAVAILABLE")
+        else:
+            if not _text(prediction.get("evidenceHash") or prediction.get("evidenceGraphHash"), 256):
+                blockers.append("EVIDENCE_HASH_MISSING")
+            if not _text(prediction.get("parameterSnapshotHash"), 256):
+                blockers.append("PARAMETER_SNAPSHOT_HASH_MISSING")
+        if not model_snapshot_id:
+            blockers.append("MODEL_SNAPSHOT_ID_MISSING")
+        if not prompt_hash:
+            blockers.append("PROMPT_HASH_MISSING")
         if not promoted:
             blockers.append("MODEL_NOT_CERTIFIED")
         if _text(model.get("predictiveClaim") or "NONE", 64).upper() == "NONE":
@@ -415,25 +437,80 @@ def evaluate_insight_selection(
         "boardHarRequired": False,
     }
     if production_top25 and playables:
-        frozen_rows = [
-            {
+        frozen_rows = []
+        freeze_members: list[FreezeMember] = []
+        for row in production_top25:
+            offer = row.get("offerRevalidation") or {}
+            prediction = predictions.get(_text(row.get("claimId"), 512)) or {}
+            recommendation_id = "REC:" + content_hash({
+                "claimId": row.get("claimId"),
+                "lineSnapshotId": offer.get("lineSnapshotId"),
+                "modelSnapshotId": model_snapshot_id,
+                "side": (row.get("row") or {}).get("direction"),
+            })
+            member = FreezeMember(
+                recommendation_id=recommendation_id,
+                prop_id=_text(row.get("claimId") or (row.get("row") or {}).get("projectionId"), 512),
+                line_snapshot_id=_text(offer.get("lineSnapshotId"), 512),
+                market_definition_id=_text(offer.get("marketDefinitionId"), 256),
+                evidence_hash=_text(prediction.get("evidenceHash") or prediction.get("evidenceGraphHash"), 256),
+                parameter_snapshot_hash=_text(prediction.get("parameterSnapshotHash"), 256),
+            )
+            freeze_members.append(member)
+            frozen_rows.append({
+                "recommendationId": recommendation_id,
                 "projectionId": (row.get("row") or {}).get("projectionId"),
                 "claimId": row.get("claimId"),
+                "lineSnapshotId": member.line_snapshot_id,
+                "marketDefinitionId": member.market_definition_id,
+                "settlementRuleHash": offer.get("settlementRuleHash"),
+                "offerHash": offer.get("offerHash"),
+                "sourceHash": offer.get("sourceHash"),
+                "evidenceHash": member.evidence_hash,
+                "parameterSnapshotHash": member.parameter_snapshot_hash,
+                "modelSnapshotId": model_snapshot_id,
                 "line": (row.get("row") or {}).get("line"),
                 "direction": (row.get("row") or {}).get("direction"),
                 "evidenceSafeP": row.get("evidenceSafeP"),
                 "calibratedP": row.get("calibratedP"),
                 "selectionScore": row.get("selectionScore"),
                 "rank": row.get("rank"),
-            }
+            })
+        if dest is None:
+            raise LineageHalt("FREEZE_STORE_REQUIRED")
+        board_hash = content_hash(sorted(
+            _text((row.get("offerRevalidation") or {}).get("offerHash"), 256)
             for row in production_top25
-        ]
+        ))
+        freeze_at = _text(
+            model.get("freezeAtUtc")
+            or model.get("forecastCutoff")
+            or production_top25[0].get("forecastCutoff"),
+            64,
+        )
+        if not freeze_at:
+            raise LineageHalt("FREEZE_TIMESTAMP_REQUIRED")
+        lineage = LineageStore(dest / "lineage.sqlite3")
+        try:
+            freeze_id = lineage.freeze(
+                run_id=_text(model.get("runId") or dest.name, 256),
+                frozen_at_utc=freeze_at,
+                model_snapshot_id=model_snapshot_id,
+                prompt_hash=prompt_hash,
+                board_hash=board_hash,
+                members=freeze_members,
+            )
+        finally:
+            lineage.close()
         freeze_hash = content_hash(frozen_rows)
         freeze_doc.update({
             "status": "FROZEN",
-            "freezeId": "INSIGHT_FREEZE:" + freeze_hash,
+            "freezeId": freeze_id,
             "rows": frozen_rows,
             "frozenPredictionHash": freeze_hash,
+            "modelSnapshotId": model_snapshot_id,
+            "promptHash": prompt_hash,
+            "boardHash": board_hash,
             "reason": None,
         })
 
