@@ -161,6 +161,10 @@ def test_current_offer_model_gates_produce_top100_top25_and_freeze(tmp_path: Pat
         "predictiveCertified": True,
         "productionRootCertified": True,
         "predictiveClaim": "PREDICTIVE",
+        "modelSnapshotId": "MODEL-SNAPSHOT-TEST",
+        "promptHash": "prompt-hash-test",
+        "freezeAtUtc": "2026-09-17T21:51:00Z",
+        "runId": "RUN-INSIGHT-TEST",
         "predictions": [{
             "claimId": claim["claimId"],
             "evidenceSafeP": 0.72,
@@ -174,6 +178,8 @@ def test_current_offer_model_gates_produce_top100_top25_and_freeze(tmp_path: Pat
             "epistemicUncertainty": 0.1,
             "volatility": 0.2,
             "forecastCutoff": "2026-09-17T21:51:00Z",
+            "evidenceHash": "evidence-hash-test",
+            "parameterSnapshotHash": "parameter-hash-test",
             "parameterSnapshot": {"status": "ACTIVE"},
         }],
     }
@@ -192,6 +198,9 @@ def test_current_offer_model_gates_produce_top100_top25_and_freeze(tmp_path: Pat
     assert selection["productionTop25Count"] == 1
     assert selection["playableCount"] == 1
     assert selection["freeze"]["status"] == "FROZEN"
+    assert str(selection["freeze"]["freezeId"]).startswith("FREEZE:")
+    assert selection["freeze"]["rows"][0]["lineSnapshotId"]
+    assert selection["freeze"]["rows"][0]["evidenceHash"] == "evidence-hash-test"
     assert state["top100"]["productionTop100Count"] == 1
     assert state["top100"]["productionTop100"]
     assert selection["noBoardHarAsk"] is True
