@@ -2,10 +2,10 @@
 
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
-- Modules: **261**
-- Symbols: **1996**
+- Modules: **263**
+- Symbols: **2022**
 - Parse errors: **0**
-- Inventory hash: `78226da8cc808001a6db6bebf042478edc678c2a490de2a9cc361d7d2b616285`
+- Inventory hash: `22de8d7eb95e7e1f30496de834a81ffb08a5662b7e1177756cca860010cdc3b5`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -120,6 +120,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | UNMAPPED | `src/dcm/paths.py` | 0 | 5 |
 | UNMAPPED | `src/dcm/platform/__init__.py` | 0 | 0 |
 | UNMAPPED | `src/dcm/platform/prizepicks/__init__.py` | 0 | 0 |
+| UNMAPPED | `src/dcm/platform/prizepicks/economics.py` | 2 | 6 |
 | UNMAPPED | `src/dcm/platform/prizepicks/entry_contract.py` | 1 | 3 |
 | UNMAPPED | `src/dcm/platform/prizepicks/leaderboard.py` | 0 | 0 |
 | UNMAPPED | `src/dcm/platform/prizepicks/minimum_guarantee.py` | 0 | 0 |
@@ -218,6 +219,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P5-P14 | `src/dcm/runtime/har_run.py` | 0 | 3 |
 | P5-P14 | `src/dcm/runtime/host_contract.py` | 1 | 2 |
 | P5-P14 | `src/dcm/runtime/input_boundary.py` | 0 | 7 |
+| P5-P14 | `src/dcm/runtime/lineage_integrity.py` | 3 | 15 |
 | P5-P14 | `src/dcm/runtime/mount_v541.py` | 0 | 10 |
 | P5-P14 | `src/dcm/runtime/perf.py` | 1 | 2 |
 | P5-P14 | `src/dcm/runtime/pipeline.py` | 0 | 2 |
@@ -776,18 +778,18 @@ _No class/function symbols._
 
 ### `src/dcm/chat/insight_closure.py`
 
-- `function` **_text** L28
-- `function` **_number** L32
-- `function` **_request_ids** L42
-- `function` **_coverage_map** L64
-- `function` **build_top100_artifact** L72 — Turn the deterministic research queue into an auditable Top-100 stage.
-- `function` **build_event_worlds** L140 — Build a safe shared event context index for Insights descendants.
-- `function` **_prediction_rows** L196
-- `function` **_model_is_promoted** L216
-- `function` **_future** L227
-- `function` **_candidate_row** L242
-- `function` **evaluate_insight_selection** L255 — Consume Insights snapshots through ranking, gates, constraints, freeze.
-- `function` **refresh_insight_pipeline_files** L483 — Persist the inner consumer artifacts and return the full state.
+- `function` **_text** L29
+- `function` **_number** L33
+- `function` **_request_ids** L43
+- `function` **_coverage_map** L65
+- `function` **build_top100_artifact** L73 — Turn the deterministic research queue into an auditable Top-100 stage.
+- `function` **build_event_worlds** L141 — Build a safe shared event context index for Insights descendants.
+- `function` **_prediction_rows** L197
+- `function` **_model_is_promoted** L217
+- `function` **_future** L228
+- `function` **_candidate_row** L243
+- `function` **evaluate_insight_selection** L256 — Consume Insights snapshots through ranking, gates, constraints, freeze.
+- `function` **refresh_insight_pipeline_files** L560 — Persist the inner consumer artifacts and return the full state.
 
 ### `src/dcm/chat/report.py`
 
@@ -1495,6 +1497,17 @@ _No class/function symbols._
 
 _No class/function symbols._
 
+### `src/dcm/platform/prizepicks/economics.py`
+
+- `class` **PayoutPricingError** L16
+- `class` **LegOutcomeProbabilities** L21
+- `method` **LegOutcomeProbabilities.__post_init__** L26
+- `function` **_return_for_state** L34
+- `function` **independent_state_distribution** L43 — Return P(non-push tier count, wins) under independent marginals.
+- `function` **expected_return_independent** L66 — Exact expected table return for independent W/L/P marginals.
+- `function` **expected_return_from_worlds** L100 — Price aligned joint W/L/P worlds without an independence assumption.
+- `function` **probabilities_from_mapping** L141
+
 ### `src/dcm/platform/prizepicks/entry_contract.py`
 
 - `class` **EntryContractError** L16
@@ -1545,7 +1558,7 @@ _No class/function symbols._
 - `function` **_economic** L56
 - `function` **_pick_state** L72
 - `function` **settle_world_lineup** L98
-- `function` **_outcome** L224
+- `function` **_outcome** L225
 
 ### `src/dcm/postgame.py`
 
@@ -2109,16 +2122,16 @@ _No class/function symbols._
 
 ### `src/dcm/research/offer_revalidation.py`
 
-- `class` **OfferRevalidationError** L26 — A current-offer observation is not safe to consume.
-- `function` **_text** L30
-- `function` **_number** L34
-- `function` **_time** L44
-- `function` **_key** L55
-- `function` **_snapshot_key** L67
-- `function` **_known_by_id** L71
-- `function` **validate_offer_revalidation** L83 — Return one canonical current-offer snapshot or raise a typed error.
-- `function` **import_offer_revalidations** L177 — Validate and persist current offers without overwriting prior versions.
-- `function` **load_current_offers** L252
+- `class` **OfferRevalidationError** L32 — A current-offer observation is not safe to consume.
+- `function` **_text** L36
+- `function` **_number** L40
+- `function` **_time** L50
+- `function` **_key** L61
+- `function` **_snapshot_key** L73
+- `function` **_known_by_id** L77
+- `function` **validate_offer_revalidation** L89 — Return one canonical current-offer snapshot or raise a typed error.
+- `function` **import_offer_revalidations** L189 — Validate and persist current offers without overwriting prior versions.
+- `function` **load_current_offers** L275
 
 ### `src/dcm/research/os_graphs.py`
 
@@ -2663,6 +2676,27 @@ _No class/function symbols._
 - `function` **inspect_input_boundary** L81 — Return a redacted, content-addressed input summary.
 - `function` **build_input_boundary_manifest** L120
 - `function` **persist_input_boundary_manifest** L144
+
+### `src/dcm/runtime/lineage_integrity.py`
+
+- `class` **LineageHalt** L21 — Raised when a P0 integrity invariant fails closed.
+- `method` **LineageHalt.__init__** L24
+- `function` **_utc** L30
+- `function` **_iso** L46
+- `function` **freshness_ttl_seconds** L50 — Return a conservative, versioned TTL based on time-to-event.
+- `function` **derive_valid_until** L71
+- `function` **offer_is_fresh** L80
+- `function` **line_snapshot_id** L87
+- `function` **validate_line_transition** L104 — Fail when a freeze-critical offer field changed without recomputation.
+- `function` **freeze_manifest_hash** L123
+- `class` **FreezeMember** L158
+- `method` **FreezeMember.as_dict** L166
+- `class` **LineageStore** L177 — Append-only P0 relational ledger used by freeze/settlement boundaries.
+- `method` **LineageStore.__init__** L180
+- `method` **LineageStore.append_line_snapshot** L187
+- `method` **LineageStore.freeze** L238
+- `method` **LineageStore.settle** L313
+- `method` **LineageStore.close** L370
 
 ### `src/dcm/runtime/mount_v541.py`
 

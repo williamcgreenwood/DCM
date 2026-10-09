@@ -17,6 +17,12 @@ from typing import Any, Iterable, Mapping
 from dcm.chat.state import read_json, write_json
 from dcm.contracts.hashes import content_hash
 from dcm.research.provider import _validate_source_url
+from dcm.runtime.lineage_integrity import (
+    FRESHNESS_POLICY_VERSION,
+    LineageStore,
+    derive_valid_until,
+    line_snapshot_id,
+)
 
 
 REVALIDATION_SCHEMA = "pillars_dcm.offer_revalidation.v1"
@@ -170,6 +176,12 @@ def validate_offer_revalidation(
         "researchOnly": False,
         "productionSelectionPermitted": False,
     }
+    normalized["freshnessPolicyVersion"] = FRESHNESS_POLICY_VERSION
+    normalized["validUntilUtc"] = derive_valid_until(
+        retrieved_at=retrieved_at,
+        scheduled_time=normalized.get("scheduledTime"),
+    )
+    normalized["lineSnapshotId"] = line_snapshot_id(normalized)
     normalized["offerHash"] = content_hash({key: value for key, value in normalized.items() if key != "offerHash"})
     return normalized
 
@@ -206,6 +218,17 @@ def import_offer_revalidations(
             if isinstance(previous, dict):
                 existing.append(previous)
     existing_hashes = {str(row.get("offerHash") or "") for row in existing}
+
+    # P0 relational mirror: current-offer observations are inserted into the
+    # append-only line ledger before downstream selection can consume them.
+    if valid:
+        lineage = LineageStore(dest / "lineage.sqlite3")
+        try:
+            for row in valid:
+                lineage.append_line_snapshot(row)
+        finally:
+            lineage.close()
+
     appended = 0
     if valid:
         path.parent.mkdir(parents=True, exist_ok=True)
