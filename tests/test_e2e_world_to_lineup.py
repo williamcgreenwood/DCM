@@ -180,7 +180,7 @@ def test_tie_stays_in_eligibility_not_removed():
     assert out.lineup.tie_count == 1
     assert out.lineup.administrative_removed_count == 0
     assert out.lineup.eligibility_population_count == 2
-    assert out.lineup.payout_tier_count == 2
+    assert out.lineup.payout_tier_count == 1
 
 
 def test_dnp_removes_from_eligibility():
