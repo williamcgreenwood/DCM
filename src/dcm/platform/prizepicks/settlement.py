@@ -147,11 +147,12 @@ def settle_world_lineup(
     if len(wins) + len(losses) + len(pushes) != len(active):
         raise SettlementError(FailureCode.ENTRY_CONTRACT_INCOMPLETE, "active accounting hole")
 
-    # Ties stay in eligibility; DNP/Reboot do not.
-    payout_tier_count = len(active)  # remaining after admin removal; ties still occupy a tier slot
+    # Ties remain part of the entry's eligibility accounting but reduce the
+    # minimum-guarantee payout tier. Administrative removals are already absent
+    # from active. This is the economic distinction that prevents an integer
+    # push from being mispriced as harmless protection.
     eligibility_population_count = len(active)
-    # payout tier steps down for ties AND voids; remaining result count for MG lookup
-    # uses active picks as the card that still exists. Wins are compared inside that card.
+    payout_tier_count = len(active) - len(pushes)
     remaining_pick_ids = {s.projection_id for s in active}
     remaining_teams = {
         p.team_id for p in entry.picks if p.projection_id in remaining_pick_ids
