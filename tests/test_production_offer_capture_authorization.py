@@ -166,7 +166,8 @@ def test_absent_conflicting_stale_or_postcutoff_contract_never_authorizes(change
                 key: val for key, val in captured.items() if key != "contentHash"
             })
     if (side, field) in {
-        ("raw", "direction"), ("raw", "line"), ("raw", "periodLabel")
+        ("raw", "direction"), ("raw", "line"), ("raw", "periodLabel"),
+        ("raw", "current"),
     }:
         with pytest.raises(ValueError):
             validate_offer_revalidation(raw, snapshots={raw["claimId"]: captured}, cutoff=CUTOFF)
