@@ -5,7 +5,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 - Modules: **267**
 - Symbols: **2049**
 - Parse errors: **0**
-- Inventory hash: `d90d1c847ab7d79b9f82ce04ce600f55d2f87f4c0bf43a697c7241a3aa02ce05`
+- Inventory hash: `ac8f0d8dcfb50c28981628994973839766f44716cc1f10e975d77567f7387b15`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -2716,9 +2716,9 @@ _No class/function symbols._
 - `class` **LineageStore** L177 — Append-only P0 relational ledger used by freeze/settlement boundaries.
 - `method` **LineageStore.__init__** L180
 - `method` **LineageStore.append_line_snapshot** L187
-- `method` **LineageStore.freeze** L238
-- `method` **LineageStore.settle** L313
-- `method` **LineageStore.close** L370
+- `method` **LineageStore.freeze** L241
+- `method` **LineageStore.settle** L316
+- `method` **LineageStore.close** L373
 
 ### `src/dcm/runtime/mount_v541.py`
 
