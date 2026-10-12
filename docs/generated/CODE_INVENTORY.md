@@ -3,9 +3,9 @@
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
 - Modules: **267**
-- Symbols: **2050**
+- Symbols: **2051**
 - Parse errors: **0**
-- Inventory hash: `4a9256c5bc93a7e4465603abbe771a02d2623a24ebe4856160ffadb013cce0eb`
+- Inventory hash: `a124856e4478cffcca75771556397db8f2ffbebb71f32a6f6d849822b0d3f781`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -227,7 +227,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P5-P14 | `src/dcm/runtime/pipeline.py` | 0 | 2 |
 | P5-P14 | `src/dcm/runtime/readiness.py` | 0 | 1 |
 | P5-P14 | `src/dcm/runtime/run_director.py` | 2 | 17 |
-| P5-P14 | `src/dcm/runtime/runner_freeze_bridge.py` | 0 | 3 |
+| P5-P14 | `src/dcm/runtime/runner_freeze_bridge.py` | 0 | 4 |
 | P5-P14 | `src/dcm/runtime/schema_root.py` | 0 | 5 |
 | P5-P14 | `src/dcm/runtime/storage_router.py` | 3 | 12 |
 | P5-P14 | `src/dcm/runtime/store.py` | 1 | 4 |
@@ -2064,9 +2064,9 @@ _No class/function symbols._
 - `function` **plan_insight_host_research** L114 — Create reusable EVENT/AFFILIATION/COUNTERPARTY/SUBJECT jobs.
 - `function` **_finite_line** L195
 - `function` **insights_offer_snapshots** L205 — Promote Insights claims with exact line + HIGHER/LOWER into offer-equivalent snapshots.
-- `function` **build_insight_research_graph** L299 — Build a non-offer graph for the Insights research population.
-- `method` **build_insight_research_graph.add_node** L311
-- `method` **build_insight_research_graph.add_edge** L322
+- `function` **build_insight_research_graph** L303 — Build a non-offer graph for the Insights research population.
+- `method` **build_insight_research_graph.add_node** L315
+- `method` **build_insight_research_graph.add_edge** L326
 
 ### `src/dcm/research/insight_queue.py`
 
@@ -2505,7 +2505,7 @@ _No class/function symbols._
 - `method` **run_dcm._snapshot_for** L1181
 - `method` **run_dcm._resimulate_material** L1679
 - `method` **run_dcm.slim** L1870
-- `function` **main** L2501
+- `function` **main** L2511
 
 ### `src/dcm/runtime/__init__.py`
 
@@ -2775,7 +2775,8 @@ _No class/function symbols._
 
 - `function` **_utc** L25
 - `function` **_hash** L35
-- `function` **freeze_supported_cfb_card** L42 — Persist an actual P0 freeze only when every current CFB dependency passes.
+- `function` **bind_verified_runner_cfb_card** L43 — Bind modeled survivors to capture-origin IDs without manufacturing lineage.
+- `function` **freeze_supported_cfb_card** L127 — Persist an actual P0 freeze only when every current CFB dependency passes.
 
 ### `src/dcm/runtime/schema_root.py`
 
