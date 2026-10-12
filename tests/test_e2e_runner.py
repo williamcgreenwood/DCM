@@ -135,6 +135,8 @@ def test_a_synthetic_smoke(tmp_path: Path):
     freeze = json.loads((dest / "frozen_forecast.json").read_text())
     assert freeze["v5Decoder"] == "NOT_MOUNTED"
     assert freeze["productionCertified"] is False
+    assert freeze["productionLineageFreezeState"] == "NOT_ELIGIBLE"
+    assert not (dest / "lineage.sqlite3").exists()
     assert freeze["notProductionRootCertified"] is True
     assert freeze["executionMode"] == "RESEARCHED_MODELED"
     certified = json.loads((dest / "production_certified_card.json").read_text())

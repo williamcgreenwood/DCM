@@ -2,10 +2,10 @@
 
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
-- Modules: **266**
-- Symbols: **2046**
+- Modules: **267**
+- Symbols: **2049**
 - Parse errors: **0**
-- Inventory hash: `703c2c962450a9cccb9bfa26bce935b195a507ec2acd1eee36a6db2b1c791259`
+- Inventory hash: `ac8f0d8dcfb50c28981628994973839766f44716cc1f10e975d77567f7387b15`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -227,6 +227,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P5-P14 | `src/dcm/runtime/pipeline.py` | 0 | 2 |
 | P5-P14 | `src/dcm/runtime/readiness.py` | 0 | 1 |
 | P5-P14 | `src/dcm/runtime/run_director.py` | 2 | 17 |
+| P5-P14 | `src/dcm/runtime/runner_freeze_bridge.py` | 0 | 3 |
 | P5-P14 | `src/dcm/runtime/schema_root.py` | 0 | 5 |
 | P5-P14 | `src/dcm/runtime/storage_router.py` | 3 | 12 |
 | P5-P14 | `src/dcm/runtime/store.py` | 1 | 4 |
@@ -2503,7 +2504,7 @@ _No class/function symbols._
 - `method` **run_dcm._snapshot_for** L1181
 - `method` **run_dcm._resimulate_material** L1679
 - `method` **run_dcm.slim** L1870
-- `function` **main** L2443
+- `function` **main** L2501
 
 ### `src/dcm/runtime/__init__.py`
 
@@ -2715,9 +2716,9 @@ _No class/function symbols._
 - `class` **LineageStore** L177 — Append-only P0 relational ledger used by freeze/settlement boundaries.
 - `method` **LineageStore.__init__** L180
 - `method` **LineageStore.append_line_snapshot** L187
-- `method` **LineageStore.freeze** L238
-- `method` **LineageStore.settle** L313
-- `method` **LineageStore.close** L370
+- `method` **LineageStore.freeze** L241
+- `method` **LineageStore.settle** L316
+- `method` **LineageStore.close** L373
 
 ### `src/dcm/runtime/mount_v541.py`
 
@@ -2768,6 +2769,12 @@ _No class/function symbols._
 - `method` **RunDirector._reconcile_pointer** L316 — Move only the mutable pointer back to the checkpoint authority.
 - `method` **RunDirector.step** L356
 - `method` **RunDirector.run_until_awaiting** L468
+
+### `src/dcm/runtime/runner_freeze_bridge.py`
+
+- `function` **_utc** L25
+- `function` **_hash** L35
+- `function` **freeze_supported_cfb_card** L42 — Persist an actual P0 freeze only when every current CFB dependency passes.
 
 ### `src/dcm/runtime/schema_root.py`
 
