@@ -2213,7 +2213,7 @@ def run_dcm(
     freeze["productionLineageFreezeState"] = "NOT_ELIGIBLE"
     if root_accepted and production_certified:
         from dcm.runtime.lineage_integrity import LineageHalt
-        from dcm.runtime.runner_freeze_bridge import freeze_supported_cfb_card
+        from dcm.runtime.runner_freeze_bridge import bind_verified_runner_cfb_card, freeze_supported_cfb_card
         from dcm.research.offer_revalidation import load_current_offers
 
         try:
@@ -2222,11 +2222,21 @@ def run_dcm(
             selected_for_lineage = [p for p in card if p.get("productionSelectable") is True]
             if len(selected_for_lineage) != len(production_certified):
                 raise LineageHalt("PRODUCTION_FREEZE_CARD_IDENTITY_MISMATCH")
+            current_offers = load_current_offers(dest)
+            selected_for_lineage = bind_verified_runner_cfb_card(
+                selected_for_lineage,
+                current_offers=current_offers,
+                parameter_snapshot_hashes=parameter_snapshot_hashes,
+                feature_store_hash=str(feature_store_hash or ""),
+                evidence_graph_hash=str(evidence_graph.get("contentHash") or ""),
+            )
             model_snapshot_id = (
                 "MODEL:" + content_hash({
                     "modelConfigHash": config_hash,
                     "calibrationStateHash": calibration_state.get("contentHash"),
                     "parameterSnapshotHashes": parameter_snapshot_hashes,
+                    "featureStoreHash": feature_store_hash,
+                    "evidenceGraphHash": evidence_graph.get("contentHash"),
                 })
                 if config_hash and calibration_state.get("contentHash") and parameter_snapshot_hashes else ""
             )
@@ -2236,7 +2246,7 @@ def run_dcm(
                 prompt_hash=str(freeze.get("promptHash") or ""),
                 model_snapshot_id=model_snapshot_id,
                 card=selected_for_lineage,
-                current_offers=load_current_offers(dest),
+                current_offers=current_offers,
                 root_accepted=root_accepted,
             )
             freeze["productionLineageFreeze"] = receipt
