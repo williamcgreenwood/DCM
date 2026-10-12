@@ -9,7 +9,9 @@ import pytest
 from dcm.contracts.hashes import content_hash
 from dcm.research.offer_revalidation import validate_offer_revalidation
 from dcm.runtime.lineage_integrity import LineageHalt
-from dcm.runtime.runner_freeze_bridge import freeze_supported_cfb_card
+from dcm.runtime.runner_freeze_bridge import (
+    bind_verified_runner_cfb_card, freeze_supported_cfb_card,
+)
 
 
 CUTOFF = "2026-10-18T20:00:00Z"
@@ -94,6 +96,8 @@ def test_exact_capture_can_authorize_synthetic_pregame_freeze_and_replay(tmp_pat
         },
         "selectedSide": "HIGHER",
         "parameterSnapshotHash": "e" * 64,
+        "parameterSnapshot": {"parameter_snapshot_hash": "e" * 64, "evidence_hashes": ["f" * 64]},
+        "calibratedP": 0.63,
         "evidenceHashes": ["f" * 64],
         "evidenceSafeP": 0.62,
         "grade": "PLAYABLE",
@@ -101,6 +105,13 @@ def test_exact_capture_can_authorize_synthetic_pregame_freeze_and_replay(tmp_pat
         "productionSelectable": True,
         "survivorStateAccepted": True,
     }
+    bound = bind_verified_runner_cfb_card(
+        [selected], current_offers={raw["claimId"]: offer},
+        parameter_snapshot_hashes=["e" * 64], feature_store_hash="2" * 64,
+        evidence_graph_hash="3" * 64,
+    )
+    assert bound[0]["row"]["propId"] == offer["propId"]
+    assert bound[0]["featureStoreHash"] == "2" * 64
     args = {
         "dest": tmp_path,
         "run_id": "SYNTHETIC-PREGAME-CFB",
@@ -108,7 +119,7 @@ def test_exact_capture_can_authorize_synthetic_pregame_freeze_and_replay(tmp_pat
         "board_hash": "0" * 64,
         "prompt_hash": "1" * 64,
         "model_snapshot_id": "MODEL:SYNTHETIC-CFB",
-        "card": [selected],
+        "card": bound,
         "current_offers": {raw["claimId"]: offer},
         "root_accepted": True,
     }
