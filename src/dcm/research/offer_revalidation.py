@@ -9,6 +9,7 @@ second HAR.
 from __future__ import annotations
 
 import json
+import re
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
@@ -84,6 +85,80 @@ def _known_by_id(snapshots: Iterable[Mapping[str, Any]]) -> dict[str, dict[str, 
             if value:
                 out[value] = dict(row)
     return out
+
+
+
+def _production_capture_authorized(
+    raw: Mapping[str, Any],
+    captured: Mapping[str, Any],
+    normalized: Mapping[str, Any],
+    *,
+    cutoff: str | None,
+) -> bool:
+    """Require independently captured, exact, cutoff-safe platform/market lineage.
+
+    A research-only Insights line/side is not production permission. The
+    producer must prove canonical identity, platform rule provenance, the
+    original HAR body hash, an observed active offer, and point-in-time validity.
+    This never synthesizes missing IDs or requests a separate board HAR.
+    """
+    from dcm.cfb.markets import canonicalize_cfb_market, contract_for
+
+    if captured.get("schema") != "pillars_dcm.insights_offer_snapshot.v1":
+        return False
+    if (captured.get("sourceAdapter") != "INSIGHTS_EVIDENCE"
+        or captured.get("harIdentityState") != "VERIFIED_HAR_LOCAL"
+        or captured.get("league") != "CFB"):
+        return False
+    capture_hash = captured.get("contentHash")
+    if not capture_hash or capture_hash != content_hash({
+        key: value for key, value in captured.items() if key != "contentHash"
+    }):
+        return False
+    for name in ("sourceHarSha256", "sourceBodyHash", "platformRulesSourceHash"):
+        if not re.fullmatch(r"[0-9a-f]{64}", str(captured.get(name) or "")):
+            return False
+    if (normalized.get("sourceHash") != captured.get("sourceBodyHash")
+        or raw.get("sourceId") != "HAR:" + str(captured["sourceHarSha256"])
+        or raw.get("authority") != "PLATFORM_CAPTURE"):
+        return False
+    if (captured.get("platformRulesVerified") is not True
+        or raw.get("current") is not True
+        or raw.get("marketActive") is not True):
+        return False
+    if not all(normalized.get(k) and captured.get(k) and normalized[k] == captured[k]
+               for k in ("propId", "marketDefinitionId", "settlementRuleHash")):
+        return False
+    if (str(normalized["propId"]).startswith("AUDIT_ROW:")
+        or not re.fullmatch(r"[0-9a-f]{64}", str(normalized["settlementRuleHash"]))):
+        return False
+    if (normalized.get("eventId") != captured.get("eventId")
+        or normalized.get("subjectId") != captured.get("subjectId")
+        or normalized.get("periodLabel") != str(captured.get("periodLabel") or "").upper()
+        or normalized.get("modifier") != str(captured.get("modifier") or "").upper()):
+        return False
+    market = canonicalize_cfb_market(str(captured.get("market") or ""))
+    if market is None or contract_for(market) is None:
+        return False
+    if market != str(normalized.get("proposition") or "").lower():
+        return False
+    if (normalized.get("eventStatus") != "PRE_GAME"
+        or str(captured.get("eventStatus") or "").upper() != "PRE_GAME"):
+        return False
+    if not cutoff or not str(captured.get("sourceSnapshotTime") or ""):
+        return False
+    deadline = _time(cutoff)
+    observed = _time(normalized.get("retrievedAt"))
+    source_time = _time(captured.get("sourceSnapshotTime"))
+    begins = _time(normalized.get("scheduledTime"))
+    valid_until = _time(normalized.get("validUntilUtc"))
+    if any(t is None for t in (deadline, observed, source_time, begins, valid_until)):
+        return False
+    if not (source_time <= observed <= deadline <= valid_until and deadline < begins):
+        return False
+    if _time(normalized.get("offerTimestamp")) is None or _time(normalized["offerTimestamp"]) > deadline:
+        return False
+    return True
 
 
 def validate_offer_revalidation(
@@ -169,6 +244,7 @@ def validate_offer_revalidation(
             or (captured.get("eventStartTime") if isinstance(captured, Mapping) else None),
             64,
         ) or None,
+        "propId": _text(raw.get("propId"), 256) or None,
         "marketDefinitionId": _text(raw.get("marketDefinitionId"), 256) or None,
         "settlementRuleHash": _text(raw.get("settlementRuleHash"), 256) or None,
         "sourceHarSha256": _text(captured.get("sourceHarSha256"), 128) or None,
@@ -182,6 +258,9 @@ def validate_offer_revalidation(
         scheduled_time=normalized.get("scheduledTime"),
     )
     normalized["lineSnapshotId"] = line_snapshot_id(normalized)
+    normalized["productionSelectionPermitted"] = _production_capture_authorized(
+        raw, captured, normalized, cutoff=cutoff,
+    )
     normalized["offerHash"] = content_hash({key: value for key, value in normalized.items() if key != "offerHash"})
     return normalized
 
@@ -265,7 +344,9 @@ def import_offer_revalidations(
         "blockers": dict(sorted(blockers.items())),
         "appendOnly": True,
         "boardHarRequired": False,
-        "productionSelectionPermitted": False,
+        "productionSelectionPermitted": any(
+            offer.get("productionSelectionPermitted") is True for offer in latest.values()
+        ),
     }
     payload["contentHash"] = content_hash(payload)
     write_json(dest / "current_offer_snapshots.json", payload)
