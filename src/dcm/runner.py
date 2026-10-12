@@ -2207,6 +2207,62 @@ def run_dcm(
     # structurally complete diagnostic bundle; missing/malformed requests do not.
     research_terminal = research == "fixture" or bool(bundle.get("complete"))
     can_freeze = frontier_final and research_terminal and stop_reason != "EXTERNAL_HOST_REQUIRED"
+    # A diagnostic frozen_forecast.json is NOT a production LineageStore freeze.
+    # Only current-offer revalidation plus canonical identities, model/evidence
+    # provenance and a supported CFB market may publish production members.
+    freeze["productionLineageFreezeState"] = "NOT_ELIGIBLE"
+    if root_accepted and production_certified:
+        from dcm.runtime.lineage_integrity import LineageHalt
+        from dcm.runtime.runner_freeze_bridge import freeze_supported_cfb_card
+        from dcm.research.offer_revalidation import load_current_offers
+
+        try:
+            if not can_freeze:
+                raise LineageHalt("FRONTIER_RESEARCH_REQUIRED")
+            selected_for_lineage = [p for p in card if p.get("productionSelectable") is True]
+            if len(selected_for_lineage) != len(production_certified):
+                raise LineageHalt("PRODUCTION_FREEZE_CARD_IDENTITY_MISMATCH")
+            model_snapshot_id = (
+                "MODEL:" + content_hash({
+                    "modelConfigHash": config_hash,
+                    "calibrationStateHash": calibration_state.get("contentHash"),
+                    "parameterSnapshotHashes": parameter_snapshot_hashes,
+                })
+                if config_hash and calibration_state.get("contentHash") and parameter_snapshot_hashes else ""
+            )
+            receipt = freeze_supported_cfb_card(
+                dest=dest, run_id=run_id, frozen_at_utc=forecast_cutoff,
+                board_hash=str(board.get("contentHash") or ""),
+                prompt_hash=str(freeze.get("promptHash") or ""),
+                model_snapshot_id=model_snapshot_id,
+                card=selected_for_lineage,
+                current_offers=load_current_offers(dest),
+                root_accepted=root_accepted,
+            )
+            freeze["productionLineageFreeze"] = receipt
+            freeze["productionLineageFreezeState"] = "FROZEN"
+        except LineageHalt as exc:
+            # No card may remain production-certified without a relational freeze.
+            freeze["productionLineageFreezeState"] = "BLOCKED"
+            freeze["productionLineageFreezeBlocker"] = exc.code
+            freeze["productionCertified"] = False
+            freeze["productionCertifiedCardSize"] = 0
+            freeze["productionRootCertification"] = NOT_PRODUCTION_ROOT_CERTIFIED
+            freeze["notProductionRootCertified"] = True
+            freeze["productionEmptyCardReason"] = "PRODUCTION_LINEAGE_FREEZE_BLOCKED"
+            freeze["executionMode"] = "RESEARCHED_MODELED"
+            freeze["productionRootBlockers"] = list(freeze.get("productionRootBlockers") or []) + [exc.code]
+            root_accepted = False
+            production_certified = []
+            write_card_layer_files(
+                dest, top25_ranked=top25_ranked, strict_card=strict_card,
+                production_certified=production_certified,
+                directional_passes=directional_passes,
+            )
+            freeze["runState"] = layer_run_state(
+                root_accepted=False, modeled_card_size=len(card),
+                ranked_size=len(top25_ranked), unsupported=unsupported,
+            )
     freeze["top25Final"] = frontier_final
     freeze["frontierStopReason"] = stop_reason
     freeze["frontierPassCount"] = int(loop_doc.get("frontierPassCount") or 0)
@@ -2233,6 +2289,8 @@ def run_dcm(
         "forecastFrozen": freeze.get("forecastFrozen"),
         "top25Final": freeze.get("top25Final"),
         "freezeState": freeze.get("freezeState"),
+        "productionLineageFreezeState": freeze.get("productionLineageFreezeState"),
+        "productionLineageFreezeId": (freeze.get("productionLineageFreeze") or {}).get("freezeId"),
         "frontierCheckpointHash": freeze.get("frontierCheckpointHash"),
     }
     if empty_card_reason:
