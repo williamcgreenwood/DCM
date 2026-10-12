@@ -226,6 +226,9 @@ class LineageStore:
             )
             self.conn.commit()
         except sqlite3.IntegrityError as exc:
+            # A failed duplicate INSERT leaves SQLite in a transaction. Roll it
+            # back before idempotent readback or the next freeze BEGIN IMMEDIATE.
+            self.conn.rollback()
             row = self.conn.execute(
                 "SELECT content_hash FROM line_snapshots WHERE line_snapshot_id=?",
                 (sid,),
