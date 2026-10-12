@@ -135,14 +135,20 @@ END;
 -- Protect the observed-time and eligibility boundary even from direct SQL writers.
 CREATE TRIGGER IF NOT EXISTS freeze_members_point_in_time_gate
 BEFORE INSERT ON freeze_members BEGIN
-    SELECT CASE WHEN NEW.evidence_hash='' OR NEW.parameter_snapshot_hash=''
+    SELECT CASE WHEN length(trim(NEW.evidence_hash))=0 OR length(trim(NEW.parameter_snapshot_hash))=0
         THEN RAISE(ABORT,'PILLARS_P0_FREEZE_MISSING_EVIDENCE_OR_MODEL') END;
     SELECT CASE WHEN EXISTS (
         SELECT 1 FROM line_snapshots l JOIN freezes f ON f.freeze_id=NEW.freeze_id
         WHERE l.line_snapshot_id=NEW.line_snapshot_id AND l.captured_at_utc>f.frozen_at_utc
     ) THEN RAISE(ABORT,'PILLARS_P0_FUTURE_OFFER_LEAKAGE') END;
     SELECT CASE WHEN EXISTS (
+        SELECT 1 FROM line_snapshots l JOIN freezes f ON f.freeze_id=NEW.freeze_id
+        WHERE l.line_snapshot_id=NEW.line_snapshot_id
+        AND (l.valid_until_utc<f.frozen_at_utc OR l.prop_id!=NEW.prop_id
+             OR l.market_definition_id!=NEW.market_definition_id)
+    ) THEN RAISE(ABORT,'PILLARS_P0_FREEZE_LINEAGE_OR_FRESHNESS_MISMATCH') END;
+    SELECT CASE WHEN EXISTS (
         SELECT 1 FROM line_snapshots l WHERE l.line_snapshot_id=NEW.line_snapshot_id
-        AND (l.status NOT IN ('PRE_GAME','PREGAME') OR l.source_hash='')
+        AND (l.status NOT IN ('PRE_GAME','PREGAME') OR length(trim(l.source_hash))=0)
     ) THEN RAISE(ABORT,'PILLARS_P0_FREEZE_OFFER_UNSUPPORTED') END;
 END;
