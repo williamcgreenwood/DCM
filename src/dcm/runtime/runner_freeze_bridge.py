@@ -39,6 +39,91 @@ def _hash(value: Any, code: str) -> str:
     return text
 
 
+
+def bind_verified_runner_cfb_card(
+    card: Sequence[Mapping[str, Any]],
+    *,
+    current_offers: Mapping[str, Mapping[str, Any]],
+    parameter_snapshot_hashes: Sequence[str],
+    feature_store_hash: str,
+    evidence_graph_hash: str,
+) -> list[dict[str, Any]]:
+    """Bind modeled survivors to capture-origin IDs without manufacturing lineage."""
+    _hash(feature_store_hash, "PRODUCTION_FREEZE_FEATURE_STORE_REQUIRED")
+    _hash(evidence_graph_hash, "PRODUCTION_FREEZE_EVIDENCE_GRAPH_REQUIRED")
+    known_parameters = set(parameter_snapshot_hashes)
+    if not known_parameters or any(not _HEX.fullmatch(str(h)) for h in known_parameters):
+        raise LineageHalt("PRODUCTION_FREEZE_PARAMETER_INDEX_INVALID")
+    prepared: list[dict[str, Any]] = []
+    for candidate in card:
+        row = candidate.get("row")
+        if not isinstance(row, Mapping):
+            raise LineageHalt("PRODUCTION_FREEZE_ROW_MISSING")
+        projection_id = str(row.get("projectionId") or "")
+        offer = current_offers.get(projection_id) if projection_id else None
+        if not isinstance(offer, Mapping):
+            raise LineageHalt("OFFER_REVALIDATION_UNAVAILABLE")
+        if offer.get("productionSelectionPermitted") is not True:
+            raise LineageHalt("PRODUCTION_FREEZE_OFFER_NOT_AUTHORIZED")
+        if (str(row.get("league") or "").upper() != "CFB"
+            or str(row.get("eventId") or "") != str(offer.get("eventId") or "")
+            or str(row.get("playerId") or "") != str(offer.get("subjectId") or "")
+            or canonicalize_cfb_market(str(row.get("market") or "")) !=
+                str(offer.get("proposition") or "").lower()):
+            raise LineageHalt("PRODUCTION_FREEZE_CAPTURE_ROW_MISMATCH")
+        try:
+            if (not isfinite(float(row["line"])) or
+                float(row["line"]) != float(offer["line"])):
+                raise LineageHalt("PRODUCTION_FREEZE_LINE_CHANGED")
+        except (KeyError, ValueError, TypeError) as exc:
+            raise LineageHalt("PRODUCTION_FREEZE_LINE_MISSING") from exc
+        side = str(candidate.get("selectedSide") or "").upper()
+        side = {"MORE": "HIGHER", "LESS": "LOWER"}.get(side, side)
+        if side not in {"HIGHER", "LOWER"} or side != str(offer.get("direction") or ""):
+            raise LineageHalt("PRODUCTION_FREEZE_DIRECTION_MISMATCH")
+        if row.get("status") not in {"pre_game", "PRE_GAME", "pregame", "PREGAME"}:
+            raise LineageHalt("PRODUCTION_FREEZE_EVENT_NOT_PREGAME")
+        for key in ("propId", "marketDefinitionId", "settlementRuleHash", "periodLabel", "modifier"):
+            verified = str(offer.get(key) or "")
+            if not verified:
+                raise LineageHalt("PRODUCTION_FREEZE_CAPTURE_FIELD_MISSING")
+            existing = str(row.get(key) or "")
+            if existing and existing.upper() != verified.upper():
+                raise LineageHalt("PRODUCTION_FREEZE_CANONICAL_CONFLICT")
+        parameter_hash = str(candidate.get("parameterSnapshotHash") or "")
+        if parameter_hash not in known_parameters:
+            raise LineageHalt("PRODUCTION_FREEZE_PARAMETER_NOT_IN_RUN")
+        snapshot = candidate.get("parameterSnapshot")
+        if not isinstance(snapshot, Mapping) or snapshot.get("parameter_snapshot_hash") != parameter_hash:
+            raise LineageHalt("PRODUCTION_FREEZE_PARAMETER_SNAPSHOT_UNBOUND")
+        evidence = candidate.get("evidenceHashes")
+        if not isinstance(evidence, (tuple, list)) or not evidence:
+            raise LineageHalt("PRODUCTION_FREEZE_EVIDENCE_REQUIRED")
+        if sorted(evidence) != sorted(snapshot.get("evidence_hashes") or []):
+            raise LineageHalt("PRODUCTION_FREEZE_EVIDENCE_SNAPSHOT_CONFLICT")
+        try:
+            calibrated = float(candidate["calibratedP"])
+        except (KeyError, ValueError, TypeError) as exc:
+            raise LineageHalt("PRODUCTION_FREEZE_CALIBRATION_REQUIRED") from exc
+        if not isfinite(calibrated) or not 0 <= calibrated <= 1:
+            raise LineageHalt("PRODUCTION_FREEZE_CALIBRATION_INVALID")
+        bound_row = dict(row)
+        for key in ("propId", "marketDefinitionId", "settlementRuleHash", "periodLabel", "modifier"):
+            bound_row[key] = offer[key]
+        # Capture-authorized observed side, never inferred availability.
+        observed_key = "offeredHigher" if side == "HIGHER" else "offeredLower"
+        if row.get(observed_key) is False:
+            raise LineageHalt("PRODUCTION_FREEZE_SIDE_NOT_OFFERED")
+        bound_row[observed_key] = True
+        bound = dict(candidate)
+        bound["row"] = bound_row
+        bound["selectedSide"] = side
+        bound["featureStoreHash"] = feature_store_hash
+        bound["evidenceGraphHash"] = evidence_graph_hash
+        prepared.append(bound)
+    return prepared
+
+
 def freeze_supported_cfb_card(
     *,
     dest: Path,

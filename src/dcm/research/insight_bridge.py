@@ -274,6 +274,10 @@ def insights_offer_snapshots(claims: list[dict[str, Any]]) -> dict[str, Any]:
             "sourceHarSha256": claim.get("sourceHarSha256"),
             "sourceBodyHash": claim.get("sourceBodyHash"),
         }
+        # Preserve only explicitly observed fields; absence is not authorization.
+        for key in ("periodLabel", "sourceSnapshotTime", "propId", "marketDefinitionId", "settlementRuleHash"):
+            if claim.get(key) is not None:
+                body[key] = claim[key]
         body["contentHash"] = content_hash({k: v for k, v in body.items() if k != "contentHash"})
         snapshots.append(body)
     snapshots.sort(key=lambda row: (str(row.get("league") or ""), str(row.get("claimId") or "")))
