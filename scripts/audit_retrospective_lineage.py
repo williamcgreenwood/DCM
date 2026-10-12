@@ -47,8 +47,11 @@ def _col(address: str) -> int:
     return out - 1
 
 
-def read_first_sheet(data: bytes) -> list[dict[str, str]]:
-    """Read literal XLSX cells, never evaluate formulas or cached formulas."""
+def read_first_sheet(data: bytes, *, sheet_name: str | None = None) -> list[dict[str, str]]:
+    """Read literal XLSX cells from an explicitly named sheet, or first sheet by default.
+
+    No formula evaluation. A missing or duplicate requested sheet fails closed.
+    """
     if len(data) > 20_000_000:
         raise RetrospectiveHalt("WORKBOOK_SIZE_LIMIT")
     try:
@@ -58,9 +61,20 @@ def read_first_sheet(data: bytes) -> list[dict[str, str]]:
                 if z.getinfo(name).file_size > 10_000_000:
                     raise RetrospectiveHalt("WORKBOOK_XML_SIZE_LIMIT")
             book = ET.fromstring(z.read("xl/workbook.xml"))
-            sheet = book.find(f"{{{MAIN}}}sheets/{{{MAIN}}}sheet")
-            if sheet is None:
-                raise RetrospectiveHalt("WORKSHEET_MISSING")
+            sheets = book.findall(f"{{{MAIN}}}sheets/{{{MAIN}}}sheet")
+            if sheet_name is None:
+                if not sheets:
+                    raise RetrospectiveHalt("WORKSHEET_MISSING")
+                sheet = sheets[0]
+            else:
+                if not isinstance(sheet_name, str) or not sheet_name:
+                    raise RetrospectiveHalt("WORKSHEET_NAME_INVALID")
+                matches = [item for item in sheets if item.get("name") == sheet_name]
+                if not matches:
+                    raise RetrospectiveHalt("WORKSHEET_NAME_MISSING")
+                if len(matches) != 1:
+                    raise RetrospectiveHalt("WORKSHEET_NAME_AMBIGUOUS")
+                sheet = matches[0]
             rel_id = sheet.get(f"{{{REL}}}id")
             rels = ET.fromstring(z.read("xl/_rels/workbook.xml.rels"))
             target = next((r.get("Target") for r in rels.findall(f"{{{PKG_REL}}}Relationship") if r.get("Id") == rel_id), None)
@@ -117,7 +131,9 @@ def read_first_sheet(data: bytes) -> list[dict[str, str]]:
 
 
 def ingest(*, workbook: Path, addendum: Path, db: Path, run_id: str,
-           expected_sha256: str, source_column: str = "SOURCE_URL", expected_rows: int = 74) -> dict[str, object]:
+           expected_sha256: str, source_column: str = "SOURCE_URL", expected_rows: int = 74,
+           sheet_name: str | None = None,
+           row_key_columns: tuple[str, ...] | None = None) -> dict[str, object]:
     """Verify before the first write; then commit original row anchors and corrections atomically."""
     if not run_id or not re.fullmatch(r"[0-9a-f]{64}", expected_sha256.lower()):
         raise RetrospectiveHalt("EXPECTED_HASH_REQUIRED")
@@ -125,18 +141,40 @@ def ingest(*, workbook: Path, addendum: Path, db: Path, run_id: str,
     actual_hash = sha256(raw)
     if actual_hash != expected_sha256.lower():
         raise RetrospectiveHalt("WORKBOOK_SHA256_MISMATCH")
-    records = read_first_sheet(raw)
+    if row_key_columns is not None:
+        if not isinstance(row_key_columns, (list, tuple)) or not row_key_columns or (
+            any(not isinstance(k, str) or not k or k != k.strip() for k in row_key_columns)
+        ) or len(set(row_key_columns)) != len(row_key_columns):
+            raise RetrospectiveHalt("COMPOSITE_ROW_KEY_COLUMNS_INVALID")
+        if not sheet_name:
+            raise RetrospectiveHalt("COMPOSITE_WORKSHEET_NAME_REQUIRED")
+    records = read_first_sheet(raw, sheet_name=sheet_name)
     if len(records) != expected_rows:
         raise RetrospectiveHalt("WORKBOOK_ROW_COUNT_MISMATCH")
     ids = ("ROW_ID", "RECORD_ID", "PROP_ID")
     id_col = next((key for key in ids if key in records[0]), None)
-    if not id_col or source_column not in records[0]:
+    if source_column not in records[0]:
         raise RetrospectiveHalt("ROW_ID_OR_SOURCE_COLUMN_MISSING")
+    if row_key_columns is None and not id_col:
+        raise RetrospectiveHalt("ROW_ID_OR_SOURCE_COLUMN_MISSING")
+    if row_key_columns is not None and any(key not in records[0] for key in row_key_columns):
+        raise RetrospectiveHalt("COMPOSITE_ROW_KEY_COLUMN_MISSING")
     rows = {}
     for row in records:
-        rid = row[id_col].strip()
-        if not rid or rid in rows:
-            raise RetrospectiveHalt("ROW_ID_MISSING_OR_DUPLICATE")
+        if row_key_columns is None:
+            rid = row[id_col].strip()
+            if not rid or rid in rows:
+                raise RetrospectiveHalt("ROW_ID_MISSING_OR_DUPLICATE")
+        else:
+            # Audit-row anchor ONLY. Never reuse this as a historical PROP_ID.
+            columns = [[key, row[key]] for key in row_key_columns]
+            if any(not value.strip() for _, value in columns):
+                raise RetrospectiveHalt("COMPOSITE_ROW_KEY_VALUE_MISSING")
+            rid = "AUDIT_ROW:" + digest_json({
+                "kind": "retrospective_composite_row_key.v1", "columns": columns
+            })
+            if rid in rows:
+                raise RetrospectiveHalt("COMPOSITE_ROW_KEY_DUPLICATE")
         rows[rid] = (digest_json(row), row[source_column])
     try:
         amendment = json.loads(addendum.read_text(encoding="utf-8"))
@@ -144,6 +182,22 @@ def ingest(*, workbook: Path, addendum: Path, db: Path, run_id: str,
         raise RetrospectiveHalt("ADDENDUM_STRUCTURED_JSON_REQUIRED") from exc
     if amendment.get("workbook_sha256") != actual_hash:
         raise RetrospectiveHalt("ADDENDUM_WORKBOOK_HASH_MISMATCH")
+    if row_key_columns is not None:
+        expected_scheme = (
+            'AUDIT_ROW:+sha256(canonical_json({"kind":"retrospective_composite_row_key.v1",'
+            '"columns":[[column_name,raw_cell_text],...]}))'
+        )
+        expected_contract = {
+            "schema": "dcm.retrospective_source_corrections.v1",
+            "run_id": run_id,
+            "workbook_sheet_name": sheet_name,
+            "source_column": source_column,
+            "row_key_columns": list(row_key_columns),
+            "row_key_scheme": expected_scheme,
+            "expected_rows": expected_rows,
+        }
+        if any(amendment.get(key) != value for key, value in expected_contract.items()):
+            raise RetrospectiveHalt("COMPOSITE_MANIFEST_CONTRACT_MISMATCH")
     corrections = amendment.get("corrections")
     if not isinstance(corrections, list):
         raise RetrospectiveHalt("CORRECTIONS_LIST_REQUIRED")
@@ -218,11 +272,17 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--run-id", required=True)
     ap.add_argument("--expected-sha256", required=True)
     ap.add_argument("--source-column", default="SOURCE_URL")
+    ap.add_argument("--sheet-name", help="Exact XLSX worksheet name (default: first worksheet)")
+    ap.add_argument("--row-key-columns", help="Comma-separated composite retrospective audit key")
     args = ap.parse_args(argv)
     try:
+        row_key_columns = None
+        if args.row_key_columns is not None:
+            row_key_columns = tuple(args.row_key_columns.split(","))
         receipt = ingest(workbook=args.workbook, addendum=args.addendum, db=args.db,
                          run_id=args.run_id, expected_sha256=args.expected_sha256,
-                         source_column=args.source_column)
+                         source_column=args.source_column, sheet_name=args.sheet_name,
+                         row_key_columns=row_key_columns)
     except (RetrospectiveHalt, OSError) as exc:
         print(json.dumps({"state": "BLOCKED", "reason": getattr(exc, "code", "INPUT_IO_ERROR")}), file=sys.stderr)
         return 2
