@@ -116,3 +116,32 @@ def test_freeze_member_rejects_future_offer_and_empty_evidence(tmp_path: Path) -
             c.execute("INSERT INTO freeze_members VALUES(?,?,?,?,?,?,?)", ('F1','R1','P1','L1','M1','','parameters'))
     finally:
         store.close()
+
+
+def test_direct_freeze_member_rejects_stale_identity_and_unsupported_status(tmp_path: Path) -> None:
+    from dcm.runtime.lineage_integrity import LineageStore
+    store = LineageStore(tmp_path / 'lineage.sqlite3')
+    try:
+        c = store.conn
+        c.execute("INSERT INTO line_snapshots VALUES(?,?,?,?,?,?,?,?,?,?,?,?)",
+                  ('L2','P2','M2','2026-10-12T19:00:00Z','2026-10-12T19:01:00Z',10.5,
+                   'LOWER','STANDARD','FULL_GAME','PRE_GAME','src','hash-l2'))
+        c.execute("INSERT INTO freezes VALUES(?,?,?,?,?,?,?)",
+                  ('F2','RUN','2026-10-12T19:02:00Z','MODEL','PROMPT','BOARD','hash-f2'))
+        with pytest.raises(sqlite3.IntegrityError, match='FREEZE_LINEAGE_OR_FRESHNESS_MISMATCH'):
+            c.execute("INSERT INTO freeze_members VALUES(?,?,?,?,?,?,?)",
+                      ('F2','R2','P2','L2','M2','evidence','parameters'))
+        c.execute("INSERT INTO line_snapshots VALUES(?,?,?,?,?,?,?,?,?,?,?,?)",
+                  ('L3','P3','M3','2026-10-12T19:00:00Z','2026-10-12T19:04:00Z',10.5,
+                   'HIGHER','STANDARD','FULL_GAME','PRE_GAME','src','hash-l3'))
+        with pytest.raises(sqlite3.IntegrityError, match='FREEZE_LINEAGE_OR_FRESHNESS_MISMATCH'):
+            c.execute("INSERT INTO freeze_members VALUES(?,?,?,?,?,?,?)",
+                      ('F2','R3','WRONG_PROP','L3','M3','evidence','parameters'))
+        c.execute("INSERT INTO line_snapshots VALUES(?,?,?,?,?,?,?,?,?,?,?,?)",
+                  ('L4','P4','M4','2026-10-12T19:00:00Z','2026-10-12T19:04:00Z',10.5,
+                   'HIGHER','STANDARD','FULL_GAME','LIVE','src','hash-l4'))
+        with pytest.raises(sqlite3.IntegrityError, match='FREEZE_OFFER_UNSUPPORTED'):
+            c.execute("INSERT INTO freeze_members VALUES(?,?,?,?,?,?,?)",
+                      ('F2','R4','P4','L4','M4','evidence','parameters'))
+    finally:
+        store.close()
