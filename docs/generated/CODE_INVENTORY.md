@@ -3,9 +3,9 @@
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
 - Modules: **267**
-- Symbols: **2049**
+- Symbols: **2050**
 - Parse errors: **0**
-- Inventory hash: `ac8f0d8dcfb50c28981628994973839766f44716cc1f10e975d77567f7387b15`
+- Inventory hash: `ba34b082a5d9ca0e3ffb26edc9fdc192ff32e9a32e9692fed6467fe74cc22002`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -177,7 +177,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P1 | `src/dcm/research/observation_execute_support.py` | 0 | 10 |
 | P1 | `src/dcm/research/observation_typed.py` | 0 | 7 |
 | P1 | `src/dcm/research/offer_metadata.py` | 0 | 1 |
-| P1 | `src/dcm/research/offer_revalidation.py` | 1 | 9 |
+| P1 | `src/dcm/research/offer_revalidation.py` | 1 | 10 |
 | P1 | `src/dcm/research/os_graphs.py` | 0 | 8 |
 | P1 | `src/dcm/research/player_offer_set.py` | 1 | 6 |
 | P1 | `src/dcm/research/player_packet.py` | 0 | 13 |
@@ -2144,16 +2144,17 @@ _No class/function symbols._
 
 ### `src/dcm/research/offer_revalidation.py`
 
-- `class` **OfferRevalidationError** L32 — A current-offer observation is not safe to consume.
-- `function` **_text** L36
-- `function` **_number** L40
-- `function` **_time** L50
-- `function` **_key** L61
-- `function` **_snapshot_key** L73
-- `function` **_known_by_id** L77
-- `function` **validate_offer_revalidation** L89 — Return one canonical current-offer snapshot or raise a typed error.
-- `function` **import_offer_revalidations** L189 — Validate and persist current offers without overwriting prior versions.
-- `function` **load_current_offers** L275
+- `class` **OfferRevalidationError** L33 — A current-offer observation is not safe to consume.
+- `function` **_text** L37
+- `function` **_number** L41
+- `function` **_time** L51
+- `function` **_key** L62
+- `function` **_snapshot_key** L74
+- `function` **_known_by_id** L78
+- `function` **_production_capture_authorized** L91 — Require independently captured, exact, cutoff-safe platform/market lineage.
+- `function` **validate_offer_revalidation** L164 — Return one canonical current-offer snapshot or raise a typed error.
+- `function` **import_offer_revalidations** L268 — Validate and persist current offers without overwriting prior versions.
+- `function` **load_current_offers** L356
 
 ### `src/dcm/research/os_graphs.py`
 
