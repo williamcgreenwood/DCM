@@ -773,6 +773,18 @@ def _ml() -> tuple[dict[str, Any], ...]:
             applicability_contract=appl, input_contract="structured features", output_contract="estimate/score",
             semantic_scope=name, fallback_algorithm_id=fb,
         ))
+    rows.append(_a(
+        "ALG-ML-TIME-009", "Event-disjoint chronological walk-forward folds", "ML_TIME", "REQUIRED_CONDITIONAL",
+        implementation_module="dcm.learning.walkforward", implementation_symbol="chronological_folds",
+        runtime_producer="dcm.learning.dataset.build_dataset",
+        runtime_consumer="dcm.learning.walkforward.run_walkforward",
+        applicability_contract=("settled frozen forecasts with timezone-aware decisionCutoff, labelAvailableAt, "
+                                "and eventId; folds are blocked if any required event identity is missing"),
+        input_contract="chronological settled rows with eventId and label availability timestamps",
+        output_contract="expanding folds with training labels available before test and zero train/test event overlap",
+        semantic_scope="calibration and walk-forward validation across event-grouped sports forecasts",
+        test_ids=("test_p6_learning", "test_external_donor_decisions"),
+    ))
     challengers = [
         ("ALG-ML-TABULAR-003", "Random Forest", "ML_TABULAR", "ALG-ML-TABULAR-001"),
         ("ALG-ML-TABULAR-004", "Extra Trees", "ML_TABULAR", "ALG-ML-TABULAR-001"),

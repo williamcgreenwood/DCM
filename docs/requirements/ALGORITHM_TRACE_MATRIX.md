@@ -5,9 +5,9 @@ Constitution version: `DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903`
 Generated from `dcm.algorithms.catalog`. Do not hand-edit algorithm rows.
 Re-run `python scripts/export_algorithm_registry.py` after catalog changes.
 
-- Registry rows: **170**
+- Registry rows: **171**
 - REQUIRED_CORE: **79**
-- REQUIRED_CONDITIONAL: **29**
+- REQUIRED_CONDITIONAL: **30**
 - PERMANENT_CHALLENGER: **62**
 
 | algorithm_id | name | family | lifecycle | implementation | producer | consumer | fallback | tests | traces |
@@ -128,6 +128,7 @@ Re-run `python scripts/export_algorithm_registry.py` after catalog changes.
 | `ALG-ML-TIME-006` | Hidden Markov Models | ML_TIME | PERMANENT_CHALLENGER | `dcm.algorithms.ml_families.not_active_challenger` | AlgorithmFrontierReview | benchmarks/algorithm_frontier | ALG-ML-TIME-002 | test_algorithm_constitution,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
 | `ALG-ML-TIME-007` | Bayesian Online Change Point Detection | ML_TIME | PERMANENT_CHALLENGER | `dcm.algorithms.ml_families.not_active_challenger` | AlgorithmFrontierReview | benchmarks/algorithm_frontier | ALG-ML-TIME-003 | test_algorithm_constitution,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
 | `ALG-ML-TIME-008` | PELT | ML_TIME | PERMANENT_CHALLENGER | `dcm.algorithms.ml_families.not_active_challenger` | AlgorithmFrontierReview | benchmarks/algorithm_frontier | ALG-ML-TIME-002 | test_algorithm_constitution,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
+| `ALG-ML-TIME-009` | Event-disjoint chronological walk-forward folds | ML_TIME | REQUIRED_CONDITIONAL | `dcm.learning.walkforward.chronological_folds` | dcm.learning.dataset.build_dataset | dcm.learning.walkforward.run_walkforward |  | test_p6_learning,test_external_donor_decisions,test_algorithm_core | REQ-ALG-CONST-R0 |
 | `ALG-PORT-001` | Shared-outcome portfolio dependence diagnostic | GROUP | REQUIRED_CORE | `dcm.model.advanced_execution._shared_world_diagnostics` | aligned EventWorld pick outcomes | dcm.selection.portfolio and payout EV |  | test_algorithm_constitution,test_algorithm_core | REQ-ALG-CONST-R0 |
 | `ALG-SCHED-001` | Lazy-greedy CELF scheduler | SCHED | REQUIRED_CORE | `dcm.algorithms.scheduling.LazyGreedyScheduler` | HarAlgorithmExecutionPlan | dcm.research.batch |  | test_algorithm_constitution,test_algorithm_core | REQ-ALG-CONST-R0,REQ-ALG-SUBMODULAR |
 | `ALG-SCHED-002` | Weighted set-cover scheduler | SCHED | REQUIRED_CORE | `dcm.algorithms.scheduling.cover_actions` | HarAlgorithmExecutionPlan | dcm.research.batch |  | test_algorithm_constitution,test_algorithm_core | REQ-ALG-CONST-R0,REQ-ALG-SETCOVER |

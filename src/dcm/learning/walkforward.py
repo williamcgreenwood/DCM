@@ -19,6 +19,7 @@ from dcm.version import LEARNING_REVISION, PREDICTIVE_CLAIM, SOFTWARE
 LOG_LOSS_CLIP = 1e-12
 MIN_CHALLENGER_TRAIN_N = 8
 REPORT_SCHEMA = "dcm.walkforward_report.v1-20260830"
+WALKFORWARD_ALGORITHM_ID = "ALG-ML-TIME-009"
 
 class WalkForwardLeakage(RuntimeError):
     """Test fold decisionCutoff is not strictly after every train cutoff."""
@@ -127,9 +128,9 @@ def metrics(preds: list[float], y: list[float], *, n_bins: int = 10) -> dict[str
     }
 
 def assert_no_leakage(train: list[dict[str, Any]], test: list[dict[str, Any]]) -> None:
-    train_c = [_ts(r.get("decisionCutoff")) for r in train if _ts(r.get("decisionCutoff"))]
-    test_c = [_ts(r.get("decisionCutoff")) for r in test if _ts(r.get("decisionCutoff"))]
-    if not train_c or not test_c:
+    train_c = [_aware_time(r.get("decisionCutoff")) for r in train]
+    test_c = [_aware_time(r.get("decisionCutoff")) for r in test]
+    if not train_c or not test_c or any(value is None for value in train_c + test_c):
         raise WalkForwardLeakage("WALKFORWARD_LEAKAGE: missing decisionCutoff on train or test")
     max_train = max(train_c)
     min_test = min(test_c)
@@ -137,13 +138,12 @@ def assert_no_leakage(train: list[dict[str, Any]], test: list[dict[str, Any]]) -
         raise WalkForwardLeakage(
             f"WALKFORWARD_LEAKAGE: max(train cutoff)={max_train!r} is not < min(test cutoff)={min_test!r}"
         )
-    for row in test:
-        c = _ts(row.get("decisionCutoff"))
-        if c and c <= max_train:
-            raise WalkForwardLeakage(f"WALKFORWARD_LEAKAGE: test cutoff {c!r} <= train max {max_train!r}")
-    first_test = min((_aware_time(c) for c in test_c), default=None)
-    if first_test is None:
-        raise WalkForwardLeakage("WALKFORWARD_LEAKAGE: invalid test decision cutoff")
+    for cutoff in test_c:
+        if cutoff <= max_train:
+            raise WalkForwardLeakage(
+                f"WALKFORWARD_LEAKAGE: test cutoff {cutoff!r} <= train max {max_train!r}"
+            )
+    first_test = min(test_c)
     for row in train:
         available = row.get("labelAvailableAt")
         if available is None:
@@ -151,36 +151,69 @@ def assert_no_leakage(train: list[dict[str, Any]], test: list[dict[str, Any]]) -
         available_at = _aware_time(available)
         if available_at is None or available_at >= first_test:
             raise WalkForwardLeakage("WALKFORWARD_LEAKAGE: training label unavailable at test cutoff")
+    train_events = {str(row.get("eventId") or "") for row in train}
+    test_events = {str(row.get("eventId") or "") for row in test}
+    if train_events != {""} or test_events != {""}:
+        if "" in train_events or "" in test_events:
+            raise WalkForwardLeakage("WALKFORWARD_LEAKAGE: missing eventId in event-disjoint fold")
+        overlap = train_events & test_events
+        if overlap:
+            raise WalkForwardLeakage(
+                f"WALKFORWARD_LEAKAGE: train/test event overlap: {sorted(overlap)[:3]!r}"
+            )
 
 def chronological_folds(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """As-of expanding folds; a prior forecast is trainable only after its label arrived."""
+    """As-of expanding folds with event-disjoint, label-available training rows.
+
+    Rows without an event identity cannot prove group disjointness and therefore
+    produce no calibration folds. A currently tested event is excluded from the
+    training population even when an earlier forecast for that event has settled.
+    """
     labeled = [r for r in rows if _ts(r.get("decisionCutoff"))]
-    cutoff_values = {_ts(r.get("decisionCutoff")) for r in labeled}
-    cutoff_pairs = [(_aware_time(value), value) for value in cutoff_values]
-    if any(parsed is None for parsed, _ in cutoff_pairs):
+    if not labeled or any(not _ts(row.get("eventId")) for row in labeled):
         return []
-    cutoffs = [value for _parsed, value in sorted(cutoff_pairs)]
+    cutoff_times = [_aware_time(r.get("decisionCutoff")) for r in labeled]
+    if any(parsed is None for parsed in cutoff_times):
+        return []
+    cutoffs = sorted(set(cutoff_times))
+    rows_by_cutoff = {
+        cutoff: [row for row in labeled if _aware_time(row.get("decisionCutoff")) == cutoff]
+        for cutoff in cutoffs
+    }
+    canonical_cutoff = lambda value: value.isoformat().replace("+00:00", "Z")
     folds: list[dict[str, Any]] = []
     for i in range(1, len(cutoffs)):
-        test_cut = {cutoffs[i]}
-        test_time = _aware_time(cutoffs[i])
+        test_time = cutoffs[i]
         train_cut = set(cutoffs[:i])
+        test = rows_by_cutoff[test_time]
+        test_events = {_ts(row.get("eventId")) for row in test}
         train = [r for r in labeled
-                 if _ts(r.get("decisionCutoff")) in train_cut
+                 if _aware_time(r.get("decisionCutoff")) in train_cut
                  and r.get("labelAvailableAt") is not None
                  and _aware_time(r.get("labelAvailableAt")) is not None
-                 and _aware_time(r.get("labelAvailableAt")) < test_time]
-        test = [r for r in labeled if _ts(r.get("decisionCutoff")) in test_cut]
+                 and _aware_time(r.get("labelAvailableAt")) < test_time
+                 and _ts(r.get("eventId")) not in test_events]
         if not train:
             continue
         assert_no_leakage(train, test)
+        actual_train_cutoffs = sorted({
+            canonical_cutoff(_aware_time(r.get("decisionCutoff"))) for r in train
+        })
         folds.append(
             {
                 "fold": i,
-                "trainCutoffs": sorted(train_cut),
-                "testCutoffs": sorted(test_cut),
+                "trainCutoffs": actual_train_cutoffs,
+                "testCutoffs": [canonical_cutoff(test_time)],
                 "trainN": len(train),
                 "testN": len(test),
+                "trainEventN": len({_ts(row.get("eventId")) for row in train}),
+                "testEventN": len(test_events),
+                "sameEventTrainingRowsExcluded": sum(
+                    _aware_time(r.get("decisionCutoff")) in train_cut
+                    and _ts(r.get("eventId")) in test_events
+                    for r in labeled
+                ),
+                "eventDisjoint": True,
                 "train": train,
                 "test": test,
             }
@@ -300,13 +333,31 @@ def evaluate_folds(folds: list[dict[str, Any]]) -> dict[str, Any]:
 
 def run_walkforward(rows: list[dict[str, Any]]) -> dict[str, Any]:
     folds = chronological_folds(rows)
+    event_identity_missing = bool(rows) and any(
+        _ts(row.get("decisionCutoff")) and not _ts(row.get("eventId")) for row in rows
+    )
+    execution = {
+        "algorithmId": WALKFORWARD_ALGORITHM_ID,
+        "producer": "dcm.learning.walkforward.chronological_folds",
+        "consumer": "dcm.learning.walkforward.run_walkforward",
+        "state": "EXECUTED" if folds else "BLOCKED_MISSING_EVENT_ID" if event_identity_missing else "BLOCKED_NO_VALID_FOLDS",
+        "inputHash": content_hash(rows),
+        "foldCount": len(folds),
+        "eventDisjoint": bool(folds) and all(fold.get("eventDisjoint") is True for fold in folds),
+    }
     if not folds:
+        status = "BLOCKED_MISSING_EVENT_ID" if event_identity_missing else "INSUFFICIENT_CHRONOLOGICAL_CUTOFFS"
         report = {
             "schema": REPORT_SCHEMA,
-            "status": "INSUFFICIENT_CHRONOLOGICAL_CUTOFFS",
+            "status": status,
             "leakage": False,
             "foldCount": 0,
-            "note": "Need ≥2 distinct decisionCutoff values. Random/shuffled splits are refused.",
+            "algorithmExecution": execution,
+            "note": (
+                "Event IDs are required to prove event-disjoint validation; rows without one are excluded."
+                if event_identity_missing else
+                "Need ≥2 distinct decisionCutoff values and training labels available before test cutoffs."
+            ),
             "baseline": {
                 "model": "frozen_dcm_calibratedP_or_selectedP",
                 "role": "CHAMPION_PROBABILITY_PATH",
@@ -319,7 +370,7 @@ def run_walkforward(rows: list[dict[str, Any]]) -> dict[str, Any]:
                 "trainedNeuralNet": False,
                 "pkl": False,
                 "skipped": True,
-                "reason": "INSUFFICIENT_CHRONOLOGICAL_CUTOFFS",
+                "reason": status,
             },
             "learningRevision": LEARNING_REVISION,
             "predictiveClaim": PREDICTIVE_CLAIM,
@@ -333,6 +384,7 @@ def run_walkforward(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "status": "COMPLETE",
         "leakage": False,
         "foldCount": len(evaluated["folds"]),
+        "algorithmExecution": execution,
         "folds": evaluated["folds"],
         "baseline": {
             "model": "frozen_dcm_calibratedP_or_selectedP",

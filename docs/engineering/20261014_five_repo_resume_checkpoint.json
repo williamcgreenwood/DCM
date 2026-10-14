@@ -1,0 +1,146 @@
+{
+  "schema": "dcm.five_repo_resume_checkpoint.v1",
+  "task_id": "PILLARS_DCM_CHATGPT_WORK_RESUME_AND_FINISH_v4_FIVE_REPOS_20261014",
+  "verified_base_sha": "98cb698cf000b963e24ca47b3c1e4e18722bda96",
+  "work_branch": "feat/five-repo-audit-implementation-20261014",
+  "implementation_hash": "71bf3323d724833d5242198cbb1119d2ea2a04ec78f30c7c487b7400608d5c47",
+  "canonical_language_and_kernel_selection": "Python per DCM_BOOTSTRAP_MANIFEST.json; no donor/runtime or dependency switch justified.",
+  "learning_revision": "LR000000",
+  "predictive_claim": "NONE",
+  "production_certification": false,
+  "ledger": [
+    {
+      "task_id": "PILLARS_DCM_CHATGPT_WORK_RESUME_AND_FINISH_v4_FIVE_REPOS_20261014",
+      "requirement": "Event-disjoint chronological walk-forward and UTC-instant ordering",
+      "applicability": "Settled DCM rows with timezone-aware decisionCutoff, labelAvailableAt, and nonempty eventId",
+      "source": "sports-betting TimeSeriesSplit/leakage audit comparator; canonical DCM training dataset and settlement rows",
+      "base_sha": "98cb698cf000b963e24ca47b3c1e4e18722bda96",
+      "implementation_hash": "71bf3323d724833d5242198cbb1119d2ea2a04ec78f30c7c487b7400608d5c47",
+      "consumer": "dcm.learning.dataset.build_dataset → dcm.learning.walkforward.chronological_folds → dcm.learning.walkforward.run_walkforward",
+      "tests/exit_codes": {
+        "focused_suite_exit_code": 0,
+        "full_suite_exit_code": 0,
+        "focused_tests_passed": 29,
+        "registry_inventory_policy_diff": "PASS"
+      },
+      "benchmark": {
+        "type": "synthetic implementation timing only",
+        "rows": 5000,
+        "cutoffs": 50,
+        "folds": 49,
+        "elapsed_seconds": 1.26314,
+        "predictive_claim": "NONE"
+      },
+      "evidence_cutoff": "No timezone-qualified forecast cutoff is supplied by the screenshots; PDF creation time is export time only.",
+      "run_id": "NOT_RUN_NO_FORECAST_PACKET",
+      "PR/CI/merge SHA": {
+        "pr_number": null,
+        "head_sha": null,
+        "ci": "PENDING",
+        "merge_sha": null
+      },
+      "status": "IMPLEMENTED_AND_TESTED",
+      "blocker": "Real-world DCM settled cohort remains insufficient for performance claims; missing event IDs block evaluation.",
+      "next_command": "Await/create single PR after final verification"
+    },
+    {
+      "task_id": "PILLARS_DCM_CHATGPT_WORK_RESUME_AND_FINISH_v4_FIVE_REPOS_20261014",
+      "requirement": "Five donor repository review and rights/fit gates",
+      "applicability": "Reusable only where rights, dependencies, and a canonical DCM consumer exist",
+      "source": "Five upstream SHAs and component hashes in docs/donor/EXTERNAL_DONOR_FIVE_REPO_MATRIX.json",
+      "base_sha": "98cb698cf000b963e24ca47b3c1e4e18722bda96",
+      "implementation_hash": "71bf3323d724833d5242198cbb1119d2ea2a04ec78f30c7c487b7400608d5c47",
+      "consumer": "src/dcm; no donor runtime imports",
+      "tests/exit_codes": {
+        "test_external_donor_decisions": "PASS",
+        "full_suite_exit_code": 0
+      },
+      "benchmark": "No donor benchmark: no donor runtime was adopted.",
+      "evidence_cutoff": "No timezone-qualified forecast cutoff is supplied by the screenshots; PDF creation time is export time only.",
+      "run_id": "NOT_RUN_NO_FORECAST_PACKET",
+      "PR/CI/merge SHA": {
+        "pr_number": null,
+        "head_sha": null,
+        "ci": "PENDING",
+        "merge_sha": null
+      },
+      "status": "COMPLETE_NO_DONOR_CODE_ADOPTED",
+      "blocker": "imbalanced-learn-extra license signals conflict; other donors are duplicate, poor-fit, runtime-incompatible, or already covered by DCM.",
+      "next_command": "Await/create single PR after final verification"
+    },
+    {
+      "task_id": "PILLARS_DCM_CHATGPT_WORK_RESUME_AND_FINISH_v4_FIVE_REPOS_20261014",
+      "requirement": "Seven mandatory mathematical capability gates",
+      "applicability": "Every invocation evaluates each required gate; this audit invocation intentionally has no forecasts, portfolio, or calibration history",
+      "source": "Empty-input receipt docs/audits/20261014_five_repo_empty_input_seven_gate_receipt.json",
+      "base_sha": "98cb698cf000b963e24ca47b3c1e4e18722bda96",
+      "implementation_hash": "71bf3323d724833d5242198cbb1119d2ea2a04ec78f30c7c487b7400608d5c47",
+      "consumer": "dcm.model.advanced_execution.execute_advanced_modeling",
+      "tests/exit_codes": {
+        "test_advanced_modeling_execution": "PASS",
+        "full_suite_exit_code": 0
+      },
+      "benchmark": "NOT_APPLICABLE",
+      "evidence_cutoff": "No timezone-qualified forecast cutoff is supplied by the screenshots; PDF creation time is export time only.",
+      "run_id": "RUN_FIVE_REPO_AUDIT_20261014",
+      "PR/CI/merge SHA": {
+        "pr_number": null,
+        "head_sha": null,
+        "ci": "PENDING",
+        "merge_sha": null
+      },
+      "status": "EVALUATED_EMPTY_INPUT; FULL_MODELING_EXECUTION_FALSE",
+      "blocker": "No authorized DCM pre-event forecast or complete entry/payout contract; probability and EV execution remain blocked.",
+      "next_command": "Await/create single PR after final verification"
+    },
+    {
+      "task_id": "PILLARS_DCM_CHATGPT_WORK_RESUME_AND_FINISH_v4_FIVE_REPOS_20261014",
+      "requirement": "10/13 and 10/14 input audit",
+      "applicability": "10/13 only for realized ticket-state review; 10/14 for research/board screenshots",
+      "source": "User-provided image-only PDFs inspected in local quarantine; sanitized summary in donor matrix",
+      "base_sha": "98cb698cf000b963e24ca47b3c1e4e18722bda96",
+      "implementation_hash": "71bf3323d724833d5242198cbb1119d2ea2a04ec78f30c7c487b7400608d5c47",
+      "consumer": "No model or training consumer; private receipt remains local",
+      "tests/exit_codes": {
+        "visual_page_review": "58 pages and 131 pages",
+        "full_suite_exit_code": 0
+      },
+      "benchmark": "NOT_APPLICABLE",
+      "evidence_cutoff": "No timezone-qualified forecast cutoff is supplied by the screenshots; PDF creation time is export time only.",
+      "run_id": "NOT_RUN_NO_FORECAST_PACKET",
+      "PR/CI/merge SHA": {
+        "pr_number": null,
+        "head_sha": null,
+        "ci": "PENDING",
+        "merge_sha": null
+      },
+      "status": "AUDITED_REALIZED_OUTCOME_ONLY",
+      "blocker": "10/13 provides no DCM frozen forecast packet or timezone-qualified cutoff; 10/14 has no verified DCM forecast-to-settlement lineage.",
+      "next_command": "Await/create single PR after final verification"
+    },
+    {
+      "task_id": "PILLARS_DCM_CHATGPT_WORK_RESUME_AND_FINISH_v4_FIVE_REPOS_20261014",
+      "requirement": "Cross-project fantasy intelligence",
+      "applicability": "Only if source data is authorized and accessible",
+      "source": "Google Drive metadata; Fantasy Basketball starter manifest; no project-chat connector",
+      "base_sha": "98cb698cf000b963e24ca47b3c1e4e18722bda96",
+      "implementation_hash": "71bf3323d724833d5242198cbb1119d2ea2a04ec78f30c7c487b7400608d5c47",
+      "consumer": "No DCM consumer can be wired without contents",
+      "tests/exit_codes": {
+        "full_suite_exit_code": 0
+      },
+      "benchmark": "NOT_APPLICABLE",
+      "evidence_cutoff": "No timezone-qualified forecast cutoff is supplied by the screenshots; PDF creation time is export time only.",
+      "run_id": "NOT_RUN_NO_FORECAST_PACKET",
+      "PR/CI/merge SHA": {
+        "pr_number": null,
+        "head_sha": null,
+        "ci": "PENDING",
+        "merge_sha": null
+      },
+      "status": "BLOCKED_SOURCE_ACCESS",
+      "blocker": "Football content is not shared, basketball starter has no league data, and other project chats are inaccessible.",
+      "next_command": "Await/create single PR after final verification"
+    }
+  ]
+}
