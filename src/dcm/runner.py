@@ -1,6 +1,3 @@
-Warning: truncated output (original token count: 35298)
-Total output lines: 2728
-
 """Top-level DCM runner: HAR → research → worlds → grade → rank → freeze.
 
 python -m dcm.runner --synthetic --out dcm_v6/RUNS
@@ -1201,7 +1198,387 @@ def run_dcm(
     stages_done.add("RESEARCH")
 
     canonical_ready = mount.get("state") == "HASH_VERIFIED_EXTRACTED"
-    schema_ready = bool(schema_root.get("productionEl…5298 tokens truncated…s = bytes(
+    schema_ready = bool(schema_root.get("productionEligible")) and schema_root.get("state") == "HASH_VERIFIED"
+    production_research_ready = bool(bundle.get("production_ready"))
+    # Preserve the established root gate for non-CFB rows. CFB guarded launch
+    # permits row-level selection eligibility only when that row's snapshot has
+    # PLAYABLE support; global unrelated coverage remains an audit/certification
+    # signal and cannot manufacture a PLAYABLE.
+    root_selection_gate = canonical_ready and schema_ready and not synthetic
+    global_selection_gate = root_selection_gate and production_research_ready
+
+    gov = Governor(
+        fast_worlds=int(model_config["fastWorlds"]),
+        serious_worlds=int(model_config["seriousWorlds"]),
+        ceiling_worlds=int(model_config["ceilingWorlds"]),
+        mc_se_target=float(model_config["mcSeTarget"]),
+    )
+    t = StageTimer("MODEL")
+    world_cache: dict[tuple[str, str, str], list[dict[str, float]]] = {}
+    event_context_cache: dict[tuple[str, str, int], list[dict[str, float]]] = {}
+    parameter_cache: dict[str, dict[str, Any]] = {}
+    modeled: list[dict[str, Any]] = []
+    classified: list[dict[str, Any]] = []
+    conservation_failures = 0
+    unsupported = excluded = unresolved = evidence_blocked = 0
+    teammate_groups = basketball_teammate_groups(rows)
+    cfb_groups = cfb_teammate_groups(rows)
+    joint_world_cache: dict[tuple[str, str, int], dict[str, list[dict[str, float]]]] = {}
+    joint_meta_acc: list[dict[str, Any]] = []
+    material_facts_payload = resolve_material_facts(bundle.get("claims") or [], cutoff=forecast_cutoff)
+    hold_ids = hold_playable_scope_ids(material_facts_payload)
+    fact_features = facts_to_features(material_facts_payload, cutoff=forecast_cutoff)
+    signal_registry = build_cfb_signal_registry()
+    signal_evaluations: list[dict[str, Any]] = []
+    signal_feature_records: list[dict[str, Any]] = []
+    signal_rows_executed = 0
+    signal_errors: list[dict[str, Any]] = []
+    survivor_state = SurvivorState()
+    decision_integrity_records: list[dict[str, Any]] = []
+    platform_authority = resolve_platform_rules_authority(bundle.get("claims") or [])
+    cfb_rules_snapshot = build_cfb_rules_snapshot(
+        as_of=forecast_cutoff,
+        # The HAR is an offer/input dataset, not official statistical
+        # settlement evidence.  Only hashed MaterialFact/source evidence may
+        # populate the statistical-authority side of this contract.
+        statistical_source_hashes=tuple(
+            sorted({str(claim.get("source_hash") or "") for claim in (bundle.get("claims") or []) if claim.get("source_hash")})
+        ),
+        platform_source_hashes=tuple(platform_authority["platform_source_hashes"]),
+        platform_rules_verified=bool(platform_authority["platform_rules_verified"]),
+    )
+
+    def _snapshot_for(prow: dict[str, Any]) -> dict[str, Any]:
+        oid = str(prow.get("projectionId") or "")
+        cached = parameter_cache.get(oid) if oid else None
+        if cached is not None:
+            return cached
+        pid = str(prow.get("playerId") or "")
+        eid = str(prow.get("eventId") or "")
+        tid = str(prow.get("teamId") or prow.get("team") or "")
+        opp = str(prow.get("opponentId") or prow.get("opponent") or "")
+        relevant = [
+            f for f in fact_features
+            if str(f.get("scopeId") or "") in {pid, eid, tid, opp, f"env:{eid}", ""}
+        ]
+        snap = build_parameter_snapshot(
+            prow,
+            bundle["claims"],
+            team_packets=team_packet_map,
+            event_packets=event_packet_map,
+            opponent_packets=opponent_packet_map,
+            fact_features=relevant or None,
+            rules_snapshot=cfb_rules_snapshot,
+        )
+        if oid:
+            parameter_cache[oid] = snap
+        return snap
+
+    for row in rows:
+        state, blocker = _classify(row)
+        rec: dict[str, Any] = {"row": row, "state": state, "blocker": blocker}
+        if state == "EXCLUDED_GOBLIN":
+            excluded += 1; classified.append(rec); continue
+        if state == "UNSUPPORTED":
+            unsupported += 1; classified.append(rec); continue
+        if state == "UNRESOLVED":
+            unresolved += 1; classified.append(rec); continue
+
+        snapshot = _snapshot_for(row)
+        rec["forecastCutoff"] = forecast_cutoff
+        rec["playerStatus"] = snapshot.get("status")
+        rec["parameterSnapshot"] = snapshot
+        rec["dependencyTags"] = snapshot.get("dependency_tags") or []
+        is_cfb_guarded_row = (
+            str(row.get("sportFamily") or "") == "gridiron"
+            and str(row.get("league") or "").upper() == "CFB"
+        )
+        if is_cfb_guarded_row:
+            try:
+                signal_registry, evaluations, features = execute_cfb_signals(
+                    row, snapshot, material_facts_payload, cutoff=forecast_cutoff, registry=signal_registry,
+                )
+                serialized = [evaluation.to_dict() for evaluation in evaluations]
+                signal_evaluations.extend({"projectionId": row.get("projectionId"), **item} for item in serialized)
+                signal_feature_records.extend(features)
+                signal_rows_executed += 1
+                rec["signalRegistryHash"] = signal_registry.registry_hash
+                rec["signalEvaluationHashes"] = [str(item.get("outputHash") or "") for item in serialized]
+                rec["signalFeatureHashes"] = [str(item.get("contentHash") or content_hash(item)) for item in features]
+                snapshot["signalRegistryHash"] = signal_registry.registry_hash
+                snapshot["signalEvaluationHashes"] = rec["signalEvaluationHashes"]
+                # build_parameter_snapshot hashes the semantic snapshot before
+                # this runtime annotation; recompute without self-reference.
+                snapshot["parameter_snapshot_hash"] = content_hash({
+                    key: value for key, value in snapshot.items() if key != "parameter_snapshot_hash"
+                })
+                parameter_cache[str(row.get("projectionId") or "")] = snapshot
+            except (RuntimeError, ValueError, TypeError) as exc:
+                signal_errors.append({"projectionId": row.get("projectionId"), "error": type(exc).__name__})
+                rec["blocker"] = rec.get("blocker") or "SIGNAL_EXECUTION_FAILED"
+        # Status/start hard gates apply even on synthetic/fixture runs.
+        snap_blocker = snapshot.get("blocker")
+        if snap_blocker in STATUS_START_HARD_BLOCKERS:
+            rec["blocker"] = rec.get("blocker") or snap_blocker
+        start_blk = started_event_blocker(row, forecast_cutoff)
+        if start_blk:
+            rec["blocker"] = rec.get("blocker") or start_blk
+        minimum_model_support = bool(snapshot.get("minimum_model_support", snapshot.get("production_eligible")))
+        if is_cfb_guarded_row and not minimum_model_support:
+            rec["state"] = "HELD_FOR_RESEARCH"
+            support = snapshot.get("model_support") if isinstance(snapshot.get("model_support"), dict) else {}
+            blockers = support.get("modelBlockers") or []
+            rec["blocker"] = rec.get("blocker") or (blockers[0] if blockers else snapshot.get("blocker") or "MINIMUM_MODEL_SUPPORT_MISSING")
+            rec["productionSelectable"] = False
+            evidence_blocked += 1
+            survivor_state.reject(str(row.get("projectionId") or ""), str(rec.get("blocker") or "MINIMUM_MODEL_SUPPORT_MISSING"))
+            rec["survivorStateAccepted"] = False
+            classified.append(rec)
+            continue
+
+        diagnostic_model = is_cfb_guarded_row and not bool(snapshot["production_eligible"])
+        row_selection_gate = root_selection_gate if is_cfb_guarded_row else global_selection_gate
+        production_selectable = row_selection_gate and bool(snapshot["production_eligible"]) and rec.get("blocker") is None
+        if diagnostic_model:
+            rec["blocker"] = rec.get("blocker") or snapshot.get("blocker") or "PLAYABLE_SUPPORT_INCOMPLETE"
+            evidence_blocked += 1
+
+        key = (str(row["eventId"]), str(row["playerId"]), str(snapshot["parameter_snapshot_hash"]))
+        board_id = str(row.get("boardId") or "FULL_GAME")
+        try:
+            if key not in world_cache:
+                ctx_key = (str(row.get("sportFamily") or ""), str(row.get("eventId") or ""), gov.max_worlds)
+                if ctx_key not in event_context_cache:
+                    event_context_cache[ctx_key] = generate_event_contexts(
+                        ctx_key[0], ctx_key[1], n=gov.max_worlds, seed=har_sha
+                    )
+                group_key = (str(row.get("eventId") or ""), str(row.get("teamId") or ""))
+                family = str(row.get("sportFamily") or "")
+                league = str(row.get("league") or "").upper()
+                group = (cfb_groups if family == "gridiron" and league == "CFB" else teammate_groups).get(group_key) or {}
+                use_joint_bball = family == "basketball" and len(group) >= 2
+                use_joint_cfb = family == "gridiron" and league == "CFB" and bool(str(row.get("eventId") or ""))
+                if use_joint_cfb:
+                    group = group or {str(row.get("playerId") or ""): row}
+                if use_joint_bball or use_joint_cfb:
+                    jkey = (group_key[0], group_key[1], gov.max_worlds)
+                    if jkey not in joint_world_cache:
+                        specs = []
+                        for _pid, prow in group.items():
+                            psnap = _snapshot_for(prow)
+                            specs.append({"row": prow, "snapshot": psnap})
+                        if use_joint_cfb:
+                            joint = simulate_joint_cfb_event_worlds(
+                                specs,
+                                n=gov.max_worlds,
+                                seed=har_sha,
+                                event_contexts=event_context_cache[ctx_key],
+                            )
+                        else:
+                            joint = simulate_joint_team_worlds(
+                                specs,
+                                n=gov.max_worlds,
+                                seed=har_sha,
+                                event_contexts=event_context_cache[ctx_key],
+                            )
+                        joint_world_cache[jkey] = joint["worlds"]
+                        joint_meta_acc.append(joint["meta"])
+                    pid = str(row["playerId"])
+                    world_cache[key] = joint_world_cache[jkey][pid]
+                else:
+                    world_cache[key] = simulate_player_worlds(
+                        row,
+                        n=gov.max_worlds,
+                        seed=har_sha,
+                        parameter_snapshot=snapshot,
+                        event_contexts=event_context_cache[ctx_key],
+                    )
+            values = [value_from_stats(row["market"], w, board_id=board_id) for w in world_cache[key]]
+        except QuarterPluginIncomplete as exc:
+            rec["state"] = "UNSUPPORTED"; rec["blocker"] = getattr(exc, "blocker", None) or "QUARTER_PLUGIN_INCOMPLETE"
+            unsupported += 1; classified.append(rec); continue
+        except UnknownMarketError as exc:
+            rec["state"] = "UNSUPPORTED"; rec["blocker"] = getattr(exc, "blocker", None) or "UNVERIFIED_MARKET_DEFINITION"
+            unsupported += 1; classified.append(rec); continue
+        except KeyError:
+            rec["state"] = "UNSUPPORTED"; rec["blocker"] = "UNSUPPORTED_FAIL_CLOSED"
+            unsupported += 1; classified.append(rec); continue
+        except RuntimeError:
+            conservation_failures += 1; rec["state"] = "UNRESOLVED"
+            rec["blocker"] = "PRIMITIVE_CONSERVATION_FAILURE"
+            unresolved += 1; classified.append(rec); continue
+
+        dist = from_worlds(values, float(row["line"]))
+        preliminary = max(
+            dist["pHigher"] if row.get("offeredHigher") else 0.0,
+            dist["pLower"] if row.get("offeredLower") else 0.0,
+        )
+        demon = row.get("modifier") == "DEMON"
+        decision_threshold = 0.63 if demon else 0.58
+
+        while True:
+            target_worlds = gov.next_world_count(
+                current=len(values),
+                selected_probability=preliminary,
+                decision_threshold=decision_threshold,
+                production_selectable=production_selectable,
+            )
+            if target_worlds <= len(values):
+                break
+            adaptive_ctx_key = (
+                str(row.get("sportFamily") or ""),
+                str(row.get("eventId") or ""),
+                target_worlds,
+            )
+            if adaptive_ctx_key not in event_context_cache:
+                event_context_cache[adaptive_ctx_key] = generate_event_contexts(
+                    adaptive_ctx_key[0],
+                    adaptive_ctx_key[1],
+                    n=target_worlds,
+                    seed=har_sha,
+                )
+            group_key = (str(row.get("eventId") or ""), str(row.get("teamId") or ""))
+            family = str(row.get("sportFamily") or "")
+            league = str(row.get("league") or "").upper()
+            group = (cfb_groups if family == "gridiron" and league == "CFB" else teammate_groups).get(group_key) or {}
+            use_joint_bball = family == "basketball" and len(group) >= 2
+            use_joint_cfb = family == "gridiron" and league == "CFB" and bool(str(row.get("eventId") or ""))
+            if use_joint_cfb:
+                group = group or {str(row.get("playerId") or ""): row}
+            if use_joint_bball or use_joint_cfb:
+                jkey = (group_key[0], group_key[1], target_worlds)
+                if jkey not in joint_world_cache:
+                    specs = []
+                    for _pid, prow in group.items():
+                        psnap = _snapshot_for(prow)
+                        specs.append({"row": prow, "snapshot": psnap})
+                    if use_joint_cfb:
+                        joint = simulate_joint_cfb_event_worlds(
+                            specs,
+                            n=target_worlds,
+                            seed=har_sha,
+                            event_contexts=event_context_cache[adaptive_ctx_key],
+                        )
+                    else:
+                        joint = simulate_joint_team_worlds(
+                            specs,
+                            n=target_worlds,
+                            seed=har_sha,
+                            event_contexts=event_context_cache[adaptive_ctx_key],
+                        )
+                    joint_world_cache[jkey] = joint["worlds"]
+                    joint_meta_acc.append(joint["meta"])
+                world_cache[key] = joint_world_cache[jkey][str(row["playerId"])]
+            else:
+                world_cache[key] = simulate_player_worlds(
+                    row,
+                    n=target_worlds,
+                    seed=har_sha,
+                    parameter_snapshot=snapshot,
+                    event_contexts=event_context_cache[adaptive_ctx_key],
+                )
+            values = [value_from_stats(row["market"], w, board_id=board_id) for w in world_cache[key]]
+            dist = from_worlds(values, float(row["line"]))
+            preliminary = max(
+                dist["pHigher"] if row.get("offeredHigher") else 0.0,
+                dist["pLower"] if row.get("offeredLower") else 0.0,
+            )
+
+        sd = statistics.pstdev(values) if len(values) >= 2 else 0.0
+        volatility = min(1.0, sd / (abs(float(dist["mean"])) + 1.0))
+        support_n = min(
+            int((snapshot.get("opportunity") or {}).get("support_n", 0)),
+            int((snapshot.get("efficiency") or {}).get("support_n", 0)),
+        )
+        offered_sides = []
+        if row.get("offeredHigher"): offered_sides.append("MORE")
+        if row.get("offeredLower"): offered_sides.append("LESS")
+        if not offered_sides:
+            rec["state"] = "UNRESOLVED"; rec["blocker"] = "OFFERED_SIDE_UNKNOWN"
+            unresolved += 1; classified.append(rec); continue
+
+        evaluations: dict[str, dict[str, Any]] = {}
+        for side in offered_sides:
+            raw_p = dist["pHigher"] if side == "MORE" else dist["pLower"]
+            ckey = cell_key(str(row.get("sportFamily")), str(row.get("league")), str(row.get("market")), side)
+            cal = apply_calibration(raw_p, key=ckey, cells=calibration_cells)
+            unc = probability_bundle(
+                raw_selected_p=float(cal["calibrated"]), n_worlds=len(values),
+                support_n=support_n, data_quality=float(snapshot.get("data_quality") or 0.0),
+                ood_risk=float(snapshot.get("ood_risk") or 1.0), volatility=volatility,
+                synthetic=bool(snapshot.get("synthetic")),
+            )
+            safe_p = float(unc["evidence_safe_probability"])
+            surf = line_surface(values, float(row["line"]), side=side, playable_p=0.63 if demon else 0.58)
+            fragility = min(
+                1.0,
+                0.10 + float(unc["epistemic_uncertainty"]) * 0.70
+                + float(snapshot.get("ood_risk") or 0.0) * 0.20
+                + min(0.20, float(surf["edge_elasticity"]) * 0.20),
+            )
+            side_grade = grade_of(
+                selected_p=safe_p, lower_bound=float(unc["lower_bound"]), demon=demon,
+                fragility=fragility, robustness_area=float(surf["robustness_area"]),
+                elasticity=float(surf["edge_elasticity"]), false_sign=float(unc["false_sign_risk"]),
+            )
+            evaluations[side] = {
+                "side": side, "rawP": raw_p, "calibratedP": float(cal["calibrated"]),
+                "calibrationState": cal["state"], "evidenceSafeP": safe_p,
+                "lowerBound": float(unc["lower_bound"]), "monteCarloSE": float(unc["monte_carlo_se"]),
+                "epistemicUncertainty": float(unc["epistemic_uncertainty"]),
+                "aleatoricUncertainty": float(unc["aleatoric_uncertainty"]),
+                "reliability": float(unc["reliability"]), "falseSignRisk": float(unc["false_sign_risk"]),
+                "volatility": volatility, "fragility": fragility, "lineSurface": surf, "grade": side_grade,
+            }
+
+        forced = row.get("side") if row.get("side") in evaluations else None
+        chosen_side = forced or max(evaluations, key=lambda x: (evaluations[x]["evidenceSafeP"], evaluations[x]["lowerBound"]))
+        ev = evaluations[chosen_side]
+        preselection = None
+        if str(row.get("sourceFormat") or "").upper() == "OUTLIER":
+            # Outlier is a preferred input format, but a close line is not
+            # allowed to become a selection merely because its board score is
+            # high. Run the cheap line-distance check first and require only
+            # the focused research fields for that candidate.
+            try:
+                minimum_margin = float(row.get("preselectionMinimumMarginSigma", OUTLIER_MINIMUM_MARGIN_SIGMA))
+            except (TypeError, ValueError):
+                minimum_margin = OUTLIER_MINIMUM_MARGIN_SIGMA
+            preselection = assess_preselection(
+                offered_line=row.get("line"),
+                projected_mean=dist.get("mean"),
+                projected_stddev=sd,
+                minimum_margin_sigma=minimum_margin,
+                research=research_flags_from_snapshot(snapshot, row),
+                modifier=row.get("modifier"),
+                target_book_offer_present=bool(row.get("targetBookOfferPresent", True)),
+                explicit_side=chosen_side,
+                subject=row,
+            )
+            if not preselection.may_select:
+                production_selectable = False
+                rec["blocker"] = rec.get("blocker") or f"OUTLIER_{preselection.state}"
+                rec["outlierPreselectionHold"] = True
+                rec["preselectionMissingResearch"] = list(preselection.missing_research)
+                rec["preselectionPolicyVersion"] = OUTLIER_PRESELECTION_POLICY_VERSION
+        decision_audit = inverse_consistency_audit(row, evaluations, chosen_side)
+        probability_diagnostic = probability_sanity_diagnostic(
+            p_higher=dist.get("pHigher"), p_lower=dist.get("pLower"), p_push=dist.get("pPush"),
+        )
+        decision_integrity_records.append({
+            "projectionId": row.get("projectionId"),
+            "inverseConsistency": decision_audit,
+            "probabilitySanity": probability_diagnostic,
+        })
+        if not decision_audit.get("valid") or not probability_diagnostic.get("valid"):
+            reasons = list(decision_audit.get("blockers") or []) + list(probability_diagnostic.get("blockers") or [])
+            rec["blocker"] = rec.get("blocker") or "DECISION_INTEGRITY_FAILED"
+            rec["decisionIntegrityBlockers"] = sorted(set(reasons))
+            production_selectable = False
+            survivor_state.reject(str(row.get("projectionId") or ""), "DECISION_INTEGRITY_FAILED", *reasons)
+        selected_line = float(row["line"])
+        if chosen_side == "MORE":
+            selection_outcomes = bytes(
                 2 if value > selected_line else 0 if value < selected_line else 1
                 for value in values
             )
