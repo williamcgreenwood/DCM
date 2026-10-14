@@ -172,6 +172,76 @@ def allocate_counts(means: Sequence[float], caps: Sequence[float], team_total: i
     return ints, residual
 
 
+def reconcile_receiving_ledger(
+    players: Sequence[Mapping[str, Any]],
+    drawn: Mapping[str, dict[str, Any]],
+    *,
+    team_pass_yards: int,
+    team_pass_touchdowns: int,
+) -> dict[str, int]:
+    """Reconcile observed receiver primitives to the shared QB pass ledger.
+
+    The board can contain only some teammates, so unmatched production remains
+    in explicit unmodeled residuals. If independently sampled receiver totals
+    exceed the QB's shared passing primitives, deterministically scale only the
+    overage back to the total. This preserves player-level integer statistics,
+    lineup composites, and the exact team identity without random postprocessing.
+    """
+    receivers = [str(player.get("playerId") or "") for player in players
+                 if str(player.get("role") or "").upper() not in {"QB", *KICKER_ROLES}
+                 and str(player.get("playerId") or "") in drawn]
+
+    def allocate_proportionally(weights: Sequence[int], total: int) -> list[int]:
+        total = max(0, int(total))
+        weight_sum = sum(max(0, int(value)) for value in weights)
+        if not weights:
+            return []
+        if weight_sum <= 0 or total <= 0:
+            return [0] * len(weights)
+        quotas = [total * max(0, int(value)) / weight_sum for value in weights]
+        allocated = [int(value) for value in quotas]
+        remainder = total - sum(allocated)
+        order = sorted(range(len(weights)), key=lambda i: (-(quotas[i] - allocated[i]), i))
+        for index in order[:remainder]:
+            allocated[index] += 1
+        return allocated
+
+    original_yards = [int(round(float(drawn[pid].get("rec_yds") or 0))) for pid in receivers]
+    original_tds = [max(0, int(drawn[pid].get("rec_td") or 0)) for pid in receivers]
+    pass_yards = int(team_pass_yards)
+    pass_tds = max(0, int(team_pass_touchdowns))
+    yards_reconciled = sum(original_yards) > pass_yards
+    if yards_reconciled:
+        negative_yards = [min(0, value) for value in original_yards]
+        positive_budget = max(0, pass_yards - sum(negative_yards))
+        positive_allocation = allocate_proportionally([max(0, value) for value in original_yards], positive_budget)
+        final_yards = [negative_yards[i] + positive_allocation[i] for i in range(len(receivers))]
+    else:
+        final_yards = original_yards
+    yards_residual = pass_yards - sum(final_yards)
+
+    touchdowns_reconciled = sum(original_tds) > pass_tds
+    if touchdowns_reconciled:
+        final_tds = allocate_proportionally(original_tds, pass_tds)
+    else:
+        final_tds = original_tds
+    touchdowns_residual = pass_tds - sum(final_tds)
+
+    for index, pid in enumerate(receivers):
+        stats = drawn[pid]
+        stats["rec_yds"] = final_yards[index]
+        stats["rec_td"] = final_tds[index]
+    for stats in drawn.values():
+        stats["unmodeled_receiving_yards"] = yards_residual
+        stats["unmodeled_receiving_td"] = touchdowns_residual
+    return {
+        "receivingYardsReconciled": int(yards_reconciled),
+        "receivingTouchdownsReconciled": int(touchdowns_reconciled),
+        "unmodeledReceivingYards": yards_residual,
+        "unmodeledReceivingTouchdowns": touchdowns_residual,
+    }
+
+
 def allocate_team_opportunity(
     players: Sequence[Mapping[str, Any]],
     *,

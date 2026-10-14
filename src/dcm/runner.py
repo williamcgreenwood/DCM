@@ -1863,6 +1863,10 @@ def run_dcm(
     (dest / "performance" / "rank.json").write_text(json.dumps(rank_perf, indent=2) + "\n", encoding="utf-8")
     _write_refresh.write_text(json.dumps(refresh["report"], indent=2, sort_keys=True) + "\n", encoding="utf-8")
     qualified = apply_pre_freeze_status_start_gates(ranked, cutoff=forecast_cutoff)
+    from dcm.model.advanced_execution import apply_directional_research_conflict_gate
+    qualified, directional_research_report = apply_directional_research_conflict_gate(
+        qualified, forecast_cutoff=str(forecast_cutoff or ""),
+    )
     card = build_card(qualified)
     exposure = exposure_report(card)
     # Advanced-modeling capabilities run on the canonical producer outputs.
@@ -1882,6 +1886,7 @@ def run_dcm(
         event_world_metadata=event_worlds_meta,
         joint_backend_metadata=joint_meta_acc,
         run_id=str(run_id),
+        directional_research_report=directional_research_report,
     )
     validate_advanced_execution_receipt(advanced_execution)
     (dest / "advanced_modeling_execution.json").write_text(

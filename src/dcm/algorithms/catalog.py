@@ -744,10 +744,14 @@ def _ml() -> tuple[dict[str, Any], ...]:
         rows.append(_a(
             aid, name, fam, "REQUIRED_CORE",
             implementation_module="dcm.algorithms.ml_families", implementation_symbol=sym,
-            runtime_producer="AlgorithmSelectionEngine",
-            runtime_consumer="dcm.model.uncertainty" if fam in {"CAL", "UNCERTAINTY"} else "dcm.learning.registry",
+            runtime_producer=("dcm.model.advanced_execution._calibration_challenger_report"
+                              if aid == "ALG-CAL-001" else "AlgorithmSelectionEngine"),
+            runtime_consumer=("dcm.model.advanced_execution receipt + dcm.cfb.recompute.apply_calibration"
+                              if aid == "ALG-CAL-001" else
+                              "dcm.model.uncertainty" if fam in {"CAL", "UNCERTAINTY"} else "dcm.learning.registry"),
             applicability_contract=appl, input_contract=inp, output_contract=out, semantic_scope=scope,
-            test_ids=("test_algorithm_constitution", "test_algorithm_core", "test_algorithm_ml_stdlib"),
+            test_ids=("test_algorithm_constitution", "test_algorithm_core", "test_algorithm_ml_stdlib",
+                      *(('test_advanced_modeling_execution',) if aid == "ALG-CAL-001" else ())),
         ))
     conditional = [
         ("ALG-ML-TABULAR-002", "Generalized Linear Models", "ML_TABULAR", "ridge_closed_form", "ALG-ML-TABULAR-001",

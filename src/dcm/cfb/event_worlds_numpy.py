@@ -15,7 +15,7 @@ from typing import Any
 import numpy as np
 
 from dcm.cfb.event_world_backend import RNG_VERSION, backend_meta
-from dcm.cfb.opportunity_ledger import KICKER_ROLES, allocate_team_opportunity_fast
+from dcm.cfb.opportunity_ledger import KICKER_ROLES, allocate_team_opportunity_fast, reconcile_receiving_ledger
 from dcm.model.worlds import _clip, _nonneg_int_gauss, _p, _rng, sample_football
 
 # Hot fields mirrored into SoA for future C ABI / matrix consumers.
@@ -41,6 +41,8 @@ _SOA_FIELDS = (
     "unmodeled_rush_residual",
     "unmodeled_target_residual",
     "unmodeled_pass_residual",
+    "unmodeled_receiving_yards",
+    "unmodeled_receiving_td",
 )
 
 
@@ -95,7 +97,8 @@ def simulate_joint_cfb_event_worlds_numpy(
 
     worlds: dict[str, list[dict[str, float]]] = {pid: [] for pid in player_ids}
     conservation_failures = 0
-    residual_acc = {"rush": 0, "targets": 0, "pass": 0}
+    residual_acc = {"rush": 0, "targets": 0, "pass": 0, "receivingYards": 0, "receivingTouchdowns": 0}
+    reconciled_worlds = {"receivingYards": 0, "receivingTouchdowns": 0}
     last_alloc: dict[str, Any] = {}
     ctx_list = event_contexts or [{}]
 
@@ -187,7 +190,7 @@ def simulate_joint_cfb_event_worlds_numpy(
                 stats["pass_cmp"] = min(int(stats.get("pass_cmp") or 0), player_pass[j])
                 stats["rush_att"] = player_rush[j]
                 stats["targets"] = player_tgt[j]
-                pass_yds_qb = float(stats.get("pass_yds") or 0)
+                pass_yds_qb += float(stats.get("pass_yds") or 0)
             else:
                 stats["pass_att"] = 0
                 stats["pass_cmp"] = 0
@@ -216,13 +219,31 @@ def simulate_joint_cfb_event_worlds_numpy(
             for f in _SOA_FIELDS:
                 soa[p["playerId"]][f][i] = float(stats.get(f) or 0.0)
 
-        if rush_sum + alloc["residualRushAtt"] > team_rush_att + 1:
+        reconciliation = reconcile_receiving_ledger(
+            players, drawn, team_pass_yards=int(round(pass_yds_qb)),
+            team_pass_touchdowns=int(round(scoring["pass_td"])),
+        )
+        residual_acc["receivingYards"] += reconciliation["unmodeledReceivingYards"]
+        residual_acc["receivingTouchdowns"] += reconciliation["unmodeledReceivingTouchdowns"]
+        reconciled_worlds["receivingYards"] += reconciliation["receivingYardsReconciled"]
+        reconciled_worlds["receivingTouchdowns"] += reconciliation["receivingTouchdownsReconciled"]
+        rec_yds_sum = sum(float(stats.get("rec_yds") or 0) for stats in drawn.values())
+        scoring["rec_td"] = sum(float(stats.get("rec_td") or 0) for stats in drawn.values())
+        for pid, stats in drawn.items():
+            stats["rush_rec_yds"] = float(stats.get("rush_yds") or 0) + float(stats.get("rec_yds") or 0)
+            stats["rush_rec_td"] = float(stats.get("rush_td") or 0) + float(stats.get("rec_td") or 0)
+            for field in _SOA_FIELDS:
+                soa[pid][field][i] = float(stats.get(field) or 0.0)
+        modeled_pass_att = sum(int(stats.get("pass_att") or 0) for stats in drawn.values())
+        if modeled_pass_att + int(alloc["residualPassAtt"]) != team_pass_att:
             conservation_failures += 1
-        if tgt_sum + alloc["residualTargets"] > team_targets + 1:
+        if rush_sum + alloc["residualRushAtt"] > team_rush_att:
             conservation_failures += 1
-        if pass_yds_qb and rec_yds_sum and rec_yds_sum > pass_yds_qb + 40.0:
+        if tgt_sum + alloc["residualTargets"] != team_targets:
             conservation_failures += 1
-        if scoring["rec_td"] > scoring["pass_td"] + 1:
+        if rec_yds_sum + reconciliation["unmodeledReceivingYards"] != pass_yds_qb:
+            conservation_failures += 1
+        if scoring["rec_td"] + reconciliation["unmodeledReceivingTouchdowns"] != scoring["pass_td"]:
             conservation_failures += 1
         for pid, stats in drawn.items():
             worlds[pid].append(stats)
@@ -242,12 +263,18 @@ def simulate_joint_cfb_event_worlds_numpy(
             "minutes": True,
             "rush_plus_residual_le_team": True,
             "targets_plus_residual_le_team": True,
+            "pass_attempts_plus_unmodeled_equals_team_pass_attempts": True,
+            "receiving_yards_plus_unmodeled_equals_pass_yards": True,
+            "receiving_touchdowns_plus_unmodeled_equals_pass_touchdowns": True,
         },
         "residual": {
             "rushAttMean": residual_acc["rush"] / denom,
             "targetsMean": residual_acc["targets"] / denom,
             "passAttMean": residual_acc["pass"] / denom,
+            "receivingYardsMean": residual_acc["receivingYards"] / denom,
+            "receivingTouchdownsMean": residual_acc["receivingTouchdowns"] / denom,
         },
+        "reconciledWorlds": reconciled_worlds,
         "kickerIsolated": bool(last_alloc.get("kickerIsolated", True)),
         "sharedPrimitives": [
             "team_off_plays",
