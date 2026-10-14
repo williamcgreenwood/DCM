@@ -5,7 +5,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 - Modules: **270**
 - Symbols: **2068**
 - Parse errors: **0**
-- Inventory hash: `30db949e648dade3dd70a7daa77381d7ba2f19ccec24664f86a2e07c02561d5b`
+- Inventory hash: `dd45caf95bf60568df0313bc210bc11e77351a33f9eccc6bc413ebc3babc784b`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -36,8 +36,8 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | UNMAPPED | `src/dcm/cfb/champion.py` | 0 | 3 |
 | UNMAPPED | `src/dcm/cfb/coextract.py` | 0 | 3 |
 | UNMAPPED | `src/dcm/cfb/event_world_backend.py` | 0 | 3 |
-| UNMAPPED | `src/dcm/cfb/event_worlds_numpy.py` | 0 | 1 |
 | UNMAPPED | `src/dcm/cfb/event_worlds.py` | 0 | 3 |
+| UNMAPPED | `src/dcm/cfb/event_worlds_numpy.py` | 0 | 1 |
 | UNMAPPED | `src/dcm/cfb/frontier.py` | 0 | 4 |
 | UNMAPPED | `src/dcm/cfb/har_delta.py` | 0 | 3 |
 | UNMAPPED | `src/dcm/cfb/launch.py` | 0 | 9 |
@@ -59,8 +59,8 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P7 | `src/dcm/chat/report.py` | 0 | 1 |
 | P7 | `src/dcm/chat/research_bridge.py` | 0 | 7 |
 | P7 | `src/dcm/chat/session.py` | 1 | 34 |
-| P7 | `src/dcm/chat/slate_autonomous.py` | 0 | 21 |
 | P7 | `src/dcm/chat/slate.py` | 0 | 18 |
+| P7 | `src/dcm/chat/slate_autonomous.py` | 0 | 21 |
 | P7 | `src/dcm/chat/state.py` | 0 | 4 |
 | UNMAPPED | `src/dcm/compact.py` | 4 | 20 |
 | P0 | `src/dcm/contracts/__init__.py` | 0 | 0 |
@@ -148,15 +148,15 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P1 | `src/dcm/research/adapters/prizepicks.py` | 1 | 5 |
 | P1 | `src/dcm/research/adapters/pro_football_reference.py` | 2 | 7 |
 | P1 | `src/dcm/research/authority.py` | 1 | 5 |
-| P1 | `src/dcm/research/batch_store.py` | 3 | 13 |
 | P1 | `src/dcm/research/batch.py` | 0 | 5 |
-| P1 | `src/dcm/research/cache_layers.py` | 1 | 12 |
+| P1 | `src/dcm/research/batch_store.py` | 3 | 13 |
 | P1 | `src/dcm/research/cache.py` | 1 | 7 |
+| P1 | `src/dcm/research/cache_layers.py` | 1 | 12 |
 | P1 | `src/dcm/research/claims.py` | 0 | 3 |
-| P1 | `src/dcm/research/classify_runtime.py` | 0 | 2 |
 | P1 | `src/dcm/research/classify.py` | 0 | 7 |
-| P1 | `src/dcm/research/coverage_incremental.py` | 1 | 5 |
+| P1 | `src/dcm/research/classify_runtime.py` | 0 | 2 |
 | P1 | `src/dcm/research/coverage.py` | 0 | 11 |
+| P1 | `src/dcm/research/coverage_incremental.py` | 1 | 5 |
 | P1 | `src/dcm/research/dependency_graph.py` | 0 | 4 |
 | P1 | `src/dcm/research/emit.py` | 0 | 5 |
 | P1 | `src/dcm/research/entity_graph.py` | 0 | 4 |
@@ -176,8 +176,8 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P1 | `src/dcm/research/insight_queue.py` | 0 | 11 |
 | P1 | `src/dcm/research/lineup.py` | 0 | 3 |
 | P1 | `src/dcm/research/material_facts.py` | 0 | 20 |
-| P1 | `src/dcm/research/observation_execute_support.py` | 0 | 10 |
 | P1 | `src/dcm/research/observation_execute.py` | 0 | 1 |
+| P1 | `src/dcm/research/observation_execute_support.py` | 0 | 10 |
 | P1 | `src/dcm/research/observation_typed.py` | 0 | 7 |
 | P1 | `src/dcm/research/offer_metadata.py` | 0 | 1 |
 | P1 | `src/dcm/research/offer_revalidation.py` | 1 | 10 |
@@ -211,9 +211,9 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P5-P14 | `src/dcm/runtime/benchmark.py` | 0 | 4 |
 | P5-P14 | `src/dcm/runtime/capabilities.py` | 0 | 4 |
 | P5-P14 | `src/dcm/runtime/capture_authority.py` | 0 | 4 |
+| P5-P14 | `src/dcm/runtime/checkpoint.py` | 0 | 3 |
 | P5-P14 | `src/dcm/runtime/checkpoint_outbox.py` | 0 | 4 |
 | P5-P14 | `src/dcm/runtime/checkpoint_reconciliation.py` | 0 | 2 |
-| P5-P14 | `src/dcm/runtime/checkpoint.py` | 0 | 3 |
 | P5-P14 | `src/dcm/runtime/cutoff.py` | 1 | 4 |
 | P5-P14 | `src/dcm/runtime/dag.py` | 3 | 28 |
 | P5-P14 | `src/dcm/runtime/diagnostics.py` | 0 | 4 |
@@ -643,15 +643,15 @@ _No class/function symbols._
 - `function` **resolve_event_world_backend** L32 — Resolve backend: explicit arg → env → default (numpy if available).
 - `function` **backend_meta** L46
 
-### `src/dcm/cfb/event_worlds_numpy.py`
-
-- `function` **simulate_joint_cfb_event_worlds_numpy** L47
-
 ### `src/dcm/cfb/event_worlds.py`
 
 - `function` **cfb_teammate_groups** L24
 - `function` **simulate_joint_cfb_event_worlds_reference** L44 — Portable pure-Python joint CFB EventWorld (mandatory fallback path).
 - `function` **simulate_joint_cfb_event_worlds** L201 — Shared team plays/pass-rate/rush-rate → residual-aware player opportunity.
+
+### `src/dcm/cfb/event_worlds_numpy.py`
+
+- `function` **simulate_joint_cfb_event_worlds_numpy** L47
 
 ### `src/dcm/cfb/frontier.py`
 
@@ -859,6 +859,27 @@ _No class/function symbols._
 - `method` **HostSession.settle** L1023
 - `function` **cfb_launch** L1030 — Guarded CFB vertical slice. Fixture/bundle can freeze; file research returns the host loop.
 
+### `src/dcm/chat/slate.py`
+
+- `function` **_sha256_bytes** L107
+- `function` **_sha256_file** L111
+- `function` **_write_json** L115
+- `function` **_write_jsonl** L123
+- `function` **_read_jsonl** L130
+- `function` **_safe_error** L144
+- `function` **_prompt_metadata** L150
+- `function` **_sport_hint** L170
+- `function` **_ordered_inputs** L178
+- `function` **_repo_head** L196
+- `function` **_source_summary** L211
+- `function` **_safe_claim** L295 — Drop accidental free-form/raw fields if an adapter ever supplies one.
+- `method` **_safe_claim.clean** L299
+- `function` **_step** L313
+- `function` **_write_terminal_artifacts** L337
+- `function` **_legacy_run_slate** L709 — Run independent captures, the reconciled union, and HAR-only autonomous closure.
+- `function` **_repository_prompt** L1234
+- `function` **run_slate** L1241 — Run the legacy producer and then apply the HAR-only closure controller.
+
 ### `src/dcm/chat/slate_autonomous.py`
 
 - `function` **_parse_time** L53
@@ -882,27 +903,6 @@ _No class/function symbols._
 - `function` **_drive_train** L631
 - `function` **_drive_playables** L706
 - `function` **advance_autonomous_closure** L741 — Advance research → settle → train → rank/select/freeze with typed states.
-
-### `src/dcm/chat/slate.py`
-
-- `function` **_sha256_bytes** L107
-- `function` **_sha256_file** L111
-- `function` **_write_json** L115
-- `function` **_write_jsonl** L123
-- `function` **_read_jsonl** L130
-- `function` **_safe_error** L144
-- `function` **_prompt_metadata** L150
-- `function` **_sport_hint** L170
-- `function` **_ordered_inputs** L178
-- `function` **_repo_head** L196
-- `function` **_source_summary** L211
-- `function` **_safe_claim** L295 — Drop accidental free-form/raw fields if an adapter ever supplies one.
-- `method` **_safe_claim.clean** L299
-- `function` **_step** L313
-- `function` **_write_terminal_artifacts** L337
-- `function` **_legacy_run_slate** L709 — Run independent captures, the reconciled union, and HAR-only autonomous closure.
-- `function` **_repository_prompt** L1234
-- `function` **run_slate** L1241 — Run the legacy producer and then apply the HAR-only closure controller.
 
 ### `src/dcm/chat/state.py`
 
@@ -1774,6 +1774,14 @@ _No class/function symbols._
 - `method` **SourceAuthorityRegistry.__init__** L89
 - `method` **SourceAuthorityRegistry.derive** L92
 
+### `src/dcm/research/batch.py`
+
+- `function` **scheduler_score** L40
+- `function` **_event_id_of** L53
+- `function` **_request_id_of** L64
+- `function` **_host_task** L79 — Expose the minimum actionable context for a host acquisition.
+- `function` **build_next_research_batch** L131
+
 ### `src/dcm/research/batch_store.py`
 
 - `class` **BatchEnvelopeError** L16
@@ -1793,13 +1801,16 @@ _No class/function symbols._
 - `function` **write_checkpoint_cas** L188
 - `function` **verify_checkpoint** L229
 
-### `src/dcm/research/batch.py`
+### `src/dcm/research/cache.py`
 
-- `function` **scheduler_score** L40
-- `function` **_event_id_of** L53
-- `function` **_request_id_of** L64
-- `function` **_host_task** L79 — Expose the minimum actionable context for a host acquisition.
-- `function` **build_next_research_batch** L131
+- `function` **cache_identity** L34
+- `class` **ResearchCache** L57 — Compatibility cache with optional durable SQLite backing.
+- `method` **ResearchCache.__init__** L66
+- `method` **ResearchCache.put** L73
+- `method` **ResearchCache.get** L102
+- `method` **ResearchCache.hits** L126
+- `method` **ResearchCache.snapshot** L129
+- `method` **ResearchCache.close** L138
 
 ### `src/dcm/research/cache_layers.py`
 
@@ -1817,27 +1828,11 @@ _No class/function symbols._
 - `method` **ResearchCacheCascade.close** L361
 - `function` **content_address_bytes** L370
 
-### `src/dcm/research/cache.py`
-
-- `function` **cache_identity** L34
-- `class` **ResearchCache** L57 — Compatibility cache with optional durable SQLite backing.
-- `method` **ResearchCache.__init__** L66
-- `method` **ResearchCache.put** L73
-- `method` **ResearchCache.get** L102
-- `method` **ResearchCache.hits** L126
-- `method` **ResearchCache.snapshot** L129
-- `method` **ResearchCache.close** L138
-
 ### `src/dcm/research/claims.py`
 
 - `function` **claim_record** L11
 - `function` **dedupe** L91 — Remove byte-logically identical claims without mutating hashed content.
 - `function` **conflict_ledger** L101 — Record divergent values separately from immutable EvidenceClaims.
-
-### `src/dcm/research/classify_runtime.py`
-
-- `function` **refine_delta** L17
-- `function` **classify_requests** L26
 
 ### `src/dcm/research/classify.py`
 
@@ -1849,14 +1844,10 @@ _No class/function symbols._
 - `function` **classify_rows** L159
 - `function` **market_definition_id** L197
 
-### `src/dcm/research/coverage_incremental.py`
+### `src/dcm/research/classify_runtime.py`
 
-- `class` **IncrementalCoverageMismatch** L11
-- `function` **_request_id** L15
-- `function` **_row_digest** L19
-- `function` **coverage_index_hash** L23
-- `function` **_dirty_ids** L35
-- `function` **incremental_coverage_report** L51 — Evaluate only requests touched by changed claims, then reuse old rows.
+- `function` **refine_delta** L17
+- `function` **classify_requests** L26
 
 ### `src/dcm/research/coverage.py`
 
@@ -1871,6 +1862,15 @@ _No class/function symbols._
 - `function` **_schema_missing** L154 — SportResearchSchema-driven extras. Does not replace existing field gates.
 - `function` **evaluate_request** L215
 - `function` **coverage_report** L312
+
+### `src/dcm/research/coverage_incremental.py`
+
+- `class` **IncrementalCoverageMismatch** L11
+- `function` **_request_id** L15
+- `function` **_row_digest** L19
+- `function` **coverage_index_hash** L23
+- `function` **_dirty_ids** L35
+- `function` **incremental_coverage_report** L51 — Evaluate only requests touched by changed claims, then reuse old rows.
 
 ### `src/dcm/research/dependency_graph.py`
 
@@ -2140,6 +2140,10 @@ _No class/function symbols._
 - `function` **apply_fact_features_to_packets** L595 — Overlay resolved FeatureRecords onto modeling packets BEFORE RoleEpoch/fit.
 - `function` **facts_for_refresh** L689 — Index MaterialFacts by (scope, scopeId, claimType-or-field). Never latest-claim-wins across types.
 
+### `src/dcm/research/observation_execute.py`
+
+- `function` **execute_source_aware_observations** L64 — Import source-aware host observations and optionally refresh consumers.
+
 ### `src/dcm/research/observation_execute_support.py`
 
 - `function` **_build_counterparty_index** L37 — One-shot opponent → offer ids map (BoardIndexes has no by_counterparty).
@@ -2152,10 +2156,6 @@ _No class/function symbols._
 - `function` **_load_existing_dag** L252 — Prefer canonical run DAG artifacts over throwaway mini-DAGs.
 - `function` **_persist_run_dag** L269 — Write canonical runtime_dag.json plus source-aware alias used by tests.
 - `function` **_ensure_offer_lineage** L278 — Permanent claim→fact→feature→parameter→worlds→grade→rank for one offer.
-
-### `src/dcm/research/observation_execute.py`
-
-- `function` **execute_source_aware_observations** L64 — Import source-aware host observations and optionally refresh consumers.
 
 ### `src/dcm/research/observation_typed.py`
 
@@ -2572,6 +2572,12 @@ _No class/function symbols._
 - `function` **capture_gate_status** L68
 - `function` **_content_hash** L78
 
+### `src/dcm/runtime/checkpoint.py`
+
+- `function` **atomic_write** L13
+- `function` **load_checkpoint** L38
+- `function` **write_checkpoint** L48
+
 ### `src/dcm/runtime/checkpoint_outbox.py`
 
 - `function` **_without_hash** L20
@@ -2583,12 +2589,6 @@ _No class/function symbols._
 
 - `function` **_remote_state** L14
 - `function` **reconcile_checkpoint_outbox** L25
-
-### `src/dcm/runtime/checkpoint.py`
-
-- `function` **atomic_write** L13
-- `function` **load_checkpoint** L38
-- `function` **write_checkpoint** L48
 
 ### `src/dcm/runtime/cutoff.py`
 
