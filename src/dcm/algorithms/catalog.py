@@ -834,7 +834,48 @@ def _ml() -> tuple[dict[str, Any], ...]:
     return tuple(rows)
 
 
-ALGORITHM_RECORDS = ALGORITHM_RECORDS + _ml()
+ALGORITHM_RECORDS = ALGORITHM_RECORDS + _ml() + (
+    _a("ALG-CTRL-001", "Versioned advanced-model execution DAG", "GRAPH", "REQUIRED_CORE",
+       implementation_module="dcm.model.advanced_execution", implementation_symbol="compile_advanced_execution_dag",
+       runtime_producer="dcm.model.advanced_execution", runtime_consumer="dcm.runner.run_dcm",
+       applicability_contract="every canonical forecast run",
+       input_contract="canonical run stages and registered capability IDs",
+       output_contract="validated dependency-ordered modeling DAG",
+       semantic_scope="probability, portfolio, EV, and freeze execution lineage"),
+    _a("ALG-ML-PROB-009", "Gaussian KDE bandwidth-selected density diagnostic", "ML_PROB", "REQUIRED_CONDITIONAL",
+       implementation_module="dcm.model.advanced_execution", implementation_symbol="gaussian_kde_diagnostic",
+       runtime_producer="cutoff-safe comparable historical outcomes", runtime_consumer="diagnostic density receipt",
+       applicability_contract="at least 30 finite, cutoff-safe comparable historical samples; diagnostics only",
+       input_contract="values + exact comparable key + observed/label-available UTC timestamps", output_contract="LOO bandwidth and density diagnostics; no forecast probability",
+       semantic_scope="shadow-only continuous distribution diagnostic",
+       fallback_algorithm_id="ALG-ML-PROB-001", test_ids=("test_advanced_modeling",)),
+    _a("ALG-ML-TABULAR-013", "Normalized singular-value decomposition diagnostic", "ML_TABULAR", "REQUIRED_CONDITIONAL",
+       implementation_module="dcm.model.advanced_execution", implementation_symbol="normalized_svd_diagnostic",
+       runtime_producer="validated historical role/opponent feature matrix", runtime_consumer="diagnostic feature receipt",
+       applicability_contract="chronology-valid feature matrix with at least 8 rows and 2 columns",
+       input_contract="finite normalized feature matrix with observed-at timestamps",
+       output_contract="rank and singular values; no forecast probability",
+       semantic_scope="shadow-only role/opponent feature structure",
+       fallback_algorithm_id="ALG-ML-TABULAR-001", test_ids=("test_advanced_modeling",)),
+    _a("ALG-MC-001", "Shared EventWorld Monte Carlo diagnostics", "ML_PROB", "REQUIRED_CORE",
+       implementation_module="dcm.model.advanced_execution", implementation_symbol="_shared_world_diagnostics",
+       runtime_producer="dcm.cfb.event_worlds / canonical EventWorld backends", runtime_consumer="probability and portfolio joint outcomes",
+       applicability_contract="forecast worlds exist for a supported event and market",
+       input_contract="aligned shared-world selection outcomes", output_contract="joint outcomes, correlation, convergence diagnostics",
+       semantic_scope="joint event probabilities and downstream portfolio"),
+    _a("ALG-PORT-001", "Shared-outcome portfolio dependence diagnostic", "GROUP", "REQUIRED_CORE",
+       implementation_module="dcm.model.advanced_execution", implementation_symbol="_shared_world_diagnostics",
+       runtime_producer="aligned EventWorld pick outcomes", runtime_consumer="dcm.selection.portfolio and payout EV",
+       applicability_contract="at least two portfolio picks share aligned world indices",
+       input_contract="aligned win/loss/push outcomes by pick", output_contract="pairwise correlations and joint outcomes",
+       semantic_scope="portfolio dependency and EV"),
+    _a("ALG-EV-001", "Payout-rule-specific expected value", "CAL", "REQUIRED_CONDITIONAL",
+       implementation_module="dcm.platform.prizepicks.economics", implementation_symbol="expected_return_from_worlds",
+       runtime_producer="captured provider payout contract and joint EventWorld outcomes", runtime_consumer="portfolio ranking and freeze gate",
+       applicability_contract="verified payout table, stake, and joint calibrated outcome distribution are present",
+       input_contract="payout hash + aligned W/L/P worlds + stake", output_contract="gross return and net expected value",
+       semantic_scope="provider-specific payout economics", test_ids=("test_prizepicks_push_economics",)),
+)
 
 
 def registry_document() -> dict[str, Any]:

@@ -2,10 +2,10 @@
 
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
-- Modules: **267**
-- Symbols: **2051**
+- Modules: **268**
+- Symbols: **2059**
 - Parse errors: **0**
-- Inventory hash: `a124856e4478cffcca75771556397db8f2ffbebb71f32a6f6d849822b0d3f781`
+- Inventory hash: `9f104d0047a81cfb80db131c00929db33d63ca1941435b576ad15ccb4c676427`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -102,6 +102,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P2 | `src/dcm/ml/__init__.py` | 0 | 0 |
 | P2 | `src/dcm/ml/feature_store.py` | 1 | 9 |
 | P2-P4 | `src/dcm/model/__init__.py` | 0 | 1 |
+| P2-P4 | `src/dcm/model/advanced_execution.py` | 0 | 8 |
 | P2-P4 | `src/dcm/model/availability.py` | 0 | 2 |
 | P2-P4 | `src/dcm/model/basketball_efficiency.py` | 1 | 6 |
 | P2-P4 | `src/dcm/model/basketball_opportunity.py` | 1 | 8 |
@@ -307,7 +308,7 @@ _No class/function symbols._
 
 - `function` **_a** L10
 - `function` **_ml** L719
-- `function` **registry_document** L840
+- `function` **registry_document** L881
 
 ### `src/dcm/algorithms/constitution.py`
 
@@ -874,8 +875,8 @@ _No class/function symbols._
 - `function` **_step** L313
 - `function` **_write_terminal_artifacts** L337
 - `function` **_legacy_run_slate** L709 — Run independent captures, the reconciled union, and HAR-only autonomous closure.
-- `function` **_repository_prompt** L1229
-- `function` **run_slate** L1236 — Run the legacy producer and then apply the HAR-only closure controller.
+- `function` **_repository_prompt** L1234
+- `function` **run_slate** L1241 — Run the legacy producer and then apply the HAR-only closure controller.
 
 ### `src/dcm/chat/slate_autonomous.py`
 
@@ -1321,6 +1322,17 @@ _No class/function symbols._
 ### `src/dcm/model/__init__.py`
 
 - `function` **__getattr__** L27
+
+### `src/dcm/model/advanced_execution.py`
+
+- `function` **compile_advanced_execution_dag** L48 — Compile and validate the bounded modeling DAG against the live registry.
+- `function` **_receipt** L73
+- `function` **_timestamp_at_or_before** L90
+- `function` **gaussian_kde_diagnostic** L104 — Select bandwidth by deterministic leave-one-out likelihood.
+- `function` **normalized_svd_diagnostic** L143 — Validate chronology, normalize columns, and report a NumPy SVD rank.
+- `function` **_shared_world_diagnostics** L190
+- `function` **execute_advanced_modeling** L226 — Evaluate each modeling capability for a canonical runner invocation.
+- `function` **validate_advanced_execution_receipt** L402
 
 ### `src/dcm/model/availability.py`
 
@@ -2504,8 +2516,8 @@ _No class/function symbols._
 - `method` **run_dcm._ingest_stream** L429
 - `method` **run_dcm._snapshot_for** L1181
 - `method` **run_dcm._resimulate_material** L1679
-- `method` **run_dcm.slim** L1870
-- `function` **main** L2511
+- `method` **run_dcm.slim** L1893
+- `function` **main** L2538
 
 ### `src/dcm/runtime/__init__.py`
 

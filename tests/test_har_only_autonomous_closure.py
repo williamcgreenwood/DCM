@@ -132,6 +132,8 @@ def test_insights_only_slate_receipt_has_no_board_har_required_blocker(tmp_path:
     feature = json.loads((root / "feature_snapshot.json").read_text(encoding="utf-8"))
 
     assert receipt["boardHarRequired"] is False
+    assert receipt["modelingAuthority"] == "MANUAL_SHADOW_ANALYSIS"
+    assert receipt["canonicalExecutionEvidence"] is None
     assert receipt["requiredOperatorAsks"] == []
     assert receipt["nextRequiredOperatorInput"] == "NONE"
     assert receipt["operatorContract"]["boardHarRequired"] is False
