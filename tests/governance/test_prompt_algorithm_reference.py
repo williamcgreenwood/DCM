@@ -31,6 +31,9 @@ def test_prompt_algorithm_reference():
     assert "silent" in agents.lower() or "Algorithmic Constitution" in agents
     assert "LR000000" in (ROOT / "docs" / "PROGRAM_STATUS.md").read_text(encoding="utf-8")
     assert "NONE" in (ROOT / "docs" / "PROGRAM_STATUS.md").read_text(encoding="utf-8")
+    assert "UNIVERSAL_ALGORITHMIC_COMPUTATION_AND_RESEARCH_DISCOVERY_LAW.md" in (
+        ROOT / "docs" / "prompts" / "PILLARS_DCM_WORK_CODEX_EXECUTION_PROMPT_20260908.md"
+    ).read_text(encoding="utf-8")
 
 
 def test_work_codex_prompt_names_only_the_current_host_boundary():

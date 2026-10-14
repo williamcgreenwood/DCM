@@ -22,7 +22,7 @@ from dcm.research.research_store import STORE_SCHEMA, ResearchStore, extract_gam
 from dcm.research.scopes import canonical_scope
 
 STATEPACK_SCHEMA = "pillars_dcm.statepack.v1"
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 SECRET_PATTERNS = (
     re.compile(r"(?i)(api[_-]?key|secret|password|passwd|bearer\s+[a-z0-9\._\-]+)"),
     re.compile(r"(?i)(cookie\s*[:=]|authorization\s*[:=])"),
@@ -80,9 +80,21 @@ CREATE INDEX IF NOT EXISTS idx_claim_source ON claim_index(source_id);
 CREATE INDEX IF NOT EXISTS idx_claim_asof ON claim_index(as_of_date);
 CREATE INDEX IF NOT EXISTS idx_claim_type ON claim_index(claim_type);
 """
+MIGRATION_0002_SQL = """
+CREATE TABLE IF NOT EXISTS method_discovery_events (
+    content_hash TEXT PRIMARY KEY,
+    candidate_id TEXT NOT NULL,
+    lifecycle TEXT NOT NULL,
+    rights_state TEXT NOT NULL,
+    payload_json TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_discovery_candidate ON method_discovery_events(candidate_id, content_hash);
+CREATE INDEX IF NOT EXISTS idx_discovery_rights_lifecycle ON method_discovery_events(rights_state, lifecycle);
+"""
 
 MIGRATIONS: dict[int, dict[str, str]] = {
     1: {"id": "0001_phase1_index_pack", "sql": MIGRATION_0001_SQL},
+    2: {"id": "0002_rights_aware_method_discovery", "sql": MIGRATION_0002_SQL},
 }
 
 
@@ -334,7 +346,26 @@ class StatePack:
                 conn.commit()
             finally:
                 conn.close()
-        return {"ingestedBlobs": n, "ingestedOutcomes": o_n}
+        discovery_n = 0
+        discovery_rows = store.discovery_events()
+        if discovery_rows:
+            conn = _connect(self.db_path)
+            try:
+                for row in discovery_rows:
+                    candidate = row.get("candidate") if isinstance(row.get("candidate"), dict) else {}
+                    conn.execute(
+                        """INSERT OR IGNORE INTO method_discovery_events(
+                            content_hash, candidate_id, lifecycle, rights_state, payload_json
+                        ) VALUES (?, ?, ?, ?, ?)""",
+                        (str(row["contentHash"]), str(candidate.get("candidateId") or ""),
+                         str(row.get("lifecycle") or "CANDIDATE"), str(row.get("rightsState") or ""),
+                         json.dumps(row, sort_keys=True, separators=(",", ":"))),
+                    )
+                    discovery_n += 1
+                conn.commit()
+            finally:
+                conn.close()
+        return {"ingestedBlobs": n, "ingestedOutcomes": o_n, "ingestedDiscoveryEvents": discovery_n}
 
     def _load_blob(self, conn: sqlite3.Connection, digest: str) -> dict[str, Any]:
         row = conn.execute("SELECT payload_json FROM blobs WHERE content_hash = ?", (digest,)).fetchone()
@@ -387,6 +418,7 @@ class StatePack:
                 "claims": int(conn.execute("SELECT COUNT(*) AS n FROM claim_index").fetchone()["n"]),
                 "latestEntities": int(conn.execute("SELECT COUNT(*) AS n FROM latest").fetchone()["n"]),
                 "outcomes": int(conn.execute("SELECT COUNT(*) AS n FROM outcomes").fetchone()["n"]),
+                "discoveryEvents": int(conn.execute("SELECT COUNT(*) AS n FROM method_discovery_events").fetchone()["n"]),
             }
         finally:
             conn.close()
@@ -399,14 +431,36 @@ class StatePack:
         finally:
             conn.close()
 
+    def query_discovery(self, candidate_id: str | None = None) -> list[dict[str, Any]]:
+        conn = _connect(self.db_path)
+        try:
+            if candidate_id is None:
+                rows = conn.execute("SELECT content_hash, payload_json FROM method_discovery_events ORDER BY content_hash").fetchall()
+            else:
+                rows = conn.execute(
+                    "SELECT content_hash, payload_json FROM method_discovery_events WHERE candidate_id = ? ORDER BY content_hash",
+                    (str(candidate_id),),
+                ).fetchall()
+            events = [json.loads(row["payload_json"]) for row in rows]
+            for event in events:
+                expected = content_hash({k: v for k, v in event.items() if k != "contentHash"})
+                if event.get("contentHash") != expected:
+                    raise StatePackIntegrityError("DISCOVERY_EVENT_HASH_MISMATCH")
+            return events
+        finally:
+            conn.close()
+
     def export_object(self) -> dict[str, Any]:
         records = self.deterministic_records()
+        discovery_events = self.query_discovery()
         return {
             "schema": STATEPACK_SCHEMA,
             "schemaVersion": SCHEMA_VERSION,
             "storeSchema": STORE_SCHEMA,
             "recordCount": len(records),
             "records": records,
+            "discoveryEventCount": len(discovery_events),
+            "discoveryEvents": discovery_events,
         }
 
     def snapshot(self) -> dict[str, Any]:
@@ -425,9 +479,9 @@ class StatePack:
         schema_manifest = {
             "schema": STATEPACK_SCHEMA,
             "schemaVersion": SCHEMA_VERSION,
-            "phase": 1,
+            "phase": 2,
             "completeResearchOsDatabase": False,
-            "tables": ["schema_meta", "schema_migrations", "blobs", "claim_index", "latest", "outcomes"],
+            "tables": ["schema_meta", "schema_migrations", "blobs", "claim_index", "latest", "outcomes", "method_discovery_events"],
             "wal": True,
             "foreignKeys": True,
             "migrations": [{"version": k, "id": v["id"], "hash": sha256_bytes(v["sql"].encode())} for k, v in MIGRATIONS.items()],
@@ -438,7 +492,7 @@ class StatePack:
         manifest = {
             "schema": STATEPACK_SCHEMA,
             "schemaVersion": SCHEMA_VERSION,
-            "phase": 1,
+            "phase": 2,
             "completeResearchOsDatabase": False,
             "counts": counts,
             "files": {
@@ -555,4 +609,27 @@ class StatePack:
             self.put_blob(payload)
             self.index_claim(payload)
             n += 1
-        return {"restored": n, "exportSchema": schema, "schemaVersion": version}
+        discovery_count = 0
+        conn = _connect(self.db_path)
+        try:
+            for event in data.get("discoveryEvents") or []:
+                if not isinstance(event, dict):
+                    continue
+                candidate = event.get("candidate") if isinstance(event.get("candidate"), dict) else {}
+                expected = content_hash({k: v for k, v in event.items() if k != "contentHash"})
+                if event.get("contentHash") != expected:
+                    raise StatePackIntegrityError("DISCOVERY_EVENT_HASH_MISMATCH")
+                conn.execute(
+                    """INSERT OR IGNORE INTO method_discovery_events(
+                        content_hash, candidate_id, lifecycle, rights_state, payload_json
+                    ) VALUES (?, ?, ?, ?, ?)""",
+                    (str(event["contentHash"]), str(candidate.get("candidateId") or ""),
+                     str(event.get("lifecycle") or "CANDIDATE"), str(event.get("rightsState") or ""),
+                     json.dumps(event, sort_keys=True, separators=(",", ":"))),
+                )
+                discovery_count += 1
+            conn.commit()
+        finally:
+            conn.close()
+        return {"restored": n, "restoredDiscoveryEvents": discovery_count,
+                "exportSchema": schema, "schemaVersion": version}

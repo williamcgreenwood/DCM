@@ -8,6 +8,8 @@ prompt_declared_constitution_sha256: bba7b082bf67e12d87e675ac58d5b6f96d9cbad9b6a
 committed_constitution_sha256: computed at load time from docs/architecture/DCM_ALGORITHMIC_CONSTITUTION.md
 registry: configs/algorithm_registry.json
 consumption_law: docs/engineering/ALGORITHM_CONSUMPTION_LAW.md
+universal_computation_and_discovery_law: docs/engineering/UNIVERSAL_ALGORITHMIC_COMPUTATION_AND_RESEARCH_DISCOVERY_LAW.md
+universal_computation_law_version: PILLARS-UNIVERSAL-ALGORITHMIC-COMPUTATION-v1.0.0-20261014
 consumption_lock: EXACT_INDEX→CACHE_CELF→DAG→TWO_REP→NUMPY_EVENTWORLD→REGISTRY_ML
 schema: schemas/AlgorithmRequirement.schema.json
 trace: docs/requirements/ALGORITHM_TRACE_MATRIX.md

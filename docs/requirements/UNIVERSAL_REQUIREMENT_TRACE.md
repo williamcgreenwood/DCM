@@ -15,5 +15,7 @@ uses executable gate states, not percentages.
 | Immutable lineage and per-run root | PARTIAL | Runtime roots are emitted; full release/root certification remains open. |
 | Source-health scheduling and reuse | IMPLEMENTED | Persisted health and content-addressed reuse are active on the CFB path. |\n| Canonical host research scope boundary | IMPLEMENTED_PENDING_VALIDATION | Legacy adapter scopes are normalized before host research tasks and bundle keys are emitted. |
 | Prospective settlement and learning promotion | EXTERNAL_BLOCKED | Requires future platform outcomes and chronological unseen settlement evidence. |
+| Universal search/sort/group/index/append/archive/hash/learning law | IMPLEMENTED | Required permanent law is inherited by project instructions; advanced modeling DAG, manifest, and per-capability receipts bind its version and SHA-256. |
+| Rights-aware algorithm and research discovery | IMPLEMENTED_UNVERIFIED | Append-only candidate records are stored under the canonical ResearchStore index with explicit rights/lifecycle gates; no external candidate is adopted by this tranche. |
 | Current-HAR ChatGPT acceptance | EXTERNAL_BLOCKED | A current sanitized CFB HAR and host-acquired evidence were not supplied. |
 | Complete mixed-sport R1 | NOT_IMPLEMENTED | Explicitly outside this CFB tranche. |

@@ -264,6 +264,18 @@ class ResearchStore:
         self._by_source_path = self.indexes / "by_source.json"
         self._by_asof_path = self.indexes / "by_asof.json"
 
+    def append_discovery_event(self, candidate: dict[str, Any], *, event_type: str = "UPSERT_CANDIDATE") -> dict[str, Any]:
+        """Append a rights-aware research-method record to this store's immutable log."""
+        from dcm.research.discovery import append_discovery_event
+
+        return append_discovery_event(self, candidate, event_type=event_type)
+
+    def discovery_events(self, *, candidate_id: str | None = None) -> list[dict[str, Any]]:
+        """Return integrity-checked method-discovery history from this store."""
+        from dcm.research.discovery import discovery_events
+
+        return discovery_events(self, candidate_id=candidate_id)
+
     def _append_index(self, rec: dict[str, Any]) -> None:
         with self._index_path.open("a", encoding="utf-8") as fh:
             fh.write(json.dumps(rec, sort_keys=True, ensure_ascii=True, separators=(",", ":")) + "\n")

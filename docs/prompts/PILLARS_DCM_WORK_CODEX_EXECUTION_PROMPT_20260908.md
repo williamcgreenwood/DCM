@@ -7,6 +7,8 @@ Purpose: execute one safe, bounded, reviewable DCM increment and/or one bounded
 external-research batch, then leave a durable receipt from which the next Work/Codex run
 can continue.
 
+Permanent computation policy: inherit `docs/engineering/UNIVERSAL_ALGORITHMIC_COMPUTATION_AND_RESEARCH_DISCOVERY_LAW.md`; preserve its rights-aware discovery rules and hash its identity into applicable execution receipts.
+
 Scope: the universal DCM repository and its 233 research tasks / 1,839 subject-offer
 sets. This prompt does not claim that those tasks are completed and does not authorize
 researching all of them in one response.
