@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 from dcm.model.advanced_execution import (
+    _calibration_challenger_report,
+    apply_directional_research_conflict_gate,
+    _shared_world_diagnostics,
     compile_advanced_execution_dag,
     execute_advanced_modeling,
     gaussian_kde_diagnostic,
@@ -199,3 +202,108 @@ def test_payout_ev_stays_uncertified_without_complete_entry_adapter():
     assert ev["details"]["expectedValue"] == 0.5
     assert ev["state"] == "SHADOW_DIAGNOSTIC_ENTRY_RULES_UNVERIFIED"
     assert "CAPTURED_ENTRY_CONTRACT_AND_COMPLETE_SETTLEMENT_ADAPTER_MISSING" in ev["blockers"]
+
+
+def test_calibration_challenger_is_event_disjoint_chronological_and_never_promotes():
+    rows = []
+    for day in range(1, 7):
+        decision = f"2026-10-{day:02d}T12:00:00Z"
+        available = f"2026-10-{day:02d}T20:00:00Z"
+        for index in range(10):
+            rows.append({
+                "decisionCutoff": decision,
+                "labelAvailableAt": available,
+                "eventId": f"event-{day}-{index}",
+                "forecastP": 0.2 + 0.06 * (index % 10),
+                "binaryOutcome": int((day + index) % 3 != 0),
+            })
+    report = _calibration_challenger_report(rows)
+    assert report["state"] == "CHRONOLOGICAL_OOS_CHALLENGER_EVALUATED"
+    assert report["foldCount"] >= 2
+    assert report["baselinePooled"]["n"] > 0
+    assert report["isotonicChallengerPooled"]["n"] == report["baselinePooled"]["n"]
+    assert all(not fold["sameEventOverlap"] and fold["trainingLabelsAvailableBeforeTest"]
+               for fold in report["folds"])
+    assert report["promotionState"] == "CHALLENGER_ONLY_NO_PROMOTION"
+    assert report["learningRevision"] == "LR000000"
+    assert report["predictiveClaim"] == "NONE"
+
+    # The canonical seven-capability receipt consumes the same historical
+    # dataset and records the OOS challenger result without opening its gate.
+    receipt = execute_advanced_modeling(
+        forecasts=[], portfolio=[], calibration_state={"walkforwardRows": rows},
+        forecast_cutoff="2026-10-14T07:00:00Z", run_id="calibration-challenger-fixture",
+    )
+    calibration = next(r for r in receipt["receipts"] if r["capability"] == "CALIBRATION")
+    challenger = calibration["details"]["calibrationChallenger"]
+    assert challenger["foldCount"] >= 2
+    assert calibration["details"]["outOfSampleMetricsProduced"] is True
+    assert calibration["details"]["learningRevision"] == "LR000000"
+
+
+def test_portfolio_diagnostics_report_aligned_joint_states_not_independent_marginals():
+    forecasts = [
+        {"_selectionOutcomes": bytes([2, 0, 2, 0])},
+        {"_selectionOutcomes": bytes([0, 2, 0, 2])},
+    ]
+    report = _shared_world_diagnostics(forecasts)
+    assert report["state"] == "EXECUTED"
+    assert report["jointOutcomeMethod"] == "ALIGNED_SHARED_EVENT_WORLD_ROWS"
+    assert report["jointStateDistribution"] == {"WL": 2, "LW": 2}
+    assert report["winCountDistribution"] == {"1": 4}
+    assert report["allLegsWinProbability"] == 0.0
+    assert report["anyLegLossProbability"] == 1.0
+
+
+def test_verified_same_market_contradictions_block_without_auto_inversion():
+    cutoff = "2026-10-13T20:00:00Z"
+    rows = [
+        {"row": {"projectionId": "carrie", "market": "rush attempts", "line": 12.5},
+         "selectedSide": "MORE", "grade": "PLAYABLE", "productionSelectable": True,
+         "modeledPlayable": True,
+         "directionalResearchEvidence": [{"market": "rush attempts", "line": 11.5,
+             "direction": "LESS", "sampleN": 7, "availableAt": "2026-10-13T19:00:00Z",
+             "sourceHash": "source-a", "identityVerified": True, "marketComparable": True,
+             "hardGateEligible": True}]},
+        {"row": {"projectionId": "anderson", "market": "fantasy score", "line": 14.5},
+         "selectedSide": "LESS", "grade": "PLAYABLE", "productionSelectable": True,
+         "directionalResearchEvidence": [{"market": "fantasy score", "line": 14.5,
+             "direction": "MORE", "sampleN": 5, "availableAt": "2026-10-13T19:00:00Z",
+             "sourceHash": "source-b", "identityVerified": True, "marketComparable": True,
+             "hardGateEligible": True}]},
+        # A matching trend can still miss on one event; the controller does
+        # not convert it into certainty or invert it after seeing the result.
+        {"row": {"projectionId": "kohl", "market": "interceptions", "line": 0.5},
+         "selectedSide": "MORE", "grade": "PLAYABLE", "productionSelectable": True,
+         "directionalResearchEvidence": [{"market": "interceptions", "line": 0.5,
+             "direction": "MORE", "sampleN": 5, "availableAt": "2026-10-13T19:00:00Z",
+             "sourceHash": "source-c", "identityVerified": True, "marketComparable": True,
+             "hardGateEligible": True}]},
+    ]
+    evaluated, report = apply_directional_research_conflict_gate(rows, forecast_cutoff=cutoff)
+    assert report["conflictCount"] == 2
+    assert report["hardBlockedCount"] == 2
+    assert evaluated[0]["productionSelectable"] is False
+    assert evaluated[0]["modeledPlayable"] is False
+    assert evaluated[1]["productionSelectable"] is False
+    assert evaluated[2]["productionSelectable"] is True
+    assert all(not row.get("directionalResearchConflictState") == "INVERTED" for row in evaluated)
+    assert report["automaticInverseAllowed"] is False
+
+
+def test_manual_source_order_does_not_become_a_canonical_utc_cutoff():
+    row = {"row": {"projectionId": "manual", "market": "fantasy score", "line": 14.5},
+           "selectedSide": "LESS", "grade": "PLAYABLE",
+           "directionalResearchEvidence": [{"market": "fantasy score", "line": 14.5,
+               "direction": "MORE", "sampleN": 5, "cutoffRelation": "BEFORE_DECISION",
+               "sourceHash": "source", "identityVerified": True,
+               "marketComparable": True, "hardGateEligible": True}]}
+    rejected, rejected_report = apply_directional_research_conflict_gate([row], forecast_cutoff="")
+    assert rejected_report["conflictCount"] == 0
+    assert rejected_report["temporalBasis"] == "BLOCKED_NO_VALID_FORECAST_CUTOFF"
+    accepted, manual_report = apply_directional_research_conflict_gate(
+        [row], forecast_cutoff="", allow_manual_order_only=True,
+    )
+    assert manual_report["temporalBasis"] == "MANUAL_SOURCE_ORDER_ONLY"
+    assert accepted[0]["directionalResearchConflicts"][0]["availableAt"] is None
+    assert accepted[0]["productionSelectable"] is False

@@ -106,6 +106,25 @@ def test_numpy_vs_reference_bitwise_world_parity():
     assert npb["meta"]["rngVersion"] == RNG_VERSION
     assert npb["meta"]["backend"] == "numpy"
     assert ref["meta"]["backend"] == "reference"
+    assert ref["meta"]["conservationFailures"] == npb["meta"]["conservationFailures"] == 0
+    assert ref["meta"]["conservation"]["receiving_yards_plus_unmodeled_equals_pass_yards"] is True
+    assert ref["meta"]["conservation"]["receiving_touchdowns_plus_unmodeled_equals_pass_touchdowns"] is True
+    assert ref["meta"]["conservation"]["pass_attempts_plus_unmodeled_equals_team_pass_attempts"] is True
+    for world_index in range(96):
+        ledger = [ref["worlds"][pid][world_index] for pid in ref["worlds"]]
+        qb_pass_yards = sum(float(row.get("pass_yds") or 0) for row in ledger)
+        receiver_yards = sum(float(row.get("rec_yds") or 0) for row in ledger)
+        unmodeled_yards = float(ledger[0].get("unmodeled_receiving_yards") or 0)
+        qb_pass_tds = sum(int(row.get("pass_td") or 0) for row in ledger)
+        receiver_tds = sum(int(row.get("rec_td") or 0) for row in ledger)
+        unmodeled_tds = int(ledger[0].get("unmodeled_receiving_td") or 0)
+        assert receiver_yards + unmodeled_yards == qb_pass_yards
+        assert receiver_tds + unmodeled_tds == qb_pass_tds
+        assert all(row.get("pass_cmp", 0) <= row.get("pass_att", 0) for row in ledger)
+        assert all(row.get("receptions", 0) <= row.get("targets", 0) for row in ledger)
+        for row in ledger:
+            assert row["rush_rec_yds"] == row["rush_yds"] + row["rec_yds"]
+            assert row["rush_rec_td"] == row["rush_td"] + row["rec_td"]
 
 
 def test_reference_function_portable_path():

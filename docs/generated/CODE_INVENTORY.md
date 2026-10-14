@@ -3,9 +3,9 @@
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
 - Modules: **272**
-- Symbols: **2079**
+- Symbols: **2088**
 - Parse errors: **0**
-- Inventory hash: `9f1a62b029fef4d3898335a4821a5242aa64547a2aedfbc8a8796e459fe03c3b`
+- Inventory hash: `89c17f221540b67c3dc4a521da940e71acc117baec2743b95f5235984f6e7203`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -43,7 +43,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | UNMAPPED | `src/dcm/cfb/har_delta.py` | 0 | 3 |
 | UNMAPPED | `src/dcm/cfb/launch.py` | 0 | 9 |
 | UNMAPPED | `src/dcm/cfb/markets.py` | 0 | 9 |
-| UNMAPPED | `src/dcm/cfb/opportunity_ledger.py` | 0 | 8 |
+| UNMAPPED | `src/dcm/cfb/opportunity_ledger.py` | 0 | 10 |
 | UNMAPPED | `src/dcm/cfb/opportunity_state.py` | 1 | 5 |
 | UNMAPPED | `src/dcm/cfb/recompute.py` | 0 | 1 |
 | UNMAPPED | `src/dcm/cfb/refresh.py` | 0 | 2 |
@@ -103,7 +103,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P2 | `src/dcm/ml/__init__.py` | 0 | 0 |
 | P2 | `src/dcm/ml/feature_store.py` | 1 | 9 |
 | P2-P4 | `src/dcm/model/__init__.py` | 0 | 1 |
-| P2-P4 | `src/dcm/model/advanced_execution.py` | 0 | 10 |
+| P2-P4 | `src/dcm/model/advanced_execution.py` | 0 | 17 |
 | P2-P4 | `src/dcm/model/availability.py` | 0 | 2 |
 | P2-P4 | `src/dcm/model/basketball_efficiency.py` | 1 | 6 |
 | P2-P4 | `src/dcm/model/basketball_opportunity.py` | 1 | 8 |
@@ -312,7 +312,7 @@ _No class/function symbols._
 
 - `function` **_a** L10
 - `function` **_ml** L719
-- `function` **registry_document** L881
+- `function` **registry_document** L885
 
 ### `src/dcm/algorithms/computation_law.py`
 
@@ -654,11 +654,11 @@ _No class/function symbols._
 
 - `function` **cfb_teammate_groups** L24
 - `function` **simulate_joint_cfb_event_worlds_reference** L44 — Portable pure-Python joint CFB EventWorld (mandatory fallback path).
-- `function` **simulate_joint_cfb_event_worlds** L201 — Shared team plays/pass-rate/rush-rate → residual-aware player opportunity.
+- `function` **simulate_joint_cfb_event_worlds** L224 — Shared team plays/pass-rate/rush-rate → residual-aware player opportunity.
 
 ### `src/dcm/cfb/event_worlds_numpy.py`
 
-- `function` **simulate_joint_cfb_event_worlds_numpy** L47
+- `function` **simulate_joint_cfb_event_worlds_numpy** L49
 
 ### `src/dcm/cfb/frontier.py`
 
@@ -704,9 +704,11 @@ _No class/function symbols._
 - `function` **_support_n** L38
 - `function` **estimate_opportunity_share** L52 — Evidence-driven share of a team opportunity pool.
 - `function` **allocate_counts** L144 — Absolute means, capped, never renormalized to 100% of the team pool.
-- `function` **allocate_team_opportunity** L175 — Return per-player counts plus residual buckets.
-- `function` **_pool_mean_cap_for_total** L243 — Return (mean, allocate_cap, fallback) matching estimate_opportunity_share math.
-- `function` **allocate_team_opportunity_fast** L306 — Hot-path allocation without per-call content_hash / shareEstimates bodies.
+- `function` **reconcile_receiving_ledger** L175 — Reconcile observed receiver primitives to the shared QB pass ledger.
+- `method` **reconcile_receiving_ledger.allocate_proportionally** L194
+- `function` **allocate_team_opportunity** L245 — Return per-player counts plus residual buckets.
+- `function` **_pool_mean_cap_for_total** L313 — Return (mean, allocate_cap, fallback) matching estimate_opportunity_share math.
+- `function` **allocate_team_opportunity_fast** L376 — Hot-path allocation without per-call content_hash / shareEstimates bodies.
 
 ### `src/dcm/cfb/opportunity_state.py`
 
@@ -1335,16 +1337,23 @@ _No class/function symbols._
 
 ### `src/dcm/model/advanced_execution.py`
 
-- `function` **_deterministic_hash_payload** L62 — Remove observational timings recursively from deterministic hashes.
-- `function` **compile_advanced_execution_dag** L72 — Compile and validate the bounded modeling DAG against the live registry.
-- `function` **_receipt** L108
-- `function` **_timestamp_at_or_before** L162
-- `function` **_aware_utc_timestamp** L176
-- `function` **gaussian_kde_diagnostic** L189 — Select bandwidth by deterministic leave-one-out likelihood.
-- `function` **normalized_svd_diagnostic** L257 — Validate chronology, normalize columns, and report a NumPy SVD rank.
-- `function` **_shared_world_diagnostics** L328
-- `function` **execute_advanced_modeling** L364 — Evaluate each modeling capability for a canonical runner invocation.
-- `function` **validate_advanced_execution_receipt** L655
+- `function` **_deterministic_hash_payload** L63 — Remove observational timings recursively from deterministic hashes.
+- `function` **compile_advanced_execution_dag** L73 — Compile and validate the bounded modeling DAG against the live registry.
+- `function` **_receipt** L109
+- `function` **_timestamp_at_or_before** L163
+- `function` **_aware_utc_timestamp** L177
+- `function` **gaussian_kde_diagnostic** L190 — Select bandwidth by deterministic leave-one-out likelihood.
+- `function` **normalized_svd_diagnostic** L262 — Validate chronology, normalize columns, and report a NumPy SVD rank.
+- `function` **_shared_world_diagnostics** L336
+- `function` **_calibration_challenger_report** L389 — Fit isotonic calibration only inside event-disjoint chronological folds.
+- `method` **_calibration_challenger_report.score** L420
+- `method` **_calibration_challenger_report.score.standard_error** L430
+- `method` **_calibration_challenger_report.predict** L470
+- `function` **apply_directional_research_conflict_gate** L496 — Block only verified same-market evidence that contradicts a selected side.
+- `method` **apply_directional_research_conflict_gate.market_key** L510
+- `method` **apply_directional_research_conflict_gate.side_key** L513
+- `function` **execute_advanced_modeling** L595 — Evaluate each modeling capability for a canonical runner invocation.
+- `function` **validate_advanced_execution_receipt** L927
 
 ### `src/dcm/model/availability.py`
 
@@ -2552,8 +2561,8 @@ _No class/function symbols._
 - `method` **run_dcm._ingest_stream** L499
 - `method` **run_dcm._snapshot_for** L1251
 - `method` **run_dcm._resimulate_material** L1749
-- `method` **run_dcm.slim** L1964
-- `function` **main** L2609
+- `method` **run_dcm.slim** L1969
+- `function` **main** L2614
 
 ### `src/dcm/runtime/__init__.py`
 

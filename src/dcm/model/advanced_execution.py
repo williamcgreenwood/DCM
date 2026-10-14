@@ -8,6 +8,7 @@ as a typed blocker in the receipt.
 from __future__ import annotations
 
 import math
+import re
 import time
 from datetime import datetime, timezone
 from typing import Any, Mapping, Sequence
@@ -235,8 +236,9 @@ def gaussian_kde_diagnostic(values: Sequence[float], *, min_n: int = MIN_KDE_SAM
                / (len(xs) * best_h * root_2pi) for point in grid]
     integral = sum((density[i] + density[i + 1]) * (grid[i + 1] - grid[i]) / 2
                    for i in range(len(grid) - 1))
-    return {
+    result = {
         "state": "SHADOW_DIAGNOSTIC",
+        "algorithmVersion": "KDE-LOO-GAUSSIAN-v1",
         "n": len(xs),
         "inputN": original_n,
         "sampleCap": MAX_KDE_SAMPLE,
@@ -252,6 +254,9 @@ def gaussian_kde_diagnostic(values: Sequence[float], *, min_n: int = MIN_KDE_SAM
         "forecastProbability": None,
         "probabilityAuthority": "NONE_DIAGNOSTIC_ONLY",
     }
+    result["inputContentHash"] = content_hash({"values": xs, "algorithmVersion": result["algorithmVersion"]})
+    result["snapshotHash"] = content_hash({k: v for k, v in result.items() if k != "snapshotHash"})
+    return result
 
 
 def normalized_svd_diagnostic(
@@ -318,10 +323,13 @@ def normalized_svd_diagnostic(
     stability = "RANK_STABLE" if len(fold_ranks) == 2 and fold_ranks[0] == fold_ranks[1] else "RANK_UNSTABLE_OR_UNAVAILABLE"
     return {
         "state": "SHADOW_DIAGNOSTIC", "rows": len(rows), "columns": width,
+        "algorithmVersion": "SVD-ZSCORE-CHRONOLOGICAL-v1",
+        "inputMatrixHash": content_hash(rows),
         "rank": rank, "singularValues": [float(x) for x in singular],
         "normalization": "COLUMN_ZSCORE", "chronologicalFoldRanks": fold_ranks,
         "stability": stability,
         "forecastProbability": None,
+        "probabilityAuthority": "NONE_DIAGNOSTIC_ONLY",
     }
 
 
@@ -356,9 +364,232 @@ def _shared_world_diagnostics(portfolio: Sequence[Mapping[str, Any]]) -> dict[st
         full = sum(v == 2 for v in values[:n]) / n
         early = sum(v == 2 for v in values[:half]) / half
         convergence.append({"halfSampleWinRate": early, "fullSampleWinRate": full, "absoluteDelta": abs(early - full)})
+    state_distribution: dict[str, int] = {}
+    win_count_distribution: dict[str, int] = {}
+    all_win = 0
+    any_loss = 0
+    for world_index in range(n):
+        outcomes = [row[world_index] for row in outcome_rows]
+        state_key = "".join({0: "L", 1: "P", 2: "W"}.get(value, "?") for value in outcomes)
+        state_distribution[state_key] = state_distribution.get(state_key, 0) + 1
+        wins = sum(value == 2 for value in outcomes)
+        win_count_distribution[str(wins)] = win_count_distribution.get(str(wins), 0) + 1
+        all_win += wins == len(outcomes)
+        any_loss += any(value == 0 for value in outcomes)
     return {"state": "EXECUTED", "worldCount": n, "correlations": correlations,
             "alignedOutcomeHash": content_hash([list(x[:n]) for x in outcome_rows]),
+            "jointStateDistribution": state_distribution,
+            "winCountDistribution": win_count_distribution,
+            "allLegsWinProbability": all_win / n,
+            "anyLegLossProbability": any_loss / n,
+            "jointOutcomeMethod": "ALIGNED_SHARED_EVENT_WORLD_ROWS",
             "convergence": "PREFIX_VS_FULL_DIAGNOSTIC", "convergenceByLeg": convergence}
+
+
+def _calibration_challenger_report(rows: Sequence[Mapping[str, Any]], *, min_train_n: int = 30,
+                                   min_test_n: int = 5) -> dict[str, Any]:
+    """Fit isotonic calibration only inside event-disjoint chronological folds.
+
+    The report is an OOS challenger diagnostic. It never activates a champion
+    calibration cell or changes LR000000.
+    """
+    normalized = []
+    for raw in rows:
+        if not isinstance(raw, Mapping) or raw.get("binaryOutcome") not in {0, 1}:
+            continue
+        decision = _aware_utc_timestamp(raw.get("decisionCutoff"))
+        available = _aware_utc_timestamp(raw.get("labelAvailableAt"))
+        event_id = str(raw.get("eventId") or "").strip()
+        try:
+            p = float(raw.get("forecastP", raw.get("selectedP")))
+        except (TypeError, ValueError, OverflowError):
+            continue
+        if (decision is None or available is None or decision >= available or not event_id
+                or not math.isfinite(p) or not 0.0 <= p <= 1.0):
+            continue
+        normalized.append({"decision": decision, "available": available, "eventId": event_id,
+                           "p": p, "y": int(raw["binaryOutcome"])})
+    cutoffs = sorted({row["decision"] for row in normalized})
+    folds = []
+    all_base: list[float] = []
+    all_base_y: list[int] = []
+    all_challenger: list[float] = []
+    all_challenger_y: list[int] = []
+    from dcm.algorithms.ml_families import isotonic_regression
+
+    def score(preds: list[float], labels: list[int]) -> dict[str, Any]:
+        if not preds:
+            return {"n": 0, "brier": None, "brierStandardError": None,
+                    "logLoss": None, "logLossStandardError": None, "ece": None, "reliability": []}
+        sq_errors = [(p-y) ** 2 for p, y in zip(preds, labels)]
+        row_losses = [-(y * math.log(max(1e-12, min(1-1e-12, p)))
+                        + (1-y) * math.log(max(1e-12, min(1-1e-12, 1-p))))
+                      for p, y in zip(preds, labels)]
+        brier = sum(sq_errors) / len(preds)
+        log_loss = sum(row_losses) / len(preds)
+        def standard_error(values: list[float], mean: float) -> float:
+            if len(values) < 2:
+                return 0.0
+            variance = sum((value - mean) ** 2 for value in values) / (len(values) - 1)
+            return math.sqrt(variance / len(values))
+        bins = []
+        ece = 0.0
+        for bin_index in range(10):
+            members = [(p, y) for p, y in zip(preds, labels)
+                       if min(9, int(p * 10)) == bin_index]
+            if not members:
+                continue
+            mean_p = sum(p for p, _ in members) / len(members)
+            rate = sum(y for _, y in members) / len(members)
+            count = len(members)
+            z = 1.96
+            denominator = 1.0 + z*z/count
+            center = (rate + z*z/(2*count)) / denominator
+            half_width = z * math.sqrt(rate*(1-rate)/count + z*z/(4*count*count)) / denominator
+            ece += len(members) / len(preds) * abs(mean_p - rate)
+            bins.append({"bin": bin_index, "n": len(members), "meanForecast": mean_p,
+                         "observedRate": rate,
+                         "observedRateWilson95": [max(0.0, center-half_width), min(1.0, center+half_width)]})
+        return {"n": len(preds), "brier": brier,
+                "brierStandardError": standard_error(sq_errors, brier),
+                "logLoss": log_loss,
+                "logLossStandardError": standard_error(row_losses, log_loss), "ece": ece,
+                "reliability": bins}
+
+    for cutoff in cutoffs[1:]:
+        test = [row for row in normalized if row["decision"] == cutoff]
+        test_events = {row["eventId"] for row in test}
+        train = [row for row in normalized if row["decision"] < cutoff and row["available"] < cutoff
+                 and row["eventId"] not in test_events]
+        if len(train) < min_train_n or len(test) < min_test_n:
+            continue
+        ordered = sorted(train, key=lambda row: (row["p"], row["decision"], row["eventId"]))
+        fitted = isotonic_regression([r["p"] for r in ordered], [r["y"] for r in ordered])
+        train_x = [r["p"] for r in ordered]
+
+        def predict(p: float) -> float:
+            nearest = min(range(len(train_x)), key=lambda i: (abs(train_x[i] - p), i))
+            return max(0.001, min(0.999, float(fitted[nearest])))
+
+        base_p = [row["p"] for row in test]
+        labels = [row["y"] for row in test]
+        challenger_p = [predict(p) for p in base_p]
+        base_metrics, challenger_metrics = score(base_p, labels), score(challenger_p, labels)
+        folds.append({"testCutoff": cutoff.isoformat(), "trainN": len(train), "testN": len(test),
+                      "trainEventCount": len({r["eventId"] for r in train}),
+                      "testEventCount": len(test_events), "sameEventOverlap": False,
+                      "trainingLabelsAvailableBeforeTest": True,
+                      "baseline": base_metrics, "isotonicChallenger": challenger_metrics})
+        all_base.extend(base_p); all_base_y.extend(labels)
+        all_challenger.extend(challenger_p); all_challenger_y.extend(labels)
+    return {
+        "state": "CHRONOLOGICAL_OOS_CHALLENGER_EVALUATED" if folds else "BLOCKED_INSUFFICIENT_EVENT_DISJOINT_FOLDS",
+        "method": "ISOTONIC_REGRESSION_EVENT_DISJOINT_EXPANDING_WINDOW",
+        "foldCount": len(folds), "folds": folds,
+        "baselinePooled": score(all_base, all_base_y),
+        "isotonicChallengerPooled": score(all_challenger, all_challenger_y),
+        "promotionState": "CHALLENGER_ONLY_NO_PROMOTION",
+        "learningRevision": "LR000000", "predictiveClaim": "NONE",
+    }
+
+
+def apply_directional_research_conflict_gate(
+    forecasts: Sequence[Mapping[str, Any]], *, forecast_cutoff: str,
+    allow_manual_order_only: bool = False,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Block only verified same-market evidence that contradicts a selected side.
+
+    This is a fail-closed review gate, not an inversion rule. Upstream evidence
+    must explicitly attest identity, market comparability, cutoff, and hard-gate
+    eligibility; unverified trend claims remain diagnostics only.
+    """
+    cutoff = _aware_utc_timestamp(forecast_cutoff)
+    out: list[dict[str, Any]] = []
+    decisions: list[dict[str, Any]] = []
+
+    def market_key(value: Any) -> str:
+        return re.sub(r"[^a-z0-9]+", "", str(value or "").casefold())
+
+    def side_key(value: Any) -> str:
+        raw = str(value or "").strip().upper()
+        if raw in {"OVER", "HIGHER", "MORE", "ABOVE"}:
+            return "MORE"
+        if raw in {"UNDER", "LOWER", "LESS", "BELOW"}:
+            return "LESS"
+        return ""
+
+    for source in forecasts:
+        row = dict(source)
+        core = row.get("row") if isinstance(row.get("row"), Mapping) else {}
+        selected = side_key(row.get("selectedSide"))
+        target_market = market_key(core.get("marketDefinitionId") or core.get("market"))
+        try:
+            selected_line = float(core.get("line"))
+        except (TypeError, ValueError, OverflowError):
+            selected_line = None
+        conflicts = []
+        for evidence in row.get("directionalResearchEvidence") or ():
+            if not isinstance(evidence, Mapping):
+                continue
+            evidence_market = market_key(evidence.get("marketDefinitionId") or evidence.get("market"))
+            available = _aware_utc_timestamp(evidence.get("labelAvailableAt") or evidence.get("availableAt"))
+            temporal_ok = bool(available and cutoff and available <= cutoff)
+            if (not temporal_ok and allow_manual_order_only
+                    and str(evidence.get("cutoffRelation") or "").upper() == "BEFORE_DECISION"):
+                temporal_ok = True
+            direction = side_key(evidence.get("direction"))
+            try:
+                evidence_line = float(evidence.get("line"))
+                sample_n = int(evidence.get("sampleN"))
+            except (TypeError, ValueError, OverflowError):
+                continue
+            if (not selected or not target_market or target_market != evidence_market
+                    or not temporal_ok or not direction
+                    or sample_n < 1):
+                continue
+            comparable_line = selected_line is not None and (
+                abs(selected_line - evidence_line) <= 1e-9
+                or (selected == "MORE" and direction == "LESS" and evidence_line <= selected_line)
+                or (selected == "LESS" and direction == "MORE" and evidence_line >= selected_line)
+            )
+            if not comparable_line or selected == direction:
+                continue
+            conflicts.append({
+                "market": str(core.get("marketDefinitionId") or core.get("market")),
+                "selectedSide": selected,
+                "researchSide": direction,
+                "selectedLine": selected_line,
+                "researchLine": evidence_line,
+                "sampleN": sample_n,
+                "sourceHash": str(evidence.get("sourceHash") or ""),
+                "availableAt": available.isoformat() if available else None,
+                "temporalBasis": "ABSOLUTE_UTC_CUTOFF" if available and cutoff else "MANUAL_SOURCE_ORDER_ONLY",
+                "hardGateEligible": bool(evidence.get("hardGateEligible")
+                                           and evidence.get("identityVerified")
+                                           and evidence.get("marketComparable")),
+            })
+        if conflicts:
+            hard = any(item["hardGateEligible"] for item in conflicts)
+            row["directionalResearchConflicts"] = conflicts
+            row["directionalResearchConflictState"] = "BLOCKED_REVIEW_REQUIRED" if hard else "SHADOW_CONFLICT_ONLY"
+            if hard:
+                row["directionalResearchBlocker"] = "VERIFIED_SAME_MARKET_EVIDENCE_CONTRADICTS_SELECTED_SIDE"
+                row["productionSelectable"] = False
+                row["modeledPlayable"] = False
+                row["grade"] = "LEAN" if row.get("grade") == "PLAYABLE" else row.get("grade")
+                row["blocker"] = row.get("blocker") or row["directionalResearchBlocker"]
+            decisions.append({"projectionId": str(core.get("projectionId") or ""),
+                              "state": row["directionalResearchConflictState"],
+                              "conflicts": conflicts, "automaticallyInverted": False})
+        out.append(row)
+    report = {"state": "EVALUATED", "evaluatedForecasts": len(out),
+              "conflictCount": sum(len(item["conflicts"]) for item in decisions),
+              "hardBlockedCount": sum(item["state"] == "BLOCKED_REVIEW_REQUIRED" for item in decisions),
+              "decisions": decisions, "automaticInverseAllowed": False,
+              "temporalBasis": ("MANUAL_SOURCE_ORDER_ONLY" if allow_manual_order_only else
+                                "ABSOLUTE_UTC_CUTOFF" if cutoff else "BLOCKED_NO_VALID_FORECAST_CUTOFF")}
+    report["contentHash"] = content_hash({k: v for k, v in report.items() if k != "contentHash"})
+    return out, report
 
 
 def execute_advanced_modeling(
@@ -370,6 +601,7 @@ def execute_advanced_modeling(
     joint_backend_metadata: Sequence[Mapping[str, Any]] = (),
     run_id: str = "UNAVAILABLE",
     execution_mode: str = "CANONICAL_RUNNER_EXECUTION",
+    directional_research_report: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Evaluate each modeling capability for a canonical runner invocation."""
     rows = list(forecasts)
@@ -389,6 +621,7 @@ def execute_advanced_modeling(
     kde_blocked = 0
     kde_unsupported_market = 0
     kde_started = time.perf_counter()
+    kde_snapshots: list[dict[str, Any]] = []
     historical_kde = list((calibration_state or {}).get("kdeComparableSamples") or [])
     diagnostic_forecasts = [
         row for row in rows
@@ -419,10 +652,18 @@ def execute_advanced_modeling(
         except (KeyError, TypeError, ValueError):
             comparable_values = []
         result = gaussian_kde_diagnostic(comparable_values)
+        if result.get("state") == "SHADOW_DIAGNOSTIC":
+            kde_snapshots.append({
+                "marketId": str((row.get("row") or {}).get("projectionId") or ""),
+                "comparableKey": comparable_key,
+                "snapshotHash": result.get("snapshotHash"),
+                "inputContentHash": result.get("inputContentHash"),
+                "diagnostic": result,
+            })
         kde_done += result["state"] == "SHADOW_DIAGNOSTIC"
         kde_blocked += result["state"] != "SHADOW_DIAGNOSTIC"
     kde_state = "SHADOW_DIAGNOSTIC" if kde_done else (
-        "NOT_APPLICABLE" if diagnostic_forecasts and kde_unsupported_market == len(diagnostic_forecasts)
+        "NOT_APPLICABLE" if not diagnostic_forecasts or kde_unsupported_market == len(diagnostic_forecasts)
         else "INACTIVE_INSUFFICIENT_DATA"
     )
     kde_blockers = (["KDE_IS_DIAGNOSTIC_ONLY_NO_PROBABILITY_AUTHORITY"] if kde_done else [])
@@ -430,6 +671,8 @@ def execute_advanced_modeling(
         kde_blockers.append("DISCRETE_OUTCOME_DOMAIN_NOT_KDE_APPLICABLE")
     if not kde_done and kde_unsupported_market < len(diagnostic_forecasts):
         kde_blockers.append("NO_SUFFICIENT_VALIDATED_COMPARABLE_HISTORY")
+    if not diagnostic_forecasts:
+        kde_blockers.append("NO_MODELED_MARKET_INPUTS_RESEARCH_ONLY_OR_EMPTY_RUN")
     receipts.append(_receipt("KDE", kde_state,
         producer="cutoff-safe comparable historical outcomes", consumer="advanced-modeling density diagnostics",
         blockers=kde_blockers,
@@ -437,6 +680,8 @@ def execute_advanced_modeling(
                  "historicalSampleRows": len(historical_kde),
                  "diagnosticRows": kde_done, "inactiveRows": kde_blocked,
                  "unsupportedDiscreteRows": kde_unsupported_market,
+                 "densitySnapshots": kde_snapshots,
+                 "densitySnapshotConsumer": "advanced-modeling receipt and audit diagnostics",
                  "forecastProbabilityProduced": False}, run_id=run_id,
         forecast_cutoff=forecast_cutoff, input_hashes=input_hashes, event_ids=event_ids,
         market_ids=market_ids, applicability="CONTINUOUS_ONLY; DISCRETE_COUNT_MARKETS_ABSTAIN",
@@ -471,7 +716,10 @@ def execute_advanced_modeling(
     rng_versions = sorted({str(m.get("rngVersion")) for m in joint_backend_metadata if m.get("rngVersion")})
     receipts.append(_receipt("MONTE_CARLO", world_receipt["state"], producer="dcm.runner shared EventWorld backend",
         consumer="probability and portfolio joint outcomes",
-        blockers=[] if world_receipt["state"] == "EXECUTED" else [world_receipt["state"]],
+        blockers=[] if world_receipt["state"] == "EXECUTED" else list(dict.fromkeys([
+            world_receipt["state"],
+            *(["CANONICAL_EVENTWORLD_OUTPUTS_MISSING"] if not world_rows else []),
+        ])),
         details={"backend": backends or ["NOT_RECORDED"], "rngVersion": rng_versions or ["NOT_RECORDED"],
                  "seedSource": "input HAR content hash", "seedInputHash": seed_input_hash,
                  "randomSeed": seed_input_hash,
@@ -512,17 +760,22 @@ def execute_advanced_modeling(
     cal_metrics = evaluate_calibration_readiness(historical)
     from dcm.learning.walkforward import run_walkforward
     walkforward_metrics = run_walkforward(historical_walkforward)
+    calibration_challenger = _calibration_challenger_report(historical_walkforward)
     active = sum(str(r.get("calibrationState")) == "ACTIVE_CHRONOLOGICAL_CELL" for r in calibration_rows)
+    calibration_blockers = list(cal_metrics.get("reasons") or []) if not cal_metrics.get("ready") else ["LR000000_PROMOTION_GATE_REMAINS"]
+    if not forecast_cutoff:
+        calibration_blockers.append("VALID_FORECAST_CUTOFF_MISSING")
     receipts.append(_receipt("CALIBRATION", "EXECUTED_READINESS_ONLY", producer="dcm.learning.calibration",
         consumer="canonical probability records and portfolio gate",
-        blockers=list(cal_metrics.get("reasons") or []) if not cal_metrics.get("ready") else ["LR000000_PROMOTION_GATE_REMAINS"],
+        blockers=calibration_blockers,
         details={"candidateRowsEvaluated": len(calibration_rows), "activeRows": active,
                  "chronologicalReadiness": cal_metrics, "learningRevision": "LR000000",
                  "predictiveClaim": "NONE", "historicalSettlementRows": len(historical),
                  "calibrationSnapshotHash": (calibration_state or {}).get("contentHash"),
                  "walkForward": walkforward_metrics,
+                 "calibrationChallenger": calibration_challenger,
                  "outOfSampleMetricsProduced": bool(
-                     (walkforward_metrics.get("baselinePooled") or {}).get("n", 0)
+                     calibration_challenger.get("foldCount", 0)
                  )}, run_id=run_id,
         forecast_cutoff=forecast_cutoff, input_hashes=input_hashes, event_ids=event_ids,
         market_ids=market_ids, applicability="APPLICABLE_WHEN_CUTOFF_SAFE_LABELS_EXIST",
@@ -536,17 +789,33 @@ def execute_advanced_modeling(
         consumer="dcm.selection.portfolio.build_card / EV joint outcomes",
         blockers=[] if corr["state"] in {"EXECUTED", "SKIPPED_NOT_APPLICABLE"} else ["SHARED_PORTFOLIO_OUTCOMES_UNAVAILABLE"],
         details={"correlations": corr.get("correlations", []), "worldCount": corr.get("worldCount", 0),
+                 "jointStateDistribution": corr.get("jointStateDistribution", {}),
+                 "winCountDistribution": corr.get("winCountDistribution", {}),
+                 "allLegsWinProbability": corr.get("allLegsWinProbability"),
+                 "anyLegLossProbability": corr.get("anyLegLossProbability"),
+                 "alignedOutcomeHash": corr.get("alignedOutcomeHash"),
+                 "jointOutcomeMethod": corr.get("jointOutcomeMethod", "NOT_AVAILABLE"),
                  "portfolioSize": len(portfolio), "usesIndependentMarginals": False},
         run_id=run_id, forecast_cutoff=forecast_cutoff, input_hashes=input_hashes,
         event_ids=event_ids, market_ids=market_ids,
-        applicability="APPLICABLE_FOR_TWO_OR_MORE_ELIGIBLE_SELECTIONS" if len(portfolio) >= 2 else "NOT_APPLICABLE_SINGLE_SELECTION",
+        applicability="APPLICABLE_FOR_TWO_OR_MORE_ELIGIBLE_SELECTIONS" if len(portfolio) >= 2 else (
+            "NOT_APPLICABLE_SINGLE_SELECTION" if len(portfolio) == 1 else "NOT_APPLICABLE_NO_ELIGIBLE_PORTFOLIO_INPUT"
+        ),
         duration_ms=round((time.perf_counter() - portfolio_started) * 1000, 3)))
 
     ev_started = time.perf_counter()
     if not payout_table_hash or stake is None or len(portfolio) < 2:
         ev_state = "BLOCKED_MISSING_ENTRY_CONTRACT"
-        ev_details = {"expectedValue": None, "required": ["captured payout table hash", "stake", "entry rules"]}
-        ev_blockers = ["PAYOUT_RULES_OR_ENTRY_CONTRACT_MISSING"]
+        missing_ev_inputs = []
+        if not payout_table_hash:
+            missing_ev_inputs.append("CAPTURED_PAYOUT_RULES_MISSING")
+        if stake is None:
+            missing_ev_inputs.append("ENTRY_STAKE_MISSING")
+        if len(portfolio) < 2:
+            missing_ev_inputs.append("VERIFIED_MULTI_SELECTION_ENTRY_MISSING")
+        ev_details = {"expectedValue": None, "required": ["captured payout table hash", "stake", "entry rules"],
+                      "missingInputs": missing_ev_inputs}
+        ev_blockers = ["PAYOUT_RULES_OR_ENTRY_CONTRACT_MISSING", *missing_ev_inputs]
     elif corr["state"] != "EXECUTED":
         ev_state = "BLOCKED_JOINT_PROBABILITIES_MISSING"
         ev_details = {"expectedValue": None}
@@ -638,6 +907,9 @@ def execute_advanced_modeling(
         "compiledDag": compiled_dag,
         "dag": stages,
         "receipts": receipts,
+        "directionalResearchConflictGate": dict(directional_research_report or {
+            "state": "NOT_PROVIDED", "automaticInverseAllowed": False,
+        }),
         "capabilityCounts": {r["capability"]: 1 for r in receipts},
         "allCapabilitiesEvaluated": len(receipts) == len(CAPABILITY_DAG) + 1,
         "fullModelingExecution": False,
