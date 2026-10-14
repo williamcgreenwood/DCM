@@ -5,7 +5,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 - Modules: **270**
 - Symbols: **2068**
 - Parse errors: **0**
-- Inventory hash: `dd45caf95bf60568df0313bc210bc11e77351a33f9eccc6bc413ebc3babc784b`
+- Inventory hash: `87c230525e75099cc9a8a0e43aa00eec167c42860e1276f4b6d7494e57a80f39`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -1435,14 +1435,14 @@ _No class/function symbols._
 - `class` **InverseGateResult** L24
 - `method` **InverseGateResult.as_dict** L37
 - `function` **_as_aware_datetime** L41
-- `function` **audit_direction** L48
+- `function` **audit_direction** L48 — Evaluate a candidate direction; never convert hit rate into calibrated p.
 
 ### `src/dcm/model/joint_value.py`
 
 - `class` **WorldSelection** L17
 - `class` **JointValueResult** L27
 - `method` **JointValueResult.as_dict** L37
-- `function` **evaluate_shared_world_portfolio** L41
+- `function` **evaluate_shared_world_portfolio** L41 — Evaluate correlated outcomes; block certification if inputs lack proof.
 
 ### `src/dcm/model/line_surface.py`
 
