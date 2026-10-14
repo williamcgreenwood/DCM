@@ -14,6 +14,7 @@ import hashlib
 import json
 import math
 from collections import Counter
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -350,12 +351,29 @@ def _summarize(freeze: dict[str, Any], integrity: dict[str, Any], settlements: l
     }
 
 
-def settle_run(run_dir: Path, outcomes_path: Path, *, card_only: bool = False) -> dict[str, Any]:
+def settle_run(
+    run_dir: Path, outcomes_path: Path, *, card_only: bool = False,
+    label_available_at_utc: str | None = None,
+) -> dict[str, Any]:
     run_dir = Path(run_dir)
     outcomes_path = Path(outcomes_path)
     freeze_path = run_dir / "frozen_forecast.json"
     freeze_bytes = freeze_path.read_bytes() if freeze_path.is_file() else b""
     freeze, integrity, population = _verify_frozen_run(run_dir)
+    label_available_at = label_available_at_utc or datetime.now(timezone.utc).isoformat()
+    try:
+        parsed_label_time = datetime.fromisoformat(
+            label_available_at[:-1] + "+00:00" if label_available_at.endswith("Z") else label_available_at
+        )
+    except ValueError as exc:
+        raise ValueError("LABEL_AVAILABILITY_TIME_INVALID") from exc
+    if parsed_label_time.tzinfo is None or parsed_label_time.utcoffset() is None:
+        raise ValueError("LABEL_AVAILABILITY_TIME_REQUIRES_UTC_OFFSET")
+    label_available_at = parsed_label_time.astimezone(timezone.utc).isoformat()
+    decision_cutoff = str(
+        integrity.get("forecastDecisionCutoff") or integrity.get("forecastCutoff")
+        or freeze.get("forecastDecisionCutoff") or freeze.get("forecastCutoff") or ""
+    )
     outcomes_sha256 = _sha256_file(outcomes_path)
     outcomes = _outcomes(outcomes_path)
     modeled = _modeled_rows(population)
@@ -370,6 +388,12 @@ def settle_run(run_dir: Path, outcomes_path: Path, *, card_only: bool = False) -
     for prop in modeled:
         out = outcomes.get(str(prop.get("projectionId") or ""))
         rec = _settle_row(prop, out, outcomes_sha256=outcomes_sha256)
+        rec["decisionCutoff"] = decision_cutoff
+        rec["labelAvailableAt"] = label_available_at if rec.get("binaryOutcome") in {0, 1} else None
+        rec["labelAvailabilityState"] = (
+            "OBSERVED_AT_SETTLEMENT_RUN" if rec.get("binaryOutcome") in {0, 1}
+            else "NO_BINARY_LABEL"
+        )
         classified = classify_failure(
             predicted_side=str(rec.get("direction") or prop.get("direction") or ""),
             outcome=str(rec.get("result") or rec.get("settlement") or ""),

@@ -288,13 +288,79 @@ def _default_model_config() -> dict[str, Any]:
     }
 
 
-def _active_calibration(workspace: Path) -> dict[str, Any]:
+def _active_calibration(workspace: Path, history_root: Path | None = None) -> dict[str, Any]:
     path = workspace / "dcm_v6" / "calibration" / "active_cells.json"
     try:
         cells = json.loads(path.read_text(encoding="utf-8")) if path.is_file() else {}
     except (OSError, json.JSONDecodeError):
         cells = {}
-    return {"cells": cells, "contentHash": content_hash(cells)}
+    # Reuse only persisted canonical settlement sidecars. Older rows without a
+    # label-availability timestamp remain auditable but cannot enter as-of
+    # calibration or walk-forward training.
+    roots = [workspace / "dcm_v6" / "RUNS"]
+    if history_root is not None:
+        roots.append(Path(history_root))
+    settlements: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    max_rows = 50_000
+    max_runs = 1_000
+    visited_runs = 0
+    for root in dict.fromkeys(p.resolve() for p in roots):
+        if not root.is_dir():
+            continue
+        try:
+            run_dirs = sorted((p for p in root.iterdir() if p.is_dir()), key=lambda p: p.name)
+        except OSError:
+            continue
+        for run_dir in run_dirs:
+            if visited_runs >= max_runs or len(settlements) >= max_rows:
+                break
+            visited_runs += 1
+            sidecar = run_dir / "settlements.jsonl"
+            try:
+                with sidecar.open("r", encoding="utf-8") as handle:
+                    for line in handle:
+                        if len(settlements) >= max_rows:
+                            break
+                        if len(line) > 1_000_000:
+                            continue
+                        try:
+                            record = json.loads(line)
+                        except json.JSONDecodeError:
+                            continue
+                        if not isinstance(record, dict):
+                            continue
+                        if record.get("binaryOutcome") not in {0, 1} or record.get("forecastP") is None:
+                            continue
+                        identity = str(record.get("recordHash") or content_hash(record))
+                        if identity in seen:
+                            continue
+                        seen.add(identity)
+                        settlements.append(record)
+            except OSError:
+                continue
+    settlements.sort(key=lambda row: (str(row.get("decisionCutoff") or ""),
+                                      str(row.get("labelAvailableAt") or ""),
+                                      str(row.get("projectionId") or "")))
+    walkforward_rows = [{
+        "decisionCutoff": row.get("decisionCutoff"),
+        "labelAvailableAt": row.get("labelAvailableAt"),
+        "result": row.get("result") or row.get("settlement"),
+        "forecastP": row.get("forecastP"),
+        "binaryOutcome": row.get("binaryOutcome"),
+        "labelSplit": "supervised",
+    } for row in settlements]
+    snapshot = {
+        "cells": cells,
+        "settlements": settlements,
+        "walkforwardRows": walkforward_rows,
+        "settlementSource": "canonical RUNS/settlements.jsonl sidecars",
+        "settlementRunDirsScanned": visited_runs,
+        "settlementRowsLoaded": len(settlements),
+        "legacyRowsWithoutAsOfLabelTimeExcluded": True,
+    }
+    snapshot["contentHash"] = content_hash({k: v for k, v in snapshot.items() if k != "contentHash"})
+    return snapshot
 
 
 def run_dcm(
@@ -373,7 +439,11 @@ def run_dcm(
             raise RuntimeError("INPUT_MANIFEST_BOARD_SOURCE_MISMATCH")
         if str(ck.get("modelConfigHash") or "") != content_hash(model_config):
             raise RuntimeError("MODEL_CONFIG_HASH_MISMATCH_ON_RESUME")
-        if str(calibration_state.get("contentHash") or "") != content_hash(calibration_cells):
+        stored_calibration_hash = str(calibration_state.get("contentHash") or "")
+        expected_calibration_hash = content_hash({
+            key: value for key, value in calibration_state.items() if key != "contentHash"
+        })
+        if stored_calibration_hash not in {expected_calibration_hash, content_hash(calibration_cells)}:
             raise RuntimeError("CALIBRATION_STATE_SELF_HASH_MISMATCH")
         if str(ck.get("calibrationStateHash") or "") != str(calibration_state.get("contentHash") or ""):
             raise RuntimeError("CALIBRATION_STATE_HASH_MISMATCH_ON_RESUME")
@@ -453,7 +523,7 @@ def run_dcm(
         )
         persist_input_boundary_manifest(dest, boundary_manifest)
         model_config = _default_model_config()
-        calibration_state = _active_calibration(workspace)
+        calibration_state = _active_calibration(workspace, output_root)
         (dest / "MODEL_CONFIG.json").write_text(
             json.dumps(model_config, indent=2, sort_keys=True) + "\n",
             encoding="utf-8",
@@ -1811,6 +1881,7 @@ def run_dcm(
         model_config_hash=config_hash,
         event_world_metadata=event_worlds_meta,
         joint_backend_metadata=joint_meta_acc,
+        run_id=str(run_id),
     )
     validate_advanced_execution_receipt(advanced_execution)
     (dest / "advanced_modeling_execution.json").write_text(

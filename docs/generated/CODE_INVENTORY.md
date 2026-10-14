@@ -3,9 +3,9 @@
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
 - Modules: **270**
-- Symbols: **2068**
+- Symbols: **2071**
 - Parse errors: **0**
-- Inventory hash: `87c230525e75099cc9a8a0e43aa00eec167c42860e1276f4b6d7494e57a80f39`
+- Inventory hash: `e1877648267508bc63814d115f1d59db4a7bda813e519d9dd2de70ae43510687`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -98,11 +98,11 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P6 | `src/dcm/learning/postgame.py` | 0 | 13 |
 | P6 | `src/dcm/learning/registry.py` | 0 | 10 |
 | P6 | `src/dcm/learning/sidecar.py` | 0 | 5 |
-| P6 | `src/dcm/learning/walkforward.py` | 1 | 15 |
+| P6 | `src/dcm/learning/walkforward.py` | 1 | 16 |
 | P2 | `src/dcm/ml/__init__.py` | 0 | 0 |
 | P2 | `src/dcm/ml/feature_store.py` | 1 | 9 |
 | P2-P4 | `src/dcm/model/__init__.py` | 0 | 1 |
-| P2-P4 | `src/dcm/model/advanced_execution.py` | 0 | 8 |
+| P2-P4 | `src/dcm/model/advanced_execution.py` | 0 | 10 |
 | P2-P4 | `src/dcm/model/availability.py` | 0 | 2 |
 | P2-P4 | `src/dcm/model/basketball_efficiency.py` | 1 | 6 |
 | P2-P4 | `src/dcm/model/basketball_opportunity.py` | 1 | 8 |
@@ -1217,9 +1217,9 @@ _No class/function symbols._
 - `function` **_decision_cutoff** L158
 - `function` **_label_split** L168
 - `function` **build_training_row** L182 — Join freeze slim + hashes + settlement. Returns None if no real settlement.
-- `function` **build_dataset** L236 — Build rows from one or more settled run dests. Never invents settlements.
-- `function` **write_dataset** L301
-- `function` **main** L316
+- `function` **build_dataset** L238 — Build rows from one or more settled run dests. Never invents settlements.
+- `function` **write_dataset** L303
+- `function` **main** L318
 
 ### `src/dcm/learning/failure_class.py`
 
@@ -1250,19 +1250,19 @@ _No class/function symbols._
 
 ### `src/dcm/learning/postgame.py`
 
-- `function` **_load_jsonl** L34
-- `function` **_population** L51 — Prefer the post-model slim population; fall back to the account-time dump.
-- `function` **_modeled_rows** L61
-- `function` **_card_ids** L75
-- `function` **_outcomes** L89 — Parse a synthetic/official outcome map. Never invent missing keys.
-- `function` **_sha256_file** L129
-- `function` **_verify_frozen_run** L137
-- `function` **_result** L179 — PrizePicks sporting compare: MORE wins above the line, LESS below, exact is PUSH.
-- `function` **_normalize_result** L188
-- `function` **_settle_row** L201
-- `function` **_attach_scores** L309
-- `function` **_summarize** L320
-- `function` **settle_run** L353
+- `function` **_load_jsonl** L35
+- `function` **_population** L52 — Prefer the post-model slim population; fall back to the account-time dump.
+- `function` **_modeled_rows** L62
+- `function` **_card_ids** L76
+- `function` **_outcomes** L90 — Parse a synthetic/official outcome map. Never invent missing keys.
+- `function` **_sha256_file** L130
+- `function` **_verify_frozen_run** L138
+- `function` **_result** L180 — PrizePicks sporting compare: MORE wins above the line, LESS below, exact is PUSH.
+- `function` **_normalize_result** L189
+- `function` **_settle_row** L202
+- `function` **_attach_scores** L310
+- `function` **_summarize** L321
+- `function` **settle_run** L354
 
 ### `src/dcm/learning/registry.py`
 
@@ -1287,22 +1287,23 @@ _No class/function symbols._
 
 ### `src/dcm/learning/walkforward.py`
 
-- `class` **WalkForwardLeakage** L22 — Test fold decisionCutoff is not strictly after every train cutoff.
-- `function` **_ts** L25
-- `function` **prediction_p** L28
-- `function` **binary_pairs** L41 — WIN=1, LOSS=0. PUSH excluded (default) or scored as 0.5.
-- `function` **metrics** L66
-- `function` **assert_no_leakage** L116
-- `function` **chronological_folds** L132 — Expanding-window folds: unique cutoffs sorted; train all earlier, test the next cutoff.
-- `function` **_sigmoid** L156
-- `function` **_shadow_features** L160
-- `method` **_shadow_features.f** L165
-- `function` **fit_shadow_logistic** L174 — Tiny intercept+linear logistic. SHADOW only. No sklearn required. No .pkl.
-- `function` **predict_shadow** L203
-- `function` **evaluate_folds** L209
-- `function` **run_walkforward** L267
-- `function` **write_walkforward_report** L326
-- `function` **main** L334
+- `class` **WalkForwardLeakage** L23 — Test fold decisionCutoff is not strictly after every train cutoff.
+- `function` **_ts** L26
+- `function` **_aware_time** L29
+- `function` **prediction_p** L41
+- `function` **binary_pairs** L54 — WIN=1, LOSS=0. PUSH excluded (default) or scored as 0.5.
+- `function` **metrics** L79
+- `function` **assert_no_leakage** L129
+- `function` **chronological_folds** L155 — As-of expanding folds; a prior forecast is trainable only after its label arrived.
+- `function` **_sigmoid** L190
+- `function` **_shadow_features** L194
+- `method` **_shadow_features.f** L199
+- `function` **fit_shadow_logistic** L208 — Tiny intercept+linear logistic. SHADOW only. No sklearn required. No .pkl.
+- `function` **predict_shadow** L237
+- `function` **evaluate_folds** L243
+- `function` **run_walkforward** L301
+- `function` **write_walkforward_report** L360
+- `function` **main** L368
 
 ### `src/dcm/ml/__init__.py`
 
@@ -1327,14 +1328,16 @@ _No class/function symbols._
 
 ### `src/dcm/model/advanced_execution.py`
 
-- `function` **compile_advanced_execution_dag** L48 — Compile and validate the bounded modeling DAG against the live registry.
-- `function` **_receipt** L73
-- `function` **_timestamp_at_or_before** L90
-- `function` **gaussian_kde_diagnostic** L104 — Select bandwidth by deterministic leave-one-out likelihood.
-- `function` **normalized_svd_diagnostic** L143 — Validate chronology, normalize columns, and report a NumPy SVD rank.
-- `function` **_shared_world_diagnostics** L190
-- `function` **execute_advanced_modeling** L226 — Evaluate each modeling capability for a canonical runner invocation.
-- `function` **validate_advanced_execution_receipt** L402
+- `function` **_deterministic_hash_payload** L61 — Remove observational timings recursively from deterministic hashes.
+- `function` **compile_advanced_execution_dag** L71 — Compile and validate the bounded modeling DAG against the live registry.
+- `function` **_receipt** L105
+- `function` **_timestamp_at_or_before** L156
+- `function` **_aware_utc_timestamp** L170
+- `function` **gaussian_kde_diagnostic** L183 — Select bandwidth by deterministic leave-one-out likelihood.
+- `function` **normalized_svd_diagnostic** L251 — Validate chronology, normalize columns, and report a NumPy SVD rank.
+- `function` **_shared_world_diagnostics** L322
+- `function` **execute_advanced_modeling** L358 — Evaluate each modeling capability for a canonical runner invocation.
+- `function` **validate_advanced_execution_receipt** L648
 
 ### `src/dcm/model/availability.py`
 
@@ -2529,12 +2532,12 @@ _No class/function symbols._
 - `function` **_git_commit_sha** L260 — Best-effort git HEAD. Never writes git config. Missing git is None, not a crash.
 - `function` **_default_model_config** L280
 - `function` **_active_calibration** L291
-- `function` **run_dcm** L300
-- `method` **run_dcm._ingest_stream** L429
-- `method` **run_dcm._snapshot_for** L1181
-- `method` **run_dcm._resimulate_material** L1679
-- `method` **run_dcm.slim** L1893
-- `function` **main** L2538
+- `function` **run_dcm** L366
+- `method` **run_dcm._ingest_stream** L499
+- `method` **run_dcm._snapshot_for** L1251
+- `method` **run_dcm._resimulate_material** L1749
+- `method` **run_dcm.slim** L1964
+- `function` **main** L2609
 
 ### `src/dcm/runtime/__init__.py`
 

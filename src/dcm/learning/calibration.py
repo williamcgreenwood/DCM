@@ -128,7 +128,9 @@ def evaluate_calibration_readiness(settlements: list[dict[str, Any]]) -> dict[st
     for rec in settlements or []:
         if rec.get("binaryOutcome") not in {0, 1}:
             continue
-        p = _clip_p(rec.get("forecastP") or rec.get("calibratedP") or rec.get("selectedP"))
+        raw_p = next((rec.get(key) for key in ("forecastP", "calibratedP", "selectedP")
+                      if rec.get(key) is not None), None)
+        p = _clip_p(raw_p)
         if p is None:
             continue
         preds.append(p)

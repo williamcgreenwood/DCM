@@ -206,6 +206,8 @@ def build_training_row(
         "predictiveClaim": freeze.get("predictiveClaim") or PREDICTIVE_CLAIM,
         "software": freeze.get("dcmVersion") or freeze.get("software") or SOFTWARE,
         "decisionCutoff": _decision_cutoff(freeze),
+        "labelAvailableAt": settlement.get("labelAvailableAt"),
+        "labelAvailabilityState": settlement.get("labelAvailabilityState") or "LEGACY_TIMESTAMP_UNAVAILABLE",
         "eventStart": event_start or slim.get("eventStartTime") or slim.get("eventStart") or "",
         "labelSplit": split,
         "settlement": result,

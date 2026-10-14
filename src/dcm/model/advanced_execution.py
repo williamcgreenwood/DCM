@@ -8,16 +8,20 @@ as a typed blocker in the receipt.
 from __future__ import annotations
 
 import math
+import time
 from datetime import datetime, timezone
 from typing import Any, Mapping, Sequence
 
 from dcm.contracts.hashes import content_hash
 from dcm.learning.calibration import evaluate_calibration_readiness
-from dcm.algorithms.registry import require_algorithm
+from dcm.algorithms.registry import algorithm_registry_sha256, load_algorithm_registry, require_algorithm
 
 ADVANCED_EXECUTION_SCHEMA = "pillars_dcm.advanced_modeling_execution.v1"
 MIN_KDE_SAMPLE = 30
+MAX_KDE_SAMPLE = 500
 MIN_SVD_ROWS = 8
+MAX_SVD_ROWS = 10_000
+MAX_SVD_COLUMNS = 512
 
 CAPABILITY_DAG = (
     ("SVD", "FEATURES", "PARAMETERS"),
@@ -28,14 +32,23 @@ CAPABILITY_DAG = (
     ("PAYOUT_EV", "PORTFOLIO", "FREEZE"),
 )
 CAPABILITY_DEPENDENCIES = {
-    "SVD": ("FEATURES",),
-    "MONTE_CARLO": ("PARAMETERS", "EVENTWORLD"),
-    "KDE": ("EVIDENCE", "EVENTWORLD"),
-    "CALIBRATION": ("PROBABILITY", "HISTORICAL_SETTLEMENTS"),
-    "PORTFOLIO_CORRELATION": ("CALIBRATION", "PORTFOLIO", "SHARED_EVENT_OUTCOMES"),
-    "PAYOUT_EV": ("PORTFOLIO_CORRELATION", "PAYOUT_RULES", "CALIBRATED_JOINT_PROBABILITIES"),
+    "SVD": ("ALGORITHM_GRAPH",),
+    "MONTE_CARLO": ("ALGORITHM_GRAPH",),
+    "KDE": ("ALGORITHM_GRAPH",),
+    "CALIBRATION": ("MONTE_CARLO",),
+    "PORTFOLIO_CORRELATION": ("MONTE_CARLO", "CALIBRATION"),
+    "PAYOUT_EV": ("PORTFOLIO_CORRELATION",),
+}
+CAPABILITY_INPUT_REQUIREMENTS = {
+    "SVD": ("CUTOFF_SAFE_ROLE_OPPONENT_FEATURE_MATRIX",),
+    "MONTE_CARLO": ("PARAMETER_SNAPSHOT", "SUPPORTED_EVENTWORLD_BACKEND"),
+    "KDE": ("COMPARABLE_CUTOFF_SAFE_CONTINUOUS_HISTORY",),
+    "CALIBRATION": ("CHRONOLOGICAL_FORECAST_OUTCOME_PAIRS",),
+    "PORTFOLIO_CORRELATION": ("ALIGNED_SHARED_EVENT_OUTCOMES",),
+    "PAYOUT_EV": ("VERIFIED_ENTRY_CONTRACT", "COMPLETE_PAYOUT_RULES", "CALIBRATED_JOINT_OUTCOMES"),
 }
 CAPABILITY_ALGORITHMS = {
+    "ALGORITHM_GRAPH": "ALG-CTRL-001",
     "KDE": "ALG-ML-PROB-009",
     "SVD": "ALG-ML-TABULAR-013",
     "MONTE_CARLO": "ALG-MC-001",
@@ -45,11 +58,29 @@ CAPABILITY_ALGORITHMS = {
 }
 
 
+def _deterministic_hash_payload(value: Any) -> Any:
+    """Remove observational timings recursively from deterministic hashes."""
+    if isinstance(value, Mapping):
+        return {str(k): _deterministic_hash_payload(v) for k, v in value.items()
+                if k not in {"executionDurationMs", "contentHash"}}
+    if isinstance(value, (list, tuple)):
+        return [_deterministic_hash_payload(item) for item in value]
+    return value
+
+
 def compile_advanced_execution_dag() -> dict[str, Any]:
     """Compile and validate the bounded modeling DAG against the live registry."""
-    nodes = []
-    node_ids = {capability for capability, _producer, _consumer in CAPABILITY_DAG}
-    seen: set[str] = set()
+    nodes = [{
+        "nodeId": "ALGORITHM_GRAPH",
+        "algorithmId": CAPABILITY_ALGORITHMS["ALGORITHM_GRAPH"],
+        "lifecycle": require_algorithm(CAPABILITY_ALGORITHMS["ALGORITHM_GRAPH"]).lifecycle,
+        "producer": "dcm.algorithms.registry",
+        "consumer": "canonical seven-capability execution controller",
+        "dependsOn": [],
+        "requiredInputs": ["CANONICAL_RUN_CONTEXT"],
+    }]
+    node_ids = {"ALGORITHM_GRAPH", *(capability for capability, _producer, _consumer in CAPABILITY_DAG)}
+    seen: set[str] = {"ALGORITHM_GRAPH"}
     for capability, producer, consumer in CAPABILITY_DAG:
         algorithm_id = CAPABILITY_ALGORITHMS[capability]
         record = require_algorithm(algorithm_id)
@@ -63,28 +94,63 @@ def compile_advanced_execution_dag() -> dict[str, Any]:
             "producer": producer,
             "consumer": consumer,
             "dependsOn": list(dependencies),
+            "requiredInputs": list(CAPABILITY_INPUT_REQUIREMENTS[capability]),
         }
         nodes.append(node)
         seen.add(capability)
-    return {"schema": "pillars_dcm.advanced_modeling_dag.v1", "version": "1.0.0",
+    return {"schema": "pillars_dcm.advanced_modeling_dag.v1", "version": "1.1.0",
             "nodes": nodes, "validated": True}
 
 
 def _receipt(capability: str, state: str, *, producer: str, consumer: str,
-             blockers: Sequence[str] = (), details: Mapping[str, Any] | None = None) -> dict[str, Any]:
+             blockers: Sequence[str] = (), details: Mapping[str, Any] | None = None,
+             run_id: str = "UNAVAILABLE", forecast_cutoff: str = "",
+             input_hashes: Sequence[str] = (), event_ids: Sequence[str] = (),
+             market_ids: Sequence[str] = (), duration_ms: float | None = None,
+             applicability: str = "EVALUATED") -> dict[str, Any]:
     algorithm_id = CAPABILITY_ALGORITHMS[capability]
     record = require_algorithm(algorithm_id)
-    return {
+    body = {
         "capability": capability,
         "algorithmId": algorithm_id,
+        "algorithmVersion": record.introduced_version,
         "algorithmLifecycle": record.lifecycle,
         "fallbackAlgorithmId": record.fallback_algorithm_id,
+        "requirementIds": list(record.requirement_trace_ids),
+        "testReferences": list(record.test_ids),
+        "benchmarkReferences": list(record.benchmark_ids),
+        "runId": run_id,
+        "modelId": "DCM_CANONICAL",
+        "modelVersion": "UNAVAILABLE",
+        "inputDatasetIds": [],
+        "inputDatasetLineageState": "NOT_PROVIDED_BY_CANONICAL_RUNNER",
+        "featureSnapshotIds": [],
+        "parameterSnapshotIds": [],
+        "snapshotLineageState": "RECORDED_IN_INPUT_CONTENT_HASHES_WHEN_PRESENT",
+        "eventIds": list(dict.fromkeys(str(x) for x in event_ids if x)),
+        "marketIds": list(dict.fromkeys(str(x) for x in market_ids if x)),
+        "evidenceCutoff": forecast_cutoff or None,
+        "inputContentHashes": list(dict.fromkeys(str(x) for x in input_hashes if x)),
+        "applicabilityVerdict": applicability,
         "state": state,
+        "executionMethod": record.implementation_module + "." + record.implementation_symbol,
+        "randomSeed": (details or {}).get("randomSeed"),
+        "rngVersion": (details or {}).get("rngVersion"),
+        "executionDurationMs": duration_ms,
+        "outputHash": None,
+        "numericalDiagnostics": (details or {}).get("diagnostics") or (details or {}).get("diagnostic") or {},
         "producer": producer,
         "consumer": consumer,
+        "fallbackDetails": None,
         "blockers": list(blockers),
         "details": dict(details or {}),
     }
+    # Duration is audit telemetry. It must not perturb deterministic output or
+    # restart-equivalence hashes for identical model inputs.
+    body["outputHash"] = content_hash({
+        k: v for k, v in body.items() if k not in {"outputHash", "executionDurationMs"}
+    })
+    return body
 
 
 def _timestamp_at_or_before(value: Any, cutoff: str) -> bool:
@@ -101,16 +167,42 @@ def _timestamp_at_or_before(value: Any, cutoff: str) -> bool:
     return parsed.astimezone(timezone.utc) <= cutoff_dt.astimezone(timezone.utc)
 
 
+def _aware_utc_timestamp(value: Any) -> datetime | None:
+    raw = str(value or "").strip()
+    if not raw:
+        return None
+    try:
+        parsed = datetime.fromisoformat(raw[:-1] + "+00:00" if raw.endswith("Z") else raw)
+    except ValueError:
+        return None
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        return None
+    return parsed.astimezone(timezone.utc)
+
+
 def gaussian_kde_diagnostic(values: Sequence[float], *, min_n: int = MIN_KDE_SAMPLE) -> dict[str, Any]:
     """Select bandwidth by deterministic leave-one-out likelihood.
 
     The returned density is explicitly diagnostic and has no probability-field
     or calibration interface. Sparse samples abstain.
     """
-    xs = [float(x) for x in values if math.isfinite(float(x))]
+    try:
+        xs = [float(x) for x in values]
+    except (TypeError, ValueError, OverflowError):
+        return {"state": "BLOCKED_INVALID_DENSITY_INPUT", "n": 0,
+                "blocker": "NON_NUMERIC_OBSERVATION", "forecastProbability": None}
+    if any(not math.isfinite(x) for x in xs):
+        return {"state": "BLOCKED_INVALID_DENSITY_INPUT", "n": len(xs),
+                "blocker": "NONFINITE_OBSERVATION", "forecastProbability": None}
     if len(xs) < min_n:
         return {"state": "INACTIVE_INSUFFICIENT_DATA", "n": len(xs),
                 "blocker": f"INSUFFICIENT_SAMPLE:{len(xs)}<{min_n}", "forecastProbability": None}
+    original_n = len(xs)
+    if original_n > MAX_KDE_SAMPLE:
+        # Deterministic evenly spaced thinning bounds O(n^2) LOO work while
+        # retaining the observed range; the result remains diagnostic-only.
+        xs = [xs[round(i * (original_n - 1) / (MAX_KDE_SAMPLE - 1))]
+              for i in range(MAX_KDE_SAMPLE)]
     mean = sum(xs) / len(xs)
     variance = sum((x - mean) ** 2 for x in xs) / (len(xs) - 1)
     sigma = math.sqrt(max(variance, 1e-12))
@@ -118,6 +210,7 @@ def gaussian_kde_diagnostic(values: Sequence[float], *, min_n: int = MIN_KDE_SAM
     candidates = [base * factor for factor in (0.5, 0.75, 1.0, 1.5, 2.0)]
     root_2pi = math.sqrt(2.0 * math.pi)
     best_h, best_score = candidates[0], -math.inf
+    candidate_scores = []
     for h in candidates:
         score = 0.0
         for i, point in enumerate(xs):
@@ -126,15 +219,30 @@ def gaussian_kde_diagnostic(values: Sequence[float], *, min_n: int = MIN_KDE_SAM
             density /= (len(xs) - 1) * h * root_2pi
             score += math.log(max(density, 1e-300))
         score /= len(xs)
+        candidate_scores.append({"bandwidth": h, "looLogLikelihood": score})
         if score > best_score:
             best_h, best_score = h, score
     density_se = math.sqrt(max(0.0, 1.0 / (len(xs) * best_h * root_2pi)))
+    lower, upper = min(xs) - 3.0 * best_h, max(xs) + 3.0 * best_h
+    grid = [lower + (upper - lower) * i / 100 for i in range(101)]
+    density = [sum(math.exp(-0.5 * ((point - x) / best_h) ** 2) for x in xs)
+               / (len(xs) * best_h * root_2pi) for point in grid]
+    integral = sum((density[i] + density[i + 1]) * (grid[i + 1] - grid[i]) / 2
+                   for i in range(len(grid) - 1))
     return {
         "state": "SHADOW_DIAGNOSTIC",
         "n": len(xs),
+        "inputN": original_n,
+        "sampleCap": MAX_KDE_SAMPLE,
+        "sampleReduction": "EVEN_SPACED_DETERMINISTIC" if original_n > MAX_KDE_SAMPLE else "NONE",
         "bandwidth": best_h,
         "looLogLikelihood": best_score,
+        "bandwidthCandidates": candidate_scores,
+        "densityGrid": [{"x": x, "density": y} for x, y in zip(grid, density)],
+        "gridIntegralDiagnostic": integral,
+        "densityNormalization": "ANALYTIC_GAUSSIAN_KERNEL_MIXTURE",
         "densityUncertaintyDiagnostic": density_se,
+        "effectiveSampleSize": len(xs),
         "forecastProbability": None,
         "probabilityAuthority": "NONE_DIAGNOSTIC_ONLY",
     }
@@ -157,14 +265,22 @@ def normalized_svd_diagnostic(
     width = len(rows[0])
     if width == 0 or any(len(row) != width for row in rows):
         return {"state": "BLOCKED_INVALID_FEATURE_MATRIX", "forecastProbability": None}
-    if observed_at is not None:
-        if len(observed_at) != len(rows) or not forecast_cutoff:
-            return {"state": "BLOCKED_TEMPORAL_METADATA_MISSING", "forecastProbability": None}
-        if any(str(ts) > forecast_cutoff for ts in observed_at):
-            return {"state": "BLOCKED_POST_CUTOFF_FEATURE", "forecastProbability": None}
+    if observed_at is None or len(observed_at) != len(rows) or not forecast_cutoff:
+        return {"state": "BLOCKED_TEMPORAL_METADATA_MISSING", "forecastProbability": None}
+    if any(not _timestamp_at_or_before(ts, forecast_cutoff) for ts in observed_at):
+        return {"state": "BLOCKED_POST_CUTOFF_FEATURE", "forecastProbability": None}
+    timestamps = [_aware_utc_timestamp(ts) for ts in observed_at]
+    if any(ts is None for ts in timestamps):
+        return {"state": "BLOCKED_TEMPORAL_METADATA_INVALID", "forecastProbability": None}
+    if timestamps != sorted(timestamps):
+        return {"state": "BLOCKED_NONCHRONOLOGICAL_FEATURE_MATRIX", "forecastProbability": None}
     if len(rows) < min_rows or width < 2:
         return {"state": "INACTIVE_INSUFFICIENT_DATA", "rows": len(rows), "columns": width,
                 "blocker": "INSUFFICIENT_FEATURE_MATRIX", "forecastProbability": None}
+    if len(rows) > MAX_SVD_ROWS or width > MAX_SVD_COLUMNS:
+        return {"state": "BLOCKED_RESOURCE_LIMIT", "rows": len(rows), "columns": width,
+                "limits": {"maxRows": MAX_SVD_ROWS, "maxColumns": MAX_SVD_COLUMNS},
+                "forecastProbability": None}
     try:
         import numpy as np
     except ImportError:
@@ -179,10 +295,26 @@ def normalized_svd_diagnostic(
         rank = 0
     else:
         rank = int(np.sum(singular > max(normalized.shape) * np.finfo(float).eps * singular[0]))
+    fold_ranks: list[int] = []
+    # Chronological prefix/suffix rank stability is a diagnostic only; neither
+    # fold may contain rows after the forecast evidence cutoff.
+    split = len(rows) // 2
+    for fold in (rows[:split], rows[split:]):
+        if len(fold) < 4:
+            continue
+        fold_array = np.asarray(fold, dtype=np.float64)
+        fold_scales = fold_array.std(axis=0)
+        fold_scales[fold_scales < 1e-12] = 1.0
+        fold_normalized = (fold_array - fold_array.mean(axis=0)) / fold_scales
+        fold_singular = np.linalg.svd(fold_normalized, compute_uv=False)
+        threshold = max(fold_normalized.shape) * np.finfo(float).eps * (float(fold_singular[0]) if fold_singular.size else 0.0)
+        fold_ranks.append(int(np.sum(fold_singular > threshold)))
+    stability = "RANK_STABLE" if len(fold_ranks) == 2 and fold_ranks[0] == fold_ranks[1] else "RANK_UNSTABLE_OR_UNAVAILABLE"
     return {
         "state": "SHADOW_DIAGNOSTIC", "rows": len(rows), "columns": width,
         "rank": rank, "singularValues": [float(x) for x in singular],
-        "normalization": "COLUMN_ZSCORE", "stability": "NOT_EVALUATED_NO_CHRONOLOGICAL_FOLDS",
+        "normalization": "COLUMN_ZSCORE", "chronologicalFoldRanks": fold_ranks,
+        "stability": stability,
         "forecastProbability": None,
     }
 
@@ -230,18 +362,38 @@ def execute_advanced_modeling(
     seed_input_hash: str | None = None, model_config_hash: str | None = None,
     event_world_metadata: Mapping[str, Any] | None = None,
     joint_backend_metadata: Sequence[Mapping[str, Any]] = (),
+    run_id: str = "UNAVAILABLE",
+    execution_mode: str = "CANONICAL_RUNNER_EXECUTION",
 ) -> dict[str, Any]:
     """Evaluate each modeling capability for a canonical runner invocation."""
     rows = list(forecasts)
+    started = time.perf_counter()
     receipts: list[dict[str, Any]] = []
+    event_ids = [str((row.get("row") or {}).get("eventId") or "") for row in rows]
+    market_ids = [str((row.get("row") or {}).get("projectionId") or "") for row in rows]
+    input_hashes = [str(value) for row in rows for value in (row.get("evidenceHashes") or [])]
+    input_hashes.extend(str(row.get("parameterSnapshotHash")) for row in rows if row.get("parameterSnapshotHash"))
+    if seed_input_hash:
+        input_hashes.append(seed_input_hash)
+    if model_config_hash:
+        input_hashes.append(model_config_hash)
+    if (calibration_state or {}).get("contentHash"):
+        input_hashes.append(str(calibration_state["contentHash"]))
     kde_done = 0
     kde_blocked = 0
+    kde_unsupported_market = 0
+    kde_started = time.perf_counter()
     historical_kde = list((calibration_state or {}).get("kdeComparableSamples") or [])
     diagnostic_forecasts = [
         row for row in rows
         if row.get("selectedSide") and row.get("state") == "MODELED"
     ][:25]
     for row in diagnostic_forecasts:
+        if str(row.get("outcomeDomain") or "DISCRETE").upper() not in {
+            "CONTINUOUS", "CONTINUOUS_APPROXIMATION_VALIDATED"
+        }:
+            kde_unsupported_market += 1
+            continue
         comparable_key = "|".join((
             str((row.get("row") or {}).get("sportFamily") or ""),
             str((row.get("row") or {}).get("league") or ""),
@@ -263,14 +415,28 @@ def execute_advanced_modeling(
         result = gaussian_kde_diagnostic(comparable_values)
         kde_done += result["state"] == "SHADOW_DIAGNOSTIC"
         kde_blocked += result["state"] != "SHADOW_DIAGNOSTIC"
-    receipts.append(_receipt("KDE", "SHADOW_DIAGNOSTIC" if kde_done else "INACTIVE_INSUFFICIENT_DATA",
+    kde_state = "SHADOW_DIAGNOSTIC" if kde_done else (
+        "NOT_APPLICABLE" if diagnostic_forecasts and kde_unsupported_market == len(diagnostic_forecasts)
+        else "INACTIVE_INSUFFICIENT_DATA"
+    )
+    kde_blockers = (["KDE_IS_DIAGNOSTIC_ONLY_NO_PROBABILITY_AUTHORITY"] if kde_done else [])
+    if kde_unsupported_market:
+        kde_blockers.append("DISCRETE_OUTCOME_DOMAIN_NOT_KDE_APPLICABLE")
+    if not kde_done and kde_unsupported_market < len(diagnostic_forecasts):
+        kde_blockers.append("NO_SUFFICIENT_VALIDATED_COMPARABLE_HISTORY")
+    receipts.append(_receipt("KDE", kde_state,
         producer="cutoff-safe comparable historical outcomes", consumer="advanced-modeling density diagnostics",
-        blockers=["KDE_IS_DIAGNOSTIC_ONLY_NO_PROBABILITY_AUTHORITY"] + (["NO_SUFFICIENT_VALIDATED_COMPARABLE_HISTORY"] if not kde_done else []),
+        blockers=kde_blockers,
         details={"evaluatedRows": len(diagnostic_forecasts), "populationRows": len(rows),
                  "historicalSampleRows": len(historical_kde),
                  "diagnosticRows": kde_done, "inactiveRows": kde_blocked,
-                 "forecastProbabilityProduced": False}))
+                 "unsupportedDiscreteRows": kde_unsupported_market,
+                 "forecastProbabilityProduced": False}, run_id=run_id,
+        forecast_cutoff=forecast_cutoff, input_hashes=input_hashes, event_ids=event_ids,
+        market_ids=market_ids, applicability="CONTINUOUS_ONLY; DISCRETE_COUNT_MARKETS_ABSTAIN",
+        duration_ms=round((time.perf_counter() - kde_started) * 1000, 3)))
 
+    svd_started = time.perf_counter()
     history_matrix = (calibration_state or {}).get("historicalRoleOpponentFeatureMatrix")
     if isinstance(history_matrix, Mapping):
         svd = normalized_svd_diagnostic(
@@ -283,8 +449,12 @@ def execute_advanced_modeling(
     receipts.append(_receipt("SVD", svd["state"], producer="canonical historical feature store",
         consumer="advanced-modeling feature diagnostics",
         blockers=[] if svd.get("state") == "SHADOW_DIAGNOSTIC" else [str(svd.get("state") or "VALIDATED_ROLE_OPPONENT_HISTORY_UNAVAILABLE")],
-        details={"diagnostic": svd, "forecastProbabilityProduced": False}))
+        details={"diagnostic": svd, "forecastProbabilityProduced": False}, run_id=run_id,
+        forecast_cutoff=forecast_cutoff, input_hashes=input_hashes, event_ids=event_ids,
+        market_ids=market_ids, applicability="APPLICABLE_WHEN_VALID_ROLE_OPPONENT_MATRIX_EXISTS",
+        duration_ms=round((time.perf_counter() - svd_started) * 1000, 3)))
 
+    worlds_started = time.perf_counter()
     world_rows = [r for r in rows if isinstance(r.get("_worldValues"), (list, tuple))
                   and isinstance(r.get("_selectionOutcomes"), (bytes, bytearray))]
     world_receipt = _shared_world_diagnostics(world_rows[:25])
@@ -298,20 +468,61 @@ def execute_advanced_modeling(
         blockers=[] if world_receipt["state"] == "EXECUTED" else [world_receipt["state"]],
         details={"backend": backends or ["NOT_RECORDED"], "rngVersion": rng_versions or ["NOT_RECORDED"],
                  "seedSource": "input HAR content hash", "seedInputHash": seed_input_hash,
+                 "randomSeed": seed_input_hash,
                  "modelConfigHash": model_config_hash, "conservation": conservation,
-                 "worlds": world_receipt["worldCount"], "diagnostics": world_receipt}))
+                 "rngVersion": rng_versions or ["NOT_RECORDED"],
+                 "worlds": world_receipt["worldCount"], "diagnostics": world_receipt},
+        run_id=run_id, forecast_cutoff=forecast_cutoff, input_hashes=input_hashes,
+        event_ids=event_ids, market_ids=market_ids,
+        applicability="APPLICABLE_WHEN_SHARED_EVENTWORLDS_EXIST",
+        duration_ms=round((time.perf_counter() - worlds_started) * 1000, 3)))
 
+    calibration_started = time.perf_counter()
     calibration_rows = [r for r in rows if r.get("calibrationState")]
-    historical = list((calibration_state or {}).get("settlements") or [])
+    historical = []
+    historical_walkforward = []
+    for record in (calibration_state or {}).get("settlements") or []:
+        if not isinstance(record, Mapping) or record.get("binaryOutcome") not in {0, 1}:
+            continue
+        available_at = _aware_utc_timestamp(record.get("labelAvailableAt"))
+        decision_at = _aware_utc_timestamp(record.get("decisionCutoff"))
+        cutoff_at = _aware_utc_timestamp(forecast_cutoff)
+        if not available_at or not decision_at or not cutoff_at:
+            continue
+        if decision_at >= available_at or available_at > cutoff_at:
+            continue
+        if not _timestamp_at_or_before(record.get("decisionCutoff"), forecast_cutoff):
+            continue
+        historical.append(dict(record))
+    for record in (calibration_state or {}).get("walkforwardRows") or []:
+        if not isinstance(record, Mapping):
+            continue
+        available_at = _aware_utc_timestamp(record.get("labelAvailableAt"))
+        decision_at = _aware_utc_timestamp(record.get("decisionCutoff"))
+        cutoff_at = _aware_utc_timestamp(forecast_cutoff)
+        if (available_at and decision_at and cutoff_at and decision_at < available_at <= cutoff_at
+                and record.get("binaryOutcome") in {0, 1}):
+            historical_walkforward.append(dict(record))
     cal_metrics = evaluate_calibration_readiness(historical)
+    from dcm.learning.walkforward import run_walkforward
+    walkforward_metrics = run_walkforward(historical_walkforward)
     active = sum(str(r.get("calibrationState")) == "ACTIVE_CHRONOLOGICAL_CELL" for r in calibration_rows)
     receipts.append(_receipt("CALIBRATION", "EXECUTED_READINESS_ONLY", producer="dcm.learning.calibration",
         consumer="canonical probability records and portfolio gate",
         blockers=list(cal_metrics.get("reasons") or []) if not cal_metrics.get("ready") else ["LR000000_PROMOTION_GATE_REMAINS"],
         details={"candidateRowsEvaluated": len(calibration_rows), "activeRows": active,
                  "chronologicalReadiness": cal_metrics, "learningRevision": "LR000000",
-                 "predictiveClaim": "NONE"}))
+                 "predictiveClaim": "NONE", "historicalSettlementRows": len(historical),
+                 "calibrationSnapshotHash": (calibration_state or {}).get("contentHash"),
+                 "walkForward": walkforward_metrics,
+                 "outOfSampleMetricsProduced": bool(
+                     (walkforward_metrics.get("baselinePooled") or {}).get("n", 0)
+                 )}, run_id=run_id,
+        forecast_cutoff=forecast_cutoff, input_hashes=input_hashes, event_ids=event_ids,
+        market_ids=market_ids, applicability="APPLICABLE_WHEN_CUTOFF_SAFE_LABELS_EXIST",
+        duration_ms=round((time.perf_counter() - calibration_started) * 1000, 3)))
 
+    portfolio_started = time.perf_counter()
     corr = _shared_world_diagnostics(portfolio) if len(portfolio) >= 2 else {
         "state": "SKIPPED_NOT_APPLICABLE", "worldCount": 0, "correlations": [],
     }
@@ -319,8 +530,13 @@ def execute_advanced_modeling(
         consumer="dcm.selection.portfolio.build_card / EV joint outcomes",
         blockers=[] if corr["state"] in {"EXECUTED", "SKIPPED_NOT_APPLICABLE"} else ["SHARED_PORTFOLIO_OUTCOMES_UNAVAILABLE"],
         details={"correlations": corr.get("correlations", []), "worldCount": corr.get("worldCount", 0),
-                 "portfolioSize": len(portfolio), "usesIndependentMarginals": False}))
+                 "portfolioSize": len(portfolio), "usesIndependentMarginals": False},
+        run_id=run_id, forecast_cutoff=forecast_cutoff, input_hashes=input_hashes,
+        event_ids=event_ids, market_ids=market_ids,
+        applicability="APPLICABLE_FOR_TWO_OR_MORE_ELIGIBLE_SELECTIONS" if len(portfolio) >= 2 else "NOT_APPLICABLE_SINGLE_SELECTION",
+        duration_ms=round((time.perf_counter() - portfolio_started) * 1000, 3)))
 
+    ev_started = time.perf_counter()
     if not payout_table_hash or stake is None or len(portfolio) < 2:
         ev_state = "BLOCKED_MISSING_ENTRY_CONTRACT"
         ev_details = {"expectedValue": None, "required": ["captured payout table hash", "stake", "entry rules"]}
@@ -355,17 +571,46 @@ def execute_advanced_modeling(
             ev_state, ev_blockers = "BLOCKED_PAYOUT_RULES", [f"{type(exc).__name__}:{exc}"]
             ev_details = {"expectedValue": None}
     receipts.append(_receipt("PAYOUT_EV", ev_state, producer="PrizePicks payout rules + joint outcomes",
-        consumer="portfolio ranking and freeze eligibility", blockers=ev_blockers, details=ev_details))
+        consumer="portfolio ranking and freeze eligibility", blockers=ev_blockers, details=ev_details,
+        run_id=run_id, forecast_cutoff=forecast_cutoff, input_hashes=input_hashes,
+        event_ids=event_ids, market_ids=market_ids,
+        applicability="APPLICABLE_WHEN_ENTRY_CONTRACT_IS_CAPTURED" if len(portfolio) >= 2 else "NOT_APPLICABLE_NO_MULTI_SELECTION_ENTRY",
+        duration_ms=round((time.perf_counter() - ev_started) * 1000, 3)))
 
+    graph_started = time.perf_counter()
     compiled_dag = compile_advanced_execution_dag()
+    registry_rows = load_algorithm_registry()
+    lifecycle_counts: dict[str, int] = {}
+    for record in registry_rows:
+        lifecycle_counts[record.lifecycle] = lifecycle_counts.get(record.lifecycle, 0) + 1
+    graph_details = {
+        "registrySha256": algorithm_registry_sha256(),
+        "registryAlgorithmCount": len(registry_rows),
+        "registryLifecycleCounts": lifecycle_counts,
+        "dedicatedCapabilityCount": len(CAPABILITY_DAG),
+        "registeredDoesNotMeanExecuted": True,
+        "unrelatedRegistryAlgorithmsExecutionState": "TRACKED_BY_CANONICAL_ALGORITHM_PLAN_NOT_CLAIMED_BY_ADVANCED_LAYER",
+    }
+    receipts.append(_receipt("ALGORITHM_GRAPH", "EXECUTED_GRAPH_WITH_CAPABILITY_BLOCKERS",
+        producer="dcm.algorithms.registry + compile_advanced_execution_dag",
+        consumer="seven-capability execution controller", details=graph_details,
+        run_id=run_id, forecast_cutoff=forecast_cutoff, input_hashes=input_hashes,
+        event_ids=event_ids, market_ids=market_ids, applicability="APPLICABLE_EVERY_CANONICAL_RUN",
+        duration_ms=round((time.perf_counter() - graph_started) * 1000, 3)))
     receipt_by_capability = {r["capability"]: r for r in receipts}
     stages = [{"stage": stage, "algorithmId": CAPABILITY_ALGORITHMS[stage], "input": before, "output": after,
                "state": receipt_by_capability[stage]["state"],
                "blockers": list(receipt_by_capability[stage]["blockers"])}
               for stage, before, after in CAPABILITY_DAG]
+    if execution_mode not in {"CANONICAL_RUNNER_EXECUTION", "MANUAL_SHADOW_ANALYSIS", "TEST_FIXTURE"}:
+        raise ValueError("ADVANCED_EXECUTION_MODE_INVALID")
     body = {
         "schema": ADVANCED_EXECUTION_SCHEMA,
-        "mode": "CANONICAL_RUNNER_EXECUTION",
+        "manifestType": "ModelExecutionManifest",
+        "mode": execution_mode,
+        "runId": run_id,
+        "modelId": "DCM_CANONICAL",
+        "modelVersion": "UNAVAILABLE",
         "forecastCutoff": forecast_cutoff,
         "seedInputHash": seed_input_hash,
         "modelConfigHash": model_config_hash,
@@ -387,15 +632,16 @@ def execute_advanced_modeling(
         "dag": stages,
         "receipts": receipts,
         "capabilityCounts": {r["capability"]: 1 for r in receipts},
-        "allCapabilitiesEvaluated": len(receipts) == len(CAPABILITY_DAG),
-        "fullModelingExecution": all(r["state"] in {"EXECUTED", "EXECUTED_READINESS_ONLY", "SHADOW_DIAGNOSTIC", "SKIPPED_NOT_APPLICABLE"} for r in receipts),
+        "allCapabilitiesEvaluated": len(receipts) == len(CAPABILITY_DAG) + 1,
+        "fullModelingExecution": False,
+        "executionDurationMs": round((time.perf_counter() - started) * 1000, 3),
         "certification": {"learningRevision": "LR000000", "predictiveClaim": "NONE",
                           "productionRootCertified": False},
         "limitations": ["KDE and SVD are diagnostic-only and cannot emit forecast probability.",
                         "Settlement is a later append-only lifecycle stage.",
                         "Payout EV is not certified without calibrated joint probabilities and the captured, fully modeled entry settlement rules."],
     }
-    body["contentHash"] = content_hash(body)
+    body["contentHash"] = content_hash(_deterministic_hash_payload(body))
     return body
 
 
@@ -403,7 +649,7 @@ def validate_advanced_execution_receipt(receipt: Mapping[str, Any]) -> None:
     if receipt.get("schema") != ADVANCED_EXECUTION_SCHEMA:
         raise ValueError("ADVANCED_EXECUTION_SCHEMA_INVALID")
     rows = receipt.get("receipts")
-    if not isinstance(rows, list) or {r.get("capability") for r in rows} != {r[0] for r in CAPABILITY_DAG}:
+    if not isinstance(rows, list) or {r.get("capability") for r in rows} != {r[0] for r in CAPABILITY_DAG} | {"ALGORITHM_GRAPH"}:
         raise ValueError("ADVANCED_EXECUTION_CAPABILITY_RECEIPTS_INCOMPLETE")
     for row in rows:
         if row.get("algorithmId") != CAPABILITY_ALGORITHMS.get(str(row.get("capability"))):
@@ -412,5 +658,14 @@ def validate_advanced_execution_receipt(receipt: Mapping[str, Any]) -> None:
         if row.get("state") in {"EXECUTED", "EXECUTED_READINESS_ONLY", "SHADOW_DIAGNOSTIC", "SHADOW_DIAGNOSTIC_UNCALIBRATED"}:
             if not row.get("producer") or not row.get("consumer"):
                 raise ValueError("ADVANCED_EXECUTION_PRODUCER_CONSUMER_MISSING")
-    if receipt.get("contentHash") != content_hash({k: v for k, v in receipt.items() if k != "contentHash"}):
+        for field in ("runId", "algorithmVersion", "requirementIds", "inputContentHashes",
+                      "applicabilityVerdict", "executionMethod", "executionDurationMs",
+                      "outputHash", "producer", "consumer"):
+            if field not in row:
+                raise ValueError(f"ADVANCED_EXECUTION_REQUIRED_RECEIPT_FIELD_MISSING:{field}")
+        if row.get("outputHash") != content_hash({
+            k: v for k, v in row.items() if k not in {"outputHash", "executionDurationMs"}
+        }):
+            raise ValueError("ADVANCED_EXECUTION_ALGORITHM_OUTPUT_HASH_MISMATCH")
+    if receipt.get("contentHash") != content_hash(_deterministic_hash_payload(receipt)):
         raise ValueError("ADVANCED_EXECUTION_HASH_MISMATCH")
