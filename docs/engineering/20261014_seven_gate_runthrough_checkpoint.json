@@ -38,12 +38,13 @@
   "implementation_hash": "6c67adc9d1d70826858c6aaa09e3bae966ad74e3672b8cbe49c9da4b77aa542f",
   "implementation_hash_scope": "Changed implementation and audit files; checkpoint and generated inventory files excluded.",
   "learning_revision": "LR000000",
-  "next_command": "./.venv/bin/python scripts/build_code_inventory.py --check && ./.venv/bin/python scripts/export_algorithm_registry.py --check",
+  "next_command": "Wait for PR #110 normal merge, then verify main SHA and post-merge CI; resume only if the merge did not complete.",
   "parent_task": "PILLARS_DCM_CHATGPT_WORK_RESUME_AND_FINISH_v4_FIVE_REPOS_20261014",
   "pr_ci_merge": {
-    "ci": "NOT_STARTED",
+    "ci": "SUCCESS: GitHub Actions run 38651179538 / DCM v6 branch CI / run 489; all 8 jobs passed, including full pytest suite, inventory, RFECV, governance, benchmark/profile, durable batch-search, package/CLI, and python-dcm.",
+    "head_sha": "865e9cdc8f5c84b0f0d454390cb3bc6043adc56f",
     "merge_sha": null,
-    "pr": "NOT_CREATED"
+    "pr": "#110 OPEN: https://github.com/williamcgreenwood/DCM/pull/110; mergeable; normal merge pending."
   },
   "predictive_status": "NONE",
   "production_certified": false,
@@ -55,6 +56,7 @@
     "algorithm_frontier_smoke": "13 checks passed",
     "compileall": "passed",
     "focused_final": "22 passed (advanced execution + algorithm registry/core governance)",
+    "full_suite_github_ci": "Passed on exact candidate 865e9cdc8f5c84b0f0d454390cb3bc6043adc56f; all 8 workflow jobs succeeded.",
     "full_suite_local": "Reached 100% on pre-SVD code state; no failure/error markers; one skip marker. Final SVD producer change passed focused tests; exact-candidate full suite remains required in GitHub CI.",
     "inventory": "write/check passed",
     "policy": "DCM_POLICY_VALID",
