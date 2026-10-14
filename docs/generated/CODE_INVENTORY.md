@@ -5,7 +5,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 - Modules: **272**
 - Symbols: **2088**
 - Parse errors: **0**
-- Inventory hash: `89c17f221540b67c3dc4a521da940e71acc117baec2743b95f5235984f6e7203`
+- Inventory hash: `df5f783af6d0f86fc262b110b81586bf910c8d57b5bab4a1a38553a0f1c57bd2`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -312,7 +312,7 @@ _No class/function symbols._
 
 - `function` **_a** L10
 - `function` **_ml** L719
-- `function` **registry_document** L885
+- `function` **registry_document** L897
 
 ### `src/dcm/algorithms/computation_law.py`
 
@@ -1215,20 +1215,20 @@ _No class/function symbols._
 
 ### `src/dcm/learning/dataset.py`
 
-- `class` **SettlementsMissing** L59 — Run dest has no settlements sidecar; builder will not invent labels.
-- `function` **_load_json** L62
-- `function` **_load_jsonl** L70
-- `function` **_index_by_pid** L86
-- `function` **_settlements** L94
-- `function` **_population** L103
-- `function` **_event_starts** L110
-- `function` **_feature_hashes** L145
-- `function` **_decision_cutoff** L158
-- `function` **_label_split** L168
-- `function` **build_training_row** L182 — Join freeze slim + hashes + settlement. Returns None if no real settlement.
-- `function` **build_dataset** L238 — Build rows from one or more settled run dests. Never invents settlements.
-- `function` **write_dataset** L303
-- `function` **main** L318
+- `class` **SettlementsMissing** L60 — Run dest has no settlements sidecar; builder will not invent labels.
+- `function` **_load_json** L63
+- `function` **_load_jsonl** L71
+- `function` **_index_by_pid** L87
+- `function` **_settlements** L95
+- `function` **_population** L104
+- `function` **_event_starts** L111
+- `function` **_feature_hashes** L146
+- `function` **_decision_cutoff** L159
+- `function` **_label_split** L169
+- `function` **build_training_row** L183 — Join freeze slim + hashes + settlement. Returns None if no real settlement.
+- `function` **build_dataset** L240 — Build rows from one or more settled run dests. Never invents settlements.
+- `function` **write_dataset** L305
+- `function` **main** L320
 
 ### `src/dcm/learning/failure_class.py`
 
@@ -1269,9 +1269,9 @@ _No class/function symbols._
 - `function` **_result** L180 — PrizePicks sporting compare: MORE wins above the line, LESS below, exact is PUSH.
 - `function` **_normalize_result** L189
 - `function` **_settle_row** L202
-- `function` **_attach_scores** L310
-- `function` **_summarize** L321
-- `function` **settle_run** L354
+- `function` **_attach_scores** L311
+- `function` **_summarize** L322
+- `function` **settle_run** L355
 
 ### `src/dcm/learning/registry.py`
 
@@ -1296,23 +1296,23 @@ _No class/function symbols._
 
 ### `src/dcm/learning/walkforward.py`
 
-- `class` **WalkForwardLeakage** L23 — Test fold decisionCutoff is not strictly after every train cutoff.
-- `function` **_ts** L26
-- `function` **_aware_time** L29
-- `function` **prediction_p** L41
-- `function` **binary_pairs** L54 — WIN=1, LOSS=0. PUSH excluded (default) or scored as 0.5.
-- `function` **metrics** L79
-- `function` **assert_no_leakage** L129
-- `function` **chronological_folds** L155 — As-of expanding folds; a prior forecast is trainable only after its label arrived.
-- `function` **_sigmoid** L190
-- `function` **_shadow_features** L194
-- `method` **_shadow_features.f** L199
-- `function` **fit_shadow_logistic** L208 — Tiny intercept+linear logistic. SHADOW only. No sklearn required. No .pkl.
-- `function` **predict_shadow** L237
-- `function` **evaluate_folds** L243
-- `function` **run_walkforward** L301
-- `function` **write_walkforward_report** L360
-- `function` **main** L368
+- `class` **WalkForwardLeakage** L24 — Test fold decisionCutoff is not strictly after every train cutoff.
+- `function` **_ts** L27
+- `function` **_aware_time** L30
+- `function` **prediction_p** L42
+- `function` **binary_pairs** L55 — WIN=1, LOSS=0. PUSH excluded (default) or scored as 0.5.
+- `function` **metrics** L80
+- `function` **assert_no_leakage** L130
+- `function` **chronological_folds** L165 — As-of expanding folds with event-disjoint, label-available training rows.
+- `function` **_sigmoid** L223
+- `function` **_shadow_features** L227
+- `method` **_shadow_features.f** L232
+- `function` **fit_shadow_logistic** L241 — Tiny intercept+linear logistic. SHADOW only. No sklearn required. No .pkl.
+- `function` **predict_shadow** L270
+- `function` **evaluate_folds** L276
+- `function` **run_walkforward** L334
+- `function` **write_walkforward_report** L412
+- `function` **main** L420
 
 ### `src/dcm/ml/__init__.py`
 

@@ -208,6 +208,7 @@ def _settle_row(
     pid = str(prop.get("projectionId") or "")
     base = {
         "projectionId": pid,
+        "eventId": prop.get("eventId"),
         "player": prop.get("player"),
         "market": prop.get("market"),
         "line": prop.get("line"),

@@ -78,7 +78,7 @@ def test_dag_is_registered_and_receipt_has_every_capability():
     }
     assert receipt["fullModelingExecution"] is False
     graph = next(r for r in receipt["receipts"] if r["capability"] == "ALGORITHM_GRAPH")
-    assert graph["details"]["registryAlgorithmCount"] == 170
+    assert graph["details"]["registryAlgorithmCount"] == 171
     assert graph["details"]["registeredDoesNotMeanExecuted"] is True
     assert graph["details"]["unrelatedRegistryAlgorithmsExecutionState"].startswith("TRACKED_BY")
     assert all("outputHash" in r and "executionDurationMs" in r for r in receipt["receipts"])
@@ -164,7 +164,7 @@ def test_calibration_uses_only_labels_available_by_forecast_cutoff():
     cal = next(r for r in receipt["receipts"] if r["capability"] == "CALIBRATION")
     assert cal["details"]["historicalSettlementRows"] == 1
     assert cal["details"]["outOfSampleMetricsProduced"] is False
-    assert cal["details"]["walkForward"]["status"] == "INSUFFICIENT_CHRONOLOGICAL_CUTOFFS"
+    assert cal["details"]["walkForward"]["status"] == "BLOCKED_MISSING_EVENT_ID"
 
 
 def test_joint_world_payout_ev_matches_independent_fixture():

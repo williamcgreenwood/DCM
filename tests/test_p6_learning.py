@@ -28,9 +28,10 @@ from dcm.version import LEARNING_REVISION, PREDICTIVE_CLAIM, SOFTWARE
 CUTOFF = "2026-08-29T00:00:00Z"
 
 
-def _row(i: int, *, grade: str = "PLAYABLE", market: str = "pts") -> dict:
+def _row(i: int, *, grade: str = "PLAYABLE", market: str = "pts", event_prefix: str = "event") -> dict:
     return {
         "projectionId": f"proj-{i}",
+        "eventId": f"{event_prefix}-{i}",
         "player": f"Player {i}",
         "market": market,
         "line": 20.5 + i,
@@ -176,7 +177,10 @@ def test_walkforward_refuses_leakage(tmp_path: Path):
         assert_no_leakage(early, early)
 
     dest_a = _write_settleable(tmp_path / "RUN_A", [_row(0), _row(1)], ["proj-0"], cutoff="2026-08-01T00:00:00Z")
-    dest_b = _write_settleable(tmp_path / "RUN_B", [_row(0), _row(1)], ["proj-0"], cutoff="2026-08-10T00:00:00Z")
+    dest_b = _write_settleable(
+        tmp_path / "RUN_B", [_row(0, event_prefix="later-event"), _row(1, event_prefix="later-event")],
+        ["proj-0"], cutoff="2026-08-10T00:00:00Z"
+    )
     (tmp_path / "oa.json").write_text(json.dumps({"proj-0": "WIN", "proj-1": "LOSS"}) + "\n", encoding="utf-8")
     (tmp_path / "ob.json").write_text(json.dumps({"proj-0": "LOSS", "proj-1": "WIN"}) + "\n", encoding="utf-8")
     settle_run(dest_a, tmp_path / "oa.json", label_available_at_utc="2026-08-02T00:00:00Z")
@@ -188,9 +192,13 @@ def test_walkforward_refuses_leakage(tmp_path: Path):
         train_c = fold["trainCutoffs"]
         test_c = fold["testCutoffs"]
         assert max(train_c) < min(test_c)
+        assert fold["eventDisjoint"] is True
         assert_no_leakage(fold["train"], fold["test"])
     report = run_walkforward(rows)
     assert report["leakage"] is False
+    assert report["algorithmExecution"]["algorithmId"] == "ALG-ML-TIME-009"
+    assert report["algorithmExecution"]["state"] == "EXECUTED"
+    assert report["algorithmExecution"]["eventDisjoint"] is True
     assert report["learningRevision"] == "LR000000"
     assert report["predictiveClaim"] == "NONE"
     assert report["lrPromoted"] is False
@@ -212,6 +220,50 @@ def test_walkforward_does_not_train_on_labels_not_yet_available():
     assert chronological_folds([early_forecast_late_label, later_forecast]) == []
     with pytest.raises(WalkForwardLeakage, match="label unavailable"):
         assert_no_leakage([early_forecast_late_label], [later_forecast])
+
+
+def test_walkforward_folds_require_event_ids_and_exclude_the_test_event():
+    rows = [
+        {"eventId": "shared-event", "decisionCutoff": "2026-08-01T00:00:00Z",
+         "labelAvailableAt": "2026-08-02T00:00:00Z", "result": "WIN", "selectedP": 0.6},
+        {"eventId": "prior-event", "decisionCutoff": "2026-08-01T00:00:00Z",
+         "labelAvailableAt": "2026-08-02T00:00:00Z", "result": "LOSS", "selectedP": 0.4},
+        {"eventId": "shared-event", "decisionCutoff": "2026-08-03T00:00:00Z",
+         "labelAvailableAt": "2026-08-04T00:00:00Z", "result": "LOSS", "selectedP": 0.5},
+        {"eventId": "later-event", "decisionCutoff": "2026-08-03T00:00:00Z",
+         "labelAvailableAt": "2026-08-04T00:00:00Z", "result": "WIN", "selectedP": 0.7},
+        {"eventId": "final-event", "decisionCutoff": "2026-08-05T00:00:00Z",
+         "labelAvailableAt": "2026-08-06T00:00:00Z", "result": "WIN", "selectedP": 0.8},
+    ]
+    folds = chronological_folds(rows)
+    assert folds
+    first_test_fold = next(fold for fold in folds if fold["testCutoffs"] == ["2026-08-03T00:00:00Z"])
+    assert first_test_fold["sameEventTrainingRowsExcluded"] == 1
+    assert {row["eventId"] for row in first_test_fold["train"]} == {"prior-event"}
+    assert {row["eventId"] for row in first_test_fold["test"]} == {"shared-event", "later-event"}
+    assert first_test_fold["eventDisjoint"] is True
+    assert chronological_folds([{k: v for k, v in row.items() if k != "eventId"} for row in rows]) == []
+    blocked = run_walkforward([{k: v for k, v in row.items() if k != "eventId"} for row in rows])
+    assert blocked["status"] == "BLOCKED_MISSING_EVENT_ID"
+    assert blocked["algorithmExecution"]["state"] == "BLOCKED_MISSING_EVENT_ID"
+
+    with pytest.raises(WalkForwardLeakage, match="event overlap"):
+        assert_no_leakage([rows[0]], [rows[2]])
+
+
+def test_walkforward_leakage_checks_compare_utc_instants_not_timestamp_strings():
+    later_train = {
+        "eventId": "prior-event",
+        "decisionCutoff": "2026-08-01T23:30:00-02:00",
+        "labelAvailableAt": "2026-08-02T00:30:00Z",
+    }
+    earlier_test = {
+        "eventId": "test-event",
+        "decisionCutoff": "2026-08-02T01:00:00Z",
+        "labelAvailableAt": "2026-08-03T00:00:00Z",
+    }
+    with pytest.raises(WalkForwardLeakage, match=r"max\(train cutoff\)"):
+        assert_no_leakage([later_train], [earlier_test])
 
 
 def test_challenger_shadow_propose_blocked_promote_refuses_lr(tmp_path: Path, monkeypatch):

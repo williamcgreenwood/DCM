@@ -1,0 +1,807 @@
+{
+  "acceptance_trials": [
+    {
+      "dcm_test_paths": [
+        "tests/test_p6_learning.py::test_walkforward_folds_require_event_ids_and_exclude_the_test_event",
+        "tests/test_advanced_modeling_execution.py::test_calibration_uses_only_labels_available_by_forecast_cutoff"
+      ],
+      "donor": "sports-betting",
+      "status": "PASS — donor CV assumptions compared; native event-disjoint path wired and covered; donor loader tests inspected only.",
+      "trial": "Compare TimeSeriesSplit date ordering with DCM chronological_folds and same-event exclusion; inspect donor feature/odds temporal leakage tests and execution APIs."
+    },
+    {
+      "dcm_test_paths": [
+        "tests/test_external_donor_decisions.py::test_unresolved_oversampling_license_is_a_hard_exclusion"
+      ],
+      "donor": "imbalanced-learn-extra",
+      "status": "PASS — unresolved rights conflict blocks import/install; no synthetic sampling executed.",
+      "trial": "Rights-gate three conflicting license signals; assert no runtime dependency or import; do not sample without event/role/season boundaries and untouched folds."
+    },
+    {
+      "dcm_test_paths": [
+        "tests/test_external_donor_decisions.py::test_remote_llm_and_physics_donors_remain_outside_runtime",
+        "tests/test_external_donor_decisions.py::test_canonical_package_does_not_import_donor_engines_or_template"
+      ],
+      "donor": "scikit-ai",
+      "status": "PASS — remote inference and donor runtime imports excluded; authorized/denied path not executed because no remote inference consumer is authorized.",
+      "trial": "Inspect authorized vs denied research-classification boundary; reject remote classifier absent explicit authorized inputs and a verified DCM consumer."
+    },
+    {
+      "dcm_test_paths": [
+        "tests/test_external_donor_decisions.py::test_remote_llm_and_physics_donors_remain_outside_runtime",
+        "tests/test_external_donor_decisions.py::test_canonical_package_does_not_import_donor_engines_or_template"
+      ],
+      "donor": "scikit-complexity",
+      "status": "PASS — dependency and consumer gate rejects incompatible physical simulation; no SageMath/LAMMPS installed.",
+      "trial": "Compare its SageMath/LAMMPS physical system against sport EventWorld; require coherent observable and numerical parity/benefit before adoption."
+    },
+    {
+      "dcm_test_paths": [
+        "tests/test_external_donor_decisions.py::test_template_donor_did_not_replace_canonical_packaging_or_runtime"
+      ],
+      "donor": "copier-modern-python",
+      "status": "PASS — current packaging/CI/inventory contract verified; no template regeneration or layout change.",
+      "trial": "Safe-diff check existing uv/pytest/Ruff/policy/inventory/protected CI; no Copier regeneration or package-layout mutation."
+    },
+    {
+      "donor": "canonical DCM walkforward",
+      "status": "PASS — event-disjoint implementation wired; 29 focused tests and full final suite passed; generated inventory/registry and policy checks pass.",
+      "trial": "Chronological as-of fold uses matured labels and disjoint eventIds; missing eventId produces an explicit blocked report."
+    }
+  ],
+  "base_main_sha": "98cb698cf000b963e24ca47b3c1e4e18722bda96",
+  "created_utc": "2026-10-14T21:08:59Z",
+  "cross_project_sources": [
+    {
+      "project": "Fantasy Football",
+      "reason": "Drive exposed folder metadata but marked source visibility not_shared; no roster, waiver, or outcome content was read. No connected project-chat search surface was available.",
+      "source": "Google Drive project/2026 folder",
+      "status": "INACCESSIBLE_SOURCE"
+    },
+    {
+      "project": "Fantasy Basketball",
+      "reason": "Read the small validation manifest; it states that no NBA folders or league data were created in the starter bundle. No roster or outcome evidence was present.",
+      "source": "Fantasy_Basketball_Project_Starter_2026-27 folder",
+      "status": "ACCESSIBLE_METADATA_ONLY_NO_LEAGUE_DATA"
+    },
+    {
+      "project": "ChatGPT Fantasy Football and Fantasy Basketball project chats",
+      "reason": "No supported connector exposes other project chat transcripts in this session; no chat contents were assumed.",
+      "source": "project chat history",
+      "status": "INACCESSIBLE_SOURCE"
+    }
+  ],
+  "disposition_enum": [
+    "ALREADY_PRESENT_VERIFIED",
+    "REUSE_DEPENDENCY",
+    "PORT_WITH_LICENSE",
+    "DCM_NATIVE_EQUIVALENT",
+    "CHALLENGER_SHADOW",
+    "REJECT_DUPLICATE",
+    "REJECT_POOR_FIT",
+    "BLOCKED_RIGHTS",
+    "BLOCKED_DEPENDENCY",
+    "BLOCKED_INSUFFICIENT_DATA",
+    "FAILED"
+  ],
+  "donors": [
+    {
+      "ci_file_sha256": {
+        ".github/workflows/ci.yml": "c598236c4d4a5f6925b062a272c416cf1a8d3df9421d35411db9f30cd2c237a7",
+        ".github/workflows/doc.yml": "8cc50252feb0a4c29b9235474e72884e37721dae4c0af6f961d090f138103fac",
+        ".github/workflows/equivalence.yml": "a5f289415b51adf075aad9ac193c695065e2278b59ed4bf5a96151256488f943"
+      },
+      "ci_files": [
+        ".github/workflows/ci.yml",
+        ".github/workflows/equivalence.yml",
+        ".github/workflows/doc.yml"
+      ],
+      "components": [
+        {
+          "audited_dcm_consumer_path_hashes": {
+            "src/dcm/ingest/insights.py": "f266a4beff35bfd51fc56c890d1a54a717b91d56b25cc07e9509482d4f55f9bf",
+            "src/dcm/ingest/outlier.py": "3652cb08c09c0b805141b1ac09354188b93ce46330fc749cc50e44fd3f990497",
+            "src/dcm/research/": "267f1b9d9d47e361e4428987aabaff8620d91b73d97e340a35d1866d3ae59a34"
+          },
+          "audited_dcm_consumer_paths": [
+            "src/dcm/ingest/outlier.py",
+            "src/dcm/ingest/insights.py",
+            "src/dcm/research"
+          ],
+          "benchmark_result": "NOT_RUN_NOT_ADOPTED",
+          "block_and_rollback": "No DCM dependency/code change. Remove this audit row in a future version only through append-only correction; revisit if evidence/rights change.",
+          "candidate_algorithm_or_stage": "RESEARCH_INGESTION / MODEL_VALIDATION / ENGINEERING_PATTERN",
+          "consumer": "No donor consumer wired; mapped equivalent or absent consumer stated above",
+          "content_hashes": {
+            "src/sportsbet/dataloaders/_base.py": "62db72503a78020cccd07b83b053e59a571c03cbbef6ab00b9111e6ac7896e0a",
+            "src/sportsbet/dataloaders/_extraction.py": "f1946d33fb0b806934d22b07bbb7c4f6ec9da10ab2368d7f55ad6b8473463eef",
+            "src/sportsbet/dataloaders/_factory.py": "c77d8cb69134288759b362d87967795fa63918313775c34a18ef92fb2dfdc4ff",
+            "src/sportsbet/dataloaders/_sourced.py": "7aa85450bc9813055260391b3988b5393d4012f3af2105a9268ade20e510f5c2",
+            "src/sportsbet/sources/_base.py": "dd75c7a3a5b62f5ea22ade66bdbe2cdb87e211935e647de65a314a09978eb95b",
+            "src/sportsbet/sources/_odds/_odds_api.py": "2d6ac8e69c270ef49741cb01d64c8eb4933e27199f57fc36c323608901f64f45",
+            "src/sportsbet/sources/_resolver.py": "36462b115f6aee5a885a75983206842630d47029f5ed649adeb6548ab455657f",
+            "src/sportsbet/sources/_schema.py": "0857cad82f003eeab91b4842392aaf728e266216b34e0435093d1652aac92720",
+            "src/sportsbet/sources/_stats/_football_data.py": "e31d7d8e070d0238a017a0719c93b68449969235b59c5bef9c8e05721d4e8ca0"
+          },
+          "dependency_health": "Python >=3.11,<3.14; pandas, sklearn, cloudpickle, BeautifulSoup, aiohttp, Pandera, PyArrow; optional MCP and Playwright execution",
+          "disposition": "REJECT_POOR_FIT",
+          "donor_tests_execution": "INSPECTED_ONLY; donor tests were not executed or installed",
+          "executed_test_paths": [],
+          "existing_dcm_equivalent": "DCM-native Insights/HAR accounting, typed research adapters, exact-offer authorization and evidence graph",
+          "fitted_parameters_or_config": "NONE",
+          "functionality": "External sports stats/odds acquisition, schema and team-name resolver",
+          "imported_code_and_attribution": "NONE; no donor bytes imported",
+          "module_or_stage": "sportsbet/dataloaders and sources",
+          "performance_and_uncertainty": "NOT_BENCHMARKED; no candidate workload, authorized labels, or adopted executable implementation",
+          "producer": "No donor producer wired into canonical src/dcm",
+          "rights_state": "CLEAR_FOR_REVIEW; NO CODE COPIED",
+          "risk": "No data/provider rights or exact DCM offer contract; would create duplicate source/identity stack. No source imported.",
+          "rollback": "Not applicable; no runtime change",
+          "schema_units_cutoff": "Not adopted; DCM typed schema/cutoff contracts remain authoritative",
+          "source_paths": [
+            "src/sportsbet/dataloaders/_base.py",
+            "src/sportsbet/dataloaders/_extraction.py",
+            "src/sportsbet/dataloaders/_factory.py",
+            "src/sportsbet/dataloaders/_sourced.py",
+            "src/sportsbet/sources/_base.py",
+            "src/sportsbet/sources/_resolver.py",
+            "src/sportsbet/sources/_schema.py",
+            "src/sportsbet/sources/_odds/_odds_api.py",
+            "src/sportsbet/sources/_stats/_football_data.py"
+          ],
+          "source_sha256": {
+            "src/sportsbet/dataloaders/_base.py": "62db72503a78020cccd07b83b053e59a571c03cbbef6ab00b9111e6ac7896e0a",
+            "src/sportsbet/dataloaders/_extraction.py": "f1946d33fb0b806934d22b07bbb7c4f6ec9da10ab2368d7f55ad6b8473463eef",
+            "src/sportsbet/dataloaders/_factory.py": "c77d8cb69134288759b362d87967795fa63918313775c34a18ef92fb2dfdc4ff",
+            "src/sportsbet/dataloaders/_sourced.py": "7aa85450bc9813055260391b3988b5393d4012f3af2105a9268ade20e510f5c2",
+            "src/sportsbet/sources/_base.py": "dd75c7a3a5b62f5ea22ade66bdbe2cdb87e211935e647de65a314a09978eb95b",
+            "src/sportsbet/sources/_odds/_odds_api.py": "2d6ac8e69c270ef49741cb01d64c8eb4933e27199f57fc36c323608901f64f45",
+            "src/sportsbet/sources/_resolver.py": "36462b115f6aee5a885a75983206842630d47029f5ed649adeb6548ab455657f",
+            "src/sportsbet/sources/_schema.py": "0857cad82f003eeab91b4842392aaf728e266216b34e0435093d1652aac92720",
+            "src/sportsbet/sources/_stats/_football_data.py": "e31d7d8e070d0238a017a0719c93b68449969235b59c5bef9c8e05721d4e8ca0"
+          }
+        },
+        {
+          "audited_dcm_consumer_path_hashes": {
+            "src/dcm/cfb/event_worlds.py": "e7d2684e2a2ecb8ded056eb332bcdc58f442980fa6462781f4005c32e8ad826e",
+            "src/dcm/learning/calibration.py": "1b8bb6e7bec91565e6352d2393186a8db36a90afb5390059314d80fa808ec450",
+            "src/dcm/learning/walkforward.py": "389f14c46250bcce0109bde25ecbee6ce1b00aadcba3263587482f44d11b6938",
+            "src/dcm/model/advanced_execution.py": "2da505b359b9534e438baa4e33b663772325f8eee6447af6fbb2271f850b0231"
+          },
+          "audited_dcm_consumer_paths": [
+            "src/dcm/learning/walkforward.py",
+            "src/dcm/learning/calibration.py",
+            "src/dcm/model/advanced_execution.py",
+            "src/dcm/cfb/event_worlds.py"
+          ],
+          "benchmark_result": "NOT_RUN_NOT_ADOPTED",
+          "block_and_rollback": "No DCM dependency/code change. Remove this audit row in a future version only through append-only correction; revisit if evidence/rights change.",
+          "candidate_algorithm_or_stage": "RESEARCH_INGESTION / MODEL_VALIDATION / ENGINEERING_PATTERN",
+          "consumer": "No donor consumer wired; mapped equivalent or absent consumer stated above",
+          "content_hashes": {
+            "src/sportsbet/evaluation/_base.py": "95ab4f610eefe6901f91303e9c7c9c4ccfb92aee6b4c0d1310c5c6263f93b560",
+            "src/sportsbet/evaluation/_classifier.py": "ff6b2522a0858aa962788c5c0d5db39d3b7a50f2d63e3812a5581b4773b0be54",
+            "src/sportsbet/evaluation/_model_selection.py": "d9066af0c31e72bd1ac4f0c3e96685003c1d83b809796430c39c6df3961c68c5",
+            "src/sportsbet/evaluation/_rules.py": "dab297432c5728936325f5ead0c818207458799d93417d8bc123105589b9b390"
+          },
+          "dependency_health": "Python >=3.11,<3.14; pandas, sklearn, cloudpickle, BeautifulSoup, aiohttp, Pandera, PyArrow; optional MCP and Playwright execution",
+          "disposition": "DCM_NATIVE_EQUIVALENT",
+          "donor_tests_execution": "INSPECTED_ONLY; donor tests were not executed or installed",
+          "executed_test_paths": [],
+          "existing_dcm_equivalent": "DCM-native EventWorld, walkforward, chronological event-grouped calibration and payout gates",
+          "fitted_parameters_or_config": "NONE",
+          "functionality": "sklearn bettor estimator, odds strategy, TimeSeriesSplit backtest and grid search",
+          "imported_code_and_attribution": "NONE; no donor bytes imported",
+          "module_or_stage": "sportsbet/evaluation",
+          "performance_and_uncertainty": "NOT_BENCHMARKED; no candidate workload, authorized labels, or adopted executable implementation",
+          "producer": "No donor producer wired into canonical src/dcm",
+          "rights_state": "CLEAR_FOR_REVIEW; NO CODE COPIED",
+          "risk": "TimeSeriesSplit orders rows by date but does not establish event-disjoint groups, point-in-time label availability, DCM offer authority or platform payout semantics. Reused the audit as a validation requirement; no code copied.",
+          "rollback": "Not applicable; no runtime change",
+          "schema_units_cutoff": "Not adopted; DCM typed schema/cutoff contracts remain authoritative",
+          "source_paths": [
+            "src/sportsbet/evaluation/_base.py",
+            "src/sportsbet/evaluation/_classifier.py",
+            "src/sportsbet/evaluation/_model_selection.py",
+            "src/sportsbet/evaluation/_rules.py"
+          ],
+          "source_sha256": {
+            "src/sportsbet/evaluation/_base.py": "95ab4f610eefe6901f91303e9c7c9c4ccfb92aee6b4c0d1310c5c6263f93b560",
+            "src/sportsbet/evaluation/_classifier.py": "ff6b2522a0858aa962788c5c0d5db39d3b7a50f2d63e3812a5581b4773b0be54",
+            "src/sportsbet/evaluation/_model_selection.py": "d9066af0c31e72bd1ac4f0c3e96685003c1d83b809796430c39c6df3961c68c5",
+            "src/sportsbet/evaluation/_rules.py": "dab297432c5728936325f5ead0c818207458799d93417d8bc123105589b9b390"
+          }
+        },
+        {
+          "audited_dcm_consumer_path_hashes": {
+            "src/dcm/chat/cli.py": "72c0db5b6fc39725863e47ee3a488a7365dde353a510af3ed001ce3f60a5fb73",
+            "src/dcm/chat/har_only_controller.py": "0a9dcdce9020a1f5bfd0e044e863335b118b06f740a6bee93eababb0ae28a2e6",
+            "src/dcm/runner.py": "05f31de9a0cb39bc2b4359ec9c01701f13f4d8e2287167e3d3fcaed468651523"
+          },
+          "audited_dcm_consumer_paths": [
+            "src/dcm/runner.py",
+            "src/dcm/chat/cli.py",
+            "src/dcm/chat/har_only_controller.py"
+          ],
+          "benchmark_result": "NOT_RUN_NOT_ADOPTED",
+          "block_and_rollback": "No DCM dependency/code change. Remove this audit row in a future version only through append-only correction; revisit if evidence/rights change.",
+          "candidate_algorithm_or_stage": "RESEARCH_INGESTION / MODEL_VALIDATION / ENGINEERING_PATTERN",
+          "consumer": "No donor consumer wired; mapped equivalent or absent consumer stated above",
+          "content_hashes": {
+            "src/sportsbet/cli/_cli.py": "3aebb1d1c72d717d48d30ba53fe6c3ae148865922481f74fa73c685488397a0b",
+            "src/sportsbet/mcp/_server.py": "fb60d41d90030305d619a710ff8e9a101ffa4deebdfcad02c8cadeed4aea96fe"
+          },
+          "dependency_health": "Python >=3.11,<3.14; pandas, sklearn, cloudpickle, BeautifulSoup, aiohttp, Pandera, PyArrow; optional MCP and Playwright execution",
+          "disposition": "REJECT_POOR_FIT",
+          "donor_tests_execution": "INSPECTED_ONLY; donor tests were not executed or installed",
+          "executed_test_paths": [],
+          "existing_dcm_equivalent": "Canonical dcm.runner / dcm.chat and governed Research OS",
+          "fitted_parameters_or_config": "NONE",
+          "functionality": "Data, model, backtest, bet, execution and browser MCP surfaces",
+          "imported_code_and_attribution": "NONE; no donor bytes imported",
+          "module_or_stage": "sportsbet/cli and sportsbet/mcp",
+          "performance_and_uncertainty": "NOT_BENCHMARKED; no candidate workload, authorized labels, or adopted executable implementation",
+          "producer": "No donor producer wired into canonical src/dcm",
+          "rights_state": "CLEAR_FOR_REVIEW; NO CODE COPIED",
+          "risk": "Parallel orchestration and offer/data namespaces; not needed for DCM.",
+          "rollback": "Not applicable; no runtime change",
+          "schema_units_cutoff": "Not adopted; DCM typed schema/cutoff contracts remain authoritative",
+          "source_paths": [
+            "src/sportsbet/cli/_cli.py",
+            "src/sportsbet/mcp/_server.py"
+          ],
+          "source_sha256": {
+            "src/sportsbet/cli/_cli.py": "3aebb1d1c72d717d48d30ba53fe6c3ae148865922481f74fa73c685488397a0b",
+            "src/sportsbet/mcp/_server.py": "fb60d41d90030305d619a710ff8e9a101ffa4deebdfcad02c8cadeed4aea96fe"
+          }
+        },
+        {
+          "audited_dcm_consumer_path_hashes": {},
+          "audited_dcm_consumer_paths": [],
+          "benchmark_result": "NOT_RUN_NOT_ADOPTED",
+          "block_and_rollback": "No DCM dependency/code change. Remove this audit row in a future version only through append-only correction; revisit if evidence/rights change.",
+          "candidate_algorithm_or_stage": "RESEARCH_INGESTION / MODEL_VALIDATION / ENGINEERING_PATTERN",
+          "consumer": "No donor consumer wired; mapped equivalent or absent consumer stated above",
+          "content_hashes": {
+            "src/sportsbet/execution/_base.py": "a544fd93434e38dd0dbd163114f2c17ea3e37cd2bbda29e20cb54ee569bd2db2",
+            "src/sportsbet/execution/_browser.py": "b325f63c553d5b7cb1b2529af25d61558ffd4c4d7fd47d68fc2ec4ae1b3a8f9f",
+            "src/sportsbet/execution/_credentials.py": "2a57b82fe66f3601aaf7800833a9fd3e4f568c0d8b4433b8d8bde1fa68f53879",
+            "src/sportsbet/execution/_event.py": "61c61f92fda39ce0bd6a7da1d47a2af62e7d1357da8d07e5e80801af8990ad8f"
+          },
+          "dependency_health": "Python >=3.11,<3.14; pandas, sklearn, cloudpickle, BeautifulSoup, aiohttp, Pandera, PyArrow; optional MCP and Playwright execution",
+          "disposition": "REJECT_POOR_FIT",
+          "donor_tests_execution": "INSPECTED_ONLY; donor tests were not executed or installed",
+          "executed_test_paths": [],
+          "existing_dcm_equivalent": "No authorized DCM consumer",
+          "fitted_parameters_or_config": "NONE",
+          "functionality": "Bookmaker API/browser login and real-money placement",
+          "imported_code_and_attribution": "NONE; no donor bytes imported",
+          "module_or_stage": "sportsbet/execution",
+          "performance_and_uncertainty": "NOT_BENCHMARKED; no candidate workload, authorized labels, or adopted executable implementation",
+          "producer": "No donor producer wired into canonical src/dcm",
+          "rights_state": "CLEAR_FOR_REVIEW; NO CODE COPIED",
+          "risk": "Explicitly excluded real-money execution and account/browser control.",
+          "rollback": "Not applicable; no runtime change",
+          "schema_units_cutoff": "Not adopted; DCM typed schema/cutoff contracts remain authoritative",
+          "source_paths": [
+            "src/sportsbet/execution/_base.py",
+            "src/sportsbet/execution/_browser.py",
+            "src/sportsbet/execution/_credentials.py",
+            "src/sportsbet/execution/_event.py"
+          ],
+          "source_sha256": {
+            "src/sportsbet/execution/_base.py": "a544fd93434e38dd0dbd163114f2c17ea3e37cd2bbda29e20cb54ee569bd2db2",
+            "src/sportsbet/execution/_browser.py": "b325f63c553d5b7cb1b2529af25d61558ffd4c4d7fd47d68fc2ec4ae1b3a8f9f",
+            "src/sportsbet/execution/_credentials.py": "2a57b82fe66f3601aaf7800833a9fd3e4f568c0d8b4433b8d8bde1fa68f53879",
+            "src/sportsbet/execution/_event.py": "61c61f92fda39ce0bd6a7da1d47a2af62e7d1357da8d07e5e80801af8990ad8f"
+          }
+        }
+      ],
+      "default_branch": "main",
+      "entrypoints": [
+        "sportsbet.cli:main",
+        "sportsbet.mcp:run"
+      ],
+      "latest_commit_observed": "2026-07-28T08:36:29+03:00 chore: Release 0.15.1",
+      "license_evidence": "MIT (root LICENSE and pyproject agree)",
+      "license_file_sha256": "c8367bc49b1df477e68e4cbb198a7472cffeced655fe752860f8534db997c6f1",
+      "observed_main_commit": "eb4cedf376663fac68f508e50b83fd832e74dfd4",
+      "pyproject_sha256": "886bd3f146750a2fc81030dfdcca514eee2396f8a98748a8e78dd85a33bc129d",
+      "python_and_dependency_health": "Python >=3.11,<3.14; pandas, sklearn, cloudpickle, BeautifulSoup, aiohttp, Pandera, PyArrow; optional MCP and Playwright execution",
+      "readme_sha256": "9e4c6de24d180b1641f867d793199a43a1bcc5205e7b5836b779442779a2e109",
+      "release_tags_observed": [
+        "0.15.1"
+      ],
+      "remote_branches_observed": [
+        "origin/main"
+      ],
+      "repository": "https://github.com/georgedouzas/sports-betting",
+      "rights_state": "CLEAR_FOR_REVIEW; NO CODE COPIED",
+      "tree_sha": "b5a13b2b18964bef44d31d5b118bb7ae189b328d"
+    },
+    {
+      "ci_file_sha256": {
+        ".github/workflows/ci-docs.yml": "dce6f702446b5b9bc1bab1356a825d6d9a47c8e214cf8b08da3af64a4bd61d72",
+        ".github/workflows/ci.yml": "87e18e4209b252c25258ce2c80fe6d301c12dff3bd4bb728d51260dc476e3d9c",
+        ".github/workflows/doc.yml": "1d0440a2a16f3ff54d980cedd441d1c86d683735621abfe0a2de0f0a3832bccd"
+      },
+      "ci_files": [
+        ".github/workflows/ci.yml",
+        ".github/workflows/ci-docs.yml",
+        ".github/workflows/doc.yml"
+      ],
+      "components": [
+        {
+          "audited_dcm_consumer_path_hashes": {
+            "src/dcm/research/": "267f1b9d9d47e361e4428987aabaff8620d91b73d97e340a35d1866d3ae59a34"
+          },
+          "audited_dcm_consumer_paths": [
+            "src/dcm/research"
+          ],
+          "benchmark_result": "NOT_RUN_NOT_ADOPTED",
+          "block_and_rollback": "No DCM dependency/code change. Remove this audit row in a future version only through append-only correction; revisit if evidence/rights change.",
+          "candidate_algorithm_or_stage": "RESEARCH_TRIAGE / LEARNING_CHALLENGER / ENGINEERING_PATTERN",
+          "consumer": "No donor consumer wired; mapped equivalent or absent consumer stated above",
+          "content_hashes": {
+            "src/skai/base/llm/__init__.py": "6a7ce52e1283684f94c777e3790ed4a380bb61326f6380e2aab7e6cd1c6601a9",
+            "src/skai/llm/_openai.py": "e40367fb56b91d340d7d2fd5bc23d1938b93ae50b0dbf1790a2cb515e46daa79"
+          },
+          "dependency_health": "Python >=3.11,<3.14; scikit-learn, OpenAI SDK, python-dotenv; RL base also requires Gymnasium when used",
+          "disposition": "REJECT_DUPLICATE",
+          "donor_tests_execution": "INSPECTED_ONLY; donor tests were not executed or installed",
+          "executed_test_paths": [],
+          "existing_dcm_equivalent": "No remote research classifier consumer; DCM uses typed deterministic research actions/evidence contracts",
+          "fitted_parameters_or_config": "NONE",
+          "functionality": "sklearn-style LLM classifier; OpenAI API prompt/completion interface",
+          "imported_code_and_attribution": "NONE; no donor bytes imported",
+          "module_or_stage": "skai/base/llm and skai/llm/_openai.py",
+          "performance_and_uncertainty": "NOT_BENCHMARKED; no candidate workload, authorized labels, or adopted executable implementation",
+          "producer": "No donor producer wired into canonical src/dcm",
+          "rights_state": "CLEAR_FOR_REVIEW; NO CODE COPIED",
+          "risk": "Remote inference is not authorized for private/restricted inputs and does not add verified fact authority. OpenAI dependency and model output cannot be a truth/probability oracle.",
+          "rollback": "Not applicable; no runtime change",
+          "schema_units_cutoff": "Not adopted; DCM typed schema/cutoff contracts remain authoritative",
+          "source_paths": [
+            "src/skai/base/llm/__init__.py",
+            "src/skai/llm/_openai.py"
+          ],
+          "source_sha256": {
+            "src/skai/base/llm/__init__.py": "6a7ce52e1283684f94c777e3790ed4a380bb61326f6380e2aab7e6cd1c6601a9",
+            "src/skai/llm/_openai.py": "e40367fb56b91d340d7d2fd5bc23d1938b93ae50b0dbf1790a2cb515e46daa79"
+          }
+        },
+        {
+          "audited_dcm_consumer_path_hashes": {},
+          "audited_dcm_consumer_paths": [],
+          "benchmark_result": "NOT_RUN_NOT_ADOPTED",
+          "block_and_rollback": "No DCM dependency/code change. Remove this audit row in a future version only through append-only correction; revisit if evidence/rights change.",
+          "candidate_algorithm_or_stage": "RESEARCH_TRIAGE / LEARNING_CHALLENGER / ENGINEERING_PATTERN",
+          "consumer": "No donor consumer wired; mapped equivalent or absent consumer stated above",
+          "content_hashes": {
+            "src/skai/base/rl/_base.py": "9bd920998942eb858e46c9c21c63f8f4e2571b72c236ba5513894b3173cf25a1"
+          },
+          "dependency_health": "Python >=3.11,<3.14; scikit-learn, OpenAI SDK, python-dotenv; RL base also requires Gymnasium when used",
+          "disposition": "REJECT_POOR_FIT",
+          "donor_tests_execution": "INSPECTED_ONLY; donor tests were not executed or installed",
+          "executed_test_paths": [],
+          "existing_dcm_equivalent": "No RL-based product requirement or DCM consumer",
+          "fitted_parameters_or_config": "NONE",
+          "functionality": "Abstract RL agent contract",
+          "imported_code_and_attribution": "NONE; no donor bytes imported",
+          "module_or_stage": "skai/base/rl",
+          "performance_and_uncertainty": "NOT_BENCHMARKED; no candidate workload, authorized labels, or adopted executable implementation",
+          "producer": "No donor producer wired into canonical src/dcm",
+          "rights_state": "CLEAR_FOR_REVIEW; NO CODE COPIED",
+          "risk": "No evidence that RL can safely improve current under-labeled, chronological DCM targets; no RL functionality is inferred beyond inspected base abstraction.",
+          "rollback": "Not applicable; no runtime change",
+          "schema_units_cutoff": "Not adopted; DCM typed schema/cutoff contracts remain authoritative",
+          "source_paths": [
+            "src/skai/base/rl/_base.py"
+          ],
+          "source_sha256": {
+            "src/skai/base/rl/_base.py": "9bd920998942eb858e46c9c21c63f8f4e2571b72c236ba5513894b3173cf25a1"
+          }
+        }
+      ],
+      "default_branch": "main",
+      "entrypoints": [],
+      "latest_commit_observed": "2025-07-13T07:18:31+03:00 docs: Fix badges URLs",
+      "license_evidence": "MIT (root LICENSE and pyproject agree)",
+      "license_file_sha256": "1d87f14145a0aef762e292d2d6764796f44861b35434ed7962589283f81b49d7",
+      "observed_main_commit": "aaee46f9b8de1af2b20fe41dbcb82ee06c5b80a7",
+      "pyproject_sha256": "9bc8b4ac305e3b22ac2cfb72ef1f108f84ea5b943d52da5fcb7b782db11aa53d",
+      "python_and_dependency_health": "Python >=3.11,<3.14; scikit-learn, OpenAI SDK, python-dotenv; RL base also requires Gymnasium when used",
+      "readme_sha256": "10c9457529b98389ec4030e5ace746765c3fc997d266192dd2c1975e450fd388",
+      "release_tags_observed": [],
+      "remote_branches_observed": [
+        "origin/main"
+      ],
+      "repository": "https://github.com/georgedouzas/scikit-ai",
+      "rights_state": "CLEAR_FOR_REVIEW; NO CODE COPIED",
+      "tree_sha": "626a7258cdd97d1fddf601ba09bb7b391c55eb13"
+    },
+    {
+      "ci_file_sha256": {
+        ".github/workflows/ci-docs.yml": "57d02e2d0fa47780cd0085eaea65d57f918d372b766db8438c21c72968839674",
+        ".github/workflows/ci.yml": "9b68c62f372da2a51ba92d87d24ec3ed17863005733eeb5e2cd6fce80eedff0a",
+        ".github/workflows/doc.yml": "82255011521f006545a21a740a0993ce9c2b52ecd37fa88e86a41c137f271449"
+      },
+      "ci_files": [
+        ".github/workflows/ci.yml",
+        ".github/workflows/ci-docs.yml",
+        ".github/workflows/doc.yml"
+      ],
+      "components": [
+        {
+          "audited_dcm_consumer_path_hashes": {
+            "src/dcm/algorithms/ml_families.py": "70a6d813ca72dcb37d509f1130ae3a28f1d6810c73f462a7e65166a9cf49a86c",
+            "src/dcm/learning/dataset.py": "9b0cf46916417e3cb2b0763008f2c7ad8186d320384f3af1c719aa7f110d2dd9",
+            "src/dcm/learning/walkforward.py": "389f14c46250bcce0109bde25ecbee6ce1b00aadcba3263587482f44d11b6938"
+          },
+          "audited_dcm_consumer_paths": [
+            "src/dcm/learning/dataset.py",
+            "src/dcm/learning/walkforward.py",
+            "src/dcm/algorithms/ml_families.py"
+          ],
+          "benchmark_result": "NOT_RUN_NOT_ADOPTED",
+          "block_and_rollback": "No DCM dependency/code change. Remove this audit row in a future version only through append-only correction; revisit if evidence/rights change.",
+          "candidate_algorithm_or_stage": "RESEARCH_TRIAGE / LEARNING_CHALLENGER / ENGINEERING_PATTERN",
+          "consumer": "No donor consumer wired; mapped equivalent or absent consumer stated above",
+          "content_hashes": {
+            "src/imblearn_extra/gsmote/geometric_smote.py": "163565e7c1f4a5fb998170a7f508fb3be9768e7ea70a91be8f86b5c02efc44cc"
+          },
+          "dependency_health": "Python >=3.10,<3.14; SciPy, NumPy, imbalanced-learn, MiniSom, typing-extensions; DCM requires Python >=3.11 and NumPy only",
+          "disposition": "BLOCKED_RIGHTS",
+          "donor_tests_execution": "INSPECTED_ONLY; donor tests were not executed or installed",
+          "executed_test_paths": [],
+          "existing_dcm_equivalent": "No eligible DCM historical target population; native walkforward and class-prior/shrinkage baselines",
+          "fitted_parameters_or_config": "NONE",
+          "functionality": "Geometric SMOTE for synthetic minority classification samples",
+          "imported_code_and_attribution": "NONE; no donor bytes imported",
+          "module_or_stage": "imblearn_extra/gsmote/geometric_smote.py",
+          "performance_and_uncertainty": "NOT_BENCHMARKED; no candidate workload, authorized labels, or adopted executable implementation",
+          "producer": "No donor producer wired into canonical src/dcm",
+          "rights_state": "BLOCKED_RIGHTS; no redistribution or installed dependency pending authoritative clarification",
+          "risk": "Three incompatible license signals across package/license/file header. No source copied or dependency installed; no synthetic data used as observed history.",
+          "rollback": "Not applicable; no runtime change",
+          "schema_units_cutoff": "Not adopted; DCM typed schema/cutoff contracts remain authoritative",
+          "source_paths": [
+            "src/imblearn_extra/gsmote/geometric_smote.py"
+          ],
+          "source_sha256": {
+            "src/imblearn_extra/gsmote/geometric_smote.py": "163565e7c1f4a5fb998170a7f508fb3be9768e7ea70a91be8f86b5c02efc44cc"
+          }
+        },
+        {
+          "audited_dcm_consumer_path_hashes": {
+            "src/dcm/algorithms/ml_families.py": "70a6d813ca72dcb37d509f1130ae3a28f1d6810c73f462a7e65166a9cf49a86c",
+            "src/dcm/learning/dataset.py": "9b0cf46916417e3cb2b0763008f2c7ad8186d320384f3af1c719aa7f110d2dd9",
+            "src/dcm/learning/walkforward.py": "389f14c46250bcce0109bde25ecbee6ce1b00aadcba3263587482f44d11b6938"
+          },
+          "audited_dcm_consumer_paths": [
+            "src/dcm/learning/dataset.py",
+            "src/dcm/learning/walkforward.py",
+            "src/dcm/algorithms/ml_families.py"
+          ],
+          "benchmark_result": "NOT_RUN_NOT_ADOPTED",
+          "block_and_rollback": "No DCM dependency/code change. Remove this audit row in a future version only through append-only correction; revisit if evidence/rights change.",
+          "candidate_algorithm_or_stage": "RESEARCH_TRIAGE / LEARNING_CHALLENGER / ENGINEERING_PATTERN",
+          "consumer": "No donor consumer wired; mapped equivalent or absent consumer stated above",
+          "content_hashes": {
+            "src/imblearn_extra/clover/clusterer/_som.py": "e3c79af410e9f192b4e8b05625faeb582700a8973d1918c2690708bd14f0a3a0",
+            "src/imblearn_extra/clover/distribution/_density.py": "203b6b5750caf27ebb445cf9e011c9916206e2940f62fd700c99d8f165008653",
+            "src/imblearn_extra/clover/over_sampling/_cluster.py": "e04aee2071f2ec82f8a2aa05d796988cf30f9f5e8ad2000267b4c830e103bcab",
+            "src/imblearn_extra/clover/over_sampling/_gsomo.py": "70ef3987f96a0cf2152ef39d29d78cb05bc936400b16d4386fbc19690506e599",
+            "src/imblearn_extra/clover/over_sampling/_kmeans_smote.py": "a3ef604e08818e8836b35cbf936202dc7cb3ab12a22a9f7b014691c717e0dfdc",
+            "src/imblearn_extra/clover/over_sampling/_somo.py": "092dc8b1cd2aa5740c71e9bb9b66a9b519c245ff5fa8e4643fbb592af33dd89b"
+          },
+          "dependency_health": "Python >=3.10,<3.14; SciPy, NumPy, imbalanced-learn, MiniSom, typing-extensions; DCM requires Python >=3.11 and NumPy only",
+          "disposition": "BLOCKED_RIGHTS",
+          "donor_tests_execution": "INSPECTED_ONLY; donor tests were not executed or installed",
+          "executed_test_paths": [],
+          "existing_dcm_equivalent": "No eligible target and no event/team/role/season/temporal neighbor-boundary proof",
+          "fitted_parameters_or_config": "NONE",
+          "functionality": "Clustering-based SOMO/KMeans-SMOTE and density distributor",
+          "imported_code_and_attribution": "NONE; no donor bytes imported",
+          "module_or_stage": "imblearn_extra/clover",
+          "performance_and_uncertainty": "NOT_BENCHMARKED; no candidate workload, authorized labels, or adopted executable implementation",
+          "producer": "No donor producer wired into canonical src/dcm",
+          "rights_state": "BLOCKED_RIGHTS; no redistribution or installed dependency pending authoritative clarification",
+          "risk": "Same package license conflict; oversampling could cross related-prop/event boundaries and distort probability calibration.",
+          "rollback": "Not applicable; no runtime change",
+          "schema_units_cutoff": "Not adopted; DCM typed schema/cutoff contracts remain authoritative",
+          "source_paths": [
+            "src/imblearn_extra/clover/over_sampling/_cluster.py",
+            "src/imblearn_extra/clover/over_sampling/_gsomo.py",
+            "src/imblearn_extra/clover/over_sampling/_kmeans_smote.py",
+            "src/imblearn_extra/clover/over_sampling/_somo.py",
+            "src/imblearn_extra/clover/distribution/_density.py",
+            "src/imblearn_extra/clover/clusterer/_som.py"
+          ],
+          "source_sha256": {
+            "src/imblearn_extra/clover/clusterer/_som.py": "e3c79af410e9f192b4e8b05625faeb582700a8973d1918c2690708bd14f0a3a0",
+            "src/imblearn_extra/clover/distribution/_density.py": "203b6b5750caf27ebb445cf9e011c9916206e2940f62fd700c99d8f165008653",
+            "src/imblearn_extra/clover/over_sampling/_cluster.py": "e04aee2071f2ec82f8a2aa05d796988cf30f9f5e8ad2000267b4c830e103bcab",
+            "src/imblearn_extra/clover/over_sampling/_gsomo.py": "70ef3987f96a0cf2152ef39d29d78cb05bc936400b16d4386fbc19690506e599",
+            "src/imblearn_extra/clover/over_sampling/_kmeans_smote.py": "a3ef604e08818e8836b35cbf936202dc7cb3ab12a22a9f7b014691c717e0dfdc",
+            "src/imblearn_extra/clover/over_sampling/_somo.py": "092dc8b1cd2aa5740c71e9bb9b66a9b519c245ff5fa8e4643fbb592af33dd89b"
+          }
+        }
+      ],
+      "default_branch": "main",
+      "entrypoints": [],
+      "latest_commit_observed": "2025-10-20T09:11:49+03:00 chore: Release 0.2.10",
+      "license_evidence": "Conflicting evidence: root LICENSE says Apache-2.0; project metadata says MIT; GeometricSMOTE source header says BSD-3-Clause",
+      "license_file_sha256": "048a5823560eef70950a79f1143cdb66ff42cda1367543164e0a8752a923566e",
+      "observed_main_commit": "9e523b84af629f5a7dc85c419528d835a5774bce",
+      "pyproject_sha256": "d4b2aa0d0f7c7ce900e00362a810c76fdf71f733a12e62c2ec08b6fc34075c5c",
+      "python_and_dependency_health": "Python >=3.10,<3.14; SciPy, NumPy, imbalanced-learn, MiniSom, typing-extensions; DCM requires Python >=3.11 and NumPy only",
+      "readme_sha256": "8b136cd5ea3e8fd71f07ea6b599e42a4ecedcafa8782f42dde37308c248ddea0",
+      "release_tags_observed": [
+        "0.2.10"
+      ],
+      "remote_branches_observed": [
+        "origin/main"
+      ],
+      "repository": "https://github.com/georgedouzas/imbalanced-learn-extra",
+      "rights_state": "BLOCKED_RIGHTS; no redistribution or installed dependency pending authoritative clarification",
+      "tree_sha": "b85c22055af254acc3f434700de831389b2961b6"
+    },
+    {
+      "ci_file_sha256": {
+        ".github/workflows/ci-docs.yml": "c594293c30f2dfea39657a3ac7892ccd66bda9b7f33d34f0fe20da66d8dd9928",
+        ".github/workflows/ci.yml": "8e8ee37b2a24036a3e324db9ea965787d87a7056d9c7a1ab31fba664042dc64c"
+      },
+      "ci_files": [
+        ".github/workflows/ci.yml",
+        ".github/workflows/ci-docs.yml"
+      ],
+      "components": [
+        {
+          "audited_dcm_consumer_path_hashes": {
+            "src/dcm/cfb/event_worlds.py": "e7d2684e2a2ecb8ded056eb332bcdc58f442980fa6462781f4005c32e8ad826e",
+            "src/dcm/cfb/event_worlds_numpy.py": "7d1a2d2e3ac718e94e428f2ff75efcde7a099007f3bd77e0bdc3c7fab15b4008"
+          },
+          "audited_dcm_consumer_paths": [
+            "src/dcm/cfb/event_worlds.py",
+            "src/dcm/cfb/event_worlds_numpy.py"
+          ],
+          "benchmark_result": "NOT_RUN_NOT_ADOPTED",
+          "block_and_rollback": "No DCM dependency/code change. Remove this audit row in a future version only through append-only correction; revisit if evidence/rights change.",
+          "candidate_algorithm_or_stage": "RESEARCH_TRIAGE / LEARNING_CHALLENGER / ENGINEERING_PATTERN",
+          "consumer": "No donor consumer wired; mapped equivalent or absent consumer stated above",
+          "content_hashes": {
+            "src/skcomplex/base.py": "20435dd08032627a7cedbe34036fdebd7ddfaf109074e89da351a29a5bdc6df8",
+            "src/skcomplex/spaces/_euclidean.py": "5ce95f0c2a9850a391a2e50a8922d1eedc1903765630d3bbc940bc643e170563"
+          },
+          "dependency_health": "Python >=3.12,<3.13 (DCM >=3.11); SageMath imports in base/physics/spaces; LAMMPS declared dependency",
+          "disposition": "REJECT_POOR_FIT",
+          "donor_tests_execution": "INSPECTED_ONLY; donor tests were not executed or installed",
+          "executed_test_paths": [],
+          "existing_dcm_equivalent": "DCM EventWorld and NumPy primitives already model sport-specific shared outcomes/conservation",
+          "fitted_parameters_or_config": "NONE",
+          "functionality": "SageMath-backed abstractions for spaces and system components",
+          "imported_code_and_attribution": "NONE; no donor bytes imported",
+          "module_or_stage": "skcomplex/base.py and skcomplex/spaces/_euclidean.py",
+          "performance_and_uncertainty": "NOT_BENCHMARKED; no candidate workload, authorized labels, or adopted executable implementation",
+          "producer": "No donor producer wired into canonical src/dcm",
+          "rights_state": "CLEAR_FOR_REVIEW; NO CODE COPIED",
+          "risk": "No validated mapping from classical mechanics/Euclidean geometry to game outcomes; heavyweight/incompatible runtime with no benchmarked numerical advantage.",
+          "rollback": "Not applicable; no runtime change",
+          "schema_units_cutoff": "Not adopted; DCM typed schema/cutoff contracts remain authoritative",
+          "source_paths": [
+            "src/skcomplex/base.py",
+            "src/skcomplex/spaces/_euclidean.py"
+          ],
+          "source_sha256": {
+            "src/skcomplex/base.py": "20435dd08032627a7cedbe34036fdebd7ddfaf109074e89da351a29a5bdc6df8",
+            "src/skcomplex/spaces/_euclidean.py": "5ce95f0c2a9850a391a2e50a8922d1eedc1903765630d3bbc940bc643e170563"
+          }
+        },
+        {
+          "audited_dcm_consumer_path_hashes": {
+            "src/dcm/cfb/event_worlds.py": "e7d2684e2a2ecb8ded056eb332bcdc58f442980fa6462781f4005c32e8ad826e",
+            "src/dcm/cfb/event_worlds_numpy.py": "7d1a2d2e3ac718e94e428f2ff75efcde7a099007f3bd77e0bdc3c7fab15b4008"
+          },
+          "audited_dcm_consumer_paths": [
+            "src/dcm/cfb/event_worlds.py",
+            "src/dcm/cfb/event_worlds_numpy.py"
+          ],
+          "benchmark_result": "NOT_RUN_NOT_ADOPTED",
+          "block_and_rollback": "No DCM dependency/code change. Remove this audit row in a future version only through append-only correction; revisit if evidence/rights change.",
+          "candidate_algorithm_or_stage": "RESEARCH_TRIAGE / LEARNING_CHALLENGER / ENGINEERING_PATTERN",
+          "consumer": "No donor consumer wired; mapped equivalent or absent consumer stated above",
+          "content_hashes": {
+            "src/skcomplex/physics/_classical_mechanics.py": "e0402d1cb80e57e45f10c75d44d715405d4cdab772757855b8a3eb57675efaa4"
+          },
+          "dependency_health": "Python >=3.12,<3.13 (DCM >=3.11); SageMath imports in base/physics/spaces; LAMMPS declared dependency",
+          "disposition": "REJECT_POOR_FIT",
+          "donor_tests_execution": "INSPECTED_ONLY; donor tests were not executed or installed",
+          "executed_test_paths": [],
+          "existing_dcm_equivalent": "No coherent DCM consumer; sport EventWorld is probability/conservation based",
+          "fitted_parameters_or_config": "NONE",
+          "functionality": "Point-particle forces, potentials and classical mechanics simulation",
+          "imported_code_and_attribution": "NONE; no donor bytes imported",
+          "module_or_stage": "skcomplex/physics/_classical_mechanics.py",
+          "performance_and_uncertainty": "NOT_BENCHMARKED; no candidate workload, authorized labels, or adopted executable implementation",
+          "producer": "No donor producer wired into canonical src/dcm",
+          "rights_state": "CLEAR_FOR_REVIEW; NO CODE COPIED",
+          "risk": "Would model unrelated physical phenomena. SageMath/LAMMPS not added to canonical runtime.",
+          "rollback": "Not applicable; no runtime change",
+          "schema_units_cutoff": "Not adopted; DCM typed schema/cutoff contracts remain authoritative",
+          "source_paths": [
+            "src/skcomplex/physics/_classical_mechanics.py"
+          ],
+          "source_sha256": {
+            "src/skcomplex/physics/_classical_mechanics.py": "e0402d1cb80e57e45f10c75d44d715405d4cdab772757855b8a3eb57675efaa4"
+          }
+        }
+      ],
+      "default_branch": "main",
+      "entrypoints": [],
+      "latest_commit_observed": "2024-09-03T23:05:20+03:00 chore: Add lammps dependency",
+      "license_evidence": "MIT (root LICENSE and pyproject agree)",
+      "license_file_sha256": "95fdd0ccab793ad40dbe22b90b97c91077e47301746b8c27f26dcde6e7b94ab7",
+      "observed_main_commit": "2fe89a8d1b046ac50c0e7bfd586df597c0863db6",
+      "pyproject_sha256": "6e34ba081f6ea93a9cac67f8fca68fbd59a1ceda7002662db9ba8f4e55ec36b8",
+      "python_and_dependency_health": "Python >=3.12,<3.13 (DCM >=3.11); SageMath imports in base/physics/spaces; LAMMPS declared dependency",
+      "readme_sha256": "37ef956ae2fd83cda080d9f4f341fe206b36232b1da1926a8760f0012679c1a7",
+      "release_tags_observed": [],
+      "remote_branches_observed": [
+        "origin/main"
+      ],
+      "repository": "https://github.com/georgedouzas/scikit-complexity",
+      "rights_state": "CLEAR_FOR_REVIEW; NO CODE COPIED",
+      "tree_sha": "82287a40dad588ddb77f667380f2e5d563e3ccd3"
+    },
+    {
+      "ci_file_sha256": {
+        ".github/workflows/doc.yml": "64cd998bad59db5758500998a658671cd2105eef107420890f3ec6790e996a5f",
+        ".github/workflows/tests.yml": "f9d4509e67d01f66c4252a146f1c5896d23da0ab4315d3556e7a3cd2725787d5"
+      },
+      "ci_files": [
+        ".github/workflows/tests.yml",
+        ".github/workflows/doc.yml"
+      ],
+      "components": [
+        {
+          "audited_dcm_consumer_path_hashes": {
+            ".github/workflows/dcm-v6-ci.yml": "dd4803a27a334099f3d9af50a7558c28ae5377385fb1114dfc889b221057a7ed",
+            "AGENTS.md": "32bc5db0ada26d4cc691633bdd8bfbc9b7f32e273caa52440f8dbf0350ecdde6",
+            "pyproject.toml": "0e564703fe121169dfbd53197c8d45296f50658a0b5d64388cd76076d99c6023",
+            "scripts/build_code_inventory.py": "f687ac40ec610c658d0bafea6fb645615c226389062f97f04ad5e541600028d4"
+          },
+          "audited_dcm_consumer_paths": [
+            "AGENTS.md",
+            "pyproject.toml",
+            ".github/workflows/dcm-v6-ci.yml",
+            "scripts/build_code_inventory.py"
+          ],
+          "benchmark_result": "NOT_RUN_NOT_ADOPTED",
+          "block_and_rollback": "No DCM dependency/code change. Remove this audit row in a future version only through append-only correction; revisit if evidence/rights change.",
+          "candidate_algorithm_or_stage": "RESEARCH_TRIAGE / LEARNING_CHALLENGER / ENGINEERING_PATTERN",
+          "consumer": "No donor consumer wired; mapped equivalent or absent consumer stated above",
+          "content_hashes": {
+            "project/.pre-commit-config.yaml.jinja": "622a3f575ca6e3ebdab91922ee8d80d8b71c06c5c9fc0e88bba90f49e64cce2a",
+            "project/noxfile.py.jinja": "2c291b725978b4f81c2c7d8ba1f799142247c9412dbe0d7f65514c8075cf9993",
+            "pyproject.toml": "4171269fd01f3619a6171134c759ed922875ea0babc5b3323dd049339636fd6a"
+          },
+          "dependency_health": "Copier template; supports UV/PDM, Nox, pytest, Ruff, mypy, dependency/security and docs configuration; no DCM runtime package",
+          "disposition": "ALREADY_PRESENT_VERIFIED",
+          "donor_tests_execution": "INSPECTED_ONLY; donor tests were not executed or installed",
+          "executed_test_paths": [],
+          "existing_dcm_equivalent": "Existing DCM uv workflow, pytest, protected python-dcm CI, policy validator, inventory generator, AGENTS and canonical package",
+          "fitted_parameters_or_config": "NONE",
+          "functionality": "Modern Python packaging, local test/check recipes, type/lint/security checks and CI patterns",
+          "imported_code_and_attribution": "NONE; no donor bytes imported",
+          "module_or_stage": "project template, pyproject.toml, noxfile.py, CI and pre-commit templates",
+          "performance_and_uncertainty": "NOT_BENCHMARKED; no candidate workload, authorized labels, or adopted executable implementation",
+          "producer": "No donor producer wired into canonical src/dcm",
+          "rights_state": "CLEAR_FOR_REVIEW; TEMPLATE ONLY; NO GENERATION OR COPIED CODE",
+          "risk": "Inspected as engineering pattern. No missing guardrail justified a tool/config change; no Copier run or destructive layout regeneration.",
+          "rollback": "Not applicable; no runtime change",
+          "schema_units_cutoff": "Not adopted; DCM typed schema/cutoff contracts remain authoritative",
+          "source_paths": [
+            "pyproject.toml",
+            "project/noxfile.py.jinja",
+            "project/.github/workflows/tests.yml.jinja",
+            "project/.pre-commit-config.yaml.jinja"
+          ],
+          "source_sha256": {
+            "project/.pre-commit-config.yaml.jinja": "622a3f575ca6e3ebdab91922ee8d80d8b71c06c5c9fc0e88bba90f49e64cce2a",
+            "project/noxfile.py.jinja": "2c291b725978b4f81c2c7d8ba1f799142247c9412dbe0d7f65514c8075cf9993",
+            "pyproject.toml": "4171269fd01f3619a6171134c759ed922875ea0babc5b3323dd049339636fd6a"
+          }
+        }
+      ],
+      "default_branch": "main",
+      "entrypoints": [],
+      "latest_commit_observed": "2026-10-11T22:09:12+03:00 docs: Update changelog for version 2.0.2",
+      "license_evidence": "MIT (root LICENSE)",
+      "license_file_sha256": "95fdd0ccab793ad40dbe22b90b97c91077e47301746b8c27f26dcde6e7b94ab7",
+      "observed_main_commit": "46bc1835e256f94f6a08cb290da61c071a2fa2b3",
+      "pyproject_sha256": "4171269fd01f3619a6171134c759ed922875ea0babc5b3323dd049339636fd6a",
+      "python_and_dependency_health": "Copier template; supports UV/PDM, Nox, pytest, Ruff, mypy, dependency/security and docs configuration; no DCM runtime package",
+      "readme_sha256": "bc6636254c3833210a60aa6cb652113d2aaf65f1aa0ca1431307501cacbe9a24",
+      "release_tags_observed": [
+        "2.0.2"
+      ],
+      "remote_branches_observed": [
+        "origin/main"
+      ],
+      "repository": "https://github.com/georgedouzas/copier-modern-python",
+      "rights_state": "CLEAR_FOR_REVIEW; TEMPLATE ONLY; NO GENERATION OR COPIED CODE",
+      "tree_sha": "4616900edf2938f852a2b55787dd01f43d5c0135"
+    }
+  ],
+  "inspection": {
+    "local_python_runtime": "Python 3.11-compatible DCM environment; scikit-complexity requires Python >=3.12,<3.13.",
+    "local_test_result": "Focused final suite: PASS (29 tests, exit 0); full final suite: PASS (exit 0); registry export, code inventory, policy validation, and diff check: PASS.",
+    "method": "Read-only shallow clones of each named upstream main; inspected README/docs, source paths, tests, CI workflow files, project metadata/lock/dependency declarations, license evidence, entrypoints, tags and recent commit date. External code was not installed or executed.",
+    "upstream_tests": "INSPECTED_ONLY_NOT_EXECUTED"
+  },
+  "known_external_blockers": [
+    "The 10/13 attachment shows one realized six-pick loss, but no DCM frozen forecast packet or timezone-qualified cutoff; it cannot support probability scoring or chronological training.",
+    "imbalanced-learn-extra has unresolved license conflict (Apache-2.0 LICENSE, MIT pyproject, BSD-3-Clause source header); do not copy or install.",
+    "No qualifying event-disjoint settled DCM labels for a rare-event oversampling challenger.",
+    "No authorized external LLM classifier inference or third-party text transfer.",
+    "scikit-complexity targets Python 3.12 only and imports SageMath; no coherent sport-specific benchmark target.",
+    "No accessible authorized Fantasy Football roster/waiver/outcome data or cross-project chat transcript was available to wire into DCM research; Fantasy Basketball starter manifest has no league data.",
+    "The 10/13 screenshot shows a settled ticket state and selected payout tiers only; it does not establish a complete canonical payout contract including pushes/voids."
+  ],
+  "references": {
+    "author_page": "https://georgedouzas.github.io/",
+    "imbalanced_learn_extra_docs": "https://georgedouzas.github.io/imbalanced-learn-extra/",
+    "sports_betting_docs": "https://georgedouzas.github.io/sports-betting/"
+  },
+  "runtime_change_summary": {
+    "canonical_package": "src/dcm",
+    "code_imported": false,
+    "native_validation_change": "ALG-ML-TIME-009 now requires eventId and labelAvailableAt and excludes the active test event from training; missing event identities block folds.",
+    "new_runtime_dependencies": [],
+    "runtime_imports_from_donors": false
+  },
+  "schema": "dcm.external_donor_five_repo_matrix.v1",
+  "scope": "Sanitized source audit of the five named public upstream repositories; no donor source was installed, executed, copied, or committed.",
+  "dcm_native_benchmark": {
+    "method": "synthetic walk-forward fold construction; no predictive-performance claim",
+    "rows": 5000,
+    "cutoffs": 50,
+    "folds": 49,
+    "train_rows_across_folds": 122500,
+    "test_rows_across_folds": 4900,
+    "same_event_rows_excluded": 0,
+    "event_disjoint_all": true,
+    "elapsed_seconds": 1.26314,
+    "environment": "local Python runtime; single invocation; perf_counter wall time"
+  },
+  "input_source_audit": {
+    "source_classes": [
+      "user-provided 10/13 and 10/14 image-only PDFs"
+    ],
+    "ten_thirteen": "A submitted six-selection ticket and its completed event result are visible. The result screen shows 3/6 hits and a Loss. This is an observed realized outcome, not a DCM forecast or probability test.",
+    "ten_fourteen": "Image-only research/board screenshots were reviewed; no DCM frozen forecast packet or verified selection-to-settlement lineage is present.",
+    "cutoff_and_rights": "The screenshots do not establish a timezone-qualified decision cutoff or a complete canonical DCM feature/offer packet. The PDF creation time is export time and is not used as forecast cutoff.",
+    "private_source_policy": "No raw PDF, OCR text, account identifiers, platform account data, event/team identifiers, individual selections, or monetary stake is committed."
+  },
+  "seven_gate_receipt": {
+    "path": "docs/audits/20261014_five_repo_empty_input_seven_gate_receipt.json",
+    "run_id": "RUN_FIVE_REPO_AUDIT_20261014",
+    "execution_mode": "MANUAL_SHADOW_ANALYSIS",
+    "input_scope": "intentionally empty forecasts, portfolio, and calibration state; not the user screenshots",
+    "all_capabilities_evaluated": true,
+    "full_modeling_execution": false,
+    "learning_revision": "LR000000",
+    "predictive_claim": "NONE",
+    "production_certification": false,
+    "capability_states": {
+      "ALGORITHM_GRAPH": "EXECUTED_GRAPH_WITH_CAPABILITY_BLOCKERS",
+      "KDE": "NOT_APPLICABLE",
+      "SVD": "BLOCKED_HISTORICAL_FEATURE_MATRIX_MISSING",
+      "MONTE_CARLO": "BLOCKED_SHARED_OUTCOMES_MISSING",
+      "CALIBRATION": "EXECUTED_READINESS_ONLY",
+      "PORTFOLIO_CORRELATION": "SKIPPED_NOT_APPLICABLE",
+      "PAYOUT_EV": "BLOCKED_MISSING_ENTRY_CONTRACT"
+    }
+  }
+}
