@@ -2,10 +2,10 @@
 
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
-- Modules: **268**
-- Symbols: **2059**
+- Modules: **270**
+- Symbols: **2068**
 - Parse errors: **0**
-- Inventory hash: `9f104d0047a81cfb80db131c00929db33d63ca1941435b576ad15ccb4c676427`
+- Inventory hash: `87c230525e75099cc9a8a0e43aa00eec167c42860e1276f4b6d7494e57a80f39`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -112,6 +112,8 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P2-P4 | `src/dcm/model/grade.py` | 0 | 1 |
 | P2-P4 | `src/dcm/model/gridiron_models.py` | 3 | 14 |
 | P2-P4 | `src/dcm/model/hierarchical_distribution.py` | 1 | 5 |
+| P2-P4 | `src/dcm/model/inverse_gate.py` | 2 | 3 |
+| P2-P4 | `src/dcm/model/joint_value.py` | 2 | 2 |
 | P2-P4 | `src/dcm/model/line_surface.py` | 0 | 4 |
 | P2-P4 | `src/dcm/model/market_derive.py` | 1 | 8 |
 | P2-P4 | `src/dcm/model/parameters.py` | 0 | 13 |
@@ -1426,6 +1428,21 @@ _No class/function symbols._
 - `function` **_finite** L65
 - `function` **fit_hierarchical_distribution** L77
 - `function` **uncertainty_interval** L145
+
+### `src/dcm/model/inverse_gate.py`
+
+- `class` **HistoricalObservation** L17
+- `class` **InverseGateResult** L24
+- `method` **InverseGateResult.as_dict** L37
+- `function` **_as_aware_datetime** L41
+- `function` **audit_direction** L48 — Evaluate a candidate direction; never convert hit rate into calibrated p.
+
+### `src/dcm/model/joint_value.py`
+
+- `class` **WorldSelection** L17
+- `class` **JointValueResult** L27
+- `method` **JointValueResult.as_dict** L37
+- `function` **evaluate_shared_world_portfolio** L41 — Evaluate correlated outcomes; block certification if inputs lack proof.
 
 ### `src/dcm/model/line_surface.py`
 
