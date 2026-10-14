@@ -5,9 +5,9 @@ Constitution version: `DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903`
 Generated from `dcm.algorithms.catalog`. Do not hand-edit algorithm rows.
 Re-run `python scripts/export_algorithm_registry.py` after catalog changes.
 
-- Registry rows: **172**
+- Registry rows: **173**
 - REQUIRED_CORE: **79**
-- REQUIRED_CONDITIONAL: **30**
+- REQUIRED_CONDITIONAL: **31**
 - PERMANENT_CHALLENGER: **63**
 
 | algorithm_id | name | family | lifecycle | implementation | producer | consumer | fallback | tests | traces |
@@ -108,6 +108,7 @@ Re-run `python scripts/export_algorithm_registry.py` after catalog changes.
 | `ALG-ML-PROB-007` | Extreme Value Theory (GEV/GPD) | ML_PROB | PERMANENT_CHALLENGER | `dcm.algorithms.ml_families.not_active_challenger` | AlgorithmFrontierReview | benchmarks/algorithm_frontier | ALG-ML-TABULAR-010 | test_algorithm_constitution,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
 | `ALG-ML-PROB-008` | Distributional Regression | ML_PROB | PERMANENT_CHALLENGER | `dcm.algorithms.ml_families.not_active_challenger` | AlgorithmFrontierReview | benchmarks/algorithm_frontier | ALG-ML-TABULAR-010 | test_algorithm_constitution,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
 | `ALG-ML-PROB-009` | Gaussian KDE bandwidth-selected density diagnostic | ML_PROB | REQUIRED_CONDITIONAL | `dcm.model.advanced_execution.gaussian_kde_diagnostic` | cutoff-safe comparable historical outcomes | diagnostic density receipt | ALG-ML-PROB-001 | test_advanced_modeling,test_algorithm_core,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
+| `ALG-ML-PROB-010` | Empirical discrete outcome distribution fallback | ML_PROB | REQUIRED_CONDITIONAL | `dcm.model.advanced_execution.empirical_discrete_distribution_diagnostic` | cutoff-safe comparable discrete outcomes | diagnostic density receipt | ALG-ML-PROB-001 | test_advanced_modeling,test_algorithm_core,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
 | `ALG-ML-TABULAR-001` | Elastic Net / ridge | ML_TABULAR | REQUIRED_CORE | `dcm.algorithms.ml_families.ridge_closed_form` | AlgorithmSelectionEngine | dcm.learning.registry |  | test_algorithm_constitution,test_algorithm_core,test_algorithm_ml_stdlib | REQ-ALG-CONST-R0 |
 | `ALG-ML-TABULAR-002` | Generalized Linear Models | ML_TABULAR | REQUIRED_CONDITIONAL | `dcm.algorithms.ml_families.ridge_closed_form` | AlgorithmSelectionEngine | dcm.learning.registry | ALG-ML-TABULAR-001 | test_algorithm_constitution,test_algorithm_core,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
 | `ALG-ML-TABULAR-003` | Random Forest | ML_TABULAR | PERMANENT_CHALLENGER | `dcm.algorithms.ml_families.not_active_challenger` | AlgorithmFrontierReview | benchmarks/algorithm_frontier | ALG-ML-TABULAR-001 | test_algorithm_constitution,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
@@ -120,7 +121,7 @@ Re-run `python scripts/export_algorithm_registry.py` after catalog changes.
 | `ALG-ML-TABULAR-010` | Quantile Regression | ML_TABULAR | REQUIRED_CORE | `dcm.algorithms.ml_families.empirical_quantile` | AlgorithmSelectionEngine | dcm.learning.registry |  | test_algorithm_constitution,test_algorithm_core,test_algorithm_ml_stdlib | REQ-ALG-CONST-R0 |
 | `ALG-ML-TABULAR-011` | Quantile Gradient Boosting | ML_TABULAR | PERMANENT_CHALLENGER | `dcm.algorithms.ml_families.not_active_challenger` | AlgorithmFrontierReview | benchmarks/algorithm_frontier | ALG-ML-TABULAR-010 | test_algorithm_constitution,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
 | `ALG-ML-TABULAR-012` | NGBoost | ML_TABULAR | PERMANENT_CHALLENGER | `dcm.algorithms.ml_families.not_active_challenger` | AlgorithmFrontierReview | benchmarks/algorithm_frontier | ALG-ML-TABULAR-010 | test_algorithm_constitution,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
-| `ALG-ML-TABULAR-013` | Normalized singular-value decomposition diagnostic | ML_TABULAR | REQUIRED_CONDITIONAL | `dcm.model.advanced_execution.normalized_svd_diagnostic` | validated historical role/opponent feature matrix | diagnostic feature receipt | ALG-ML-TABULAR-001 | test_advanced_modeling,test_algorithm_core,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
+| `ALG-ML-TABULAR-013` | Normalized singular-value decomposition diagnostic | ML_TABULAR | REQUIRED_CONDITIONAL | `dcm.model.advanced_execution.normalized_svd_diagnostic` | frozen chronological training rows or validated role/opponent feature matrix | diagnostic feature receipt | ALG-ML-TABULAR-001 | test_advanced_modeling,test_algorithm_core,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
 | `ALG-ML-TIME-001` | EWMA | ML_TIME | REQUIRED_CORE | `dcm.algorithms.ml_families.ewma` | AlgorithmSelectionEngine | dcm.learning.registry |  | test_algorithm_constitution,test_algorithm_core,test_algorithm_ml_stdlib | REQ-ALG-CONST-R0 |
 | `ALG-ML-TIME-002` | CUSUM | ML_TIME | REQUIRED_CORE | `dcm.algorithms.ml_families.cusum` | AlgorithmSelectionEngine | dcm.learning.registry |  | test_algorithm_constitution,test_algorithm_core,test_algorithm_ml_stdlib | REQ-ALG-CONST-R0 |
 | `ALG-ML-TIME-003` | Page-Hinkley | ML_TIME | REQUIRED_CORE | `dcm.algorithms.ml_families.page_hinkley` | AlgorithmSelectionEngine | dcm.learning.registry |  | test_algorithm_constitution,test_algorithm_core,test_algorithm_ml_stdlib | REQ-ALG-CONST-R0 |

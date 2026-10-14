@@ -3,9 +3,9 @@
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
 - Modules: **273**
-- Symbols: **2091**
+- Symbols: **2093**
 - Parse errors: **0**
-- Inventory hash: `76e9dce49d537bd8291d3d53750b90af08f2849b1e925e7c7616a1329bb15ce8`
+- Inventory hash: `7cd59a7bb78d0ec6fb1538d31aa557e4dcec279c8f3970e59e8744e90af79dd2`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -104,7 +104,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P2 | `src/dcm/ml/__init__.py` | 0 | 0 |
 | P2 | `src/dcm/ml/feature_store.py` | 1 | 9 |
 | P2-P4 | `src/dcm/model/__init__.py` | 0 | 1 |
-| P2-P4 | `src/dcm/model/advanced_execution.py` | 0 | 17 |
+| P2-P4 | `src/dcm/model/advanced_execution.py` | 0 | 19 |
 | P2-P4 | `src/dcm/model/availability.py` | 0 | 2 |
 | P2-P4 | `src/dcm/model/basketball_efficiency.py` | 1 | 6 |
 | P2-P4 | `src/dcm/model/basketball_opportunity.py` | 1 | 8 |
@@ -313,7 +313,7 @@ _No class/function symbols._
 
 - `function` **_a** L10
 - `function` **_ml** L719
-- `function` **registry_document** L910
+- `function` **registry_document** L918
 
 ### `src/dcm/algorithms/computation_law.py`
 
@@ -1344,23 +1344,25 @@ _No class/function symbols._
 
 ### `src/dcm/model/advanced_execution.py`
 
-- `function` **_deterministic_hash_payload** L63 — Remove observational timings recursively from deterministic hashes.
-- `function` **compile_advanced_execution_dag** L73 — Compile and validate the bounded modeling DAG against the live registry.
-- `function` **_receipt** L109
-- `function` **_timestamp_at_or_before** L163
-- `function` **_aware_utc_timestamp** L177
-- `function` **gaussian_kde_diagnostic** L190 — Select bandwidth by deterministic leave-one-out likelihood.
-- `function` **normalized_svd_diagnostic** L262 — Validate chronology, normalize columns, and report a NumPy SVD rank.
-- `function` **_shared_world_diagnostics** L336
-- `function` **_calibration_challenger_report** L389 — Fit isotonic calibration only inside event-disjoint chronological folds.
-- `method` **_calibration_challenger_report.score** L420
-- `method` **_calibration_challenger_report.score.standard_error** L430
-- `method` **_calibration_challenger_report.predict** L470
-- `function` **apply_directional_research_conflict_gate** L496 — Block only verified same-market evidence that contradicts a selected side.
-- `method` **apply_directional_research_conflict_gate.market_key** L510
-- `method` **apply_directional_research_conflict_gate.side_key** L513
-- `function` **execute_advanced_modeling** L595 — Evaluate each modeling capability for a canonical runner invocation.
-- `function` **validate_advanced_execution_receipt** L927
+- `function` **_deterministic_hash_payload** L72 — Remove observational timings recursively from deterministic hashes.
+- `function` **compile_advanced_execution_dag** L82 — Compile and validate the bounded modeling DAG against the live registry.
+- `function` **_receipt** L118
+- `function` **_timestamp_at_or_before** L172
+- `function` **_aware_utc_timestamp** L186
+- `function` **gaussian_kde_diagnostic** L199 — Select bandwidth by deterministic leave-one-out likelihood.
+- `function` **normalized_svd_diagnostic** L271 — Validate chronology, normalize columns, and report a NumPy SVD rank.
+- `function` **build_cutoff_safe_svd_matrix** L345 — Build an SVD matrix from numeric features frozen with prior forecasts.
+- `function` **empirical_discrete_distribution_diagnostic** L433 — Bounded empirical fallback for discrete/count outcomes.
+- `function` **_shared_world_diagnostics** L476
+- `function` **_calibration_challenger_report** L529 — Fit isotonic calibration only inside event-disjoint chronological folds.
+- `method` **_calibration_challenger_report.score** L560
+- `method` **_calibration_challenger_report.score.standard_error** L570
+- `method` **_calibration_challenger_report.predict** L610
+- `function` **apply_directional_research_conflict_gate** L636 — Block only verified same-market evidence that contradicts a selected side.
+- `method` **apply_directional_research_conflict_gate.market_key** L650
+- `method` **apply_directional_research_conflict_gate.side_key** L653
+- `function` **execute_advanced_modeling** L735 — Evaluate each modeling capability for a canonical runner invocation.
+- `function` **validate_advanced_execution_receipt** L1131
 
 ### `src/dcm/model/availability.py`
 
@@ -2568,8 +2570,8 @@ _No class/function symbols._
 - `method` **run_dcm._ingest_stream** L499
 - `method` **run_dcm._snapshot_for** L1251
 - `method` **run_dcm._resimulate_material** L1749
-- `method` **run_dcm.slim** L1969
-- `function` **main** L2614
+- `method` **run_dcm.slim** L1972
+- `function` **main** L2617
 
 ### `src/dcm/runtime/__init__.py`
 

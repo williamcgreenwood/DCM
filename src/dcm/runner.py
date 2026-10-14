@@ -1886,6 +1886,9 @@ def run_dcm(
         event_world_metadata=event_worlds_meta,
         joint_backend_metadata=joint_meta_acc,
         run_id=str(run_id),
+        sport_scopes=sorted({str((row.get("row") or {}).get("league") or "").upper()
+                             for row in classified
+                             if str((row.get("row") or {}).get("league") or "").strip()}),
         directional_research_report=directional_research_report,
     )
     validate_advanced_execution_receipt(advanced_execution)

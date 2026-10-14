@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import sys
 import time
+from datetime import datetime, timedelta
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -15,6 +16,11 @@ from dcm.algorithms.grouping import UnionFind, composite_group
 from dcm.algorithms.indexing import BloomFilter, merkle_root
 from dcm.algorithms.searching import bm25, exact_hash_lookup, submodular_lazy_greedy, weighted_set_cover
 from dcm.algorithms.sorting import heap_topk, timsort
+from dcm.model.advanced_execution import (
+    build_cutoff_safe_svd_matrix,
+    empirical_discrete_distribution_diagnostic,
+    normalized_svd_diagnostic,
+)
 
 
 def _timed(name: str, fn):
@@ -30,6 +36,7 @@ def main() -> int:
     rows = [{"event": i % 50, "player": i % 17, "v": i} for i in range(2000)]
     universe = list(range(40))
     bundles = {f"b{i}": {(i + j) % 40 for j in range(6)} for i in range(30)}
+    discrete_observations = [float(i % 13) for i in range(500)]
     report = {
         "schema": "pillars_dcm.algorithm_frontier_smoke.v1",
         "hostPerformanceCertified": False,
@@ -50,6 +57,8 @@ def main() -> int:
             )),
             _timed("merkle", lambda: merkle_root([f"h{i}" for i in range(64)])),
             _timed("lru", lambda: _lru()),
+            _timed("empirical_discrete_distribution_500", lambda: empirical_discrete_distribution_diagnostic(discrete_observations)),
+            _timed("cutoff_safe_svd_matrix_32x3", lambda: _svd()),
         ],
     }
     assert report["hostPerformanceCertified"] is False
@@ -82,6 +91,21 @@ def _lru():
     for i in range(200):
         cache.put(i, i)
     return cache.get(199) == 199
+
+
+def _svd():
+    rows = [{
+        "eventId": f"event-{i}", "projectionId": f"projection-{i}",
+        "decisionCutoff": (datetime(2026, 9, 1) + timedelta(days=i)).strftime("%Y-%m-%dT12:00:00Z"),
+        "labelAvailableAt": (datetime(2026, 9, 1) + timedelta(days=i)).strftime("%Y-%m-%dT20:00:00Z"),
+        "numericFeatures": {"opportunity": float(i), "roleShare": float((i * 7) % 13),
+                            "opponentRate": float((i * 11) % 17)},
+    } for i in range(32)]
+    built = build_cutoff_safe_svd_matrix(rows, forecast_cutoff="2026-10-14T23:00:00Z")
+    return normalized_svd_diagnostic(
+        built["matrix"], observed_at=built["observedAt"],
+        forecast_cutoff="2026-10-14T23:00:00Z",
+    )
 
 
 if __name__ == "__main__":

@@ -49,6 +49,15 @@ CAPABILITY_INPUT_REQUIREMENTS = {
     "PORTFOLIO_CORRELATION": ("ALIGNED_SHARED_EVENT_OUTCOMES",),
     "PAYOUT_EV": ("VERIFIED_ENTRY_CONTRACT", "COMPLETE_PAYOUT_RULES", "CALIBRATED_JOINT_OUTCOMES"),
 }
+CAPABILITY_INPUT_PRODUCERS = {
+    "ALGORITHM_GRAPH": ("CANONICAL_ALGORITHM_REGISTRY",),
+    "KDE": ("CUTOFF_SAFE_COMPARABLE_STAT_HISTORY", "OBSERVED_MARKET_DEFINITION_AND_LINE"),
+    "SVD": ("FROZEN_CUTOFF_SAFE_FEATURE_HISTORY", "CHRONOLOGICAL_TRAINING_ROWS.numericFeatures"),
+    "MONTE_CARLO": ("SPORT_PARAMETER_SNAPSHOTS", "SPORT_SPECIFIC_SHARED_EVENTWORLD_BACKEND"),
+    "CALIBRATION": ("FROZEN_PREGAME_FORECASTS", "AUTHORITATIVE_LATER_SETTLEMENTS"),
+    "PORTFOLIO_CORRELATION": ("ALIGNED_SHARED_EVENT_SELECTION_OUTCOMES",),
+    "PAYOUT_EV": ("OBSERVED_ENTRY_CONTRACT", "COMPLETE_DATED_PAYOUT_RULES", "CALIBRATED_JOINT_OUTCOMES"),
+}
 CAPABILITY_ALGORITHMS = {
     "ALGORITHM_GRAPH": "ALG-CTRL-001",
     "KDE": "ALG-ML-PROB-009",
@@ -333,6 +342,137 @@ def normalized_svd_diagnostic(
     }
 
 
+def build_cutoff_safe_svd_matrix(
+    rows: Sequence[Mapping[str, Any]], *, forecast_cutoff: str,
+    min_rows: int = MIN_SVD_ROWS,
+) -> dict[str, Any]:
+    """Build an SVD matrix from numeric features frozen with prior forecasts.
+
+    Training-dataset labels are used only to establish that the frozen row had
+    settled by the current cutoff. Feature values themselves come only from
+    the original frozen ``numericFeatures`` payload, never from settlement
+    records. Rows without stable event/time identity or finite feature values
+    are excluded and counted.
+    """
+    cutoff_dt = _aware_utc_timestamp(forecast_cutoff)
+    if cutoff_dt is None:
+        return {"state": "BLOCKED_VALID_FORECAST_CUTOFF_MISSING", "matrix": [],
+                "featureNames": [], "sourceRowCount": 0, "excludedRows": len(rows)}
+    eligible: list[tuple[datetime, str, str, dict[str, float]]] = []
+    excluded_after_cutoff = 0
+    excluded_invalid = 0
+    for raw in rows:
+        if not isinstance(raw, Mapping):
+            excluded_invalid += 1
+            continue
+        decision = _aware_utc_timestamp(raw.get("decisionCutoff"))
+        available = _aware_utc_timestamp(raw.get("labelAvailableAt"))
+        event_id = str(raw.get("eventId") or "").strip()
+        pid = str(raw.get("projectionId") or "").strip()
+        features_raw = raw.get("numericFeatures")
+        if decision and decision <= cutoff_dt and available and available <= cutoff_dt:
+            pass
+        elif decision and available and decision <= cutoff_dt and available > cutoff_dt:
+            excluded_after_cutoff += 1
+            continue
+        else:
+            excluded_invalid += 1
+            continue
+        if not event_id or not pid or decision >= available or not isinstance(features_raw, Mapping):
+            excluded_invalid += 1
+            continue
+        features: dict[str, float] = {}
+        valid = True
+        for key, value in features_raw.items():
+            try:
+                number = float(value)
+            except (TypeError, ValueError, OverflowError):
+                valid = False
+                break
+            if not math.isfinite(number):
+                valid = False
+                break
+            features[str(key)] = number
+        if not valid or len(features) < 2:
+            excluded_invalid += 1
+            continue
+        eligible.append((decision, event_id, pid, features))
+    eligible.sort(key=lambda item: (item[0], item[1], item[2]))
+    if len(eligible) < min_rows:
+        return {"state": "BLOCKED_HISTORICAL_FEATURE_MATRIX_MISSING", "matrix": [],
+                "featureNames": [], "sourceRowCount": len(eligible),
+                "excludedAfterCutoffRows": excluded_after_cutoff,
+                "excludedInvalidRows": excluded_invalid,
+                "blocker": f"INSUFFICIENT_FROZEN_FEATURE_ROWS:{len(eligible)}<{min_rows}"}
+    feature_names = sorted(set.intersection(*(set(item[3]) for item in eligible)))
+    if len(feature_names) < 2:
+        return {"state": "BLOCKED_HISTORICAL_FEATURE_MATRIX_MISSING", "matrix": [],
+                "featureNames": feature_names, "sourceRowCount": len(eligible),
+                "excludedAfterCutoffRows": excluded_after_cutoff,
+                "excludedInvalidRows": excluded_invalid,
+                "blocker": "FEWER_THAN_TWO_SHARED_NUMERIC_FEATURES"}
+    matrix = [[item[3][name] for name in feature_names] for item in eligible]
+    observed_at = [item[0].isoformat().replace("+00:00", "Z") for item in eligible]
+    lineage = [{"eventId": item[1], "projectionId": item[2], "decisionCutoff": observed_at[i]}
+               for i, item in enumerate(eligible)]
+    return {
+        "state": "MATRIX_BUILT_FROM_FROZEN_FEATURES",
+        "matrix": matrix,
+        "observedAt": observed_at,
+        "featureNames": feature_names,
+        "sourceRowCount": len(eligible),
+        "excludedAfterCutoffRows": excluded_after_cutoff,
+        "excludedInvalidRows": excluded_invalid,
+        "sourceLineageHash": content_hash(lineage),
+        "inputMatrixHash": content_hash({"featureNames": feature_names, "matrix": matrix,
+                                          "observedAt": observed_at, "lineage": lineage}),
+        "source": "FROZEN_CHRONOLOGICAL_TRAINING_ROWS.numericFeatures",
+    }
+
+
+def empirical_discrete_distribution_diagnostic(
+    values: Sequence[float], *, min_n: int = MIN_KDE_SAMPLE,
+) -> dict[str, Any]:
+    """Bounded empirical fallback for discrete/count outcomes.
+
+    Gaussian KDE smooths integer mass across impossible fractional values. For
+    counts and other discrete domains, retain the observed point masses instead.
+    This is a distribution diagnostic only; it never supplies forecast or
+    calibrated probability authority.
+    """
+    try:
+        xs = [float(value) for value in values]
+    except (TypeError, ValueError, OverflowError):
+        return {"state": "BLOCKED_INVALID_DENSITY_INPUT", "n": 0,
+                "blocker": "NON_NUMERIC_OBSERVATION", "probabilityAuthority": False}
+    if any(not math.isfinite(value) for value in xs):
+        return {"state": "BLOCKED_INVALID_DENSITY_INPUT", "n": len(xs),
+                "blocker": "NONFINITE_OBSERVATION", "probabilityAuthority": False}
+    if any(not value.is_integer() for value in xs):
+        return {"state": "BLOCKED_INVALID_DENSITY_INPUT", "n": len(xs),
+                "blocker": "NONINTEGER_DISCRETE_OBSERVATION", "probabilityAuthority": False}
+    if len(xs) < min_n:
+        return {"state": "INACTIVE_INSUFFICIENT_DATA", "n": len(xs),
+                "blocker": f"INSUFFICIENT_SAMPLE:{len(xs)}<{min_n}",
+                "probabilityAuthority": False}
+    counts: dict[str, int] = {}
+    for value in xs:
+        key = str(int(value)) if value.is_integer() else format(value, ".12g")
+        counts[key] = counts.get(key, 0) + 1
+    masses = {key: count / len(xs) for key, count in sorted(counts.items(), key=lambda item: float(item[0]))}
+    return {
+        "state": "EMPIRICAL_DISCRETE_DIAGNOSTIC",
+        "algorithmId": "ALG-ML-PROB-010",
+        "algorithmVersion": require_algorithm("ALG-ML-PROB-010").introduced_version,
+        "methodVersion": "EMPIRICAL-DISCRETE-PMF-v1",
+        "n": len(xs),
+        "uniqueValues": len(counts),
+        "mass": masses,
+        "inputContentHash": content_hash(xs),
+        "probabilityAuthority": False,
+    }
+
+
 def _shared_world_diagnostics(portfolio: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     outcome_rows: list[bytes] = []
     for item in portfolio:
@@ -601,6 +741,7 @@ def execute_advanced_modeling(
     joint_backend_metadata: Sequence[Mapping[str, Any]] = (),
     run_id: str = "UNAVAILABLE",
     execution_mode: str = "CANONICAL_RUNNER_EXECUTION",
+    sport_scopes: Sequence[str] = (),
     directional_research_report: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Evaluate each modeling capability for a canonical runner invocation."""
@@ -618,8 +759,9 @@ def execute_advanced_modeling(
     if (calibration_state or {}).get("contentHash"):
         input_hashes.append(str(calibration_state["contentHash"]))
     kde_done = 0
+    kde_fallback_done = 0
     kde_blocked = 0
-    kde_unsupported_market = 0
+    kde_discrete_rows = 0
     kde_started = time.perf_counter()
     kde_snapshots: list[dict[str, Any]] = []
     historical_kde = list((calibration_state or {}).get("kdeComparableSamples") or [])
@@ -628,11 +770,10 @@ def execute_advanced_modeling(
         if row.get("selectedSide") and row.get("state") == "MODELED"
     ][:25]
     for row in diagnostic_forecasts:
-        if str(row.get("outcomeDomain") or "DISCRETE").upper() not in {
+        is_continuous = str(row.get("outcomeDomain") or "DISCRETE").upper() in {
             "CONTINUOUS", "CONTINUOUS_APPROXIMATION_VALIDATED"
-        }:
-            kde_unsupported_market += 1
-            continue
+        }
+        kde_discrete_rows += not is_continuous
         comparable_key = "|".join((
             str((row.get("row") or {}).get("sportFamily") or ""),
             str((row.get("row") or {}).get("league") or ""),
@@ -651,25 +792,30 @@ def execute_advanced_modeling(
             comparable_values = [float(sample["value"]) for sample in comparable]
         except (KeyError, TypeError, ValueError):
             comparable_values = []
-        result = gaussian_kde_diagnostic(comparable_values)
-        if result.get("state") == "SHADOW_DIAGNOSTIC":
+        result = (gaussian_kde_diagnostic(comparable_values) if is_continuous
+                  else empirical_discrete_distribution_diagnostic(comparable_values))
+        if result.get("state") in {"SHADOW_DIAGNOSTIC", "EMPIRICAL_DISCRETE_DIAGNOSTIC"}:
             kde_snapshots.append({
                 "marketId": str((row.get("row") or {}).get("projectionId") or ""),
                 "comparableKey": comparable_key,
                 "snapshotHash": result.get("snapshotHash"),
                 "inputContentHash": result.get("inputContentHash"),
+                "methodState": result.get("state"),
                 "diagnostic": result,
             })
         kde_done += result["state"] == "SHADOW_DIAGNOSTIC"
-        kde_blocked += result["state"] != "SHADOW_DIAGNOSTIC"
-    kde_state = "SHADOW_DIAGNOSTIC" if kde_done else (
-        "NOT_APPLICABLE" if not diagnostic_forecasts or kde_unsupported_market == len(diagnostic_forecasts)
-        else "INACTIVE_INSUFFICIENT_DATA"
-    )
-    kde_blockers = (["KDE_IS_DIAGNOSTIC_ONLY_NO_PROBABILITY_AUTHORITY"] if kde_done else [])
-    if kde_unsupported_market:
-        kde_blockers.append("DISCRETE_OUTCOME_DOMAIN_NOT_KDE_APPLICABLE")
-    if not kde_done and kde_unsupported_market < len(diagnostic_forecasts):
+        kde_fallback_done += result["state"] == "EMPIRICAL_DISCRETE_DIAGNOSTIC"
+        kde_blocked += result["state"] not in {"SHADOW_DIAGNOSTIC", "EMPIRICAL_DISCRETE_DIAGNOSTIC"}
+    kde_state = ("SHADOW_DIAGNOSTIC" if kde_done and not kde_fallback_done else
+                 "FALLBACK_EXECUTED" if kde_fallback_done and not kde_done else
+                 "MIXED_DIAGNOSTIC_AND_FALLBACK" if kde_done and kde_fallback_done else
+                 "EXECUTED_READINESS_ONLY")
+    kde_blockers = []
+    if kde_done:
+        kde_blockers.append("CONTINUOUS_DENSITY_IS_DIAGNOSTIC_ONLY_NO_PROBABILITY_AUTHORITY")
+    if kde_fallback_done:
+        kde_blockers.append("DISCRETE_EMPIRICAL_FALLBACK_IS_DIAGNOSTIC_ONLY_NO_PROBABILITY_AUTHORITY")
+    if kde_blocked and diagnostic_forecasts:
         kde_blockers.append("NO_SUFFICIENT_VALIDATED_COMPARABLE_HISTORY")
     if not diagnostic_forecasts:
         kde_blockers.append("NO_MODELED_MARKET_INPUTS_RESEARCH_ONLY_OR_EMPTY_RUN")
@@ -679,16 +825,33 @@ def execute_advanced_modeling(
         details={"evaluatedRows": len(diagnostic_forecasts), "populationRows": len(rows),
                  "historicalSampleRows": len(historical_kde),
                  "diagnosticRows": kde_done, "inactiveRows": kde_blocked,
-                 "unsupportedDiscreteRows": kde_unsupported_market,
+                 "discreteFallbackRows": kde_fallback_done,
+                 "discreteRowsEvaluated": kde_discrete_rows,
                  "densitySnapshots": kde_snapshots,
                  "densitySnapshotConsumer": "advanced-modeling receipt and audit diagnostics",
                  "forecastProbabilityProduced": False}, run_id=run_id,
         forecast_cutoff=forecast_cutoff, input_hashes=input_hashes, event_ids=event_ids,
-        market_ids=market_ids, applicability="CONTINUOUS_ONLY; DISCRETE_COUNT_MARKETS_ABSTAIN",
+        market_ids=market_ids, applicability="CONTINUOUS_KDE_OR_DISCRETE_EMPIRICAL_FALLBACK; INPUT_READINESS_ALWAYS_EVALUATED",
         duration_ms=round((time.perf_counter() - kde_started) * 1000, 3)))
 
     svd_started = time.perf_counter()
     history_matrix = (calibration_state or {}).get("historicalRoleOpponentFeatureMatrix")
+    matrix_input_summary: dict[str, Any] = {"source": "CANONICAL_FEATURE_MATRIX"}
+    if not isinstance(history_matrix, Mapping):
+        history_matrix = build_cutoff_safe_svd_matrix(
+            (calibration_state or {}).get("walkforwardRows") or [],
+            forecast_cutoff=forecast_cutoff,
+        )
+        matrix_input_summary = {
+            "source": history_matrix.get("source", "FROZEN_CHRONOLOGICAL_TRAINING_ROWS.numericFeatures"),
+            "sourceRowCount": history_matrix.get("sourceRowCount", 0),
+            "excludedAfterCutoffRows": history_matrix.get("excludedAfterCutoffRows", 0),
+            "excludedInvalidRows": history_matrix.get("excludedInvalidRows", 0),
+            "featureNames": history_matrix.get("featureNames", []),
+            "sourceLineageHash": history_matrix.get("sourceLineageHash"),
+            "inputMatrixHash": history_matrix.get("inputMatrixHash"),
+            "blocker": history_matrix.get("blocker"),
+        }
     if isinstance(history_matrix, Mapping):
         svd = normalized_svd_diagnostic(
             history_matrix.get("matrix") or [],
@@ -700,7 +863,8 @@ def execute_advanced_modeling(
     receipts.append(_receipt("SVD", svd["state"], producer="canonical historical feature store",
         consumer="advanced-modeling feature diagnostics",
         blockers=[] if svd.get("state") == "SHADOW_DIAGNOSTIC" else [str(svd.get("state") or "VALIDATED_ROLE_OPPONENT_HISTORY_UNAVAILABLE")],
-        details={"diagnostic": svd, "forecastProbabilityProduced": False}, run_id=run_id,
+        details={"diagnostic": svd, "matrixInput": matrix_input_summary,
+                 "forecastProbabilityProduced": False}, run_id=run_id,
         forecast_cutoff=forecast_cutoff, input_hashes=input_hashes, event_ids=event_ids,
         market_ids=market_ids, applicability="APPLICABLE_WHEN_VALID_ROLE_OPPONENT_MATRIX_EXISTS",
         duration_ms=round((time.perf_counter() - svd_started) * 1000, 3)))
@@ -782,12 +946,34 @@ def execute_advanced_modeling(
         duration_ms=round((time.perf_counter() - calibration_started) * 1000, 3)))
 
     portfolio_started = time.perf_counter()
-    corr = _shared_world_diagnostics(portfolio) if len(portfolio) >= 2 else {
-        "state": "SKIPPED_NOT_APPLICABLE", "worldCount": 0, "correlations": [],
-    }
+    selected_portfolio = list(portfolio)
+    portfolio_source = "SELECTED_PORTFOLIO"
+    if len(selected_portfolio) < 2:
+        # A final card can be empty while the run still has modeled candidate
+        # outcomes. Analyze those aligned worlds for ranking/diagnostic use;
+        # never promote them to selected legs or payout EV.
+        selected_portfolio = [row for row in rows
+                              if isinstance(row.get("_selectionOutcomes"), (bytes, bytearray))]
+        portfolio_source = "MODELED_CANDIDATE_POOL"
+    if len(selected_portfolio) >= 2:
+        corr = _shared_world_diagnostics(selected_portfolio[:25])
+        corr["analysisPopulation"] = portfolio_source
+        corr["state"] = "EXECUTED" if corr["state"] == "EXECUTED" else corr["state"]
+    else:
+        corr = {
+            "state": "EXECUTED_EMPTY_PORTFOLIO_DIAGNOSTIC",
+            "worldCount": 0,
+            "correlations": [],
+            "jointStateDistribution": {},
+            "winCountDistribution": {},
+            "allLegsWinProbability": None,
+            "anyLegLossProbability": None,
+            "jointOutcomeMethod": "NO_MULTI_SELECTION_INPUTS",
+            "analysisPopulation": "EMPTY_OR_SINGLETON_CANDIDATE_POOL",
+        }
     receipts.append(_receipt("PORTFOLIO_CORRELATION", corr["state"], producer="shared aligned selection outcomes",
         consumer="dcm.selection.portfolio.build_card / EV joint outcomes",
-        blockers=[] if corr["state"] in {"EXECUTED", "SKIPPED_NOT_APPLICABLE"} else ["SHARED_PORTFOLIO_OUTCOMES_UNAVAILABLE"],
+        blockers=[] if corr["state"] in {"EXECUTED", "EXECUTED_EMPTY_PORTFOLIO_DIAGNOSTIC"} else ["SHARED_PORTFOLIO_OUTCOMES_UNAVAILABLE"],
         details={"correlations": corr.get("correlations", []), "worldCount": corr.get("worldCount", 0),
                  "jointStateDistribution": corr.get("jointStateDistribution", {}),
                  "winCountDistribution": corr.get("winCountDistribution", {}),
@@ -795,17 +981,17 @@ def execute_advanced_modeling(
                  "anyLegLossProbability": corr.get("anyLegLossProbability"),
                  "alignedOutcomeHash": corr.get("alignedOutcomeHash"),
                  "jointOutcomeMethod": corr.get("jointOutcomeMethod", "NOT_AVAILABLE"),
-                 "portfolioSize": len(portfolio), "usesIndependentMarginals": False},
+                 "portfolioSize": len(portfolio), "analyzedCandidateCount": len(selected_portfolio),
+                 "analysisPopulation": corr.get("analysisPopulation"),
+                 "usesIndependentMarginals": False},
         run_id=run_id, forecast_cutoff=forecast_cutoff, input_hashes=input_hashes,
         event_ids=event_ids, market_ids=market_ids,
-        applicability="APPLICABLE_FOR_TWO_OR_MORE_ELIGIBLE_SELECTIONS" if len(portfolio) >= 2 else (
-            "NOT_APPLICABLE_SINGLE_SELECTION" if len(portfolio) == 1 else "NOT_APPLICABLE_NO_ELIGIBLE_PORTFOLIO_INPUT"
-        ),
+        applicability="SELECTED_PORTFOLIO_OR_MODELED_CANDIDATE_POOL; EMPTY_SET_DIAGNOSTIC_IF_NO_MULTI_SELECTION_INPUT",
         duration_ms=round((time.perf_counter() - portfolio_started) * 1000, 3)))
 
     ev_started = time.perf_counter()
     if not payout_table_hash or stake is None or len(portfolio) < 2:
-        ev_state = "BLOCKED_MISSING_ENTRY_CONTRACT"
+        ev_state = "EV_UNVERIFIED"
         missing_ev_inputs = []
         if not payout_table_hash:
             missing_ev_inputs.append("CAPTURED_PAYOUT_RULES_MISSING")
@@ -817,7 +1003,7 @@ def execute_advanced_modeling(
                       "missingInputs": missing_ev_inputs}
         ev_blockers = ["PAYOUT_RULES_OR_ENTRY_CONTRACT_MISSING", *missing_ev_inputs]
     elif corr["state"] != "EXECUTED":
-        ev_state = "BLOCKED_JOINT_PROBABILITIES_MISSING"
+        ev_state = "EV_UNVERIFIED"
         ev_details = {"expectedValue": None}
         ev_blockers = ["JOINT_OUTCOME_DISTRIBUTION_REQUIRED"]
     else:
@@ -849,7 +1035,7 @@ def execute_advanced_modeling(
         consumer="portfolio ranking and freeze eligibility", blockers=ev_blockers, details=ev_details,
         run_id=run_id, forecast_cutoff=forecast_cutoff, input_hashes=input_hashes,
         event_ids=event_ids, market_ids=market_ids,
-        applicability="APPLICABLE_WHEN_ENTRY_CONTRACT_IS_CAPTURED" if len(portfolio) >= 2 else "NOT_APPLICABLE_NO_MULTI_SELECTION_ENTRY",
+        applicability="ENTRY_CONTRACT_CHECKED_EVERY_RUN; PRODUCTION_EV_REQUIRES_VERIFIED_MULTI_SELECTION_ENTRY",
         duration_ms=round((time.perf_counter() - ev_started) * 1000, 3)))
 
     graph_started = time.perf_counter()
@@ -885,6 +1071,7 @@ def execute_advanced_modeling(
         "manifestType": "ModelExecutionManifest",
         "mode": execution_mode,
         "runId": run_id,
+        "sportScopes": sorted({str(scope).strip().upper() for scope in sport_scopes if str(scope).strip()}),
         "modelId": "DCM_CANONICAL",
         "modelVersion": "UNAVAILABLE",
         "forecastCutoff": forecast_cutoff,
@@ -899,14 +1086,31 @@ def execute_advanced_modeling(
             {"stage": "EVENTWORLD", "state": "CANONICAL_RUN_CONSUMED"},
             {"stage": "PROBABILITY", "state": "CANONICAL_RUN_CONSUMED"},
             {"stage": "CALIBRATION", "state": "EVALUATED_WITH_READINESS_RECEIPT"},
-            {"stage": "PORTFOLIO", "state": "CONSUMED_OR_NOT_APPLICABLE"},
-            {"stage": "EV", "state": "EXECUTED_OR_TYPED_BLOCKER"},
+            {"stage": "PORTFOLIO", "state": "CORRELATION_GATE_EVALUATED"},
+            {"stage": "EV", "state": "ENTRY_EV_GATE_EVALUATED"},
             {"stage": "FREEZE", "state": "PENDING_RECEIPT_HASH_BIND"},
             {"stage": "SETTLEMENT", "state": "NOT_RUN_APPEND_ONLY_LIFECYCLE"},
         ],
         "compiledDag": compiled_dag,
         "dag": stages,
         "receipts": receipts,
+        "capabilityRunThrough": {
+            "schema": "pillars_dcm.capability_run_through.v1",
+            "evaluationState": "COMPLETED_FOR_ALL_SEVEN_GATES",
+            "runContinuesOnInputIssues": True,
+            "gates": [{
+                "capability": r["capability"],
+                "gateEvaluationState": "COMPLETED",
+                "computationState": r["state"],
+                "inputIssueCount": len(r.get("blockers") or []),
+                "inputIssues": list(r.get("blockers") or []),
+                "requiredInputs": list(CAPABILITY_INPUT_REQUIREMENTS.get(r["capability"], ("CANONICAL_RUN_CONTEXT",))),
+                "inputProducersNeeded": list(CAPABILITY_INPUT_PRODUCERS.get(r["capability"], ())),
+                "receiptOutputHash": r["outputHash"],
+            } for r in receipts],
+            "completedGateCount": len(receipts),
+            "requiredGateCount": 7,
+        },
         "directionalResearchConflictGate": dict(directional_research_report or {
             "state": "NOT_PROVIDED", "automaticInverseAllowed": False,
         }),
