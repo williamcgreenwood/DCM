@@ -2,10 +2,10 @@
 
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
-- Modules: **270**
-- Symbols: **2071**
+- Modules: **272**
+- Symbols: **2079**
 - Parse errors: **0**
-- Inventory hash: `e1877648267508bc63814d115f1d59db4a7bda813e519d9dd2de70ae43510687`
+- Inventory hash: `9f1a62b029fef4d3898335a4821a5242aa64547a2aedfbc8a8796e459fe03c3b`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -14,6 +14,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P16 | `src/dcm/algorithms/__init__.py` | 0 | 0 |
 | P16 | `src/dcm/algorithms/cache.py` | 2 | 7 |
 | P16 | `src/dcm/algorithms/catalog.py` | 0 | 3 |
+| P16 | `src/dcm/algorithms/computation_law.py` | 0 | 2 |
 | P16 | `src/dcm/algorithms/constitution.py` | 0 | 6 |
 | P16 | `src/dcm/algorithms/contracts.py` | 4 | 7 |
 | P16 | `src/dcm/algorithms/control_plane.py` | 5 | 11 |
@@ -158,6 +159,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P1 | `src/dcm/research/coverage.py` | 0 | 11 |
 | P1 | `src/dcm/research/coverage_incremental.py` | 1 | 5 |
 | P1 | `src/dcm/research/dependency_graph.py` | 0 | 4 |
+| P1 | `src/dcm/research/discovery.py` | 0 | 3 |
 | P1 | `src/dcm/research/emit.py` | 0 | 5 |
 | P1 | `src/dcm/research/entity_graph.py` | 0 | 4 |
 | P1 | `src/dcm/research/entity_packets.py` | 0 | 13 |
@@ -188,7 +190,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P1 | `src/dcm/research/provider.py` | 4 | 17 |
 | P1 | `src/dcm/research/readiness.py` | 0 | 4 |
 | P1 | `src/dcm/research/requests.py` | 0 | 6 |
-| P1 | `src/dcm/research/research_store.py` | 1 | 29 |
+| P1 | `src/dcm/research/research_store.py` | 1 | 31 |
 | P1 | `src/dcm/research/response.py` | 1 | 6 |
 | P1 | `src/dcm/research/role_epoch.py` | 1 | 27 |
 | P1 | `src/dcm/research/run_lock.py` | 3 | 13 |
@@ -199,7 +201,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P1 | `src/dcm/research/source_catalog.py` | 0 | 9 |
 | P1 | `src/dcm/research/source_health.py` | 1 | 24 |
 | P1 | `src/dcm/research/staged.py` | 0 | 5 |
-| P1 | `src/dcm/research/statepack.py` | 4 | 26 |
+| P1 | `src/dcm/research/statepack.py` | 4 | 27 |
 | P1 | `src/dcm/research/subject_offer_set.py` | 1 | 10 |
 | P1 | `src/dcm/research/temporal.py` | 1 | 4 |
 | P1 | `src/dcm/research/test_mode.py` | 0 | 3 |
@@ -311,6 +313,11 @@ _No class/function symbols._
 - `function` **_a** L10
 - `function` **_ml** L719
 - `function` **registry_document** L881
+
+### `src/dcm/algorithms/computation_law.py`
+
+- `function` **law_path** L12
+- `function` **computation_law_identity** L20
 
 ### `src/dcm/algorithms/constitution.py`
 
@@ -1328,16 +1335,16 @@ _No class/function symbols._
 
 ### `src/dcm/model/advanced_execution.py`
 
-- `function` **_deterministic_hash_payload** L61 — Remove observational timings recursively from deterministic hashes.
-- `function` **compile_advanced_execution_dag** L71 — Compile and validate the bounded modeling DAG against the live registry.
-- `function` **_receipt** L105
-- `function` **_timestamp_at_or_before** L156
-- `function` **_aware_utc_timestamp** L170
-- `function` **gaussian_kde_diagnostic** L183 — Select bandwidth by deterministic leave-one-out likelihood.
-- `function` **normalized_svd_diagnostic** L251 — Validate chronology, normalize columns, and report a NumPy SVD rank.
-- `function` **_shared_world_diagnostics** L322
-- `function` **execute_advanced_modeling** L358 — Evaluate each modeling capability for a canonical runner invocation.
-- `function` **validate_advanced_execution_receipt** L648
+- `function` **_deterministic_hash_payload** L62 — Remove observational timings recursively from deterministic hashes.
+- `function` **compile_advanced_execution_dag** L72 — Compile and validate the bounded modeling DAG against the live registry.
+- `function` **_receipt** L108
+- `function` **_timestamp_at_or_before** L162
+- `function` **_aware_utc_timestamp** L176
+- `function` **gaussian_kde_diagnostic** L189 — Select bandwidth by deterministic leave-one-out likelihood.
+- `function` **normalized_svd_diagnostic** L257 — Validate chronology, normalize columns, and report a NumPy SVD rank.
+- `function` **_shared_world_diagnostics** L328
+- `function` **execute_advanced_modeling** L364 — Evaluate each modeling capability for a canonical runner invocation.
+- `function` **validate_advanced_execution_receipt** L655
 
 ### `src/dcm/model/availability.py`
 
@@ -1882,6 +1889,12 @@ _No class/function symbols._
 - `method` **build_research_dependency_graph.add_node** L51
 - `method` **build_research_dependency_graph.add_edge** L61
 
+### `src/dcm/research/discovery.py`
+
+- `function` **_validate_candidate** L26
+- `function` **append_discovery_event** L71 — Append an immutable discovery snapshot under an existing ResearchStore.
+- `function` **discovery_events** L107 — Read and integrity-check discovery history from a ResearchStore.
+
 ### `src/dcm/research/emit.py`
 
 - `function` **_write** L27
@@ -2286,25 +2299,27 @@ _No class/function symbols._
 - `function` **history_gap** L233
 - `class` **ResearchStore** L250 — Filesystem content-addressed store. Git never receives raw HARs/HTML dumps.
 - `method` **ResearchStore.__init__** L253
-- `method` **ResearchStore._append_index** L267
-- `method` **ResearchStore._load_index** L271
-- `method` **ResearchStore._latest** L285
-- `method` **ResearchStore._set_latest** L294
-- `method` **ResearchStore._load_map** L299
-- `method` **ResearchStore._index_push** L308
-- `method` **ResearchStore.put_claim** L315
-- `method` **ResearchStore.put_game_logs** L383
-- `method` **ResearchStore.get** L410
-- `method` **ResearchStore.latest_for** L417
-- `method` **ResearchStore.latest_blob** L421
-- `method` **ResearchStore.prior_fields** L427 — Hydrate classify_delta `prior` from the stored blob, not the pointer.
-- `method` **ResearchStore.records_for** L460
-- `method` **ResearchStore.put_outcome** L476 — Store settlement memory separately from research validity.
-- `method` **ResearchStore.telemetry** L499
-- `function` **classify_delta** L519 — Deterministic gap analysis before the host is asked to research.
-- `function` **classify_requests** L614
-- `function` **merge_latest_store_claims** L653 — Merge ResearchStore latest blobs into a forecast claim list.
-- `function` **hydrate_reused_claims** L703 — Pull still-valid stored claims so forecast does not research from zero.
+- `method` **ResearchStore.append_discovery_event** L267 — Append a rights-aware research-method record to this store's immutable log.
+- `method` **ResearchStore.discovery_events** L273 — Return integrity-checked method-discovery history from this store.
+- `method` **ResearchStore._append_index** L279
+- `method` **ResearchStore._load_index** L283
+- `method` **ResearchStore._latest** L297
+- `method` **ResearchStore._set_latest** L306
+- `method` **ResearchStore._load_map** L311
+- `method` **ResearchStore._index_push** L320
+- `method` **ResearchStore.put_claim** L327
+- `method` **ResearchStore.put_game_logs** L395
+- `method` **ResearchStore.get** L422
+- `method` **ResearchStore.latest_for** L429
+- `method` **ResearchStore.latest_blob** L433
+- `method` **ResearchStore.prior_fields** L439 — Hydrate classify_delta `prior` from the stored blob, not the pointer.
+- `method` **ResearchStore.records_for** L472
+- `method` **ResearchStore.put_outcome** L488 — Store settlement memory separately from research validity.
+- `method` **ResearchStore.telemetry** L511
+- `function` **classify_delta** L531 — Deterministic gap analysis before the host is asked to research.
+- `function` **classify_requests** L626
+- `function` **merge_latest_store_claims** L665 — Merge ResearchStore latest blobs into a forecast claim list.
+- `function` **hydrate_reused_claims** L715 — Pull still-valid stored claims so forecast does not research from zero.
 
 ### `src/dcm/research/response.py`
 
@@ -2450,36 +2465,37 @@ _No class/function symbols._
 
 ### `src/dcm/research/statepack.py`
 
-- `class` **StatePackError** L89
-- `class` **UnsupportedSchemaVersion** L93
-- `class` **StatePackIntegrityError** L97
-- `function` **_utc_now** L101
-- `function` **_asof_day** L105
-- `function` **sha256_bytes** L112
-- `function` **sha256_file** L116
-- `function` **write_deterministic_gzip** L124
-- `function` **read_gzip_bytes** L131
-- `function` **scan_secrets** L136
-- `function` **_connect** L145
-- `function` **detected_schema_version** L155
-- `function` **apply_migrations** L171
-- `class` **StatePack** L195
-- `method` **StatePack.__init__** L196
-- `method` **StatePack._init_db** L208
-- `method` **StatePack.sqlite_health** L215
-- `method` **StatePack.put_blob** L231
-- `method` **StatePack.index_claim** L244
-- `method` **StatePack.ingest_store** L293
-- `method` **StatePack._load_blob** L339
-- `method` **StatePack.query_entity** L347
-- `method` **StatePack.query_source** L366
-- `method` **StatePack.query_asof** L374
-- `method` **StatePack.counts** L382
-- `method` **StatePack.deterministic_records** L394
-- `method` **StatePack.export_object** L402
-- `method` **StatePack.snapshot** L412
-- `method` **StatePack.integrity_ok** L483
-- `method` **StatePack.restore_from_export** L530
+- `class` **StatePackError** L101
+- `class` **UnsupportedSchemaVersion** L105
+- `class` **StatePackIntegrityError** L109
+- `function` **_utc_now** L113
+- `function` **_asof_day** L117
+- `function` **sha256_bytes** L124
+- `function` **sha256_file** L128
+- `function` **write_deterministic_gzip** L136
+- `function` **read_gzip_bytes** L143
+- `function` **scan_secrets** L148
+- `function` **_connect** L157
+- `function` **detected_schema_version** L167
+- `function` **apply_migrations** L183
+- `class` **StatePack** L207
+- `method` **StatePack.__init__** L208
+- `method` **StatePack._init_db** L220
+- `method` **StatePack.sqlite_health** L227
+- `method` **StatePack.put_blob** L243
+- `method` **StatePack.index_claim** L256
+- `method` **StatePack.ingest_store** L305
+- `method` **StatePack._load_blob** L370
+- `method` **StatePack.query_entity** L378
+- `method` **StatePack.query_source** L397
+- `method` **StatePack.query_asof** L405
+- `method` **StatePack.counts** L413
+- `method` **StatePack.deterministic_records** L426
+- `method` **StatePack.query_discovery** L434
+- `method` **StatePack.export_object** L453
+- `method` **StatePack.snapshot** L466
+- `method` **StatePack.integrity_ok** L537
+- `method` **StatePack.restore_from_export** L584
 
 ### `src/dcm/research/subject_offer_set.py`
 

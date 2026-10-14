@@ -106,3 +106,36 @@ def test_algorithm_consumption_law_lock():
     assert "BoardStore" in board
     acq = (root / "src" / "dcm" / "research" / "acquisition.py").read_text(encoding="utf-8")
     assert "ALG-SCHED-001" in acq or "CELF" in acq or "LazyGreedy" in acq
+
+
+def test_permanent_computation_law_is_inherited_and_bound_to_execution_receipts():
+    from pathlib import Path as P
+    from dcm.algorithms.computation_law import COMPUTATION_LAW_SHA256, COMPUTATION_LAW_VERSION, computation_law_identity
+    from dcm.model.advanced_execution import compile_advanced_execution_dag
+
+    root = P(__file__).resolve().parents[2]
+    law_path = root / "docs/engineering/UNIVERSAL_ALGORITHMIC_COMPUTATION_AND_RESEARCH_DISCOVERY_LAW.md"
+    law = law_path.read_text(encoding="utf-8")
+    for term in ("Search", "Sort and rank", "Group", "Index", "Append", "Archive", "Hash", "Learn",
+                 "rights", "chronological", "KDE", "SVD", "Monte Carlo", "portfolio", "payout"):
+        assert term.lower() in law.lower(), term
+    assert COMPUTATION_LAW_VERSION in law
+    assert "UNIVERSAL_ALGORITHMIC_COMPUTATION_AND_RESEARCH_DISCOVERY_LAW.md" in (root / "AGENTS.md").read_text()
+    assert "universal_computation_and_discovery_law" in (root / "docs/architecture/CONSTITUTION_INHERITANCE.md").read_text()
+    identity = computation_law_identity()
+    import hashlib
+    assert hashlib.sha256(law_path.read_bytes()).hexdigest() == COMPUTATION_LAW_SHA256
+    dag = compile_advanced_execution_dag()
+    assert dag["computationLawVersion"] == identity["version"]
+    assert dag["computationLawSha256"] == identity["sha256"]
+
+
+def test_computation_law_identity_has_verified_wheel_fallback(monkeypatch):
+    from dcm.algorithms.computation_law import COMPUTATION_LAW_SHA256, computation_law_identity
+
+    def unavailable():
+        raise FileNotFoundError("repository documentation is not shipped in a wheel")
+
+    monkeypatch.setattr("dcm.algorithms.computation_law.law_path", unavailable)
+    identity = computation_law_identity()
+    assert identity["sha256"] == COMPUTATION_LAW_SHA256

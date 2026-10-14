@@ -13,6 +13,7 @@ from datetime import datetime, timezone
 from typing import Any, Mapping, Sequence
 
 from dcm.contracts.hashes import content_hash
+from dcm.algorithms.computation_law import computation_law_identity
 from dcm.learning.calibration import evaluate_calibration_readiness
 from dcm.algorithms.registry import algorithm_registry_sha256, load_algorithm_registry, require_algorithm
 
@@ -98,7 +99,9 @@ def compile_advanced_execution_dag() -> dict[str, Any]:
         }
         nodes.append(node)
         seen.add(capability)
-    return {"schema": "pillars_dcm.advanced_modeling_dag.v1", "version": "1.1.0",
+    law = computation_law_identity()
+    return {"schema": "pillars_dcm.advanced_modeling_dag.v1", "version": "1.2.0",
+            "computationLawVersion": law["version"], "computationLawSha256": law["sha256"],
             "nodes": nodes, "validated": True}
 
 
@@ -110,7 +113,10 @@ def _receipt(capability: str, state: str, *, producer: str, consumer: str,
              applicability: str = "EVALUATED") -> dict[str, Any]:
     algorithm_id = CAPABILITY_ALGORITHMS[capability]
     record = require_algorithm(algorithm_id)
+    law = computation_law_identity()
     body = {
+        "computationLawVersion": law["version"],
+        "computationLawSha256": law["sha256"],
         "capability": capability,
         "algorithmId": algorithm_id,
         "algorithmVersion": record.introduced_version,
@@ -606,6 +612,7 @@ def execute_advanced_modeling(
         raise ValueError("ADVANCED_EXECUTION_MODE_INVALID")
     body = {
         "schema": ADVANCED_EXECUTION_SCHEMA,
+        "computationLaw": computation_law_identity(),
         "manifestType": "ModelExecutionManifest",
         "mode": execution_mode,
         "runId": run_id,
@@ -648,6 +655,9 @@ def execute_advanced_modeling(
 def validate_advanced_execution_receipt(receipt: Mapping[str, Any]) -> None:
     if receipt.get("schema") != ADVANCED_EXECUTION_SCHEMA:
         raise ValueError("ADVANCED_EXECUTION_SCHEMA_INVALID")
+    law = computation_law_identity()
+    if receipt.get("computationLaw") != law:
+        raise ValueError("ADVANCED_EXECUTION_COMPUTATION_LAW_IDENTITY_MISMATCH")
     rows = receipt.get("receipts")
     if not isinstance(rows, list) or {r.get("capability") for r in rows} != {r[0] for r in CAPABILITY_DAG} | {"ALGORITHM_GRAPH"}:
         raise ValueError("ADVANCED_EXECUTION_CAPABILITY_RECEIPTS_INCOMPLETE")
@@ -660,9 +670,13 @@ def validate_advanced_execution_receipt(receipt: Mapping[str, Any]) -> None:
                 raise ValueError("ADVANCED_EXECUTION_PRODUCER_CONSUMER_MISSING")
         for field in ("runId", "algorithmVersion", "requirementIds", "inputContentHashes",
                       "applicabilityVerdict", "executionMethod", "executionDurationMs",
-                      "outputHash", "producer", "consumer"):
+                      "outputHash", "producer", "consumer", "computationLawVersion",
+                      "computationLawSha256"):
             if field not in row:
                 raise ValueError(f"ADVANCED_EXECUTION_REQUIRED_RECEIPT_FIELD_MISSING:{field}")
+        if (row.get("computationLawVersion") != law["version"]
+                or row.get("computationLawSha256") != law["sha256"]):
+            raise ValueError("ADVANCED_EXECUTION_RECEIPT_COMPUTATION_LAW_MISMATCH")
         if row.get("outputHash") != content_hash({
             k: v for k, v in row.items() if k not in {"outputHash", "executionDurationMs"}
         }):

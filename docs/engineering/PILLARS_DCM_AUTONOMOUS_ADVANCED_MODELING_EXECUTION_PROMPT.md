@@ -5,6 +5,8 @@
 **Priority:** Execute code, tests, evidence review, and protected GitHub delivery; do not stop at an architecture proposal.
 **Scientific status to preserve:** `LR000000`, predictive claim `NONE`, production certification `NOT CERTIFIED` until predeclared chronological evidence passes.
 
+**Permanent cross-cutting law:** inherit `docs/engineering/UNIVERSAL_ALGORITHMIC_COMPUTATION_AND_RESEARCH_DISCOVERY_LAW.md`. Every manifest and capability receipt must bind its current version and SHA-256. External method/data leads remain rights-gated discovery candidates until use permissions, provenance, experiments, tests, and a downstream consumer are evidenced.
+
 ## Mission
 
 Complete the permanent advanced modeling execution layer inside the existing DCM runtime. Make all seven capabilities callable, cutoff-safe, tested, auditable, consumed by the existing pipeline where applicable, and explicit about missing inputs. Reuse the canonical board, research, evidence, feature, parameter, EventWorld, probability, calibration, selection, portfolio, freeze, and settlement components. Do not create a second engine, runner, research store, or prediction path.

@@ -5,6 +5,9 @@
 **Registry:** `configs/algorithm_registry.json`  
 **Surfaces:** `AGENTS.md`, `docs/architecture/CONSTITUTION_INHERITANCE.md`, governance tests
 
+Cross-cutting discovery, rights review, SHA-256 lineage, archival, and governed
+learning rules inherit `docs/engineering/UNIVERSAL_ALGORITHMIC_COMPUTATION_AND_RESEARCH_DISCOVERY_LAW.md`.
+
 This is the permanent order DCM SHALL use for search, index, ML, grouping, and
 appending hot paths. Agents and future prompts may not invent silent one-off
 algorithms when a registered constitution path exists.

@@ -8,6 +8,10 @@ requirements or explicitly reference this file. A change is not complete
 because a module exists; it is complete only when the live runtime consumes
 it, the output is traceable, and the relevant gates pass.
 
+All prompts and changes also inherit
+`docs/engineering/UNIVERSAL_ALGORITHMIC_COMPUTATION_AND_RESEARCH_DISCOVERY_LAW.md`.
+Advanced modeling manifests and receipts bind that law's version and SHA-256.
+
 ## 1. Begin with a bounded execution contract
 
 Every task prompt must declare: objective; in-scope and out-of-scope areas;
