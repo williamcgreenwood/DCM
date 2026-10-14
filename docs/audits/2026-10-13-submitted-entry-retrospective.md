@@ -25,4 +25,6 @@ The missing safeguards could have flagged at least two risky cases for review: C
 
 ## Reproducible test-run status
 
-The repository's advanced execution test suite was run with synthetic software fixtures and verifies the seven capability receipts and explicit missing-input blockers. It is not a replay of this ticket. The screenshot PDF itself was not ingested into the production ResearchStore, so no production run receipt is claimed. The 2026-10-14 mixed-props PDF is 211,036,978 bytes; Drive metadata is readable, but raw transfer failed in this session. Its offers, pages, and candidate claims therefore remain unverified test inputs.
+The exact six selections and displayed 3–3 result are captured in `docs/audits/FIU_JAX_20261013_AUDIT_RECEIPT.json`. FIU Athletics' official box score independently confirms the event result and the available count statistics; fantasy scoring and the dated entry payout contract remain unverified. No DCM frozen forecast exists, so this remains a retrospective and is excluded from training, calibration, and predictive evaluation.
+
+The 2026-10-14 mixed-props PDF was later reacquired and hashed in local quarantine. Its 131-page visual review and 74 entity-distinguished trend claims are recorded in `docs/audits/OUTLIER_20261014_RESEARCH_COVERAGE.json`. Those claims remain research screenshots, not verified active offers or cutoff-safe forecast inputs. The source PDF and OCR files are not committed.

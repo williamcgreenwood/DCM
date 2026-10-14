@@ -331,8 +331,64 @@ def evaluate_folds(folds: list[dict[str, Any]]) -> dict[str, Any]:
         "shadowLogisticPooled": metrics(chal_preds, chal_y) if chal_preds else {"n": 0, "status": "SHADOW", "skipped": True},
     }
 
+def _rfecv_shadow_report(rows: list[dict[str, Any]]) -> dict[str, Any]:
+    """Optional registered shadow challenger; only frozen numeric features qualify."""
+    eligible = [
+        row for row in rows
+        if str(row.get("labelSplit") or "supervised") == "supervised"
+        and isinstance(row.get("numericFeatures"), dict)
+    ]
+    if not eligible:
+        return {
+            "algorithmId": "ALG-ML-FS-001",
+            "fallbackAlgorithmId": "ALG-ML-TABULAR-001",
+            "status": "BLOCKED_MISSING_CUTOFF_SAFE_NUMERIC_FEATURE_MATRIX",
+            "consumer": "dcm.learning.walkforward.run_walkforward",
+            "trainingOrProductionSelection": False,
+            "predictiveClaim": "NONE",
+        }
+    feature_sets = [set(row["numericFeatures"]) for row in eligible]
+    names = sorted(feature_sets[0])
+    if len(names) < 2 or any(set(names) != columns for columns in feature_sets[1:]):
+        return {
+            "algorithmId": "ALG-ML-FS-001",
+            "fallbackAlgorithmId": "ALG-ML-TABULAR-001",
+            "status": "BLOCKED_INCONSISTENT_OR_INSUFFICIENT_FEATURE_SCHEMA",
+            "consumer": "dcm.learning.walkforward.run_walkforward",
+            "trainingOrProductionSelection": False,
+            "predictiveClaim": "NONE",
+        }
+    try:
+        from dcm.learning.rfecv_shadow import evaluate_rfecv_shadow
+
+        result = evaluate_rfecv_shadow(
+            [
+                {**row, "features": row["numericFeatures"]}
+                for row in eligible
+            ],
+            names,
+        )
+        return {
+            "algorithmId": "ALG-ML-FS-001",
+            "consumer": "dcm.learning.walkforward.run_walkforward",
+            "fallbackAlgorithmId": "ALG-ML-TABULAR-001",
+            "trainingOrProductionSelection": False,
+            **result,
+        }
+    except RuntimeError as exc:
+        return {
+            "algorithmId": "ALG-ML-FS-001",
+            "fallbackAlgorithmId": "ALG-ML-TABULAR-001",
+            "status": "BLOCKED_OPTIONAL_DEPENDENCY_MISSING",
+            "blocker": str(exc),
+            "consumer": "dcm.learning.walkforward.run_walkforward",
+            "trainingOrProductionSelection": False,
+            "predictiveClaim": "NONE",
+        }
+
 def run_walkforward(rows: list[dict[str, Any]]) -> dict[str, Any]:
     folds = chronological_folds(rows)
+    rfecv_shadow = _rfecv_shadow_report(rows)
     event_identity_missing = bool(rows) and any(
         _ts(row.get("decisionCutoff")) and not _ts(row.get("eventId")) for row in rows
     )
@@ -372,6 +428,7 @@ def run_walkforward(rows: list[dict[str, Any]]) -> dict[str, Any]:
                 "skipped": True,
                 "reason": status,
             },
+            "rfecvShadowChallenger": rfecv_shadow,
             "learningRevision": LEARNING_REVISION,
             "predictiveClaim": PREDICTIVE_CLAIM,
             "software": SOFTWARE,
@@ -401,6 +458,7 @@ def run_walkforward(rows: list[dict[str, Any]]) -> dict[str, Any]:
             "metrics": evaluated["shadowLogisticPooled"],
             "note": "Honest linear logistic on frozen features. Not a neural net. Not production.",
         },
+        "rfecvShadowChallenger": rfecv_shadow,
         "learningRevision": LEARNING_REVISION,
         "predictiveClaim": PREDICTIVE_CLAIM,
         "software": SOFTWARE,

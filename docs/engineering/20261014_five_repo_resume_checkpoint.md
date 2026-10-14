@@ -42,3 +42,14 @@
 3. Full post-change tests, focused gates, compile, registry, inventory, policy, secret-pattern scan, and diff check have passed. Required GitHub CI remains pending after push.
 4. Review final diff for raw PDFs, OCR text, account material, copied donor source, private ticket details, or absolute host paths; none are staged.
 5. Commit, push, create one PR, verify required checks and merge state, then fetch `main` and record its final SHA.
+
+## v4 completion continuation (2026-10-14)
+
+- **Verified base:** `main` at `0c78b20286eb666b77797dd514b9d077be179773`; this includes merged PR #108 and required CI run #485.
+- **10/13 source audit:** `docs/audits/FIU_JAX_20261013_AUDIT_RECEIPT.json` binds the quarantined source PDF SHA-256, six screenshot selections, FIU Athletics' official box score, and explicit payout/cutoff limitations. It remains post-event only.
+- **10/14 source audit:** `docs/audits/OUTLIER_20261014_RESEARCH_COVERAGE.json` binds the 131-page PDF SHA-256, page-level trend claims, 76 OCR card occurrences, and 74 subject-distinguished claims after repeated cards are reconciled. Active offers, screenshot times, exact scoring definitions, and event mappings are still not established.
+- **Seven-gate consumer execution:** `docs/audits/SEVEN_CAPABILITY_20261014_EXECUTION.json` records a canonical controller run bound to the source hash. All seven gates were evaluated; it was research-only with no forecasts, portfolio, feature matrix, shared outcomes, entry contract, or training history. `fullModelingExecution=false`.
+- **RFECV:** the optional `rfecv` extra adds a scikit-learn RFECV shadow comparison through event-disjoint chronological inner folds, an outer held-out cutoff, and Pipeline-scoped imputation/scaling. `docs/audits/SKLEARN_RFECV_20261014_SHADOW_RECEIPT.json` records deterministic fixture evidence only. The all-feature baseline and selected-feature model scored identically; this provides no predictive or production feature-selection claim.
+- **Cross-project fantasy intelligence:** still blocked by inaccessible Football project contents and a Basketball starter with no league data. No content was guessed or backfilled.
+- **Donor packages:** the five-repository component/rights audit remains in `docs/donor/EXTERNAL_DONOR_FIVE_REPO_MATRIX.json`. No complete donor package passed rights, runtime, and consumer fit; compatible algorithms were implemented in canonical DCM code only.
+- **Delivery:** follow-up implementation and audit receipts are being validated on one branch and will be delivered through one normal PR after local gates pass. Update the JSON ledger with the actual head, CI, PR, and merge SHA before marking complete.

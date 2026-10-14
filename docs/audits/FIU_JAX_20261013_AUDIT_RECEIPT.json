@@ -1,0 +1,128 @@
+{
+  "schema": "dcm.submitted_entry_retrospective_receipt.v1",
+  "auditDate": "2026-10-14",
+  "runId": "RUN_FIU_JAX_20261013_RETROSPECTIVE",
+  "classification": "POST_EVENT_AUDIT_ONLY; not a DCM forecast, replay, or pregame training run",
+  "sourcePacket": {
+    "fileName": "101326audit.pdf",
+    "sha256": "38da1fcabc9849b750f3cfeee43b4490e0885fca0a8f97b94010bb92a6a68c01",
+    "pageCount": 58,
+    "screenshotTicketPageRefs": [
+      57,
+      58
+    ],
+    "rawPdfCommitted": false,
+    "screenshotCaptureZone": "unknown",
+    "screenshotOrderTime": "ticket view displays Oct 13 4:59 PM; timezone not shown"
+  },
+  "officialOutcomeSource": {
+    "provider": "FIU Athletics official box score",
+    "url": "https://fiusports.com/sports/football/stats/2026/jax-state/boxscore/14277",
+    "eventDate": "2026-10-13",
+    "final": "FIU 24, Jacksonville State 27",
+    "kickoffTime": "19:02 local per official box-score page; screenshot timezone cannot be aligned independently",
+    "accessedDate": "2026-10-14",
+    "scope": "official event result and count-stat verification only; source is postgame and prohibited from pregame feature use"
+  },
+  "submittedTicketAsVisible": {
+    "entryFeeUsd": 20,
+    "displayedPotentialPayoutUsd": 500,
+    "displayedStatus": "LOSS",
+    "displayedRealizedPayoutUsd": 0,
+    "reportedRecord": "3 wins, 3 losses",
+    "contractVerification": "BLOCKED; screenshot is user-submitted UI evidence, not an authoritative dated payout/settlement contract",
+    "ev": "NOT_COMPUTED"
+  },
+  "selectionRows": [
+    {
+      "subject": "Anthony Carrie",
+      "team": "FIU",
+      "market": "Rushing Attempts",
+      "line": 12.5,
+      "direction": "MORE",
+      "observedResult": 10,
+      "grade": "LOSS",
+      "resultEvidence": "FIU official box score; 10 rushing attempts",
+      "preEventAvailability": "selection appears in screenshot ticket; timezone-qualified cutoff unavailable",
+      "forecastReplay": "PROHIBITED_NO_FROZEN_DCM_FORECAST"
+    },
+    {
+      "subject": "Caden Creel",
+      "team": "Jacksonville State",
+      "market": "Passing Attempts",
+      "line": 29,
+      "direction": "LESS",
+      "observedResult": 22,
+      "grade": "WIN",
+      "resultEvidence": "FIU official box score; 22 pass attempts",
+      "preEventAvailability": "selection appears in screenshot ticket; timezone-qualified cutoff unavailable",
+      "forecastReplay": "PROHIBITED_NO_FROZEN_DCM_FORECAST"
+    },
+    {
+      "subject": "Deondre Johnson",
+      "team": "Jacksonville State",
+      "market": "Fantasy Score",
+      "line": 11,
+      "direction": "MORE",
+      "observedResult": 19.3,
+      "grade": "WIN",
+      "resultEvidence": "ticket screenshot reports 19.3; exact fantasy scoring-version/stat assembly was not independently reproduced",
+      "preEventAvailability": "selection appears in screenshot ticket; timezone-qualified cutoff unavailable",
+      "forecastReplay": "PROHIBITED_NO_FROZEN_DCM_FORECAST"
+    },
+    {
+      "subject": "James Resar",
+      "team": "FIU",
+      "market": "Receptions",
+      "line": 2.5,
+      "direction": "MORE",
+      "observedResult": 5,
+      "grade": "WIN",
+      "resultEvidence": "ticket screenshot reports 5 receptions; official box score receiving line is an available primary cross-check",
+      "preEventAvailability": "selection appears in screenshot ticket; timezone-qualified cutoff unavailable",
+      "forecastReplay": "PROHIBITED_NO_FROZEN_DCM_FORECAST"
+    },
+    {
+      "subject": "JJ Kohl",
+      "team": "FIU",
+      "market": "Interceptions Thrown",
+      "line": 0.5,
+      "direction": "MORE",
+      "observedResult": 0,
+      "grade": "LOSS",
+      "resultEvidence": "FIU official box score; 0 interceptions thrown",
+      "preEventAvailability": "selection appears in screenshot ticket; timezone-qualified cutoff unavailable",
+      "forecastReplay": "PROHIBITED_NO_FROZEN_DCM_FORECAST"
+    },
+    {
+      "subject": "Maguire Anderson",
+      "team": "FIU",
+      "market": "Fantasy Score",
+      "line": 14.5,
+      "direction": "LESS",
+      "observedResult": 33.8,
+      "grade": "LOSS",
+      "resultEvidence": "ticket screenshot reports 33.8; exact fantasy scoring-version/stat assembly was not independently reproduced",
+      "preEventAvailability": "selection appears in screenshot ticket; timezone-qualified cutoff unavailable",
+      "forecastReplay": "PROHIBITED_NO_FROZEN_DCM_FORECAST"
+    }
+  ],
+  "verifiedSummary": {
+    "wins": 3,
+    "losses": 3,
+    "pushes": 0,
+    "dcmFrozenForecastFound": false,
+    "chronologicalBacktestEligible": false,
+    "calibrationEligible": false,
+    "trainingEligible": false,
+    "predictiveClaim": "NONE",
+    "learningRevision": "LR000000",
+    "productionCertification": false
+  },
+  "limitations": [
+    "The ticket and outcomes are recorded from the user-provided retrospective screenshot packet; statistical outcomes are cross-checked where the official FIU box score publishes the exact stat.",
+    "Fantasy-score outcomes and ticket payout terms lack independent scoring-version and contract validation.",
+    "The screenshot time omits timezone; the PDF creation timestamp is an export timestamp, not proof of the pre-event decision cutoff.",
+    "No inverse side is inferred from the result; no counterfactual probability is claimed."
+  ]
+}

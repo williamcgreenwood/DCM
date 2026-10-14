@@ -78,7 +78,7 @@ def test_dag_is_registered_and_receipt_has_every_capability():
     }
     assert receipt["fullModelingExecution"] is False
     graph = next(r for r in receipt["receipts"] if r["capability"] == "ALGORITHM_GRAPH")
-    assert graph["details"]["registryAlgorithmCount"] == 171
+    assert graph["details"]["registryAlgorithmCount"] == 172
     assert graph["details"]["registeredDoesNotMeanExecuted"] is True
     assert graph["details"]["unrelatedRegistryAlgorithmsExecutionState"].startswith("TRACKED_BY")
     assert all("outputHash" in r and "executionDurationMs" in r for r in receipt["receipts"])

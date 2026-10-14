@@ -1,0 +1,101 @@
+{
+  "schema": "dcm.rfecv_shadow_validation.v1",
+  "runId": "RUN_RFECV_SYNTHETIC_FIXTURE_20261014",
+  "executionType": "DETERMINISTIC_SYNTHETIC_SOFTWARE_FIXTURE",
+  "algorithmId": "ALG-ML-FS-001",
+  "registrySha256": "b702172412ba2d80ed6a8932d16c2b6b76732652925dc16060b71e00b8f6745a",
+  "canonicalConsumer": "dcm.learning.walkforward.run_walkforward",
+  "libraryVersion": "1.9.1",
+  "inputRows": 72,
+  "inputEvents": 72,
+  "features": [
+    "signal",
+    "noise"
+  ],
+  "directEvaluation": {
+    "status": "SHADOW_ONLY",
+    "sklearnVersion": "1.9.1",
+    "inputHash": "547a2a6e5bb6d2e0f5ae050d1b51249367ead528a72d5819595af26541464204",
+    "featureNames": [
+      "signal",
+      "noise"
+    ],
+    "selectedFeatures": [
+      "signal",
+      "noise"
+    ],
+    "featureCount": 2,
+    "outerTrainN": 70,
+    "outerTestN": 2,
+    "outerTrainEventN": 70,
+    "outerTestEventN": 2,
+    "eventDisjoint": true,
+    "innerFoldCount": 34,
+    "outerTestLogLoss": 0.04499385589654347,
+    "allFeatureBaselineLogLoss": 0.04499385589654347,
+    "logLossDifferenceVsAllFeatureBaseline": 0.0,
+    "outerTestPredictions": [
+      0.04396903952521982,
+      0.9559757515194496
+    ],
+    "preprocessingFitScope": "each inner training fold; final selector fit restricted to outer training rows",
+    "productionProbabilityAuthority": false,
+    "predictiveClaim": "NONE"
+  },
+  "canonicalWalkforwardConsumerReceipt": {
+    "algorithmId": "ALG-ML-FS-001",
+    "consumer": "dcm.learning.walkforward.run_walkforward",
+    "fallbackAlgorithmId": "ALG-ML-TABULAR-001",
+    "trainingOrProductionSelection": false,
+    "status": "SHADOW_ONLY",
+    "sklearnVersion": "1.9.1",
+    "inputHash": "4d8830e2a5707242081e08462587bf7f95e07ba64a1c3c3f6149929843379793",
+    "featureNames": [
+      "noise",
+      "signal"
+    ],
+    "selectedFeatures": [
+      "signal"
+    ],
+    "featureCount": 1,
+    "outerTrainN": 70,
+    "outerTestN": 2,
+    "outerTrainEventN": 70,
+    "outerTestEventN": 2,
+    "eventDisjoint": true,
+    "innerFoldCount": 34,
+    "outerTestLogLoss": 0.04504063816778437,
+    "allFeatureBaselineLogLoss": 0.04499385589654347,
+    "logLossDifferenceVsAllFeatureBaseline": 4.678227124089995e-05,
+    "outerTestPredictions": [
+      0.04404136736358279,
+      0.9559586326364171
+    ],
+    "preprocessingFitScope": "each inner training fold; final selector fit restricted to outer training rows",
+    "productionProbabilityAuthority": false,
+    "predictiveClaim": "NONE"
+  },
+  "elapsedSeconds": 2.251837,
+  "python": "3.12.14",
+  "numpyVersion": "2.5.4",
+  "scipyVersion": "1.18.1",
+  "productionDataUsed": false,
+  "productionProbabilityAuthority": false,
+  "productionFeatureSelection": false,
+  "predictiveClaim": "NONE",
+  "learningRevision": "LR000000",
+  "interpretation": "The registered RFECV shadow challenger is wired into run_walkforward. It ran end-to-end on deterministic synthetic data with event-disjoint chronological inner folds, preprocessing fitted within each fold, and an outer cutoff held out. The selected-feature model matched the all-feature baseline on this tiny fixture; no predictive conclusion or production feature selection follows.",
+  "environmentVersionAudit": {
+    "initialSystemPython": [
+      "scikit-learn 1.8.0",
+      "numpy 2.3.5",
+      "scipy 1.17.0"
+    ],
+    "isolatedProjectExtra": [
+      "scikit-learn 1.9.1",
+      "numpy 2.3.5",
+      "scipy 1.18.1"
+    ],
+    "interpretation": "Baseline system versions were inspected before installation. The project RFECV extra was then resolved and tested in the isolated uv environment."
+  }
+}
