@@ -55,6 +55,7 @@ SLIM_FIELDS = (
     "sportFamily",
     "league",
     "blocker",
+    "numericFeatures",
 )
 
 class SettlementsMissing(RuntimeError):
@@ -225,6 +226,10 @@ def build_training_row(
     for key in SLIM_FIELDS:
         if key in slim:
             row[key] = slim[key]
+        elif key == "numericFeatures":
+            # Feature-selection inputs must be bound to the frozen forecast,
+            # never introduced through post-event settlement payloads.
+            continue
         elif key in settlement and key not in row:
             row[key] = settlement[key]
     row["projectionId"] = pid

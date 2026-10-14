@@ -2,10 +2,10 @@
 
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
-- Modules: **272**
-- Symbols: **2088**
+- Modules: **273**
+- Symbols: **2091**
 - Parse errors: **0**
-- Inventory hash: `df5f783af6d0f86fc262b110b81586bf910c8d57b5bab4a1a38553a0f1c57bd2`
+- Inventory hash: `76e9dce49d537bd8291d3d53750b90af08f2849b1e925e7c7616a1329bb15ce8`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -98,8 +98,9 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P6 | `src/dcm/learning/outlier_patterns.py` | 1 | 4 |
 | P6 | `src/dcm/learning/postgame.py` | 0 | 13 |
 | P6 | `src/dcm/learning/registry.py` | 0 | 10 |
+| P6 | `src/dcm/learning/rfecv_shadow.py` | 0 | 2 |
 | P6 | `src/dcm/learning/sidecar.py` | 0 | 5 |
-| P6 | `src/dcm/learning/walkforward.py` | 1 | 16 |
+| P6 | `src/dcm/learning/walkforward.py` | 1 | 17 |
 | P2 | `src/dcm/ml/__init__.py` | 0 | 0 |
 | P2 | `src/dcm/ml/feature_store.py` | 1 | 9 |
 | P2-P4 | `src/dcm/model/__init__.py` | 0 | 1 |
@@ -312,7 +313,7 @@ _No class/function symbols._
 
 - `function` **_a** L10
 - `function` **_ml** L719
-- `function` **registry_document** L897
+- `function` **registry_document** L910
 
 ### `src/dcm/algorithms/computation_law.py`
 
@@ -1215,20 +1216,20 @@ _No class/function symbols._
 
 ### `src/dcm/learning/dataset.py`
 
-- `class` **SettlementsMissing** L60 — Run dest has no settlements sidecar; builder will not invent labels.
-- `function` **_load_json** L63
-- `function` **_load_jsonl** L71
-- `function` **_index_by_pid** L87
-- `function` **_settlements** L95
-- `function` **_population** L104
-- `function` **_event_starts** L111
-- `function` **_feature_hashes** L146
-- `function` **_decision_cutoff** L159
-- `function` **_label_split** L169
-- `function` **build_training_row** L183 — Join freeze slim + hashes + settlement. Returns None if no real settlement.
-- `function` **build_dataset** L240 — Build rows from one or more settled run dests. Never invents settlements.
-- `function` **write_dataset** L305
-- `function` **main** L320
+- `class` **SettlementsMissing** L61 — Run dest has no settlements sidecar; builder will not invent labels.
+- `function` **_load_json** L64
+- `function` **_load_jsonl** L72
+- `function` **_index_by_pid** L88
+- `function` **_settlements** L96
+- `function` **_population** L105
+- `function` **_event_starts** L112
+- `function` **_feature_hashes** L147
+- `function` **_decision_cutoff** L160
+- `function` **_label_split** L170
+- `function` **build_training_row** L184 — Join freeze slim + hashes + settlement. Returns None if no real settlement.
+- `function` **build_dataset** L245 — Build rows from one or more settled run dests. Never invents settlements.
+- `function` **write_dataset** L310
+- `function` **main** L325
 
 ### `src/dcm/learning/failure_class.py`
 
@@ -1286,6 +1287,11 @@ _No class/function symbols._
 - `function` **promote** L186 — Hard-refuse any promotion that would change LEARNING_REVISION or PREDICTIVE_CLAIM.
 - `function` **main** L206
 
+### `src/dcm/learning/rfecv_shadow.py`
+
+- `function` **evaluate_rfecv_shadow** L16 — Run one outer chronological RFECV comparison on explicit numeric features.
+- `method` **evaluate_rfecv_shadow.matrix** L84
+
 ### `src/dcm/learning/sidecar.py`
 
 - `function` **_require_kind** L17
@@ -1310,9 +1316,10 @@ _No class/function symbols._
 - `function` **fit_shadow_logistic** L241 — Tiny intercept+linear logistic. SHADOW only. No sklearn required. No .pkl.
 - `function` **predict_shadow** L270
 - `function` **evaluate_folds** L276
-- `function` **run_walkforward** L334
-- `function` **write_walkforward_report** L412
-- `function` **main** L420
+- `function` **_rfecv_shadow_report** L334 — Optional registered shadow challenger; only frozen numeric features qualify.
+- `function` **run_walkforward** L389
+- `function` **write_walkforward_report** L470
+- `function` **main** L478
 
 ### `src/dcm/ml/__init__.py`
 

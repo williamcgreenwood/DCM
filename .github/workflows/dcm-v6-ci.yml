@@ -71,6 +71,26 @@ jobs:
           path: /tmp/dcm-ci-diagnostics-tests.json
           if-no-files-found: warn
 
+  rfecv-shadow:
+    name: RFECV chronological shadow fixture
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install optional RFECV extra
+        run: python -m pip install --upgrade pip && python -m pip install ".[dev,rfecv]"
+      - name: Run nested chronological RFECV fixture
+        run: python scripts/ci/run_gate.py --name rfecv-shadow --out /tmp/dcm-ci-diagnostics-rfecv.json -- pytest -q tests/test_rfecv_shadow.py
+      - name: Upload RFECV diagnostics on failure
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: dcm-ci-diagnostics-${{ github.run_id }}-rfecv-${{ github.run_attempt }}
+          path: /tmp/dcm-ci-diagnostics-rfecv.json
+          if-no-files-found: warn
+
   constitution:
     name: Algorithm, policy, and governance gates
     runs-on: ubuntu-latest

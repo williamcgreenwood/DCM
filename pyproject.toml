@@ -14,6 +14,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8.0"]
+rfecv = ["scikit-learn>=1.8,<2"]
 
 [project.scripts]
 pillars-dcm = "dcm.runner:main"

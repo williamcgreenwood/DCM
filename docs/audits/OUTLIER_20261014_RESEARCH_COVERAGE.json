@@ -1,0 +1,1498 @@
+{
+  "schema": "dcm.outlier_research_coverage.v1",
+  "auditDate": "2026-10-14",
+  "source": {
+    "driveFileId": "1yUjjH4GkQsCq6s2_VXKhJ3m3oVooba65",
+    "fileName": "101426mixedprops.pdf",
+    "sha256": "e037a8d76f330af37f9a0acb90ce7d23525fee803f282a3ea22c355654c05563",
+    "pageCount": 131,
+    "pdfCreationTime": "2026-10-14T04:01:04-04:00",
+    "creationTimeInterpretation": "export metadata; not screenshot capture time, observation time, offer time, or forecast cutoff",
+    "localRawSourceCommitted": false
+  },
+  "review": {
+    "allPagesVisuallyReviewed": true,
+    "trendPagesTranscribed": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26
+    ],
+    "ocrOccurrences": 76,
+    "entityQualifiedUniqueClaims": 74,
+    "duplicateDisplayOccurrences": 2,
+    "previouslyReportedClaimCount": 73,
+    "reconciledCount": 74,
+    "countMethod": "deduplicated by displayed subject plus normalized trend text; identical trend text on distinct subjects remains distinct",
+    "outlierResearchExportFound": true,
+    "exportReference": "Drive document 2026-10-14_Outlier_CFB_9_Observed_Trend_Claims covers only nine CFB cards; its cited PDF hash differs from this source and was not treated as authority",
+    "deduplicationCorrections": [
+      "Removed OCR interface fragments before names (for example, a stray “Ye ” preceding Brayden Munroe).",
+      "Kept identical trend text as separate claims when the displayed subject differs (e.g., Chris Durkin and Stijn Spierings)."
+    ]
+  },
+  "slateScreenshots": {
+    "cfb": {
+      "labels": [
+        "KENN @ MOSU",
+        "WKU @ SHSU"
+      ],
+      "eventIdentity": "screenshot labels only; schedule/event mapping not independently verified here",
+      "injuryOddsMatchupScreens": "present in source pages 27-131; no verified authoritative cutoff or active market capture"
+    },
+    "mls": {
+      "labels": "multiple matchup/player board screens across pages 5-26 and 27-131",
+      "eventIdentity": "screenshot labels only; event mapping pending authoritative schedule cross-check"
+    }
+  },
+  "admissibility": {
+    "researchOnly": true,
+    "activePrizePicksOfferVerified": false,
+    "exactOfferSnapshot": false,
+    "payoutContractVerified": false,
+    "forecastCutoff": null,
+    "preEventTrainingPermitted": false,
+    "probabilityProduced": false,
+    "predictiveClaim": "NONE"
+  },
+  "acquisitionNeeds": [
+    "timezone-qualified original screenshot capture timestamps",
+    "official event/schedule and participant identity mapping",
+    "official injury/availability status observed before cutoff",
+    "cutoff-safe historical game logs for each exact market",
+    "provider offer and line snapshot with scoring version",
+    "provider-specific payout and settlement contract"
+  ],
+  "claims": [
+    {
+      "claimId": "20261014-OUTLIER-001",
+      "subjectAsDisplayed": "Brayden Munroe",
+      "eventLabelAsDisplayed": "KENN @ MOSU",
+      "marketAsDisplayed": "fantasy score (PrizePicks)",
+      "historicalThreshold": 10.5,
+      "observedTrendSide": "LOWER",
+      "hitCountAsDisplayed": 4,
+      "sampleNAsDisplayed": 5,
+      "claimText": "has failed to exceed 10.5 fantasy score (PrizePicks) in 4 of his last 5 games (10.3 fantasy score (PrizePicks)/game average).",
+      "sourcePages": [
+        1
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-002",
+      "subjectAsDisplayed": "Isaiah Myers",
+      "eventLabelAsDisplayed": "KENN @ MOSU",
+      "marketAsDisplayed": "fantasy score (PrizePicks)",
+      "historicalThreshold": 13.0,
+      "observedTrendSide": "HIGHER",
+      "hitCountAsDisplayed": 4,
+      "sampleNAsDisplayed": 5,
+      "claimText": "has exceeded 13.0 fantasy score (PrizePicks) in 4 of his last 5 games (17.8 fantasy score (PrizePicks)/game average).",
+      "sourcePages": [
+        1
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-003",
+      "subjectAsDisplayed": "Javon Rogers",
+      "eventLabelAsDisplayed": "KENN @ MOSU",
+      "marketAsDisplayed": "longest reception",
+      "historicalThreshold": 18.5,
+      "observedTrendSide": "HIGHER",
+      "hitCountAsDisplayed": 5,
+      "sampleNAsDisplayed": 6,
+      "claimText": "has exceeded 18.5 longest reception in 5 of his last 6 games (40.5 longest reception/game average).",
+      "sourcePages": [
+        2
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-004",
+      "subjectAsDisplayed": "Jmariyae Robinson",
+      "eventLabelAsDisplayed": "KENN @ MOSU",
+      "marketAsDisplayed": "receiving yards",
+      "historicalThreshold": 39.5,
+      "observedTrendSide": "HIGHER",
+      "hitCountAsDisplayed": 4,
+      "sampleNAsDisplayed": 5,
+      "claimText": "has exceeded 39.5 receiving yards in 4 of his last 5 games at home (56.0 receiving yards/game average).",
+      "sourcePages": [
+        2
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-005",
+      "subjectAsDisplayed": "Brayden Munroe",
+      "eventLabelAsDisplayed": "KENN @ MOSU",
+      "marketAsDisplayed": "receiving yards",
+      "historicalThreshold": 54.5,
+      "observedTrendSide": "LOWER",
+      "hitCountAsDisplayed": 4,
+      "sampleNAsDisplayed": 5,
+      "claimText": "has failed to exceed 54.5 receiving yards in 4 of his last 5 games (59.8 receiving yards/game average).",
+      "sourcePages": [
+        2,
+        3
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-006",
+      "subjectAsDisplayed": "Jmariyae Robinson",
+      "eventLabelAsDisplayed": "KENN @ MOSU",
+      "marketAsDisplayed": "receptions",
+      "historicalThreshold": 3.5,
+      "observedTrendSide": "HIGHER",
+      "hitCountAsDisplayed": 8,
+      "sampleNAsDisplayed": 10,
+      "claimText": "has exceeded 3.5 receptions in 8 of his last 10 games (4.8 receptions/game average).",
+      "sourcePages": [
+        3
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-007",
+      "subjectAsDisplayed": "Isaiah Myers",
+      "eventLabelAsDisplayed": "KENN @ MOSU",
+      "marketAsDisplayed": "receiving yards",
+      "historicalThreshold": 69.5,
+      "observedTrendSide": "LOWER",
+      "hitCountAsDisplayed": 10,
+      "sampleNAsDisplayed": 13,
+      "claimText": "has failed to exceed 69.5 receiving yards in 10 of his last 13 games (35.5 receiving yards/game average).",
+      "sourcePages": [
+        3
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-008",
+      "subjectAsDisplayed": "Isaiah Myers",
+      "eventLabelAsDisplayed": "KENN @ MOSU",
+      "marketAsDisplayed": "longest reception",
+      "historicalThreshold": 33.5,
+      "observedTrendSide": "LOWER",
+      "hitCountAsDisplayed": 10,
+      "sampleNAsDisplayed": 13,
+      "claimText": "has failed to exceed 33.5 longest reception in 10 of his last 13 games (14.0 longest reception/game average).",
+      "sourcePages": [
+        4
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-009",
+      "subjectAsDisplayed": "Rickie Collins",
+      "eventLabelAsDisplayed": "KENN @ MOSU",
+      "marketAsDisplayed": "fantasy score (PrizePicks)",
+      "historicalThreshold": 21.5,
+      "observedTrendSide": "LOWER",
+      "hitCountAsDisplayed": 4,
+      "sampleNAsDisplayed": 5,
+      "claimText": "has failed to exceed 21.5 fantasy score (PrizePicks) in 4 of his last 5 games on the road (12.0 fantasy score (PrizePicks)/game average).",
+      "sourcePages": [
+        4
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-010",
+      "subjectAsDisplayed": "Jayden Hibbert",
+      "eventLabelAsDisplayed": null,
+      "marketAsDisplayed": "saves",
+      "historicalThreshold": 1.5,
+      "observedTrendSide": "HIGHER",
+      "hitCountAsDisplayed": 7,
+      "sampleNAsDisplayed": 7,
+      "claimText": "has exceeded 1.5 saves in 7 straight games (3.9 saves/game average).",
+      "sourcePages": [
+        5
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-011",
+      "subjectAsDisplayed": "Ousseni Bouda",
+      "eventLabelAsDisplayed": "RSL vs SJ",
+      "marketAsDisplayed": "crosses",
+      "historicalThreshold": 3.0,
+      "observedTrendSide": "LOWER",
+      "hitCountAsDisplayed": 5,
+      "sampleNAsDisplayed": 5,
+      "claimText": "has failed to exceed 3.0 crosses in 5 straight games (0.4 crosses/game average).",
+      "sourcePages": [
+        5
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-012",
+      "subjectAsDisplayed": "Antoine Griezmann",
+      "eventLabelAsDisplayed": "TOR vs ORL",
+      "marketAsDisplayed": "passing attempts",
+      "historicalThreshold": 45.5,
+      "observedTrendSide": "HIGHER",
+      "hitCountAsDisplayed": 5,
+      "sampleNAsDisplayed": 5,
+      "claimText": "has exceeded 45.5 passing attempts in 5 straight games on the road (55.0 passing attempts/game average).",
+      "sourcePages": [
+        5
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-013",
+      "subjectAsDisplayed": "Andrew Thomas",
+      "eventLabelAsDisplayed": null,
+      "marketAsDisplayed": "passing attempts",
+      "historicalThreshold": 26.5,
+      "observedTrendSide": "HIGHER",
+      "hitCountAsDisplayed": 6,
+      "sampleNAsDisplayed": 6,
+      "claimText": "has exceeded 26.5 passing attempts in 6 straight games vs. bottom 10 defenses for passes conceded (31.3 passing  attempts/game average).",
+      "sourcePages": [
+        6
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-014",
+      "subjectAsDisplayed": "Brad Stuver",
+      "eventLabelAsDisplayed": "LAFC vs ATX",
+      "marketAsDisplayed": "saves",
+      "historicalThreshold": 2.5,
+      "observedTrendSide": "HIGHER",
+      "hitCountAsDisplayed": 18,
+      "sampleNAsDisplayed": 19,
+      "claimText": "has exceeded 2.5 saves in 18 of his last 19 games on the road (5.4 saves/game average).",
+      "sourcePages": [
+        6
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-015",
+      "subjectAsDisplayed": "Tomas Chancalay",
+      "eventLabelAsDisplayed": "COL vs MIN",
+      "marketAsDisplayed": "passing attempts",
+      "historicalThreshold": 36.5,
+      "observedTrendSide": "LOWER",
+      "hitCountAsDisplayed": 15,
+      "sampleNAsDisplayed": 16,
+      "claimText": "has failed to exceed 36.5 passing attempts in 15 of his last 16 games vs. top 10 defenses for passes conceded (17.0 passing attempts/game average).",
+      "sourcePages": [
+        6
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-016",
+      "subjectAsDisplayed": "Zach Booth",
+      "eventLabelAsDisplayed": null,
+      "marketAsDisplayed": "shots on goal",
+      "historicalThreshold": 0.5,
+      "observedTrendSide": "LOWER",
+      "hitCountAsDisplayed": 9,
+      "sampleNAsDisplayed": 10,
+      "claimText": "has failed to exceed 0.5 shots on goal in 9 of his last 10 games (0.1 shots on goal/game average).",
+      "sourcePages": [
+        7
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-017",
+      "subjectAsDisplayed": "JT Marcinkowski",
+      "eventLabelAsDisplayed": "LA vs POR",
+      "marketAsDisplayed": "saves",
+      "historicalThreshold": 1.5,
+      "observedTrendSide": "HIGHER",
+      "hitCountAsDisplayed": 17,
+      "sampleNAsDisplayed": 19,
+      "claimText": "has exceeded 1.5 saves in 17 of his last 19 games (3.9 saves/game average).",
+      "sourcePages": [
+        7
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-018",
+      "subjectAsDisplayed": "Pep Biel",
+      "eventLabelAsDisplayed": "CLB vs CLT",
+      "marketAsDisplayed": "passing attempts",
+      "historicalThreshold": 30.5,
+      "observedTrendSide": "LOWER",
+      "hitCountAsDisplayed": 8,
+      "sampleNAsDisplayed": 9,
+      "claimText": "has failed to exceed 30.5 passing attempts in 8 of his last 9 games vs. top 10 defenses for passes conceded (24.6 passing attempts/game average).",
+      "sourcePages": [
+        7
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-019",
+      "subjectAsDisplayed": "Alexandru Matan",
+      "eventLabelAsDisplayed": null,
+      "marketAsDisplayed": "shots on goal",
+      "historicalThreshold": 0.5,
+      "observedTrendSide": "LOWER",
+      "hitCountAsDisplayed": 8,
+      "sampleNAsDisplayed": 9,
+      "claimText": "has failed to exceed 0.5 shots on goal in 8 of his last 9 games (0.1 shots on goal/game average).",
+      "sourcePages": [
+        8
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-020",
+      "subjectAsDisplayed": "Tyler Miller",
+      "eventLabelAsDisplayed": "CLB vs CLT",
+      "marketAsDisplayed": "saves",
+      "historicalThreshold": 3.5,
+      "observedTrendSide": "LOWER",
+      "hitCountAsDisplayed": 8,
+      "sampleNAsDisplayed": 9,
+      "claimText": "has failed to exceed 3.5 saves in 8 of his last 9 games vs. top 10 teams in saves against (2.6 saves/game average).",
+      "sourcePages": [
+        8
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-021",
+      "subjectAsDisplayed": "Rafael Cabral",
+      "eventLabelAsDisplayed": "RSL vs SJ",
+      "marketAsDisplayed": "passing attempts",
+      "historicalThreshold": 36.5,
+      "observedTrendSide": "LOWER",
+      "hitCountAsDisplayed": null,
+      "sampleNAsDisplayed": null,
+      "claimText": "has failed to exceed 36.5 passing attempts in & of his last 9 games (30.0 passing attempts/game average).",
+      "sourcePages": [
+        8
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-022",
+      "subjectAsDisplayed": "Petar Musa",
+      "eventLabelAsDisplayed": null,
+      "marketAsDisplayed": "passing attempts",
+      "historicalThreshold": 21.5,
+      "observedTrendSide": "LOWER",
+      "hitCountAsDisplayed": 7,
+      "sampleNAsDisplayed": 8,
+      "claimText": "has failed to exceed 21.5 passing attempts in 7 of his last 8 games (17.4 passing attempts/game average).",
+      "sourcePages": [
+        9
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-023",
+      "subjectAsDisplayed": "Bernard Kamungo",
+      "eventLabelAsDisplayed": "DAL vs SEA",
+      "marketAsDisplayed": "passing attempts",
+      "historicalThreshold": 26.5,
+      "observedTrendSide": "LOWER",
+      "hitCountAsDisplayed": 7,
+      "sampleNAsDisplayed": 8,
+      "claimText": "has failed to exceed 26.5 passing attempts in 7 of his last 8 games (20.9 passing attempts/game average).",
+      "sourcePages": [
+        9
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-024",
+      "subjectAsDisplayed": "Kelvin Yeboah",
+      "eventLabelAsDisplayed": "COL vs MIN",
+      "marketAsDisplayed": "passing attempts",
+      "historicalThreshold": 15.5,
+      "observedTrendSide": "HIGHER",
+      "hitCountAsDisplayed": 7,
+      "sampleNAsDisplayed": 8,
+      "claimText": "has exceeded 15.5 passing attempts in 7 of his last 8 games on the road (17.4 passing attempts/game average).",
+      "sourcePages": [
+        9
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-025",
+      "subjectAsDisplayed": "Timo Baumgartl",
+      "eventLabelAsDisplayed": null,
+      "marketAsDisplayed": "passing attempts",
+      "historicalThreshold": 63.5,
+      "observedTrendSide": "HIGHER",
+      "hitCountAsDisplayed": 7,
+      "sampleNAsDisplayed": 8,
+      "claimText": "has exceeded 63.5 passing attempts in 7 of his last 8 games at home (74.5 passing attempts/game average).",
+      "sourcePages": [
+        10
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-026",
+      "subjectAsDisplayed": "Miguel Almiron",
+      "eventLabelAsDisplayed": "MTL vs ATL",
+      "marketAsDisplayed": "passing attempts",
+      "historicalThreshold": 38.5,
+      "observedTrendSide": "LOWER",
+      "hitCountAsDisplayed": 6,
+      "sampleNAsDisplayed": 7,
+      "claimText": "has failed to exceed 38.5 passing attempts in 6 of his last 7 games on the road (34.3 passing attempts/game average).",
+      "sourcePages": [
+        10
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-027",
+      "subjectAsDisplayed": "Paxten Aaronson",
+      "eventLabelAsDisplayed": "COL vs MIN",
+      "marketAsDisplayed": "key passes",
+      "historicalThreshold": 1.5,
+      "observedTrendSide": "HIGHER",
+      "hitCountAsDisplayed": 6,
+      "sampleNAsDisplayed": 7,
+      "claimText": "has exceeded 1.5 key passes in 6 of his last 7 games at home (3.3 key passes/game average).",
+      "sourcePages": [
+        10
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-028",
+      "subjectAsDisplayed": "Allan Saint-Maximin",
+      "eventLabelAsDisplayed": null,
+      "marketAsDisplayed": "shots on goal",
+      "historicalThreshold": 0.5,
+      "observedTrendSide": "HIGHER",
+      "hitCountAsDisplayed": null,
+      "sampleNAsDisplayed": null,
+      "claimText": "has exceeded 0.5 shots on goal in G of his last 7 games on the road (1.1 shots on goal/game average).",
+      "sourcePages": [
+        11
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-029",
+      "subjectAsDisplayed": "Christian Cappis",
+      "eventLabelAsDisplayed": "DAL vs SEA",
+      "marketAsDisplayed": "passing attempts",
+      "historicalThreshold": 40.5,
+      "observedTrendSide": "LOWER",
+      "hitCountAsDisplayed": 6,
+      "sampleNAsDisplayed": 7,
+      "claimText": "has failed to exceed 40.5 passing attempts in 6 of his last 7 games at home (26.3 passing attempts/game average).",
+      "sourcePages": [
+        11
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-030",
+      "subjectAsDisplayed": "Drake Callender",
+      "eventLabelAsDisplayed": "COL vs MIN",
+      "marketAsDisplayed": "saves",
+      "historicalThreshold": 2.5,
+      "observedTrendSide": "HIGHER",
+      "hitCountAsDisplayed": 6,
+      "sampleNAsDisplayed": 7,
+      "claimText": "has exceeded 2.5 saves in 6 of his last 7 games on the road (4.3 saves/game average).",
+      "sourcePages": [
+        11
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-031",
+      "subjectAsDisplayed": "Albert Rusnak",
+      "eventLabelAsDisplayed": null,
+      "marketAsDisplayed": "passing attempts",
+      "historicalThreshold": 42.5,
+      "observedTrendSide": "HIGHER",
+      "hitCountAsDisplayed": 6,
+      "sampleNAsDisplayed": 7,
+      "claimText": "has exceeded 42.5 passing attempts in 6 of his last 7 games vs. bottom 10 defenses for passes conceded (47.6 passing attempts/game average).",
+      "sourcePages": [
+        12
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-032",
+      "subjectAsDisplayed": "Stefan Frei",
+      "eventLabelAsDisplayed": "DAL vs SEA",
+      "marketAsDisplayed": "saves",
+      "historicalThreshold": 3.5,
+      "observedTrendSide": "LOWER",
+      "hitCountAsDisplayed": 11,
+      "sampleNAsDisplayed": 13,
+      "claimText": "has failed to exceed 3.5 saves in 11 of his last 13 games on the road (2.2 saves/game average).",
+      "sourcePages": [
+        12
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-033",
+      "subjectAsDisplayed": "Beau Leroux",
+      "eventLabelAsDisplayed": "RSL vs SJ",
+      "marketAsDisplayed": "crosses",
+      "historicalThreshold": 1.5,
+      "observedTrendSide": "LOWER",
+      "hitCountAsDisplayed": 16,
+      "sampleNAsDisplayed": 19,
+      "claimText": "has failed to exceed 1.5 crosses in 16 of his last 19 games on the road (0.7 crosses/game average).",
+      "sourcePages": [
+        12
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-034",
+      "subjectAsDisplayed": "Ariath Piol",
+      "eventLabelAsDisplayed": null,
+      "marketAsDisplayed": "shots on goal",
+      "historicalThreshold": 0.5,
+      "observedTrendSide": "LOWER",
+      "hitCountAsDisplayed": 16,
+      "sampleNAsDisplayed": 19,
+      "claimText": "has failed to exceed 0.5 shots on goal in 16 of his last 19 games (0.2 shots on goal/game average).",
+      "sourcePages": [
+        13
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-035",
+      "subjectAsDisplayed": "Philip Quinton",
+      "eventLabelAsDisplayed": "RSL vs SJ",
+      "marketAsDisplayed": "passing attempts",
+      "historicalThreshold": 55.5,
+      "observedTrendSide": "LOWER",
+      "hitCountAsDisplayed": 5,
+      "sampleNAsDisplayed": 6,
+      "claimText": "has failed to exceed 55.5 passing attempts in 5 of his last 6 games (46.7 passing attempts/game average).",
+      "sourcePages": [
+        13
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-036",
+      "subjectAsDisplayed": "Junior Alonso",
+      "eventLabelAsDisplayed": "MTL vs ATL",
+      "marketAsDisplayed": "clearances",
+      "historicalThreshold": 5.0,
+      "observedTrendSide": "LOWER",
+      "hitCountAsDisplayed": 5,
+      "sampleNAsDisplayed": 6,
+      "claimText": "has failed to exceed 5.0 clearances in 5 of his last 6 games (3.2 clearances/game average).",
+      "sourcePages": [
+        13
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-037",
+      "subjectAsDisplayed": "Morris Duggan",
+      "eventLabelAsDisplayed": null,
+      "marketAsDisplayed": "passing attempts",
+      "historicalThreshold": 47.5,
+      "observedTrendSide": "LOWER",
+      "hitCountAsDisplayed": 5,
+      "sampleNAsDisplayed": 6,
+      "claimText": "has failed to exceed 47.5 passing attempts in 5 of his last 6 games vs. top 10 defenses for passes conceded (39.5 passing attempts/game average).",
+      "sourcePages": [
+        14
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-038",
+      "subjectAsDisplayed": "Brian White",
+      "eventLabelAsDisplayed": "STL vs VAN",
+      "marketAsDisplayed": "passing  attempts",
+      "historicalThreshold": 14.5,
+      "observedTrendSide": "HIGHER",
+      "hitCountAsDisplayed": 5,
+      "sampleNAsDisplayed": 6,
+      "claimText": "has exceeded 14.5 passing  attempts in 5 of his last 6 games (17.7 passing attempts/game average).",
+      "sourcePages": [
+        14
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-039",
+      "subjectAsDisplayed": "Pep Biel",
+      "eventLabelAsDisplayed": "CLB vs CLT",
+      "marketAsDisplayed": "key passes",
+      "historicalThreshold": 1.5,
+      "observedTrendSide": "LOWER",
+      "hitCountAsDisplayed": 10,
+      "sampleNAsDisplayed": 12,
+      "claimText": "has failed to exceed 1.5 key passes in 10 of his last 12 games vs. top 10 defenses for key passes conceded (1.1 key passes/game average).",
+      "sourcePages": [
+        14
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-040",
+      "subjectAsDisplayed": "Bernard Kamungo",
+      "eventLabelAsDisplayed": null,
+      "marketAsDisplayed": "crosses",
+      "historicalThreshold": 1.5,
+      "observedTrendSide": "HIGHER",
+      "hitCountAsDisplayed": 9,
+      "sampleNAsDisplayed": 11,
+      "claimText": "has exceeded 1.5 crosses in 9 of his last 11 games at home (2.8 crosses/game average).",
+      "sourcePages": [
+        15
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-041",
+      "subjectAsDisplayed": "Ivan Angulo",
+      "eventLabelAsDisplayed": "TOR vs ORL",
+      "marketAsDisplayed": "passing attempts",
+      "historicalThreshold": 40.5,
+      "observedTrendSide": "HIGHER",
+      "hitCountAsDisplayed": 9,
+      "sampleNAsDisplayed": 11,
+      "claimText": "has exceeded 40.5 passing attempts in 9 of his last 11 games (49.6 passing attempts/game average).",
+      "sourcePages": [
+        15
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-042",
+      "subjectAsDisplayed": "Jackson Ragen",
+      "eventLabelAsDisplayed": "DAL vs SEA",
+      "marketAsDisplayed": "passing attempts",
+      "historicalThreshold": 79.5,
+      "observedTrendSide": "LOWER",
+      "hitCountAsDisplayed": 9,
+      "sampleNAsDisplayed": 11,
+      "claimText": "has failed to exceed 79.5 passing attempts in 9 of his last 11 games (67.5 passing attempts/game average).",
+      "sourcePages": [
+        15
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-043",
+      "subjectAsDisplayed": "Roman Biirki",
+      "eventLabelAsDisplayed": null,
+      "marketAsDisplayed": "saves",
+      "historicalThreshold": 1.5,
+      "observedTrendSide": "HIGHER",
+      "hitCountAsDisplayed": 13,
+      "sampleNAsDisplayed": 16,
+      "claimText": "has exceeded 1.5 saves in 13 of his last 16 games vs. bottom 10 teams in saves against (3.1 saves/game average).",
+      "sourcePages": [
+        16
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-044",
+      "subjectAsDisplayed": "Philip Quinton",
+      "eventLabelAsDisplayed": "RSL vs SJ",
+      "marketAsDisplayed": "clearances",
+      "historicalThreshold": 5.5,
+      "observedTrendSide": "LOWER",
+      "hitCountAsDisplayed": 13,
+      "sampleNAsDisplayed": 16,
+      "claimText": "has failed to exceed 5.5 clearances in 13 of his last 16 games at home (3.7 clearances/game average).",
+      "sourcePages": [
+        16
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-045",
+      "subjectAsDisplayed": "Chris Durkin",
+      "eventLabelAsDisplayed": "STL vs VAN",
+      "marketAsDisplayed": "dribble attempts",
+      "historicalThreshold": 0.5,
+      "observedTrendSide": "LOWER",
+      "hitCountAsDisplayed": 4,
+      "sampleNAsDisplayed": 5,
+      "claimText": "has failed to exceed 0.5 dribble attempts in 4 of his last 5 games at home (0.2 dribble attempts/game average).",
+      "sourcePages": [
+        16
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-046",
+      "subjectAsDisplayed": "Wil Trapp",
+      "eventLabelAsDisplayed": null,
+      "marketAsDisplayed": "passing attempts",
+      "historicalThreshold": 44.5,
+      "observedTrendSide": "LOWER",
+      "hitCountAsDisplayed": 4,
+      "sampleNAsDisplayed": 5,
+      "claimText": "has failed to exceed 44.5 passing attempts in 4 of his last 5 games vs. top 10 defenses for passes conceded (29.0 passing attempts/game average).",
+      "sourcePages": [
+        17
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-047",
+      "subjectAsDisplayed": "Patrick Schulte",
+      "eventLabelAsDisplayed": "CLB vs CLT",
+      "marketAsDisplayed": "passing attempts",
+      "historicalThreshold": 33.5,
+      "observedTrendSide": "LOWER",
+      "hitCountAsDisplayed": 4,
+      "sampleNAsDisplayed": 5,
+      "claimText": "has failed to exceed 33.5 passing attempts in 4 of his last 5 games (28.2 passing attempts/game average).",
+      "sourcePages": [
+        17
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-048",
+      "subjectAsDisplayed": "Stijn Spierings",
+      "eventLabelAsDisplayed": "RSL vs SJ",
+      "marketAsDisplayed": "passing attempts",
+      "historicalThreshold": 51.5,
+      "observedTrendSide": "HIGHER",
+      "hitCountAsDisplayed": 4,
+      "sampleNAsDisplayed": 5,
+      "claimText": "has exceeded 51.5 passing attempts in 4 of his last 5 games (54.2 passing attempts/game average).",
+      "sourcePages": [
+        17
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-049",
+      "subjectAsDisplayed": "Rob Holding",
+      "eventLabelAsDisplayed": null,
+      "marketAsDisplayed": "passing attempts",
+      "historicalThreshold": 74.5,
+      "observedTrendSide": "LOWER",
+      "hitCountAsDisplayed": 4,
+      "sampleNAsDisplayed": 5,
+      "claimText": "has failed to exceed 74.5 passing attempts in 4 of his last 5 games (68.0 passing attempts/game average).",
+      "sourcePages": [
+        18
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-050",
+      "subjectAsDisplayed": "Andrés Cubas",
+      "eventLabelAsDisplayed": "STL vs VAN",
+      "marketAsDisplayed": "key passes",
+      "historicalThreshold": 0.5,
+      "observedTrendSide": "LOWER",
+      "hitCountAsDisplayed": 4,
+      "sampleNAsDisplayed": 5,
+      "claimText": "has failed to exceed 0.5 key passes in 4 of his last 5 games vs. top 10 defenses for key passes conceded (0.2 key passes/game average).",
+      "sourcePages": [
+        18
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-051",
+      "subjectAsDisplayed": "Chris Brady",
+      "eventLabelAsDisplayed": "CHI vs PHI",
+      "marketAsDisplayed": "saves",
+      "historicalThreshold": 1.5,
+      "observedTrendSide": "HIGHER",
+      "hitCountAsDisplayed": 4,
+      "sampleNAsDisplayed": 5,
+      "claimText": "has exceeded 1.5 saves in 4 of his last 5 games (3.4 saves/game average).",
+      "sourcePages": [
+        18
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-052",
+      "subjectAsDisplayed": "Morgan Guilavogui",
+      "eventLabelAsDisplayed": null,
+      "marketAsDisplayed": "dribble attempts",
+      "historicalThreshold": 1.5,
+      "observedTrendSide": "HIGHER",
+      "hitCountAsDisplayed": 4,
+      "sampleNAsDisplayed": 5,
+      "claimText": "has exceeded 1.5 dribble attempts in 4 of his last 5 games (2.6 dribble attempts/game average).",
+      "sourcePages": [
+        19
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-053",
+      "subjectAsDisplayed": "Joaquin Valiente",
+      "eventLabelAsDisplayed": "DAL vs SEA",
+      "marketAsDisplayed": "key passes",
+      "historicalThreshold": 1.5,
+      "observedTrendSide": "HIGHER",
+      "hitCountAsDisplayed": 4,
+      "sampleNAsDisplayed": 5,
+      "claimText": "has exceeded 1.5 key passes in 4 of his last 5 games (2.2 key passes/game average).",
+      "sourcePages": [
+        19
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-054",
+      "subjectAsDisplayed": "Robin Jansson",
+      "eventLabelAsDisplayed": "TOR vs ORL",
+      "marketAsDisplayed": "passing attempts",
+      "historicalThreshold": 59.5,
+      "observedTrendSide": "HIGHER",
+      "hitCountAsDisplayed": 4,
+      "sampleNAsDisplayed": 5,
+      "claimText": "has exceeded 59.5 passing attempts in 4 of his last 5 games on the road (74.6 passing attempts/game average).",
+      "sourcePages": [
+        19
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-055",
+      "subjectAsDisplayed": "Paxten Aaronson",
+      "eventLabelAsDisplayed": null,
+      "marketAsDisplayed": "shots on goal",
+      "historicalThreshold": 0.5,
+      "observedTrendSide": "HIGHER",
+      "hitCountAsDisplayed": 4,
+      "sampleNAsDisplayed": 5,
+      "claimText": "has exceeded 0.5 shots on goal in 4 of his last 5 games (1.6 shots on goal/game average).",
+      "sourcePages": [
+        20
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-056",
+      "subjectAsDisplayed": "Carlo Holse",
+      "eventLabelAsDisplayed": "STL vs VAN",
+      "marketAsDisplayed": "shots on goal",
+      "historicalThreshold": 0.5,
+      "observedTrendSide": "HIGHER",
+      "hitCountAsDisplayed": 4,
+      "sampleNAsDisplayed": 5,
+      "claimText": "has exceeded 0.5 shots on goal in 4 of his last 5 games (1.6 shots on goal/game average).",
+      "sourcePages": [
+        20
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-057",
+      "subjectAsDisplayed": "Andrés Cubas",
+      "eventLabelAsDisplayed": "STL vs VAN",
+      "marketAsDisplayed": "passing attempts",
+      "historicalThreshold": 47.5,
+      "observedTrendSide": "HIGHER",
+      "hitCountAsDisplayed": 4,
+      "sampleNAsDisplayed": 5,
+      "claimText": "has exceeded 47.5 passing attempts in 4 of his last 5 games on the road (66.2 passing attempts/game average).",
+      "sourcePages": [
+        20,
+        21
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-058",
+      "subjectAsDisplayed": "Paxten Aaronson",
+      "eventLabelAsDisplayed": "COL vs MIN",
+      "marketAsDisplayed": "passing attempts",
+      "historicalThreshold": 34.5,
+      "observedTrendSide": "HIGHER",
+      "hitCountAsDisplayed": 4,
+      "sampleNAsDisplayed": 5,
+      "claimText": "has exceeded 34.5 passing attempts in 4 of his last 5 games vs. bottom 10 defenses for passes conceded (37.6 passing attempts/game average).",
+      "sourcePages": [
+        21
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-059",
+      "subjectAsDisplayed": "Stijn Spierings",
+      "eventLabelAsDisplayed": "RSL vs SJ",
+      "marketAsDisplayed": "dribble attempts",
+      "historicalThreshold": 0.5,
+      "observedTrendSide": "LOWER",
+      "hitCountAsDisplayed": 4,
+      "sampleNAsDisplayed": 5,
+      "claimText": "has failed to exceed 0.5 dribble attempts in 4 of his last 5 games at home (0.2 dribble attempts/game average).",
+      "sourcePages": [
+        21
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-060",
+      "subjectAsDisplayed": "Steven Moreira",
+      "eventLabelAsDisplayed": null,
+      "marketAsDisplayed": "passing attempts",
+      "historicalThreshold": 64.5,
+      "observedTrendSide": "LOWER",
+      "hitCountAsDisplayed": 4,
+      "sampleNAsDisplayed": 5,
+      "claimText": "has failed to exceed 64.5 passing attempts in 4 of his last 5 games (54.2 passing attempts/game average).",
+      "sourcePages": [
+        22
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-061",
+      "subjectAsDisplayed": "Dante Sealy",
+      "eventLabelAsDisplayed": "MTL vs ATL",
+      "marketAsDisplayed": "shots on goal",
+      "historicalThreshold": 0.5,
+      "observedTrendSide": "HIGHER",
+      "hitCountAsDisplayed": 4,
+      "sampleNAsDisplayed": 5,
+      "claimText": "has exceeded 0.5 shots on goal in 4 of his last 5 games at home (0.8 shots on goal/game average).",
+      "sourcePages": [
+        22
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-062",
+      "subjectAsDisplayed": "Prince Owusu",
+      "eventLabelAsDisplayed": "MTL vs ATL",
+      "marketAsDisplayed": "dribble attempts",
+      "historicalThreshold": 1.5,
+      "observedTrendSide": "LOWER",
+      "hitCountAsDisplayed": 4,
+      "sampleNAsDisplayed": 5,
+      "claimText": "has failed to exceed 1.5 dribble attempts in 4 of his last 5 games at home (1.0 dribble attempts/game average).",
+      "sourcePages": [
+        22
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-063",
+      "subjectAsDisplayed": "Daniel Munie",
+      "eventLabelAsDisplayed": null,
+      "marketAsDisplayed": "clearances",
+      "historicalThreshold": 3.5,
+      "observedTrendSide": "HIGHER",
+      "hitCountAsDisplayed": 4,
+      "sampleNAsDisplayed": 5,
+      "claimText": "has exceeded 3.5 clearances in 4 of his last 5 games (5.8 clearances/game average).",
+      "sourcePages": [
+        23
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-064",
+      "subjectAsDisplayed": "Kelvin Yeboah",
+      "eventLabelAsDisplayed": "COL vs MIN",
+      "marketAsDisplayed": "crosses",
+      "historicalThreshold": 0.5,
+      "observedTrendSide": "HIGHER",
+      "hitCountAsDisplayed": 4,
+      "sampleNAsDisplayed": 5,
+      "claimText": "has exceeded 0.5 crosses in 4 of his last 5 games on the road (0.8 crosses/game average).",
+      "sourcePages": [
+        23
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-065",
+      "subjectAsDisplayed": "Brais Méndez",
+      "eventLabelAsDisplayed": "CLB vs CLT",
+      "marketAsDisplayed": "passing  attempts",
+      "historicalThreshold": 48.5,
+      "observedTrendSide": "LOWER",
+      "hitCountAsDisplayed": 12,
+      "sampleNAsDisplayed": 15,
+      "claimText": "has failed to exceed 48.5 passing  attempts in 12 of his last 15 games at home (36.4 passing attempts/game average).",
+      "sourcePages": [
+        23
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-066",
+      "subjectAsDisplayed": "Beau Leroux",
+      "eventLabelAsDisplayed": null,
+      "marketAsDisplayed": "passing attempts",
+      "historicalThreshold": 38.5,
+      "observedTrendSide": "LOWER",
+      "hitCountAsDisplayed": 7,
+      "sampleNAsDisplayed": 9,
+      "claimText": "has failed to exceed 38.5 passing attempts in 7 of his last 9 games on the road (30.7 passing attempts/game average).",
+      "sourcePages": [
+        24
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-067",
+      "subjectAsDisplayed": "Yohei Takaoka",
+      "eventLabelAsDisplayed": "STL vs VAN",
+      "marketAsDisplayed": "passing attempts",
+      "historicalThreshold": 33.5,
+      "observedTrendSide": "HIGHER",
+      "hitCountAsDisplayed": 7,
+      "sampleNAsDisplayed": 9,
+      "claimText": "has exceeded 33.5 passing attempts in 7 of his last 9 games (37.0 passing attempts/game average).",
+      "sourcePages": [
+        24
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-068",
+      "subjectAsDisplayed": "Denis Bouanga",
+      "eventLabelAsDisplayed": "LAFC vs ATX",
+      "marketAsDisplayed": "shots on goal",
+      "historicalThreshold": 1.5,
+      "observedTrendSide": "LOWER",
+      "hitCountAsDisplayed": 7,
+      "sampleNAsDisplayed": 9,
+      "claimText": "has failed to exceed 1.5 shots on goal in 7 of his last 9 games at home (1.3 shots on goal/game average).",
+      "sourcePages": [
+        24
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-069",
+      "subjectAsDisplayed": "Lucas Hoyos",
+      "eventLabelAsDisplayed": null,
+      "marketAsDisplayed": "saves",
+      "historicalThreshold": 1.5,
+      "observedTrendSide": "HIGHER",
+      "hitCountAsDisplayed": 14,
+      "sampleNAsDisplayed": 18,
+      "claimText": "has exceeded 1.5 saves in 14 of his last 18 games (2.6 saves/game average).",
+      "sourcePages": [
+        25
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-070",
+      "subjectAsDisplayed": "Sam Sarver",
+      "eventLabelAsDisplayed": "DAL vs SEA",
+      "marketAsDisplayed": "shots on goal",
+      "historicalThreshold": 0.5,
+      "observedTrendSide": "LOWER",
+      "hitCountAsDisplayed": 7,
+      "sampleNAsDisplayed": 9,
+      "claimText": "has failed to exceed 0.5 shots on goal in 7 of his last 9 games (0.2 shots on goal/game average).",
+      "sourcePages": [
+        25
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-071",
+      "subjectAsDisplayed": "Andre Blake",
+      "eventLabelAsDisplayed": "CHI vs PHI",
+      "marketAsDisplayed": "saves",
+      "historicalThreshold": 1.5,
+      "observedTrendSide": "HIGHER",
+      "hitCountAsDisplayed": 10,
+      "sampleNAsDisplayed": 13,
+      "claimText": "has exceeded 1.5 saves in 10 of his last 13 games vs. bottom 10 teams in saves against (2.2 saves/game average).",
+      "sourcePages": [
+        25
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-072",
+      "subjectAsDisplayed": "Drake Callender",
+      "eventLabelAsDisplayed": null,
+      "marketAsDisplayed": "passing attempts",
+      "historicalThreshold": 24.5,
+      "observedTrendSide": "HIGHER",
+      "hitCountAsDisplayed": 10,
+      "sampleNAsDisplayed": 13,
+      "claimText": "has exceeded 24.5 passing attempts in 10 of his last 13 games (26.5 passing attempts/game average).",
+      "sourcePages": [
+        26
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-073",
+      "subjectAsDisplayed": "Pep Biel",
+      "eventLabelAsDisplayed": "CLB vs CLT",
+      "marketAsDisplayed": "crosses",
+      "historicalThreshold": 3.5,
+      "observedTrendSide": "LOWER",
+      "hitCountAsDisplayed": 13,
+      "sampleNAsDisplayed": 17,
+      "claimText": "has failed to exceed 3.5 crosses in 13 of his last 17 games on the road (2.9 crosses/game average).",
+      "sourcePages": [
+        26
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    },
+    {
+      "claimId": "20261014-OUTLIER-074",
+      "subjectAsDisplayed": "Chris Durkin",
+      "eventLabelAsDisplayed": "STL vs VAN",
+      "marketAsDisplayed": "passing attempts",
+      "historicalThreshold": 48.5,
+      "observedTrendSide": "LOWER",
+      "hitCountAsDisplayed": 13,
+      "sampleNAsDisplayed": 17,
+      "claimText": "has failed to exceed 48.5 passing attempts in 13 of his last 17 games at home (39.1 passing attempts/game average).",
+      "sourcePages": [
+        26
+      ],
+      "eventEntityResolution": "SCREENSHOT_LABEL_ONLY_UNVERIFIED",
+      "offerState": "RESEARCH_CLAIM; ACTIVE_OFFER_NOT_ESTABLISHED",
+      "cutoffState": "CAPTURE_TIME_UNKNOWN; NOT_CUTOFF_SAFE_FOR_FORECAST",
+      "validationState": "VISUALLY_REVIEWED_OCR; UNDERLYING_GAME_LOGS_AND_SCORING_DEFINITION_NOT_VERIFIED",
+      "confidence": "MEDIUM_FOR_DISPLAYED_TEXT; NONE_FOR_PROBABILITY"
+    }
+  ]
+}

@@ -10,7 +10,7 @@ from dcm.learning.calibration import (
     INACTIVE_INSUFFICIENT_CHRONOLOGICAL_SETTLEMENTS,
     evaluate_calibration_readiness,
 )
-from dcm.learning.dataset import SettlementsMissing, build_dataset, write_dataset
+from dcm.learning.dataset import SettlementsMissing, build_dataset, build_training_row, write_dataset
 from dcm.learning.failure_class import classify_failure
 from dcm.learning.postgame import settle_run
 from dcm.learning.registry import propose_promotion, promote, register_challenger
@@ -157,6 +157,29 @@ def test_dataset_builds_n_rows_from_synthetic_settled_run(tmp_path: Path):
     jsonl = (dest / "training_dataset.jsonl").read_text(encoding="utf-8").strip().splitlines()
     assert len(jsonl) == 9
     assert (dest / "training_dataset_manifest.json").is_file()
+
+
+def test_numeric_feature_selection_inputs_only_copy_from_frozen_forecast():
+    freeze = {"runId": "RUN_FEATURE_LINEAGE", "frozenForecastHash": "freeze-hash", "forecastCutoff": CUTOFF}
+    settlement = {"projectionId": "p1", "eventId": "event-1", "result": "WIN", "labelAvailableAt": "2026-08-30T00:00:00Z", "numericFeatures": {"postgame": 99.0}}
+    frozen = build_training_row(
+        settlement,
+        slim={"projectionId": "p1", "eventId": "event-1", "numericFeatures": {"role": 0.4, "opponent": 0.2}},
+        freeze=freeze,
+        feature_hashes=["feature-hash"],
+        feature_schema_hash="schema-hash",
+        event_start="2026-08-30T01:00:00Z",
+    )
+    assert frozen["numericFeatures"] == {"role": 0.4, "opponent": 0.2}
+    settlement_only = build_training_row(
+        settlement,
+        slim={"projectionId": "p1", "eventId": "event-1"},
+        freeze=freeze,
+        feature_hashes=[],
+        feature_schema_hash="schema-hash",
+        event_start="2026-08-30T01:00:00Z",
+    )
+    assert "numericFeatures" not in settlement_only
 
 
 def test_dataset_refuses_missing_settlements(tmp_path: Path):

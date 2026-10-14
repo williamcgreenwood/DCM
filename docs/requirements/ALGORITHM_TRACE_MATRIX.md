@@ -5,10 +5,10 @@ Constitution version: `DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903`
 Generated from `dcm.algorithms.catalog`. Do not hand-edit algorithm rows.
 Re-run `python scripts/export_algorithm_registry.py` after catalog changes.
 
-- Registry rows: **171**
+- Registry rows: **172**
 - REQUIRED_CORE: **79**
 - REQUIRED_CONDITIONAL: **30**
-- PERMANENT_CHALLENGER: **62**
+- PERMANENT_CHALLENGER: **63**
 
 | algorithm_id | name | family | lifecycle | implementation | producer | consumer | fallback | tests | traces |
 |---|---|---|---|---|---|---|---|---|---|
@@ -98,6 +98,7 @@ Re-run `python scripts/export_algorithm_registry.py` after catalog changes.
 | `ALG-ML-CAUSAL-002` | Double Machine Learning | ML_CAUSAL | PERMANENT_CHALLENGER | `dcm.algorithms.ml_families.not_active_challenger` | AlgorithmFrontierReview | benchmarks/algorithm_frontier | ALG-ML-TABULAR-001 | test_algorithm_constitution,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
 | `ALG-ML-CAUSAL-003` | Meta-learners S/T/X/R | ML_CAUSAL | PERMANENT_CHALLENGER | `dcm.algorithms.ml_families.not_active_challenger` | AlgorithmFrontierReview | benchmarks/algorithm_frontier | ALG-ML-TABULAR-001 | test_algorithm_constitution,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
 | `ALG-ML-CAUSAL-004` | TMLE | ML_CAUSAL | PERMANENT_CHALLENGER | `dcm.algorithms.ml_families.not_active_challenger` | AlgorithmFrontierReview | benchmarks/algorithm_frontier | ALG-ML-TABULAR-001 | test_algorithm_constitution,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
+| `ALG-ML-FS-001` | Recursive feature elimination with chronological CV | ML_TABULAR | PERMANENT_CHALLENGER | `dcm.learning.rfecv_shadow.evaluate_rfecv_shadow` | dcm.learning.dataset.build_dataset frozen numericFeatures | dcm.learning.walkforward.run_walkforward rfecvShadowChallenger | ALG-ML-TABULAR-001 | test_rfecv_shadow,test_p6_learning,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
 | `ALG-ML-PROB-001` | Empirical Bayes shrinkage | ML_PROB | REQUIRED_CORE | `dcm.algorithms.ml_families.empirical_bayes_shrink` | AlgorithmSelectionEngine | dcm.learning.registry |  | test_algorithm_constitution,test_algorithm_core,test_algorithm_ml_stdlib | REQ-ALG-CONST-R0 |
 | `ALG-ML-PROB-002` | Gaussian Processes | ML_PROB | PERMANENT_CHALLENGER | `dcm.algorithms.ml_families.not_active_challenger` | AlgorithmFrontierReview | benchmarks/algorithm_frontier | ALG-ML-TABULAR-001 | test_algorithm_constitution,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
 | `ALG-ML-PROB-003` | Mixture Models | ML_PROB | REQUIRED_CONDITIONAL | `dcm.algorithms.ml_families.not_active_challenger` | AlgorithmSelectionEngine | dcm.learning.registry | ALG-GROUP-018 | test_algorithm_constitution,test_algorithm_core,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
