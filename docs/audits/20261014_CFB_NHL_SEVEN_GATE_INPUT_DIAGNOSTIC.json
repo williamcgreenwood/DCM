@@ -1,0 +1,946 @@
+{
+  "allCapabilitiesEvaluated": true,
+  "canonicalFlow": [
+    {
+      "stage": "BOARD",
+      "state": "CANONICAL_RUN_CONSUMED"
+    },
+    {
+      "stage": "RESEARCH",
+      "state": "CANONICAL_RUN_CONSUMED"
+    },
+    {
+      "stage": "EVIDENCE",
+      "state": "CANONICAL_RUN_CONSUMED"
+    },
+    {
+      "stage": "FEATURES",
+      "state": "CANONICAL_RUN_CONSUMED"
+    },
+    {
+      "stage": "PARAMETERS",
+      "state": "CANONICAL_RUN_CONSUMED"
+    },
+    {
+      "stage": "EVENTWORLD",
+      "state": "CANONICAL_RUN_CONSUMED"
+    },
+    {
+      "stage": "PROBABILITY",
+      "state": "CANONICAL_RUN_CONSUMED"
+    },
+    {
+      "stage": "CALIBRATION",
+      "state": "EVALUATED_WITH_READINESS_RECEIPT"
+    },
+    {
+      "stage": "PORTFOLIO",
+      "state": "CORRELATION_GATE_EVALUATED"
+    },
+    {
+      "stage": "EV",
+      "state": "ENTRY_EV_GATE_EVALUATED"
+    },
+    {
+      "stage": "FREEZE",
+      "state": "PENDING_RECEIPT_HASH_BIND"
+    },
+    {
+      "stage": "SETTLEMENT",
+      "state": "NOT_RUN_APPEND_ONLY_LIFECYCLE"
+    }
+  ],
+  "capabilityCounts": {
+    "ALGORITHM_GRAPH": 1,
+    "CALIBRATION": 1,
+    "KDE": 1,
+    "MONTE_CARLO": 1,
+    "PAYOUT_EV": 1,
+    "PORTFOLIO_CORRELATION": 1,
+    "SVD": 1
+  },
+  "capabilityRunThrough": {
+    "completedGateCount": 7,
+    "evaluationState": "COMPLETED_FOR_ALL_SEVEN_GATES",
+    "gates": [
+      {
+        "capability": "KDE",
+        "computationState": "EXECUTED_READINESS_ONLY",
+        "gateEvaluationState": "COMPLETED",
+        "inputIssueCount": 1,
+        "inputIssues": [
+          "NO_MODELED_MARKET_INPUTS_RESEARCH_ONLY_OR_EMPTY_RUN"
+        ],
+        "inputProducersNeeded": [
+          "CUTOFF_SAFE_COMPARABLE_STAT_HISTORY",
+          "OBSERVED_MARKET_DEFINITION_AND_LINE"
+        ],
+        "receiptOutputHash": "8975998f65a63be72ca60d2ce0262c0a6c45391fe2c7c59e7097376737938265",
+        "requiredInputs": [
+          "COMPARABLE_CUTOFF_SAFE_CONTINUOUS_HISTORY"
+        ]
+      },
+      {
+        "capability": "SVD",
+        "computationState": "BLOCKED_HISTORICAL_FEATURE_MATRIX_MISSING",
+        "gateEvaluationState": "COMPLETED",
+        "inputIssueCount": 1,
+        "inputIssues": [
+          "BLOCKED_HISTORICAL_FEATURE_MATRIX_MISSING"
+        ],
+        "inputProducersNeeded": [
+          "FROZEN_CUTOFF_SAFE_FEATURE_HISTORY",
+          "CHRONOLOGICAL_TRAINING_ROWS.numericFeatures"
+        ],
+        "receiptOutputHash": "200291eab1eccb15ff1dce4ac11f99821ab54cb15b51e13cb7d007a4438c07ba",
+        "requiredInputs": [
+          "CUTOFF_SAFE_ROLE_OPPONENT_FEATURE_MATRIX"
+        ]
+      },
+      {
+        "capability": "MONTE_CARLO",
+        "computationState": "BLOCKED_SHARED_OUTCOMES_MISSING",
+        "gateEvaluationState": "COMPLETED",
+        "inputIssueCount": 2,
+        "inputIssues": [
+          "BLOCKED_SHARED_OUTCOMES_MISSING",
+          "CANONICAL_EVENTWORLD_OUTPUTS_MISSING"
+        ],
+        "inputProducersNeeded": [
+          "SPORT_PARAMETER_SNAPSHOTS",
+          "SPORT_SPECIFIC_SHARED_EVENTWORLD_BACKEND"
+        ],
+        "receiptOutputHash": "68f04f39649264b97f2978624c4c343e4b5b5a417baf12d27a8dd1f3ab52f42f",
+        "requiredInputs": [
+          "PARAMETER_SNAPSHOT",
+          "SUPPORTED_EVENTWORLD_BACKEND"
+        ]
+      },
+      {
+        "capability": "CALIBRATION",
+        "computationState": "EXECUTED_READINESS_ONLY",
+        "gateEvaluationState": "COMPLETED",
+        "inputIssueCount": 5,
+        "inputIssues": [
+          "INSUFFICIENT_N:0<200",
+          "INACTIVE_INSUFFICIENT_CHRONOLOGICAL_SETTLEMENTS",
+          "ECE_UNDEFINED",
+          "LR000000_UNCHANGED",
+          "VALID_FORECAST_CUTOFF_MISSING"
+        ],
+        "inputProducersNeeded": [
+          "FROZEN_PREGAME_FORECASTS",
+          "AUTHORITATIVE_LATER_SETTLEMENTS"
+        ],
+        "receiptOutputHash": "4069755301c16d4f663c8b48bf5fbb0760fffd3a17970918172590143d2cf570",
+        "requiredInputs": [
+          "CHRONOLOGICAL_FORECAST_OUTCOME_PAIRS"
+        ]
+      },
+      {
+        "capability": "PORTFOLIO_CORRELATION",
+        "computationState": "EXECUTED_EMPTY_PORTFOLIO_DIAGNOSTIC",
+        "gateEvaluationState": "COMPLETED",
+        "inputIssueCount": 0,
+        "inputIssues": [],
+        "inputProducersNeeded": [
+          "ALIGNED_SHARED_EVENT_SELECTION_OUTCOMES"
+        ],
+        "receiptOutputHash": "fef60279dbc13b4d0e64522c164c730b1ef0f7c7a034222745fa38e8060ca5da",
+        "requiredInputs": [
+          "ALIGNED_SHARED_EVENT_OUTCOMES"
+        ]
+      },
+      {
+        "capability": "PAYOUT_EV",
+        "computationState": "EV_UNVERIFIED",
+        "gateEvaluationState": "COMPLETED",
+        "inputIssueCount": 4,
+        "inputIssues": [
+          "PAYOUT_RULES_OR_ENTRY_CONTRACT_MISSING",
+          "CAPTURED_PAYOUT_RULES_MISSING",
+          "ENTRY_STAKE_MISSING",
+          "VERIFIED_MULTI_SELECTION_ENTRY_MISSING"
+        ],
+        "inputProducersNeeded": [
+          "OBSERVED_ENTRY_CONTRACT",
+          "COMPLETE_DATED_PAYOUT_RULES",
+          "CALIBRATED_JOINT_OUTCOMES"
+        ],
+        "receiptOutputHash": "c9ca7fbdf16ddb7f5e6046125abd01db64988d78fcd73f1e5465aff5dd17f67e",
+        "requiredInputs": [
+          "VERIFIED_ENTRY_CONTRACT",
+          "COMPLETE_PAYOUT_RULES",
+          "CALIBRATED_JOINT_OUTCOMES"
+        ]
+      },
+      {
+        "capability": "ALGORITHM_GRAPH",
+        "computationState": "EXECUTED_GRAPH_WITH_CAPABILITY_BLOCKERS",
+        "gateEvaluationState": "COMPLETED",
+        "inputIssueCount": 0,
+        "inputIssues": [],
+        "inputProducersNeeded": [
+          "CANONICAL_ALGORITHM_REGISTRY"
+        ],
+        "receiptOutputHash": "ae4ac53f390d528de355c596dd6d3c39c67b4786d2ee1763664a5693783c7c50",
+        "requiredInputs": [
+          "CANONICAL_RUN_CONTEXT"
+        ]
+      }
+    ],
+    "requiredGateCount": 7,
+    "runContinuesOnInputIssues": true,
+    "schema": "pillars_dcm.capability_run_through.v1"
+  },
+  "certification": {
+    "learningRevision": "LR000000",
+    "predictiveClaim": "NONE",
+    "productionRootCertified": false
+  },
+  "compiledDag": {
+    "computationLawSha256": "9ff2ee25592c97342585623901eaebe2a782379e01572042c5af7b00c1bee598",
+    "computationLawVersion": "PILLARS-UNIVERSAL-ALGORITHMIC-COMPUTATION-v1.0.0-20261014",
+    "nodes": [
+      {
+        "algorithmId": "ALG-CTRL-001",
+        "consumer": "canonical seven-capability execution controller",
+        "dependsOn": [],
+        "lifecycle": "REQUIRED_CORE",
+        "nodeId": "ALGORITHM_GRAPH",
+        "producer": "dcm.algorithms.registry",
+        "requiredInputs": [
+          "CANONICAL_RUN_CONTEXT"
+        ]
+      },
+      {
+        "algorithmId": "ALG-ML-TABULAR-013",
+        "consumer": "PARAMETERS",
+        "dependsOn": [
+          "ALGORITHM_GRAPH"
+        ],
+        "lifecycle": "REQUIRED_CONDITIONAL",
+        "nodeId": "SVD",
+        "producer": "FEATURES",
+        "requiredInputs": [
+          "CUTOFF_SAFE_ROLE_OPPONENT_FEATURE_MATRIX"
+        ]
+      },
+      {
+        "algorithmId": "ALG-MC-001",
+        "consumer": "PROBABILITY",
+        "dependsOn": [
+          "ALGORITHM_GRAPH"
+        ],
+        "lifecycle": "REQUIRED_CORE",
+        "nodeId": "MONTE_CARLO",
+        "producer": "EVENTWORLD",
+        "requiredInputs": [
+          "PARAMETER_SNAPSHOT",
+          "SUPPORTED_EVENTWORLD_BACKEND"
+        ]
+      },
+      {
+        "algorithmId": "ALG-ML-PROB-009",
+        "consumer": "PROBABILITY_DIAGNOSTIC",
+        "dependsOn": [
+          "ALGORITHM_GRAPH"
+        ],
+        "lifecycle": "REQUIRED_CONDITIONAL",
+        "nodeId": "KDE",
+        "producer": "EVENTWORLD",
+        "requiredInputs": [
+          "COMPARABLE_CUTOFF_SAFE_CONTINUOUS_HISTORY"
+        ]
+      },
+      {
+        "algorithmId": "ALG-CAL-001",
+        "consumer": "PORTFOLIO",
+        "dependsOn": [
+          "MONTE_CARLO"
+        ],
+        "lifecycle": "REQUIRED_CORE",
+        "nodeId": "CALIBRATION",
+        "producer": "PROBABILITY",
+        "requiredInputs": [
+          "CHRONOLOGICAL_FORECAST_OUTCOME_PAIRS"
+        ]
+      },
+      {
+        "algorithmId": "ALG-PORT-001",
+        "consumer": "PORTFOLIO",
+        "dependsOn": [
+          "MONTE_CARLO",
+          "CALIBRATION"
+        ],
+        "lifecycle": "REQUIRED_CORE",
+        "nodeId": "PORTFOLIO_CORRELATION",
+        "producer": "PROBABILITY",
+        "requiredInputs": [
+          "ALIGNED_SHARED_EVENT_OUTCOMES"
+        ]
+      },
+      {
+        "algorithmId": "ALG-EV-001",
+        "consumer": "FREEZE",
+        "dependsOn": [
+          "PORTFOLIO_CORRELATION"
+        ],
+        "lifecycle": "REQUIRED_CONDITIONAL",
+        "nodeId": "PAYOUT_EV",
+        "producer": "PORTFOLIO",
+        "requiredInputs": [
+          "VERIFIED_ENTRY_CONTRACT",
+          "COMPLETE_PAYOUT_RULES",
+          "CALIBRATED_JOINT_OUTCOMES"
+        ]
+      }
+    ],
+    "schema": "pillars_dcm.advanced_modeling_dag.v1",
+    "validated": true,
+    "version": "1.2.0"
+  },
+  "computationLaw": {
+    "path": "docs/engineering/UNIVERSAL_ALGORITHMIC_COMPUTATION_AND_RESEARCH_DISCOVERY_LAW.md",
+    "sha256": "9ff2ee25592c97342585623901eaebe2a782379e01572042c5af7b00c1bee598",
+    "version": "PILLARS-UNIVERSAL-ALGORITHMIC-COMPUTATION-v1.0.0-20261014"
+  },
+  "contentHash": "48d87bf67742393acd158a6f6d7b35683a40ae02b1e97ed5ade09da8c52baf15",
+  "dag": [
+    {
+      "algorithmId": "ALG-ML-TABULAR-013",
+      "blockers": [
+        "BLOCKED_HISTORICAL_FEATURE_MATRIX_MISSING"
+      ],
+      "input": "FEATURES",
+      "output": "PARAMETERS",
+      "stage": "SVD",
+      "state": "BLOCKED_HISTORICAL_FEATURE_MATRIX_MISSING"
+    },
+    {
+      "algorithmId": "ALG-MC-001",
+      "blockers": [
+        "BLOCKED_SHARED_OUTCOMES_MISSING",
+        "CANONICAL_EVENTWORLD_OUTPUTS_MISSING"
+      ],
+      "input": "EVENTWORLD",
+      "output": "PROBABILITY",
+      "stage": "MONTE_CARLO",
+      "state": "BLOCKED_SHARED_OUTCOMES_MISSING"
+    },
+    {
+      "algorithmId": "ALG-ML-PROB-009",
+      "blockers": [
+        "NO_MODELED_MARKET_INPUTS_RESEARCH_ONLY_OR_EMPTY_RUN"
+      ],
+      "input": "EVENTWORLD",
+      "output": "PROBABILITY_DIAGNOSTIC",
+      "stage": "KDE",
+      "state": "EXECUTED_READINESS_ONLY"
+    },
+    {
+      "algorithmId": "ALG-CAL-001",
+      "blockers": [
+        "INSUFFICIENT_N:0<200",
+        "INACTIVE_INSUFFICIENT_CHRONOLOGICAL_SETTLEMENTS",
+        "ECE_UNDEFINED",
+        "LR000000_UNCHANGED",
+        "VALID_FORECAST_CUTOFF_MISSING"
+      ],
+      "input": "PROBABILITY",
+      "output": "PORTFOLIO",
+      "stage": "CALIBRATION",
+      "state": "EXECUTED_READINESS_ONLY"
+    },
+    {
+      "algorithmId": "ALG-PORT-001",
+      "blockers": [],
+      "input": "PROBABILITY",
+      "output": "PORTFOLIO",
+      "stage": "PORTFOLIO_CORRELATION",
+      "state": "EXECUTED_EMPTY_PORTFOLIO_DIAGNOSTIC"
+    },
+    {
+      "algorithmId": "ALG-EV-001",
+      "blockers": [
+        "PAYOUT_RULES_OR_ENTRY_CONTRACT_MISSING",
+        "CAPTURED_PAYOUT_RULES_MISSING",
+        "ENTRY_STAKE_MISSING",
+        "VERIFIED_MULTI_SELECTION_ENTRY_MISSING"
+      ],
+      "input": "PORTFOLIO",
+      "output": "FREEZE",
+      "stage": "PAYOUT_EV",
+      "state": "EV_UNVERIFIED"
+    }
+  ],
+  "directionalResearchConflictGate": {
+    "automaticInverseAllowed": false,
+    "state": "NOT_PROVIDED"
+  },
+  "executionDurationMs": 17.982,
+  "forecastCutoff": "",
+  "fullModelingExecution": false,
+  "inputScope": {
+    "activeOffersObserved": 0,
+    "cutoffTimestampProvided": false,
+    "eventsFound": [
+      {
+        "competition": "CFB",
+        "event": "Kennesaw State at Missouri State",
+        "sourceStatus": "SCHEDULE_ONLY",
+        "sourceUrl": "https://missouristatebears.com/game-center/7864"
+      },
+      {
+        "competition": "CFB",
+        "event": "WKU at Sam Houston",
+        "sourceStatus": "SCHEDULE_ONLY",
+        "sourceUrl": "https://gobearkats.com/sports/football/schedule"
+      },
+      {
+        "competition": "NHL",
+        "event": "Dallas Stars at Colorado Avalanche",
+        "sourceStatus": "SCHEDULE_ONLY",
+        "sourceUrl": "https://www.nhl.com/news/nhl-announces-the-following-start-time-changes-for-the-2026-27-regular-season-schedule"
+      }
+    ],
+    "note": "All seven gate evaluators completed for CFB/NHL scope. Schedule discovery does not supply player offers, cutoff-safe histories, frozen forecasts, or payout contracts. This is not a forecast, card, replay, probability, or payout estimate.",
+    "runPurpose": "GATE_RUNTHROUGH_AND_INPUT_READINESS_ONLY",
+    "sourceClaimsAdmittedAsForecastInputs": 0
+  },
+  "limitations": [
+    "KDE and SVD are diagnostic-only and cannot emit forecast probability.",
+    "Settlement is a later append-only lifecycle stage.",
+    "Payout EV is not certified without calibrated joint probabilities and the captured, fully modeled entry settlement rules."
+  ],
+  "manifestType": "ModelExecutionManifest",
+  "mode": "MANUAL_SHADOW_ANALYSIS",
+  "modelConfigHash": null,
+  "modelId": "DCM_CANONICAL",
+  "modelVersion": "UNAVAILABLE",
+  "receipts": [
+    {
+      "algorithmId": "ALG-ML-PROB-009",
+      "algorithmLifecycle": "REQUIRED_CONDITIONAL",
+      "algorithmVersion": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "applicabilityVerdict": "CONTINUOUS_KDE_OR_DISCRETE_EMPIRICAL_FALLBACK; INPUT_READINESS_ALWAYS_EVALUATED",
+      "benchmarkReferences": [
+        "benchmarks/algorithm_frontier/core_smoke.py"
+      ],
+      "blockers": [
+        "NO_MODELED_MARKET_INPUTS_RESEARCH_ONLY_OR_EMPTY_RUN"
+      ],
+      "capability": "KDE",
+      "computationLawSha256": "9ff2ee25592c97342585623901eaebe2a782379e01572042c5af7b00c1bee598",
+      "computationLawVersion": "PILLARS-UNIVERSAL-ALGORITHMIC-COMPUTATION-v1.0.0-20261014",
+      "consumer": "advanced-modeling density diagnostics",
+      "details": {
+        "densitySnapshotConsumer": "advanced-modeling receipt and audit diagnostics",
+        "densitySnapshots": [],
+        "diagnosticRows": 0,
+        "discreteFallbackRows": 0,
+        "discreteRowsEvaluated": 0,
+        "evaluatedRows": 0,
+        "forecastProbabilityProduced": false,
+        "historicalSampleRows": 0,
+        "inactiveRows": 0,
+        "populationRows": 0
+      },
+      "eventIds": [],
+      "evidenceCutoff": null,
+      "executionDurationMs": 0.003,
+      "executionMethod": "dcm.model.advanced_execution.gaussian_kde_diagnostic",
+      "fallbackAlgorithmId": "ALG-ML-PROB-001",
+      "fallbackDetails": null,
+      "featureSnapshotIds": [],
+      "inputContentHashes": [],
+      "inputDatasetIds": [],
+      "inputDatasetLineageState": "NOT_PROVIDED_BY_CANONICAL_RUNNER",
+      "marketIds": [],
+      "modelId": "DCM_CANONICAL",
+      "modelVersion": "UNAVAILABLE",
+      "numericalDiagnostics": {},
+      "outputHash": "8975998f65a63be72ca60d2ce0262c0a6c45391fe2c7c59e7097376737938265",
+      "parameterSnapshotIds": [],
+      "producer": "cutoff-safe comparable historical outcomes",
+      "randomSeed": null,
+      "requirementIds": [
+        "REQ-ALG-CONST-R0"
+      ],
+      "rngVersion": null,
+      "runId": "RUN_101426_CFB_NHL_INPUT_DIAGNOSTIC",
+      "snapshotLineageState": "RECORDED_IN_INPUT_CONTENT_HASHES_WHEN_PRESENT",
+      "state": "EXECUTED_READINESS_ONLY",
+      "testReferences": [
+        "test_advanced_modeling",
+        "test_algorithm_core",
+        "test_algorithm_fallbacks"
+      ]
+    },
+    {
+      "algorithmId": "ALG-ML-TABULAR-013",
+      "algorithmLifecycle": "REQUIRED_CONDITIONAL",
+      "algorithmVersion": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "applicabilityVerdict": "APPLICABLE_WHEN_VALID_ROLE_OPPONENT_MATRIX_EXISTS",
+      "benchmarkReferences": [
+        "benchmarks/algorithm_frontier/core_smoke.py"
+      ],
+      "blockers": [
+        "BLOCKED_HISTORICAL_FEATURE_MATRIX_MISSING"
+      ],
+      "capability": "SVD",
+      "computationLawSha256": "9ff2ee25592c97342585623901eaebe2a782379e01572042c5af7b00c1bee598",
+      "computationLawVersion": "PILLARS-UNIVERSAL-ALGORITHMIC-COMPUTATION-v1.0.0-20261014",
+      "consumer": "advanced-modeling feature diagnostics",
+      "details": {
+        "diagnostic": {
+          "forecastProbability": null,
+          "state": "BLOCKED_HISTORICAL_FEATURE_MATRIX_MISSING"
+        },
+        "forecastProbabilityProduced": false,
+        "matrixInput": {
+          "blocker": null,
+          "excludedAfterCutoffRows": 0,
+          "excludedInvalidRows": 0,
+          "featureNames": [],
+          "inputMatrixHash": null,
+          "source": "FROZEN_CHRONOLOGICAL_TRAINING_ROWS.numericFeatures",
+          "sourceLineageHash": null,
+          "sourceRowCount": 0
+        }
+      },
+      "eventIds": [],
+      "evidenceCutoff": null,
+      "executionDurationMs": 0.032,
+      "executionMethod": "dcm.model.advanced_execution.normalized_svd_diagnostic",
+      "fallbackAlgorithmId": "ALG-ML-TABULAR-001",
+      "fallbackDetails": null,
+      "featureSnapshotIds": [],
+      "inputContentHashes": [],
+      "inputDatasetIds": [],
+      "inputDatasetLineageState": "NOT_PROVIDED_BY_CANONICAL_RUNNER",
+      "marketIds": [],
+      "modelId": "DCM_CANONICAL",
+      "modelVersion": "UNAVAILABLE",
+      "numericalDiagnostics": {
+        "forecastProbability": null,
+        "state": "BLOCKED_HISTORICAL_FEATURE_MATRIX_MISSING"
+      },
+      "outputHash": "200291eab1eccb15ff1dce4ac11f99821ab54cb15b51e13cb7d007a4438c07ba",
+      "parameterSnapshotIds": [],
+      "producer": "canonical historical feature store",
+      "randomSeed": null,
+      "requirementIds": [
+        "REQ-ALG-CONST-R0"
+      ],
+      "rngVersion": null,
+      "runId": "RUN_101426_CFB_NHL_INPUT_DIAGNOSTIC",
+      "snapshotLineageState": "RECORDED_IN_INPUT_CONTENT_HASHES_WHEN_PRESENT",
+      "state": "BLOCKED_HISTORICAL_FEATURE_MATRIX_MISSING",
+      "testReferences": [
+        "test_advanced_modeling",
+        "test_algorithm_core",
+        "test_algorithm_fallbacks"
+      ]
+    },
+    {
+      "algorithmId": "ALG-MC-001",
+      "algorithmLifecycle": "REQUIRED_CORE",
+      "algorithmVersion": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "applicabilityVerdict": "APPLICABLE_WHEN_SHARED_EVENTWORLDS_EXIST",
+      "benchmarkReferences": [
+        "benchmarks/algorithm_frontier/core_smoke.py"
+      ],
+      "blockers": [
+        "BLOCKED_SHARED_OUTCOMES_MISSING",
+        "CANONICAL_EVENTWORLD_OUTPUTS_MISSING"
+      ],
+      "capability": "MONTE_CARLO",
+      "computationLawSha256": "9ff2ee25592c97342585623901eaebe2a782379e01572042c5af7b00c1bee598",
+      "computationLawVersion": "PILLARS-UNIVERSAL-ALGORITHMIC-COMPUTATION-v1.0.0-20261014",
+      "consumer": "probability and portfolio joint outcomes",
+      "details": {
+        "backend": [
+          "NOT_RECORDED"
+        ],
+        "conservation": {},
+        "diagnostics": {
+          "convergence": "NOT_EVALUATED",
+          "correlations": [],
+          "state": "BLOCKED_SHARED_OUTCOMES_MISSING",
+          "worldCount": 0
+        },
+        "modelConfigHash": null,
+        "randomSeed": null,
+        "rngVersion": [
+          "NOT_RECORDED"
+        ],
+        "seedInputHash": null,
+        "seedSource": "input HAR content hash",
+        "worlds": 0
+      },
+      "eventIds": [],
+      "evidenceCutoff": null,
+      "executionDurationMs": 0.011,
+      "executionMethod": "dcm.model.advanced_execution._shared_world_diagnostics",
+      "fallbackAlgorithmId": null,
+      "fallbackDetails": null,
+      "featureSnapshotIds": [],
+      "inputContentHashes": [],
+      "inputDatasetIds": [],
+      "inputDatasetLineageState": "NOT_PROVIDED_BY_CANONICAL_RUNNER",
+      "marketIds": [],
+      "modelId": "DCM_CANONICAL",
+      "modelVersion": "UNAVAILABLE",
+      "numericalDiagnostics": {
+        "convergence": "NOT_EVALUATED",
+        "correlations": [],
+        "state": "BLOCKED_SHARED_OUTCOMES_MISSING",
+        "worldCount": 0
+      },
+      "outputHash": "68f04f39649264b97f2978624c4c343e4b5b5a417baf12d27a8dd1f3ab52f42f",
+      "parameterSnapshotIds": [],
+      "producer": "dcm.runner shared EventWorld backend",
+      "randomSeed": null,
+      "requirementIds": [
+        "REQ-ALG-CONST-R0"
+      ],
+      "rngVersion": [
+        "NOT_RECORDED"
+      ],
+      "runId": "RUN_101426_CFB_NHL_INPUT_DIAGNOSTIC",
+      "snapshotLineageState": "RECORDED_IN_INPUT_CONTENT_HASHES_WHEN_PRESENT",
+      "state": "BLOCKED_SHARED_OUTCOMES_MISSING",
+      "testReferences": [
+        "test_algorithm_constitution",
+        "test_algorithm_core"
+      ]
+    },
+    {
+      "algorithmId": "ALG-CAL-001",
+      "algorithmLifecycle": "REQUIRED_CORE",
+      "algorithmVersion": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "applicabilityVerdict": "APPLICABLE_WHEN_CUTOFF_SAFE_LABELS_EXIST",
+      "benchmarkReferences": [
+        "benchmarks/algorithm_frontier/core_smoke.py"
+      ],
+      "blockers": [
+        "INSUFFICIENT_N:0<200",
+        "INACTIVE_INSUFFICIENT_CHRONOLOGICAL_SETTLEMENTS",
+        "ECE_UNDEFINED",
+        "LR000000_UNCHANGED",
+        "VALID_FORECAST_CUTOFF_MISSING"
+      ],
+      "capability": "CALIBRATION",
+      "computationLawSha256": "9ff2ee25592c97342585623901eaebe2a782379e01572042c5af7b00c1bee598",
+      "computationLawVersion": "PILLARS-UNIVERSAL-ALGORITHMIC-COMPUTATION-v1.0.0-20261014",
+      "consumer": "canonical probability records and portfolio gate",
+      "details": {
+        "activeRows": 0,
+        "calibrationChallenger": {
+          "baselinePooled": {
+            "brier": null,
+            "brierStandardError": null,
+            "ece": null,
+            "logLoss": null,
+            "logLossStandardError": null,
+            "n": 0,
+            "reliability": []
+          },
+          "foldCount": 0,
+          "folds": [],
+          "isotonicChallengerPooled": {
+            "brier": null,
+            "brierStandardError": null,
+            "ece": null,
+            "logLoss": null,
+            "logLossStandardError": null,
+            "n": 0,
+            "reliability": []
+          },
+          "learningRevision": "LR000000",
+          "method": "ISOTONIC_REGRESSION_EVENT_DISJOINT_EXPANDING_WINDOW",
+          "predictiveClaim": "NONE",
+          "promotionState": "CHALLENGER_ONLY_NO_PROMOTION",
+          "state": "BLOCKED_INSUFFICIENT_EVENT_DISJOINT_FOLDS"
+        },
+        "calibrationSnapshotHash": null,
+        "candidateRowsEvaluated": 0,
+        "chronologicalReadiness": {
+          "activatesCalibration": false,
+          "ece": null,
+          "learningRevisionUnchanged": "LR000000",
+          "maxEce": 0.08,
+          "minN": 200,
+          "n": 0,
+          "predictiveClaimUnchanged": "NONE",
+          "ready": false,
+          "reasons": [
+            "INSUFFICIENT_N:0<200",
+            "INACTIVE_INSUFFICIENT_CHRONOLOGICAL_SETTLEMENTS",
+            "ECE_UNDEFINED",
+            "LR000000_UNCHANGED"
+          ],
+          "state": "INACTIVE_INSUFFICIENT_CHRONOLOGICAL_SETTLEMENTS"
+        },
+        "historicalSettlementRows": 0,
+        "learningRevision": "LR000000",
+        "outOfSampleMetricsProduced": false,
+        "predictiveClaim": "NONE",
+        "walkForward": {
+          "algorithmExecution": {
+            "algorithmId": "ALG-ML-TIME-009",
+            "consumer": "dcm.learning.walkforward.run_walkforward",
+            "eventDisjoint": false,
+            "foldCount": 0,
+            "inputHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "producer": "dcm.learning.walkforward.chronological_folds",
+            "state": "BLOCKED_NO_VALID_FOLDS"
+          },
+          "baseline": {
+            "model": "frozen_dcm_calibratedP_or_selectedP",
+            "pkl": false,
+            "role": "CHAMPION_PROBABILITY_PATH",
+            "trained": false
+          },
+          "contentHash": "d7c9a6ae03d78f2f56f69b445a4bcdba99bbb1c74f9f0672084192d3ab552e11",
+          "foldCount": 0,
+          "leakage": false,
+          "learningRevision": "LR000000",
+          "note": "Need \u22652 distinct decisionCutoff values and training labels available before test cutoffs.",
+          "predictiveClaim": "NONE",
+          "rfecvShadowChallenger": {
+            "algorithmId": "ALG-ML-FS-001",
+            "consumer": "dcm.learning.walkforward.run_walkforward",
+            "fallbackAlgorithmId": "ALG-ML-TABULAR-001",
+            "predictiveClaim": "NONE",
+            "status": "BLOCKED_MISSING_CUTOFF_SAFE_NUMERIC_FEATURE_MATRIX",
+            "trainingOrProductionSelection": false
+          },
+          "schema": "dcm.walkforward_report.v1-20260830",
+          "shadowChallenger": {
+            "model": "logistic_linear_shadow",
+            "pkl": false,
+            "reason": "INSUFFICIENT_CHRONOLOGICAL_CUTOFFS",
+            "skipped": true,
+            "status": "SHADOW",
+            "trainedNeuralNet": false
+          },
+          "software": "6.0.0+WSAB.E2E.PRODUCTION_PIPELINE.LR000000",
+          "status": "INSUFFICIENT_CHRONOLOGICAL_CUTOFFS"
+        }
+      },
+      "eventIds": [],
+      "evidenceCutoff": null,
+      "executionDurationMs": 3.203,
+      "executionMethod": "dcm.algorithms.ml_families.isotonic_regression",
+      "fallbackAlgorithmId": null,
+      "fallbackDetails": null,
+      "featureSnapshotIds": [],
+      "inputContentHashes": [],
+      "inputDatasetIds": [],
+      "inputDatasetLineageState": "NOT_PROVIDED_BY_CANONICAL_RUNNER",
+      "marketIds": [],
+      "modelId": "DCM_CANONICAL",
+      "modelVersion": "UNAVAILABLE",
+      "numericalDiagnostics": {},
+      "outputHash": "4069755301c16d4f663c8b48bf5fbb0760fffd3a17970918172590143d2cf570",
+      "parameterSnapshotIds": [],
+      "producer": "dcm.learning.calibration",
+      "randomSeed": null,
+      "requirementIds": [
+        "REQ-ALG-CONST-R0"
+      ],
+      "rngVersion": null,
+      "runId": "RUN_101426_CFB_NHL_INPUT_DIAGNOSTIC",
+      "snapshotLineageState": "RECORDED_IN_INPUT_CONTENT_HASHES_WHEN_PRESENT",
+      "state": "EXECUTED_READINESS_ONLY",
+      "testReferences": [
+        "test_algorithm_constitution",
+        "test_algorithm_core",
+        "test_algorithm_ml_stdlib",
+        "test_advanced_modeling_execution"
+      ]
+    },
+    {
+      "algorithmId": "ALG-PORT-001",
+      "algorithmLifecycle": "REQUIRED_CORE",
+      "algorithmVersion": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "applicabilityVerdict": "SELECTED_PORTFOLIO_OR_MODELED_CANDIDATE_POOL; EMPTY_SET_DIAGNOSTIC_IF_NO_MULTI_SELECTION_INPUT",
+      "benchmarkReferences": [
+        "benchmarks/algorithm_frontier/core_smoke.py"
+      ],
+      "blockers": [],
+      "capability": "PORTFOLIO_CORRELATION",
+      "computationLawSha256": "9ff2ee25592c97342585623901eaebe2a782379e01572042c5af7b00c1bee598",
+      "computationLawVersion": "PILLARS-UNIVERSAL-ALGORITHMIC-COMPUTATION-v1.0.0-20261014",
+      "consumer": "dcm.selection.portfolio.build_card / EV joint outcomes",
+      "details": {
+        "alignedOutcomeHash": null,
+        "allLegsWinProbability": null,
+        "analysisPopulation": "EMPTY_OR_SINGLETON_CANDIDATE_POOL",
+        "analyzedCandidateCount": 0,
+        "anyLegLossProbability": null,
+        "correlations": [],
+        "jointOutcomeMethod": "NO_MULTI_SELECTION_INPUTS",
+        "jointStateDistribution": {},
+        "portfolioSize": 0,
+        "usesIndependentMarginals": false,
+        "winCountDistribution": {},
+        "worldCount": 0
+      },
+      "eventIds": [],
+      "evidenceCutoff": null,
+      "executionDurationMs": 0.006,
+      "executionMethod": "dcm.model.advanced_execution._shared_world_diagnostics",
+      "fallbackAlgorithmId": null,
+      "fallbackDetails": null,
+      "featureSnapshotIds": [],
+      "inputContentHashes": [],
+      "inputDatasetIds": [],
+      "inputDatasetLineageState": "NOT_PROVIDED_BY_CANONICAL_RUNNER",
+      "marketIds": [],
+      "modelId": "DCM_CANONICAL",
+      "modelVersion": "UNAVAILABLE",
+      "numericalDiagnostics": {},
+      "outputHash": "fef60279dbc13b4d0e64522c164c730b1ef0f7c7a034222745fa38e8060ca5da",
+      "parameterSnapshotIds": [],
+      "producer": "shared aligned selection outcomes",
+      "randomSeed": null,
+      "requirementIds": [
+        "REQ-ALG-CONST-R0"
+      ],
+      "rngVersion": null,
+      "runId": "RUN_101426_CFB_NHL_INPUT_DIAGNOSTIC",
+      "snapshotLineageState": "RECORDED_IN_INPUT_CONTENT_HASHES_WHEN_PRESENT",
+      "state": "EXECUTED_EMPTY_PORTFOLIO_DIAGNOSTIC",
+      "testReferences": [
+        "test_algorithm_constitution",
+        "test_algorithm_core"
+      ]
+    },
+    {
+      "algorithmId": "ALG-EV-001",
+      "algorithmLifecycle": "REQUIRED_CONDITIONAL",
+      "algorithmVersion": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "applicabilityVerdict": "ENTRY_CONTRACT_CHECKED_EVERY_RUN; PRODUCTION_EV_REQUIRES_VERIFIED_MULTI_SELECTION_ENTRY",
+      "benchmarkReferences": [
+        "benchmarks/algorithm_frontier/core_smoke.py"
+      ],
+      "blockers": [
+        "PAYOUT_RULES_OR_ENTRY_CONTRACT_MISSING",
+        "CAPTURED_PAYOUT_RULES_MISSING",
+        "ENTRY_STAKE_MISSING",
+        "VERIFIED_MULTI_SELECTION_ENTRY_MISSING"
+      ],
+      "capability": "PAYOUT_EV",
+      "computationLawSha256": "9ff2ee25592c97342585623901eaebe2a782379e01572042c5af7b00c1bee598",
+      "computationLawVersion": "PILLARS-UNIVERSAL-ALGORITHMIC-COMPUTATION-v1.0.0-20261014",
+      "consumer": "portfolio ranking and freeze eligibility",
+      "details": {
+        "expectedValue": null,
+        "missingInputs": [
+          "CAPTURED_PAYOUT_RULES_MISSING",
+          "ENTRY_STAKE_MISSING",
+          "VERIFIED_MULTI_SELECTION_ENTRY_MISSING"
+        ],
+        "required": [
+          "captured payout table hash",
+          "stake",
+          "entry rules"
+        ]
+      },
+      "eventIds": [],
+      "evidenceCutoff": null,
+      "executionDurationMs": 0.003,
+      "executionMethod": "dcm.platform.prizepicks.economics.expected_return_from_worlds",
+      "fallbackAlgorithmId": null,
+      "fallbackDetails": null,
+      "featureSnapshotIds": [],
+      "inputContentHashes": [],
+      "inputDatasetIds": [],
+      "inputDatasetLineageState": "NOT_PROVIDED_BY_CANONICAL_RUNNER",
+      "marketIds": [],
+      "modelId": "DCM_CANONICAL",
+      "modelVersion": "UNAVAILABLE",
+      "numericalDiagnostics": {},
+      "outputHash": "c9ca7fbdf16ddb7f5e6046125abd01db64988d78fcd73f1e5465aff5dd17f67e",
+      "parameterSnapshotIds": [],
+      "producer": "PrizePicks payout rules + joint outcomes",
+      "randomSeed": null,
+      "requirementIds": [
+        "REQ-ALG-CONST-R0"
+      ],
+      "rngVersion": null,
+      "runId": "RUN_101426_CFB_NHL_INPUT_DIAGNOSTIC",
+      "snapshotLineageState": "RECORDED_IN_INPUT_CONTENT_HASHES_WHEN_PRESENT",
+      "state": "EV_UNVERIFIED",
+      "testReferences": [
+        "test_prizepicks_push_economics",
+        "test_algorithm_core"
+      ]
+    },
+    {
+      "algorithmId": "ALG-CTRL-001",
+      "algorithmLifecycle": "REQUIRED_CORE",
+      "algorithmVersion": "DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903",
+      "applicabilityVerdict": "APPLICABLE_EVERY_CANONICAL_RUN",
+      "benchmarkReferences": [
+        "benchmarks/algorithm_frontier/core_smoke.py"
+      ],
+      "blockers": [],
+      "capability": "ALGORITHM_GRAPH",
+      "computationLawSha256": "9ff2ee25592c97342585623901eaebe2a782379e01572042c5af7b00c1bee598",
+      "computationLawVersion": "PILLARS-UNIVERSAL-ALGORITHMIC-COMPUTATION-v1.0.0-20261014",
+      "consumer": "seven-capability execution controller",
+      "details": {
+        "dedicatedCapabilityCount": 6,
+        "registeredDoesNotMeanExecuted": true,
+        "registryAlgorithmCount": 173,
+        "registryLifecycleCounts": {
+          "PERMANENT_CHALLENGER": 63,
+          "REQUIRED_CONDITIONAL": 31,
+          "REQUIRED_CORE": 79
+        },
+        "registrySha256": "9e0421abf4ad8212fd33858e59359f9d5b531fc9576d29b6d68c71c9c51cd4a5",
+        "unrelatedRegistryAlgorithmsExecutionState": "TRACKED_BY_CANONICAL_ALGORITHM_PLAN_NOT_CLAIMED_BY_ADVANCED_LAYER"
+      },
+      "eventIds": [],
+      "evidenceCutoff": null,
+      "executionDurationMs": 0.861,
+      "executionMethod": "dcm.model.advanced_execution.compile_advanced_execution_dag",
+      "fallbackAlgorithmId": null,
+      "fallbackDetails": null,
+      "featureSnapshotIds": [],
+      "inputContentHashes": [],
+      "inputDatasetIds": [],
+      "inputDatasetLineageState": "NOT_PROVIDED_BY_CANONICAL_RUNNER",
+      "marketIds": [],
+      "modelId": "DCM_CANONICAL",
+      "modelVersion": "UNAVAILABLE",
+      "numericalDiagnostics": {},
+      "outputHash": "ae4ac53f390d528de355c596dd6d3c39c67b4786d2ee1763664a5693783c7c50",
+      "parameterSnapshotIds": [],
+      "producer": "dcm.algorithms.registry + compile_advanced_execution_dag",
+      "randomSeed": null,
+      "requirementIds": [
+        "REQ-ALG-CONST-R0"
+      ],
+      "rngVersion": null,
+      "runId": "RUN_101426_CFB_NHL_INPUT_DIAGNOSTIC",
+      "snapshotLineageState": "RECORDED_IN_INPUT_CONTENT_HASHES_WHEN_PRESENT",
+      "state": "EXECUTED_GRAPH_WITH_CAPABILITY_BLOCKERS",
+      "testReferences": [
+        "test_algorithm_constitution",
+        "test_algorithm_core"
+      ]
+    }
+  ],
+  "runId": "RUN_101426_CFB_NHL_INPUT_DIAGNOSTIC",
+  "schema": "pillars_dcm.advanced_modeling_execution.v1",
+  "seedInputHash": null,
+  "sportScopes": [
+    "CFB",
+    "NHL"
+  ]
+}

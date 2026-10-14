@@ -4,7 +4,9 @@ from dcm.model.advanced_execution import (
     _calibration_challenger_report,
     apply_directional_research_conflict_gate,
     _shared_world_diagnostics,
+    build_cutoff_safe_svd_matrix,
     compile_advanced_execution_dag,
+    empirical_discrete_distribution_diagnostic,
     execute_advanced_modeling,
     gaussian_kde_diagnostic,
     normalized_svd_diagnostic,
@@ -66,26 +68,38 @@ def test_dag_is_registered_and_receipt_has_every_capability():
                   "calibrationState": "INACTIVE_INSUFFICIENT_CHRONOLOGICAL_SETTLEMENTS"}]
     receipt = execute_advanced_modeling(
         forecasts=forecasts, portfolio=[], calibration_state={},
-        forecast_cutoff="2026-10-14T07:00:00Z",
+        forecast_cutoff="2026-10-14T07:00:00Z", sport_scopes=("CFB", "NHL"),
     )
     validate_advanced_execution_receipt(receipt)
     assert receipt["manifestType"] == "ModelExecutionManifest"
     assert receipt["runId"] == "UNAVAILABLE"
+    assert receipt["sportScopes"] == ["CFB", "NHL"]
     assert receipt["allCapabilitiesEvaluated"] is True
+    assert receipt["capabilityRunThrough"]["evaluationState"] == "COMPLETED_FOR_ALL_SEVEN_GATES"
+    assert receipt["capabilityRunThrough"]["runContinuesOnInputIssues"] is True
+    assert receipt["capabilityRunThrough"]["completedGateCount"] == 7
+    assert all(row["gateEvaluationState"] == "COMPLETED"
+               for row in receipt["capabilityRunThrough"]["gates"])
+    assert all("NOT_APPLICABLE" not in str(row) and "SKIPPED" not in str(row)
+               for row in receipt["capabilityRunThrough"]["gates"])
+    assert all(row["state"] != "CONSUMED_OR_NOT_APPLICABLE"
+               for row in receipt["canonicalFlow"])
+    assert all(row["requiredInputs"] for row in receipt["capabilityRunThrough"]["gates"])
+    assert all(row["inputProducersNeeded"] for row in receipt["capabilityRunThrough"]["gates"])
     assert {r["capability"] for r in receipt["receipts"]} == {
         "ALGORITHM_GRAPH", "KDE", "SVD", "MONTE_CARLO", "CALIBRATION",
         "PORTFOLIO_CORRELATION", "PAYOUT_EV"
     }
     assert receipt["fullModelingExecution"] is False
     graph = next(r for r in receipt["receipts"] if r["capability"] == "ALGORITHM_GRAPH")
-    assert graph["details"]["registryAlgorithmCount"] == 172
+    assert graph["details"]["registryAlgorithmCount"] == 173
     assert graph["details"]["registeredDoesNotMeanExecuted"] is True
     assert graph["details"]["unrelatedRegistryAlgorithmsExecutionState"].startswith("TRACKED_BY")
     assert all("outputHash" in r and "executionDurationMs" in r for r in receipt["receipts"])
     assert all(r["runId"] == "UNAVAILABLE" for r in receipt["receipts"])
     assert receipt["certification"]["learningRevision"] == "LR000000"
     assert receipt["certification"]["predictiveClaim"] == "NONE"
-    assert next(r for r in receipt["receipts"] if r["capability"] == "PAYOUT_EV")["state"] == "BLOCKED_MISSING_ENTRY_CONTRACT"
+    assert next(r for r in receipt["receipts"] if r["capability"] == "PAYOUT_EV")["state"] == "EV_UNVERIFIED"
 
 
 def test_kde_only_consumes_exact_key_cutoff_safe_history():
@@ -114,7 +128,37 @@ def test_kde_only_consumes_exact_key_cutoff_safe_history():
     assert kde["details"]["forecastProbabilityProduced"] is False
 
 
-def test_kde_abstains_for_discrete_market_even_with_history():
+def test_svd_builds_matrix_only_from_cutoff_safe_frozen_numeric_features():
+    rows = [{
+        "eventId": f"event-{i}", "projectionId": f"projection-{i}",
+        "decisionCutoff": f"2026-10-{i + 1:02d}T12:00:00Z",
+        "labelAvailableAt": f"2026-10-{i + 1:02d}T20:00:00Z",
+        "numericFeatures": {"opportunity": float(i), "roleShare": float((i * 7) % 13)},
+    } for i in range(8)]
+    rows.append({
+        "eventId": "future-event", "projectionId": "future-projection",
+        "decisionCutoff": "2026-10-13T12:00:00Z", "labelAvailableAt": "2026-10-15T20:00:00Z",
+        "numericFeatures": {"opportunity": 999.0, "roleShare": 999.0},
+    })
+    built = build_cutoff_safe_svd_matrix(rows, forecast_cutoff="2026-10-14T23:00:00Z")
+    assert built["state"] == "MATRIX_BUILT_FROM_FROZEN_FEATURES"
+    assert built["sourceRowCount"] == 8
+    assert built["excludedAfterCutoffRows"] == 1
+    assert built["featureNames"] == ["opportunity", "roleShare"]
+    assert all(max(row) < 100.0 for row in built["matrix"])
+    receipt = execute_advanced_modeling(
+        forecasts=[], portfolio=[],
+        calibration_state={"walkforwardRows": rows},
+        forecast_cutoff="2026-10-14T23:00:00Z",
+    )
+    svd = next(item for item in receipt["receipts"] if item["capability"] == "SVD")
+    assert svd["state"] == "SHADOW_DIAGNOSTIC"
+    assert svd["details"]["matrixInput"]["sourceRowCount"] == 8
+    assert svd["details"]["matrixInput"]["excludedAfterCutoffRows"] == 1
+    assert svd["details"]["diagnostic"]["forecastProbability"] is None
+
+
+def test_kde_uses_empirical_fallback_for_discrete_market_with_history():
     history = [{"comparableKey": "gridiron|CFB|receptions|MORE", "value": float(i),
                 "observedAt": "2026-10-10T00:00:00Z", "labelAvailableAt": "2026-10-11T00:00:00Z"}
                for i in range(40)]
@@ -125,8 +169,52 @@ def test_kde_abstains_for_discrete_market_even_with_history():
         forecast_cutoff="2026-10-14T07:00:00Z",
     )
     kde = next(item for item in receipt["receipts"] if item["capability"] == "KDE")
-    assert kde["state"] == "NOT_APPLICABLE"
-    assert kde["details"]["unsupportedDiscreteRows"] == 1
+    assert kde["state"] == "FALLBACK_EXECUTED"
+    assert kde["details"]["discreteRowsEvaluated"] == 1
+    assert kde["details"]["discreteFallbackRows"] == 1
+    assert kde["details"]["forecastProbabilityProduced"] is False
+    snapshot = kde["details"]["densitySnapshots"][0]["diagnostic"]
+    assert snapshot["state"] == "EMPIRICAL_DISCRETE_DIAGNOSTIC"
+    assert sum(snapshot["mass"].values()) == 1.0
+    invalid = empirical_discrete_distribution_diagnostic([float(i) for i in range(39)] + [0.5])
+    assert invalid["state"] == "BLOCKED_INVALID_DENSITY_INPUT"
+    assert invalid["blocker"] == "NONINTEGER_DISCRETE_OBSERVATION"
+
+
+def test_empty_portfolio_gate_executes_empty_diagnostic_and_records_ev_inputs():
+    receipt = execute_advanced_modeling(
+        forecasts=[], portfolio=[], calibration_state={},
+        forecast_cutoff="2026-10-14T07:00:00Z",
+    )
+    portfolio = next(row for row in receipt["receipts"]
+                     if row["capability"] == "PORTFOLIO_CORRELATION")
+    ev = next(row for row in receipt["receipts"] if row["capability"] == "PAYOUT_EV")
+    assert portfolio["state"] == "EXECUTED_EMPTY_PORTFOLIO_DIAGNOSTIC"
+    assert portfolio["details"]["portfolioSize"] == 0
+    assert portfolio["details"]["allLegsWinProbability"] is None
+    assert ev["state"] == "EV_UNVERIFIED"
+    assert set(ev["details"]["missingInputs"]) == {
+        "CAPTURED_PAYOUT_RULES_MISSING", "ENTRY_STAKE_MISSING",
+        "VERIFIED_MULTI_SELECTION_ENTRY_MISSING",
+    }
+
+
+def test_portfolio_gate_uses_modeled_candidate_pool_when_final_card_is_empty():
+    forecasts = [
+        {"_selectionOutcomes": bytes([2, 0, 2, 0])},
+        {"_selectionOutcomes": bytes([0, 2, 0, 2])},
+    ]
+    receipt = execute_advanced_modeling(
+        forecasts=forecasts, portfolio=[], calibration_state={},
+        forecast_cutoff="2026-10-14T07:00:00Z",
+    )
+    result = next(row for row in receipt["receipts"]
+                  if row["capability"] == "PORTFOLIO_CORRELATION")
+    assert result["state"] == "EXECUTED"
+    assert result["details"]["portfolioSize"] == 0
+    assert result["details"]["analyzedCandidateCount"] == 2
+    assert result["details"]["analysisPopulation"] == "MODELED_CANDIDATE_POOL"
+    assert result["details"]["jointStateDistribution"] == {"WL": 2, "LW": 2}
 
 
 def test_manual_shadow_mode_never_claims_canonical_full_execution():

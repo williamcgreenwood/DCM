@@ -1,0 +1,80 @@
+{
+  "benchmark": {
+    "canonical_1000_rows": {
+      "cpuSeconds": 136.13151158300002,
+      "fixtureOnly": true,
+      "peakRSSBytesObserved": 2040463360,
+      "rowsPerWallSecond": 7.342838675604043,
+      "wallSeconds": 136.1871129379997
+    },
+    "canonical_100_rows": {
+      "cpuSeconds": 10.640381157,
+      "fixtureOnly": true,
+      "peakRSSBytesObserved": 258654208,
+      "rowsPerWallSecond": 9.38454928067353,
+      "wallSeconds": 10.65581276299963
+    },
+    "discrete_fallback_500_ms": 20.4111,
+    "hostPerformanceCertified": false,
+    "svd_matrix_plus_diagnostic_32x3_cold_ms": 200.8783
+  },
+  "branch": "feat/seven-gate-runthrough-20261014",
+  "changes": [
+    "ALG-ML-PROB-010 discrete empirical fallback with integer-domain guard",
+    "cutoff-safe SVD matrix producer from frozen numericFeatures in chronological training rows",
+    "all seven gate evaluations explicitly complete while input issues remain separate",
+    "candidate-pool correlation analysis and empty-portfolio diagnostic",
+    "CFB/NHL scope recorded by canonical runner",
+    "10/14 CFB/NHL root-cause and gate-input receipts"
+  ],
+  "evidence_cutoff": "UNAVAILABLE_FOR_PREGAME_RUN",
+  "exact_external_blockers": [
+    "No observed CFB/NHL player offer board with exact line, side, period, and cutoff in accessible inputs.",
+    "No eligible historical player-market sample distribution in the Oct. 14 run input.",
+    "No NHL-specific primitive ledger/EventWorld/settlement adapter in the current package.",
+    "No eligible frozen forecasts joined to authoritative later settlements for calibration.",
+    "No verified entry contract, stake, complete dated payout schedule, or calibrated joint outcomes for EV."
+  ],
+  "implementation_hash": "6c67adc9d1d70826858c6aaa09e3bae966ad74e3672b8cbe49c9da4b77aa542f",
+  "implementation_hash_scope": "Changed implementation and audit files; checkpoint and generated inventory files excluded.",
+  "learning_revision": "LR000000",
+  "next_command": "Wait for PR #110 normal merge, then verify main SHA and post-merge CI; resume only if the merge did not complete.",
+  "parent_task": "PILLARS_DCM_CHATGPT_WORK_RESUME_AND_FINISH_v4_FIVE_REPOS_20261014",
+  "pr_ci_merge": {
+    "ci": "SUCCESS: GitHub Actions run 38651179538 / DCM v6 branch CI / run 489; all 8 jobs passed, including full pytest suite, inventory, RFECV, governance, benchmark/profile, durable batch-search, package/CLI, and python-dcm.",
+    "head_sha": "865e9cdc8f5c84b0f0d454390cb3bc6043adc56f",
+    "merge_sha": null,
+    "pr": "#110 OPEN: https://github.com/williamcgreenwood/DCM/pull/110; mergeable; normal merge pending."
+  },
+  "predictive_status": "NONE",
+  "production_certified": false,
+  "receipt_sha256": "ce7e0147a7ee6dd3448ceffeaa594732a2e5eb46c7fcf38196b56beeed0ccf1d",
+  "run_id": "RUN_101426_CFB_NHL_INPUT_DIAGNOSTIC",
+  "schema": "pillars_dcm.interruption_checkpoint.v1",
+  "task_id": "seven_gate_runthrough_cfb_nhl_20261014",
+  "tests": {
+    "algorithm_frontier_smoke": "13 checks passed",
+    "compileall": "passed",
+    "focused_final": "22 passed (advanced execution + algorithm registry/core governance)",
+    "full_suite_github_ci": "Passed on exact candidate 865e9cdc8f5c84b0f0d454390cb3bc6043adc56f; all 8 workflow jobs succeeded.",
+    "full_suite_local": "Reached 100% on pre-SVD code state; no failure/error markers; one skip marker. Final SVD producer change passed focused tests; exact-candidate full suite remains required in GitHub CI.",
+    "inventory": "write/check passed",
+    "policy": "DCM_POLICY_VALID",
+    "registry": "173 rows; --check passed",
+    "wheel": "pillars_dcm-6.0.0-py3-none-any.whl built successfully"
+  },
+  "verified_base_sha": "946bbe7df7e24264356e89fa81d22356de77e3d7",
+  "verified_prior_merges": [
+    {
+      "merge_sha": "98cb698cf000b963e24ca47b3c1e4e18722bda96",
+      "pr": 107,
+      "state": "MERGED"
+    },
+    {
+      "merge_sha": "946bbe7df7e24264356e89fa81d22356de77e3d7",
+      "pr": 109,
+      "state": "MERGED"
+    }
+  ],
+  "wheel_sha256": "f2e9e3161bd9d756334f6db3537ecaefa6704000560e4cf342766201b543d6bd"
+}
