@@ -179,8 +179,8 @@ def test_walkforward_refuses_leakage(tmp_path: Path):
     dest_b = _write_settleable(tmp_path / "RUN_B", [_row(0), _row(1)], ["proj-0"], cutoff="2026-08-10T00:00:00Z")
     (tmp_path / "oa.json").write_text(json.dumps({"proj-0": "WIN", "proj-1": "LOSS"}) + "\n", encoding="utf-8")
     (tmp_path / "ob.json").write_text(json.dumps({"proj-0": "LOSS", "proj-1": "WIN"}) + "\n", encoding="utf-8")
-    settle_run(dest_a, tmp_path / "oa.json")
-    settle_run(dest_b, tmp_path / "ob.json")
+    settle_run(dest_a, tmp_path / "oa.json", label_available_at_utc="2026-08-02T00:00:00Z")
+    settle_run(dest_b, tmp_path / "ob.json", label_available_at_utc="2026-08-11T00:00:00Z")
     rows, _ = build_dataset([dest_a, dest_b])
     folds = chronological_folds(rows)
     assert folds
@@ -198,6 +198,20 @@ def test_walkforward_refuses_leakage(tmp_path: Path):
     assert report["shadowChallenger"]["pkl"] is False
     assert report["shadowChallenger"]["trainedNeuralNet"] is False
     (tmp_path / "walkforward_report.json").write_text(json.dumps(report), encoding="utf-8")
+
+
+def test_walkforward_does_not_train_on_labels_not_yet_available():
+    early_forecast_late_label = {
+        "decisionCutoff": "2026-08-01T00:00:00Z", "labelAvailableAt": "2026-08-12T00:00:00Z",
+        "result": "WIN", "selectedP": 0.7, "labelSplit": "supervised",
+    }
+    later_forecast = {
+        "decisionCutoff": "2026-08-10T00:00:00Z", "labelAvailableAt": "2026-08-11T00:00:00Z",
+        "result": "LOSS", "selectedP": 0.6, "labelSplit": "supervised",
+    }
+    assert chronological_folds([early_forecast_late_label, later_forecast]) == []
+    with pytest.raises(WalkForwardLeakage, match="label unavailable"):
+        assert_no_leakage([early_forecast_late_label], [later_forecast])
 
 
 def test_challenger_shadow_propose_blocked_promote_refuses_lr(tmp_path: Path, monkeypatch):

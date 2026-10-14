@@ -10,6 +10,7 @@ import json
 import math
 from pathlib import Path
 from typing import Any, Iterable
+from datetime import datetime, timezone
 
 from dcm.contracts.hashes import content_hash
 from dcm.learning.dataset import _load_jsonl
@@ -24,6 +25,18 @@ class WalkForwardLeakage(RuntimeError):
 
 def _ts(value: Any) -> str:
     return str(value or "")
+
+def _aware_time(value: Any) -> datetime | None:
+    raw = _ts(value)
+    if not raw:
+        return None
+    try:
+        parsed = datetime.fromisoformat(raw[:-1] + "+00:00" if raw.endswith("Z") else raw)
+    except ValueError:
+        return None
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        return None
+    return parsed.astimezone(timezone.utc)
 
 def prediction_p(row: dict[str, Any]) -> float | None:
     for key in ("calibratedP", "selectedP", "evidenceSafeP", "forecastP", "rawP"):
@@ -128,17 +141,38 @@ def assert_no_leakage(train: list[dict[str, Any]], test: list[dict[str, Any]]) -
         c = _ts(row.get("decisionCutoff"))
         if c and c <= max_train:
             raise WalkForwardLeakage(f"WALKFORWARD_LEAKAGE: test cutoff {c!r} <= train max {max_train!r}")
+    first_test = min((_aware_time(c) for c in test_c), default=None)
+    if first_test is None:
+        raise WalkForwardLeakage("WALKFORWARD_LEAKAGE: invalid test decision cutoff")
+    for row in train:
+        available = row.get("labelAvailableAt")
+        if available is None:
+            continue  # Legacy rows are excluded by chronological_folds.
+        available_at = _aware_time(available)
+        if available_at is None or available_at >= first_test:
+            raise WalkForwardLeakage("WALKFORWARD_LEAKAGE: training label unavailable at test cutoff")
 
 def chronological_folds(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Expanding-window folds: unique cutoffs sorted; train all earlier, test the next cutoff."""
+    """As-of expanding folds; a prior forecast is trainable only after its label arrived."""
     labeled = [r for r in rows if _ts(r.get("decisionCutoff"))]
-    cutoffs = sorted({_ts(r.get("decisionCutoff")) for r in labeled})
+    cutoff_values = {_ts(r.get("decisionCutoff")) for r in labeled}
+    cutoff_pairs = [(_aware_time(value), value) for value in cutoff_values]
+    if any(parsed is None for parsed, _ in cutoff_pairs):
+        return []
+    cutoffs = [value for _parsed, value in sorted(cutoff_pairs)]
     folds: list[dict[str, Any]] = []
     for i in range(1, len(cutoffs)):
-        train_cut = set(cutoffs[:i])
         test_cut = {cutoffs[i]}
-        train = [r for r in labeled if _ts(r.get("decisionCutoff")) in train_cut]
+        test_time = _aware_time(cutoffs[i])
+        train_cut = set(cutoffs[:i])
+        train = [r for r in labeled
+                 if _ts(r.get("decisionCutoff")) in train_cut
+                 and r.get("labelAvailableAt") is not None
+                 and _aware_time(r.get("labelAvailableAt")) is not None
+                 and _aware_time(r.get("labelAvailableAt")) < test_time]
         test = [r for r in labeled if _ts(r.get("decisionCutoff")) in test_cut]
+        if not train:
+            continue
         assert_no_leakage(train, test)
         folds.append(
             {

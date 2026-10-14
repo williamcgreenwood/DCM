@@ -1,11 +1,14 @@
+Warning: truncated output (original token count: 34758)
+Total output lines: 3196
+
 # Generated DCM code inventory
 
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
 - Modules: **270**
-- Symbols: **2068**
+- Symbols: **2071**
 - Parse errors: **0**
-- Inventory hash: `87c230525e75099cc9a8a0e43aa00eec167c42860e1276f4b6d7494e57a80f39`
+- Inventory hash: `e1877648267508bc63814d115f1d59db4a7bda813e519d9dd2de70ae43510687`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -98,11 +101,11 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P6 | `src/dcm/learning/postgame.py` | 0 | 13 |
 | P6 | `src/dcm/learning/registry.py` | 0 | 10 |
 | P6 | `src/dcm/learning/sidecar.py` | 0 | 5 |
-| P6 | `src/dcm/learning/walkforward.py` | 1 | 15 |
+| P6 | `src/dcm/learning/walkforward.py` | 1 | 16 |
 | P2 | `src/dcm/ml/__init__.py` | 0 | 0 |
 | P2 | `src/dcm/ml/feature_store.py` | 1 | 9 |
 | P2-P4 | `src/dcm/model/__init__.py` | 0 | 1 |
-| P2-P4 | `src/dcm/model/advanced_execution.py` | 0 | 8 |
+| P2-P4 | `src/dcm/model/advanced_execution.py` | 0 | 10 |
 | P2-P4 | `src/dcm/model/availability.py` | 0 | 2 |
 | P2-P4 | `src/dcm/model/basketball_efficiency.py` | 1 | 6 |
 | P2-P4 | `src/dcm/model/basketball_opportunity.py` | 1 | 8 |
@@ -1217,9 +1220,9 @@ _No class/function symbols._
 - `function` **_decision_cutoff** L158
 - `function` **_label_split** L168
 - `function` **build_training_row** L182 — Join freeze slim + hashes + settlement. Returns None if no real settlement.
-- `function` **build_dataset** L236 — Build rows from one or more settled run dests. Never invents settlements.
-- `function` **write_dataset** L301
-- `function` **main** L316
+- `function` **build_dataset** L238 — Build rows from one or more settled run dests. Never invents settlements.
+- `function` **write_dataset** L303
+- `function` **main** L318
 
 ### `src/dcm/learning/failure_class.py`
 
@@ -1250,19 +1253,19 @@ _No class/function symbols._
 
 ### `src/dcm/learning/postgame.py`
 
-- `function` **_load_jsonl** L34
-- `function` **_population** L51 — Prefer the post-model slim population; fall back to the account-time dump.
-- `function` **_modeled_rows** L61
-- `function` **_card_ids** L75
-- `function` **_outcomes** L89 — Parse a synthetic/official outcome map. Never invent missing keys.
-- `function` **_sha256_file** L129
-- `function` **_verify_frozen_run** L137
-- `function` **_result** L179 — PrizePicks sporting compare: MORE wins above the line, LESS below, exact is PUSH.
-- `function` **_normalize_result** L188
-- `function` **_settle_row** L201
-- `function` **_attach_scores** L309
-- `function` **_summarize** L320
-- `function` **settle_run** L353
+- `function` **_load_jsonl** L35
+- `function` **_population** L52 — Prefer the post-model slim population; fall back to the account-time dump.
+- `function` **_modeled_rows** L62
+- `function` **_card_ids** L76
+- `function` **_outcomes** L90 — Parse a synthetic/official outcome map. Never invent missing keys.
+- `function` **_sha256_file** L130
+- `function` **_verify_frozen_run** L138
+- `function` **_result** L180 — PrizePicks sporting compare: MORE wins above the line, LESS below, exact is PUSH.
+- `function` **_normalize_result** L189
+- `function` **_settle_row** L202
+- `function` **_attach_scores** L310
+- `function` **_summarize** L321
+- `function` **settle_run** L354
 
 ### `src/dcm/learning/registry.py`
 
@@ -1287,22 +1290,23 @@ _No class/function symbols._
 
 ### `src/dcm/learning/walkforward.py`
 
-- `class` **WalkForwardLeakage** L22 — Test fold decisionCutoff is not strictly after every train cutoff.
-- `function` **_ts** L25
-- `function` **prediction_p** L28
-- `function` **binary_pairs** L41 — WIN=1, LOSS=0. PUSH excluded (default) or scored as 0.5.
-- `function` **metrics** L66
-- `function` **assert_no_leakage** L116
-- `function` **chronological_folds** L132 — Expanding-window folds: unique cutoffs sorted; train all earlier, test the next cutoff.
-- `function` **_sigmoid** L156
-- `function` **_shadow_features** L160
-- `method` **_shadow_features.f** L165
-- `function` **fit_shadow_logistic** L174 — Tiny intercept+linear logistic. SHADOW only. No sklearn required. No .pkl.
-- `function` **predict_shadow** L203
-- `function` **evaluate_folds** L209
-- `function` **run_walkforward** L267
-- `function` **write_walkforward_report** L326
-- `function` **main** L334
+- `class` **WalkForwardLeakage** L23 — Test fold decisionCutoff is not strictly after every train cutoff.
+- `function` **_ts** L26
+- `function` **_aware_time** L29
+- `function` **prediction_p** L41
+- `function` **binary_pairs** L54 — WIN=1, LOSS=0. PUSH excluded (default) or scored as 0.5.
+- `function` **metrics** L79
+- `function` **assert_no_leakage** L129
+- `function` **chronological_folds** L155 — As-of expanding folds; a prior forecast is trainable only after its label arrived.
+- `function` **_sigmoid** L190
+- `function` **_shadow_features** L194
+- `method` **_shadow_features.f** L199
+- `function` **fit_shadow_logistic** L208 — Tiny intercept+linear logistic. SHADOW only. No sklearn required. No .pkl.
+- `function` **predict_shadow** L237
+- `function` **evaluate_folds** L243
+- `function` **run_walkforward** L301
+- `function` **write_walkforward_report** L360
+- `function` **main** L368
 
 ### `src/dcm/ml/__init__.py`
 
@@ -1327,14 +1331,16 @@ _No class/function symbols._
 
 ### `src/dcm/model/advanced_execution.py`
 
-- `function` **compile_advanced_execution_dag** L48 — Compile and validate the bounded modeling DAG against the live registry.
-- `function` **_receipt** L73
-- `function` **_timestamp_at_or_before** L90
-- `function` **gaussian_kde_diagnostic** L104 — Select bandwidth by deterministic leave-one-out likelihood.
-- `function` **normalized_svd_diagnostic** L143 — Validate chronology, normalize columns, and report a NumPy SVD rank.
-- `function` **_shared_world_diagnostics** L190
-- `function` **execute_advanced_modeling** L226 — Evaluate each modeling capability for a canonical runner invocation.
-- `function` **validate_advanced_execution_receipt** L402
+- `function` **_deterministic_hash_payload** L61 — Remove observational timings recursively from deterministic hashes.
+- `function` **compile_advanced_execution_dag** L71 — Compile and validate the bounded modeling DAG against the live registry.
+- `function` **_receipt** L105
+- `function` **_timestamp_at_or_before** L156
+- `function` **_aware_utc_timestamp** L170
+- `function` **gaussian_kde_diagnostic** L183 — Select bandwidth by deterministic leave-one-out likelihood.
+- `function` **normalized_svd_diagnostic** L251 — Validate chronology, normalize columns, and report a NumPy SVD rank.
+- `function` **_shared_world_diagnostics** L322
+- `function` **execute_advanced_modeling** L358 — Evaluate each modeling capability for a canonical runner invocation.
+- `function` **validate_advanced_execution_receipt** L648
 
 ### `src/dcm/model/availability.py`
 
@@ -1377,451 +1383,7 @@ _No class/function symbols._
 - `function` **reconcile_team_minutes** L98 — Soft rescale + hard residual-adjust. Returns (minutes, residual, method).
 - `function` **allocate_team_fga** L127 — Dirichlet allocation of a noisy team FGA total. Returns (player_fga, residual_fga, team_fga).
 - `function` **simulate_joint_team_worlds** L150 — Simulate one EventWorld stream shared by modeled teammates.
-- `function` **summarize_joint_meta** L258
-
-### `src/dcm/model/explanation.py`
-
-- `function` **_f** L87
-- `function` **_league_key** L97
-- `function` **_priors_for** L101
-- `function` **_market_sign_override** L108 — Market-specific encoded sign. None means keep the default.
-- `function` **_driver_record** L120
-- `function` **_drivers_from_snapshot** L150
-- `function` **_failure_paths** L217
-- `function` **_model_ids** L258
-- `function` **_projected_opportunity** L269
-- `function` **_projected_efficiency** L282
-- `function` **build_prop_explanation** L294 — Build a machine-readable explanation. Drivers are encoded diffs, never prose.
-- `function` **render_prop_explanation_text** L381 — Optional human text generated FROM the explanation object only. Never invents drivers.
-- `function` **load_feature_hash_index** L402 — entity+eventId → content hashes of FeatureStore records (and their sourceHashes).
-- `function` **persist_prop_explanations** L424
-
-### `src/dcm/model/grade.py`
-
-- `function` **grade** L6
-
-### `src/dcm/model/gridiron_models.py`
-
-- `function` **_f** L72
-- `function` **_avg** L80
-- `function` **_sd** L89
-- `function` **_blend** L98
-- `function` **_rate** L114
-- `function` **league_priors** L120
-- `function` **_role_bucket** L125
-- `function` **_eb** L138 — Empirical Bayes shrink toward the declared prior. Never uses outcomes.
-- `class` **GridironOpportunityModel** L151 — Snaps / dropbacks / routes / targets / carries / kicking attempts from role-comparable logs.
-- `method` **GridironOpportunityModel.fit** L156
-- `class` **GridironEfficiencyModel** L260 — YPA / completion / catch-rate / YPR / TD-INT / FG-XP rates from comparable logs.
-- `method` **GridironEfficiencyModel.fit** L268
-- `method` **GridironEfficiencyModel.fit._sum_rate** L289
-- `method` **GridironEfficiencyModel.fit._b** L318
-- `class` **TeamEventModel** L367 — Team plays / pass-rate / rush-rate / pace plus opponent pass/rush defense.
-- `method` **TeamEventModel.fit** L377
-- `method` **TeamEventModel.fit._first** L391
-
-### `src/dcm/model/hierarchical_distribution.py`
-
-- `class` **HierarchicalFit** L21
-- `method` **HierarchicalFit.to_dict** L33
-- `function` **effective_sample_size** L50
-- `function` **_finite** L65
-- `function` **fit_hierarchical_distribution** L77
-- `function` **uncertainty_interval** L145
-
-### `src/dcm/model/inverse_gate.py`
-
-- `class` **HistoricalObservation** L17
-- `class` **InverseGateResult** L24
-- `method` **InverseGateResult.as_dict** L37
-- `function` **_as_aware_datetime** L41
-- `function` **audit_direction** L48 — Evaluate a candidate direction; never convert hit rate into calibrated p.
-
-### `src/dcm/model/joint_value.py`
-
-- `class` **WorldSelection** L17
-- `class` **JointValueResult** L27
-- `method` **JointValueResult.as_dict** L37
-- `function` **evaluate_shared_world_portfolio** L41 — Evaluate correlated outcomes; block certification if inputs lack proof.
-
-### `src/dcm/model/line_surface.py`
-
-- `function` **_probs** L12
-- `function` **_side_p** L22
-- `function` **_order_break** L26
-- `function` **surface** L36
-
-### `src/dcm/model/market_derive.py`
-
-- `class` **UnknownMarketError** L164 — Unknown or unverified market. Fail closed — never nearest-match.
-- `method` **UnknownMarketError.__init__** L167
-- `function` **canonicalize_market** L173 — Exact alias lookup. Returns None when the key is not registered.
-- `function` **is_registered** L189
-- `function` **looks_like_basketball_ledger** L193
-- `function` **looks_like_gridiron_ledger** L201
-- `function` **_num** L208
-- `function` **_formulas** L215
-- `function` **derive_market** L271 — Map a ledger + market key to a scalar. Never independently samples.
-
-### `src/dcm/model/parameters.py`
-
-- `function` **_f** L37
-- `function` **_pairs** L45
-- `function` **_game_log_row_marker** L56 — Stable per-game marker for claim log union (date / game_date / gameId).
-- `function` **_union_log_row_fields** L61 — Per-row field union: incoming fills missing/null keys only.
-- `function` **_union_game_log_lists** L75 — Union game-log lists by date/game_date/gameId with per-row field union.
-- `method` **_union_game_log_lists._ingest** L84
-- `function` **_merge** L107
-- `function` **_avg** L121
-- `function` **_sd** L133
-- `function` **_shrink** L143
-- `function` **_collect_player_game_logs** L152 — Collect per-game logs from common host/claim aliases without inventing rows.
-- `function` **build_parameter_snapshot** L183
-- `method` **build_parameter_snapshot._rate_claimed** L417
-
-### `src/dcm/model/participation.py`
-
-- `function` **_f** L19
-- `function` **_avg** L27
-- `function` **_sd** L39
-- `function` **_blend** L51
-- `class` **ParticipationModel** L67 — Expected participation units from role-comparable logs.
-- `method` **ParticipationModel.fit** L76
-
-### `src/dcm/model/quarter_worlds.py`
-
-- `class` **QuarterPluginIncomplete** L24
-- `method` **QuarterPluginIncomplete.__init__** L27
-- `function` **dirichlet_shares** L32
-- `function` **allocate_int** L40 — Largest-remainder so allocated integers sum exactly to total.
-- `function` **allocate_float** L57
-- `function` **split_game_to_quarters** L69 — Split full-game pts/minutes into n quarters that sum to the game totals.
-- `function` **attach_quarter_state** L94
-- `function` **require_quarters** L103
-- `function` **count_quarters_at_least** L110
-- `function` **derive_board_market** L115 — Derive a quarter/half board market from the attached quarter split.
-
-### `src/dcm/model/ranking.py`
-
-- `function` **selection_score** L11
-- `function` **frontier_slice** L25 — Partial Top-K without requiring a second full-board sort.
-- `function` **rank_candidates** L34
-
-### `src/dcm/model/uncertainty.py`
-
-- `function` **evidence_safe_probability** L24
-- `function` **wilson_lower_bound** L34
-- `function` **probability_bundle** L44
-
-### `src/dcm/model/worlds.py`
-
-- `function` **_rng** L16
-- `function` **_clip** L22
-- `function` **_nonneg_int_gauss** L26
-- `function` **_binomial** L30
-- `function` **_poisson** L35
-- `function` **_categorical_counts** L49
-- `function` **_p** L74
-- `function` **generate_event_contexts** L81 — Create deterministic latent event states shared by every player.
-- `function` **_contextualize** L107
-- `function` **assert_ledger_identities** L166 — Fail closed when a world violates basketball counting identities.
-- `function` **as_primitive_ledger** L200 — Canonical PrimitiveStatLedger dict. Applies oreb/dreb split if only reb is present.
-- `function` **sample_basketball** L233
-- `function` **sample_football** L284
-- `function` **sample_baseball_batter** L341
-- `function` **value_from_stats** L401
-- `function` **simulate_player_worlds** L424
-
-### `src/dcm/paths.py`
-
-- `function` **repo_root** L16
-- `function` **package_dir** L28 — Directory containing the installed/editable ``dcm`` package.
-- `function` **src_root** L33 — Parent of the ``dcm`` package (``src/`` in checkout).
-- `function` **archive_root** L39 — Historical workstream archive (fixtures/configs/docs). Not install root.
-- `function` **default_workspace** L47
-
-### `src/dcm/platform/__init__.py`
-
-_No class/function symbols._
-
-### `src/dcm/platform/prizepicks/__init__.py`
-
-_No class/function symbols._
-
-### `src/dcm/platform/prizepicks/economics.py`
-
-- `class` **PayoutPricingError** L16
-- `class` **LegOutcomeProbabilities** L21
-- `method` **LegOutcomeProbabilities.__post_init__** L26
-- `function` **_return_for_state** L34
-- `function` **independent_state_distribution** L43 — Return P(non-push tier count, wins) under independent marginals.
-- `function` **expected_return_independent** L66 — Exact expected table return for independent W/L/P marginals.
-- `function` **expected_return_from_worlds** L100 — Price aligned joint W/L/P worlds without an independence assumption.
-- `function` **probabilities_from_mapping** L141
-
-### `src/dcm/platform/prizepicks/entry_contract.py`
-
-- `class` **EntryContractError** L16
-- `method` **EntryContractError.__init__** L17
-- `function` **build_entry_contract** L22
-- `function` **pick** L87
-
-### `src/dcm/platform/prizepicks/leaderboard.py`
-
-_No class/function symbols._
-
-### `src/dcm/platform/prizepicks/minimum_guarantee.py`
-
-_No class/function symbols._
-
-### `src/dcm/platform/prizepicks/participation.py`
-
-- `class` **ParticipationFacts** L20 — World-realized participation. Reboot evaluation consumes this; it does not decide economics.
-- `function` **football_qualifying_exit** L38 — Official window: leave 1H and do not return in 2H.
-- `function` **board_allows_reboot** L52
-
-### `src/dcm/platform/prizepicks/payouts.py`
-
-- `function` **register_minimum_guarantee_table** L8 — rows maps (payout_tier_count, win_count) -> return amount (not multiplier).
-- `function` **minimum_guarantee_return** L47
-
-### `src/dcm/platform/prizepicks/platform_rules_authority.py`
-
-- `function` **_claim_is_platform_rules** L61
-- `function` **_hash_from_claim** L82
-- `function` **collect_platform_rule_claim_hashes** L90
-- `function` **resolve_platform_rules_authority** L100 — Resolve platform settlement authority for build_cfb_rules_snapshot.
-
-### `src/dcm/platform/prizepicks/reboot.py`
-
-- `class` **RebootDecision** L37
-- `function` **evaluate_reboot** L44
-- `function` **_nba_wnba** L83
-- `function` **_nfl** L94
-- `function` **_cfb** L120
-
-### `src/dcm/platform/prizepicks/settlement.py`
-
-- `class` **GroupScoreContext** L34 — Optional. Without this, Leaderboard return is UNMODELED.
-- `class` **SettlementError** L41
-- `method` **SettlementError.__init__** L42
-- `function` **compare** L47
-- `function` **_economic** L56
-- `function` **_pick_state** L72
-- `function` **settle_world_lineup** L98
-- `function` **_outcome** L225
-
-### `src/dcm/postgame.py`
-
-- `function` **main** L11
-
-### `src/dcm/release.py`
-
-- `function` **_sha256_bytes** L39
-- `function` **repo_root** L43
-- `function` **package_root** L51 — Return the Python package discovery root (``src/``), not the archive.
-- `function` **count_pytest_functions** L60
-- `function` **resolve_git_commit** L68 — Populate gitCommit from git rev-parse HEAD. FAIL if blank.
-- `function` **canonical_package_files** L88 — Ordered (relative, absolute) files of the canonical Python package tree.
-- `function` **build_complete_project_source** L108
-- `function` **capability_document** L128
-- `function` **_ensure_build_deps** L162
-- `function` **build_wheel** L181 — Build an installable pillars-dcm wheel into dest (and dest/../dist if present).
-- `function` **build_portable** L224
-- `function` **verify_extraction** L362
-- `function` **verify_complete_project_source** L396
-- `function` **main** L426
-
-### `src/dcm/research/__init__.py`
-
-- `function` **__getattr__** L45
-
-### `src/dcm/research/acquisition.py`
-
-- `function` **_scalable_weighted_set_cover** L50 — Lazy greedy set cover using a requirement→action reverse index.
-- `function` **_req_id** L96
-- `function` **build_acquisition_actions** L100 — Group reusable-entity requests into fan-out AcquisitionActions.
-- `function` **schedule_acquisition_actions** L309 — Live CELF selector with set-cover + constrained batch packing.
-- `method` **schedule_acquisition_actions.gain_fn** L356
-- `method` **schedule_acquisition_actions.cost_fn** L366
-- `function` **build_acquisition_action_graph** L466 — Persistable AcquisitionActionGraph: one action may cover many requirements.
-
-### `src/dcm/research/action_state.py`
-
-- `function` **_parse_time** L51
-- `function` **deterministic_backoff** L62
-- `function` **transition** L67
-- `function` **initial_action_state** L77
-- `function` **load_action_state** L88
-- `function` **save_action_state** L113
-- `function` **apply_transition** L144
-- `function` **apply_failure** L156
-- `function` **_failure_applies** L224
-- `function` **eligible_action_ids** L241 — Return only actions safe to schedule at this instant.
-
-### `src/dcm/research/adapters/__init__.py`
-
-_No class/function symbols._
-
-### `src/dcm/research/adapters/base.py`
-
-- `function` **utc_now** L31
-- `function` **live_fetch_enabled** L35
-- `function` **hostname_of** L43
-- `function` **adapter_record** L47
-- `class` **SourceAdapter** L81 — Fetch/normalize boundary. CI uses fixtures; live fetch is opt-in.
-- `method` **SourceAdapter.fetch** L88 — Return a SourceDocument-shaped dict (url, text/html, timestamps).
-- `method` **SourceAdapter.normalize** L92 — Return adapter records with provenance + content hash.
-- `function` **fetch_normalize** L97
-
-### `src/dcm/research/adapters/basketball_reference.py`
-
-- `function` **_as_text** L33
-- `function` **_pick_table** L41
-- `function` **_fetch_http** L58
-- `class` **BasketballReferenceGameLogAdapter** L67
-- `method` **BasketballReferenceGameLogAdapter.__init__** L72
-- `method` **BasketballReferenceGameLogAdapter.fetch** L76
-- `method` **BasketballReferenceGameLogAdapter.normalize** L101
-- `method` **BasketballReferenceGameLogAdapter.fetch_normalize** L138 — Parse HTML/text into canonical logs via normalize_basketball_logs.
-- `class` **BasketballReferencePlayerAdapter** L159
-- `method` **BasketballReferencePlayerAdapter.__init__** L164
-- `method` **BasketballReferencePlayerAdapter.fetch** L168
-- `method` **BasketballReferencePlayerAdapter.normalize** L192
-- `function` **_fixture_or_live** L246
-- `class` **BasketballReferenceTeamAdapter** L273
-- `method` **BasketballReferenceTeamAdapter.__init__** L278
-- `method` **BasketballReferenceTeamAdapter.fetch** L282
-- `method` **BasketballReferenceTeamAdapter.normalize** L290
-- `class` **BasketballReferenceTeamGameLogAdapter** L335
-- `method` **BasketballReferenceTeamGameLogAdapter.__init__** L340
-- `method` **BasketballReferenceTeamGameLogAdapter.fetch** L344
-- `method` **BasketballReferenceTeamGameLogAdapter.normalize** L352
-- `class` **BasketballReferenceSplitAdapter** L392
-- `method` **BasketballReferenceSplitAdapter.__init__** L397
-- `method` **BasketballReferenceSplitAdapter.fetch** L401
-- `method` **BasketballReferenceSplitAdapter.normalize** L409
-- `class` **BasketballReferenceLineupAdapter** L445
-- `method` **BasketballReferenceLineupAdapter.__init__** L450
-- `method` **BasketballReferenceLineupAdapter.fetch** L454
-- `method` **BasketballReferenceLineupAdapter.normalize** L462
-- `class` **BasketballReferenceOnOffAdapter** L495
-- `method` **BasketballReferenceOnOffAdapter.__init__** L500
-- `method` **BasketballReferenceOnOffAdapter.fetch** L504
-- `method` **BasketballReferenceOnOffAdapter.normalize** L512
-
-### `src/dcm/research/adapters/espn_status.py`
-
-- `function` **canonicalize_status** L37
-- `function` **_as_text** L49
-- `function` **_parse_payload** L59
-- `class` **ESPNStatusAdapter** L84
-- `method` **ESPNStatusAdapter.__init__** L89
-- `method` **ESPNStatusAdapter.fetch** L93
-- `method` **ESPNStatusAdapter.normalize** L122
-
-### `src/dcm/research/adapters/html_tables.py`
-
-- `function` **unwrap_commented_tables** L16
-- `method` **unwrap_commented_tables.repl** L17
-- `class` **_TableParser** L26
-- `method` **_TableParser.__init__** L27
-- `method` **_TableParser.handle_starttag** L47
-- `method` **_TableParser.handle_endtag** L80
-- `method` **_TableParser.handle_data** L134
-- `function` **extract_tables** L139
-- `function` **table_rows_as_dicts** L146
-
-### `src/dcm/research/adapters/official_league.py`
-
-- `function` **_as_text** L16
-- `function` **_games** L26
-- `function` **_normalize_game** L44
-- `class` **_OfficialScheduleAdapter** L81
-- `method` **_OfficialScheduleAdapter.__init__** L84
-- `method` **_OfficialScheduleAdapter.fetch** L88
-- `method` **_OfficialScheduleAdapter.normalize** L116
-- `class` **OfficialWNBAAdapter** L136
-- `class` **OfficialNBAAdapter** L142
-
-### `src/dcm/research/adapters/prizepicks.py`
-
-- `function` **offer_fields_from_row** L15
-- `class` **PrizePicksOfferAdapter** L41
-- `method` **PrizePicksOfferAdapter.__init__** L46
-- `method` **PrizePicksOfferAdapter.fetch** L50
-- `method` **PrizePicksOfferAdapter.normalize** L61
-- `method` **PrizePicksOfferAdapter.normalize_rows** L92
-
-### `src/dcm/research/adapters/pro_football_reference.py`
-
-- `function` **_as_text** L30
-- `function` **_pick_table** L38
-- `function` **_fetch_http** L56
-- `class` **FootballReferenceGameLogAdapter** L65
-- `method` **FootballReferenceGameLogAdapter.__init__** L70
-- `method` **FootballReferenceGameLogAdapter.fetch** L74
-- `method` **FootballReferenceGameLogAdapter.normalize** L103
-- `method` **FootballReferenceGameLogAdapter.fetch_normalize** L148
-- `class` **ProFootballReferenceAdapter** L165 — Alias used by NFL hosts. Same parser as FootballReferenceGameLogAdapter.
-
-### `src/dcm/research/authority.py`
-
-- `function` **_parse** L22
-- `function` **classify_source** L35
-- `function` **derive_quality** L54
-- `class` **SourceAuthorityRegistry** L86 — Lookup table + derivation. Host never writes reliability/freshness as authority.
-- `method` **SourceAuthorityRegistry.__init__** L89
-- `method` **SourceAuthorityRegistry.derive** L92
-
-### `src/dcm/research/batch.py`
-
-- `function` **scheduler_score** L40
-- `function` **_event_id_of** L53
-- `function` **_request_id_of** L64
-- `function` **_host_task** L79 — Expose the minimum actionable context for a host acquisition.
-- `function` **build_next_research_batch** L131
-
-### `src/dcm/research/batch_store.py`
-
-- `class` **BatchEnvelopeError** L16
-- `class` **BatchEnvelopeOverwriteBlocked** L20
-- `class` **CheckpointCasMismatch** L24
-- `function` **_canonical_bytes** L28
-- `function` **_fsync_dir** L32
-- `function` **_atomic_create** L43 — Create a file without replacing an existing path, even on a race.
-- `function` **_atomic_replace** L64
-- `function` **_identity** L75
-- `function` **make_batch_envelope** L86
-- `function` **_validate_envelope** L124
-- `function` **load_batch** L142
-- `function` **seal_batch** L146 — Seal once.  A repeat with the same identity returns the original bytes.
-- `function` **_envelope_args** L167
-- `function` **_checkpoint_hash** L184
-- `function` **write_checkpoint_cas** L188
-- `function` **verify_checkpoint** L229
-
-### `src/dcm/research/cache.py`
-
-- `function` **cache_identity** L34
-- `class` **ResearchCache** L57 — Compatibility cache with optional durable SQLite backing.
-- `method` **ResearchCache.__init__** L66
-- `method` **ResearchCache.put** L73
-- `method` **ResearchCache.get** L102
-- `method` **ResearchCache.hits** L126
-- `method` **ResearchCache.snapshot** L129
-- `method` **ResearchCache.close** L138
-
-### `src/dcm/research/cache_layers.py`
-
-- `function` **_key** L43
-- `function` **_decode_cached_row** L57 — Decode and verify a durable cache row before it becomes a reuse hit.
-- `function` **_open_persistent_index** L74 — Open a durable L2 index, falling back without deleting corrupt bytes.
-- `class` **ResearchCacheCascade** L122 — Exact-first reuse. Web acquisition is L6 and never the first lookup.
-- `method` **ResearchCacheCascade.__init__** L125
-- `method` **ResearchCacheCascade.put** L158
-- `method` **ResearchCacheCascade.get** L189
-- `method` **ResearchCacheCascade.get_asof** L253 — L4 bitemporal catalog: latest payload with asof <= as_of.
+- `function` **summarize…4758 tokens truncated…test payload with asof <= as_of.
 - `method` **ResearchCacheCascade.disposition** L281
 - `method` **ResearchCacheCascade.snapshot** L315
 - `method` **ResearchCacheCascade.clear_ephemeral** L343 — Drop current-run/process/L2 rows; durable L5 remains unchanged.
@@ -2529,12 +2091,12 @@ _No class/function symbols._
 - `function` **_git_commit_sha** L260 — Best-effort git HEAD. Never writes git config. Missing git is None, not a crash.
 - `function` **_default_model_config** L280
 - `function` **_active_calibration** L291
-- `function` **run_dcm** L300
-- `method` **run_dcm._ingest_stream** L429
-- `method` **run_dcm._snapshot_for** L1181
-- `method` **run_dcm._resimulate_material** L1679
-- `method` **run_dcm.slim** L1893
-- `function` **main** L2538
+- `function` **run_dcm** L366
+- `method` **run_dcm._ingest_stream** L499
+- `method` **run_dcm._snapshot_for** L1251
+- `method` **run_dcm._resimulate_material** L1749
+- `method` **run_dcm.slim** L1964
+- `function` **main** L2609
 
 ### `src/dcm/runtime/__init__.py`
 
