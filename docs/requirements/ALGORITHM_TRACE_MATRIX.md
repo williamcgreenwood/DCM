@@ -5,9 +5,9 @@ Constitution version: `DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903`
 Generated from `dcm.algorithms.catalog`. Do not hand-edit algorithm rows.
 Re-run `python scripts/export_algorithm_registry.py` after catalog changes.
 
-- Registry rows: **164**
-- REQUIRED_CORE: **76**
-- REQUIRED_CONDITIONAL: **26**
+- Registry rows: **170**
+- REQUIRED_CORE: **79**
+- REQUIRED_CONDITIONAL: **29**
 - PERMANENT_CHALLENGER: **62**
 
 | algorithm_id | name | family | lifecycle | implementation | producer | consumer | fallback | tests | traces |
@@ -21,6 +21,8 @@ Re-run `python scripts/export_algorithm_registry.py` after catalog changes.
 | `ALG-CAL-004` | Bayesian Model Averaging | CAL | PERMANENT_CHALLENGER | `dcm.algorithms.ml_families.not_active_challenger` | AlgorithmFrontierReview | benchmarks/algorithm_frontier | ALG-CAL-002 | test_algorithm_constitution,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
 | `ALG-CAL-005` | Stacking | CAL | PERMANENT_CHALLENGER | `dcm.algorithms.ml_families.not_active_challenger` | AlgorithmFrontierReview | benchmarks/algorithm_frontier | ALG-CAL-002 | test_algorithm_constitution,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
 | `ALG-CAL-006` | Blending | CAL | PERMANENT_CHALLENGER | `dcm.algorithms.ml_families.not_active_challenger` | AlgorithmFrontierReview | benchmarks/algorithm_frontier | ALG-CAL-002 | test_algorithm_constitution,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
+| `ALG-CTRL-001` | Versioned advanced-model execution DAG | GRAPH | REQUIRED_CORE | `dcm.model.advanced_execution.compile_advanced_execution_dag` | dcm.model.advanced_execution | dcm.runner.run_dcm |  | test_algorithm_constitution,test_algorithm_core | REQ-ALG-CONST-R0 |
+| `ALG-EV-001` | Payout-rule-specific expected value | CAL | REQUIRED_CONDITIONAL | `dcm.platform.prizepicks.economics.expected_return_from_worlds` | captured provider payout contract and joint EventWorld outcomes | portfolio ranking and freeze gate |  | test_prizepicks_push_economics,test_algorithm_core | REQ-ALG-CONST-R0 |
 | `ALG-FM-001` | TabFM | FM | PERMANENT_CHALLENGER | `dcm.algorithms.ml_families.not_active_challenger` | AlgorithmFrontierReview | benchmarks/algorithm_frontier | ALG-ML-TABULAR-001 | test_algorithm_constitution,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
 | `ALG-FM-002` | TabPFN-family | FM | PERMANENT_CHALLENGER | `dcm.algorithms.ml_families.not_active_challenger` | AlgorithmFrontierReview | benchmarks/algorithm_frontier | ALG-ML-TABULAR-001 | test_algorithm_constitution,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
 | `ALG-FM-003` | TabICL-style models | FM | PERMANENT_CHALLENGER | `dcm.algorithms.ml_families.not_active_challenger` | AlgorithmFrontierReview | benchmarks/algorithm_frontier | ALG-ML-TABULAR-001 | test_algorithm_constitution,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
@@ -91,6 +93,7 @@ Re-run `python scripts/export_algorithm_registry.py` after catalog changes.
 | `ALG-INDEX-024` | DiskANN index | INDEX | PERMANENT_CHALLENGER | `dcm.algorithms.searching.not_active_challenger` | AlgorithmFrontierReview | benchmarks/algorithm_frontier | ALG-INDEX-023 | test_algorithm_constitution,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
 | `ALG-INDEX-025` | PGM-index | INDEX | PERMANENT_CHALLENGER | `dcm.algorithms.searching.not_active_challenger` | AlgorithmFrontierReview | benchmarks/algorithm_frontier | ALG-INDEX-002 | test_algorithm_constitution,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
 | `ALG-INDEX-026` | ALEX/RMI learned indexes | INDEX | PERMANENT_CHALLENGER | `dcm.algorithms.searching.not_active_challenger` | AlgorithmFrontierReview | benchmarks/algorithm_frontier | ALG-INDEX-002 | test_algorithm_constitution,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
+| `ALG-MC-001` | Shared EventWorld Monte Carlo diagnostics | ML_PROB | REQUIRED_CORE | `dcm.model.advanced_execution._shared_world_diagnostics` | dcm.cfb.event_worlds / canonical EventWorld backends | probability and portfolio joint outcomes |  | test_algorithm_constitution,test_algorithm_core | REQ-ALG-CONST-R0 |
 | `ALG-ML-CAUSAL-001` | Causal Forests | ML_CAUSAL | PERMANENT_CHALLENGER | `dcm.algorithms.ml_families.not_active_challenger` | AlgorithmFrontierReview | benchmarks/algorithm_frontier | ALG-ML-TABULAR-001 | test_algorithm_constitution,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
 | `ALG-ML-CAUSAL-002` | Double Machine Learning | ML_CAUSAL | PERMANENT_CHALLENGER | `dcm.algorithms.ml_families.not_active_challenger` | AlgorithmFrontierReview | benchmarks/algorithm_frontier | ALG-ML-TABULAR-001 | test_algorithm_constitution,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
 | `ALG-ML-CAUSAL-003` | Meta-learners S/T/X/R | ML_CAUSAL | PERMANENT_CHALLENGER | `dcm.algorithms.ml_families.not_active_challenger` | AlgorithmFrontierReview | benchmarks/algorithm_frontier | ALG-ML-TABULAR-001 | test_algorithm_constitution,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
@@ -103,6 +106,7 @@ Re-run `python scripts/export_algorithm_registry.py` after catalog changes.
 | `ALG-ML-PROB-006` | Random Survival Forests | ML_PROB | PERMANENT_CHALLENGER | `dcm.algorithms.ml_families.not_active_challenger` | AlgorithmFrontierReview | benchmarks/algorithm_frontier | ALG-ML-PROB-004 | test_algorithm_constitution,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
 | `ALG-ML-PROB-007` | Extreme Value Theory (GEV/GPD) | ML_PROB | PERMANENT_CHALLENGER | `dcm.algorithms.ml_families.not_active_challenger` | AlgorithmFrontierReview | benchmarks/algorithm_frontier | ALG-ML-TABULAR-010 | test_algorithm_constitution,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
 | `ALG-ML-PROB-008` | Distributional Regression | ML_PROB | PERMANENT_CHALLENGER | `dcm.algorithms.ml_families.not_active_challenger` | AlgorithmFrontierReview | benchmarks/algorithm_frontier | ALG-ML-TABULAR-010 | test_algorithm_constitution,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
+| `ALG-ML-PROB-009` | Gaussian KDE bandwidth-selected density diagnostic | ML_PROB | REQUIRED_CONDITIONAL | `dcm.model.advanced_execution.gaussian_kde_diagnostic` | cutoff-safe comparable historical outcomes | diagnostic density receipt | ALG-ML-PROB-001 | test_advanced_modeling,test_algorithm_core,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
 | `ALG-ML-TABULAR-001` | Elastic Net / ridge | ML_TABULAR | REQUIRED_CORE | `dcm.algorithms.ml_families.ridge_closed_form` | AlgorithmSelectionEngine | dcm.learning.registry |  | test_algorithm_constitution,test_algorithm_core,test_algorithm_ml_stdlib | REQ-ALG-CONST-R0 |
 | `ALG-ML-TABULAR-002` | Generalized Linear Models | ML_TABULAR | REQUIRED_CONDITIONAL | `dcm.algorithms.ml_families.ridge_closed_form` | AlgorithmSelectionEngine | dcm.learning.registry | ALG-ML-TABULAR-001 | test_algorithm_constitution,test_algorithm_core,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
 | `ALG-ML-TABULAR-003` | Random Forest | ML_TABULAR | PERMANENT_CHALLENGER | `dcm.algorithms.ml_families.not_active_challenger` | AlgorithmFrontierReview | benchmarks/algorithm_frontier | ALG-ML-TABULAR-001 | test_algorithm_constitution,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
@@ -115,6 +119,7 @@ Re-run `python scripts/export_algorithm_registry.py` after catalog changes.
 | `ALG-ML-TABULAR-010` | Quantile Regression | ML_TABULAR | REQUIRED_CORE | `dcm.algorithms.ml_families.empirical_quantile` | AlgorithmSelectionEngine | dcm.learning.registry |  | test_algorithm_constitution,test_algorithm_core,test_algorithm_ml_stdlib | REQ-ALG-CONST-R0 |
 | `ALG-ML-TABULAR-011` | Quantile Gradient Boosting | ML_TABULAR | PERMANENT_CHALLENGER | `dcm.algorithms.ml_families.not_active_challenger` | AlgorithmFrontierReview | benchmarks/algorithm_frontier | ALG-ML-TABULAR-010 | test_algorithm_constitution,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
 | `ALG-ML-TABULAR-012` | NGBoost | ML_TABULAR | PERMANENT_CHALLENGER | `dcm.algorithms.ml_families.not_active_challenger` | AlgorithmFrontierReview | benchmarks/algorithm_frontier | ALG-ML-TABULAR-010 | test_algorithm_constitution,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
+| `ALG-ML-TABULAR-013` | Normalized singular-value decomposition diagnostic | ML_TABULAR | REQUIRED_CONDITIONAL | `dcm.model.advanced_execution.normalized_svd_diagnostic` | validated historical role/opponent feature matrix | diagnostic feature receipt | ALG-ML-TABULAR-001 | test_advanced_modeling,test_algorithm_core,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
 | `ALG-ML-TIME-001` | EWMA | ML_TIME | REQUIRED_CORE | `dcm.algorithms.ml_families.ewma` | AlgorithmSelectionEngine | dcm.learning.registry |  | test_algorithm_constitution,test_algorithm_core,test_algorithm_ml_stdlib | REQ-ALG-CONST-R0 |
 | `ALG-ML-TIME-002` | CUSUM | ML_TIME | REQUIRED_CORE | `dcm.algorithms.ml_families.cusum` | AlgorithmSelectionEngine | dcm.learning.registry |  | test_algorithm_constitution,test_algorithm_core,test_algorithm_ml_stdlib | REQ-ALG-CONST-R0 |
 | `ALG-ML-TIME-003` | Page-Hinkley | ML_TIME | REQUIRED_CORE | `dcm.algorithms.ml_families.page_hinkley` | AlgorithmSelectionEngine | dcm.learning.registry |  | test_algorithm_constitution,test_algorithm_core,test_algorithm_ml_stdlib | REQ-ALG-CONST-R0 |
@@ -123,6 +128,7 @@ Re-run `python scripts/export_algorithm_registry.py` after catalog changes.
 | `ALG-ML-TIME-006` | Hidden Markov Models | ML_TIME | PERMANENT_CHALLENGER | `dcm.algorithms.ml_families.not_active_challenger` | AlgorithmFrontierReview | benchmarks/algorithm_frontier | ALG-ML-TIME-002 | test_algorithm_constitution,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
 | `ALG-ML-TIME-007` | Bayesian Online Change Point Detection | ML_TIME | PERMANENT_CHALLENGER | `dcm.algorithms.ml_families.not_active_challenger` | AlgorithmFrontierReview | benchmarks/algorithm_frontier | ALG-ML-TIME-003 | test_algorithm_constitution,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
 | `ALG-ML-TIME-008` | PELT | ML_TIME | PERMANENT_CHALLENGER | `dcm.algorithms.ml_families.not_active_challenger` | AlgorithmFrontierReview | benchmarks/algorithm_frontier | ALG-ML-TIME-002 | test_algorithm_constitution,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
+| `ALG-PORT-001` | Shared-outcome portfolio dependence diagnostic | GROUP | REQUIRED_CORE | `dcm.model.advanced_execution._shared_world_diagnostics` | aligned EventWorld pick outcomes | dcm.selection.portfolio and payout EV |  | test_algorithm_constitution,test_algorithm_core | REQ-ALG-CONST-R0 |
 | `ALG-SCHED-001` | Lazy-greedy CELF scheduler | SCHED | REQUIRED_CORE | `dcm.algorithms.scheduling.LazyGreedyScheduler` | HarAlgorithmExecutionPlan | dcm.research.batch |  | test_algorithm_constitution,test_algorithm_core | REQ-ALG-CONST-R0,REQ-ALG-SUBMODULAR |
 | `ALG-SCHED-002` | Weighted set-cover scheduler | SCHED | REQUIRED_CORE | `dcm.algorithms.scheduling.cover_actions` | HarAlgorithmExecutionPlan | dcm.research.batch |  | test_algorithm_constitution,test_algorithm_core | REQ-ALG-CONST-R0,REQ-ALG-SETCOVER |
 | `ALG-SCHED-003` | Deterministic value-density packing | SCHED | REQUIRED_CORE | `dcm.algorithms.scheduling.greedy_value_density_pack` | HarAlgorithmExecutionPlan | dcm.research.batch |  | test_algorithm_constitution,test_algorithm_core | REQ-ALG-CONST-R0 |
@@ -189,15 +195,3 @@ Re-run `python scripts/export_algorithm_registry.py` after catalog changes.
 | REQ-ALG-NO-SILENT-RETIRE | Retirement requires ADR | CLOSED as contract/CI |
 
 R0 does not close BoardGraph/RequirementGraph/AcquisitionAction live HAR research (R1).
-
-## Runtime consumption note — Phase 15 CFB synthetic E2E (2026-09-06)
-
-Proved on `tests/test_cfb_e2e_synthetic_phase15.py` PATH_A (synthetic fixtures only):
-
-| Algorithm / surface | Runtime producer | Runtime consumer (CFB path) | Evidence artifact |
-|---|---|---|---|
-| BoardStore + `ALG-INDEX-001` | `dcm.board_store.BoardStore` / `BoardIndexes` | `dcm.cfb.launch.prepare_cfb_research_os` → `run_dcm` | `board_indexes.json` (`exactIdentityCount`, algorithms list) |
-| CELF / `ALG-SCHED-001` | `dcm.algorithms.scheduling` via `schedule_acquisition_actions` | CFB Research OS acquisition packing | `acquisition_schedule.json`, algorithm telemetry |
-| NumPy EventWorld | `dcm.cfb.event_worlds_numpy` (default) | `run_dcm` joint CFB worlds | `event_worlds_meta.json` (`backend=numpy`, conservation, rngVersion v1) |
-
-Does not retire or replace any registry row. Live operational card remains EXTERNAL.

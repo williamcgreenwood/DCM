@@ -1795,6 +1795,29 @@ def run_dcm(
     qualified = apply_pre_freeze_status_start_gates(ranked, cutoff=forecast_cutoff)
     card = build_card(qualified)
     exposure = exposure_report(card)
+    # Advanced-modeling capabilities run on the canonical producer outputs.
+    # KDE/SVD diagnostics cannot alter probabilities; portfolio EV remains
+    # blocked unless this run has a captured entry contract and payout table.
+    from dcm.model.advanced_execution import (
+        execute_advanced_modeling,
+        validate_advanced_execution_receipt,
+    )
+    advanced_execution = execute_advanced_modeling(
+        forecasts=classified,
+        portfolio=card,
+        calibration_state=calibration_state,
+        forecast_cutoff=str(forecast_cutoff or ""),
+        seed_input_hash=har_sha,
+        model_config_hash=config_hash,
+        event_world_metadata=event_worlds_meta,
+        joint_backend_metadata=joint_meta_acc,
+    )
+    validate_advanced_execution_receipt(advanced_execution)
+    (dest / "advanced_modeling_execution.json").write_text(
+        json.dumps(advanced_execution, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    advanced_execution_hash = str(advanced_execution["contentHash"])
     remaining_actions = 0
     action_doc = None
     schedule_doc = None
@@ -2090,6 +2113,8 @@ def run_dcm(
         "schemaReady": schema_ready,
         "evidenceBlocked": evidence_blocked,
         "portfolioExposure": exposure,
+        "advancedModelingExecutionHash": advanced_execution_hash,
+        "advancedModelingExecutionState": "FULL_EXECUTION_WITH_TYPED_BLOCKERS" if advanced_execution.get("fullModelingExecution") else "PARTIAL_WITH_TYPED_BLOCKERS",
         "top25QualifiedCount": len(top25_qualified),
         "cfbTop100Count": int((cfb_forecast.get("top100") or {}).get("count") or 0),
         "cfbTop25Count": int((cfb_forecast.get("top25") or {}).get("count") or 0),
@@ -2125,6 +2150,7 @@ def run_dcm(
         "signalRegistryHash": signal_registry.registry_hash,
         "signalRuntimeHash": freeze["signalRuntimeHash"],
         "decisionIntegrityHash": freeze["decisionIntegrityHash"],
+        "advancedModelingExecutionHash": advanced_execution_hash,
         "survivorStateHash": freeze["survivorStateHash"],
         "cfbRulesSnapshotHash": freeze["cfbRulesSnapshotHash"],
         "harSha256": har_sha,
@@ -2357,6 +2383,7 @@ def run_dcm(
         "harSha256": har_sha,
         "evidenceGraphHash": evidence_graph.get("contentHash"),
         "featureStoreHash": feature_store_hash,
+        "advancedModelingExecutionHash": advanced_execution_hash,
         "signalRegistryHash": signal_registry.registry_hash,
         "signalRuntimeHash": freeze["signalRuntimeHash"],
         "decisionIntegrityHash": freeze["decisionIntegrityHash"],

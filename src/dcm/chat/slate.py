@@ -1088,6 +1088,11 @@ def _legacy_run_slate(
     receipt = {
         "schema": EXECUTION_RECEIPT_SCHEMA,
         "executionId": execution_id,
+        # A host-produced research/selection summary is not proof that the
+        # canonical numerical engine ran. Upgrade only when verified run
+        # artifacts from the canonical runner are present and hash-bound.
+        "modelingAuthority": "MANUAL_SHADOW_ANALYSIS",
+        "canonicalExecutionEvidence": None,
         "repository": "williamcgreenwood/DCM",
         "headSha": _repo_head(),
         "sourceInventoryHash": source_inventory_hash,
