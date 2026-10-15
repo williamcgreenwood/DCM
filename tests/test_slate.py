@@ -117,6 +117,7 @@ def test_explicit_prompt_slate_runs_each_capture_and_union(tmp_path: Path) -> No
         prompt=prompt,
         cutoff_from_capture=True,
         workspace=tmp_path / "runtime",
+        event_timezone="America/Los_Angeles",
     )
 
     assert result["sourceCount"] == 2
@@ -125,6 +126,11 @@ def test_explicit_prompt_slate_runs_each_capture_and_union(tmp_path: Path) -> No
     assert result["boardOfferCount"] == 0
     assert result["productionSelectionPermitted"] is False
     assert result["probabilityStatus"] == "NONE"
+    assert result["researchFunnelCount"] == 2
+    assert result["researchStageCounts"]["TOP6"] == 2
+    assert result["researchEventTimezone"] == "America/Los_Angeles"
+    assert result["researchEventDatePopulationCounts"]["2026-09-20"] == 2
+    assert result["researchFunnelArtifact"].endswith("insights_research_funnel.json")
     assert result["nextAction"]["boardHarRequired"] is False
 
     root = tmp_path / "slate"
@@ -133,6 +139,13 @@ def test_explicit_prompt_slate_runs_each_capture_and_union(tmp_path: Path) -> No
     assert census["union"]["canonicalClaimCount"] == 2
     assert census["union"]["reconciliationState"] == "RECONCILED"
     assert json.loads((root / "research_queue_top100.json").read_text())["accounting"]["top100Count"] == 2
+    funnel = json.loads((root / "insights_research_funnel.json").read_text(encoding="utf-8"))
+    assert funnel["populationCount"] == 2
+    assert [row["stage"] for row in funnel["stages"]] == [
+        "TOP2000", "TOP1000", "TOP500", "TOP250", "TOP100", "TOP50", "TOP25", "TOP12", "TOP6"
+    ]
+    assert funnel["accounting"]["productionSelectionPermitted"] is False
+    assert funnel["accounting"]["eventTimezone"] == "America/Los_Angeles"
     receipt = json.loads((root / "execution_receipt.json").read_text(encoding="utf-8"))
     assert receipt["platform"]["github"] == "PENDING_REMOTE_READBACK"
     assert receipt["status"]["predictive"] == "PREDICTIVE_NOT_EARNED"

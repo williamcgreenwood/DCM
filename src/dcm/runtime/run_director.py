@@ -185,6 +185,33 @@ class RunDirector:
                 "responsePath": response_path,
                 "requestIds": request_ids,
                 "requiredFields": required_fields,
+                "researchContract": {
+                    "candidatePopulation": "FULL_CAPTURED_RESEARCH_FUNNEL",
+                    "rankingStages": ["TOP2000", "TOP1000", "TOP500", "TOP250", "TOP100", "TOP50", "TOP25", "TOP12", "TOP6"],
+                    "eventDatePolicy": (
+                        "Partition frontiers by event date in the active user's IANA timezone. "
+                        "Pass that timezone as --event-timezone; never rank a requested daily slate against unrelated future dates."
+                    ),
+                    "capturedOfferPolicy": (
+                        "Use the user's timestamped HAR/screenshots as the chat-ignition line/side research snapshot; "
+                        "a separate board HAR is not required. Preserve capture and source provenance and never infer a missing line or side."
+                    ),
+                    "acquisitionPolicy": (
+                        "ChatGPT uses official or approved public sources to fill missing player, role, availability, game-log, "
+                        "opportunity, efficiency, event, team, opponent, environment, sport-rule, and market-definition facts. "
+                        "Research reusable entities once and reuse them across dependent claims."
+                    ),
+                    "temporalPolicy": "Only source facts published and observed by forecastCutoff may support frozen forecasts.",
+                    "failurePolicy": (
+                        "Try approved fallback sources and record source URL, retrieval time, publication/observation time, and typed failures. "
+                        "Continue independent tasks; never invent offers, model probabilities, outcomes, payouts, calibration, or dependence. "
+                        "Keep all captured candidates visible in the research ranking while production gates remain strict."
+                    ),
+                    "outputSeparation": {
+                        "researchShortlist": "always_emit_ranked_candidates_with_research_blockers",
+                        "productionCard": "emit_only_after_offer_evidence_model_and_certification_gates_pass",
+                    },
+                },
                 "offerRevalidation": {
                     "status": "REQUIRED_FOR_PRODUCTION_SELECTION",
                     "candidateClaimIds": candidate_claim_ids,
