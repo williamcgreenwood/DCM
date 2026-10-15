@@ -61,6 +61,7 @@ def build_parser() -> argparse.ArgumentParser:
     sl.add_argument("--run-root", type=Path, default=Path("dcm_v6/RUNS"))
     sl.add_argument("--cutoff", default=None)
     sl.add_argument("--cutoff-from-capture", action="store_true")
+    sl.add_argument("--event-timezone", default=None, help="IANA timezone for event-date research funnels, e.g. America/Los_Angeles")
     sl.add_argument("--workspace", type=Path, default=None)
     sl.add_argument("--observations", type=Path, default=None)
     sl.add_argument("--outcomes", type=Path, default=None, help="Optional normalized outcomes JSON for autonomous settle")
@@ -244,6 +245,7 @@ def main(argv: list[str] | None = None) -> int:
                 prompt=args.prompt,
                 cutoff=args.cutoff,
                 cutoff_from_capture=bool(args.cutoff_from_capture or not args.cutoff),
+                event_timezone=args.event_timezone,
                 workspace=args.workspace,
                 research_shadow=bool(args.research_shadow),
                 observations=args.observations,

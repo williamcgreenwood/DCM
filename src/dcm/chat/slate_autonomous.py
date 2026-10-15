@@ -480,6 +480,36 @@ def _chatgpt_research_action(
         "responsePath": f"responses/{batch_id}.response.json" if batch_id else "responses/response.json",
         "requestIds": sorted({str(value) for value in request_ids if str(value)}),
         "requiredFields": sorted({str(value) for value in required_fields if str(value)}),
+        "researchContract": {
+            "candidatePopulation": "FULL_CAPTURED_RESEARCH_FUNNEL",
+            "rankingStages": ["TOP2000", "TOP1000", "TOP500", "TOP250", "TOP100", "TOP50", "TOP25", "TOP12", "TOP6"],
+            "eventDatePolicy": (
+                "Partition frontiers by event date in the active user's IANA timezone. "
+                "Pass that timezone as --event-timezone; do not mix unrelated future dates in a requested daily slate."
+            ),
+            "capturedOfferPolicy": (
+                "Use exact line and direction in the user-supplied HAR/screenshot as the chat-ignition research snapshot. "
+                "A separate board HAR is not required. Preserve source/platform and capture-time provenance; do not infer an absent line or side."
+            ),
+            "acquisitionPolicy": (
+                "ChatGPT gathers missing player, role, availability, game-log, opportunity, efficiency, event, team, opponent, "
+                "environment, sport-rule, and market-definition facts from official or approved public sources. "
+                "Reuse facts by entity across all dependent claims and continue independent tasks after one source fails."
+            ),
+            "temporalPolicy": (
+                "Only evidence observed and published no later than forecastCutoff may support the frozen forecast. "
+                "Later evidence is stored for audit or settlement only."
+            ),
+            "failurePolicy": (
+                "Try approved fallback sources; record URL, retrieval time, observation/publication time, and typed failure for each attempt. "
+                "Do not invent research, probabilities, calibration, dependence, offers, payouts, or outcomes. "
+                "Keep every captured candidate in the research ranking even when a production requirement remains unmet."
+            ),
+            "outputSeparation": {
+                "researchShortlist": "always_emit_ranked_candidates_with_research_blockers",
+                "productionCard": "emit_only_after_offer_evidence_model_and_certification_gates_pass",
+            },
+        },
         "offerRevalidation": {
             "status": "REQUIRED_FOR_PRODUCTION_SELECTION",
             "responseField": "offerRevalidations",

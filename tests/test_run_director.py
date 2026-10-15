@@ -166,6 +166,12 @@ def test_mixed_sport_packet_is_in_scope(monkeypatch, tmp_path: Path):
     result = RunDirector(_run(tmp_path)).run_until_awaiting()
     assert result["phase"] == "AWAITING_RESPONSE"
     assert result["nextAction"]["type"] == "CHATGPT_RESEARCH_RESPONSE"
+    assert result["nextAction"]["researchContract"]["candidatePopulation"] == "FULL_CAPTURED_RESEARCH_FUNNEL"
+    assert result["nextAction"]["researchContract"]["rankingStages"] == [
+        "TOP2000", "TOP1000", "TOP500", "TOP250", "TOP100", "TOP50", "TOP25", "TOP12", "TOP6"
+    ]
+    assert "--event-timezone" in result["nextAction"]["researchContract"]["eventDatePolicy"]
+    assert result["nextAction"]["researchContract"]["outputSeparation"]["researchShortlist"] == "always_emit_ranked_candidates_with_research_blockers"
     assert result["nextAction"]["boardHarRequired"] is False
 
 

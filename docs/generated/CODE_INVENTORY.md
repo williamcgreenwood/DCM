@@ -3,9 +3,9 @@
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
 - Modules: **273**
-- Symbols: **2093**
+- Symbols: **2094**
 - Parse errors: **0**
-- Inventory hash: `7cd59a7bb78d0ec6fb1538d31aa557e4dcec279c8f3970e59e8744e90af79dd2`
+- Inventory hash: `d84795f23a114b08654eb8b2134efd806c083f3f7fa9c80637afad9ac544c126`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -176,7 +176,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P1 | `src/dcm/research/host_plan.py` | 0 | 1 |
 | P1 | `src/dcm/research/indexes.py` | 2 | 19 |
 | P1 | `src/dcm/research/insight_bridge.py` | 0 | 11 |
-| P1 | `src/dcm/research/insight_queue.py` | 0 | 11 |
+| P1 | `src/dcm/research/insight_queue.py` | 0 | 12 |
 | P1 | `src/dcm/research/lineup.py` | 0 | 3 |
 | P1 | `src/dcm/research/material_facts.py` | 0 | 20 |
 | P1 | `src/dcm/research/observation_execute.py` | 0 | 1 |
@@ -765,7 +765,7 @@ _No class/function symbols._
 - `function` **_print** L19
 - `function` **_add_run** L23
 - `function` **build_parser** L27
-- `function` **main** L216
+- `function` **main** L217
 
 ### `src/dcm/chat/contracts.py`
 
@@ -871,24 +871,24 @@ _No class/function symbols._
 
 ### `src/dcm/chat/slate.py`
 
-- `function` **_sha256_bytes** L107
-- `function` **_sha256_file** L111
-- `function` **_write_json** L115
-- `function` **_write_jsonl** L123
-- `function` **_read_jsonl** L130
-- `function` **_safe_error** L144
-- `function` **_prompt_metadata** L150
-- `function` **_sport_hint** L170
-- `function` **_ordered_inputs** L178
-- `function` **_repo_head** L196
-- `function` **_source_summary** L211
-- `function` **_safe_claim** L295 — Drop accidental free-form/raw fields if an adapter ever supplies one.
-- `method` **_safe_claim.clean** L299
-- `function` **_step** L313
-- `function` **_write_terminal_artifacts** L337
-- `function` **_legacy_run_slate** L709 — Run independent captures, the reconciled union, and HAR-only autonomous closure.
-- `function` **_repository_prompt** L1234
-- `function` **run_slate** L1241 — Run the legacy producer and then apply the HAR-only closure controller.
+- `function` **_sha256_bytes** L108
+- `function` **_sha256_file** L112
+- `function` **_write_json** L116
+- `function` **_write_jsonl** L124
+- `function` **_read_jsonl** L131
+- `function` **_safe_error** L145
+- `function` **_prompt_metadata** L151
+- `function` **_sport_hint** L171
+- `function` **_ordered_inputs** L179
+- `function` **_repo_head** L197
+- `function` **_source_summary** L212
+- `function` **_safe_claim** L296 — Drop accidental free-form/raw fields if an adapter ever supplies one.
+- `method` **_safe_claim.clean** L300
+- `function` **_step** L314
+- `function` **_write_terminal_artifacts** L338
+- `function` **_legacy_run_slate** L752 — Run independent captures, the reconciled union, and HAR-only autonomous closure.
+- `function` **_repository_prompt** L1290
+- `function` **run_slate** L1297 — Run the legacy producer and then apply the HAR-only closure controller.
 
 ### `src/dcm/chat/slate_autonomous.py`
 
@@ -906,13 +906,13 @@ _No class/function symbols._
 - `function` **_drive_research** L289 — Schedule host research; never require a board HAR.
 - `function` **_drive_settle** L337 — Settle FINAL claims when outcomes exist; defer FUTURE without a HAR ask.
 - `function` **_chatgpt_research_action** L461 — Describe the durable research handoff; the operator has no manual step.
-- `function` **_chatgpt_settlement_action** L506
-- `function` **_finite_number** L543
-- `function` **_historical_settlement_rows** L551 — Load immutable settled labels already present in this run.
-- `function` **_training_evaluation_rows** L591 — Project only exact, settled labels with an already-produced probability.
-- `function` **_drive_train** L631
-- `function` **_drive_playables** L706
-- `function` **advance_autonomous_closure** L741 — Advance research → settle → train → rank/select/freeze with typed states.
+- `function` **_chatgpt_settlement_action** L536
+- `function` **_finite_number** L573
+- `function` **_historical_settlement_rows** L581 — Load immutable settled labels already present in this run.
+- `function` **_training_evaluation_rows** L621 — Project only exact, settled labels with an already-produced probability.
+- `function` **_drive_train** L661
+- `function` **_drive_playables** L736
+- `function` **advance_autonomous_closure** L771 — Advance research → settle → train → rank/select/freeze with typed states.
 
 ### `src/dcm/chat/state.py`
 
@@ -2133,17 +2133,18 @@ _No class/function symbols._
 
 ### `src/dcm/research/insight_queue.py`
 
-- `function` **_finite** L25
-- `function` **wilson_lower_bound** L33 — Wilson 95% lower bound for a historical signal, not a next-game p.
-- `function` **_quantile** L44
-- `function` **_history_values** L57
-- `function` **_line_diagnostics** L69
-- `function` **_modifier_state** L108
-- `function` **_league_state** L128
-- `function` **score_research_attention** L139 — Score research value with transparent, bounded components.
-- `function` **queue_record** L199
-- `function` **_diversified_frontier** L265 — Avoid turning one player/event's correlated props into a fake frontier.
-- `function` **build_research_queue** L309 — Account the full claim universe, then emit Top-100/Top-25 attention lists.
+- `function` **_finite** L29
+- `function` **wilson_lower_bound** L37 — Wilson 95% lower bound for a historical signal, not a next-game p.
+- `function` **_quantile** L48
+- `function` **_history_values** L61
+- `function` **_line_diagnostics** L73
+- `function` **_modifier_state** L112
+- `function` **_league_state** L132
+- `function` **score_research_attention** L143 — Score research value with transparent, bounded components.
+- `function` **queue_record** L203
+- `function` **_diversified_frontier** L269 — Avoid turning one player/event's correlated props into a fake frontier.
+- `function` **build_research_queue** L313 — Account all claims and emit a full research ranking plus stage frontiers.
+- `method` **build_research_queue.stage_manifest** L359
 
 ### `src/dcm/research/lineup.py`
 
@@ -2827,15 +2828,15 @@ _No class/function symbols._
 - `method` **RunDirector.status** L111
 - `method` **RunDirector._next_action** L127 — Expose the next ChatGPT/DCM action as a durable, machine-readable handoff.
 - `method` **RunDirector._next_action.append_values** L145
-- `method` **RunDirector._next_command** L222
-- `method` **RunDirector._response_path** L234
-- `method` **RunDirector._batch_counts** L250 — Return bounded action/entity and dependent-offer counts.
-- `method` **RunDirector._batch_leagues** L284
-- `method` **RunDirector._assert_packet_scope** L295
-- `method` **RunDirector._checkpoint_batch** L300 — Load the checkpoint and its active immutable envelope, if any.
-- `method` **RunDirector._reconcile_pointer** L316 — Move only the mutable pointer back to the checkpoint authority.
-- `method` **RunDirector.step** L356
-- `method` **RunDirector.run_until_awaiting** L468
+- `method` **RunDirector._next_command** L249
+- `method` **RunDirector._response_path** L261
+- `method` **RunDirector._batch_counts** L277 — Return bounded action/entity and dependent-offer counts.
+- `method` **RunDirector._batch_leagues** L311
+- `method` **RunDirector._assert_packet_scope** L322
+- `method` **RunDirector._checkpoint_batch** L327 — Load the checkpoint and its active immutable envelope, if any.
+- `method` **RunDirector._reconcile_pointer** L343 — Move only the mutable pointer back to the checkpoint authority.
+- `method` **RunDirector.step** L383
+- `method` **RunDirector.run_until_awaiting** L495
 
 ### `src/dcm/runtime/runner_freeze_bridge.py`
 

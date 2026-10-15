@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
 import subprocess
 from pathlib import Path
@@ -408,7 +409,12 @@ def _write_terminal_artifacts(
     offer_doc_preview = insights_offer_snapshots(list(claims))
     insights_offer_count = int(offer_doc_preview.get("insightsOfferCount") or 0)
     insights_backed = bool(insights_offer_count)
-    paths = ["canonical_claims.jsonl", "unresolved_claims.jsonl", "research_queue_top100.json"]
+    paths = [
+        "canonical_claims.jsonl",
+        "unresolved_claims.jsonl",
+        "research_queue_top100.json",
+        "insights_research_funnel.json",
+    ]
     _write_jsonl(root / "canonical_claims.jsonl", (_safe_claim(row) for row in sorted(claims, key=lambda row: str(row.get("claimId") or ""))))
     _write_jsonl(root / "unresolved_claims.jsonl", unresolved)
     queue_artifact = {
@@ -431,6 +437,36 @@ def _write_terminal_artifacts(
     }
     queue_artifact["contentHash"] = content_hash({k: v for k, v in queue_artifact.items() if k != "contentHash"})
     _write_json(root / "research_queue_top100.json", queue_artifact)
+
+    research_funnel = queue.get("researchFunnel") if isinstance(queue, dict) else {}
+    research_funnel = research_funnel if isinstance(research_funnel, dict) else {}
+    funnel_artifact = {
+        **research_funnel,
+        "schema": "pillars_dcm.insights_research_funnel.v1",
+        "sourceHarSha256s": source_hashes,
+        "accounting": {
+            "inputClaimCount": int(queue_accounting.get("inputClaimCount") or len(claims)),
+            "queuedClaimCount": int(queue_accounting.get("queuedClaimCount") or 0),
+            "populationCount": int(research_funnel.get("populationCount") or 0),
+            "stageCounts": dict(queue_accounting.get("researchStageCounts") or {}),
+            "eventTimezone": research_funnel.get("eventTimezone") or "UTC",
+            "eventTimezoneValid": bool(research_funnel.get("eventTimezoneValid", True)),
+            "eventDatePopulationCounts": {
+                str(day): int((value or {}).get("populationCount") or 0)
+                for day, value in (research_funnel.get("byEventDate") or {}).items()
+                if isinstance(value, dict)
+            },
+            "productionTop100Count": len(selection_top100),
+            "productionTop25Count": len(selection_top25),
+            "probabilityStatus": "NONE",
+            "productionSelectionPermitted": False,
+        },
+        "contentHash": None,
+    }
+    funnel_artifact["contentHash"] = content_hash(
+        {key: value for key, value in funnel_artifact.items() if key != "contentHash"}
+    )
+    _write_json(root / "insights_research_funnel.json", funnel_artifact)
 
     # This is the explicit consumer boundary between the research Top-100 and
     # the later model/ranking path.  It is intentionally separate from the
@@ -679,6 +715,11 @@ def _write_terminal_artifacts(
         (root / "settlements.jsonl").write_text(settled_ledger.read_text(encoding="utf-8"), encoding="utf-8")
         paths.append("settlements.jsonl")
 
+    research_stage_summary = ", ".join(
+        f"{row.get('stage')}={row.get('count')}"
+        for row in (research_funnel.get("stages") or [])
+        if isinstance(row, dict)
+    )
     audit_lines = [
         "# DCM explicit-prompt slate audit",
         "",
@@ -688,6 +729,8 @@ def _write_terminal_artifacts(
         f"- Trusted current board offers: `{int(board_offer_count)}`",
         f"- Research queue Top 100: `{len(top100)}`",
         f"- Research preview Top 25: `{len(insights_top25)}` (Insights-offer-backed)",
+        f"- Full captured research funnel: `{int(research_funnel.get('populationCount') or 0)}` candidates",
+        f"- Progressive frontiers: `{research_stage_summary}`",
         f"- Production Top 100: `{len(selection_top100)}`",
         f"- Production Top 25: `{len(selection_top25)}`",
         f"- Insights offer snapshots: `{int(offer_doc.get('insightsOfferCount') or 0)}`",
@@ -1205,6 +1248,10 @@ def _legacy_run_slate(
     }
     manifest["contentHash"] = content_hash({k: v for k, v in manifest.items() if k != "contentHash"})
     _write_json(root / "run_manifest.json", manifest)
+    research_funnel = queue.get("researchFunnel") if isinstance(queue, dict) else {}
+    research_funnel = research_funnel if isinstance(research_funnel, dict) else {}
+    queue_accounting = queue.get("accounting") if isinstance(queue, dict) else {}
+    queue_accounting = queue_accounting if isinstance(queue_accounting, dict) else {}
     return {
         "schema": SLATE_SCHEMA,
         "executionId": execution_id,
@@ -1216,6 +1263,15 @@ def _legacy_run_slate(
         "boardOfferCount": board_offer_count,
         "queueTop100Count": len((queue.get("top100") or []) if isinstance(queue, dict) else []),
         "queueTop25Count": len((queue.get("top25") or []) if isinstance(queue, dict) else []),
+        "researchFunnelCount": int(research_funnel.get("populationCount") or 0),
+        "researchStageCounts": dict(queue_accounting.get("researchStageCounts") or {}),
+        "researchEventTimezone": research_funnel.get("eventTimezone") or "UTC",
+        "researchEventDatePopulationCounts": {
+            str(day): int((value or {}).get("populationCount") or 0)
+            for day, value in (research_funnel.get("byEventDate") or {}).items()
+            if isinstance(value, dict)
+        },
+        "researchFunnelArtifact": str(root / "insights_research_funnel.json"),
         "insightsOfferCount": int((read_json(root / "insights_offer_snapshots.json") or {}).get("insightsOfferCount") or 0),
         "pipelineConstitutionId": PIPELINE_CONSTITUTION_ID,
         "pipelineConstitutionValid": bool(pipeline_gate.get("valid")),
@@ -1250,24 +1306,34 @@ def run_slate(
     observations: Path | None = None,
     autonomous: bool = True,
     outcomes: Path | None = None,
+    event_timezone: str | None = None,
 ) -> dict[str, Any]:
     """Run the legacy producer and then apply the HAR-only closure controller."""
     ordered = internal_order(inputs)
     prompt_path = Path(prompt) if prompt is not None else _repository_prompt()
     workspace_path = Path(workspace) if workspace is not None else _default_workspace()
-    result = _legacy_run_slate(
-        inputs=ordered,
-        run_root=Path(run_root),
-        prompt=prompt_path,
-        cutoff=cutoff,
-        cutoff_from_capture=cutoff_from_capture,
-        workspace=workspace_path,
-        research_shadow=research_shadow,
-        observations=observations,
-        autonomous=autonomous,
-        outcomes=outcomes,
-    )
-    return enhance_slate_result(Path(run_root), ordered, result)
+    previous_timezone = os.environ.get("DCM_EVENT_TIMEZONE")
+    if event_timezone:
+        os.environ["DCM_EVENT_TIMEZONE"] = str(event_timezone)
+    try:
+        result = _legacy_run_slate(
+            inputs=ordered,
+            run_root=Path(run_root),
+            prompt=prompt_path,
+            cutoff=cutoff,
+            cutoff_from_capture=cutoff_from_capture,
+            workspace=workspace_path,
+            research_shadow=research_shadow,
+            observations=observations,
+            autonomous=autonomous,
+            outcomes=outcomes,
+        )
+        return enhance_slate_result(Path(run_root), ordered, result)
+    finally:
+        if previous_timezone is None:
+            os.environ.pop("DCM_EVENT_TIMEZONE", None)
+        else:
+            os.environ["DCM_EVENT_TIMEZONE"] = previous_timezone
 
 
 __all__ = ["EXECUTION_RECEIPT_SCHEMA", "SLATE_SCHEMA", "SLATE_VERSION", "run_slate"]

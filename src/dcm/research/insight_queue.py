@@ -9,13 +9,17 @@ market definition are required before any row can reach modeling or selection.
 from __future__ import annotations
 
 import math
+import os
 from collections import Counter
+from datetime import datetime, timezone
 from typing import Any, Iterable
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from dcm.contracts.hashes import content_hash
 
 
 QUEUE_VERSION = "OUTLIER_INSIGHTS_RESEARCH_QUEUE_V1_2026-09-14"
+RESEARCH_FUNNEL_LIMITS = (2000, 1000, 500, 250, 100, 50, 25, 12, 6)
 
 _PRODUCTION_LEAGUES = {"NFL", "NCAAFB", "CFB", "WNBA"}
 _SHADOW_LEAGUES = {"MLB"}
@@ -306,13 +310,33 @@ def _diversified_frontier(rows: list[dict[str, Any]], limit: int) -> list[dict[s
     return selected
 
 
-def build_research_queue(claims: Iterable[dict[str, Any]], *, top_n: int = 100, top_preview: int = 25) -> dict[str, Any]:
-    """Account the full claim universe, then emit Top-100/Top-25 attention lists."""
+def build_research_queue(
+    claims: Iterable[dict[str, Any]],
+    *,
+    top_n: int = 100,
+    top_preview: int = 25,
+    event_timezone: str | None = None,
+) -> dict[str, Any]:
+    """Account all claims and emit a full research ranking plus stage frontiers.
+
+    ``top100`` and ``top25`` remain the bounded compatibility/modeling
+    handoff.  ``researchFunnel`` is the unbounded research-only attention
+    funnel.  It is intentionally based on captured claims and transparent
+    metadata; its scores are never forecast probabilities.
+    """
     records = [dict(claim) for claim in claims if isinstance(claim, dict)]
+    timezone_name = str(event_timezone or os.environ.get("DCM_EVENT_TIMEZONE") or "UTC")
+    try:
+        event_tz = ZoneInfo(timezone_name)
+        timezone_valid = True
+    except ZoneInfoNotFoundError:
+        event_tz = timezone.utc
+        timezone_valid = False
     scored = [queue_record(claim, rank=0) for claim in records]
     scored.sort(
         key=lambda row: (
             0 if row["researchState"] == "RESEARCH_QUEUE" else 1,
+            0 if row.get("offerBacking") == "INSIGHTS_OFFER_BACKED" else 1,
             -float(row.get("attentionScore") or 0.0),
             -int(row.get("bookCount") or 0),
             -int(row.get("lastNCount") or 0),
@@ -325,10 +349,71 @@ def build_research_queue(claims: Iterable[dict[str, Any]], *, top_n: int = 100, 
         row["rank"] = index
     queued = [row for row in scored if row["researchState"] == "RESEARCH_QUEUE"]
     offer_backed = [row for row in queued if row.get("offerBacking") == "INSIGHTS_OFFER_BACKED"]
-    # Insights-backed Top100/Top25 fill from line+side claims even when boardOfferCount=0.
-    top100_pool = offer_backed or queued
+    # Keep every queueable captured claim in the research funnel. Exact captured
+    # line+side rows rank first, while missing-line/side claims remain visible
+    # with typed blockers so screenshot/OCR or host research can resolve them.
+    top100_pool = queued
     top100 = top100_pool[: max(0, int(top_n))]
     top25 = top100[: max(0, int(top_preview))]
+    research_funnel = [dict(row) for row in top100_pool]
+    def stage_manifest(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        return [
+            {
+                "stage": f"TOP{limit}",
+                "limit": limit,
+                "count": len(rows[:limit]),
+                "claimIds": [str(row.get("claimId") or "") for row in rows[:limit]],
+                "frontierClaimId": rows[min(len(rows), limit) - 1].get("claimId") if rows else None,
+                "saturated": len(rows) >= limit,
+            }
+            for limit in RESEARCH_FUNNEL_LIMITS
+        ]
+
+    stage_rows = stage_manifest(research_funnel)
+    by_league_rows: dict[str, list[dict[str, Any]]] = {}
+    for row in research_funnel:
+        by_league_rows.setdefault(str(row.get("leagueId") or "UNKNOWN").upper(), []).append(row)
+    by_league = {
+        league: {
+            "populationCount": len(rows),
+            "stages": stage_manifest(rows),
+        }
+        for league, rows in sorted(by_league_rows.items())
+    }
+    by_event_date_rows: dict[str, list[dict[str, Any]]] = {}
+    for row in research_funnel:
+        scheduled = str(row.get("scheduledTime") or "").strip()
+        try:
+            parsed = datetime.fromisoformat(scheduled.replace("Z", "+00:00"))
+            if parsed.tzinfo is None:
+                parsed = parsed.replace(tzinfo=timezone.utc)
+            event_date = parsed.astimezone(event_tz).date().isoformat()
+        except (TypeError, ValueError, OverflowError):
+            event_date = "UNKNOWN_DATE"
+        by_event_date_rows.setdefault(event_date, []).append(row)
+    by_event_date = {
+        event_date: {
+            "populationCount": len(rows),
+            "byLeagueCounts": dict(sorted(Counter(str(row.get("leagueId") or "UNKNOWN").upper() for row in rows).items())),
+            "stages": stage_manifest(rows),
+        }
+        for event_date, rows in sorted(by_event_date_rows.items())
+    }
+    queued_claim_ids = {str(row.get("claimId") or "") for row in research_funnel}
+    excluded_from_funnel = [
+        {
+            "claimId": row.get("claimId"),
+            "rank": row.get("rank"),
+            "leagueId": row.get("leagueId"),
+            "eventId": row.get("eventId"),
+            "scheduledTime": row.get("scheduledTime"),
+            "researchState": row.get("researchState"),
+            "candidateClass": row.get("candidateClass"),
+            "blockers": row.get("blockers") or [],
+        }
+        for row in scored
+        if str(row.get("claimId") or "") not in queued_claim_ids
+    ]
     production_blockers = {
         "PAGINATION_INCOMPLETE",
         "NON_STANDARD_MODIFIER_PRESENT",
@@ -355,6 +440,8 @@ def build_research_queue(claims: Iterable[dict[str, Any]], *, top_n: int = 100, 
         "queuedClaimCount": len(queued),
         "top100Count": len(top100),
         "top25Count": len(top25),
+        "researchFunnelPopulationCount": len(research_funnel),
+        "researchStageCounts": {row["stage"]: row["count"] for row in stage_rows},
         "insightsOfferBackedCount": len(offer_backed),
         "productionQueueCount": len(production_queue),
         "productionTop100Count": len(top100_production),
@@ -384,6 +471,34 @@ def build_research_queue(claims: Iterable[dict[str, Any]], *, top_n: int = 100, 
         "queueVersion": QUEUE_VERSION,
         "accounting": accounting,
         "rows": scored,
+        "researchFunnel": {
+            "schema": "pillars_dcm.insights_research_funnel.v1",
+            "rankingMethod": "DETERMINISTIC_RESEARCH_ATTENTION",
+            "scoreType": "RESEARCH_PRIORITY_NOT_PROBABILITY",
+            "populationCount": len(research_funnel),
+            "accountedClaimCount": len(scored),
+            "excludedFromRankingCount": len(excluded_from_funnel),
+            "stages": stage_rows,
+            "byLeague": by_league,
+            "eventTimezone": timezone_name,
+            "eventTimezoneValid": timezone_valid,
+            "byEventDate": by_event_date,
+            "rows": research_funnel,
+            "excludedRows": excluded_from_funnel,
+            "probabilityStatus": "NONE",
+            "productionSelectionPermitted": False,
+            "contentHash": content_hash({
+                "stages": stage_rows,
+                "byLeague": by_league,
+                "eventTimezone": timezone_name,
+                "byEventDate": by_event_date,
+                "excludedRows": excluded_from_funnel,
+                "rows": [
+                    {"claimId": row.get("claimId"), "rank": row.get("rank"), "attentionScore": row.get("attentionScore")}
+                    for row in research_funnel
+                ],
+            }),
+        },
         "top100": top100,
         "top25": top25,
         "insightsTop25": top25,

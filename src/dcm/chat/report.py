@@ -17,6 +17,8 @@ def build_report(dest: Path) -> dict[str, Any]:
     accounting = read_json(dest / "accounting.json") or {}
     coverage = read_json(dest / "evidence_coverage.json") or read_json(dest / "evidence" / "coverage.json") or {}
     host_state = read_json(dest / "host_state.json") or {}
+    research_funnel = read_json(dest / "insights_research_funnel.json") or {}
+    research_funnel = research_funnel if isinstance(research_funnel, dict) else {}
     ranked = read_json(dest / "top25_ranked.json") or []
     qualified = read_json(dest / "qualified.json") or read_json(dest / "production_certified.json") or []
     card = read_json(dest / "strict_card.json") or []
@@ -45,6 +47,16 @@ def build_report(dest: Path) -> dict[str, Any]:
             "missingRequirementCount": coverage.get("missingRequirementCount"),
         },
         "top25Ranked": ranked if isinstance(ranked, list) else ranked.get("rows") or ranked.get("top25") or [],
+        "researchFunnel": {
+            "status": "COMPLETE" if research_funnel else "NOT_AVAILABLE",
+            "populationCount": int(research_funnel.get("populationCount") or 0),
+            "stageCounts": dict((research_funnel.get("accounting") or {}).get("stageCounts") or {}),
+            "eventTimezone": (research_funnel.get("accounting") or {}).get("eventTimezone") or "UTC",
+            "eventDatePopulationCounts": dict((research_funnel.get("accounting") or {}).get("eventDatePopulationCounts") or {}),
+            "artifact": "insights_research_funnel.json" if research_funnel else None,
+            "scoreType": research_funnel.get("scoreType") or "RESEARCH_PRIORITY_NOT_PROBABILITY",
+            "probabilityStatus": research_funnel.get("probabilityStatus") or "NONE",
+        },
         "qualified": qualified if isinstance(qualified, list) else qualified.get("rows") or [],
         "card": card if isinstance(card, list) else card.get("rows") or card.get("card") or [],
         "cardSize": freeze.get("cardSize") or freeze.get("modeledCardSize") or 0,

@@ -359,9 +359,15 @@ def build_next_research_batch(
         ),
         "stopWhen": "coverage closed or additional research cannot change production eligibility enough to justify cost",
         "hostInstruction": (
-            "Research reusable entities once. Do not invent hashes, reliability, "
-            "or internal request IDs. Return simple host observations. "
-            "Event/team before player. One acquisition populates every board-relevant entity from that source."
+            "Execute research from the complete captured-prop population and its ranked research funnel; do not stop at Top-25 or Top-100. "
+            "Treat the user's timestamped HAR/screenshots as the chat-ignition line/side snapshot and do not request another board HAR. "
+            "Use web search and approved public/official sources to fill missing player status, role, game logs, opportunity, efficiency, event, team, opponent, environment, and market-definition facts. "
+            "Acquire reusable sport, competition, event, environment, affiliation, counterparty, and team facts once, then reuse them for every dependent claim; research player facts per subject and role epoch. "
+            "Prefer primary sources; record exact source URL, source identifier, retrievedAt, published/observed time, and quoted or structured fact for every observation. "
+            "Reject facts published or observed after forecastCutoff from forecast evidence. Public research may explain a captured prop but must never fabricate or replace its offered line, direction, price, settlement rule, model probability, or outcome. "
+            "Return only source-backed observations matching the response schema. Do not invent hashes, reliability scores, internal request IDs, missing statistics, or evidence. "
+            "For every unresolved field, try the next approved source and record each failed attempt with its typed reason; continue other independent tasks and leave explicit blockers only after source routes are exhausted. "
+            "Research event/team before player. A single acquisition must populate every board-relevant entity and dependent candidate from that source."
         ),
         "batches": batches,
         "tasks": [
