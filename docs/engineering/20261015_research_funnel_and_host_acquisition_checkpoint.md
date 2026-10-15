@@ -1,13 +1,15 @@
 # Research funnel and host acquisition checkpoint — 2026-10-15
 
-**Checkpoint updated:** `2026-10-15T21:06:42Z`
+**Checkpoint updated:** `2026-10-15T21:14:30Z`
 
 ## Repository baseline
 
 - Repository: `williamcgreenwood/DCM`
 - Verified `main`: `2f8f53015da6c56ec2fe7f76e610748159fac144` (`Record merged seven-gate run-through checkpoint (#111)`).
 - PR #107: closed and merged to `main` as `98cb698cf000b963e24ca47b3c1e4e18722bda96`.
-- Work branch: `fix/insights-research-funnel-20261015` (based directly on verified `main`).
+- PR #112: merged as `607d03b01f857b1b67b0cd1e2fbfe937d0239bb5`; this is the verified latest repository commit after merge.
+- Exact PR head: `1376cfa7b1771db10fc310a4083e8c9a80121ce8`; required workflow run `38807835854` passed all 8 jobs.
+- Work branch: `fix/insights-research-funnel-20261015` (based directly on verified `main`); implementation is merged.
 - No source HAR, PDF, private player data, or generated run outputs are added to the repository.
 
 ## Problem found and code change
@@ -58,7 +60,8 @@ Those missing data remain honest computation limits; the design correction is th
 - Algorithm registry consistency, DCM policy, generated inventory, algorithm-frontier smoke, and baseline-profile smoke passed.
 - Synthetic DCM package/CLI run completed with archive, evidence, temporal, model-run, and selection integrity checks true; predictive validation and production-root certification remain false.
 - Synthetic throughput benchmark: 100 rows in 6.92 s (263 MB peak RSS); 1,000 rows in 83.16 s (2.04 GB peak RSS). Performance remains explicitly uncertified because these are synthetic workloads.
-- The remaining required branch-head check is GitHub PR CI. Merge only after all required jobs pass.
+- GitHub CI run `38807835854` completed successfully on the exact PR head: all 8 jobs passed (Package/CLI, benchmark/profile, generated inventory, RFECV chronology, full test suite, algorithm/policy/governance, durable batch-search, and python-dcm).
 - Queue benchmark: 6,819 claims -> 6,602 candidates and all ranked tiers in ~365 ms.
-- Next: refresh generated inventory if required, run full suite and required CI, commit this branch, open one PR, wait for required checks, then merge only if all repository gates pass.
+- PR #112 merge commit: `607d03b01f857b1b67b0cd1e2fbfe937d0239bb5`. The merge is verified; GitHub exposed no separate post-merge workflow run for the merge commit.
+- No duplicate implementation work is pending. Resume by reading PR #112 and this checkpoint, verifying `main` is at or descends from the merge commit, and only then handling any new run or newly available evidence.
 - Next run command should include the active session timezone, for example `dcm-host run-slate ... --cutoff-from-capture --event-timezone America/Los_Angeles`.
