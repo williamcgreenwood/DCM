@@ -2,10 +2,10 @@
 
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
-- Modules: **273**
-- Symbols: **2094**
+- Modules: **275**
+- Symbols: **2108**
 - Parse errors: **0**
-- Inventory hash: `d84795f23a114b08654eb8b2134efd806c083f3f7fa9c80637afad9ac544c126`
+- Inventory hash: `4292882db92dc1d1e40929a90280f37e0d09f9ee8d61aecd1671ec8686e284ee`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -60,7 +60,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P7 | `src/dcm/chat/report.py` | 0 | 1 |
 | P7 | `src/dcm/chat/research_bridge.py` | 0 | 7 |
 | P7 | `src/dcm/chat/session.py` | 1 | 34 |
-| P7 | `src/dcm/chat/slate.py` | 0 | 18 |
+| P7 | `src/dcm/chat/slate.py` | 0 | 19 |
 | P7 | `src/dcm/chat/slate_autonomous.py` | 0 | 21 |
 | P7 | `src/dcm/chat/state.py` | 0 | 4 |
 | UNMAPPED | `src/dcm/compact.py` | 4 | 20 |
@@ -108,6 +108,8 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P2-P4 | `src/dcm/model/availability.py` | 0 | 2 |
 | P2-P4 | `src/dcm/model/basketball_efficiency.py` | 1 | 6 |
 | P2-P4 | `src/dcm/model/basketball_opportunity.py` | 1 | 8 |
+| P2-P4 | `src/dcm/model/captured_history.py` | 0 | 9 |
+| P2-P4 | `src/dcm/model/captured_history_database.py` | 0 | 4 |
 | P2-P4 | `src/dcm/model/distributions.py` | 0 | 2 |
 | P2-P4 | `src/dcm/model/event_world_joint.py` | 0 | 8 |
 | P2-P4 | `src/dcm/model/explanation.py` | 0 | 14 |
@@ -313,7 +315,7 @@ _No class/function symbols._
 
 - `function` **_a** L10
 - `function` **_ml** L719
-- `function` **registry_document** L918
+- `function` **registry_document** L927
 
 ### `src/dcm/algorithms/computation_law.py`
 
@@ -804,18 +806,18 @@ _No class/function symbols._
 
 ### `src/dcm/chat/insight_closure.py`
 
-- `function` **_text** L29
-- `function` **_number** L33
-- `function` **_request_ids** L43
-- `function` **_coverage_map** L65
-- `function` **build_top100_artifact** L73 — Turn the deterministic research queue into an auditable Top-100 stage.
-- `function` **build_event_worlds** L141 — Build a safe shared event context index for Insights descendants.
-- `function` **_prediction_rows** L197
-- `function` **_model_is_promoted** L217
-- `function` **_future** L228
-- `function` **_candidate_row** L243
-- `function` **evaluate_insight_selection** L256 — Consume Insights snapshots through ranking, gates, constraints, freeze.
-- `function` **refresh_insight_pipeline_files** L560 — Persist the inner consumer artifacts and return the full state.
+- `function` **_text** L31
+- `function` **_number** L35
+- `function` **_request_ids** L45
+- `function` **_coverage_map** L67
+- `function` **build_top100_artifact** L75 — Turn the deterministic research queue into an auditable Top-100 stage.
+- `function` **build_event_worlds** L143 — Build a safe shared event context index for Insights descendants.
+- `function` **_prediction_rows** L199
+- `function` **_model_is_promoted** L219
+- `function` **_future** L230
+- `function` **_candidate_row** L245
+- `function` **evaluate_insight_selection** L258 — Consume Insights snapshots through ranking, gates, constraints, freeze.
+- `function` **refresh_insight_pipeline_files** L591 — Persist the inner consumer artifacts and return the full state.
 
 ### `src/dcm/chat/report.py`
 
@@ -871,24 +873,25 @@ _No class/function symbols._
 
 ### `src/dcm/chat/slate.py`
 
-- `function` **_sha256_bytes** L108
-- `function` **_sha256_file** L112
-- `function` **_write_json** L116
-- `function` **_write_jsonl** L124
-- `function` **_read_jsonl** L131
-- `function` **_safe_error** L145
-- `function` **_prompt_metadata** L151
-- `function` **_sport_hint** L171
-- `function` **_ordered_inputs** L179
-- `function` **_repo_head** L197
-- `function` **_source_summary** L212
-- `function` **_safe_claim** L296 — Drop accidental free-form/raw fields if an adapter ever supplies one.
-- `method` **_safe_claim.clean** L300
-- `function` **_step** L314
-- `function` **_write_terminal_artifacts** L338
-- `function` **_legacy_run_slate** L752 — Run independent captures, the reconciled union, and HAR-only autonomous closure.
-- `function` **_repository_prompt** L1290
-- `function` **run_slate** L1297 — Run the legacy producer and then apply the HAR-only closure controller.
+- `function` **_prompt_event_date** L99 — Resolve the explicitly named slate date from the execution prompt.
+- `function` **_sha256_bytes** L137
+- `function` **_sha256_file** L141
+- `function` **_write_json** L145
+- `function` **_write_jsonl** L153
+- `function` **_read_jsonl** L160
+- `function` **_safe_error** L174
+- `function` **_prompt_metadata** L180
+- `function` **_sport_hint** L200
+- `function` **_ordered_inputs** L208
+- `function` **_repo_head** L226
+- `function` **_source_summary** L241
+- `function` **_safe_claim** L325 — Drop accidental free-form/raw fields if an adapter ever supplies one.
+- `method` **_safe_claim.clean** L329
+- `function` **_step** L343
+- `function` **_write_terminal_artifacts** L367
+- `function` **_legacy_run_slate** L797 — Run independent captures, the reconciled union, and HAR-only autonomous closure.
+- `function` **_repository_prompt** L1337
+- `function` **run_slate** L1344 — Run the legacy producer and then apply the HAR-only closure controller.
 
 ### `src/dcm/chat/slate_autonomous.py`
 
@@ -912,7 +915,7 @@ _No class/function symbols._
 - `function` **_training_evaluation_rows** L621 — Project only exact, settled labels with an already-produced probability.
 - `function` **_drive_train** L661
 - `function` **_drive_playables** L736
-- `function` **advance_autonomous_closure** L771 — Advance research → settle → train → rank/select/freeze with typed states.
+- `function` **advance_autonomous_closure** L773 — Advance research → settle → train → rank/select/freeze with typed states.
 
 ### `src/dcm/chat/state.py`
 
@@ -1390,6 +1393,25 @@ _No class/function symbols._
 - `class` **OpportunityModel** L104 — Per-minute opportunity from role-comparable logs and pace.
 - `method` **OpportunityModel.fit** L113
 - `method` **OpportunityModel.fit._rate** L157
+
+### `src/dcm/model/captured_history.py`
+
+- `function` **_number** L26
+- `function` **_time** L36
+- `function` **_wilson_lower** L49 — Two-sided 95% Wilson lower bound for a Bernoulli share.
+- `function` **_offered_sides** L61
+- `function` **_policy_exclusion** L74
+- `method` **_policy_exclusion.has_modifier** L76
+- `function` **_history_values** L109
+- `function` **_decision** L141
+- `function` **build_captured_history_decisions** L308 — Model all supplied player-prop claims and emit terminal accounting.
+
+### `src/dcm/model/captured_history_database.py`
+
+- `function` **_time** L16
+- `function` **_number** L27
+- `function` **_json** L37
+- `function` **build_captured_prop_database** L41 — Write a deterministic, indexed store joining source claims and decisions.
 
 ### `src/dcm/model/distributions.py`
 
@@ -2127,9 +2149,9 @@ _No class/function symbols._
 - `function` **plan_insight_host_research** L114 — Create reusable EVENT/AFFILIATION/COUNTERPARTY/SUBJECT jobs.
 - `function` **_finite_line** L195
 - `function` **insights_offer_snapshots** L205 — Promote Insights claims with exact line + HIGHER/LOWER into offer-equivalent snapshots.
-- `function` **build_insight_research_graph** L303 — Build a non-offer graph for the Insights research population.
-- `method` **build_insight_research_graph.add_node** L315
-- `method` **build_insight_research_graph.add_edge** L326
+- `function` **build_insight_research_graph** L321 — Build a non-offer graph for the Insights research population.
+- `method` **build_insight_research_graph.add_node** L333
+- `method` **build_insight_research_graph.add_edge** L344
 
 ### `src/dcm/research/insight_queue.py`
 

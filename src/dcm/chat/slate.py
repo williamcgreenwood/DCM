@@ -13,6 +13,7 @@ import json
 import os
 import re
 import subprocess
+from datetime import date, datetime
 from pathlib import Path
 from typing import Any, Callable, Iterable
 
@@ -93,6 +94,34 @@ _PHASE_WORDS = {
     "TWENTY-FIVE": 25,
     "TWENTY-SIX": 26,
 }
+
+
+def _prompt_event_date(prompt: Path) -> str | None:
+    """Resolve the explicitly named slate date from the execution prompt."""
+    text = Path(prompt).read_text(encoding="utf-8")
+    named = re.search(
+        r"\b(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|"
+        r"Jul(?:y)?|Aug(?:ust)?|Sep(?:t(?:ember)?)?|Oct(?:ober)?|"
+        r"Nov(?:ember)?|Dec(?:ember)?)\.?\s+(\d{1,2})(?:st|nd|rd|th)?[,]?\s+(20\d{2})\b",
+        text,
+        flags=re.IGNORECASE,
+    )
+    if named:
+        try:
+            month_format = "%B" if len(named.group(1)) > 3 else "%b"
+            return datetime.strptime(
+                f"{named.group(1).replace('.', '')} {named.group(2)} {named.group(3)}",
+                f"{month_format} %d %Y",
+            ).date().isoformat()
+        except ValueError:
+            pass
+    iso = re.search(r"\b(20\d{2}-\d{2}-\d{2})\b", text)
+    if iso:
+        try:
+            return date.fromisoformat(iso.group(1)).isoformat()
+        except ValueError:
+            return None
+    return None
 
 _PRIVACY = {
     "rawHarPersisted": False,
@@ -358,6 +387,12 @@ def _write_terminal_artifacts(
     selection_freeze = selection_state.get("freeze") if isinstance(selection_state.get("freeze"), dict) else {}
     autonomous_model = autonomous_body.get("model") if isinstance(autonomous_body.get("model"), dict) else {}
     event_world = autonomous_body.get("eventWorld") if isinstance(autonomous_body.get("eventWorld"), dict) else {}
+    directional = autonomous_body.get("directional") if isinstance(autonomous_body.get("directional"), dict) else {}
+    if not directional and composite_dest is not None:
+        directional = read_json(composite_dest / "captured_history_directional_decisions.json") or {}
+    captured_database = autonomous_body.get("capturedPropDatabase") if isinstance(autonomous_body.get("capturedPropDatabase"), dict) else {}
+    if not captured_database and composite_dest is not None:
+        captured_database = read_json(composite_dest / "captured_prop_ml_database_manifest.json") or {}
     current_offer_doc = read_json(composite_dest / "current_offer_snapshots.json") if composite_dest else {}
     current_offer_doc = current_offer_doc if isinstance(current_offer_doc, dict) else {}
     current_offer_rows = [
@@ -559,6 +594,16 @@ def _write_terminal_artifacts(
     if selection_state:
         _write_json(root / "insight_selection.json", selection_state)
         paths.append("insight_selection.json")
+    if directional:
+        _write_json(root / "captured_history_directional_decisions.json", directional)
+        paths.append("captured_history_directional_decisions.json")
+    if captured_database:
+        captured_database = {
+            **captured_database,
+            "relativePath": f"composite_run/{composite_dest.name if composite_dest is not None else 'unknown'}/{captured_database.get('path') or 'captured_prop_ml.sqlite3'}",
+        }
+        _write_json(root / "captured_prop_ml_database_manifest.json", captured_database)
+        paths.append("captured_prop_ml_database_manifest.json")
     _write_json(root / "current_offer_snapshots.json", current_offer_doc)
     paths.append("current_offer_snapshots.json")
 
@@ -1024,6 +1069,8 @@ def _legacy_run_slate(
             observations_imported=observations is not None and import_result is not None,
             research_queue_selected=research_queue_selected,
             outcomes=Path(outcomes) if outcomes is not None else None,
+            event_date=_prompt_event_date(Path(prompt)),
+            event_timezone=os.environ.get("DCM_EVENT_TIMEZONE"),
         )
         _write_json(root / "autonomous_closure.json", autonomous_doc)
     else:

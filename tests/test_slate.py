@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from dcm.chat.slate import run_slate
+from dcm.chat.slate import _prompt_event_date, run_slate
 from dcm.contracts.hashes import content_hash
 from dcm.ingest.har import ingest_har
 from dcm.ingest.insights import (
@@ -11,6 +11,13 @@ from dcm.ingest.insights import (
     PAGINATION_MALFORMED,
     parse_insights_payload,
 )
+
+
+def test_prompt_event_date_resolves_explicit_named_slate_date(tmp_path: Path) -> None:
+    prompt = tmp_path / "run.md"
+    prompt.write_text("Run Pillars DCM for October 15, 2026.\n", encoding="utf-8")
+
+    assert _prompt_event_date(prompt) == "2026-10-15"
 
 
 def _insight(insight_id: str) -> dict:
