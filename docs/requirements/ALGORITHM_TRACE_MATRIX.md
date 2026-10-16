@@ -5,9 +5,9 @@ Constitution version: `DCM-ALGORITHM-CONSTITUTION-v1.0.0-20260903`
 Generated from `dcm.algorithms.catalog`. Do not hand-edit algorithm rows.
 Re-run `python scripts/export_algorithm_registry.py` after catalog changes.
 
-- Registry rows: **173**
+- Registry rows: **174**
 - REQUIRED_CORE: **79**
-- REQUIRED_CONDITIONAL: **31**
+- REQUIRED_CONDITIONAL: **32**
 - PERMANENT_CHALLENGER: **63**
 
 | algorithm_id | name | family | lifecycle | implementation | producer | consumer | fallback | tests | traces |
@@ -109,6 +109,7 @@ Re-run `python scripts/export_algorithm_registry.py` after catalog changes.
 | `ALG-ML-PROB-008` | Distributional Regression | ML_PROB | PERMANENT_CHALLENGER | `dcm.algorithms.ml_families.not_active_challenger` | AlgorithmFrontierReview | benchmarks/algorithm_frontier | ALG-ML-TABULAR-010 | test_algorithm_constitution,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
 | `ALG-ML-PROB-009` | Gaussian KDE bandwidth-selected density diagnostic | ML_PROB | REQUIRED_CONDITIONAL | `dcm.model.advanced_execution.gaussian_kde_diagnostic` | cutoff-safe comparable historical outcomes | diagnostic density receipt | ALG-ML-PROB-001 | test_advanced_modeling,test_algorithm_core,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
 | `ALG-ML-PROB-010` | Empirical discrete outcome distribution fallback | ML_PROB | REQUIRED_CONDITIONAL | `dcm.model.advanced_execution.empirical_discrete_distribution_diagnostic` | cutoff-safe comparable discrete outcomes | diagnostic density receipt | ALG-ML-PROB-001 | test_advanced_modeling,test_algorithm_core,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
+| `ALG-ML-PROB-011` | Cutoff-safe empirical prop direction screening with Wilson uncertainty | ML_PROB | REQUIRED_CONDITIONAL | `dcm.model.captured_history.build_captured_history_decisions` | captured user-supplied offer snapshots and dated player histories | full-board directional decision and ranking artifact |  | test_captured_history,test_algorithm_core | REQ-ALG-CONST-R0 |
 | `ALG-ML-TABULAR-001` | Elastic Net / ridge | ML_TABULAR | REQUIRED_CORE | `dcm.algorithms.ml_families.ridge_closed_form` | AlgorithmSelectionEngine | dcm.learning.registry |  | test_algorithm_constitution,test_algorithm_core,test_algorithm_ml_stdlib | REQ-ALG-CONST-R0 |
 | `ALG-ML-TABULAR-002` | Generalized Linear Models | ML_TABULAR | REQUIRED_CONDITIONAL | `dcm.algorithms.ml_families.ridge_closed_form` | AlgorithmSelectionEngine | dcm.learning.registry | ALG-ML-TABULAR-001 | test_algorithm_constitution,test_algorithm_core,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |
 | `ALG-ML-TABULAR-003` | Random Forest | ML_TABULAR | PERMANENT_CHALLENGER | `dcm.algorithms.ml_families.not_active_challenger` | AlgorithmFrontierReview | benchmarks/algorithm_frontier | ALG-ML-TABULAR-001 | test_algorithm_constitution,test_algorithm_fallbacks | REQ-ALG-CONST-R0 |

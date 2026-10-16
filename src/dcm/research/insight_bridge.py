@@ -239,6 +239,8 @@ def insights_offer_snapshots(claims: list[dict[str, Any]]) -> dict[str, Any]:
             "offerKind": "INSIGHTS_OFFER_SNAPSHOT",
             "candidateClass": "RESEARCH_CANDIDATE",
             "offerBacking": "INSIGHTS_OFFER_BACKED",
+            "chatIgnitionOfferSnapshot": True,
+            "currentOfferRevalidated": False,
             "boardOffer": False,
             "productionSelectionPermitted": False,
             "predictiveClaim": "NONE",
@@ -266,7 +268,21 @@ def insights_offer_snapshots(claims: list[dict[str, Any]]) -> dict[str, Any]:
             "offeredLower": offered_lower,
             "offeredMore": offered_higher,
             "offeredLess": offered_lower,
-            "modifier": "STANDARD",
+            # Keep the captured modifier evidence exact. Missing or mixed
+            # modifier metadata must not be silently rewritten to STANDARD.
+            "modifier": (
+                next(iter(claim.get("modifierCounts")))
+                if isinstance(claim.get("modifierCounts"), dict)
+                and len(claim.get("modifierCounts")) == 1
+                else "UNKNOWN"
+            ),
+            "modifierCounts": dict(claim.get("modifierCounts") or {})
+            if isinstance(claim.get("modifierCounts"), dict)
+            else {},
+            "capturedBookOffers": [
+                dict(row) for row in (claim.get("observedBookOffers") or [])
+                if isinstance(row, dict)
+            ],
             "status": "pre_game",
             "isLive": False,
             "sourceAdapter": "INSIGHTS_EVIDENCE",
@@ -286,6 +302,8 @@ def insights_offer_snapshots(claims: list[dict[str, Any]]) -> dict[str, Any]:
         "offerKind": "INSIGHTS_OFFER_SNAPSHOT",
         "candidateClass": "RESEARCH_CANDIDATE",
         "offerBacking": "INSIGHTS_OFFER_BACKED",
+        "chatIgnitionOfferCount": len(snapshots),
+        "currentOfferRevalidatedCount": 0,
         "boardOfferCount": 0,
         "insightsOfferCount": len(snapshots),
         "snapshots": snapshots,

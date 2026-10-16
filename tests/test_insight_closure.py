@@ -4,7 +4,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from dcm.chat.insight_closure import build_top100_artifact, evaluate_insight_selection
+from dcm.chat.insight_closure import build_top100_artifact, evaluate_insight_selection, refresh_insight_pipeline_files
 from dcm.ingest.insights import parse_insights_payload
 from dcm.research.insight_bridge import insights_offer_snapshots, plan_insight_host_research
 from dcm.research.insight_queue import build_research_queue
@@ -118,6 +118,19 @@ def test_offer_revalidation_unavailable_is_durable_and_not_a_har_request(tmp_pat
     assert available["snapshotCount"] == 1
 
 
+def test_insights_snapshot_preserves_unknown_modifier_instead_of_claiming_standard():
+    claim = _parsed_claim()
+    claim["modifierCounts"] = {"UNKNOWN": 1}
+    claim["observedBookOffers"] = [{"book": "FANATICS", "modifier": "UNKNOWN", "side": "HIGHER"}]
+
+    snapshot = insights_offer_snapshots([claim])["snapshots"][0]
+
+    assert snapshot["chatIgnitionOfferSnapshot"] is True
+    assert snapshot["currentOfferRevalidated"] is False
+    assert snapshot["modifier"] == "UNKNOWN"
+    assert snapshot["modifierCounts"] == {"UNKNOWN": 1}
+
+
 def test_current_offer_model_gates_produce_top100_top25_and_freeze(tmp_path: Path) -> None:
     claim = _parsed_claim()
     queue = build_research_queue([claim])
@@ -204,3 +217,69 @@ def test_current_offer_model_gates_produce_top100_top25_and_freeze(tmp_path: Pat
     assert state["top100"]["productionTop100Count"] == 1
     assert state["top100"]["productionTop100"]
     assert selection["noBoardHarAsk"] is True
+
+
+def test_full_board_directional_model_runs_before_top100_frontier(tmp_path: Path) -> None:
+    claims = []
+    for index, outcome in enumerate((4, 3, 1)):
+        row = _parsed_claim()
+        row["claimId"] = f"claim-{index}"
+        row["history"] = {"items": [
+            {"date": f"2026-09-{day:02d}T00:00:00Z", "eventId": f"{index}-{day}", "value": value}
+            for day, value in enumerate((outcome, outcome + 1, outcome), start=1)
+        ]}
+        row["direction"] = "HIGHER"
+        row["directionClass"] = "HIGHER_LOWER"
+        row["reportedHitRate"] = 0.0
+        claims.append(row)
+    (tmp_path / "host_state.json").write_text(
+        json.dumps({"forecastCutoff": "2026-10-01T00:00:00Z"}), encoding="utf-8"
+    )
+
+    state = evaluate_insight_selection(
+        dest=tmp_path,
+        claims=claims,
+        queue={"top100": [{"claimId": "claim-0"}]},
+        coverage={},
+        model_result={},
+        board_offer_count=0,
+        event_date="2099-09-20",
+        event_timezone="UTC",
+    )
+
+    assert state["selection"]["candidateCount"] == 1  # the production/research frontier
+    assert state["directional"]["inputClaimCount"] == 3
+    assert len(state["directional"]["rows"]) == 3
+    assert {row["terminalStatus"] for row in state["directional"]["rows"]} == {"PASS"}
+    assert all(row["reportedHitRateUsedAsForecast"] is False for row in state["directional"]["rows"])
+
+
+def test_refresh_persists_directional_decisions_and_indexed_ml_database(tmp_path: Path) -> None:
+    claim = _parsed_claim()
+    claim["sourceHarSha256"] = "har-source-sha"
+    claim["sourceBodyHash"] = "body-source-sha"
+    claim["history"] = {"items": [
+        {"date": f"2099-09-{day:02d}T00:00:00Z", "eventId": f"event-{day}", "value": 6}
+        for day in range(1, 5)
+    ]}
+    claim["lastNCount"] = 4
+    claim["lastNHitCount"] = 4
+    claim["reportedHitRate"] = 1.0
+    (tmp_path / "host_state.json").write_text(
+        json.dumps({"forecastCutoff": "2099-09-01T00:00:00Z"}), encoding="utf-8"
+    )
+
+    state = refresh_insight_pipeline_files(
+        tmp_path,
+        claims=[claim],
+        queue={"researchFunnel": {"eventTimezone": "UTC", "byEventDate": {"2099-09-20": {}}}},
+        coverage={},
+        model_result={"forecastCutoff": "2099-09-01T00:00:00Z"},
+        event_date="2099-09-20",
+        event_timezone="UTC",
+    )
+
+    assert (tmp_path / "captured_history_directional_decisions.json").is_file()
+    assert (tmp_path / "captured_prop_ml.sqlite3").is_file()
+    assert state["database"]["sourceClaimCount"] == 1
+    assert state["selection"]["capturedPropDatabaseSha256"] == state["database"]["sha256"]

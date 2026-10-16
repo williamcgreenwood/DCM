@@ -743,7 +743,7 @@ def _drive_playables(
     model_ready = str(model.get("status") or "") in {"CERTIFIED", "PRODUCTION_CERTIFIED"}
     root_ready = bool(model.get("productionRootCertified"))
     if int(board_offer_count) <= 0:
-        reason = "OFFER_REVALIDATION_UNAVAILABLE"
+        reason = "CURRENT_OFFER_REVALIDATION_UNAVAILABLE"
     elif not model_ready or not root_ready:
         reason = "PRODUCTION_MODEL_GATES_NOT_MET"
     else:
@@ -761,9 +761,11 @@ def _drive_playables(
         reason=reason,
         boardHarRequired=False,
         note=(
-            "Playables are selected only by the production selector after exact "
-            "offer revalidation, evidence, settlement, calibrated model, and "
-            "root certification. Insights Top25 remains research-only when board=0."
+            "The supplied capture remains the chat-ignition board for accounting "
+            "and directional analysis. Production card selection additionally "
+            "requires current offer revalidation, evidence, settlement, calibrated "
+            "model, and root certification. A missing production gate does not "
+            "suppress the separate captured-history directional artifact."
         ),
     )
 
@@ -780,6 +782,8 @@ def advance_autonomous_closure(
     research_queue_selected: int,
     outcomes: Path | None = None,
     model_result: Mapping[str, Any] | None = None,
+    event_date: str | None = None,
+    event_timezone: str | None = None,
 ) -> dict[str, Any]:
     """Advance research → settle → train → rank/select/freeze with typed states."""
     insight_bridge = {}
@@ -815,6 +819,8 @@ def advance_autonomous_closure(
                 coverage=coverage,
                 model_result=model_result or train,
                 board_offer_count=board_offer_count,
+                event_date=event_date,
+                event_timezone=event_timezone,
             )
         except Exception as exc:  # typed selection boundary; retain abstention
             selection_state = {
@@ -855,9 +861,13 @@ def advance_autonomous_closure(
         "deferredJobs": deferred,
         "settlement": settlement_doc,
         "model": train,
+        "runEventDate": event_date,
+        "eventTimezone": event_timezone,
         "top100": selection_state.get("top100") if isinstance(selection_state, Mapping) else None,
         "eventWorld": selection_state.get("eventWorld") if isinstance(selection_state, Mapping) else None,
         "selection": selection,
+        "directional": selection_state.get("directional") if isinstance(selection_state, Mapping) else None,
+        "capturedPropDatabase": selection_state.get("database") if isinstance(selection_state, Mapping) else None,
         "freeze": selection_state.get("freeze") if isinstance(selection_state, Mapping) else None,
         "boardHarRequired": False,
         "requiredOperatorAsks": [],

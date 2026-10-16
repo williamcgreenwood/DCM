@@ -15,6 +15,8 @@ from typing import Any, Iterable, Mapping
 from dcm.chat.state import read_json, write_json
 from dcm.contracts.hashes import content_hash
 from dcm.model.ranking import rank_candidates
+from dcm.model.captured_history import build_captured_history_decisions
+from dcm.model.captured_history_database import build_captured_prop_database
 from dcm.research.insight_bridge import insights_offer_snapshots
 from dcm.research.offer_revalidation import UNAVAILABLE, load_current_offers
 from dcm.runtime.lineage_integrity import FreezeMember, LineageHalt, LineageStore, offer_is_fresh
@@ -261,15 +263,38 @@ def evaluate_insight_selection(
     coverage: Mapping[str, Any] | None,
     model_result: Mapping[str, Any] | None,
     board_offer_count: int = 0,
+    event_date: str | None = None,
+    event_timezone: str | None = None,
 ) -> dict[str, Any]:
     """Consume Insights snapshots through ranking, gates, constraints, freeze."""
     dest = Path(dest) if dest is not None else None
     claim_rows = [dict(row) for row in claims if isinstance(row, Mapping)]
+    host_state = read_json(dest / "host_state.json") if dest is not None else {}
+    board_state = read_json(dest / "board.json") if dest is not None else {}
+    supplied_model = dict(model_result) if isinstance(model_result, Mapping) else {}
+    cutoff = (
+        supplied_model.get("forecastCutoff")
+        or (host_state.get("forecastCutoff") if isinstance(host_state, Mapping) else None)
+        or (board_state.get("forecastCutoff") if isinstance(board_state, Mapping) else None)
+    )
     snapshot_doc = insights_offer_snapshots(claim_rows)
     snapshots = [dict(row) for row in (snapshot_doc.get("snapshots") or []) if isinstance(row, Mapping)]
-    # The research queue is the funnel boundary.  Do not silently model all
-    # thousands of captured claims after the Top-100 has been selected.
+    captured_offer_snapshot_count = len(snapshots)
+    # The queue is only the deeper-research and production frontier. The
+    # independent captured-history producer above evaluates every supplied
+    # claim before this frontier is applied.
     queue = queue if isinstance(queue, Mapping) else {}
+    research_funnel = queue.get("researchFunnel") if isinstance(queue.get("researchFunnel"), Mapping) else {}
+    event_date_populations = research_funnel.get("byEventDate") if isinstance(research_funnel.get("byEventDate"), Mapping) else {}
+    if event_date is None and len(event_date_populations) == 1:
+        event_date = str(next(iter(event_date_populations)))
+    event_timezone = event_timezone or _text(research_funnel.get("eventTimezone"), 128) or None
+    directional = build_captured_history_decisions(
+        claim_rows,
+        forecast_cutoff=str(cutoff) if cutoff else None,
+        event_date=event_date,
+        event_timezone=event_timezone,
+    )
     frontier_rows = [row for row in (queue.get("top100") or []) if isinstance(row, Mapping)]
     frontier_ids = {_text(row.get("claimId"), 512) for row in frontier_rows if _text(row.get("claimId"), 512)}
     if frontier_ids:
@@ -531,6 +556,9 @@ def evaluate_insight_selection(
         "status": "SELECTED" if production_top25 else "ABSTAINED",
         "modelPathAttempted": bool(model.get("modelPathAttempted")) or bool(predictions),
         "candidateCount": len(diagnostics),
+        "capturedHistoryClaimCount": directional["inputClaimCount"],
+        "capturedHistoryDirectionalCount": directional["directionallyRankedCount"],
+        "capturedHistoryTerminalCounts": directional["terminalCounts"],
         "rankedCount": len(ranked),
         "productionTop100Count": len(production_top100),
         "productionTop25Count": len(production_top25),
@@ -544,13 +572,16 @@ def evaluate_insight_selection(
         "freeze": freeze_doc,
         "blockerCounts": dict(sorted(blocker_counts.items())),
         "boardOfferCount": int(board_offer_count),
+        "chatIgnitionOfferSnapshotCount": captured_offer_snapshot_count,
         "insightsOfferCount": len(snapshots),
+        "researchFrontierOfferSnapshotCount": len(snapshots),
         "currentOfferRevalidationCount": len(current_offers),
         "noBoardHarAsk": True,
     }
     selection["contentHash"] = content_hash(selection)
     return {
         "top100": top100,
+        "directional": directional,
         "eventWorld": build_event_worlds(claim_rows, coverage=coverage),
         "selection": selection,
         "freeze": freeze_doc,
@@ -565,6 +596,8 @@ def refresh_insight_pipeline_files(
     coverage: Mapping[str, Any] | None,
     model_result: Mapping[str, Any] | None,
     board_offer_count: int = 0,
+    event_date: str | None = None,
+    event_timezone: str | None = None,
 ) -> dict[str, Any]:
     """Persist the inner consumer artifacts and return the full state."""
     dest = Path(dest)
@@ -597,8 +630,17 @@ def refresh_insight_pipeline_files(
         coverage=coverage,
         model_result=model_result,
         board_offer_count=board_offer_count,
+        event_date=event_date,
+        event_timezone=event_timezone,
     )
+    database_manifest = build_captured_prop_database(dest, claim_rows, state["directional"])
+    state["database"] = database_manifest
+    state["selection"]["capturedPropDatabaseSha256"] = database_manifest["sha256"]
+    state["selection"]["contentHash"] = content_hash({
+        key: value for key, value in state["selection"].items() if key != "contentHash"
+    })
     write_json(dest / "insight_event_worlds.json", state["eventWorld"])
+    write_json(dest / "captured_history_directional_decisions.json", state["directional"])
     write_json(dest / "production_top100.json", state["top100"])
     write_json(dest / "insight_selection.json", state["selection"])
     write_json(dest / "insights_frozen_predictions.json", state["freeze"])
