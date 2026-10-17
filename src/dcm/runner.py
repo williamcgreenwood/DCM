@@ -502,7 +502,10 @@ def run_dcm(
                     input_boundary_records.append(inspect_input_boundary(source, raw_bytes=raw_bytes))
                     yield ingest_har(raw_bytes, raw_bytes=raw_bytes)
 
-            ingest = compose_ingest_stream(_ingest_stream()) if len(sources) > 1 else next(_ingest_stream())
+            ingest = (
+                compose_ingest_stream(_ingest_stream(), compact_timeline=True)
+                if len(sources) > 1 else next(_ingest_stream())
+            )
         # The HAR's own provenance marker is authoritative for fixture versus
         # captured execution.  Tests and callers may select a fixture research
         # provider without passing --synthetic; never run live-only recovery
@@ -1917,8 +1920,8 @@ def run_dcm(
             if not reqs or any(r not in complete_req for r in reqs):
                 unresolved_selected += 1
         remaining_actions = unresolved_selected
-    except Exception:
-        remaining_actions = 0
+    except (OSError, json.JSONDecodeError, TypeError, ValueError) as exc:
+        raise RuntimeError("ACQUISITION_ACTION_ACCOUNTING_INVALID") from exc
     coverage_incomplete = not bool((bundle.get("coverage") or {}).get("complete"))
     host_required = str(research) == "file" and coverage_incomplete
     snapshot_hash_after = content_hash(sorted(str(s.get("parameter_snapshot_hash") or "") for s in parameter_cache.values()))

@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from dcm.ingest.board import rows_as_of
+from dcm.ingest.board import rows_as_of, write_board
 from dcm.ingest.composite import compose_ingest_stream, compose_ingests
 from dcm.ingest.har import canonical_request_scope, ingest_har
 from dcm.runner import _har_capture_sort_key
@@ -126,6 +126,49 @@ def test_streamed_composition_matches_materialized_composition():
     assert actual["rows"] == expected["rows"]
     assert actual["scopeAttempts"] == expected["scopeAttempts"]
     assert actual["timeline"] == expected["timeline"]
+
+
+def test_compact_composition_preserves_board_and_asof_with_sparse_transitions():
+    page_one = "https://api.prizepicks.com/projections?page=1"
+    page_two = "https://api.prizepicks.com/projections?page=2"
+    captures = [
+        _ing(_har(url=page_one, at="2026-08-28T10:00:00Z", rows=[_row("p1")])),
+        _ing(_har(url=page_two, at="2026-08-28T11:00:00Z", rows=[_row("p2")])),
+        _ing(_har(url=page_one, at="2026-08-28T12:00:00Z", rows=[_row("p1", 12.5)])),
+        _ing(_har(url=page_two, at="2026-08-28T13:00:00Z", status=503, body=None)),
+    ]
+    full = compose_ingest_stream(iter(captures))
+    compact = compose_ingest_stream(iter(captures), compact_timeline=True)
+    assert compact["rows"] == full["rows"]
+    assert compact["scopeAttempts"] == full["scopeAttempts"]
+    assert compact["reconciliationHash"] == full["reconciliationHash"]
+    assert compact["failedRefreshes"] == full["failedRefreshes"]
+    assert compact["timelineMode"] == "BOARD_CHANGES_ONLY"
+    assert len(compact["timeline"]) < len(full["timeline"])
+    assert any("LINE_CHANGED" in item["states"] for item in compact["timeline"])
+    assert rows_as_of(compact, "2026-08-28T11:30:00Z") == rows_as_of(full, "2026-08-28T11:30:00Z")
+
+
+def test_board_write_failure_keeps_last_complete_file(tmp_path: Path, monkeypatch):
+    import dcm.ingest.board as board_module
+
+    dest = tmp_path / "board.json"
+    write_board({"rows": ["verified"]}, dest)
+    original = dest.read_bytes()
+
+    def fail_after_partial_write(_payload, handle, **_kwargs):
+        handle.write("{partial")
+        raise OSError("disk full")
+
+    monkeypatch.setattr(board_module.json, "dump", fail_after_partial_write)
+    try:
+        write_board({"rows": ["new"]}, dest)
+    except OSError:
+        pass
+    else:
+        raise AssertionError("disk failure was suppressed")
+    assert dest.read_bytes() == original
+    assert not list(tmp_path.glob(".*.tmp"))
 
 
 def test_streamed_insight_merge_matches_materialized_merge():

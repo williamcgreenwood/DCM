@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 from dcm.chat.slate import _prompt_event_date, run_slate
+from dcm.chat.cli import main
 from dcm.contracts.hashes import content_hash
 from dcm.ingest.har import ingest_har
 from dcm.ingest.insights import (
@@ -171,3 +172,43 @@ def test_explicit_prompt_slate_runs_each_capture_and_union(tmp_path: Path) -> No
     assert len(composite_dirs) == 1
     index_receipt = json.loads((composite_dirs[0] / "search_index_receipt.json").read_text(encoding="utf-8"))
     assert index_receipt["documentKinds"]["insights"] == 2
+
+
+def test_identical_capture_bytes_are_accounted_once_and_aliased(tmp_path: Path) -> None:
+    prompt = tmp_path / "run.md"
+    prompt.write_text("Run October 17, 2026.\n", encoding="utf-8")
+    first = tmp_path / "CFB_injuries.har"
+    alias = tmp_path / "CFB_props.har"
+    _har(first, "identical")
+    alias.write_bytes(first.read_bytes())
+    result = run_slate(
+        inputs=[first, alias],
+        run_root=tmp_path / "slate",
+        prompt=prompt,
+        cutoff_from_capture=True,
+        workspace=tmp_path / "runtime",
+    )
+    assert result["sourceCount"] == 2
+    assert {row["status"] for row in result["sources"]} == {"ACCOUNTED", "ALIASED_CONTENT"}
+    assert result["canonicalClaimCount"] == 1
+    assert len(list((tmp_path / "slate" / "source_runs").glob("RUN_*"))) == 1
+    census = json.loads((tmp_path / "slate" / "har_census.json").read_text())
+    assert census["union"]["sourceHarSha256s"] == [result["sources"][0]["sha256"]]
+    assert any(row["relationship"] == "DUPLICATE_CAPTURE_BYTES" for row in
+               json.loads((tmp_path / "slate" / "capture_diff.json").read_text())["duplicateRelationships"])
+
+
+def test_supervised_cli_accepts_verified_terminal_receipts(tmp_path: Path, capsys) -> None:
+    prompt = tmp_path / "run.md"
+    prompt.write_text("Run September 20, 2026.\n", encoding="utf-8")
+    capture = tmp_path / "NFL.har"
+    _har(capture, "supervised")
+    root = tmp_path / "slate"
+    assert main([
+        "run-slate", "--har", str(capture), "--prompt", str(prompt),
+        "--run-root", str(root), "--workspace", str(tmp_path / "runtime"),
+        "--cutoff-from-capture", "--max-runtime-seconds", "30",
+    ]) == 0
+    result = json.loads(capsys.readouterr().out)
+    assert result["canonicalClaimCount"] == 1
+    assert not (root / "run_failure.json").exists()
