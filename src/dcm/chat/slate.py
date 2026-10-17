@@ -22,6 +22,7 @@ from dcm.algorithms.pipeline_constitution import (
     evaluate_insights_har_pipeline,
 )
 from dcm.chat.session import HostSession
+from dcm.chat.run_guard import progress
 from dcm.chat.slate_autonomous import (
     AUTONOMOUS_PHASE_ORDER,
     advance_autonomous_closure,
@@ -139,7 +140,11 @@ def _sha256_bytes(data: bytes) -> str:
 
 
 def _sha256_file(path: Path) -> str:
-    return _sha256_bytes(Path(path).read_bytes())
+    digest = hashlib.sha256()
+    with Path(path).open("rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
 
 
 def _write_json(path: Path, payload: dict[str, Any]) -> None:
@@ -173,7 +178,12 @@ def _read_jsonl(path: Path) -> list[dict[str, Any]]:
 
 def _safe_error(exc: BaseException) -> dict[str, str]:
     text = str(exc).upper()
-    code = next((candidate for candidate in _KNOWN_ERROR_CODES if candidate in text), "SLATE_STEP_FAILED")
+    if isinstance(exc, MemoryError):
+        code = "RUN_MEMORY_EXHAUSTED"
+    elif isinstance(exc, OSError) and exc.errno == 28:
+        code = "RUN_DISK_FULL"
+    else:
+        code = next((candidate for candidate in _KNOWN_ERROR_CODES if candidate in text), "SLATE_STEP_FAILED")
     return {"errorType": type(exc).__name__, "code": code}
 
 
@@ -347,6 +357,8 @@ def _step(label: str, fn: Callable[[], Any]) -> dict[str, Any]:
         return {"name": label, "status": "FAILED", "error": _safe_error(exc)}
     summary: dict[str, Any] = {"name": label, "status": "COMPLETE"}
     if isinstance(result, dict):
+        if result.get("valid") is False:
+            return {"name": label, "status": "FAILED", "error": {"errorType": "VerificationError", "code": "STEP_VERIFICATION_FAILED"}}
         for key in (
             "valid",
             "complete",
@@ -814,16 +826,46 @@ def _legacy_run_slate(
     prompt_meta = _prompt_metadata(Path(prompt))
     root = Path(run_root)
     root.mkdir(parents=True, exist_ok=True)
-    boundaries = {str(path.resolve()): inspect_input_boundary(path) for path in ordered}
+    progress(root, "INPUT_BOUNDARIES", state="STARTED", total=len(ordered))
+    boundaries: dict[str, dict[str, Any]] = {}
+    boundary_by_hash: dict[str, dict[str, Any]] = {}
+    for index, path in enumerate(ordered, 1):
+        digest = _sha256_file(path)
+        if digest in boundary_by_hash:
+            boundary = {**boundary_by_hash[digest], "name": path.name}
+            boundary["contentHash"] = content_hash({k: v for k, v in boundary.items() if k != "contentHash"})
+        else:
+            boundary = inspect_input_boundary(path)
+            boundary_by_hash[digest] = boundary
+        boundaries[str(path.resolve())] = boundary
+        progress(root, "INPUT_BOUNDARIES", state="RUNNING", completed=index, total=len(ordered))
     source_records: list[dict[str, Any]] = []
     # Keep only counts while the composite runner is ingesting the same
     # captures. Retaining every full source claim list here duplicates the
     # multi-HAR Insights stream and can prevent final receipt creation.
     source_claim_counts: list[int] = []
-    source_claim_lists: list[list[dict[str, Any]]] = []
     successful_sources: list[Path] = []
+    first_source_by_hash: dict[str, dict[str, Any]] = {}
 
     for order, path in enumerate(ordered, 1):
+        progress(root, "SOURCE_INGEST", state="STARTED", completed=order - 1, total=len(ordered))
+        boundary = boundaries[str(path.resolve())]
+        digest = str(boundary["sha256"])
+        if digest in first_source_by_hash:
+            original = first_source_by_hash[digest]
+            alias = {
+                **original,
+                "processingOrder": order,
+                "filename": path.name,
+                "sportHint": _sport_hint(path.name),
+                "status": "ALIASED_CONTENT" if original.get("status") == "ACCOUNTED" else "ALIASED_FAILED_CONTENT",
+                "aliasOfSha256": digest,
+                "inputBoundaryHash": boundary.get("contentHash"),
+            }
+            alias["contentHash"] = content_hash({k: v for k, v in alias.items() if k != "contentHash"})
+            source_records.append(alias)
+            progress(root, "SOURCE_INGEST", state="RUNNING", completed=order, total=len(ordered))
+            continue
         session: HostSession | None = None
         error: dict[str, str] | None = None
         try:
@@ -841,12 +883,14 @@ def _legacy_run_slate(
             )
         except Exception as exc:  # noqa: BLE001 — continue accounting for remaining captures
             error = _safe_error(exc)
-        source_records.append(
-            _source_summary(path, session, boundaries[str(path.resolve())], processing_order=order, error=error)
-        )
+        source_record = _source_summary(path, session, boundary, processing_order=order, error=error)
+        source_records.append(source_record)
+        first_source_by_hash[digest] = source_record
+        progress(root, "SOURCE_INGEST", state="RUNNING", completed=order, total=len(ordered))
 
     composite_session: HostSession | None = None
     composite_error: dict[str, str] | None = None
+    progress(root, "COMPOSITE_INGEST", state="STARTED", completed=len(successful_sources), total=len(successful_sources))
     if successful_sources:
         try:
             composite_session = HostSession.prepare(
@@ -861,24 +905,15 @@ def _legacy_run_slate(
             composite_error = _safe_error(exc)
     else:
         composite_error = {"errorType": "RuntimeError", "code": "NO_SUCCESSFUL_HAR_CAPTURES"}
+    progress(root, "COMPOSITE_INGEST", state="COMPLETE" if composite_session else "FAILED", completed=len(successful_sources), total=len(successful_sources))
 
     source_hashes = [str(row.get("sha256") or "") for row in source_records if row.get("sha256")]
-    union_hashes = [str(row.get("sha256") or "") for row in source_records if row.get("runId") and row.get("sha256")]
+    union_hashes = sorted({str(row.get("sha256") or "") for row in source_records if row.get("runId") and row.get("status") == "ACCOUNTED" and row.get("sha256")})
     merged_claims: list[dict[str, Any]] = []
     merged_accounting: dict[str, Any] = {}
-    if composite_session is None and source_records:
-        # Only materialize a full fallback merge when the canonical composite
-        # failed. A successful composite must not retain both representations.
-        source_claim_lists = [
-            _read_jsonl(
-                root / "source_runs" / str(row.get("runId") or "") / "insights_claims.jsonl"
-            )
-            for row in source_records
-            if row.get("runId")
-        ]
-        merged_claims, merged_accounting = (
-            merge_insight_claims(source_claim_lists) if source_claim_lists else ([], {})
-        )
+    # A failed composite may have exhausted memory. Do not retry by loading
+    # every source claim list into this same process; retain source receipts
+    # and report a failed union until a bounded recovery path is available.
     queue: dict[str, Any] = {}
     board_offer_count = 0
     composite_summary: dict[str, Any] = {
@@ -890,6 +925,7 @@ def _legacy_run_slate(
     coverage: dict[str, Any] = {}
     import_result: dict[str, Any] | None = None
     if composite_session is not None:
+        progress(root, "POST_INGEST", state="STARTED")
         queue = read_json(composite_session.dest / "insights_research_queue.json") or {}
         board = read_json(composite_session.dest / "board.json") or {}
         board_offer_count = len(board.get("rows") or []) if isinstance(board, dict) else 0
@@ -1035,7 +1071,7 @@ def _legacy_run_slate(
             "sourceClaimCountSum": (
                 sum(source_claim_counts)
                 if composite_session
-                else sum(len(rows) for rows in source_claim_lists)
+                else sum(source_claim_counts)
             ),
             "changedOrDuplicateAccounting": merged_accounting,
             "boardOfferCount": int(board_offer_count),
@@ -1133,7 +1169,10 @@ def _legacy_run_slate(
 
     artifact_paths = [
         path for path in sorted(root.iterdir(), key=lambda path: path.name)
-        if path.is_file() and path.name not in {"execution_receipt.json", "run_manifest.json"}
+        if path.is_file() and path.name not in {
+            "execution_receipt.json", "run_manifest.json", "run_progress.json",
+            "run_child.stdout", "run_child.stderr", "run_failure.json",
+        }
     ]
     artifact_paths.extend(sorted((root / "research_packets").glob("*.json")) if (root / "research_packets").is_dir() else [])
     artifact_hashes = {
@@ -1166,7 +1205,7 @@ def _legacy_run_slate(
     }
     phase_status = [
         {"name": "PROMPT_AUDIT", "status": "COMPLETE", "promptSha256": prompt_meta["sha256"]},
-        {"name": "ACCOUNT_EACH_HAR", "status": "COMPLETE" if all(row.get("status") == "ACCOUNTED" for row in source_records) else "PARTIAL"},
+        {"name": "ACCOUNT_EACH_HAR", "status": "COMPLETE" if all(row.get("status") in {"ACCOUNTED", "ALIASED_CONTENT"} for row in source_records) else "PARTIAL"},
         {"name": "RECONCILE_UNION", "status": "COMPLETE" if composite_session else "FAILED"},
         *steps,
         {"name": "TOP100_RESEARCH_QUEUE", "status": "COMPLETE" if queue else "ABSTAINED"},
@@ -1174,6 +1213,7 @@ def _legacy_run_slate(
         {"name": "SETTLEMENT_AND_LEARNING", "status": settle_status, "boardHarRequired": False},
         *autonomous_phases,
     ]
+    stage_failed = any(row.get("status") == "FAILED" for row in phase_status)
     source_inventory_hash = census["contentHash"]
     receipt = {
         "schema": EXECUTION_RECEIPT_SCHEMA,
@@ -1251,7 +1291,7 @@ def _legacy_run_slate(
         },
         "status": {
             "software": "IMPLEMENTED_PENDING_CI",
-            "operational": "HAR_ACCOUNTING_ACCEPTED" if composite_session and all(row.get("status") == "ACCOUNTED" for row in source_records) else "EXTERNAL_BLOCKED",
+            "operational": "HAR_ACCOUNTING_ACCEPTED" if composite_session and not stage_failed and all(row.get("status") in {"ACCOUNTED", "ALIASED_CONTENT"} for row in source_records) else "EXTERNAL_BLOCKED",
             "recovery": "LOCAL_CHECKPOINT_VERIFIED" if any(
                 row.get("name") == "CHECKPOINT_VERIFY" and row.get("valid") is True
                 for row in phase_status
@@ -1295,6 +1335,7 @@ def _legacy_run_slate(
     }
     manifest["contentHash"] = content_hash({k: v for k, v in manifest.items() if k != "contentHash"})
     _write_json(root / "run_manifest.json", manifest)
+    progress(root, "FINAL_RECEIPT", state="COMPLETE", completed=len(source_records), total=len(source_records))
     research_funnel = queue.get("researchFunnel") if isinstance(queue, dict) else {}
     research_funnel = research_funnel if isinstance(research_funnel, dict) else {}
     queue_accounting = queue.get("accounting") if isinstance(queue, dict) else {}
@@ -1375,7 +1416,10 @@ def run_slate(
             autonomous=autonomous,
             outcomes=outcomes,
         )
-        return enhance_slate_result(Path(run_root), ordered, result)
+        progress(Path(run_root), "CLOSURE_AND_REPORT", state="STARTED")
+        enhanced = enhance_slate_result(Path(run_root), ordered, result)
+        progress(Path(run_root), "CLOSURE_AND_REPORT", state="COMPLETE")
+        return enhanced
     finally:
         if previous_timezone is None:
             os.environ.pop("DCM_EVENT_TIMEZONE", None)

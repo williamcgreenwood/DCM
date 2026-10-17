@@ -128,10 +128,11 @@ def prepare_cfb_research_os(
         skip_dynamic = True
         skip_actions = True
     elif static_ready:
+        summary_only = len(rows) > 50_000
         graphs = {
-            "boardGraph": _load_json(dest / "board_graph.json") or {},
-            "marketDemandGraph": _load_json(dest / "market_demand_graph.json") or {},
-            "requirementGraph": _load_json(dest / "requirement_graph.json") or {},
+            "boardGraph": _load_json(dest / ("board_graph.summary.json" if summary_only else "board_graph.json")) or {},
+            "marketDemandGraph": _load_json(dest / ("market_demand_graph.summary.json" if summary_only else "market_demand_graph.json")) or {},
+            "requirementGraph": _load_json(dest / ("requirement_graph.summary.json" if summary_only else "requirement_graph.json")) or {},
         }
         identity = _load_json(dest / "board_indexes.json") or {"exactCount": 0, "skippedFuzzy": 0, "fuzzyCount": 0, "queriedEvents": 0, "nearDuplicatePairs": 0, "retrievalCascade": {}}
         skip_static = True
@@ -140,7 +141,10 @@ def prepare_cfb_research_os(
         indexes = BoardIndexes(rows, telemetry=tel)
         identity = indexes.resolve_identities()
         indexes.requirement_bitmaps(requests)
-        graphs = persist_research_os_graphs(dest, rows, requests, telemetry=tel, indexes=indexes)
+        graphs = persist_research_os_graphs(
+            dest, rows, requests, telemetry=tel, indexes=indexes,
+            compact_return=len(rows) > 50_000,
+        )
         skip_static = False
     health = load_research_source_health(dest)
     seen_path = dest / "source_health_seen_claims.json"

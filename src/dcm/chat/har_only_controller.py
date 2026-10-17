@@ -30,7 +30,11 @@ def _write(path: Path, value: Any) -> None:
 
 
 def _sha(path: Path) -> str:
-    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+    digest = hashlib.sha256()
+    with Path(path).open("rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
 
 
 def _har_times(path: Path) -> tuple[str, str]:
@@ -79,7 +83,14 @@ def internal_order(inputs: Iterable[Path]) -> list[Path]:
             continue
         seen.add(key)
         unique.append(path)
-    unique.sort(key=lambda path: (_har_times(path)[0] or "9999-12-31T23:59:59Z", path.name, _sha(path)))
+    capture_times: dict[str, str] = {}
+    ordered_keys: dict[Path, tuple[str, str]] = {}
+    for path in unique:
+        digest = _sha(path)
+        if digest not in capture_times:
+            capture_times[digest] = _har_times(path)[0] or "9999-12-31T23:59:59Z"
+        ordered_keys[path] = (capture_times[digest], digest)
+    unique.sort(key=lambda path: (ordered_keys[path][0], path.name, ordered_keys[path][1]))
     return unique
 
 
@@ -526,7 +537,14 @@ def enhance_slate_result(root: Path, inputs: Iterable[Path], result: Mapping[str
     root = Path(root)
     census = read_json(root / "har_census.json") or {}
     raw_sources = [dict(row) for row in (census.get("sources") or []) if isinstance(row, Mapping)]
-    metadata = {path.name: {"path": path, "sha256": _sha(path), "captureStart": _har_times(path)[0], "captureEnd": _har_times(path)[1], "sportHint": _sport(path.name)} for path in internal_order(inputs)}
+    time_by_hash: dict[str, tuple[str, str]] = {}
+    metadata = {}
+    for path in internal_order(inputs):
+        digest = _sha(path)
+        if digest not in time_by_hash:
+            time_by_hash[digest] = _har_times(path)
+        times = time_by_hash[digest]
+        metadata[path.name] = {"sha256": digest, "captureStart": times[0], "captureEnd": times[1], "sportHint": _sport(path.name)}
     for row in raw_sources:
         info = metadata.get(str(row.get("filename") or ""))
         if info is None:
@@ -545,7 +563,10 @@ def enhance_slate_result(root: Path, inputs: Iterable[Path], result: Mapping[str
     claims_by_source: list[list[dict[str, Any]]] = []
     for row in raw_sources:
         run_id = str(row.get("runId") or "")
-        claims_by_source.append(_read_claim_projections(root / "source_runs" / run_id / "insights_claims.jsonl"))
+        claims_by_source.append(
+            [] if row.get("status") == "ALIASED_CONTENT" else
+            _read_claim_projections(root / "source_runs" / run_id / "insights_claims.jsonl")
+        )
     unique_hashes = sorted({str(row.get("sha256") or "") for row in raw_sources if row.get("sha256")})
     manifest = read_json(root / "run_manifest.json") or {}
     composite_id = str(manifest.get("compositeRunId") or "")

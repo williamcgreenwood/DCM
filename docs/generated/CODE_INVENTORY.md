@@ -2,10 +2,10 @@
 
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
-- Modules: **275**
-- Symbols: **2108**
+- Modules: **276**
+- Symbols: **2120**
 - Parse errors: **0**
-- Inventory hash: `4292882db92dc1d1e40929a90280f37e0d09f9ee8d61aecd1671ec8686e284ee`
+- Inventory hash: `9985d0d4963a5688025718ec8f30fb23ec4f02ba1bbadf75c290f21f12c2aec4`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -59,6 +59,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P7 | `src/dcm/chat/insight_closure.py` | 0 | 12 |
 | P7 | `src/dcm/chat/report.py` | 0 | 1 |
 | P7 | `src/dcm/chat/research_bridge.py` | 0 | 7 |
+| P7 | `src/dcm/chat/run_guard.py` | 0 | 9 |
 | P7 | `src/dcm/chat/session.py` | 1 | 34 |
 | P7 | `src/dcm/chat/slate.py` | 0 | 19 |
 | P7 | `src/dcm/chat/slate_autonomous.py` | 0 | 21 |
@@ -67,7 +68,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P0 | `src/dcm/contracts/__init__.py` | 0 | 0 |
 | P0 | `src/dcm/contracts/codes.py` | 1 | 0 |
 | P0 | `src/dcm/contracts/failure_codes.py` | 0 | 0 |
-| P0 | `src/dcm/contracts/hashes.py` | 1 | 6 |
+| P0 | `src/dcm/contracts/hashes.py` | 1 | 8 |
 | P0 | `src/dcm/contracts/immutables.py` | 1 | 8 |
 | P0 | `src/dcm/contracts/phase_bc.py` | 0 | 0 |
 | P0 | `src/dcm/contracts/schemas.py` | 25 | 16 |
@@ -186,7 +187,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P1 | `src/dcm/research/observation_typed.py` | 0 | 7 |
 | P1 | `src/dcm/research/offer_metadata.py` | 0 | 1 |
 | P1 | `src/dcm/research/offer_revalidation.py` | 1 | 10 |
-| P1 | `src/dcm/research/os_graphs.py` | 0 | 8 |
+| P1 | `src/dcm/research/os_graphs.py` | 0 | 9 |
 | P1 | `src/dcm/research/player_offer_set.py` | 1 | 6 |
 | P1 | `src/dcm/research/player_packet.py` | 0 | 13 |
 | P1 | `src/dcm/research/population.py` | 0 | 5 |
@@ -684,9 +685,9 @@ _No class/function symbols._
 - `function` **_frontier_fingerprint** L65
 - `function` **_load_json** L69
 - `function` **prepare_cfb_research_os** L79 — Emit graphs, indexes, and live AcquisitionActions BEFORE web acquisition.
-- `function` **attach_cfb_prop_flags** L438
-- `function` **emit_cfb_forecast_artifacts** L447
-- `function` **persist_algorithm_telemetry** L640
+- `function` **attach_cfb_prop_flags** L442
+- `function` **emit_cfb_forecast_artifacts** L451
+- `function` **persist_algorithm_telemetry** L644
 
 ### `src/dcm/cfb/markets.py`
 
@@ -764,10 +765,10 @@ _No class/function symbols._
 
 ### `src/dcm/chat/cli.py`
 
-- `function` **_print** L19
-- `function` **_add_run** L23
-- `function` **build_parser** L27
-- `function` **main** L217
+- `function` **_print** L20
+- `function` **_add_run** L24
+- `function` **build_parser** L28
+- `function` **main** L222
 
 ### `src/dcm/chat/contracts.py`
 
@@ -786,23 +787,23 @@ _No class/function symbols._
 
 - `function` **_write** L27
 - `function` **_sha** L32
-- `function` **_har_times** L36
-- `function` **_sport** L60
-- `function` **internal_order** L68
-- `function` **_event_id** L86
-- `function` **_subject_id** L91
-- `function` **_status** L96
-- `function` **_key** L101
-- `function` **_projection** L114
-- `function` **_change** L137
-- `function` **build_capture_diff** L151
-- `function` **_read_claims** L316
-- `function` **_read_claim_projections** L330 — Read only fields needed for bitemporal diffing.
-- `function` **_claim_counts** L359 — Return total claims and valid exact line/side claim count by streaming.
-- `function` **_root_action** L379
-- `function` **_capability_matrix** L395
-- `function` **_closure_state** L474
-- `function` **enhance_slate_result** L525
+- `function` **_har_times** L40
+- `function` **_sport** L64
+- `function` **internal_order** L72
+- `function` **_event_id** L97
+- `function` **_subject_id** L102
+- `function` **_status** L107
+- `function` **_key** L112
+- `function` **_projection** L125
+- `function` **_change** L148
+- `function` **build_capture_diff** L162
+- `function` **_read_claims** L327
+- `function` **_read_claim_projections** L341 — Read only fields needed for bitemporal diffing.
+- `function` **_claim_counts** L370 — Return total claims and valid exact line/side claim count by streaming.
+- `function` **_root_action** L390
+- `function` **_capability_matrix** L406
+- `function` **_closure_state** L485
+- `function` **enhance_slate_result** L536
 
 ### `src/dcm/chat/insight_closure.py`
 
@@ -832,6 +833,18 @@ _No class/function symbols._
 - `function` **_researcher_view** L205 — Project canonical identity into a readable, non-authoritative handoff.
 - `function` **next_research_batch** L290
 - `method` **next_research_batch.row_league** L352
+
+### `src/dcm/chat/run_guard.py`
+
+- `function` **_atomic_json** L21
+- `function` **progress** L32 — Record a bounded, privacy-safe stage transition for the parent watchdog.
+- `function` **_cgroup_limit** L44
+- `function` **_rss_bytes** L55
+- `function` **_cgroup_usage** L65
+- `function` **_terminate** L74
+- `function` **_child_error_code** L89 — Classify bounded private stderr without copying it into a receipt.
+- `function` **_terminal_receipts_valid** L105
+- `function` **supervise_slate** L132 — Return the child's status; persist a terminal receipt even after SIGKILL.
 
 ### `src/dcm/chat/session.py`
 
@@ -873,25 +886,25 @@ _No class/function symbols._
 
 ### `src/dcm/chat/slate.py`
 
-- `function` **_prompt_event_date** L99 — Resolve the explicitly named slate date from the execution prompt.
-- `function` **_sha256_bytes** L137
-- `function` **_sha256_file** L141
-- `function` **_write_json** L145
-- `function` **_write_jsonl** L153
-- `function` **_read_jsonl** L160
-- `function` **_safe_error** L174
-- `function` **_prompt_metadata** L180
-- `function` **_sport_hint** L200
-- `function` **_ordered_inputs** L208
-- `function` **_repo_head** L226
-- `function` **_source_summary** L241
-- `function` **_safe_claim** L325 — Drop accidental free-form/raw fields if an adapter ever supplies one.
-- `method` **_safe_claim.clean** L329
-- `function` **_step** L343
-- `function` **_write_terminal_artifacts** L367
-- `function` **_legacy_run_slate** L797 — Run independent captures, the reconciled union, and HAR-only autonomous closure.
-- `function` **_repository_prompt** L1337
-- `function` **run_slate** L1344 — Run the legacy producer and then apply the HAR-only closure controller.
+- `function` **_prompt_event_date** L100 — Resolve the explicitly named slate date from the execution prompt.
+- `function` **_sha256_bytes** L138
+- `function` **_sha256_file** L142
+- `function` **_write_json** L150
+- `function` **_write_jsonl** L158
+- `function` **_read_jsonl** L165
+- `function` **_safe_error** L179
+- `function` **_prompt_metadata** L190
+- `function` **_sport_hint** L210
+- `function` **_ordered_inputs** L218
+- `function` **_repo_head** L236
+- `function` **_source_summary** L251
+- `function` **_safe_claim** L335 — Drop accidental free-form/raw fields if an adapter ever supplies one.
+- `method` **_safe_claim.clean** L339
+- `function` **_step** L353
+- `function` **_write_terminal_artifacts** L379
+- `function` **_legacy_run_slate** L809 — Run independent captures, the reconciled union, and HAR-only autonomous closure.
+- `function` **_repository_prompt** L1378
+- `function` **run_slate** L1385 — Run the legacy producer and then apply the HAR-only closure controller.
 
 ### `src/dcm/chat/slate_autonomous.py`
 
@@ -968,10 +981,12 @@ _No class/function symbols._
 - `function` **_normalize** L26
 - `function` **canonical_json** L47
 - `function` **content_hash** L51
-- `function` **require_lineage** L55 — Raise if any stage before `through` is missing or if a later stage is set without earlier ones.
-- `class` **LineageError** L69
-- `method` **LineageError.__init__** L70
-- `function` **bind_source_hashes** L75
+- `function` **content_hash_streamed** L55 — Hash canonical JSON without cloning the whole object or JSON string.
+- `method` **content_hash_streamed.tokens** L64
+- `function` **require_lineage** L118 — Raise if any stage before `through` is missing or if a later stage is set without earlier ones.
+- `class` **LineageError** L132
+- `method` **LineageError.__init__** L133
+- `function` **bind_source_hashes** L138
 
 ### `src/dcm/contracts/immutables.py`
 
@@ -1084,12 +1099,12 @@ _No class/function symbols._
 
 ### `src/dcm/ingest/board.py`
 
-- `function` **_time** L19
-- `function` **rows_as_of** L30
-- `function` **accounting_from_rows** L76
-- `method` **accounting_from_rows.n** L77
-- `function` **freeze_board** L131 — Freeze the board.
-- `function` **write_board** L198
+- `function` **_time** L20
+- `function` **rows_as_of** L31
+- `function` **accounting_from_rows** L77
+- `method` **accounting_from_rows.n** L78
+- `function` **freeze_board** L132 — Freeze the board.
+- `function` **write_board** L200 — Stream a hash-bound board to an atomic file without a giant JSON string.
 
 ### `src/dcm/ingest/composite.py`
 
@@ -1937,11 +1952,11 @@ _No class/function symbols._
 
 ### `src/dcm/research/emit.py`
 
-- `function` **_write** L27
-- `function` **_merge_verified_insight_events** L33 — Add safe same-HAR event context without treating it as external evidence.
-- `function` **emit_offer_sets_and_manifest** L63
-- `function` **emit_packets_and_graph** L120
-- `function` **emit_player_centric_research** L247 — Backward-compatible entrypoint; universal artifacts are emitted first.
+- `function` **_write** L28
+- `function` **_merge_verified_insight_events** L43 — Add safe same-HAR event context without treating it as external evidence.
+- `function` **emit_offer_sets_and_manifest** L73
+- `function` **emit_packets_and_graph** L130
+- `function` **emit_player_centric_research** L257 — Backward-compatible entrypoint; universal artifacts are emitted first.
 
 ### `src/dcm/research/entity_graph.py`
 
@@ -2244,14 +2259,15 @@ _No class/function symbols._
 
 ### `src/dcm/research/os_graphs.py`
 
-- `function` **_is_cfb** L35
-- `function` **_offer_id** L39
-- `function` **_attach_dependents** L43 — Fill dependent_offer_ids via exact composite-key grouping. No per-prop scans later.
-- `function` **build_board_graph** L105
-- `method` **build_board_graph.add_node** L117
-- `function` **build_market_demand_graph** L195
-- `function` **build_requirement_graph** L253
-- `function` **persist_research_os_graphs** L360
+- `function` **_is_cfb** L39
+- `function` **_offer_id** L43
+- `function` **_attach_dependents** L47 — Fill dependent_offer_ids via exact composite-key grouping. No per-prop scans later.
+- `function` **build_board_graph** L109
+- `method` **build_board_graph.add_node** L121
+- `function` **build_market_demand_graph** L200
+- `function` **build_requirement_graph** L259
+- `function` **persist_research_os_graphs** L398
+- `method` **persist_research_os_graphs.persist** L411
 
 ### `src/dcm/research/player_offer_set.py`
 
@@ -2591,10 +2607,10 @@ _No class/function symbols._
 - `function` **_active_calibration** L291
 - `function` **run_dcm** L366
 - `method` **run_dcm._ingest_stream** L499
-- `method` **run_dcm._snapshot_for** L1251
-- `method` **run_dcm._resimulate_material** L1749
-- `method` **run_dcm.slim** L1972
-- `function` **main** L2617
+- `method` **run_dcm._snapshot_for** L1314
+- `method` **run_dcm._resimulate_material** L1812
+- `method` **run_dcm.slim** L2035
+- `function` **main** L2680
 
 ### `src/dcm/runtime/__init__.py`
 

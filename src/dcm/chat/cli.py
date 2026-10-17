@@ -9,6 +9,7 @@ from typing import Any
 
 from dcm.chat.session import HostSession, doctor
 from dcm.chat.slate import run_slate
+from dcm.chat.run_guard import supervise_slate
 from dcm.runtime.cutoff import CutoffRequired
 from dcm.research.run_lock import RunBusyError, RunFenceError
 from dcm.research.batch_store import BatchEnvelopeError
@@ -74,6 +75,10 @@ def build_parser() -> argparse.ArgumentParser:
     )
     sl.add_argument("--no-autonomous", dest="autonomous", action="store_false")
     sl.add_argument("--no-research-shadow", dest="research_shadow", action="store_false", default=True)
+    sl.add_argument("--max-runtime-seconds", type=int, default=7200, help="Hard wall time for the supervised run")
+    sl.add_argument("--stall-seconds", type=int, default=1200, help="Maximum time without a stage transition")
+    sl.add_argument("--max-rss-mib", type=int, default=0, help="Child RSS limit; 0 uses 80% of the cgroup memory limit")
+    sl.add_argument("--unsupervised-child", action="store_true", help=argparse.SUPPRESS)
 
     n = sub.add_parser("next-research", help="Next optimized reusable-entity research batch")
     _add_run(n)
@@ -239,6 +244,16 @@ def main(argv: list[str] | None = None) -> int:
             })
             return 0
         if args.command in {"run-slate", "run"}:
+            if not args.unsupervised_child:
+                status, failure = supervise_slate(
+                    list(argv) if argv is not None else sys.argv[1:], args.run_root,
+                    max_seconds=args.max_runtime_seconds,
+                    stall_seconds=args.stall_seconds,
+                    max_rss_mib=args.max_rss_mib,
+                )
+                if failure:
+                    _print(failure)
+                return status
             _print(run_slate(
                 inputs=[*args.har, *args.input],
                 run_root=args.run_root,

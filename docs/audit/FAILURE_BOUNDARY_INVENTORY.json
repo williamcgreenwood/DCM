@@ -1,0 +1,6957 @@
+{
+  "interpretation": "Static review candidates only; a surrounding caller or supervisor may own the catch. No runtime safety certification is implied.",
+  "modules": [
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 0,
+      "module": "src/dcm/__init__.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 0,
+      "module": "src/dcm/__main__.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 0,
+      "module": "src/dcm/algorithms/__init__.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 7,
+      "module": "src/dcm/algorithms/cache.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 3,
+      "module": "src/dcm/algorithms/catalog.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 28,
+          "operation": "read_bytes"
+        }
+      ],
+      "catches": [
+        {
+          "line": 23,
+          "type": "FileNotFoundError"
+        }
+      ],
+      "functions": 2,
+      "module": "src/dcm/algorithms/computation_law.py",
+      "unhandledCallSitesForReview": 1
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 45,
+          "operation": "read_text"
+        }
+      ],
+      "catches": [
+        {
+          "line": 28,
+          "type": "OSError"
+        }
+      ],
+      "functions": 6,
+      "module": "src/dcm/algorithms/constitution.py",
+      "unhandledCallSitesForReview": 1
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 7,
+      "module": "src/dcm/algorithms/contracts.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 11,
+      "module": "src/dcm/algorithms/control_plane.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 127,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 132,
+          "operation": "write_text"
+        }
+      ],
+      "catches": [],
+      "functions": 3,
+      "module": "src/dcm/algorithms/execution_plan.py",
+      "unhandledCallSitesForReview": 2
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 6,
+      "module": "src/dcm/algorithms/graph.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 17,
+      "module": "src/dcm/algorithms/grouping.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 217,
+          "operation": "execute"
+        },
+        {
+          "insideTry": false,
+          "line": 222,
+          "operation": "connect"
+        },
+        {
+          "insideTry": false,
+          "line": 223,
+          "operation": "execute"
+        }
+      ],
+      "catches": [],
+      "functions": 37,
+      "module": "src/dcm/algorithms/indexing.py",
+      "unhandledCallSitesForReview": 3
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 13,
+      "module": "src/dcm/algorithms/ml_families.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 4,
+      "module": "src/dcm/algorithms/pipeline_constitution.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": true,
+          "line": 78,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": true,
+          "line": 107,
+          "operation": "read_bytes"
+        },
+        {
+          "insideTry": false,
+          "line": 131,
+          "operation": "read_bytes"
+        }
+      ],
+      "catches": [
+        {
+          "line": 34,
+          "type": "OSError"
+        },
+        {
+          "line": 79,
+          "type": "FileNotFoundError"
+        },
+        {
+          "line": 108,
+          "type": "FileNotFoundError"
+        }
+      ],
+      "functions": 15,
+      "module": "src/dcm/algorithms/registry.py",
+      "unhandledCallSitesForReview": 1
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 12,
+      "module": "src/dcm/algorithms/scheduling.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 43,
+      "module": "src/dcm/algorithms/searching.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 3,
+      "module": "src/dcm/algorithms/selection.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [
+        {
+          "line": 69,
+          "type": "RecursionError"
+        },
+        {
+          "line": 131,
+          "type": "StopIteration"
+        },
+        {
+          "line": 140,
+          "type": "StopIteration"
+        }
+      ],
+      "functions": 17,
+      "module": "src/dcm/algorithms/sorting.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 5,
+      "module": "src/dcm/algorithms/telemetry.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 2,
+      "module": "src/dcm/archive.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 67,
+          "operation": "execute"
+        },
+        {
+          "insideTry": false,
+          "line": 112,
+          "operation": "execute"
+        },
+        {
+          "insideTry": false,
+          "line": 238,
+          "operation": "execute"
+        },
+        {
+          "insideTry": false,
+          "line": 242,
+          "operation": "execute"
+        }
+      ],
+      "catches": [
+        {
+          "line": 270,
+          "type": "sqlite3.Error"
+        }
+      ],
+      "functions": 23,
+      "module": "src/dcm/board_store.py",
+      "unhandledCallSitesForReview": 4
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 1,
+      "module": "src/dcm/cfb/__init__.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 3,
+      "module": "src/dcm/cfb/accounting.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 3,
+      "module": "src/dcm/cfb/champion.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 3,
+      "module": "src/dcm/cfb/coextract.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [
+        {
+          "line": 28,
+          "type": "ImportError"
+        }
+      ],
+      "functions": 3,
+      "module": "src/dcm/cfb/event_world_backend.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [
+        {
+          "line": 110,
+          "type": "RuntimeError"
+        }
+      ],
+      "functions": 3,
+      "module": "src/dcm/cfb/event_worlds.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [
+        {
+          "line": 156,
+          "type": "RuntimeError"
+        }
+      ],
+      "functions": 1,
+      "module": "src/dcm/cfb/event_worlds_numpy.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 4,
+      "module": "src/dcm/cfb/frontier.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 3,
+      "module": "src/dcm/cfb/har_delta.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 45,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 46,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": true,
+          "line": 73,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": true,
+          "line": 274,
+          "operation": "read_text"
+        }
+      ],
+      "catches": [
+        {
+          "line": 74,
+          "type": "(OSError, json.JSONDecodeError)"
+        },
+        {
+          "line": 276,
+          "type": "(OSError, json.JSONDecodeError)"
+        }
+      ],
+      "functions": 9,
+      "module": "src/dcm/cfb/launch.py",
+      "unhandledCallSitesForReview": 2
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 346,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 346,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 346,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 356,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 356,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 356,
+          "operation": "replace"
+        }
+      ],
+      "catches": [
+        {
+          "line": 467,
+          "type": "(KeyError, RuntimeError, TypeError, ValueError)"
+        }
+      ],
+      "functions": 9,
+      "module": "src/dcm/cfb/markets.py",
+      "unhandledCallSitesForReview": 6
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [
+        {
+          "line": 34,
+          "type": "(TypeError, ValueError)"
+        },
+        {
+          "line": 44,
+          "type": "(TypeError, ValueError)"
+        }
+      ],
+      "functions": 10,
+      "module": "src/dcm/cfb/opportunity_ledger.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 5,
+      "module": "src/dcm/cfb/opportunity_state.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 1,
+      "module": "src/dcm/cfb/recompute.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [
+        {
+          "line": 164,
+          "type": "(TypeError, ValueError, KeyError)"
+        }
+      ],
+      "functions": 2,
+      "module": "src/dcm/cfb/refresh.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 11,
+      "module": "src/dcm/cfb/reports.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 1,
+      "module": "src/dcm/cfb/rules.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 1,
+      "module": "src/dcm/chat/__init__.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 0,
+      "module": "src/dcm/chat/__main__.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 2,
+      "module": "src/dcm/chat/archive.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": true,
+          "line": 303,
+          "operation": "open"
+        }
+      ],
+      "catches": [
+        {
+          "line": 375,
+          "type": "FileNotFoundError"
+        },
+        {
+          "line": 378,
+          "type": "(CutoffRequired, ExactVersionMismatch, RunBusyError, RunFenceError, BatchEnvelopeError, DirectorStateError, ValueError)"
+        }
+      ],
+      "functions": 4,
+      "module": "src/dcm/chat/cli.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 0,
+      "module": "src/dcm/chat/contracts.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 32,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 162,
+          "operation": "mkdir"
+        }
+      ],
+      "catches": [
+        {
+          "line": 43,
+          "type": "json.JSONDecodeError"
+        },
+        {
+          "line": 150,
+          "type": "(ValueError, TypeError, KeyError)"
+        }
+      ],
+      "functions": 6,
+      "module": "src/dcm/chat/evidence_import.py",
+      "unhandledCallSitesForReview": 2
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 28,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 29,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 34,
+          "operation": "open"
+        },
+        {
+          "insideTry": true,
+          "line": 42,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": true,
+          "line": 54,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 57,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 61,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 109,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 331,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 358,
+          "operation": "open"
+        },
+        {
+          "insideTry": false,
+          "line": 376,
+          "operation": "open"
+        }
+      ],
+      "catches": [
+        {
+          "line": 43,
+          "type": "(OSError, UnicodeDecodeError, json.JSONDecodeError)"
+        },
+        {
+          "line": 55,
+          "type": "ValueError"
+        },
+        {
+          "line": 334,
+          "type": "json.JSONDecodeError"
+        },
+        {
+          "line": 362,
+          "type": "json.JSONDecodeError"
+        },
+        {
+          "line": 380,
+          "type": "json.JSONDecodeError"
+        },
+        {
+          "line": 711,
+          "type": "Exception"
+        }
+      ],
+      "functions": 19,
+      "module": "src/dcm/chat/har_only_controller.py",
+      "unhandledCallSitesForReview": 9
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 231,
+          "operation": "replace"
+        },
+        {
+          "insideTry": true,
+          "line": 238,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 241,
+          "operation": "replace"
+        }
+      ],
+      "catches": [
+        {
+          "line": 38,
+          "type": "(TypeError, ValueError)"
+        },
+        {
+          "line": 239,
+          "type": "ValueError"
+        }
+      ],
+      "functions": 12,
+      "module": "src/dcm/chat/insight_closure.py",
+      "unhandledCallSitesForReview": 2
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 1,
+      "module": "src/dcm/chat/report.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": true,
+          "line": 41,
+          "operation": "run"
+        }
+      ],
+      "catches": [
+        {
+          "line": 45,
+          "type": "OSError"
+        },
+        {
+          "line": 409,
+          "type": "(OSError, ValueError, RuntimeError)"
+        }
+      ],
+      "functions": 7,
+      "module": "src/dcm/chat/research_bridge.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 22,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 24,
+          "operation": "open"
+        },
+        {
+          "insideTry": false,
+          "line": 29,
+          "operation": "replace"
+        },
+        {
+          "insideTry": true,
+          "line": 47,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": true,
+          "line": 57,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": true,
+          "line": 68,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": true,
+          "line": 92,
+          "operation": "open"
+        },
+        {
+          "insideTry": true,
+          "line": 110,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": true,
+          "line": 111,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 145,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 152,
+          "operation": "unlink"
+        },
+        {
+          "insideTry": false,
+          "line": 154,
+          "operation": "unlink"
+        },
+        {
+          "insideTry": false,
+          "line": 163,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 167,
+          "operation": "open"
+        },
+        {
+          "insideTry": false,
+          "line": 167,
+          "operation": "open"
+        },
+        {
+          "insideTry": false,
+          "line": 170,
+          "operation": "Popen"
+        },
+        {
+          "insideTry": false,
+          "line": 202,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 203,
+          "operation": "unlink"
+        },
+        {
+          "insideTry": false,
+          "line": 204,
+          "operation": "unlink"
+        },
+        {
+          "insideTry": true,
+          "line": 208,
+          "operation": "read_text"
+        }
+      ],
+      "catches": [
+        {
+          "line": 48,
+          "type": "(OSError, ValueError)"
+        },
+        {
+          "line": 60,
+          "type": "(OSError, ValueError, IndexError)"
+        },
+        {
+          "line": 69,
+          "type": "(OSError, ValueError)"
+        },
+        {
+          "line": 77,
+          "type": "ProcessLookupError"
+        },
+        {
+          "line": 81,
+          "type": "subprocess.TimeoutExpired"
+        },
+        {
+          "line": 84,
+          "type": "ProcessLookupError"
+        },
+        {
+          "line": 96,
+          "type": "OSError"
+        },
+        {
+          "line": 112,
+          "type": "(OSError, json.JSONDecodeError)"
+        },
+        {
+          "line": 197,
+          "type": "KeyboardInterrupt"
+        },
+        {
+          "line": 178,
+          "type": "OSError"
+        },
+        {
+          "line": 209,
+          "type": "(OSError, json.JSONDecodeError)"
+        }
+      ],
+      "functions": 9,
+      "module": "src/dcm/chat/run_guard.py",
+      "unhandledCallSitesForReview": 13
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": true,
+          "line": 44,
+          "operation": "run"
+        },
+        {
+          "insideTry": true,
+          "line": 64,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 266,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 499,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 604,
+          "operation": "read_bytes"
+        },
+        {
+          "insideTry": false,
+          "line": 629,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 740,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 786,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 788,
+          "operation": "write_bytes"
+        },
+        {
+          "insideTry": false,
+          "line": 788,
+          "operation": "read_bytes"
+        },
+        {
+          "insideTry": false,
+          "line": 793,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 794,
+          "operation": "write_text"
+        }
+      ],
+      "catches": [
+        {
+          "line": 50,
+          "type": "OSError"
+        },
+        {
+          "line": 65,
+          "type": "(OSError, json.JSONDecodeError)"
+        },
+        {
+          "line": 74,
+          "type": "Exception"
+        },
+        {
+          "line": 269,
+          "type": "json.JSONDecodeError"
+        },
+        {
+          "line": 350,
+          "type": "(ValueError, TypeError, KeyError)"
+        },
+        {
+          "line": 417,
+          "type": "(ValueError, TypeError, KeyError)"
+        },
+        {
+          "line": 502,
+          "type": "json.JSONDecodeError"
+        },
+        {
+          "line": 632,
+          "type": "json.JSONDecodeError"
+        },
+        {
+          "line": 723,
+          "type": "Exception"
+        },
+        {
+          "line": 743,
+          "type": "json.JSONDecodeError"
+        }
+      ],
+      "functions": 34,
+      "module": "src/dcm/chat/session.py",
+      "unhandledCallSitesForReview": 10
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 102,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": true,
+          "line": 114,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 144,
+          "operation": "open"
+        },
+        {
+          "insideTry": false,
+          "line": 151,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 152,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 159,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 160,
+          "operation": "open"
+        },
+        {
+          "insideTry": false,
+          "line": 169,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 194,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": true,
+          "line": 239,
+          "operation": "run"
+        },
+        {
+          "insideTry": false,
+          "line": 547,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 702,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 772,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 772,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 804,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 828,
+          "operation": "mkdir"
+        }
+      ],
+      "catches": [
+        {
+          "line": 117,
+          "type": "ValueError"
+        },
+        {
+          "line": 123,
+          "type": "ValueError"
+        },
+        {
+          "line": 172,
+          "type": "json.JSONDecodeError"
+        },
+        {
+          "line": 245,
+          "type": "OSError"
+        },
+        {
+          "line": 356,
+          "type": "Exception"
+        },
+        {
+          "line": 884,
+          "type": "Exception"
+        },
+        {
+          "line": 904,
+          "type": "Exception"
+        },
+        {
+          "line": 981,
+          "type": "Exception"
+        }
+      ],
+      "functions": 19,
+      "module": "src/dcm/chat/slate.py",
+      "unhandledCallSitesForReview": 14
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": true,
+          "line": 58,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 61,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 65,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 100,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 225,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 250,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 256,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 268,
+          "operation": "open"
+        },
+        {
+          "insideTry": false,
+          "line": 598,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": true,
+          "line": 704,
+          "operation": "write_text"
+        }
+      ],
+      "catches": [
+        {
+          "line": 59,
+          "type": "ValueError"
+        },
+        {
+          "line": 75,
+          "type": "(TypeError, ValueError)"
+        },
+        {
+          "line": 259,
+          "type": "json.JSONDecodeError"
+        },
+        {
+          "line": 319,
+          "type": "Exception"
+        },
+        {
+          "line": 391,
+          "type": "Exception"
+        },
+        {
+          "line": 576,
+          "type": "(TypeError, ValueError)"
+        },
+        {
+          "line": 601,
+          "type": "json.JSONDecodeError"
+        },
+        {
+          "line": 725,
+          "type": "Exception"
+        },
+        {
+          "line": 825,
+          "type": "Exception"
+        }
+      ],
+      "functions": 21,
+      "module": "src/dcm/chat/slate_autonomous.py",
+      "unhandledCallSitesForReview": 8
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 21,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 25,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 28,
+          "operation": "open"
+        },
+        {
+          "insideTry": false,
+          "line": 32,
+          "operation": "replace"
+        },
+        {
+          "insideTry": true,
+          "line": 34,
+          "operation": "open"
+        }
+      ],
+      "catches": [
+        {
+          "line": 39,
+          "type": "OSError"
+        }
+      ],
+      "functions": 4,
+      "module": "src/dcm/chat/state.py",
+      "unhandledCallSitesForReview": 4
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [
+        {
+          "line": 275,
+          "type": "(TypeError, ValueError)"
+        },
+        {
+          "line": 371,
+          "type": "(TypeError, ValueError)"
+        },
+        {
+          "line": 378,
+          "type": "(TypeError, ValueError)"
+        }
+      ],
+      "functions": 20,
+      "module": "src/dcm/compact.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 0,
+      "module": "src/dcm/contracts/__init__.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 0,
+      "module": "src/dcm/contracts/codes.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 0,
+      "module": "src/dcm/contracts/failure_codes.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 8,
+      "module": "src/dcm/contracts/hashes.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 8,
+      "module": "src/dcm/contracts/immutables.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 0,
+      "module": "src/dcm/contracts/phase_bc.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 16,
+      "module": "src/dcm/contracts/schemas.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [
+        {
+          "line": 102,
+          "type": "ValueError"
+        }
+      ],
+      "functions": 5,
+      "module": "src/dcm/contracts/universal_entities.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 0,
+      "module": "src/dcm/dataset.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 3,
+      "module": "src/dcm/exclusions.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 0,
+      "module": "src/dcm/governance/__init__.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 40,
+          "operation": "read_text"
+        }
+      ],
+      "catches": [],
+      "functions": 4,
+      "module": "src/dcm/governance/requirement_ledger.py",
+      "unhandledCallSitesForReview": 1
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 0,
+      "module": "src/dcm/identity/__init__.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 25,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 37,
+          "operation": "replace"
+        }
+      ],
+      "catches": [],
+      "functions": 5,
+      "module": "src/dcm/identity/resolve.py",
+      "unhandledCallSitesForReview": 2
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 0,
+      "module": "src/dcm/ingest/__init__.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": true,
+          "line": 25,
+          "operation": "replace"
+        },
+        {
+          "insideTry": true,
+          "line": 26,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 69,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 202,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": true,
+          "line": 205,
+          "operation": "open"
+        },
+        {
+          "insideTry": true,
+          "line": 210,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 212,
+          "operation": "unlink"
+        }
+      ],
+      "catches": [
+        {
+          "line": 27,
+          "type": "ValueError"
+        }
+      ],
+      "functions": 6,
+      "module": "src/dcm/ingest/board.py",
+      "unhandledCallSitesForReview": 3
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": true,
+          "line": 26,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 30,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 36,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 48,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 50,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 178,
+          "operation": "replace"
+        }
+      ],
+      "catches": [
+        {
+          "line": 27,
+          "type": "ValueError"
+        },
+        {
+          "line": 359,
+          "type": "StopIteration"
+        },
+        {
+          "line": 363,
+          "type": "StopIteration"
+        }
+      ],
+      "functions": 7,
+      "module": "src/dcm/ingest/composite.py",
+      "unhandledCallSitesForReview": 5
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [
+        {
+          "line": 96,
+          "type": "json.JSONDecodeError"
+        },
+        {
+          "line": 101,
+          "type": "json.JSONDecodeError"
+        },
+        {
+          "line": 105,
+          "type": "TypeError"
+        },
+        {
+          "line": 118,
+          "type": "(ValueError, TypeError)"
+        },
+        {
+          "line": 227,
+          "type": "json.JSONDecodeError"
+        },
+        {
+          "line": 405,
+          "type": "json.JSONDecodeError"
+        }
+      ],
+      "functions": 13,
+      "module": "src/dcm/ingest/har.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 6,
+      "module": "src/dcm/ingest/insight_context.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [
+        {
+          "line": 69,
+          "type": "(TypeError, ValueError)"
+        }
+      ],
+      "functions": 15,
+      "module": "src/dcm/ingest/insights.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 317,
+          "operation": "replace"
+        }
+      ],
+      "catches": [],
+      "functions": 4,
+      "module": "src/dcm/ingest/markets.py",
+      "unhandledCallSitesForReview": 1
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 121,
+          "operation": "replace"
+        }
+      ],
+      "catches": [
+        {
+          "line": 24,
+          "type": "(TypeError, ValueError)"
+        }
+      ],
+      "functions": 14,
+      "module": "src/dcm/ingest/outlier.py",
+      "unhandledCallSitesForReview": 1
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [
+        {
+          "line": 160,
+          "type": "(TypeError, ValueError)"
+        },
+        {
+          "line": 230,
+          "type": "(TypeError, ValueError)"
+        }
+      ],
+      "functions": 13,
+      "module": "src/dcm/ingest/prizepicks.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 5,
+      "module": "src/dcm/ingest/sanitize.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 29,
+          "operation": "read_text"
+        }
+      ],
+      "catches": [],
+      "functions": 2,
+      "module": "src/dcm/ingest/wsab_bind.py",
+      "unhandledCallSitesForReview": 1
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 26,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 36,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 53,
+          "operation": "read_bytes"
+        },
+        {
+          "insideTry": false,
+          "line": 70,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 101,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 102,
+          "operation": "write_text"
+        }
+      ],
+      "catches": [],
+      "functions": 4,
+      "module": "src/dcm/insight_settle.py",
+      "unhandledCallSitesForReview": 6
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 0,
+      "module": "src/dcm/learning/__init__.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [
+        {
+          "line": 101,
+          "type": "(TypeError, ValueError)"
+        }
+      ],
+      "functions": 6,
+      "module": "src/dcm/learning/calibration.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": true,
+          "line": 68,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 76,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 312,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 315,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 319,
+          "operation": "write_text"
+        }
+      ],
+      "catches": [
+        {
+          "line": 69,
+          "type": "(OSError, json.JSONDecodeError)"
+        },
+        {
+          "line": 82,
+          "type": "json.JSONDecodeError"
+        },
+        {
+          "line": 336,
+          "type": "SettlementsMissing"
+        }
+      ],
+      "functions": 13,
+      "module": "src/dcm/learning/dataset.py",
+      "unhandledCallSitesForReview": 4
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [
+        {
+          "line": 54,
+          "type": "(TypeError, ValueError)"
+        }
+      ],
+      "functions": 3,
+      "module": "src/dcm/learning/failure_class.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": true,
+          "line": 43,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 46,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 243,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 247,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 256,
+          "operation": "open"
+        }
+      ],
+      "catches": [
+        {
+          "line": 33,
+          "type": "(TypeError, ValueError)"
+        },
+        {
+          "line": 44,
+          "type": "ValueError"
+        },
+        {
+          "line": 250,
+          "type": "json.JSONDecodeError"
+        }
+      ],
+      "functions": 10,
+      "module": "src/dcm/learning/insight_settlement.py",
+      "unhandledCallSitesForReview": 4
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 4,
+      "module": "src/dcm/learning/outlier_patterns.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 39,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": true,
+          "line": 81,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 92,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 132,
+          "operation": "open"
+        },
+        {
+          "insideTry": false,
+          "line": 142,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 143,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 152,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 156,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 156,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 157,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 362,
+          "operation": "read_bytes"
+        },
+        {
+          "insideTry": false,
+          "line": 448,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 452,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 456,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 459,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 460,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 463,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 466,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": true,
+          "line": 508,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": true,
+          "line": 511,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": true,
+          "line": 518,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 528,
+          "operation": "read_bytes"
+        }
+      ],
+      "catches": [
+        {
+          "line": 45,
+          "type": "json.JSONDecodeError"
+        },
+        {
+          "line": 82,
+          "type": "(OSError, json.JSONDecodeError)"
+        },
+        {
+          "line": 279,
+          "type": "(KeyError, TypeError, ValueError)"
+        },
+        {
+          "line": 369,
+          "type": "ValueError"
+        },
+        {
+          "line": 525,
+          "type": "(OSError, json.JSONDecodeError, TypeError, ValueError)"
+        }
+      ],
+      "functions": 13,
+      "module": "src/dcm/learning/postgame.py",
+      "unhandledCallSitesForReview": 18
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": true,
+          "line": 59,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 72,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 80,
+          "operation": "write_text"
+        }
+      ],
+      "catches": [
+        {
+          "line": 60,
+          "type": "(OSError, json.JSONDecodeError)"
+        },
+        {
+          "line": 127,
+          "type": "(TypeError, ValueError)"
+        }
+      ],
+      "functions": 10,
+      "module": "src/dcm/learning/registry.py",
+      "unhandledCallSitesForReview": 2
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": true,
+          "line": 73,
+          "operation": "replace"
+        }
+      ],
+      "catches": [
+        {
+          "line": 37,
+          "type": "ImportError"
+        },
+        {
+          "line": 56,
+          "type": "(KeyError, TypeError, ValueError)"
+        },
+        {
+          "line": 74,
+          "type": "ValueError"
+        }
+      ],
+      "functions": 2,
+      "module": "src/dcm/learning/rfecv_shadow.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 42,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 53,
+          "operation": "open"
+        },
+        {
+          "insideTry": false,
+          "line": 62,
+          "operation": "read_text"
+        }
+      ],
+      "catches": [
+        {
+          "line": 68,
+          "type": "json.JSONDecodeError"
+        }
+      ],
+      "functions": 5,
+      "module": "src/dcm/learning/sidecar.py",
+      "unhandledCallSitesForReview": 3
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 183,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 474,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 475,
+          "operation": "write_text"
+        }
+      ],
+      "catches": [
+        {
+          "line": 36,
+          "type": "ValueError"
+        },
+        {
+          "line": 49,
+          "type": "(TypeError, ValueError)"
+        },
+        {
+          "line": 236,
+          "type": "(TypeError, ValueError)"
+        },
+        {
+          "line": 378,
+          "type": "RuntimeError"
+        },
+        {
+          "line": 486,
+          "type": "WalkForwardLeakage"
+        }
+      ],
+      "functions": 17,
+      "module": "src/dcm/learning/walkforward.py",
+      "unhandledCallSitesForReview": 3
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 0,
+      "module": "src/dcm/ml/__init__.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 271,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 353,
+          "operation": "open"
+        },
+        {
+          "insideTry": false,
+          "line": 374,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 387,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 407,
+          "operation": "open"
+        },
+        {
+          "insideTry": false,
+          "line": 412,
+          "operation": "replace"
+        },
+        {
+          "insideTry": true,
+          "line": 415,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 431,
+          "operation": "write_text"
+        }
+      ],
+      "catches": [
+        {
+          "line": 390,
+          "type": "json.JSONDecodeError"
+        },
+        {
+          "line": 416,
+          "type": "(OSError, json.JSONDecodeError)"
+        }
+      ],
+      "functions": 9,
+      "module": "src/dcm/ml/feature_store.py",
+      "unhandledCallSitesForReview": 7
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 1,
+      "module": "src/dcm/model/__init__.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 415,
+          "operation": "replace"
+        }
+      ],
+      "catches": [
+        {
+          "line": 179,
+          "type": "ValueError"
+        },
+        {
+          "line": 192,
+          "type": "ValueError"
+        },
+        {
+          "line": 207,
+          "type": "(TypeError, ValueError, OverflowError)"
+        },
+        {
+          "line": 306,
+          "type": "ImportError"
+        },
+        {
+          "line": 389,
+          "type": "(TypeError, ValueError, OverflowError)"
+        },
+        {
+          "line": 445,
+          "type": "(TypeError, ValueError, OverflowError)"
+        },
+        {
+          "line": 545,
+          "type": "(TypeError, ValueError, OverflowError)"
+        },
+        {
+          "line": 668,
+          "type": "(TypeError, ValueError, OverflowError)"
+        },
+        {
+          "line": 684,
+          "type": "(TypeError, ValueError, OverflowError)"
+        },
+        {
+          "line": 793,
+          "type": "(KeyError, TypeError, ValueError)"
+        },
+        {
+          "line": 1031,
+          "type": "Exception"
+        }
+      ],
+      "functions": 19,
+      "module": "src/dcm/model/advanced_execution.py",
+      "unhandledCallSitesForReview": 1
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 2,
+      "module": "src/dcm/model/availability.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [
+        {
+          "line": 25,
+          "type": "(TypeError, ValueError)"
+        },
+        {
+          "line": 106,
+          "type": "(TypeError, ValueError)"
+        }
+      ],
+      "functions": 6,
+      "module": "src/dcm/model/basketball_efficiency.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [
+        {
+          "line": 49,
+          "type": "(TypeError, ValueError)"
+        },
+        {
+          "line": 60,
+          "type": "(KeyError, TypeError, ValueError)"
+        },
+        {
+          "line": 72,
+          "type": "(KeyError, TypeError, ValueError)"
+        }
+      ],
+      "functions": 8,
+      "module": "src/dcm/model/basketball_opportunity.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": true,
+          "line": 41,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 101,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 137,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 299,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 353,
+          "operation": "replace"
+        }
+      ],
+      "catches": [
+        {
+          "line": 31,
+          "type": "(TypeError, ValueError, OverflowError)"
+        },
+        {
+          "line": 42,
+          "type": "ValueError"
+        },
+        {
+          "line": 206,
+          "type": "ZoneInfoNotFoundError"
+        }
+      ],
+      "functions": 9,
+      "module": "src/dcm/model/captured_history.py",
+      "unhandledCallSitesForReview": 4
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": true,
+          "line": 21,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 48,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 64,
+          "operation": "unlink"
+        },
+        {
+          "insideTry": false,
+          "line": 65,
+          "operation": "connect"
+        },
+        {
+          "insideTry": true,
+          "line": 67,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 68,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 69,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 130,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 149,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 189,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 194,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 202,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 209,
+          "operation": "replace"
+        },
+        {
+          "insideTry": true,
+          "line": 226,
+          "operation": "executemany"
+        },
+        {
+          "insideTry": true,
+          "line": 230,
+          "operation": "commit"
+        },
+        {
+          "insideTry": true,
+          "line": 231,
+          "operation": "execute"
+        },
+        {
+          "insideTry": false,
+          "line": 234,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 235,
+          "operation": "read_bytes"
+        }
+      ],
+      "catches": [
+        {
+          "line": 22,
+          "type": "ValueError"
+        },
+        {
+          "line": 32,
+          "type": "(TypeError, ValueError, OverflowError)"
+        }
+      ],
+      "functions": 4,
+      "module": "src/dcm/model/captured_history_database.py",
+      "unhandledCallSitesForReview": 5
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [
+        {
+          "line": 32,
+          "type": "ImportError"
+        }
+      ],
+      "functions": 2,
+      "module": "src/dcm/model/distributions.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [
+        {
+          "line": 201,
+          "type": "(TypeError, ValueError)"
+        }
+      ],
+      "functions": 8,
+      "module": "src/dcm/model/event_world_joint.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 408,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 426,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 428,
+          "operation": "open"
+        }
+      ],
+      "catches": [
+        {
+          "line": 90,
+          "type": "(TypeError, ValueError)"
+        }
+      ],
+      "functions": 14,
+      "module": "src/dcm/model/explanation.py",
+      "unhandledCallSitesForReview": 3
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 1,
+      "module": "src/dcm/model/grade.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [
+        {
+          "line": 76,
+          "type": "(TypeError, ValueError)"
+        }
+      ],
+      "functions": 14,
+      "module": "src/dcm/model/gridiron_models.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [
+        {
+          "line": 70,
+          "type": "(TypeError, ValueError)"
+        }
+      ],
+      "functions": 5,
+      "module": "src/dcm/model/hierarchical_distribution.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 42,
+          "operation": "replace"
+        }
+      ],
+      "catches": [],
+      "functions": 3,
+      "module": "src/dcm/model/inverse_gate.py",
+      "unhandledCallSitesForReview": 1
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 2,
+      "module": "src/dcm/model/joint_value.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 4,
+      "module": "src/dcm/model/line_surface.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 182,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 182,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 182,
+          "operation": "replace"
+        }
+      ],
+      "catches": [],
+      "functions": 8,
+      "module": "src/dcm/model/market_derive.py",
+      "unhandledCallSitesForReview": 3
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [
+        {
+          "line": 41,
+          "type": "(TypeError, ValueError)"
+        },
+        {
+          "line": 128,
+          "type": "(KeyError, TypeError, ValueError)"
+        },
+        {
+          "line": 138,
+          "type": "(KeyError, TypeError, ValueError)"
+        },
+        {
+          "line": 663,
+          "type": "(TypeError, ValueError)"
+        },
+        {
+          "line": 669,
+          "type": "(TypeError, ValueError)"
+        }
+      ],
+      "functions": 13,
+      "module": "src/dcm/model/parameters.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [
+        {
+          "line": 23,
+          "type": "(TypeError, ValueError)"
+        },
+        {
+          "line": 34,
+          "type": "(KeyError, TypeError, ValueError)"
+        },
+        {
+          "line": 46,
+          "type": "(KeyError, TypeError, ValueError)"
+        }
+      ],
+      "functions": 5,
+      "module": "src/dcm/model/participation.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 9,
+      "module": "src/dcm/model/quarter_worlds.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 3,
+      "module": "src/dcm/model/ranking.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 3,
+      "module": "src/dcm/model/uncertainty.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [
+        {
+          "line": 77,
+          "type": "(TypeError, ValueError)"
+        },
+        {
+          "line": 414,
+          "type": "UnknownMarketError"
+        },
+        {
+          "line": 446,
+          "type": "(TypeError, ValueError)"
+        }
+      ],
+      "functions": 16,
+      "module": "src/dcm/model/worlds.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 5,
+      "module": "src/dcm/paths.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 0,
+      "module": "src/dcm/platform/__init__.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 0,
+      "module": "src/dcm/platform/prizepicks/__init__.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 6,
+      "module": "src/dcm/platform/prizepicks/economics.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 3,
+      "module": "src/dcm/platform/prizepicks/entry_contract.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 0,
+      "module": "src/dcm/platform/prizepicks/leaderboard.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 0,
+      "module": "src/dcm/platform/prizepicks/minimum_guarantee.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 2,
+      "module": "src/dcm/platform/prizepicks/participation.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 2,
+      "module": "src/dcm/platform/prizepicks/payouts.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 4,
+      "module": "src/dcm/platform/prizepicks/platform_rules_authority.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 4,
+      "module": "src/dcm/platform/prizepicks/reboot.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 6,
+      "module": "src/dcm/platform/prizepicks/settlement.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 1,
+      "module": "src/dcm/postgame.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 63,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": true,
+          "line": 71,
+          "operation": "run"
+        },
+        {
+          "insideTry": false,
+          "line": 171,
+          "operation": "run"
+        },
+        {
+          "insideTry": false,
+          "line": 189,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 191,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": true,
+          "line": 193,
+          "operation": "run"
+        },
+        {
+          "insideTry": false,
+          "line": 211,
+          "operation": "write_bytes"
+        },
+        {
+          "insideTry": false,
+          "line": 211,
+          "operation": "read_bytes"
+        },
+        {
+          "insideTry": false,
+          "line": 213,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 216,
+          "operation": "write_bytes"
+        },
+        {
+          "insideTry": false,
+          "line": 216,
+          "operation": "read_bytes"
+        },
+        {
+          "insideTry": false,
+          "line": 231,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 245,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 247,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 298,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 309,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 310,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 345,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 358,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 376,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 377,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 390,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 398,
+          "operation": "read_text"
+        }
+      ],
+      "catches": [
+        {
+          "line": 78,
+          "type": "OSError"
+        },
+        {
+          "line": 167,
+          "type": "ImportError"
+        },
+        {
+          "line": 186,
+          "type": "RuntimeError"
+        },
+        {
+          "line": 200,
+          "type": "OSError"
+        }
+      ],
+      "functions": 14,
+      "module": "src/dcm/release.py",
+      "unhandledCallSitesForReview": 21
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 1,
+      "module": "src/dcm/research/__init__.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 370,
+          "operation": "run"
+        }
+      ],
+      "catches": [],
+      "functions": 7,
+      "module": "src/dcm/research/acquisition.py",
+      "unhandledCallSitesForReview": 1
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": true,
+          "line": 55,
+          "operation": "replace"
+        },
+        {
+          "insideTry": true,
+          "line": 57,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 92,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 124,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 126,
+          "operation": "open"
+        },
+        {
+          "insideTry": false,
+          "line": 132,
+          "operation": "replace"
+        },
+        {
+          "insideTry": true,
+          "line": 134,
+          "operation": "open"
+        },
+        {
+          "insideTry": false,
+          "line": 196,
+          "operation": "replace"
+        }
+      ],
+      "catches": [
+        {
+          "line": 58,
+          "type": "ValueError"
+        },
+        {
+          "line": 139,
+          "type": "OSError"
+        }
+      ],
+      "functions": 10,
+      "module": "src/dcm/research/action_state.py",
+      "unhandledCallSitesForReview": 5
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 0,
+      "module": "src/dcm/research/adapters/__init__.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 98,
+          "operation": "fetch"
+        }
+      ],
+      "catches": [],
+      "functions": 7,
+      "module": "src/dcm/research/adapters/base.py",
+      "unhandledCallSitesForReview": 1
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 63,
+          "operation": "urlopen"
+        },
+        {
+          "insideTry": false,
+          "line": 140,
+          "operation": "fetch"
+        },
+        {
+          "insideTry": false,
+          "line": 142,
+          "operation": "fetch"
+        }
+      ],
+      "catches": [],
+      "functions": 26,
+      "module": "src/dcm/research/adapters/basketball_reference.py",
+      "unhandledCallSitesForReview": 3
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [
+        {
+          "line": 66,
+          "type": "json.JSONDecodeError"
+        }
+      ],
+      "functions": 6,
+      "module": "src/dcm/research/adapters/espn_status.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 8,
+      "module": "src/dcm/research/adapters/html_tables.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [
+        {
+          "line": 32,
+          "type": "json.JSONDecodeError"
+        }
+      ],
+      "functions": 6,
+      "module": "src/dcm/research/adapters/official_league.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 93,
+          "operation": "fetch"
+        }
+      ],
+      "catches": [],
+      "functions": 5,
+      "module": "src/dcm/research/adapters/prizepicks.py",
+      "unhandledCallSitesForReview": 1
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 61,
+          "operation": "urlopen"
+        },
+        {
+          "insideTry": false,
+          "line": 149,
+          "operation": "fetch"
+        },
+        {
+          "insideTry": false,
+          "line": 151,
+          "operation": "fetch"
+        }
+      ],
+      "catches": [],
+      "functions": 7,
+      "module": "src/dcm/research/adapters/pro_football_reference.py",
+      "unhandledCallSitesForReview": 3
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": true,
+          "line": 27,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 31,
+          "operation": "replace"
+        }
+      ],
+      "catches": [
+        {
+          "line": 28,
+          "type": "ValueError"
+        }
+      ],
+      "functions": 5,
+      "module": "src/dcm/research/authority.py",
+      "unhandledCallSitesForReview": 1
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 5,
+      "module": "src/dcm/research/batch.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": true,
+          "line": 34,
+          "operation": "open"
+        },
+        {
+          "insideTry": false,
+          "line": 45,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 48,
+          "operation": "open"
+        },
+        {
+          "insideTry": true,
+          "line": 58,
+          "operation": "unlink"
+        },
+        {
+          "insideTry": false,
+          "line": 65,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 67,
+          "operation": "open"
+        },
+        {
+          "insideTry": false,
+          "line": 71,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 143,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 205,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 230,
+          "operation": "read_text"
+        }
+      ],
+      "catches": [
+        {
+          "line": 39,
+          "type": "OSError"
+        },
+        {
+          "line": 54,
+          "type": "FileExistsError"
+        },
+        {
+          "line": 59,
+          "type": "FileNotFoundError"
+        },
+        {
+          "line": 159,
+          "type": "FileExistsError"
+        }
+      ],
+      "functions": 13,
+      "module": "src/dcm/research/batch_store.py",
+      "unhandledCallSitesForReview": 8
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 7,
+      "module": "src/dcm/research/cache.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 76,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": true,
+          "line": 79,
+          "operation": "connect"
+        },
+        {
+          "insideTry": true,
+          "line": 80,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 81,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 82,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 85,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 93,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 95,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 96,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 102,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 103,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 104,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 105,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 106,
+          "operation": "commit"
+        },
+        {
+          "insideTry": true,
+          "line": 107,
+          "operation": "execute"
+        },
+        {
+          "insideTry": false,
+          "line": 140,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 148,
+          "operation": "execute"
+        },
+        {
+          "insideTry": false,
+          "line": 171,
+          "operation": "execute"
+        },
+        {
+          "insideTry": false,
+          "line": 176,
+          "operation": "commit"
+        },
+        {
+          "insideTry": false,
+          "line": 203,
+          "operation": "execute"
+        },
+        {
+          "insideTry": false,
+          "line": 206,
+          "operation": "execute"
+        },
+        {
+          "insideTry": false,
+          "line": 263,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 354,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 356,
+          "operation": "commit"
+        },
+        {
+          "insideTry": true,
+          "line": 364,
+          "operation": "commit"
+        }
+      ],
+      "catches": [
+        {
+          "line": 63,
+          "type": "(TypeError, ValueError, json.JSONDecodeError)"
+        },
+        {
+          "line": 111,
+          "type": "(OSError, sqlite3.DatabaseError, RuntimeError, ValueError)"
+        },
+        {
+          "line": 100,
+          "type": "(TypeError, ValueError, json.JSONDecodeError)"
+        },
+        {
+          "line": 114,
+          "type": "Exception"
+        },
+        {
+          "line": 150,
+          "type": "Exception"
+        },
+        {
+          "line": 217,
+          "type": "ValueError"
+        },
+        {
+          "line": 222,
+          "type": "Exception"
+        },
+        {
+          "line": 234,
+          "type": "Exception"
+        },
+        {
+          "line": 239,
+          "type": "Exception"
+        },
+        {
+          "line": 276,
+          "type": "ValueError"
+        },
+        {
+          "line": 358,
+          "type": "Exception"
+        },
+        {
+          "line": 366,
+          "type": "Exception"
+        }
+      ],
+      "functions": 12,
+      "module": "src/dcm/research/cache_layers.py",
+      "unhandledCallSitesForReview": 7
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 3,
+      "module": "src/dcm/research/claims.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 7,
+      "module": "src/dcm/research/classify.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 2,
+      "module": "src/dcm/research/classify_runtime.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [
+        {
+          "line": 137,
+          "type": "(TypeError, ValueError)"
+        }
+      ],
+      "functions": 11,
+      "module": "src/dcm/research/coverage.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 5,
+      "module": "src/dcm/research/coverage_incremental.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 4,
+      "module": "src/dcm/research/dependency_graph.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 89,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 92,
+          "operation": "open"
+        },
+        {
+          "insideTry": false,
+          "line": 102,
+          "operation": "open"
+        },
+        {
+          "insideTry": false,
+          "line": 114,
+          "operation": "open"
+        }
+      ],
+      "catches": [],
+      "functions": 3,
+      "module": "src/dcm/research/discovery.py",
+      "unhandledCallSitesForReview": 4
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 29,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": true,
+          "line": 32,
+          "operation": "open"
+        },
+        {
+          "insideTry": true,
+          "line": 37,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 39,
+          "operation": "unlink"
+        }
+      ],
+      "catches": [],
+      "functions": 5,
+      "module": "src/dcm/research/emit.py",
+      "unhandledCallSitesForReview": 2
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 4,
+      "module": "src/dcm/research/entity_graph.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [
+        {
+          "line": 37,
+          "type": "(TypeError, ValueError)"
+        },
+        {
+          "line": 127,
+          "type": "(TypeError, ValueError)"
+        }
+      ],
+      "functions": 13,
+      "module": "src/dcm/research/entity_packets.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 16,
+      "module": "src/dcm/research/evidence_graph.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 52,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 52,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 172,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 190,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 199,
+          "operation": "open"
+        }
+      ],
+      "catches": [
+        {
+          "line": 177,
+          "type": "json.JSONDecodeError"
+        }
+      ],
+      "functions": 8,
+      "module": "src/dcm/research/failures.py",
+      "unhandledCallSitesForReview": 5
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 214,
+          "operation": "replace"
+        }
+      ],
+      "catches": [
+        {
+          "line": 211,
+          "type": "ValueError"
+        },
+        {
+          "line": 293,
+          "type": "FreshnessPolicyError"
+        },
+        {
+          "line": 360,
+          "type": "FreshnessPolicyError"
+        },
+        {
+          "line": 383,
+          "type": "(TypeError, ValueError)"
+        }
+      ],
+      "functions": 12,
+      "module": "src/dcm/research/freshness.py",
+      "unhandledCallSitesForReview": 1
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": true,
+          "line": 96,
+          "operation": "replace"
+        },
+        {
+          "insideTry": true,
+          "line": 98,
+          "operation": "replace"
+        }
+      ],
+      "catches": [
+        {
+          "line": 100,
+          "type": "(TypeError, ValueError, OverflowError)"
+        },
+        {
+          "line": 197,
+          "type": "(TypeError, ValueError)"
+        }
+      ],
+      "functions": 37,
+      "module": "src/dcm/research/funnel.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [
+        {
+          "line": 176,
+          "type": "(TypeError, ValueError)"
+        },
+        {
+          "line": 187,
+          "type": "(TypeError, ValueError)"
+        }
+      ],
+      "functions": 9,
+      "module": "src/dcm/research/gamelog.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 9,
+      "module": "src/dcm/research/gridiron_gamelog.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 45,
+          "operation": "read_bytes"
+        },
+        {
+          "insideTry": false,
+          "line": 340,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 341,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 342,
+          "operation": "write_text"
+        }
+      ],
+      "catches": [
+        {
+          "line": 51,
+          "type": "json.JSONDecodeError"
+        },
+        {
+          "line": 148,
+          "type": "RecursionError"
+        }
+      ],
+      "functions": 9,
+      "module": "src/dcm/research/har_breakdown.py",
+      "unhandledCallSitesForReview": 4
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 71,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 71,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 101,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 101,
+          "operation": "replace"
+        }
+      ],
+      "catches": [
+        {
+          "line": 117,
+          "type": "(ValueError, UnicodeError)"
+        },
+        {
+          "line": 126,
+          "type": "(json.JSONDecodeError, TypeError)"
+        }
+      ],
+      "functions": 12,
+      "module": "src/dcm/research/har_records.py",
+      "unhandledCallSitesForReview": 4
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 4,
+      "module": "src/dcm/research/historical_gap.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 1,
+      "module": "src/dcm/research/host_plan.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 113,
+          "operation": "execute"
+        },
+        {
+          "insideTry": false,
+          "line": 390,
+          "operation": "execute"
+        }
+      ],
+      "catches": [
+        {
+          "line": 363,
+          "type": "sqlite3.Error"
+        },
+        {
+          "line": 410,
+          "type": "sqlite3.Error"
+        }
+      ],
+      "functions": 19,
+      "module": "src/dcm/research/indexes.py",
+      "unhandledCallSitesForReview": 2
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 258,
+          "operation": "replace"
+        }
+      ],
+      "catches": [
+        {
+          "line": 198,
+          "type": "(TypeError, ValueError)"
+        }
+      ],
+      "functions": 11,
+      "module": "src/dcm/research/insight_bridge.py",
+      "unhandledCallSitesForReview": 1
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": true,
+          "line": 387,
+          "operation": "replace"
+        },
+        {
+          "insideTry": true,
+          "line": 389,
+          "operation": "replace"
+        }
+      ],
+      "catches": [
+        {
+          "line": 32,
+          "type": "(TypeError, ValueError)"
+        },
+        {
+          "line": 332,
+          "type": "ZoneInfoNotFoundError"
+        },
+        {
+          "line": 391,
+          "type": "(TypeError, ValueError, OverflowError)"
+        }
+      ],
+      "functions": 12,
+      "module": "src/dcm/research/insight_queue.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [
+        {
+          "line": 25,
+          "type": "(TypeError, ValueError)"
+        }
+      ],
+      "functions": 3,
+      "module": "src/dcm/research/lineup.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 72,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 76,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 82,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 249,
+          "operation": "replace"
+        }
+      ],
+      "catches": [
+        {
+          "line": 64,
+          "type": "(TypeError, ValueError)"
+        },
+        {
+          "line": 79,
+          "type": "ValueError"
+        }
+      ],
+      "functions": 20,
+      "module": "src/dcm/research/material_facts.py",
+      "unhandledCallSitesForReview": 4
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 193,
+          "operation": "mkdir"
+        }
+      ],
+      "catches": [
+        {
+          "line": 178,
+          "type": "(ValueError, TypeError, KeyError)"
+        },
+        {
+          "line": 222,
+          "type": "Exception"
+        },
+        {
+          "line": 427,
+          "type": "Exception"
+        },
+        {
+          "line": 440,
+          "type": "Exception"
+        }
+      ],
+      "functions": 1,
+      "module": "src/dcm/research/observation_execute.py",
+      "unhandledCallSitesForReview": 1
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 10,
+      "module": "src/dcm/research/observation_execute_support.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 18,
+          "operation": "read_text"
+        }
+      ],
+      "catches": [
+        {
+          "line": 30,
+          "type": "json.JSONDecodeError"
+        }
+      ],
+      "functions": 7,
+      "module": "src/dcm/research/observation_typed.py",
+      "unhandledCallSitesForReview": 1
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [
+        {
+          "line": 55,
+          "type": "TemporalLeakError"
+        }
+      ],
+      "functions": 1,
+      "module": "src/dcm/research/offer_metadata.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": true,
+          "line": 56,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 59,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 208,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 292,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 313,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 314,
+          "operation": "open"
+        }
+      ],
+      "catches": [
+        {
+          "line": 44,
+          "type": "(TypeError, ValueError)"
+        },
+        {
+          "line": 57,
+          "type": "ValueError"
+        },
+        {
+          "line": 286,
+          "type": "(OfferRevalidationError, ValueError, TypeError)"
+        },
+        {
+          "line": 295,
+          "type": "json.JSONDecodeError"
+        }
+      ],
+      "functions": 10,
+      "module": "src/dcm/research/offer_revalidation.py",
+      "unhandledCallSitesForReview": 5
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 408,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": true,
+          "line": 415,
+          "operation": "open"
+        },
+        {
+          "insideTry": true,
+          "line": 420,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 422,
+          "operation": "unlink"
+        },
+        {
+          "insideTry": false,
+          "line": 431,
+          "operation": "write_text"
+        }
+      ],
+      "catches": [
+        {
+          "line": 367,
+          "type": "Exception"
+        }
+      ],
+      "functions": 9,
+      "module": "src/dcm/research/os_graphs.py",
+      "unhandledCallSitesForReview": 3
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 6,
+      "module": "src/dcm/research/player_offer_set.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [
+        {
+          "line": 49,
+          "type": "(TypeError, ValueError)"
+        }
+      ],
+      "functions": 13,
+      "module": "src/dcm/research/player_packet.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 5,
+      "module": "src/dcm/research/population.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 137,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 163,
+          "operation": "open"
+        },
+        {
+          "insideTry": false,
+          "line": 180,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 181,
+          "operation": "open"
+        },
+        {
+          "insideTry": false,
+          "line": 226,
+          "operation": "unlink"
+        }
+      ],
+      "catches": [
+        {
+          "line": 284,
+          "type": "(ValueError, TypeError, json.JSONDecodeError)"
+        }
+      ],
+      "functions": 17,
+      "module": "src/dcm/research/provider.py",
+      "unhandledCallSitesForReview": 5
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 117,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 120,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 123,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 130,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 138,
+          "operation": "read_text"
+        }
+      ],
+      "catches": [],
+      "functions": 4,
+      "module": "src/dcm/research/readiness.py",
+      "unhandledCallSitesForReview": 5
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 6,
+      "module": "src/dcm/research/requests.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 258,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 259,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 260,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 280,
+          "operation": "open"
+        },
+        {
+          "insideTry": false,
+          "line": 287,
+          "operation": "open"
+        },
+        {
+          "insideTry": true,
+          "line": 301,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 309,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": true,
+          "line": 315,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 325,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 362,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 426,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 499,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 507,
+          "operation": "open"
+        }
+      ],
+      "catches": [
+        {
+          "line": 302,
+          "type": "(OSError, json.JSONDecodeError)"
+        },
+        {
+          "line": 316,
+          "type": "(OSError, json.JSONDecodeError)"
+        },
+        {
+          "line": 584,
+          "type": "(TypeError, ValueError)"
+        },
+        {
+          "line": 618,
+          "type": "(TypeError, ValueError)"
+        }
+      ],
+      "functions": 31,
+      "module": "src/dcm/research/research_store.py",
+      "unhandledCallSitesForReview": 11
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 38,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 107,
+          "operation": "read_text"
+        }
+      ],
+      "catches": [
+        {
+          "line": 44,
+          "type": "json.JSONDecodeError"
+        },
+        {
+          "line": 51,
+          "type": "json.JSONDecodeError"
+        }
+      ],
+      "functions": 6,
+      "module": "src/dcm/research/response.py",
+      "unhandledCallSitesForReview": 2
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 27,
+      "module": "src/dcm/research/role_epoch.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 38,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 38,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 56,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 57,
+          "operation": "connect"
+        },
+        {
+          "insideTry": false,
+          "line": 58,
+          "operation": "execute"
+        },
+        {
+          "insideTry": false,
+          "line": 59,
+          "operation": "execute"
+        },
+        {
+          "insideTry": false,
+          "line": 60,
+          "operation": "execute"
+        },
+        {
+          "insideTry": false,
+          "line": 70,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 71,
+          "operation": "open"
+        },
+        {
+          "insideTry": true,
+          "line": 80,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 81,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 114,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 120,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 126,
+          "operation": "execute"
+        },
+        {
+          "insideTry": false,
+          "line": 141,
+          "operation": "execute"
+        },
+        {
+          "insideTry": false,
+          "line": 152,
+          "operation": "execute"
+        },
+        {
+          "insideTry": false,
+          "line": 171,
+          "operation": "execute"
+        },
+        {
+          "insideTry": false,
+          "line": 205,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 207,
+          "operation": "open"
+        },
+        {
+          "insideTry": false,
+          "line": 213,
+          "operation": "connect"
+        },
+        {
+          "insideTry": false,
+          "line": 214,
+          "operation": "execute"
+        },
+        {
+          "insideTry": false,
+          "line": 215,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 217,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 219,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 237,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 242,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 245,
+          "operation": "open"
+        },
+        {
+          "insideTry": true,
+          "line": 249,
+          "operation": "replace"
+        },
+        {
+          "insideTry": true,
+          "line": 251,
+          "operation": "open"
+        }
+      ],
+      "catches": [
+        {
+          "line": 74,
+          "type": "BlockingIOError"
+        },
+        {
+          "line": 123,
+          "type": "Exception"
+        },
+        {
+          "line": 93,
+          "type": "json.JSONDecodeError"
+        },
+        {
+          "line": 127,
+          "type": "sqlite3.Error"
+        },
+        {
+          "line": 210,
+          "type": "BlockingIOError"
+        },
+        {
+          "line": 225,
+          "type": "json.JSONDecodeError"
+        },
+        {
+          "line": 256,
+          "type": "OSError"
+        }
+      ],
+      "functions": 13,
+      "module": "src/dcm/research/run_lock.py",
+      "unhandledCallSitesForReview": 17
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 6,
+      "module": "src/dcm/research/scopes.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 2,
+      "module": "src/dcm/research/search_blueprint.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": true,
+          "line": 46,
+          "operation": "replace"
+        },
+        {
+          "insideTry": true,
+          "line": 47,
+          "operation": "replace"
+        }
+      ],
+      "catches": [
+        {
+          "line": 48,
+          "type": "ValueError"
+        }
+      ],
+      "functions": 9,
+      "module": "src/dcm/research/search_engine.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": true,
+          "line": 19,
+          "operation": "replace"
+        },
+        {
+          "insideTry": true,
+          "line": 22,
+          "operation": "replace"
+        }
+      ],
+      "catches": [
+        {
+          "line": 24,
+          "type": "ValueError"
+        }
+      ],
+      "functions": 4,
+      "module": "src/dcm/research/search_query.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 25,
+          "operation": "read_text"
+        }
+      ],
+      "catches": [
+        {
+          "line": 92,
+          "type": "(TypeError, ValueError)"
+        }
+      ],
+      "functions": 9,
+      "module": "src/dcm/research/source_catalog.py",
+      "unhandledCallSitesForReview": 1
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 39,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 43,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 49,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 133,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 321,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 323,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": true,
+          "line": 347,
+          "operation": "read_text"
+        }
+      ],
+      "catches": [
+        {
+          "line": 46,
+          "type": "ValueError"
+        },
+        {
+          "line": 348,
+          "type": "(OSError, json.JSONDecodeError, TypeError)"
+        }
+      ],
+      "functions": 24,
+      "module": "src/dcm/research/source_health.py",
+      "unhandledCallSitesForReview": 6
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 5,
+      "module": "src/dcm/research/staged.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 130,
+          "operation": "open"
+        },
+        {
+          "insideTry": false,
+          "line": 137,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 138,
+          "operation": "open"
+        },
+        {
+          "insideTry": false,
+          "line": 144,
+          "operation": "open"
+        },
+        {
+          "insideTry": false,
+          "line": 158,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 159,
+          "operation": "connect"
+        },
+        {
+          "insideTry": false,
+          "line": 161,
+          "operation": "execute"
+        },
+        {
+          "insideTry": false,
+          "line": 162,
+          "operation": "execute"
+        },
+        {
+          "insideTry": false,
+          "line": 163,
+          "operation": "execute"
+        },
+        {
+          "insideTry": false,
+          "line": 168,
+          "operation": "execute"
+        },
+        {
+          "insideTry": false,
+          "line": 170,
+          "operation": "execute"
+        },
+        {
+          "insideTry": false,
+          "line": 174,
+          "operation": "execute"
+        },
+        {
+          "insideTry": false,
+          "line": 196,
+          "operation": "execute"
+        },
+        {
+          "insideTry": false,
+          "line": 200,
+          "operation": "execute"
+        },
+        {
+          "insideTry": false,
+          "line": 201,
+          "operation": "execute"
+        },
+        {
+          "insideTry": false,
+          "line": 202,
+          "operation": "commit"
+        },
+        {
+          "insideTry": false,
+          "line": 210,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": true,
+          "line": 233,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 234,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 235,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 247,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 251,
+          "operation": "commit"
+        },
+        {
+          "insideTry": true,
+          "line": 281,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 296,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 300,
+          "operation": "commit"
+        },
+        {
+          "insideTry": true,
+          "line": 309,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": true,
+          "line": 323,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": true,
+          "line": 330,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 346,
+          "operation": "commit"
+        },
+        {
+          "insideTry": true,
+          "line": 356,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 365,
+          "operation": "commit"
+        },
+        {
+          "insideTry": false,
+          "line": 371,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 383,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 392,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 400,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 408,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 417,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 418,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 419,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 420,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 421,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 429,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 438,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 440,
+          "operation": "execute"
+        },
+        {
+          "insideTry": false,
+          "line": 489,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 513,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 525,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": true,
+          "line": 549,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": true,
+          "line": 622,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 631,
+          "operation": "commit"
+        }
+      ],
+      "catches": [
+        {
+          "line": 178,
+          "type": "(TypeError, ValueError)"
+        },
+        {
+          "line": 238,
+          "type": "sqlite3.Error"
+        },
+        {
+          "line": 310,
+          "type": "(OSError, json.JSONDecodeError)"
+        },
+        {
+          "line": 324,
+          "type": "(OSError, json.JSONDecodeError)"
+        },
+        {
+          "line": 550,
+          "type": "(OSError, json.JSONDecodeError)"
+        },
+        {
+          "line": 578,
+          "type": "OSError"
+        },
+        {
+          "line": 595,
+          "type": "(OSError, json.JSONDecodeError, gzip.BadGzipFile)"
+        }
+      ],
+      "functions": 27,
+      "module": "src/dcm/research/statepack.py",
+      "unhandledCallSitesForReview": 21
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 10,
+      "module": "src/dcm/research/subject_offer_set.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 4,
+      "module": "src/dcm/research/temporal.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": true,
+          "line": 29,
+          "operation": "read_text"
+        }
+      ],
+      "catches": [
+        {
+          "line": 30,
+          "type": "(OSError, json.JSONDecodeError)"
+        }
+      ],
+      "functions": 3,
+      "module": "src/dcm/research/test_mode.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 7,
+      "module": "src/dcm/research/universal_packets.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 1,
+      "module": "src/dcm/research/universal_plan.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": true,
+          "line": 241,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": true,
+          "line": 250,
+          "operation": "replace"
+        },
+        {
+          "insideTry": true,
+          "line": 253,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 256,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 257,
+          "operation": "read_bytes"
+        },
+        {
+          "insideTry": true,
+          "line": 263,
+          "operation": "run"
+        },
+        {
+          "insideTry": true,
+          "line": 294,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": true,
+          "line": 321,
+          "operation": "open"
+        },
+        {
+          "insideTry": false,
+          "line": 392,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 393,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 394,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 396,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": true,
+          "line": 410,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 422,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 431,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 432,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": true,
+          "line": 457,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 484,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 485,
+          "operation": "read_bytes"
+        },
+        {
+          "insideTry": false,
+          "line": 501,
+          "operation": "read_bytes"
+        },
+        {
+          "insideTry": false,
+          "line": 523,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 530,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 534,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 548,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 573,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 589,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 595,
+          "operation": "open"
+        },
+        {
+          "insideTry": false,
+          "line": 606,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 611,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 619,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 624,
+          "operation": "open"
+        },
+        {
+          "insideTry": false,
+          "line": 659,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 681,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 686,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 690,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 700,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 727,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 729,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 732,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 741,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 742,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 745,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 748,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 749,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 750,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": true,
+          "line": 756,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 813,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 814,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 816,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 839,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 840,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 841,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 841,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 849,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 872,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 884,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 907,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 908,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 912,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 915,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 919,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 939,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 945,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 997,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 1056,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 1080,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 1139,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 1143,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 1144,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 1153,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 1154,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 1158,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 1179,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 1245,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 1260,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 1718,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 1719,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 1729,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 1732,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 1738,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 1758,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 1761,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 1764,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 1784,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 1787,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 1926,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 1927,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 1958,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": true,
+          "line": 1967,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": true,
+          "line": 1968,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 2088,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 2089,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 2090,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 2091,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": true,
+          "line": 2100,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": true,
+          "line": 2107,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 2114,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 2153,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 2328,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 2456,
+          "operation": "unlink"
+        },
+        {
+          "insideTry": false,
+          "line": 2460,
+          "operation": "unlink"
+        },
+        {
+          "insideTry": false,
+          "line": 2500,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 2505,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 2506,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 2508,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 2518,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 2520,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 2521,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 2522,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 2546,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 2550,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 2560,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 2595,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 2625,
+          "operation": "write_text"
+        }
+      ],
+      "catches": [
+        {
+          "line": 166,
+          "type": "Exception"
+        },
+        {
+          "line": 171,
+          "type": "Exception"
+        },
+        {
+          "line": 214,
+          "type": "Exception"
+        },
+        {
+          "line": 254,
+          "type": "(OSError, UnicodeDecodeError, json.JSONDecodeError, AttributeError)"
+        },
+        {
+          "line": 251,
+          "type": "ValueError"
+        },
+        {
+          "line": 270,
+          "type": "OSError"
+        },
+        {
+          "line": 295,
+          "type": "(OSError, json.JSONDecodeError)"
+        },
+        {
+          "line": 313,
+          "type": "OSError"
+        },
+        {
+          "line": 340,
+          "type": "OSError"
+        },
+        {
+          "line": 329,
+          "type": "json.JSONDecodeError"
+        },
+        {
+          "line": 411,
+          "type": "(OSError, json.JSONDecodeError)"
+        },
+        {
+          "line": 458,
+          "type": "(OSError, json.JSONDecodeError)"
+        },
+        {
+          "line": 715,
+          "type": "Exception"
+        },
+        {
+          "line": 757,
+          "type": "(OSError, json.JSONDecodeError)"
+        },
+        {
+          "line": 1136,
+          "type": "(OSError, TypeError, ValueError, KeyError, json.JSONDecodeError)"
+        },
+        {
+          "line": 1379,
+          "type": "(RuntimeError, ValueError, TypeError)"
+        },
+        {
+          "line": 1460,
+          "type": "QuarterPluginIncomplete"
+        },
+        {
+          "line": 1463,
+          "type": "UnknownMarketError"
+        },
+        {
+          "line": 1466,
+          "type": "KeyError"
+        },
+        {
+          "line": 1469,
+          "type": "RuntimeError"
+        },
+        {
+          "line": 1608,
+          "type": "(TypeError, ValueError)"
+        },
+        {
+          "line": 1983,
+          "type": "(OSError, json.JSONDecodeError, TypeError, ValueError)"
+        },
+        {
+          "line": 2101,
+          "type": "(OSError, json.JSONDecodeError)"
+        },
+        {
+          "line": 2108,
+          "type": "(OSError, json.JSONDecodeError)"
+        },
+        {
+          "line": 2120,
+          "type": "json.JSONDecodeError"
+        },
+        {
+          "line": 2422,
+          "type": "LineageHalt"
+        },
+        {
+          "line": 2725,
+          "type": "ExactVersionMismatch"
+        },
+        {
+          "line": 2756,
+          "type": "FileNotFoundError"
+        },
+        {
+          "line": 2759,
+          "type": "(CutoffRequired, ExactVersionMismatch)"
+        }
+      ],
+      "functions": 13,
+      "module": "src/dcm/runner.py",
+      "unhandledCallSitesForReview": 101
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 0,
+      "module": "src/dcm/runtime/__init__.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 62,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 65,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 66,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": true,
+          "line": 80,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 94,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": true,
+          "line": 110,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": true,
+          "line": 116,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 132,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 133,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 142,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 146,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 153,
+          "operation": "read_text"
+        }
+      ],
+      "catches": [
+        {
+          "line": 81,
+          "type": "(OSError, json.JSONDecodeError)"
+        },
+        {
+          "line": 111,
+          "type": "(OSError, json.JSONDecodeError)"
+        },
+        {
+          "line": 118,
+          "type": "(OSError, json.JSONDecodeError)"
+        }
+      ],
+      "functions": 7,
+      "module": "src/dcm/runtime/archive_receipt.py",
+      "unhandledCallSitesForReview": 9
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 99,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 100,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 148,
+          "operation": "write_text"
+        }
+      ],
+      "catches": [],
+      "functions": 4,
+      "module": "src/dcm/runtime/benchmark.py",
+      "unhandledCallSitesForReview": 3
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": true,
+          "line": 19,
+          "operation": "run"
+        },
+        {
+          "insideTry": false,
+          "line": 37,
+          "operation": "open"
+        },
+        {
+          "insideTry": false,
+          "line": 106,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 107,
+          "operation": "write_text"
+        }
+      ],
+      "catches": [
+        {
+          "line": 22,
+          "type": "OSError"
+        }
+      ],
+      "functions": 4,
+      "module": "src/dcm/runtime/capabilities.py",
+      "unhandledCallSitesForReview": 3
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 21,
+          "operation": "read_bytes"
+        }
+      ],
+      "catches": [],
+      "functions": 4,
+      "module": "src/dcm/runtime/capture_authority.py",
+      "unhandledCallSitesForReview": 1
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 14,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 18,
+          "operation": "open"
+        },
+        {
+          "insideTry": false,
+          "line": 22,
+          "operation": "replace"
+        },
+        {
+          "insideTry": true,
+          "line": 26,
+          "operation": "open"
+        },
+        {
+          "insideTry": false,
+          "line": 39,
+          "operation": "read_text"
+        }
+      ],
+      "catches": [
+        {
+          "line": 31,
+          "type": "OSError"
+        },
+        {
+          "line": 71,
+          "type": "Exception"
+        },
+        {
+          "line": 85,
+          "type": "Exception"
+        }
+      ],
+      "functions": 3,
+      "module": "src/dcm/runtime/checkpoint.py",
+      "unhandledCallSitesForReview": 4
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 28,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 62,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 83,
+          "operation": "open"
+        }
+      ],
+      "catches": [
+        {
+          "line": 33,
+          "type": "json.JSONDecodeError"
+        }
+      ],
+      "functions": 4,
+      "module": "src/dcm/runtime/checkpoint_outbox.py",
+      "unhandledCallSitesForReview": 3
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [
+        {
+          "line": 37,
+          "type": "(OSError, RuntimeError)"
+        }
+      ],
+      "functions": 2,
+      "module": "src/dcm/runtime/checkpoint_reconciliation.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": true,
+          "line": 45,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 49,
+          "operation": "replace"
+        }
+      ],
+      "catches": [
+        {
+          "line": 46,
+          "type": "ValueError"
+        }
+      ],
+      "functions": 4,
+      "module": "src/dcm/runtime/cutoff.py",
+      "unhandledCallSitesForReview": 1
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 28,
+      "module": "src/dcm/runtime/dag.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 90,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 94,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 95,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 98,
+          "operation": "open"
+        }
+      ],
+      "catches": [],
+      "functions": 4,
+      "module": "src/dcm/runtime/diagnostics.py",
+      "unhandledCallSitesForReview": 4
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 106,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 108,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 127,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": true,
+          "line": 140,
+          "operation": "read_text"
+        }
+      ],
+      "catches": [
+        {
+          "line": 141,
+          "type": "(OSError, json.JSONDecodeError)"
+        }
+      ],
+      "functions": 10,
+      "module": "src/dcm/runtime/drive_catalog.py",
+      "unhandledCallSitesForReview": 3
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 2,
+      "module": "src/dcm/runtime/freeze.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": true,
+          "line": 138,
+          "operation": "read_bytes"
+        },
+        {
+          "insideTry": true,
+          "line": 218,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": true,
+          "line": 228,
+          "operation": "open"
+        },
+        {
+          "insideTry": false,
+          "line": 245,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 246,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 857,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 882,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 898,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 909,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 918,
+          "operation": "open"
+        },
+        {
+          "insideTry": false,
+          "line": 931,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 992,
+          "operation": "unlink"
+        },
+        {
+          "insideTry": false,
+          "line": 1010,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 1012,
+          "operation": "open"
+        },
+        {
+          "insideTry": false,
+          "line": 1018,
+          "operation": "run"
+        }
+      ],
+      "catches": [
+        {
+          "line": 139,
+          "type": "OSError"
+        },
+        {
+          "line": 150,
+          "type": "(UnicodeDecodeError, json.JSONDecodeError)"
+        },
+        {
+          "line": 159,
+          "type": "UnicodeDecodeError"
+        },
+        {
+          "line": 162,
+          "type": "UnicodeDecodeError"
+        },
+        {
+          "line": 219,
+          "type": "(OSError, json.JSONDecodeError, UnicodeDecodeError)"
+        },
+        {
+          "line": 239,
+          "type": "OSError"
+        },
+        {
+          "line": 235,
+          "type": "json.JSONDecodeError"
+        },
+        {
+          "line": 489,
+          "type": "ValueError"
+        },
+        {
+          "line": 601,
+          "type": "(TypeError, ValueError)"
+        },
+        {
+          "line": 770,
+          "type": "(TypeError, ValueError)"
+        },
+        {
+          "line": 1104,
+          "type": "OSError"
+        },
+        {
+          "line": 1108,
+          "type": "Exception"
+        }
+      ],
+      "functions": 38,
+      "module": "src/dcm/runtime/github_archive.py",
+      "unhandledCallSitesForReview": 12
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 4,
+      "module": "src/dcm/runtime/governor.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 35,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 36,
+          "operation": "read_bytes"
+        },
+        {
+          "insideTry": false,
+          "line": 40,
+          "operation": "read_bytes"
+        },
+        {
+          "insideTry": false,
+          "line": 50,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 71,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 72,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 73,
+          "operation": "write_text"
+        }
+      ],
+      "catches": [
+        {
+          "line": 95,
+          "type": "FileNotFoundError"
+        },
+        {
+          "line": 98,
+          "type": "CutoffRequired"
+        }
+      ],
+      "functions": 3,
+      "module": "src/dcm/runtime/har_run.py",
+      "unhandledCallSitesForReview": 7
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 2,
+      "module": "src/dcm/runtime/host_contract.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 88,
+          "operation": "read_bytes"
+        },
+        {
+          "insideTry": false,
+          "line": 146,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 148,
+          "operation": "write_text"
+        }
+      ],
+      "catches": [
+        {
+          "line": 62,
+          "type": "(UnicodeDecodeError, json.JSONDecodeError)"
+        }
+      ],
+      "functions": 7,
+      "module": "src/dcm/runtime/input_boundary.py",
+      "unhandledCallSitesForReview": 3
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": true,
+          "line": 38,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 47,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 47,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 154,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 182,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 183,
+          "operation": "connect"
+        },
+        {
+          "insideTry": false,
+          "line": 184,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 210,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 227,
+          "operation": "commit"
+        },
+        {
+          "insideTry": false,
+          "line": 231,
+          "operation": "rollback"
+        },
+        {
+          "insideTry": false,
+          "line": 232,
+          "operation": "execute"
+        },
+        {
+          "insideTry": false,
+          "line": 256,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 276,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 277,
+          "operation": "execute"
+        },
+        {
+          "insideTry": true,
+          "line": 289,
+          "operation": "executemany"
+        },
+        {
+          "insideTry": true,
+          "line": 304,
+          "operation": "commit"
+        },
+        {
+          "insideTry": false,
+          "line": 306,
+          "operation": "rollback"
+        },
+        {
+          "insideTry": false,
+          "line": 307,
+          "operation": "execute"
+        },
+        {
+          "insideTry": false,
+          "line": 332,
+          "operation": "execute"
+        },
+        {
+          "insideTry": false,
+          "line": 356,
+          "operation": "execute"
+        },
+        {
+          "insideTry": false,
+          "line": 371,
+          "operation": "commit"
+        }
+      ],
+      "catches": [
+        {
+          "line": 39,
+          "type": "ValueError"
+        },
+        {
+          "line": 228,
+          "type": "sqlite3.IntegrityError"
+        },
+        {
+          "line": 305,
+          "type": "sqlite3.IntegrityError"
+        }
+      ],
+      "functions": 15,
+      "module": "src/dcm/runtime/lineage_integrity.py",
+      "unhandledCallSitesForReview": 14
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 29,
+          "operation": "open"
+        },
+        {
+          "insideTry": false,
+          "line": 57,
+          "operation": "read_bytes"
+        },
+        {
+          "insideTry": false,
+          "line": 72,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 76,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 79,
+          "operation": "write_bytes"
+        },
+        {
+          "insideTry": false,
+          "line": 89,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 102,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 162,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 163,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": true,
+          "line": 175,
+          "operation": "mkdir"
+        }
+      ],
+      "catches": [
+        {
+          "line": 144,
+          "type": "ValueError"
+        },
+        {
+          "line": 177,
+          "type": "(OSError, PermissionError)"
+        }
+      ],
+      "functions": 10,
+      "module": "src/dcm/runtime/mount_v541.py",
+      "unhandledCallSitesForReview": 9
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 2,
+      "module": "src/dcm/runtime/perf.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 2,
+      "module": "src/dcm/runtime/pipeline.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 1,
+      "module": "src/dcm/runtime/readiness.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": true,
+          "line": 88,
+          "operation": "connect"
+        },
+        {
+          "insideTry": true,
+          "line": 93,
+          "operation": "execute"
+        },
+        {
+          "insideTry": false,
+          "line": 388,
+          "operation": "open"
+        }
+      ],
+      "catches": [
+        {
+          "line": 95,
+          "type": "sqlite3.Error"
+        },
+        {
+          "line": 102,
+          "type": "json.JSONDecodeError"
+        },
+        {
+          "line": 340,
+          "type": "(OSError, ValueError, TypeError)"
+        }
+      ],
+      "functions": 17,
+      "module": "src/dcm/runtime/run_director.py",
+      "unhandledCallSitesForReview": 1
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": true,
+          "line": 27,
+          "operation": "replace"
+        }
+      ],
+      "catches": [
+        {
+          "line": 28,
+          "type": "ValueError"
+        },
+        {
+          "line": 78,
+          "type": "(KeyError, ValueError, TypeError)"
+        },
+        {
+          "line": 106,
+          "type": "(KeyError, ValueError, TypeError)"
+        },
+        {
+          "line": 197,
+          "type": "(ValueError, TypeError, KeyError)"
+        },
+        {
+          "line": 221,
+          "type": "(ValueError, TypeError, KeyError)"
+        }
+      ],
+      "functions": 4,
+      "module": "src/dcm/runtime/runner_freeze_bridge.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 24,
+          "operation": "read_bytes"
+        },
+        {
+          "insideTry": false,
+          "line": 36,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": true,
+          "line": 67,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": true,
+          "line": 75,
+          "operation": "read_text"
+        }
+      ],
+      "catches": [
+        {
+          "line": 71,
+          "type": "(OSError, json.JSONDecodeError)"
+        },
+        {
+          "line": 76,
+          "type": "(OSError, json.JSONDecodeError)"
+        }
+      ],
+      "functions": 5,
+      "module": "src/dcm/runtime/schema_root.py",
+      "unhandledCallSitesForReview": 2
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 233,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 235,
+          "operation": "read_bytes"
+        },
+        {
+          "insideTry": false,
+          "line": 240,
+          "operation": "open"
+        },
+        {
+          "insideTry": false,
+          "line": 244,
+          "operation": "replace"
+        },
+        {
+          "insideTry": true,
+          "line": 277,
+          "operation": "read_bytes"
+        },
+        {
+          "insideTry": false,
+          "line": 303,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 304,
+          "operation": "write_text"
+        }
+      ],
+      "catches": [
+        {
+          "line": 278,
+          "type": "OSError"
+        }
+      ],
+      "functions": 12,
+      "module": "src/dcm/runtime/storage_router.py",
+      "unhandledCallSitesForReview": 6
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 36,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 37,
+          "operation": "connect"
+        },
+        {
+          "insideTry": false,
+          "line": 41,
+          "operation": "execute"
+        },
+        {
+          "insideTry": false,
+          "line": 58,
+          "operation": "commit"
+        },
+        {
+          "insideTry": false,
+          "line": 61,
+          "operation": "execute"
+        }
+      ],
+      "catches": [],
+      "functions": 4,
+      "module": "src/dcm/runtime/store.py",
+      "unhandledCallSitesForReview": 5
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 0,
+      "module": "src/dcm/selection/__init__.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": true,
+          "line": 83,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 87,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 118,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 340,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 341,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 342,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 343,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 346,
+          "operation": "write_text"
+        }
+      ],
+      "catches": [
+        {
+          "line": 84,
+          "type": "ValueError"
+        }
+      ],
+      "functions": 17,
+      "module": "src/dcm/selection/card_layers.py",
+      "unhandledCallSitesForReview": 7
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [
+        {
+          "line": 33,
+          "type": "(TypeError, ValueError)"
+        },
+        {
+          "line": 76,
+          "type": "(TypeError, ValueError)"
+        }
+      ],
+      "functions": 6,
+      "module": "src/dcm/selection/decision_integrity.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 4,
+      "module": "src/dcm/selection/eligibility.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [
+        {
+          "line": 76,
+          "type": "ImportError"
+        }
+      ],
+      "functions": 6,
+      "module": "src/dcm/selection/portfolio.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [
+        {
+          "line": 19,
+          "type": "(TypeError, ValueError)"
+        },
+        {
+          "line": 104,
+          "type": "(TypeError, ValueError)"
+        }
+      ],
+      "functions": 6,
+      "module": "src/dcm/selection/preselection.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 1,
+      "module": "src/dcm/settle.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 0,
+      "module": "src/dcm/signals/__init__.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 85,
+          "operation": "execute"
+        }
+      ],
+      "catches": [],
+      "functions": 3,
+      "module": "src/dcm/signals/cfb_runtime.py",
+      "unhandledCallSitesForReview": 1
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 5,
+      "module": "src/dcm/signals/compiler.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 8,
+      "module": "src/dcm/signals/contracts.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 40,
+          "operation": "read_text"
+        }
+      ],
+      "catches": [],
+      "functions": 2,
+      "module": "src/dcm/signals/donor_accounting.py",
+      "unhandledCallSitesForReview": 1
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 4,
+      "module": "src/dcm/signals/executor.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 5,
+      "module": "src/dcm/signals/integration_gate.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 2,
+      "module": "src/dcm/signals/overlap.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 8,
+      "module": "src/dcm/signals/registry.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 0,
+      "module": "src/dcm/sports/__init__.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 0,
+      "module": "src/dcm/sports/baseball/__init__.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 2,
+      "module": "src/dcm/sports/baseball/pa.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 0,
+      "module": "src/dcm/sports/basketball/__init__.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 5,
+      "module": "src/dcm/sports/basketball/minimal.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 0,
+      "module": "src/dcm/sports/common/__init__.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 49,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 49,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 57,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 57,
+          "operation": "replace"
+        }
+      ],
+      "catches": [],
+      "functions": 5,
+      "module": "src/dcm/sports/common/catalog.py",
+      "unhandledCallSitesForReview": 4
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [
+        {
+          "line": 74,
+          "type": "Exception"
+        }
+      ],
+      "functions": 12,
+      "module": "src/dcm/sports/common/contract.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 4,
+      "module": "src/dcm/sports/common/plugin.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 7,
+      "module": "src/dcm/sports/common/research_schema.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 0,
+      "module": "src/dcm/sports/football/__init__.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 2,
+      "module": "src/dcm/sports/football/appearance.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [
+        {
+          "line": 34,
+          "type": "(TypeError, ValueError)"
+        }
+      ],
+      "functions": 4,
+      "module": "src/dcm/sports/football/cfb_role.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 6,
+      "module": "src/dcm/sports/football/conservation.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 2,
+      "module": "src/dcm/sports/football/efficiency.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 5,
+      "module": "src/dcm/sports/football/ledger.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 5,
+      "module": "src/dcm/sports/football/opportunity.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 39,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 39,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 39,
+          "operation": "replace"
+        }
+      ],
+      "catches": [
+        {
+          "line": 28,
+          "type": "ValueError"
+        }
+      ],
+      "functions": 5,
+      "module": "src/dcm/sports/football/projection.py",
+      "unhandledCallSitesForReview": 3
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 5,
+      "module": "src/dcm/sports/football/registry.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 4,
+      "module": "src/dcm/sports/football/research_requirements.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 93,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 93,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 93,
+          "operation": "replace"
+        },
+        {
+          "insideTry": false,
+          "line": 96,
+          "operation": "replace"
+        }
+      ],
+      "catches": [],
+      "functions": 3,
+      "module": "src/dcm/sports/football/settlement_map.py",
+      "unhandledCallSitesForReview": 4
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [],
+      "functions": 0,
+      "module": "src/dcm/validation/__init__.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [],
+      "catches": [
+        {
+          "line": 164,
+          "type": "ConservationError"
+        }
+      ],
+      "functions": 2,
+      "module": "src/dcm/validation/conservation_harness.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": true,
+          "line": 228,
+          "operation": "replace"
+        },
+        {
+          "insideTry": true,
+          "line": 229,
+          "operation": "replace"
+        }
+      ],
+      "catches": [
+        {
+          "line": 41,
+          "type": "(TypeError, ValueError)"
+        },
+        {
+          "line": 231,
+          "type": "ValueError"
+        }
+      ],
+      "functions": 11,
+      "module": "src/dcm/validation/predictive_acceptance.py",
+      "unhandledCallSitesForReview": 0
+    },
+    {
+      "boundaryCalls": [
+        {
+          "insideTry": false,
+          "line": 56,
+          "operation": "read_text"
+        }
+      ],
+      "catches": [
+        {
+          "line": 38,
+          "type": "OSError"
+        },
+        {
+          "line": 67,
+          "type": "FileNotFoundError"
+        }
+      ],
+      "functions": 6,
+      "module": "src/dcm/version.py",
+      "unhandledCallSitesForReview": 1
+    }
+  ],
+  "schema": "pillars_dcm.failure_boundary_static_inventory.v1",
+  "summary": {
+    "boundaryCallSites": 703,
+    "broadCatchSites": 32,
+    "callsOutsideLocalTry": 528,
+    "catchSites": 326,
+    "functions": 1931,
+    "modules": 272
+  }
+}

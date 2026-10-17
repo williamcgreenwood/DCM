@@ -333,7 +333,9 @@ def compose_ingests(ingests: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
-def compose_ingest_stream(ingests: Iterable[dict[str, Any]]) -> dict[str, Any]:
+def compose_ingest_stream(
+    ingests: Iterable[dict[str, Any]], *, compact_timeline: bool = False,
+) -> dict[str, Any]:
     """Compose already chronologically ordered ingests without retaining inputs.
 
     ``run_dcm`` can receive a large multi-HAR drop.  Materializing every
@@ -342,6 +344,11 @@ def compose_ingest_stream(ingests: Iterable[dict[str, Any]]) -> dict[str, Any]:
     This variant consumes one parsed ingest at a time while retaining only the
     reconciled board state, immutable scope attempts, redacted structural
     receipts, and one deduplicated canonical Insights claim per snapshot.
+
+    With ``compact_timeline`` the timeline contains only board changes. Scope
+    attempts and row history remain complete, so an as-of replay still has
+    every snapshot. This avoids one retained-row transition per capture for
+    large, complementary HAR drops.
 
     The caller must order the stream by the same ``captureEnd`` then
     ``harSha256`` key used by :func:`compose_ingests`.
@@ -358,6 +365,9 @@ def compose_ingest_stream(ingests: Iterable[dict[str, Any]]) -> dict[str, Any]:
 
     cumulative: list[dict[str, Any]] = []
     previous: dict[str, dict[str, Any]] = {}
+    selected_scopes: dict[str, dict[str, Any]] = {}
+    scope_rows: dict[str, dict[str, dict[str, Any]]] = {}
+    candidates: dict[str, dict[str, dict[str, Any]]] = {}
     lifecycle: list[dict[str, Any]] = []
     merged_history: dict[str, list[dict[str, Any]]] = {}
     source_hashes: list[str] = []
@@ -396,10 +406,46 @@ def compose_ingest_stream(ingests: Iterable[dict[str, Any]]) -> dict[str, Any]:
                 dict(item) for item in history if isinstance(item, dict)
             )
 
-        current_result = reconcile_scope_attempts(cumulative)
-        current = {
-            str(row["projectionId"]): row for row in current_result["rows"]
-        }
+        if compact_timeline:
+            # Only a newer successful response changes a scope. A failed
+            # refresh leaves its last success intact. Preserve all attempts
+            # for the final as-of reconciliation and its exact hash.
+            impacted: set[str] = set()
+            for attempt in sorted(capture_attempts, key=_attempt_key):
+                scope = str(attempt.get("requestScope") or "")
+                if not scope or str(attempt.get("state") or "") not in SUCCESS_STATES:
+                    continue
+                old = selected_scopes.get(scope)
+                if old is not None and _attempt_key(attempt) < _attempt_key(old):
+                    continue
+                old_rows = scope_rows.get(scope, {})
+                new_rows: dict[str, dict[str, Any]] = {}
+                for value in attempt.get("rows") or []:
+                    row = {**value, "requestScope": scope}
+                    pid = str(row.get("projectionId") or "")
+                    if pid and (pid not in new_rows or _row_key(row) > _row_key(new_rows[pid])):
+                        new_rows[pid] = row
+                for pid in old_rows:
+                    candidates[pid].pop(scope, None)
+                    impacted.add(pid)
+                for pid, row in new_rows.items():
+                    candidates.setdefault(pid, {})[scope] = row
+                    impacted.add(pid)
+                selected_scopes[scope] = attempt
+                scope_rows[scope] = new_rows
+            current = previous.copy()
+            for pid in impacted:
+                competing = candidates.get(pid) or {}
+                if competing:
+                    current[pid] = max(competing.values(), key=_row_key)
+                else:
+                    current.pop(pid, None)
+                    candidates.pop(pid, None)
+        else:
+            current_result = reconcile_scope_attempts(cumulative)
+            current = {
+                str(row["projectionId"]): row for row in current_result["rows"]
+            }
         successful_scopes = {
             str(attempt.get("requestScope"))
             for attempt in capture_attempts
@@ -410,7 +456,7 @@ def compose_ingest_stream(ingests: Iterable[dict[str, Any]]) -> dict[str, Any]:
             for attempt in capture_attempts
             if str(attempt.get("state")) in FAILURE_STATES
         }
-        for projection_id in sorted(set(previous) | set(current)):
+        for projection_id in sorted(impacted if compact_timeline else set(previous) | set(current)):
             old, new = previous.get(projection_id), current.get(projection_id)
             if old is None and new is not None:
                 states = ["ADDED"]
@@ -423,6 +469,8 @@ def compose_ingest_stream(ingests: Iterable[dict[str, Any]]) -> dict[str, Any]:
             elif old is not None and new is not None:
                 scope = str(new.get("requestScope") or old.get("requestScope") or "")
                 if _row_key(old) == _row_key(new):
+                    if compact_timeline:
+                        continue
                     if scope in failed_scopes and scope not in successful_scopes:
                         states = ["FAILED_REFRESH_PRIOR_RETAINED"]
                     elif scope not in successful_scopes:
@@ -462,6 +510,8 @@ def compose_ingest_stream(ingests: Iterable[dict[str, Any]]) -> dict[str, Any]:
                 evidence_payloads.append({**dict(payload), "sourceHarSha256": source_hash})
 
     final = reconcile_scope_attempts(cumulative)
+    if compact_timeline and previous != {str(row["projectionId"]): row for row in final["rows"]}:
+        raise RuntimeError("COMPOSITE_INCREMENTAL_RECONCILIATION_MISMATCH")
     insight_claims = [insight_by_key[key] for key in sorted(insight_by_key)]
     insight_accounting = {
         "schema": "pillars_dcm.outlier_insight_composite_accounting.v1",
@@ -508,6 +558,7 @@ def compose_ingest_stream(ingests: Iterable[dict[str, Any]]) -> dict[str, Any]:
             "insights_pagination_incomplete": sum(
                 1 for claim in insight_claims if not bool(claim.get("paginationComplete"))
             ),
+            "timeline_transition_count": len(lifecycle),
         }
     )
     composite_id = content_hash(
@@ -526,6 +577,7 @@ def compose_ingest_stream(ingests: Iterable[dict[str, Any]]) -> dict[str, Any]:
         "failedRefreshes": final["failedRefreshes"],
         "reconciliationHash": final["reconciliationHash"],
         "timeline": lifecycle,
+        "timelineMode": "BOARD_CHANGES_ONLY" if compact_timeline else "FULL_CAPTURE_STATES",
         "redactedSecrets": redacted_secrets,
         "warnings": sorted(warnings),
         "evidencePayloads": evidence_payloads,

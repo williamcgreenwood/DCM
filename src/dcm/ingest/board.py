@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -182,6 +183,7 @@ def freeze_board(
         "indexStats": ingest.get("indexStats") or {},
         "warnings": ingest.get("warnings") or [],
         "timeline": ingest.get("timeline") or [],
+        "timelineMode": ingest.get("timelineMode") or "FULL_CAPTURE_STATES",
         "rows": rows,
         "unresolvedRows": [
             r["projectionId"] for r in rows
@@ -196,6 +198,16 @@ def freeze_board(
 
 
 def write_board(board: dict[str, Any], dest: Path) -> Path:
+    """Stream a hash-bound board to an atomic file without a giant JSON string."""
     dest.parent.mkdir(parents=True, exist_ok=True)
-    dest.write_text(json.dumps(board, indent=2, ensure_ascii=True, sort_keys=True) + "\n", encoding="utf-8")
+    temp = dest.with_name(f".{dest.name}.{os.getpid()}.tmp")
+    try:
+        with temp.open("w", encoding="utf-8") as handle:
+            json.dump(board, handle, indent=2, ensure_ascii=True, sort_keys=True)
+            handle.write("\n")
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temp, dest)
+    finally:
+        temp.unlink(missing_ok=True)
     return dest
