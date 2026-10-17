@@ -143,3 +143,9 @@ def test_account_only_emits_canonical_and_legacy_research_artifacts(tmp_path: Pa
     assert sport_contracts["schema"] == "pillars_dcm.sport_plugin_contract_registry.v1"
     assert sport_contracts["genericFallbackAllowed"] is False
     assert sport_contracts["productionCompleteSports"] == []
+    freeze = json.loads((dest / "freeze.json").read_text())
+    checkpoint = json.loads((dest / "checkpoint.json").read_text())
+    assert freeze["executionMode"] == "ACCOUNT_ONLY_NO_FORECAST"
+    assert freeze["forecastExecuted"] is False
+    assert "FEATURE_STORE" in checkpoint["completedStages"]
+    assert checkpoint["notRunStages"] == ["FORECAST", "RANKING", "SETTLEMENT"]

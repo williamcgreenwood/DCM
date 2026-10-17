@@ -76,6 +76,20 @@ def test_graphs_exist_before_research_and_use_constitution_primitives():
     assert any(int(a.get("dependentOfferCount") or 0) > 1 for a in actions["actions"])
 
 
+def test_unbound_parent_does_not_depend_on_every_offer():
+    rows = _rows()[:1]
+    offer_id = str(rows[0]["projectionId"])
+    graph = build_requirement_graph(rows, [
+        {"request_id": "unbound", "scope": "SUBJECT", "scope_id": "missing-player"},
+        {"request_id": "offer", "scope": "OFFER", "scope_id": offer_id,
+         "eventId": rows[0]["eventId"]},
+    ])
+    assert not any(
+        edge["from"] == "Requirement:unbound" and edge["to"] == "Requirement:offer"
+        for edge in graph["edges"]
+    )
+
+
 def test_modelable_is_not_playable_and_per_prop_flags(tmp_path: Path):
     raw = json.loads(FIXTURE.read_text(encoding="utf-8"))
     rows = ingest_har(raw)["rows"]

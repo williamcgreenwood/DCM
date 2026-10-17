@@ -376,7 +376,7 @@
         },
         {
           "insideTry": true,
-          "line": 270,
+          "line": 274,
           "operation": "read_text"
         }
       ],
@@ -386,7 +386,7 @@
           "type": "(OSError, json.JSONDecodeError)"
         },
         {
-          "line": 272,
+          "line": 276,
           "type": "(OSError, json.JSONDecodeError)"
         }
       ],
@@ -753,67 +753,72 @@
         },
         {
           "insideTry": true,
-          "line": 94,
+          "line": 92,
+          "operation": "open"
+        },
+        {
+          "insideTry": true,
+          "line": 110,
           "operation": "read_text"
         },
         {
           "insideTry": true,
-          "line": 95,
+          "line": 111,
           "operation": "read_text"
         },
         {
           "insideTry": false,
-          "line": 129,
+          "line": 145,
           "operation": "mkdir"
         },
         {
           "insideTry": false,
-          "line": 136,
+          "line": 152,
           "operation": "unlink"
-        },
-        {
-          "insideTry": false,
-          "line": 138,
-          "operation": "unlink"
-        },
-        {
-          "insideTry": false,
-          "line": 147,
-          "operation": "mkdir"
-        },
-        {
-          "insideTry": false,
-          "line": 151,
-          "operation": "open"
-        },
-        {
-          "insideTry": false,
-          "line": 151,
-          "operation": "open"
         },
         {
           "insideTry": false,
           "line": 154,
+          "operation": "unlink"
+        },
+        {
+          "insideTry": false,
+          "line": 163,
+          "operation": "mkdir"
+        },
+        {
+          "insideTry": false,
+          "line": 167,
+          "operation": "open"
+        },
+        {
+          "insideTry": false,
+          "line": 167,
+          "operation": "open"
+        },
+        {
+          "insideTry": false,
+          "line": 170,
           "operation": "Popen"
         },
         {
           "insideTry": false,
-          "line": 186,
+          "line": 202,
           "operation": "read_text"
         },
         {
           "insideTry": false,
-          "line": 187,
+          "line": 203,
           "operation": "unlink"
         },
         {
           "insideTry": false,
-          "line": 188,
+          "line": 204,
           "operation": "unlink"
         },
         {
           "insideTry": true,
-          "line": 192,
+          "line": 208,
           "operation": "read_text"
         }
       ],
@@ -844,22 +849,26 @@
         },
         {
           "line": 96,
-          "type": "(OSError, json.JSONDecodeError)"
-        },
-        {
-          "line": 181,
-          "type": "KeyboardInterrupt"
-        },
-        {
-          "line": 162,
           "type": "OSError"
         },
         {
-          "line": 193,
+          "line": 112,
+          "type": "(OSError, json.JSONDecodeError)"
+        },
+        {
+          "line": 197,
+          "type": "KeyboardInterrupt"
+        },
+        {
+          "line": 178,
+          "type": "OSError"
+        },
+        {
+          "line": 209,
           "type": "(OSError, json.JSONDecodeError)"
         }
       ],
-      "functions": 8,
+      "functions": 9,
       "module": "src/dcm/chat/run_guard.py",
       "unhandledCallSitesForReview": 13
     },
@@ -1270,7 +1279,7 @@
     {
       "boundaryCalls": [],
       "catches": [],
-      "functions": 6,
+      "functions": 8,
       "module": "src/dcm/contracts/hashes.py",
       "unhandledCallSitesForReview": 0
     },
@@ -3365,13 +3374,23 @@
       "boundaryCalls": [
         {
           "insideTry": false,
-          "line": 28,
+          "line": 29,
           "operation": "mkdir"
         },
         {
+          "insideTry": true,
+          "line": 32,
+          "operation": "open"
+        },
+        {
+          "insideTry": true,
+          "line": 37,
+          "operation": "replace"
+        },
+        {
           "insideTry": false,
-          "line": 29,
-          "operation": "write_text"
+          "line": 39,
+          "operation": "unlink"
         }
       ],
       "catches": [],
@@ -3866,34 +3885,39 @@
       "boundaryCalls": [
         {
           "insideTry": false,
-          "line": 372,
+          "line": 408,
           "operation": "mkdir"
         },
         {
-          "insideTry": false,
-          "line": 378,
-          "operation": "write_text"
+          "insideTry": true,
+          "line": 415,
+          "operation": "open"
+        },
+        {
+          "insideTry": true,
+          "line": 420,
+          "operation": "replace"
         },
         {
           "insideTry": false,
-          "line": 379,
-          "operation": "write_text"
+          "line": 422,
+          "operation": "unlink"
         },
         {
           "insideTry": false,
-          "line": 380,
+          "line": 431,
           "operation": "write_text"
         }
       ],
       "catches": [
         {
-          "line": 330,
+          "line": 367,
           "type": "Exception"
         }
       ],
-      "functions": 8,
+      "functions": 9,
       "module": "src/dcm/research/os_graphs.py",
-      "unhandledCallSitesForReview": 4
+      "unhandledCallSitesForReview": 3
     },
     {
       "boundaryCalls": [],
@@ -5024,52 +5048,47 @@
         },
         {
           "insideTry": false,
-          "line": 837,
-          "operation": "write_text"
-        },
-        {
-          "insideTry": false,
-          "line": 838,
-          "operation": "write_text"
-        },
-        {
-          "insideTry": false,
           "line": 839,
           "operation": "write_text"
         },
         {
           "insideTry": false,
-          "line": 839,
+          "line": 840,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 841,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 841,
           "operation": "read_text"
         },
         {
           "insideTry": false,
-          "line": 847,
+          "line": 849,
           "operation": "write_text"
         },
         {
           "insideTry": false,
-          "line": 869,
+          "line": 872,
           "operation": "write_text"
         },
         {
           "insideTry": false,
-          "line": 881,
+          "line": 884,
           "operation": "write_text"
         },
         {
           "insideTry": false,
-          "line": 904,
+          "line": 907,
           "operation": "mkdir"
         },
         {
           "insideTry": false,
-          "line": 905,
-          "operation": "write_text"
-        },
-        {
-          "insideTry": false,
-          "line": 909,
+          "line": 908,
           "operation": "write_text"
         },
         {
@@ -5079,248 +5098,213 @@
         },
         {
           "insideTry": false,
-          "line": 916,
+          "line": 915,
           "operation": "write_text"
         },
         {
           "insideTry": false,
-          "line": 942,
+          "line": 919,
           "operation": "write_text"
         },
         {
           "insideTry": false,
-          "line": 996,
+          "line": 939,
           "operation": "write_text"
         },
         {
           "insideTry": false,
-          "line": 1020,
+          "line": 945,
           "operation": "write_text"
         },
         {
           "insideTry": false,
-          "line": 1079,
+          "line": 997,
           "operation": "write_text"
         },
         {
           "insideTry": false,
-          "line": 1083,
+          "line": 1056,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 1080,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 1139,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 1143,
           "operation": "mkdir"
         },
         {
           "insideTry": false,
-          "line": 1084,
+          "line": 1144,
           "operation": "write_text"
         },
         {
           "insideTry": false,
-          "line": 1093,
+          "line": 1153,
           "operation": "write_text"
         },
         {
           "insideTry": false,
-          "line": 1094,
+          "line": 1154,
           "operation": "write_text"
         },
         {
           "insideTry": false,
-          "line": 1098,
+          "line": 1158,
           "operation": "write_text"
         },
         {
           "insideTry": false,
-          "line": 1119,
+          "line": 1179,
           "operation": "write_text"
         },
         {
           "insideTry": false,
-          "line": 1185,
+          "line": 1245,
           "operation": "write_text"
         },
         {
           "insideTry": false,
-          "line": 1200,
+          "line": 1260,
           "operation": "write_text"
         },
         {
           "insideTry": false,
-          "line": 1658,
+          "line": 1718,
           "operation": "mkdir"
         },
         {
           "insideTry": false,
-          "line": 1659,
+          "line": 1719,
           "operation": "write_text"
         },
         {
           "insideTry": false,
-          "line": 1669,
+          "line": 1729,
           "operation": "write_text"
         },
         {
           "insideTry": false,
-          "line": 1672,
+          "line": 1732,
           "operation": "write_text"
         },
         {
           "insideTry": false,
-          "line": 1678,
+          "line": 1738,
           "operation": "write_text"
         },
         {
           "insideTry": false,
-          "line": 1698,
+          "line": 1758,
           "operation": "write_text"
         },
         {
           "insideTry": false,
-          "line": 1701,
+          "line": 1761,
           "operation": "write_text"
         },
         {
           "insideTry": false,
-          "line": 1704,
+          "line": 1764,
           "operation": "write_text"
         },
         {
           "insideTry": false,
-          "line": 1724,
+          "line": 1784,
           "operation": "write_text"
         },
         {
           "insideTry": false,
-          "line": 1727,
+          "line": 1787,
           "operation": "write_text"
         },
         {
           "insideTry": false,
-          "line": 1866,
+          "line": 1926,
           "operation": "write_text"
         },
         {
           "insideTry": false,
-          "line": 1867,
+          "line": 1927,
           "operation": "write_text"
         },
         {
           "insideTry": false,
-          "line": 1898,
-          "operation": "write_text"
-        },
-        {
-          "insideTry": true,
-          "line": 1907,
-          "operation": "read_text"
-        },
-        {
-          "insideTry": true,
-          "line": 1908,
-          "operation": "read_text"
-        },
-        {
-          "insideTry": false,
-          "line": 2028,
-          "operation": "write_text"
-        },
-        {
-          "insideTry": false,
-          "line": 2029,
-          "operation": "write_text"
-        },
-        {
-          "insideTry": false,
-          "line": 2030,
-          "operation": "write_text"
-        },
-        {
-          "insideTry": false,
-          "line": 2031,
+          "line": 1958,
           "operation": "write_text"
         },
         {
           "insideTry": true,
-          "line": 2040,
+          "line": 1967,
           "operation": "read_text"
         },
         {
           "insideTry": true,
-          "line": 2047,
+          "line": 1968,
           "operation": "read_text"
         },
         {
           "insideTry": false,
-          "line": 2054,
+          "line": 2088,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 2089,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 2090,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 2091,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": true,
+          "line": 2100,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": true,
+          "line": 2107,
           "operation": "read_text"
         },
         {
           "insideTry": false,
-          "line": 2093,
+          "line": 2114,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 2153,
           "operation": "write_text"
         },
         {
           "insideTry": false,
-          "line": 2268,
+          "line": 2328,
           "operation": "write_text"
         },
         {
           "insideTry": false,
-          "line": 2396,
+          "line": 2456,
           "operation": "unlink"
-        },
-        {
-          "insideTry": false,
-          "line": 2400,
-          "operation": "unlink"
-        },
-        {
-          "insideTry": false,
-          "line": 2440,
-          "operation": "write_text"
-        },
-        {
-          "insideTry": false,
-          "line": 2445,
-          "operation": "write_text"
-        },
-        {
-          "insideTry": false,
-          "line": 2446,
-          "operation": "write_text"
-        },
-        {
-          "insideTry": false,
-          "line": 2448,
-          "operation": "write_text"
-        },
-        {
-          "insideTry": false,
-          "line": 2458,
-          "operation": "write_text"
         },
         {
           "insideTry": false,
           "line": 2460,
-          "operation": "write_text"
-        },
-        {
-          "insideTry": false,
-          "line": 2461,
-          "operation": "write_text"
-        },
-        {
-          "insideTry": false,
-          "line": 2462,
-          "operation": "write_text"
-        },
-        {
-          "insideTry": false,
-          "line": 2486,
-          "operation": "write_text"
-        },
-        {
-          "insideTry": false,
-          "line": 2490,
-          "operation": "read_text"
+          "operation": "unlink"
         },
         {
           "insideTry": false,
@@ -5329,12 +5313,62 @@
         },
         {
           "insideTry": false,
-          "line": 2535,
+          "line": 2505,
           "operation": "write_text"
         },
         {
           "insideTry": false,
-          "line": 2565,
+          "line": 2506,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 2508,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 2518,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 2520,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 2521,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 2522,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 2546,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 2550,
+          "operation": "read_text"
+        },
+        {
+          "insideTry": false,
+          "line": 2560,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 2595,
+          "operation": "write_text"
+        },
+        {
+          "insideTry": false,
+          "line": 2625,
           "operation": "write_text"
         }
       ],
@@ -5396,69 +5430,69 @@
           "type": "(OSError, json.JSONDecodeError)"
         },
         {
-          "line": 1076,
+          "line": 1136,
           "type": "(OSError, TypeError, ValueError, KeyError, json.JSONDecodeError)"
         },
         {
-          "line": 1319,
+          "line": 1379,
           "type": "(RuntimeError, ValueError, TypeError)"
         },
         {
-          "line": 1400,
+          "line": 1460,
           "type": "QuarterPluginIncomplete"
         },
         {
-          "line": 1403,
+          "line": 1463,
           "type": "UnknownMarketError"
         },
         {
-          "line": 1406,
+          "line": 1466,
           "type": "KeyError"
         },
         {
-          "line": 1409,
+          "line": 1469,
           "type": "RuntimeError"
         },
         {
-          "line": 1548,
+          "line": 1608,
           "type": "(TypeError, ValueError)"
         },
         {
-          "line": 1923,
+          "line": 1983,
           "type": "(OSError, json.JSONDecodeError, TypeError, ValueError)"
         },
         {
-          "line": 2041,
+          "line": 2101,
           "type": "(OSError, json.JSONDecodeError)"
         },
         {
-          "line": 2048,
+          "line": 2108,
           "type": "(OSError, json.JSONDecodeError)"
         },
         {
-          "line": 2060,
+          "line": 2120,
           "type": "json.JSONDecodeError"
         },
         {
-          "line": 2362,
+          "line": 2422,
           "type": "LineageHalt"
         },
         {
-          "line": 2665,
+          "line": 2725,
           "type": "ExactVersionMismatch"
         },
         {
-          "line": 2696,
+          "line": 2756,
           "type": "FileNotFoundError"
         },
         {
-          "line": 2699,
+          "line": 2759,
           "type": "(CutoffRequired, ExactVersionMismatch)"
         }
       ],
       "functions": 13,
       "module": "src/dcm/runner.py",
-      "unhandledCallSitesForReview": 99
+      "unhandledCallSitesForReview": 101
     },
     {
       "boundaryCalls": [],
@@ -6913,11 +6947,11 @@
   ],
   "schema": "pillars_dcm.failure_boundary_static_inventory.v1",
   "summary": {
-    "boundaryCallSites": 697,
+    "boundaryCallSites": 703,
     "broadCatchSites": 32,
-    "callsOutsideLocalTry": 527,
-    "catchSites": 325,
-    "functions": 1927,
+    "callsOutsideLocalTry": 528,
+    "catchSites": 326,
+    "functions": 1931,
     "modules": 272
   }
 }

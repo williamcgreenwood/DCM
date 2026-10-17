@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 from typing import Any
 
@@ -26,7 +27,16 @@ from dcm.sports.common.contract import contract_registry_document
 
 def _write(path: Path, payload: dict[str, Any]) -> dict[str, Any]:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, indent=2, sort_keys=True, ensure_ascii=True) + "\n", encoding="utf-8")
+    temp = path.with_name(f".{path.name}.{os.getpid()}.tmp")
+    try:
+        with temp.open("w", encoding="utf-8") as handle:
+            json.dump(payload, handle, indent=2, sort_keys=True, ensure_ascii=True)
+            handle.write("\n")
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temp, path)
+    finally:
+        temp.unlink(missing_ok=True)
     return payload
 
 

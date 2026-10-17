@@ -3,9 +3,9 @@
 Generated from Python AST. This is an executable-surface inventory, not a completion claim.
 
 - Modules: **276**
-- Symbols: **2116**
+- Symbols: **2120**
 - Parse errors: **0**
-- Inventory hash: `0cef53983e769a16881640b5455eeb65b16469ba7cb6dab691a4766448d2535a`
+- Inventory hash: `9985d0d4963a5688025718ec8f30fb23ec4f02ba1bbadf75c290f21f12c2aec4`
 
 | Workstream | Module | Classes | Functions/methods |
 |---|---|---:|---:|
@@ -59,7 +59,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P7 | `src/dcm/chat/insight_closure.py` | 0 | 12 |
 | P7 | `src/dcm/chat/report.py` | 0 | 1 |
 | P7 | `src/dcm/chat/research_bridge.py` | 0 | 7 |
-| P7 | `src/dcm/chat/run_guard.py` | 0 | 8 |
+| P7 | `src/dcm/chat/run_guard.py` | 0 | 9 |
 | P7 | `src/dcm/chat/session.py` | 1 | 34 |
 | P7 | `src/dcm/chat/slate.py` | 0 | 19 |
 | P7 | `src/dcm/chat/slate_autonomous.py` | 0 | 21 |
@@ -68,7 +68,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P0 | `src/dcm/contracts/__init__.py` | 0 | 0 |
 | P0 | `src/dcm/contracts/codes.py` | 1 | 0 |
 | P0 | `src/dcm/contracts/failure_codes.py` | 0 | 0 |
-| P0 | `src/dcm/contracts/hashes.py` | 1 | 6 |
+| P0 | `src/dcm/contracts/hashes.py` | 1 | 8 |
 | P0 | `src/dcm/contracts/immutables.py` | 1 | 8 |
 | P0 | `src/dcm/contracts/phase_bc.py` | 0 | 0 |
 | P0 | `src/dcm/contracts/schemas.py` | 25 | 16 |
@@ -187,7 +187,7 @@ Generated from Python AST. This is an executable-surface inventory, not a comple
 | P1 | `src/dcm/research/observation_typed.py` | 0 | 7 |
 | P1 | `src/dcm/research/offer_metadata.py` | 0 | 1 |
 | P1 | `src/dcm/research/offer_revalidation.py` | 1 | 10 |
-| P1 | `src/dcm/research/os_graphs.py` | 0 | 8 |
+| P1 | `src/dcm/research/os_graphs.py` | 0 | 9 |
 | P1 | `src/dcm/research/player_offer_set.py` | 1 | 6 |
 | P1 | `src/dcm/research/player_packet.py` | 0 | 13 |
 | P1 | `src/dcm/research/population.py` | 0 | 5 |
@@ -685,9 +685,9 @@ _No class/function symbols._
 - `function` **_frontier_fingerprint** L65
 - `function` **_load_json** L69
 - `function` **prepare_cfb_research_os** L79 — Emit graphs, indexes, and live AcquisitionActions BEFORE web acquisition.
-- `function` **attach_cfb_prop_flags** L438
-- `function` **emit_cfb_forecast_artifacts** L447
-- `function` **persist_algorithm_telemetry** L640
+- `function` **attach_cfb_prop_flags** L442
+- `function` **emit_cfb_forecast_artifacts** L451
+- `function` **persist_algorithm_telemetry** L644
 
 ### `src/dcm/cfb/markets.py`
 
@@ -842,8 +842,9 @@ _No class/function symbols._
 - `function` **_rss_bytes** L55
 - `function` **_cgroup_usage** L65
 - `function` **_terminate** L74
-- `function` **_terminal_receipts_valid** L89
-- `function` **supervise_slate** L116 — Return the child's status; persist a terminal receipt even after SIGKILL.
+- `function` **_child_error_code** L89 — Classify bounded private stderr without copying it into a receipt.
+- `function` **_terminal_receipts_valid** L105
+- `function` **supervise_slate** L132 — Return the child's status; persist a terminal receipt even after SIGKILL.
 
 ### `src/dcm/chat/session.py`
 
@@ -980,10 +981,12 @@ _No class/function symbols._
 - `function` **_normalize** L26
 - `function` **canonical_json** L47
 - `function` **content_hash** L51
-- `function` **require_lineage** L55 — Raise if any stage before `through` is missing or if a later stage is set without earlier ones.
-- `class` **LineageError** L69
-- `method` **LineageError.__init__** L70
-- `function` **bind_source_hashes** L75
+- `function` **content_hash_streamed** L55 — Hash canonical JSON without cloning the whole object or JSON string.
+- `method` **content_hash_streamed.tokens** L64
+- `function` **require_lineage** L118 — Raise if any stage before `through` is missing or if a later stage is set without earlier ones.
+- `class` **LineageError** L132
+- `method` **LineageError.__init__** L133
+- `function` **bind_source_hashes** L138
 
 ### `src/dcm/contracts/immutables.py`
 
@@ -1949,11 +1952,11 @@ _No class/function symbols._
 
 ### `src/dcm/research/emit.py`
 
-- `function` **_write** L27
-- `function` **_merge_verified_insight_events** L33 — Add safe same-HAR event context without treating it as external evidence.
-- `function` **emit_offer_sets_and_manifest** L63
-- `function` **emit_packets_and_graph** L120
-- `function` **emit_player_centric_research** L247 — Backward-compatible entrypoint; universal artifacts are emitted first.
+- `function` **_write** L28
+- `function` **_merge_verified_insight_events** L43 — Add safe same-HAR event context without treating it as external evidence.
+- `function` **emit_offer_sets_and_manifest** L73
+- `function` **emit_packets_and_graph** L130
+- `function` **emit_player_centric_research** L257 — Backward-compatible entrypoint; universal artifacts are emitted first.
 
 ### `src/dcm/research/entity_graph.py`
 
@@ -2256,14 +2259,15 @@ _No class/function symbols._
 
 ### `src/dcm/research/os_graphs.py`
 
-- `function` **_is_cfb** L35
-- `function` **_offer_id** L39
-- `function` **_attach_dependents** L43 — Fill dependent_offer_ids via exact composite-key grouping. No per-prop scans later.
-- `function` **build_board_graph** L105
-- `method` **build_board_graph.add_node** L117
-- `function` **build_market_demand_graph** L195
-- `function` **build_requirement_graph** L253
-- `function` **persist_research_os_graphs** L360
+- `function` **_is_cfb** L39
+- `function` **_offer_id** L43
+- `function` **_attach_dependents** L47 — Fill dependent_offer_ids via exact composite-key grouping. No per-prop scans later.
+- `function` **build_board_graph** L109
+- `method` **build_board_graph.add_node** L121
+- `function` **build_market_demand_graph** L200
+- `function` **build_requirement_graph** L259
+- `function` **persist_research_os_graphs** L398
+- `method` **persist_research_os_graphs.persist** L411
 
 ### `src/dcm/research/player_offer_set.py`
 
@@ -2603,10 +2607,10 @@ _No class/function symbols._
 - `function` **_active_calibration** L291
 - `function` **run_dcm** L366
 - `method` **run_dcm._ingest_stream** L499
-- `method` **run_dcm._snapshot_for** L1254
-- `method` **run_dcm._resimulate_material** L1752
-- `method` **run_dcm.slim** L1975
-- `function` **main** L2620
+- `method` **run_dcm._snapshot_for** L1314
+- `method` **run_dcm._resimulate_material** L1812
+- `method` **run_dcm.slim** L2035
+- `function` **main** L2680
 
 ### `src/dcm/runtime/__init__.py`
 

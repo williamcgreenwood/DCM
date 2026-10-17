@@ -824,6 +824,8 @@ def run_dcm(
         counts = dict(terminal["counts"])
         acc = dict(board.get("accounting") or {})
         acc["classified"] = counts
+        acc["classificationSemantics"] = "PREMODEL_ELIGIBILITY"
+        acc["forecastExecuted"] = False
         acc["goblins_excluded_from_selection"] = counts.get("EXCLUDED_GOBLIN", 0)
         acc["permanently_excluded_subjects"] = sum(
             1 for row in rows if permanent_subject_exclusion(row) is not None
@@ -861,8 +863,9 @@ def run_dcm(
             "inputBoundaryHash": input_boundary_hash,
             "cardSize": 0, "modeledCardSize": 0, "playable": 0,
             "productionCertified": False, "notProductionRootCertified": True,
+            "forecastExecuted": False,
             "productionRootCertification": NOT_PRODUCTION_ROOT_CERTIFIED,
-            "executionMode": "RESEARCHED_MODELED",
+            "executionMode": "ACCOUNT_ONLY_NO_FORECAST",
             "emptyCardReason": EMPTY_ACCOUNT_ONLY,
             "productionEmptyCardReason": EMPTY_ROOT_NOT_CERTIFIED,
         }
@@ -917,6 +920,58 @@ def run_dcm(
             json.dumps(coverage_report(planned["requests"], offer_recovery["claims"]), indent=2, sort_keys=True) + "\n",
             encoding="utf-8",
         )
+        # The account-only contract has already frozen and classified every
+        # offer. A full Research OS graph expands each offer into several
+        # nodes and edges; on a six-figure board it can exceed the process
+        # budget before the accounting checkpoint is committed. Preserve the
+        # completed accounting and require a bounded research partition.
+        if len(rows) > 200_000:
+            deferred = {
+                "schema": "pillars_dcm.research_graph_deferral.v1",
+                "status": "DEFERRED_RESOURCE_BUDGET",
+                "code": "RESEARCH_GRAPH_REQUIRES_PARTITION",
+                "offerCount": len(rows),
+                "requestCount": len(planned["requests"]),
+                "accountGraphOfferBudget": 200_000,
+                "productionSelectionPermitted": False,
+            }
+            deferred["contentHash"] = content_hash(deferred)
+            (dest / "research_os_deferred.json").write_text(
+                json.dumps(deferred, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+            )
+            run_state = "ACCOUNTED_RESEARCH_GRAPH_DEFERRED"
+            freeze["runState"] = run_state
+            freeze["researchGraph"] = deferred["code"]
+            (dest / "freeze.json").write_text(json.dumps(freeze, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+            ck = write_checkpoint(dest / "checkpoint.json", {
+                "runId": run_id, "dcmVersion": SOFTWARE, "learningRevision": LEARNING_REVISION,
+                "forecastCutoff": forecast_cutoff, "artifactRoot": str(dest),
+                "researchShadow": research_shadow,
+                "completedStages": ["BOARD_FREEZE", "IDENTITY", "ACCOUNT", "RESEARCH_PLAN"],
+                "pending": ["RESEARCH_GRAPH"], "nextDeterministicAction": "none",
+                "rowCounts": counts, "modelConfigHash": content_hash(model_config),
+                "calibrationStateHash": calibration_state.get("contentHash"),
+                "mountStateHash": content_hash(mount),
+                "schemaStateHash": content_hash(schema_root),
+                "inputBoundaryHash": input_boundary_hash,
+            })
+            capability_manifest["gates"] = {
+                "softwareClosed": "PASS" if capability_manifest.get("runtime", {}).get("pytestDiscoverable") else "EXTERNAL_BLOCKED",
+                "harAccountingAccepted": "PASS",
+                "operationalAcceptedWithCurrentHar": "PARTIAL_RESEARCH_GRAPH_DEFERRED",
+                "predictiveCertified": "FAIL_PREDICTIVE_CLAIM_NONE",
+                "productionRootCertified": "FAIL",
+            }
+            capability_manifest["contentHash"] = content_hash({
+                key: value for key, value in capability_manifest.items() if key != "contentHash"
+            })
+            persist_capability_manifest(dest, capability_manifest)
+            return _finalize_archive(
+                dest,
+                {"run_id": run_id, "dest": str(dest), "runState": run_state, "checkpoint": ck,
+                 "integrity": freeze, "board": board},
+                archive_github=archive_github, archive_push=archive_push, repo_root=repo_root,
+            )
         os_art = prepare_cfb_research_os(
             dest,
             rows,
@@ -962,8 +1017,13 @@ def run_dcm(
             "runId": run_id, "dcmVersion": SOFTWARE, "learningRevision": LEARNING_REVISION,
             "forecastCutoff": forecast_cutoff, "artifactRoot": str(dest),
             "researchShadow": research_shadow,
-            "completedStages": ["BOARD_FREEZE", "IDENTITY", "ACCOUNT", "RESEARCH_PLAN"],
-            "pending": [], "nextDeterministicAction": "none", "rowCounts": counts,
+            "completedStages": [
+                "BOARD_FREEZE", "IDENTITY", "ACCOUNT", "RESEARCH_PLAN",
+                "RESEARCH_OS", "POPULATION", "PACKETS_AND_GRAPHS", "FEATURE_STORE",
+            ],
+            "pending": [],
+            "notRunStages": ["FORECAST", "RANKING", "SETTLEMENT"],
+            "nextDeterministicAction": "none", "rowCounts": counts,
             "modelConfigHash": content_hash(model_config),
             "calibrationStateHash": calibration_state.get("contentHash"),
             "mountStateHash": content_hash(mount),

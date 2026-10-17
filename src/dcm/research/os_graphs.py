@@ -8,12 +8,16 @@ replace EvidenceGraph. AcquisitionActionGraph is built separately in
 from __future__ import annotations
 
 from collections import defaultdict
+import gc
+import json
+import os
+from pathlib import Path
 from typing import Any, Mapping
 
 from dcm.algorithms.graph import build_csr, cycles, dag_or_reject, hypergraph_from_bundles
 from dcm.algorithms.grouping import UnionFind, composite_group, connected_components
 from dcm.algorithms.telemetry import AlgorithmTelemetry
-from dcm.contracts.hashes import content_hash
+from dcm.contracts.hashes import content_hash, content_hash_streamed
 from dcm.research.indexes import BoardIndexes
 from dcm.research.scopes import SCOPE_RANK, canonical_scope
 from dcm.sports.football.research_requirements import MARKET_REQUIREMENTS, market_requirements
@@ -188,7 +192,8 @@ def build_board_graph(
         },
         "cfbOfferIds": list(indexes.by_league.get("CFB") or []),
     }
-    body["contentHash"] = content_hash({k: v for k, v in body.items() if k != "contentHash"})
+    hash_input = {k: v for k, v in body.items() if k != "contentHash"}
+    body["contentHash"] = (content_hash_streamed if len(rows) > 50_000 else content_hash)(hash_input)
     return body
 
 
@@ -246,7 +251,8 @@ def build_market_demand_graph(
             n["market"] for n in nodes if n.get("guardedLaunchSupported") and n.get("league") in {"CFB", "NFL"}
         ],
     }
-    body["contentHash"] = content_hash({k: v for k, v in body.items() if k != "contentHash"})
+    hash_input = {k: v for k, v in body.items() if k != "contentHash"}
+    body["contentHash"] = (content_hash_streamed if len(rows) > 50_000 else content_hash)(hash_input)
     return body
 
 
@@ -265,6 +271,9 @@ def build_requirement_graph(
     reverse_req_claims: dict[str, list[str]] = {}
     reverse_claim_reqs: dict[str, list[str]] = defaultdict(list)
     by_scope: dict[str, list[str]] = defaultdict(list)
+    by_scope_id: dict[tuple[str, str], list[str]] = defaultdict(list)
+    parent_by_offer: dict[tuple[str, str], set[str]] = defaultdict(set)
+    parent_by_claim: dict[tuple[str, str], set[str]] = defaultdict(set)
 
     for rec in reqs:
         rid = str(rec.get("request_id") or "")
@@ -293,9 +302,20 @@ def build_requirement_graph(
         for claim_id in reverse_req_claims[rid]:
             reverse_claim_reqs[claim_id].append(rid)
         by_scope[scope].append(nid)
+        by_scope_id[(scope, str(rec.get("scope_id") or ""))].append(nid)
+        if reverse_req_offers[rid]:
+            for oid in reverse_req_offers[rid]:
+                parent_by_offer[(scope, oid)].add(nid)
+        if reverse_req_claims[rid]:
+            for claim_id in reverse_req_claims[rid]:
+                parent_by_claim[(scope, claim_id)].add(nid)
 
     # Prerequisite edges by scope, bound to matching event/affiliation where possible.
     scope_to_nodes = by_scope
+    scope_position = {
+        scope: {nid: index for index, nid in enumerate(nids)}
+        for scope, nids in scope_to_nodes.items()
+    }
     for rec in reqs:
         rid = str(rec.get("request_id") or "")
         scope = canonical_scope(str(rec.get("scope") or ""))
@@ -305,7 +325,24 @@ def build_requirement_graph(
         child_offers = set(rec.get("dependent_offer_ids") or [])
         child_claims = set(rec.get("dependent_claim_ids") or [])
         for parent_scope in SCOPE_PREREQS.get(scope, ()):
-            for parent_nid in scope_to_nodes.get(parent_scope, ()):
+            if parent_scope in {"EVENT", "ENVIRONMENT"} and event_id:
+                parent_ids = list(by_scope_id.get((parent_scope, event_id), ()))
+                parent_ids.extend(by_scope_id.get((parent_scope, f"env:{event_id}"), ()))
+            elif parent_scope in {"SPORT", "COMPETITION", "EVENT", "ENVIRONMENT"}:
+                parent_ids = scope_to_nodes.get(parent_scope, ())
+            else:
+                # An unbound parent is not a prerequisite for every offer.
+                # Require an exact shared offer or claim before considering
+                # the parent's other contract checks.
+                candidates: set[str] = set()
+                if child_offers:
+                    for oid in child_offers:
+                        candidates.update(parent_by_offer.get((parent_scope, oid), ()))
+                if child_claims:
+                    for claim_id in child_claims:
+                        candidates.update(parent_by_claim.get((parent_scope, claim_id), ()))
+                parent_ids = sorted(candidates, key=scope_position.get(parent_scope, {}).__getitem__)
+            for parent_nid in parent_ids:
                 parent = nodes[parent_nid]
                 parent_sid = str(parent.get("scopeId") or "")
                 parent_offers = set(parent.get("dependentOfferIds") or [])
@@ -353,7 +390,8 @@ def build_requirement_graph(
         },
         "requests": reqs,
     }
-    body["contentHash"] = content_hash({k: v for k, v in body.items() if k != "contentHash"})
+    hash_input = {k: v for k, v in body.items() if k != "contentHash"}
+    body["contentHash"] = (content_hash_streamed if len(rows) > 50_000 else content_hash)(hash_input)
     return body
 
 
@@ -364,20 +402,44 @@ def persist_research_os_graphs(
     *,
     telemetry: AlgorithmTelemetry | None = None,
     indexes: BoardIndexes | None = None,
+    compact_return: bool = False,
 ) -> dict[str, Any]:
-    from pathlib import Path
-    import json
-
     dest = Path(dest)
     dest.mkdir(parents=True, exist_ok=True)
     tel = telemetry or AlgorithmTelemetry()
     indexes = indexes or BoardIndexes(rows, telemetry=tel)
-    board_graph = build_board_graph(rows, indexes=indexes, telemetry=tel)
-    demand = build_market_demand_graph(rows, telemetry=tel)
-    req_graph = build_requirement_graph(rows, requests, telemetry=tel)
-    (dest / "board_graph.json").write_text(json.dumps(board_graph, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    (dest / "market_demand_graph.json").write_text(json.dumps(demand, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    (dest / "requirement_graph.json").write_text(json.dumps(req_graph, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    def persist(name: str, graph: dict[str, Any]) -> dict[str, Any]:
+        path = dest / f"{name}.json"
+        temp = path.with_name(f".{path.name}.{os.getpid()}.tmp")
+        try:
+            with temp.open("w", encoding="utf-8") as handle:
+                json.dump(graph, handle, indent=2, sort_keys=True)
+                handle.write("\n")
+                handle.flush()
+                os.fsync(handle.fileno())
+            os.replace(temp, path)
+        finally:
+            temp.unlink(missing_ok=True)
+        if not compact_return:
+            return graph
+        summary = {
+            key: value for key, value in graph.items()
+            if key in {"schema", "contentHash", "nodeCount", "edgeCount", "definitionCount", "topoOk", "cycleCount"}
+        }
+        summary["materializedIn"] = path.name
+        summary["summaryHash"] = content_hash(summary)
+        (dest / f"{name}.summary.json").write_text(
+            json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+        )
+        return summary
+
+    board_graph = persist("board_graph", build_board_graph(rows, indexes=indexes, telemetry=tel))
+    if compact_return:
+        gc.collect()
+    demand = persist("market_demand_graph", build_market_demand_graph(rows, telemetry=tel))
+    if compact_return:
+        gc.collect()
+    req_graph = persist("requirement_graph", build_requirement_graph(rows, requests, telemetry=tel))
     return {
         "boardGraph": board_graph,
         "marketDemandGraph": demand,

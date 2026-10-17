@@ -86,6 +86,22 @@ def _terminate(proc: subprocess.Popen[bytes]) -> None:
         proc.wait()
 
 
+def _child_error_code(path: Path) -> str | None:
+    """Classify bounded private stderr without copying it into a receipt."""
+    try:
+        with path.open("rb") as handle:
+            handle.seek(0, os.SEEK_END)
+            handle.seek(max(0, handle.tell() - 8192))
+            tail = handle.read().decode("utf-8", errors="replace")
+    except OSError:
+        return None
+    if "MemoryError" in tail:
+        return "RUN_CHILD_MEMORY_ERROR"
+    if "No space left on device" in tail or "Errno 28" in tail:
+        return "RUN_CHILD_DISK_FULL"
+    return None
+
+
 def _terminal_receipts_valid(root: Path, *, not_before_ns: int) -> bool:
     paths = (root / "run_manifest.json", root / "execution_receipt.json")
     try:
@@ -192,7 +208,7 @@ def supervise_slate(
         stage = json.loads(progress_path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
         stage = {}
-    code = reason or (
+    code = reason or _child_error_code(err_path) or (
         "RUN_OUTPUT_INCOMPLETE" if proc.returncode == 0 else
         "RUN_CHILD_KILLED" if proc.returncode and proc.returncode < 0 else "RUN_CHILD_FAILED"
     )

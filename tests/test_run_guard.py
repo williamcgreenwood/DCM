@@ -10,6 +10,14 @@ from dcm.chat.cli import main
 from dcm.contracts.hashes import content_hash
 
 
+def test_guard_classifies_private_resource_errors(tmp_path: Path) -> None:
+    path = tmp_path / "child.stderr"
+    path.write_text("private-source-name\nMemoryError\n")
+    assert run_guard._child_error_code(path) == "RUN_CHILD_MEMORY_ERROR"
+    path.write_text("private-source-name\nOSError: [Errno 28] No space left on device\n")
+    assert run_guard._child_error_code(path) == "RUN_CHILD_DISK_FULL"
+
+
 def test_guard_records_child_failure_without_logs(tmp_path: Path, monkeypatch) -> None:
     real_popen = subprocess.Popen
 
